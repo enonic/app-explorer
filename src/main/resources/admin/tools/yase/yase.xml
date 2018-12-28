@@ -1,0 +1,9 @@
+<?xml version="1.0" standalone="yes"?>
+<tool xmlns="urn:enonic:xp:model:1.0">
+	<display-name>YASE</display-name>
+	<description>Collections, Fields, Tags and Thesauri</description>
+	<allow>
+		<principal>role:com.enonic.admin.yase.admin</principal>
+		<!--principal>role:system.admin</principal-->
+	</allow>
+</tool>
