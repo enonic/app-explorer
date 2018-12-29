@@ -12,8 +12,12 @@ import {
 	TOOL_PATH
 } from '/lib/enonic/yase/admin/constants';
 import {toolPage} from '/lib/enonic/yase/admin/routes/toolPage';
+
 import {handleFieldsPost} from '/lib/enonic/yase/admin/routes/fields/handleFieldsPost';
 import {fieldsPage} from '/lib/enonic/yase/admin/routes/fields/fieldsPage';
+
+import {handleTagsPost} from '/lib/enonic/yase/admin/routes/tags/handleTagsPost';
+import {tagsPage} from '/lib/enonic/yase/admin/routes/tags/tagsPage';
 
 
 const router = newRouter();
@@ -30,6 +34,11 @@ router.filter((req/*, next*/) => {
 	if (relPath.startsWith('/fields')) {
 		if (req.method === 'POST') { return handleFieldsPost(req); }
 		return fieldsPage(req);
+	}
+
+	if (relPath.startsWith('/tags')) {
+		if (req.method === 'POST') { return handleTagsPost(req); }
+		return tagsPage(req);
 	}
 
 	return toolPage(req);
