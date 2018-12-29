@@ -1,8 +1,39 @@
+//──────────────────────────────────────────────────────────────────────────────
+// Enonic XP libs (included in jar via gradle dependencies)
+//──────────────────────────────────────────────────────────────────────────────
+import {getToolUrl} from '/lib/xp/admin';
 import {sanitize} from '/lib/xp/common';
 
 
+//──────────────────────────────────────────────────────────────────────────────
+// Admin tool
+//──────────────────────────────────────────────────────────────────────────────
+export const TOOL_PATH = getToolUrl(app.name, 'yase');
+
+
+//──────────────────────────────────────────────────────────────────────────────
+// Node types
+//──────────────────────────────────────────────────────────────────────────────
+export const NT_COLLECTION = `${app.name}:collection`;
+export const NT_FIELD = `${app.name}:field`;
+export const NT_SYNONYM = `${app.name}:synonym`;
+export const NT_TAG = `${app.name}:tag`;
+export const NT_THESAURUS = `${app.name}:thesaurus`;
+
+
+//──────────────────────────────────────────────────────────────────────────────
+// Return types
+//──────────────────────────────────────────────────────────────────────────────
+export const RT_JSON = 'text/json;charset=utf-8';
+export const RT_HTML = 'text/html;charset=utf-8';
+
+
+//──────────────────────────────────────────────────────────────────────────────
+// Repo
+//──────────────────────────────────────────────────────────────────────────────
 export const BRANCH_ID = 'master';
 export const REPO_ID = sanitize(app.name);
+
 
 //──────────────────────────────────────────────────────────────────────────────
 // Roles
@@ -10,6 +41,7 @@ export const REPO_ID = sanitize(app.name);
 export const ROLE_YASE_ADMIN = sanitize(`${app.name}.admin`);
 export const ROLE_YASE_READ = sanitize(`${app.name}.read`);
 export const ROLE_YASE_WRITE = sanitize(`${app.name}.write`);
+
 
 //──────────────────────────────────────────────────────────────────────────────
 // User
