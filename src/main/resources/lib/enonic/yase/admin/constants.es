@@ -16,6 +16,7 @@ export const TOOL_PATH = getToolUrl(app.name, 'yase');
 //──────────────────────────────────────────────────────────────────────────────
 export const NT_COLLECTION = `${app.name}:collection`;
 export const NT_FIELD = `${app.name}:field`;
+export const NT_FOLDER = `${app.name}:folder`;
 export const NT_SYNONYM = `${app.name}:synonym`;
 export const NT_TAG = `${app.name}:tag`;
 export const NT_THESAURUS = `${app.name}:thesaurus`;
