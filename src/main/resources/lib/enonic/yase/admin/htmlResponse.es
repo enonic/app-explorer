@@ -6,11 +6,12 @@ import {assetUrl} from '/lib/xp/portal';
 export function htmlResponse({
 	main = '',
 	messages = [],
-	path = TOOL_PATH,
+	toolPath = TOOL_PATH,
+	path = toolPath,
 	title = '',
 	status = 200
 } = {}) {
-	const relPath = path.replace(TOOL_PATH, ''); //log.info(toStr({relPath}));
+	const relPath = path.replace(toolPath, ''); //log.info(toStr({relPath}));
 	const preTitle = title ? `${title} - ` : '';
 	return {
 		body: `<html>
@@ -21,11 +22,11 @@ export function htmlResponse({
 	<body>
 		<nav>
 			<ul>
-				<li><a class="${relPath === '' ? 'current' : ''}" href="${TOOL_PATH}">YASE</a></li>
-				<li><a class="${relPath.startsWith('/collections') ? 'current' : ''}" href="${TOOL_PATH}/collections">Collections</a></li>
-				<li><a class="${relPath.startsWith('/fields') ? 'current' : ''}" href="${TOOL_PATH}/fields">Fields</a></li>
-				<li><a class="${relPath.startsWith('/tags') ? 'current' : ''}" href="${TOOL_PATH}/tags">Tags</a></li>
-				<li><a class="${relPath.startsWith('/thesauri') ? 'current' : ''}" href="${TOOL_PATH}/thesauri">Thesauri</a></li>
+				<li><a class="${relPath === '' ? 'current' : ''}" href="${toolPath}">YASE</a></li>
+				<li><a class="${relPath.startsWith('/collections') ? 'current' : ''}" href="${toolPath}/collections">Collections</a></li>
+				<li><a class="${relPath.startsWith('/fields') ? 'current' : ''}" href="${toolPath}/fields">Fields</a></li>
+				<li><a class="${relPath.startsWith('/tags') ? 'current' : ''}" href="${toolPath}/tags">Tags</a></li>
+				<li><a class="${relPath.startsWith('/thesauri') ? 'current' : ''}" href="${toolPath}/thesauri">Thesauri</a></li>
 			</ul>
 		</nav>
 		${messages.length ? `<ul class="${status === 200 ? 'success' : 'error'}">${messages.map(m => `<li>${m}</li>`)}</ul>` : ''}

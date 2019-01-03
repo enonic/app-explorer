@@ -35,7 +35,7 @@ export function tagsPage(
 	{
 		params: {
 			_parentPath = '/tags'
-		},
+		} = {},
 		path
 	},
 	{
@@ -48,10 +48,13 @@ export function tagsPage(
 
 	const fieldRows = getTags().hits.map(({
 		_path
-	}) => `<tr>
-		<td>${_path.replace(/^\/tags/, '')}</td>
-		<td><button onClick="document.getElementById('_parentPath')">Create child tag</button></td>
-	</tr>`).join('\n');
+	}) => {
+		const tagPath = _path.replace(/^\/tags\//, '');
+		return `<tr>
+		<td>${tagPath}</td>
+		<td><button onClick="document.getElementById('_parentPath').setAttribute('value', '/tags/${tagPath}')">Create child tag</button></td>
+	</tr>`;
+	}).join('\n');
 
 	return htmlResponse({
 		main: `<form action="${TOOL_PATH}/tags" autocomplete="off" method="POST">
