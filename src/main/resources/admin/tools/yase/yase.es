@@ -11,20 +11,20 @@ import {hasRole} from '/lib/xp/auth';
 import {
 	ROLE_YASE_ADMIN,
 	TOOL_PATH
-} from '/lib/enonic/yase/admin/constants';
-import {toolPage} from '/lib/enonic/yase/admin/routes/toolPage';
+} from '/lib/enonic/yase/constants';
+import {toolPage} from '/lib/enonic/yase/admin/toolPage';
 
-import {handleFieldsPost} from '/lib/enonic/yase/admin/routes/fields/handleFieldsPost';
-import {fieldsPage} from '/lib/enonic/yase/admin/routes/fields/fieldsPage';
+import {handleFieldsPost} from '/lib/enonic/yase/admin/fields/handleFieldsPost';
+import {fieldsPage} from '/lib/enonic/yase/admin/fields/fieldsPage';
 
-import {handleTagsPost} from '/lib/enonic/yase/admin/routes/tags/handleTagsPost';
-import {tagsPage} from '/lib/enonic/yase/admin/routes/tags/tagsPage';
+import {handleTagsPost} from '/lib/enonic/yase/admin/tags/handleTagsPost';
+import {tagsPage} from '/lib/enonic/yase/admin/tags/tagsPage';
 
-import {handleThesauriPost} from '/lib/enonic/yase/admin/routes/thesauri/handleThesauriPost';
-import {handleThesaurusPost} from '/lib/enonic/yase/admin/routes/thesauri/handleThesaurusPost';
-import {listThesauriPage} from '/lib/enonic/yase/admin/routes/thesauri/listThesauriPage';
-import {thesaurusPage} from '/lib/enonic/yase/admin/routes/thesauri/thesaurusPage';
-import {editSynonymPage} from '/lib/enonic/yase/admin/routes/thesauri/editSynonymPage';
+import {handleThesauriPost} from '/lib/enonic/yase/admin/thesauri/handleThesauriPost';
+import {handleThesaurusPost} from '/lib/enonic/yase/admin/thesauri/handleThesaurusPost';
+import {listThesauriPage} from '/lib/enonic/yase/admin/thesauri/listThesauriPage';
+import {thesaurusPage} from '/lib/enonic/yase/admin/thesauri/thesaurusPage';
+import {editSynonymPage} from '/lib/enonic/yase/admin/thesauri/editSynonymPage';
 
 
 const router = newRouter();

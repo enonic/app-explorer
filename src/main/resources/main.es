@@ -14,10 +14,10 @@ import {
 	USER_YASE_JOB_RUNNER_NAME,
 	USER_YASE_JOB_RUNNER_USERSTORE,
 	USER_YASE_JOB_RUNNER_KEY
-} from '/lib/enonic/yase/admin/constants';
-import {ignoreErrors} from '/lib/enonic/yase/admin/ignoreErrors';
-import {initRepo} from '/lib/enonic/yase/admin/initRepo';
-import {runAsSu} from '/lib/enonic/yase/admin/runAsSu';
+} from '/lib/enonic/yase/constants';
+import {ignoreErrors} from '/lib/enonic/yase/ignoreErrors';
+import {initRepo} from '/lib/enonic/yase/initRepo';
+import {runAsSu} from '/lib/enonic/yase/runAsSu';
 
 
 //──────────────────────────────────────────────────────────────────────────────
