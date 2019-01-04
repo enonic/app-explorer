@@ -22,8 +22,8 @@ function getThesauri() {
 	};
 	const queryRes = connection.query(queryParams);
 	const thesauri = queryRes.hits.map((hit) => {
-		const {_name: name, displayName} = connection.get(hit.id);
-		return {displayName, name};
+		const {_name: name, description = '', displayName} = connection.get(hit.id);
+		return {description, displayName, name};
 	});
 	return thesauri;
 }
@@ -36,12 +36,16 @@ export function listThesauriPage(
 	return htmlResponse({
 		main: `<form action="${TOOL_PATH}/thesauri" autocomplete="off" method="POST">
 	<fieldset>
-		<legend>New thesaurus</legend>
+		<legend>Thesaurus</legend>
 		<label>
 			<span>Name</span>
 			<input name="name" type="text"/>
 		</label>
-		<button type="submit">Add thesaurus</button>
+		<label>
+			<span>Description</span>
+			<input name="description" type="text"/>
+		</label>
+		<button type="submit">Save thesaurus</button>
 	</fieldset>
 </form>
 <table>
@@ -49,6 +53,7 @@ export function listThesauriPage(
 		<tr>
 			<th>Name</th>
 			<th>Display name</th>
+			<th>Description</th>
 			<th>Synonyms count</th>
 		</tr>
 	</thead>
@@ -56,7 +61,9 @@ export function listThesauriPage(
 		${getThesauri().map(t => `<tr>
 			<td><a href="${TOOL_PATH}/thesauri/${t.name}">${t.name}</a></td>
 			<td>${t.displayName}</td>
-		</tr>`)}
+			<td>${t.description}</td>
+			<td></td>
+		</tr>`).join('\n')}
 	</tbody>
 </table>`,
 		messages,

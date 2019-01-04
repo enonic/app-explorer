@@ -25,8 +25,12 @@ function getThesaurus({name}) {
 	};
 	const queryRes = connection.query(queryParams);
 	const thesaurus = queryRes.hits.map((hit) => {
-		const {from, to} = connection.get(hit.id);
-		return {from, to};
+		const {
+			_name, displayName, from, to
+		} = connection.get(hit.id);
+		return {
+			displayName, from, id: hit.id, name: _name, to
+		};
 	});
 	return thesaurus;
 }
@@ -39,6 +43,7 @@ export function thesaurusPage({
 	status
 } = {}) {
 	const name = path.replace(`${TOOL_PATH}/thesauri/`, '');
+	const fromInput = '<input class="block" name="from" type="text"/>';
 	const toInput = '<input class="block" name="to" type="text"/>';
 	return htmlResponse({
 		main: `<h1>${name}</h1>
@@ -47,7 +52,8 @@ export function thesaurusPage({
 		<legend>Synonym</legend>
 		<label>
 			<span>From</span>
-			<input name="from" type="text"/>
+			${fromInput}
+			<button type="button" onClick="${insertAdjacentHTML(fromInput)}">+</button>
 		</label>
 		<label>
 			<span>To</span>
@@ -60,15 +66,18 @@ export function thesaurusPage({
 <table>
 	<thead>
 		<tr>
+			<th>Display name</th>
 			<th>From</th>
 			<th>To</th>
 		</tr>
 	</thead>
 	<tbody>
 		${getThesaurus({name}).map(s => `<tr>
-	<td>${s.from}</td>
+	<td>${s.displayName}</td>
+	<td>${forceArray(s.from).join('<br/>')}</td>
 	<td>${forceArray(s.to).join('<br/>')}</td>
-</tr>`)}
+	<td><a href="${TOOL_PATH}/thesauri/${name}/${s.id}">Edit</a></td>
+</tr>`).join('\n')}
 	</tbody>
 </table>`,
 		messages,

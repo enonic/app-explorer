@@ -33,7 +33,9 @@ export function createOrModifyNode({
 	_parentPath = '/',
 	//_path = '/',
 	_name,
-	displayName = _name,
+	displayName = Array.isArray(_name)
+		? _name.join(', ')
+		: _name,
 	...rest
 } = {}) {
 	/*log.info(toStr({

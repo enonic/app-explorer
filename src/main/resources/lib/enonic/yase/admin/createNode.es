@@ -40,7 +40,9 @@ export function createNode({
 	// Our own standard properties (cannot start with underscore)
 	creator = __user.key,
 	//createdTime,
-	displayName = _name,
+	displayName = Array.isArray(_name)
+		? _name.join(', ')
+		: _name,
 	//type,
 
 	...rest

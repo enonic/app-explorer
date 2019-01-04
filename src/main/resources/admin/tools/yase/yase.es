@@ -1,6 +1,7 @@
 //──────────────────────────────────────────────────────────────────────────────
 // Enonic XP libs (included in jar via gradle dependencies)
 //──────────────────────────────────────────────────────────────────────────────
+//import {toStr} from '/lib/enonic/util';
 import newRouter from '/lib/router';
 import {hasRole} from '/lib/xp/auth';
 
@@ -23,6 +24,7 @@ import {handleThesauriPost} from '/lib/enonic/yase/admin/routes/thesauri/handleT
 import {handleThesaurusPost} from '/lib/enonic/yase/admin/routes/thesauri/handleThesaurusPost';
 import {listThesauriPage} from '/lib/enonic/yase/admin/routes/thesauri/listThesauriPage';
 import {thesaurusPage} from '/lib/enonic/yase/admin/routes/thesauri/thesaurusPage';
+import {editSynonymPage} from '/lib/enonic/yase/admin/routes/thesauri/editSynonymPage';
 
 
 const router = newRouter();
@@ -36,23 +38,31 @@ router.filter((req/*, next*/) => {
 	const relPath = req.path.replace(TOOL_PATH, ''); //log.info(toStr({relPath}));
 	if (!relPath) { return toolPage(req); }
 
-	if (relPath.startsWith('/fields')) {
+	const pathParts = relPath.match(/[^/]+/g); //log.info(toStr({pathParts}));
+
+	if (pathParts[0] === 'fields') {
 		if (req.method === 'POST') { return handleFieldsPost(req); }
 		return fieldsPage(req);
 	}
 
-	if (relPath.startsWith('/tags')) {
+	if (pathParts[0] === 'tags') {
 		if (req.method === 'POST') { return handleTagsPost(req); }
 		return tagsPage(req);
 	}
 
-	if (relPath.startsWith('/thesauri')) {
-		if (relPath === '/thesauri') {
-			if (req.method === 'POST') { handleThesauriPost(req); }
+	if (pathParts[0] === 'thesauri') {
+		if (pathParts.length === 1) {
+			if (req.method === 'POST') { return handleThesauriPost(req); }
 			return listThesauriPage(req);
 		}
-		if (req.method === 'POST') { handleThesaurusPost(req); }
-		return thesaurusPage(req);
+		//const thesaurusName = pathParts[1]; log.info(toStr({thesaurusName}));
+		if (pathParts.length === 2) {
+			if (req.method === 'POST') { return handleThesaurusPost(req); }
+			return thesaurusPage(req);
+		}
+		//pathParts.length === 3
+		//const synonymId = pathParts[2]; log.info(toStr({synonymId}));
+		return editSynonymPage(req);
 	}
 
 	return toolPage(req);

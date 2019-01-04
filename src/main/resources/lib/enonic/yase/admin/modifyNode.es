@@ -21,11 +21,14 @@ export function modifyNode({
 		repoId: __repoId,
 		branch: __branch
 	}),
+	_id, // So it doesn't end up in rest.
 	_parentPath = '/',
 	_name,
 	sanitizedName = sanitize(_name), // NOTE May already be sanitized
 	key = `${_parentPath}/${sanitizedName}`, // TODO Use path join
-	displayName = _name,
+	displayName = Array.isArray(_name)
+		? _name.join(', ')
+		: _name,
 	...rest
 } = {}) {
 	//log.info(toStr({key, displayName, rest}));
