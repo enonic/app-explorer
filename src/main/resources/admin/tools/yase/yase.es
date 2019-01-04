@@ -19,6 +19,11 @@ import {fieldsPage} from '/lib/enonic/yase/admin/routes/fields/fieldsPage';
 import {handleTagsPost} from '/lib/enonic/yase/admin/routes/tags/handleTagsPost';
 import {tagsPage} from '/lib/enonic/yase/admin/routes/tags/tagsPage';
 
+import {handleThesauriPost} from '/lib/enonic/yase/admin/routes/thesauri/handleThesauriPost';
+import {handleThesaurusPost} from '/lib/enonic/yase/admin/routes/thesauri/handleThesaurusPost';
+import {listThesauriPage} from '/lib/enonic/yase/admin/routes/thesauri/listThesauriPage';
+import {thesaurusPage} from '/lib/enonic/yase/admin/routes/thesauri/thesaurusPage';
+
 
 const router = newRouter();
 
@@ -39,6 +44,15 @@ router.filter((req/*, next*/) => {
 	if (relPath.startsWith('/tags')) {
 		if (req.method === 'POST') { return handleTagsPost(req); }
 		return tagsPage(req);
+	}
+
+	if (relPath.startsWith('/thesauri')) {
+		if (relPath === '/thesauri') {
+			if (req.method === 'POST') { handleThesauriPost(req); }
+			return listThesauriPage(req);
+		}
+		if (req.method === 'POST') { handleThesaurusPost(req); }
+		return thesaurusPage(req);
 	}
 
 	return toolPage(req);
