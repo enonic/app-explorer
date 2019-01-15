@@ -14,7 +14,9 @@ import {
 } from '/lib/enonic/yase/constants';
 import {toolPage} from '/lib/enonic/yase/admin/toolPage';
 
+import {collectionsPage} from '/lib/enonic/yase/admin/collections/collectionsPage';
 import {createOrEditCollectionPage} from '/lib/enonic/yase/admin/collections/createOrEditCollectionPage';
+import {handleCollectionsPost} from '/lib/enonic/yase/admin/collections/handleCollectionsPost';
 
 import {handleFieldsPost} from '/lib/enonic/yase/admin/fields/handleFieldsPost';
 import {fieldsPage} from '/lib/enonic/yase/admin/fields/fieldsPage';
@@ -43,7 +45,11 @@ router.filter((req/*, next*/) => {
 	const pathParts = relPath.match(/[^/]+/g); //log.info(toStr({pathParts}));
 
 	if (pathParts[0] === 'collections') {
-		return createOrEditCollectionPage(req);
+		if (pathParts.length === 2) {
+			return createOrEditCollectionPage(req);
+		}
+		if (req.method === 'POST') { return handleCollectionsPost(req); }
+		return collectionsPage(req);
 	}
 
 	if (pathParts[0] === 'fields') {
