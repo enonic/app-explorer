@@ -31,6 +31,10 @@ import {listThesauriPage} from '/lib/enonic/yase/admin/thesauri/listThesauriPage
 import {thesaurusPage} from '/lib/enonic/yase/admin/thesauri/thesaurusPage';
 import {editSynonymPage} from '/lib/enonic/yase/admin/thesauri/editSynonymPage';
 
+import {interfacesPage} from '/lib/enonic/yase/admin/interfaces/interfacesPage';
+import {createOrEditInterfacePage} from '/lib/enonic/yase/admin/interfaces/createOrEditInterfacePage';
+import {handleInterfacesPost} from '/lib/enonic/yase/admin/interfaces/handleInterfacesPost';
+
 
 const router = newRouter();
 
@@ -79,6 +83,14 @@ router.filter((req/*, next*/) => {
 		//pathParts.length === 3
 		//const synonymId = pathParts[2]; log.info(toStr({synonymId}));
 		return editSynonymPage(req);
+	}
+
+	if (pathParts[0] === 'interfaces') {
+		if (pathParts.length === 2) {
+			return createOrEditInterfacePage(req);
+		}
+		if (req.method === 'POST') { return handleInterfacesPost(req); }
+		return interfacesPage(req);
 	}
 
 	return toolPage(req);
