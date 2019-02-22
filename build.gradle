@@ -46,7 +46,7 @@ dependencies {
 	//include "com.enonic.xp:lib-websocket:${xpVersion}"
 	//include "com.enonic.xp:lib-xslt:${xpVersion}"
 
-	//include 'com.enonic.lib:lib-cache:1.1.0'
+	include 'com.enonic.lib:lib-cache:1.1.0'
 	//include 'com.enonic.lib:lib-guillotine:1.0.1'
 	include 'com.enonic.lib:lib-http-client:1.0.1'
 	include 'com.enonic.lib:lib-router:1.0.0'
