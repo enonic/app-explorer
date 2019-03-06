@@ -4,9 +4,6 @@
 //──────────────────────────────────────────────────────────────────────────────
 import glob from 'glob';
 import path from 'path';
-import CleanWebpackPlugin from 'clean-webpack-plugin';
-import MiniCssExtractPlugin from 'mini-css-extract-plugin';
-import postcssPresetEnv from 'postcss-preset-env';
 import UglifyJsPlugin from 'uglifyjs-webpack-plugin'; // Supports ECMAScript2015
 
 
@@ -132,66 +129,10 @@ const SERVER_JS_CONFIG = {
 //console.log(`SERVER_JS_CONFIG:${JSON.stringify(SERVER_JS_CONFIG, null, 4)}`);
 
 //──────────────────────────────────────────────────────────────────────────────
-// Styling
-//──────────────────────────────────────────────────────────────────────────────
-const STYLE_CONFIG = {
-	context: path.resolve(__dirname, SRC_DIR, 'assets/style'),
-	entry: './index.es',
-	mode: MODE,
-	module: {
-		rules: [{
-			test: /\.sass$/,
-			use: [
-				MiniCssExtractPlugin.loader,
-				{
-					loader: 'css-loader', // translates CSS into CommonJS
-					options: { importLoaders: 1 }
-				}, {
-					loader: 'postcss-loader',
-					options: {
-						ident: 'postcss',
-						plugins: () => [
-							postcssPresetEnv(/* options */)
-						]
-					}
-				},
-				'sass-loader' // compiles Sass to CSS
-			]
-		}, {
-			test: /\.svg/,
-			use: {
-				loader: 'svg-url-loader',
-				options: {}
-			}
-		}, ES_RULE]
-	}, // module
-	output: {
-		path: path.join(__dirname, '.build')
-	},
-	plugins: [
-		new CleanWebpackPlugin(
-			path.join(__dirname, '.build'),
-			{
-				verbose: true
-			}
-		),
-		new MiniCssExtractPlugin({
-			filename: `../${DST_DIR}/assets/style.css`
-		})
-	],
-	resolve: {
-		extensions: ['.sass', '.scss', '.less', '.styl', '.css']
-	},
-	stats
-};
-//console.log(`STYLE_CONFIG:${JSON.stringify(STYLE_CONFIG, null, 4)}`);
-
-//──────────────────────────────────────────────────────────────────────────────
 // Exports
 //──────────────────────────────────────────────────────────────────────────────
 const WEBPACK_CONFIG = [
-	SERVER_JS_CONFIG,
-	STYLE_CONFIG
+	SERVER_JS_CONFIG
 ];
 
 //console.log(`WEBPACK_CONFIG:${JSON.stringify(WEBPACK_CONFIG, null, 4)}`);
