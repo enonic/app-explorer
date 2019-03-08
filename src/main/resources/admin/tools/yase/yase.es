@@ -1,7 +1,7 @@
 //──────────────────────────────────────────────────────────────────────────────
 // Enonic XP libs (included in jar via gradle dependencies)
 //──────────────────────────────────────────────────────────────────────────────
-//import {toStr} from '/lib/enonic/util';
+import {toStr} from '/lib/enonic/util';
 import newRouter from '/lib/router';
 import {hasRole} from '/lib/xp/auth';
 
@@ -19,7 +19,9 @@ import {createOrEditCollectionPage} from '/lib/enonic/yase/admin/collections/cre
 import {handleCollectionAction} from '/lib/enonic/yase/admin/collections/handleCollectionAction';
 import {handleCollectionsPost} from '/lib/enonic/yase/admin/collections/handleCollectionsPost';
 
+import {createOrEditFieldPage} from '/lib/enonic/yase/admin/fields/createOrEditFieldPage';
 import {handleFieldsPost} from '/lib/enonic/yase/admin/fields/handleFieldsPost';
+import {handleFieldDelete} from '/lib/enonic/yase/admin/fields/handleFieldDelete';
 import {fieldsPage} from '/lib/enonic/yase/admin/fields/fieldsPage';
 
 import {handleTagsPost} from '/lib/enonic/yase/admin/tags/handleTagsPost';
@@ -44,10 +46,13 @@ const router = newRouter();
 //──────────────────────────────────────────────────────────────────────────────
 router.filter((req/*, next*/) => {
 	if (!hasRole(ROLE_YASE_ADMIN)) { return { status: 401 }; }
+	//log.info(toStr({method: req.method})); // form method only supports get and post
+
 	const relPath = req.path.replace(TOOL_PATH, ''); //log.info(toStr({relPath}));
 	if (!relPath) { return toolPage(req); }
 
 	const pathParts = relPath.match(/[^/]+/g); //log.info(toStr({pathParts}));
+
 
 	if (pathParts[0] === 'collections') {
 		if (pathParts.length === 3) {
@@ -61,6 +66,12 @@ router.filter((req/*, next*/) => {
 	}
 
 	if (pathParts[0] === 'fields') {
+		if (pathParts.length === 3 && pathParts[2] === 'delete') {
+			return handleFieldDelete(req);
+		}
+		if (pathParts.length === 2) {
+			return createOrEditFieldPage(req);
+		}
 		if (req.method === 'POST') { return handleFieldsPost(req); }
 		return fieldsPage(req);
 	}
