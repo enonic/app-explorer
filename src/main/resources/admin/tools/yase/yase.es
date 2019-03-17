@@ -24,6 +24,8 @@ import {handleFieldsPost} from '/lib/enonic/yase/admin/fields/handleFieldsPost';
 import {handleFieldDelete} from '/lib/enonic/yase/admin/fields/handleFieldDelete';
 import {fieldsPage} from '/lib/enonic/yase/admin/fields/fieldsPage';
 
+import {createOrEditTagPage} from '/lib/enonic/yase/admin/tags/createOrEditTagPage';
+import {handleTagDelete} from '/lib/enonic/yase/admin/tags/handleTagDelete';
 import {handleTagsPost} from '/lib/enonic/yase/admin/tags/handleTagsPost';
 import {tagsPage} from '/lib/enonic/yase/admin/tags/tagsPage';
 
@@ -77,6 +79,12 @@ router.filter((req/*, next*/) => {
 	}
 
 	if (pathParts[0] === 'tags') {
+		if (pathParts.length === 3 && pathParts[2] === 'delete') {
+			return handleTagDelete(req);
+		}
+		if (pathParts.length === 2) {
+			return createOrEditTagPage(req);
+		}
 		if (req.method === 'POST') { return handleTagsPost(req); }
 		return tagsPage(req);
 	}
