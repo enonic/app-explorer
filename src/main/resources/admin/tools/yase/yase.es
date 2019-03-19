@@ -16,6 +16,7 @@ import {toolPage} from '/lib/enonic/yase/admin/toolPage';
 
 import {collectionsPage} from '/lib/enonic/yase/admin/collections/collectionsPage';
 import {createOrEditCollectionPage} from '/lib/enonic/yase/admin/collections/createOrEditCollectionPage';
+import {deleteCollectionPage} from '/lib/enonic/yase/admin/collections/deleteCollectionPage';
 import {handleCollectionAction} from '/lib/enonic/yase/admin/collections/handleCollectionAction';
 import {handleCollectionsPost} from '/lib/enonic/yase/admin/collections/handleCollectionsPost';
 
@@ -58,7 +59,10 @@ router.filter((req/*, next*/) => {
 
 	if (pathParts[0] === 'collections') {
 		if (pathParts.length === 3) {
-			return handleCollectionAction(req);
+			if (req.method === 'POST') {
+				return handleCollectionAction(req);
+			}
+			return deleteCollectionPage(req);
 		}
 		if (pathParts.length === 2) {
 			return createOrEditCollectionPage(req);
