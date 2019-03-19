@@ -21,8 +21,8 @@ import {handleCollectionAction} from '/lib/enonic/yase/admin/collections/handleC
 import {handleCollectionsPost} from '/lib/enonic/yase/admin/collections/handleCollectionsPost';
 
 import {createOrEditFieldPage} from '/lib/enonic/yase/admin/fields/createOrEditFieldPage';
+import {createOrEditValuePage} from '/lib/enonic/yase/admin/fields/createOrEditValuePage';
 import {handleFieldsPost} from '/lib/enonic/yase/admin/fields/handleFieldsPost';
-import {handleFieldDelete} from '/lib/enonic/yase/admin/fields/handleFieldDelete';
 import {fieldsPage} from '/lib/enonic/yase/admin/fields/fieldsPage';
 
 import {createOrEditTagPage} from '/lib/enonic/yase/admin/tags/createOrEditTagPage';
@@ -72,16 +72,30 @@ router.filter((req/*, next*/) => {
 		return collectionsPage(req);
 	}
 
+	/*──────────────────────────────────────────────────────────────────────────
+	 GET  /fields -> LIST fields
+
+	 POST /fields -> CREATE field (and show list fiels page)
+	 GET  /fields/fieldName -> EDIT field
+	 POST /fields/fieldName/update -> UPDATE field (and show list fiels page)
+	 POST /fields/fieldName/delete -> DELETE field (and show list fiels page)
+
+	 POST /fields/fieldName/values -> CREATE value (and show edit field page)
+	 GET  /fields/fieldName/values/valueName -> EDIT value
+	 POST /fields/fieldName/values/valueName/update -> UPDATE value (and show edit field page)
+	 POST /fields/fieldName/values/valueName/delete -> DELETE value (and show edit field page)
+	──────────────────────────────────────────────────────────────────────────*/
 	if (pathParts[0] === 'fields') {
-		if (pathParts.length === 3 && pathParts[2] === 'delete') {
-			return handleFieldDelete(req);
+		if (req.method === 'POST') { return handleFieldsPost(req); }
+		if (pathParts[3]) { // valueName is defined
+			return createOrEditValuePage(req);
 		}
-		if (pathParts.length === 2) {
+		if (pathParts[1]) { // fieldName is defined
 			return createOrEditFieldPage(req);
 		}
-		if (req.method === 'POST') { return handleFieldsPost(req); }
 		return fieldsPage(req);
 	}
+
 
 	if (pathParts[0] === 'tags') {
 		if (pathParts.length === 3 && pathParts[2] === 'delete') {
