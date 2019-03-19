@@ -38,6 +38,7 @@ import {editSynonymPage} from '/lib/enonic/yase/admin/thesauri/editSynonymPage';
 
 import {interfacesPage} from '/lib/enonic/yase/admin/interfaces/interfacesPage';
 import {createOrEditInterfacePage} from '/lib/enonic/yase/admin/interfaces/createOrEditInterfacePage';
+import {deleteInterfacePage} from '/lib/enonic/yase/admin/interfaces/deleteInterfacePage';
 import {handleInterfacesPost} from '/lib/enonic/yase/admin/interfaces/handleInterfacesPost';
 
 
@@ -109,10 +110,13 @@ router.filter((req/*, next*/) => {
 	}
 
 	if (pathParts[0] === 'interfaces') {
+		if (req.method === 'POST') { return handleInterfacesPost(req); }
+		if (pathParts.length === 3) {
+			return deleteInterfacePage(req);
+		}
 		if (pathParts.length === 2) {
 			return createOrEditInterfacePage(req);
 		}
-		if (req.method === 'POST') { return handleInterfacesPost(req); }
 		return interfacesPage(req);
 	}
 
