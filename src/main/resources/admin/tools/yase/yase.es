@@ -59,10 +59,10 @@ router.filter((req/*, next*/) => {
 
 
 	if (pathParts[0] === 'collections') {
-		if (pathParts.length === 3) {
-			if (req.method === 'POST') {
-				return handleCollectionAction(req);
-			}
+		if (pathParts[2] === 'collect') {
+			return handleCollectionAction(req);
+		}
+		if (pathParts[2] === 'delete') {
 			return deleteCollectionPage(req);
 		}
 		if (pathParts.length === 2) {
