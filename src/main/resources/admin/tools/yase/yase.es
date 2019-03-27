@@ -14,11 +14,15 @@ import {
 } from '/lib/enonic/yase/constants';
 import {toolPage} from '/lib/enonic/yase/admin/toolPage';
 
-import {collectionsPage} from '/lib/enonic/yase/admin/collections/collectionsPage';
-import {createOrEditCollectionPage} from '/lib/enonic/yase/admin/collections/createOrEditCollectionPage';
-import {deleteCollectionPage} from '/lib/enonic/yase/admin/collections/deleteCollectionPage';
-import {handleCollectionAction} from '/lib/enonic/yase/admin/collections/handleCollectionAction';
-import {handleCollectionsPost} from '/lib/enonic/yase/admin/collections/handleCollectionsPost';
+import {list as listCollections} from '/lib/enonic/yase/admin/collections/list';
+import {newOrEdit as newOrEditCollection} from '/lib/enonic/yase/admin/collections/newOrEdit';
+import {confirmDelete as confirmDeleteCollection} from '/lib/enonic/yase/admin/collections/confirmDelete';
+import {collect} from '/lib/enonic/yase/admin/collections/collect';
+import {handleDelete as deleteCollection} from '/lib/enonic/yase/admin/collections/handleDelete';
+import {createOrUpdate as createOrUpdateCollection} from '/lib/enonic/yase/admin/collections/createOrUpdate';
+import {status as collectorStatus} from '/lib/enonic/yase/admin/collections/status';
+import {history as collectorHistory} from '/lib/enonic/yase/admin/collections/history';
+
 
 import {createOrEditFieldPage} from '/lib/enonic/yase/admin/fields/createOrEditFieldPage';
 import {createOrEditValuePage} from '/lib/enonic/yase/admin/fields/createOrEditValuePage';
@@ -47,30 +51,64 @@ const router = newRouter();
 
 //──────────────────────────────────────────────────────────────────────────────
 // Routes
+//
+// A link cannot specify method thus all links are GET
+// A form with a submit button only supports GET and POST (not PUT DELETE PATCH)
+// To make RESTful API you need GET, POST, PUT, PATCH and DELETE
+// You could potentially use js onClick, but that's a lot for code :(
+// So I will try to make routes using as much GET as possible
+// And possibly a few instances of POST.
 //──────────────────────────────────────────────────────────────────────────────
 router.filter((req/*, next*/) => {
 	if (!hasRole(ROLE_YASE_ADMIN)) { return { status: 401 }; }
 	//log.info(toStr({method: req.method})); // form method only supports get and post
 
+	const {method} = req;
 	const relPath = req.path.replace(TOOL_PATH, ''); //log.info(toStr({relPath}));
 	if (!relPath) { return toolPage(req); }
 
 	const pathParts = relPath.match(/[^/]+/g); //log.info(toStr({pathParts}));
+	const tab = pathParts[0];
+	const action = pathParts[1];
 
 
-	if (pathParts[0] === 'collections') {
-		if (pathParts[2] === 'collect') {
-			return handleCollectionAction(req);
+	/*──────────────────────────────────────────────────────────────────────────
+	GET  /collections -> LIST collections
+	GET  /collections/list -> LIST collections
+
+	GET  /collections/new -> EDIT new collection
+	POST /collections/create -> CREATE new collection
+
+	GET  /collections/edit/name -> EDIT collection
+	POST /collections/update/name -> UPDATE collection
+
+	GET  /collections/delete/name -> CONFIRM DELETE collection
+	POST /collections/delete/name -> DELETE collection
+
+	GET  /collections/collect/name?params -> COLLECT collection
+
+	GET  /collections/status
+	GET  /collections/history
+	──────────────────────────────────────────────────────────────────────────*/
+
+	if (tab === 'collections') {
+		switch (action) {
+		case 'new': // fallthrough to edit
+		case 'edit': return newOrEditCollection(req);
+
+		case 'create': // fallthrough to update
+		case 'update': createOrUpdateCollection(req);
+
+		case 'collect': return collect(req);
+		case 'delete': return method === 'POST' ? deleteCollection(req) : confirmDeleteCollection(req);
+		case 'history': return collectorHistory(req);
+		case 'status': return collectorStatus(req);
+
+		case 'list': // fallthrough to default
+		default: return listCollections(req);
 		}
-		if (pathParts[2] === 'delete') {
-			return deleteCollectionPage(req);
-		}
-		if (pathParts.length === 2) {
-			return createOrEditCollectionPage(req);
-		}
-		if (req.method === 'POST') { return handleCollectionsPost(req); }
-		return collectionsPage(req);
-	}
+	} // collections
+
 
 	/*──────────────────────────────────────────────────────────────────────────
 	 GET  /fields -> LIST fields
@@ -86,7 +124,10 @@ router.filter((req/*, next*/) => {
 	 POST /fields/fieldName/values/valueName/delete -> DELETE value (and show edit field page)
 	──────────────────────────────────────────────────────────────────────────*/
 	if (pathParts[0] === 'fields') {
-		if (req.method === 'POST') { return handleFieldsPost(req); }
+		if (pathParts[2] === 'delete') {
+			return handleFieldsPost(req);
+		}
+		if (method === 'POST') { return handleFieldsPost(req); }
 		if (pathParts[3]) { // valueName is defined
 			return createOrEditValuePage(req);
 		}
@@ -104,7 +145,7 @@ router.filter((req/*, next*/) => {
 		if (pathParts.length === 2) {
 			return createOrEditTagPage(req);
 		}
-		if (req.method === 'POST') { return handleTagsPost(req); }
+		if (method === 'POST') { return handleTagsPost(req); }
 		return tagsPage(req);
 	}
 
@@ -115,7 +156,7 @@ router.filter((req/*, next*/) => {
 		}
 		//const thesaurusName = pathParts[1]; log.info(toStr({thesaurusName}));
 		if (pathParts.length === 2) {
-			if (req.method === 'POST') { return handleThesaurusPost(req); }
+			if (method === 'POST') { return handleThesaurusPost(req); }
 			return thesaurusPage(req);
 		}
 		//pathParts.length === 3
@@ -124,7 +165,7 @@ router.filter((req/*, next*/) => {
 	}
 
 	if (pathParts[0] === 'interfaces') {
-		if (req.method === 'POST') { return handleInterfacesPost(req); }
+		if (method === 'POST') { return handleInterfacesPost(req); }
 		if (pathParts.length === 3) {
 			return deleteInterfacePage(req);
 		}
