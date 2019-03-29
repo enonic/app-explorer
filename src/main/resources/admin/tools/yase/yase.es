@@ -63,8 +63,8 @@ router.filter((req/*, next*/) => {
 	if (!hasRole(ROLE_YASE_ADMIN)) { return { status: 401 }; }
 	//log.info(toStr({method: req.method})); // form method only supports get and post
 
-	const {method} = req;
-	const relPath = req.path.replace(TOOL_PATH, ''); //log.info(toStr({relPath}));
+	const {method, path} = req;
+	const relPath = path.replace(TOOL_PATH, ''); //log.info(toStr({relPath}));
 	if (!relPath) { return toolPage(req); }
 
 	const pathParts = relPath.match(/[^/]+/g); //log.info(toStr({pathParts}));
