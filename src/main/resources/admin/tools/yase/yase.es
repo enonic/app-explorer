@@ -24,10 +24,10 @@ import {status as collectorStatus} from '/lib/enonic/yase/admin/collections/stat
 import {history as collectorHistory} from '/lib/enonic/yase/admin/collections/history';
 
 
-import {createOrEditFieldPage} from '/lib/enonic/yase/admin/fields/createOrEditFieldPage';
-import {createOrEditValuePage} from '/lib/enonic/yase/admin/fields/createOrEditValuePage';
+import {newOrEdit as newOrEditField} from '/lib/enonic/yase/admin/fields/newOrEdit';
+import {newOrEdit as newOrEditValue} from '/lib/enonic/yase/admin/fields/values/newOrEdit';
 import {handleFieldsPost} from '/lib/enonic/yase/admin/fields/handleFieldsPost';
-import {fieldsPage} from '/lib/enonic/yase/admin/fields/fieldsPage';
+import {list as listFields} from '/lib/enonic/yase/admin/fields/list';
 
 import {createOrEditTagPage} from '/lib/enonic/yase/admin/tags/createOrEditTagPage';
 import {handleTagDelete} from '/lib/enonic/yase/admin/tags/handleTagDelete';
@@ -70,16 +70,16 @@ router.filter((req/*, next*/) => {
 	const pathParts = relPath.match(/[^/]+/g); //log.info(toStr({pathParts}));
 	const tab = pathParts[0];
 	const action = pathParts[1];
-
+	const secondaryAction = pathParts[3];
 
 	/*──────────────────────────────────────────────────────────────────────────
-	GET  /collections -> LIST collections
+	GET  /collections      -> LIST collections
 	GET  /collections/list -> LIST collections
 
-	GET  /collections/new -> EDIT new collection
+	GET  /collections/new    -> EDIT new collection
 	POST /collections/create -> CREATE new collection
 
-	GET  /collections/edit/name -> EDIT collection
+	GET  /collections/edit/name   -> EDIT collection
 	POST /collections/update/name -> UPDATE collection
 
 	GET  /collections/delete/name -> CONFIRM DELETE collection
@@ -111,34 +111,46 @@ router.filter((req/*, next*/) => {
 
 
 	/*──────────────────────────────────────────────────────────────────────────
-	 GET  /fields -> LIST fields
+	 GET  /fields      -> LIST fields
+	 GET  /fields/list -> LIST fields
 
-	 POST /fields -> CREATE field (and show list fiels page)
-	 GET  /fields/fieldName -> EDIT field
-	 POST /fields/fieldName/update -> UPDATE field (and show list fiels page)
-	 POST /fields/fieldName/delete -> DELETE field (and show list fiels page)
+	 GET  /fields/new    -> EDIT new field
+	 POST /fields/create -> CREATE new field
 
-	 POST /fields/fieldName/values -> CREATE value (and show edit field page)
-	 GET  /fields/fieldName/values/valueName -> EDIT value
-	 POST /fields/fieldName/values/valueName/update -> UPDATE value (and show edit field page)
-	 POST /fields/fieldName/values/valueName/delete -> DELETE value (and show edit field page)
+	 GET  /fields/edit/fieldName   -> EDIT field (lists values)
+	 POST /fields/update/fieldName -> UPDATE field
+	 POST /fields/delete/fieldName -> DELETE field
+
+	 GET  /fields/values/fieldName -> LIST field values
+
+	 GET  /fields/values/fieldName/new    -> EDIT new field value
+	 POST /fields/values/fieldName/create -> CREATE new field value
+
+	 GET  /fields/values/fieldName/edit/valueName   -> EDIT field value
+	 POST /fields/values/fieldName/update/valueName -> UPDATE new field value
 	──────────────────────────────────────────────────────────────────────────*/
-	if (pathParts[0] === 'fields') {
-		if (pathParts[2] === 'delete') {
-			return handleFieldsPost(req);
-		}
-		if (method === 'POST') { return handleFieldsPost(req); }
-		if (pathParts[3]) { // valueName is defined
-			return createOrEditValuePage(req);
-		}
-		if (pathParts[1]) { // fieldName is defined
-			return createOrEditFieldPage(req);
-		}
-		return fieldsPage(req);
-	}
+	if (tab === 'fields') {
+		switch (action) {
+		case 'new': // fallthrough to edit
+		case 'edit': return newOrEditField(req);
+		case 'create': // fallthrough to update
+		case 'delete': // fallthrough to update
+		case 'update': return handleFieldsPost(req);
+		case 'values':
+			switch (secondaryAction) {
+			case 'new': // fallthrough to edit
+			case 'edit': return newOrEditValue(req);
+			case 'create': // fallthrough to update
+			case 'delete': // fallthrough to update
+			case 'update': return handleFieldsPost(req);
+			default: return newOrEditField(req);
+			} // values
+		default: return listFields(req);
+		} // action
+	} // fields
 
 
-	if (pathParts[0] === 'tags') {
+	if (tab === 'tags') {
 		if (pathParts.length === 3 && pathParts[2] === 'delete') {
 			return handleTagDelete(req);
 		}
@@ -149,7 +161,7 @@ router.filter((req/*, next*/) => {
 		return tagsPage(req);
 	}
 
-	if (pathParts[0] === 'thesauri') {
+	if (tab === 'thesauri') {
 		if (pathParts.length === 1) {
 			if (req.method === 'POST') { return handleThesauriPost(req); }
 			return listThesauriPage(req);
@@ -164,7 +176,7 @@ router.filter((req/*, next*/) => {
 		return editSynonymPage(req);
 	}
 
-	if (pathParts[0] === 'interfaces') {
+	if (tab === 'interfaces') {
 		if (method === 'POST') { return handleInterfacesPost(req); }
 		if (pathParts.length === 3) {
 			return deleteInterfacePage(req);
