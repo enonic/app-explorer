@@ -97,7 +97,7 @@ router.filter((req/*, next*/) => {
 		case 'edit': return newOrEditCollection(req);
 
 		case 'create': // fallthrough to update
-		case 'update': createOrUpdateCollection(req);
+		case 'update': return createOrUpdateCollection(req);
 
 		case 'collect': return collect(req);
 		case 'delete': return method === 'POST' ? deleteCollection(req) : confirmDeleteCollection(req);
