@@ -1,7 +1,7 @@
 //──────────────────────────────────────────────────────────────────────────────
 // Enonic XP libs (included in jar via gradle dependencies)
 //──────────────────────────────────────────────────────────────────────────────
-import {toStr} from '/lib/enonic/util';
+//import {toStr} from '/lib/enonic/util';
 import newRouter from '/lib/router';
 import {hasRole} from '/lib/xp/auth';
 
@@ -128,6 +128,7 @@ router.filter((req/*, next*/) => {
 
 	 GET  /fields/values/fieldName/edit/valueName   -> EDIT field value
 	 POST /fields/values/fieldName/update/valueName -> UPDATE new field value
+	 POST /fields/values/fieldName/delete/valueName -> DELETE new field value
 	──────────────────────────────────────────────────────────────────────────*/
 	if (tab === 'fields') {
 		switch (action) {
