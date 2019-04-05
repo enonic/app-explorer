@@ -34,11 +34,14 @@ import {handleTagDelete} from '/lib/enonic/yase/admin/tags/handleTagDelete';
 import {handleTagsPost} from '/lib/enonic/yase/admin/tags/handleTagsPost';
 import {tagsPage} from '/lib/enonic/yase/admin/tags/tagsPage';
 
+import {list as listThesauri} from '/lib/enonic/yase/admin/thesauri/list';
+import {newOrEdit as newOrEditThesaurus} from '/lib/enonic/yase/admin/thesauri/newOrEdit';
+import {importPage} from '/lib/enonic/yase/admin/thesauri/importPage';
+import {exportThesaurus} from '/lib/enonic/yase/admin/thesauri/exportThesaurus';
 import {handleThesauriPost} from '/lib/enonic/yase/admin/thesauri/handleThesauriPost';
-import {handleThesaurusPost} from '/lib/enonic/yase/admin/thesauri/handleThesaurusPost';
-import {listThesauriPage} from '/lib/enonic/yase/admin/thesauri/listThesauriPage';
-import {thesaurusPage} from '/lib/enonic/yase/admin/thesauri/thesaurusPage';
-import {editSynonymPage} from '/lib/enonic/yase/admin/thesauri/editSynonymPage';
+
+import {newOrEdit as newOrEditSynonym} from '/lib/enonic/yase/admin/thesauri/synonyms/newOrEdit';
+import {handlePost as handleSynonymsPost} from '/lib/enonic/yase/admin/thesauri/synonyms/handlePost';
 
 import {interfacesPage} from '/lib/enonic/yase/admin/interfaces/interfacesPage';
 import {createOrEditInterfacePage} from '/lib/enonic/yase/admin/interfaces/createOrEditInterfacePage';
@@ -162,20 +165,49 @@ router.filter((req/*, next*/) => {
 		return tagsPage(req);
 	}
 
+	/*──────────────────────────────────────────────────────────────────────────
+	GET  /thesauri      -> LIST thesauri
+	GET  /thesauri/list -> LIST thesauri
+
+	GET  /thesauri/new    -> EDIT new thesaurus
+	POST /thesauri/create -> CREATE new thesaurus
+
+	GET  /thesauri/import/thesaurusName -> IMPORT FORM
+	POST /thesauri/import/thesaurusName -> IMPORT synonyms
+	GET  /thesauri/export/thesaurusName -> EXPORT thesaurus
+
+	GET  /thesauri/edit/thesaurusName   -> EDIT thesaurus (lists values)
+	POST /thesauri/delete/thesaurusName -> DELETE thesaurus
+	POST /thesauri/update/thesaurusName -> UPDATE thesaurus
+
+	GET  /thesauri/synonyms/thesaurusName/new -> EDIT new synonym
+	POST  /thesauri/synonyms/thesaurusName/create/synonymName -> Create new synonym
+
+	GET  /thesauri/synonyms/thesaurusName/edit/synonymName -> EDIT synonym
+	GET  /thesauri/synonyms/thesaurusName/delete/synonymName -> DELETE synonym
+	GET  /thesauri/synonyms/thesaurusName/update/synonymName -> UPDATE synonym
+	──────────────────────────────────────────────────────────────────────────*/
 	if (tab === 'thesauri') {
-		if (pathParts.length === 1) {
-			if (req.method === 'POST') { return handleThesauriPost(req); }
-			return listThesauriPage(req);
+		switch (action) {
+		case 'new': // fallthrough to edit
+		case 'edit': return newOrEditThesaurus(req);
+		case 'export': return exportThesaurus(req);
+		case 'import': return method === 'POST' ? handleThesauriPost(req) : importPage(req);
+		case 'create': // fallthrough to update
+		case 'delete': // fallthrough to update
+		case 'update': return handleThesauriPost(req);
+		case 'synonyms':
+			switch (secondaryAction) {
+			case 'new': // fallthrough to edit
+			case 'edit': return newOrEditSynonym(req);
+			case 'create': // fallthrough to update
+			case 'delete': // fallthrough to update
+			case 'update': return handleSynonymsPost(req);
+			default: return newOrEditThesaurus(req);
+			} // synonyms
+		default: return listThesauri(req);
 		}
-		//const thesaurusName = pathParts[1]; log.info(toStr({thesaurusName}));
-		if (pathParts.length === 2) {
-			if (method === 'POST') { return handleThesaurusPost(req); }
-			return thesaurusPage(req);
-		}
-		//pathParts.length === 3
-		//const synonymId = pathParts[2]; log.info(toStr({synonymId}));
-		return editSynonymPage(req);
-	}
+	} // thesauri
 
 	if (tab === 'interfaces') {
 		if (method === 'POST') { return handleInterfacesPost(req); }
