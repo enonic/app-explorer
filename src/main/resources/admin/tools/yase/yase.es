@@ -9,6 +9,7 @@ import {hasRole} from '/lib/xp/auth';
 // Local libs (Absolute path without extension so it doesn't get webpacked)
 //──────────────────────────────────────────────────────────────────────────────
 import {
+	ROLE_SYSTEM_ADMIN,
 	ROLE_YASE_ADMIN,
 	TOOL_PATH
 } from '/lib/enonic/yase/constants';
@@ -23,16 +24,10 @@ import {createOrUpdate as createOrUpdateCollection} from '/lib/enonic/yase/admin
 import {status as collectorStatus} from '/lib/enonic/yase/admin/collections/status';
 import {journal} from '/lib/enonic/yase/admin/collections/journal';
 
-
 import {newOrEdit as newOrEditField} from '/lib/enonic/yase/admin/fields/newOrEdit';
 import {newOrEdit as newOrEditValue} from '/lib/enonic/yase/admin/fields/values/newOrEdit';
 import {handleFieldsPost} from '/lib/enonic/yase/admin/fields/handleFieldsPost';
 import {list as listFields} from '/lib/enonic/yase/admin/fields/list';
-
-import {newOrEdit as newOrEditTag} from '/lib/enonic/yase/admin/tags/newOrEdit';
-import {handleTagDelete} from '/lib/enonic/yase/admin/tags/handleTagDelete';
-import {handleTagsPost} from '/lib/enonic/yase/admin/tags/handleTagsPost';
-import {list as listTags} from '/lib/enonic/yase/admin/tags/list';
 
 import {list as listThesauri} from '/lib/enonic/yase/admin/thesauri/list';
 import {newOrEdit as newOrEditThesaurus} from '/lib/enonic/yase/admin/thesauri/newOrEdit';
@@ -64,7 +59,7 @@ const router = newRouter();
 // And possibly a few instances of POST.
 //──────────────────────────────────────────────────────────────────────────────
 router.filter((req/*, next*/) => {
-	if (!hasRole(ROLE_YASE_ADMIN)) { return { status: 401 }; }
+	if (!(hasRole(ROLE_YASE_ADMIN) || hasRole(ROLE_SYSTEM_ADMIN))) { return { status: 401 }; }
 	//log.info(toStr({method: req.method})); // form method only supports get and post
 
 	const {method, path} = req;
@@ -153,18 +148,6 @@ router.filter((req/*, next*/) => {
 		default: return listFields(req);
 		} // action
 	} // fields
-
-
-	if (tab === 'tags') {
-		if (pathParts.length === 3 && pathParts[2] === 'delete') {
-			return handleTagDelete(req);
-		}
-		if (pathParts.length === 2) {
-			return newOrEditTag(req);
-		}
-		if (method === 'POST') { return handleTagsPost(req); }
-		return listTags(req);
-	}
 
 	/*──────────────────────────────────────────────────────────────────────────
 	GET  /thesauri      -> LIST thesauri
