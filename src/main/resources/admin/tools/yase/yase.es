@@ -36,6 +36,7 @@ import {tagsPage} from '/lib/enonic/yase/admin/tags/tagsPage';
 
 import {list as listThesauri} from '/lib/enonic/yase/admin/thesauri/list';
 import {newOrEdit as newOrEditThesaurus} from '/lib/enonic/yase/admin/thesauri/newOrEdit';
+import {confirmDelete as confirmDeleteThesaurus} from '/lib/enonic/yase/admin/thesauri/confirmDelete';
 import {importPage} from '/lib/enonic/yase/admin/thesauri/importPage';
 import {exportThesaurus} from '/lib/enonic/yase/admin/thesauri/exportThesaurus';
 import {handleThesauriPost} from '/lib/enonic/yase/admin/thesauri/handleThesauriPost';
@@ -177,6 +178,7 @@ router.filter((req/*, next*/) => {
 	GET  /thesauri/export/thesaurusName -> EXPORT thesaurus
 
 	GET  /thesauri/edit/thesaurusName   -> EDIT thesaurus (lists values)
+	GET  /thesauri/delete/thesaurusName -> CONFIRM DELETE thesaurus
 	POST /thesauri/delete/thesaurusName -> DELETE thesaurus
 	POST /thesauri/update/thesaurusName -> UPDATE thesaurus
 
@@ -191,11 +193,11 @@ router.filter((req/*, next*/) => {
 		switch (action) {
 		case 'new': // fallthrough to edit
 		case 'edit': return newOrEditThesaurus(req);
-		case 'export': return exportThesaurus(req);
 		case 'import': return method === 'POST' ? handleThesauriPost(req) : importPage(req);
+		case 'export': return exportThesaurus(req);
 		case 'create': // fallthrough to update
-		case 'delete': // fallthrough to update
 		case 'update': return handleThesauriPost(req);
+		case 'delete': return method === 'POST' ? handleThesauriPost(req) : confirmDeleteThesaurus(req);
 		case 'synonyms':
 			switch (secondaryAction) {
 			case 'new': // fallthrough to edit
