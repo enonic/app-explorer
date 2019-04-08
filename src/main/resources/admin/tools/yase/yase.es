@@ -29,10 +29,10 @@ import {newOrEdit as newOrEditValue} from '/lib/enonic/yase/admin/fields/values/
 import {handleFieldsPost} from '/lib/enonic/yase/admin/fields/handleFieldsPost';
 import {list as listFields} from '/lib/enonic/yase/admin/fields/list';
 
-import {createOrEditTagPage} from '/lib/enonic/yase/admin/tags/createOrEditTagPage';
+import {newOrEdit as newOrEditTag} from '/lib/enonic/yase/admin/tags/newOrEdit';
 import {handleTagDelete} from '/lib/enonic/yase/admin/tags/handleTagDelete';
 import {handleTagsPost} from '/lib/enonic/yase/admin/tags/handleTagsPost';
-import {tagsPage} from '/lib/enonic/yase/admin/tags/tagsPage';
+import {list as listTags} from '/lib/enonic/yase/admin/tags/list';
 
 import {list as listThesauri} from '/lib/enonic/yase/admin/thesauri/list';
 import {newOrEdit as newOrEditThesaurus} from '/lib/enonic/yase/admin/thesauri/newOrEdit';
@@ -160,10 +160,10 @@ router.filter((req/*, next*/) => {
 			return handleTagDelete(req);
 		}
 		if (pathParts.length === 2) {
-			return createOrEditTagPage(req);
+			return newOrEditTag(req);
 		}
 		if (method === 'POST') { return handleTagsPost(req); }
-		return tagsPage(req);
+		return listTags(req);
 	}
 
 	/*──────────────────────────────────────────────────────────────────────────
