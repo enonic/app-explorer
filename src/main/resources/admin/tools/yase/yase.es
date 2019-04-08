@@ -44,10 +44,10 @@ import {handleThesauriPost} from '/lib/enonic/yase/admin/thesauri/handleThesauri
 import {newOrEdit as newOrEditSynonym} from '/lib/enonic/yase/admin/thesauri/synonyms/newOrEdit';
 import {handlePost as handleSynonymsPost} from '/lib/enonic/yase/admin/thesauri/synonyms/handlePost';
 
-import {interfacesPage} from '/lib/enonic/yase/admin/interfaces/interfacesPage';
-import {createOrEditInterfacePage} from '/lib/enonic/yase/admin/interfaces/createOrEditInterfacePage';
-import {deleteInterfacePage} from '/lib/enonic/yase/admin/interfaces/deleteInterfacePage';
-import {handleInterfacesPost} from '/lib/enonic/yase/admin/interfaces/handleInterfacesPost';
+import {list as listInterfaces} from '/lib/enonic/yase/admin/interfaces/list';
+import {newOrEdit as newOrEditInterface} from '/lib/enonic/yase/admin/interfaces/newOrEdit';
+import {confirmDelete as confirmDeleteInterface} from '/lib/enonic/yase/admin/interfaces/confirmDelete';
+import {handlePost as handleInterfacesPost} from '/lib/enonic/yase/admin/interfaces/handlePost';
 
 
 const router = newRouter();
@@ -211,15 +211,19 @@ router.filter((req/*, next*/) => {
 		}
 	} // thesauri
 
+	/*──────────────────────────────────────────────────────────────────────────
+	GET  /interfaces      -> LIST interfaces
+	GET  /interfaces/list -> LIST interfaces
+	──────────────────────────────────────────────────────────────────────────*/
 	if (tab === 'interfaces') {
-		if (method === 'POST') { return handleInterfacesPost(req); }
-		if (pathParts.length === 3) {
-			return deleteInterfacePage(req);
+		switch (action) {
+		case 'new': // fallthrough to edit
+		case 'edit': return newOrEditInterface(req);
+		case 'create': // fallthrough to update
+		case 'update': return handleInterfacesPost(req);
+		case 'delete': return method === 'POST' ? handleInterfacesPost(req) : confirmDeleteInterface(req);
+		default: return listInterfaces(req);
 		}
-		if (pathParts.length === 2) {
-			return createOrEditInterfacePage(req);
-		}
-		return interfacesPage(req);
 	}
 
 	return toolPage(req);
