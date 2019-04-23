@@ -19,6 +19,7 @@ import {list as listCollections} from '/lib/enonic/yase/admin/collections/list';
 import {newOrEdit as newOrEditCollection} from '/lib/enonic/yase/admin/collections/newOrEdit';
 import {confirmDelete as confirmDeleteCollection} from '/lib/enonic/yase/admin/collections/confirmDelete';
 import {collect} from '/lib/enonic/yase/admin/collections/collect';
+import {stop} from '/lib/enonic/yase/admin/collections/stop';
 import {handleDelete as deleteCollection} from '/lib/enonic/yase/admin/collections/handleDelete';
 import {createOrUpdate as createOrUpdateCollection} from '/lib/enonic/yase/admin/collections/createOrUpdate';
 import {status as collectorStatus} from '/lib/enonic/yase/admin/collections/status';
@@ -85,6 +86,7 @@ router.filter((req/*, next*/) => {
 	POST /collections/delete/name -> DELETE collection
 
 	GET  /collections/collect/name?params -> COLLECT collection
+	GET  /collections/stop/name           -> STOP collector
 
 	GET  /collections/status
 	GET  /collections/journal
@@ -99,6 +101,7 @@ router.filter((req/*, next*/) => {
 		case 'update': return createOrUpdateCollection(req);
 
 		case 'collect': return collect(req);
+		case 'stop': return stop(req);
 		case 'delete': return method === 'POST' ? deleteCollection(req) : confirmDeleteCollection(req);
 		case 'journal': return journal(req);
 		case 'status': return collectorStatus(req);
