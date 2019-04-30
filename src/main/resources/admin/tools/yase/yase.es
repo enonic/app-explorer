@@ -30,6 +30,10 @@ import {newOrEdit as newOrEditValue} from '/lib/enonic/yase/admin/fields/values/
 import {handleFieldsPost} from '/lib/enonic/yase/admin/fields/handleFieldsPost';
 import {list as listFields} from '/lib/enonic/yase/admin/fields/list';
 
+import {list as listStopWords} from '/lib/enonic/yase/admin/stopWords/list';
+import {newOrEdit as newOrEditStopWords} from '/lib/enonic/yase/admin/stopWords/newOrEdit';
+import {createOrUpdate as createOrUpdateStopWords} from '/lib/enonic/yase/admin/stopWords/createOrUpdate';
+
 import {list as listThesauri} from '/lib/enonic/yase/admin/thesauri/list';
 import {newOrEdit as newOrEditThesaurus} from '/lib/enonic/yase/admin/thesauri/newOrEdit';
 import {confirmDelete as confirmDeleteThesaurus} from '/lib/enonic/yase/admin/thesauri/confirmDelete';
@@ -151,6 +155,16 @@ router.filter((req/*, next*/) => {
 		default: return listFields(req);
 		} // action
 	} // fields
+
+	if (tab === 'stopwords') {
+		switch (action) {
+		case 'new': // fallthrough to edit
+		case 'edit': return newOrEditStopWords(req);
+		case 'create': // fallthrough to update
+		case 'update': return createOrUpdateStopWords(req);
+		default: return listStopWords(req);
+		}
+	}
 
 	/*──────────────────────────────────────────────────────────────────────────
 	GET  /thesauri      -> LIST thesauri
