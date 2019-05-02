@@ -33,6 +33,7 @@ import {list as listFields} from '/lib/enonic/yase/admin/fields/list';
 import {list as listStopWords} from '/lib/enonic/yase/admin/stopWords/list';
 import {newOrEdit as newOrEditStopWords} from '/lib/enonic/yase/admin/stopWords/newOrEdit';
 import {createOrUpdate as createOrUpdateStopWords} from '/lib/enonic/yase/admin/stopWords/createOrUpdate';
+import {handleDelete as deleteStopWords} from '/lib/enonic/yase/admin/stopWords/handleDelete';
 
 import {list as listThesauri} from '/lib/enonic/yase/admin/thesauri/list';
 import {newOrEdit as newOrEditThesaurus} from '/lib/enonic/yase/admin/thesauri/newOrEdit';
@@ -162,6 +163,7 @@ router.filter((req/*, next*/) => {
 		case 'edit': return newOrEditStopWords(req);
 		case 'create': // fallthrough to update
 		case 'update': return createOrUpdateStopWords(req);
+		case 'delete': return deleteStopWords(req);
 		default: return listStopWords(req);
 		}
 	}
