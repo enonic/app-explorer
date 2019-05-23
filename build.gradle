@@ -1,9 +1,9 @@
 plugins {
 	id 'java' // Needed for assemble and build
-	//id 'maven' // When is this needed?
 	id 'maven-publish' // Provides publishing and publishToMavenLocal
-	id 'com.enonic.xp.app' version '1.1.0'
-	id 'com.moowork.node' version '1.2.0'
+	//id 'com.enonic.defaults' version '2.0.1' // Not needed?
+	id 'com.enonic.xp.app' version '2.0.0'
+	id 'com.moowork.node' version '1.3.1'
 }
 
 
@@ -27,6 +27,10 @@ dependencies {
 	compile "com.enonic.xp:core-api:${xpVersion}"
 	compile "com.enonic.xp:portal-api:${xpVersion}"
 
+	//──────────────────────────────────────────────────────────────────────────
+	// Core libs (com.enonic.xp)
+	//──────────────────────────────────────────────────────────────────────────
+
 	include "com.enonic.xp:lib-admin:${xpVersion}"
 	include "com.enonic.xp:lib-auth:${xpVersion}"
 	//include "com.enonic.xp:lib-cluster:${xpVersion}"
@@ -46,13 +50,17 @@ dependencies {
 	//include "com.enonic.xp:lib-websocket:${xpVersion}"
 	//include "com.enonic.xp:lib-xslt:${xpVersion}"
 
-	//include "com.enonic.lib:lib-admin-ui:1.3.5"
-	include "com.enonic.lib:lib-admin-ui:2.0.0-SNAPSHOT"
+	//──────────────────────────────────────────────────────────────────────────
+	// Other enonic libs (com.enonic.lib)
+	//──────────────────────────────────────────────────────────────────────────
 
-	include 'com.enonic.lib:lib-cache:1.1.0'
+	//include "com.enonic.lib:lib-admin-ui:1.3.5"
+	include "com.enonic.lib:lib-admin-ui:2.0.0"
+
+	include 'com.enonic.lib:lib-cache:2.0.0'
 	//include 'com.enonic.lib:lib-guillotine:1.0.1'
-	include 'com.enonic.lib:lib-http-client:1.0.1'
-	include 'com.enonic.lib:lib-router:1.0.0'
+	include 'com.enonic.lib:lib-http-client:2.0.0'
+	include 'com.enonic.lib:lib-router:2.0.0'
 	//include 'com.enonic.lib:menu:1.3.3'
 
 	//include 'com.enonic.lib:yase:1.0.0-SNAPSHOT'
@@ -61,7 +69,7 @@ dependencies {
 	include files('../lib-cron/build/libs/lib-cron-0.1.0.jar')
 
 	//include 'com.enonic.lib:text-encoding:1.2.0'
-	include 'com.enonic.lib:util:1.3.0'
+	include 'com.enonic.lib:lib-util:2.0.0-RC1'
 }
 
 
@@ -74,7 +82,7 @@ tasks.withType(Copy) {
 // Gradle wrapper
 //──────────────────────────────────────────────────────────────────────────────
 task wrapper(type: Wrapper) {
-	gradleVersion = '4.10.3'
+	gradleVersion = "${gradleVersion}"
 }
 
 
@@ -82,7 +90,7 @@ task wrapper(type: Wrapper) {
 // Gradle node plugin
 //──────────────────────────────────────────────────────────────────────────────
 node {
-	version '10.15.3'
+	version "${nodeVersion}"
 	download true
 }
 

@@ -1,4 +1,5 @@
 /.build/
+/.enonic
 /.gradle/
 /build/
 /node_modules/
