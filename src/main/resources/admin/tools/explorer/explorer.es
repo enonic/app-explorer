@@ -12,43 +12,43 @@ import {
 	ROLE_SYSTEM_ADMIN,
 	ROLE_YASE_ADMIN,
 	TOOL_PATH
-} from '/lib/enonic/yase/constants';
-import {toolPage} from '/lib/enonic/yase/admin/toolPage';
+} from '/lib/explorer/constants';
+import {toolPage} from '/lib/explorer/admin/toolPage';
 
-import {list as listCollections} from '/lib/enonic/yase/admin/collections/list';
-import {newOrEdit as newOrEditCollection} from '/lib/enonic/yase/admin/collections/newOrEdit';
-import {confirmDelete as confirmDeleteCollection} from '/lib/enonic/yase/admin/collections/confirmDelete';
-import {collect} from '/lib/enonic/yase/admin/collections/collect';
-import {stop} from '/lib/enonic/yase/admin/collections/stop';
-import {handleDelete as deleteCollection} from '/lib/enonic/yase/admin/collections/handleDelete';
-import {createOrUpdate as createOrUpdateCollection} from '/lib/enonic/yase/admin/collections/createOrUpdate';
-import {status as collectorStatus} from '/lib/enonic/yase/admin/collections/status';
-import {journal} from '/lib/enonic/yase/admin/collections/journal';
+import {list as listCollections} from '/lib/explorer/admin/collections/list';
+import {newOrEdit as newOrEditCollection} from '/lib/explorer/admin/collections/newOrEdit';
+import {confirmDelete as confirmDeleteCollection} from '/lib/explorer/admin/collections/confirmDelete';
+import {collect} from '/lib/explorer/admin/collections/collect';
+import {stop} from '/lib/explorer/admin/collections/stop';
+import {handleDelete as deleteCollection} from '/lib/explorer/admin/collections/handleDelete';
+import {createOrUpdate as createOrUpdateCollection} from '/lib/explorer/admin/collections/createOrUpdate';
+import {status as collectorStatus} from '/lib/explorer/admin/collections/status';
+import {journal} from '/lib/explorer/admin/collections/journal';
 
-import {newOrEdit as newOrEditField} from '/lib/enonic/yase/admin/fields/newOrEdit';
-import {newOrEdit as newOrEditValue} from '/lib/enonic/yase/admin/fields/values/newOrEdit';
-import {handleFieldsPost} from '/lib/enonic/yase/admin/fields/handleFieldsPost';
-import {list as listFields} from '/lib/enonic/yase/admin/fields/list';
+import {newOrEdit as newOrEditField} from '/lib/explorer/admin/fields/newOrEdit';
+import {newOrEdit as newOrEditValue} from '/lib/explorer/admin/fields/values/newOrEdit';
+import {handleFieldsPost} from '/lib/explorer/admin/fields/handleFieldsPost';
+import {list as listFields} from '/lib/explorer/admin/fields/list';
 
-import {list as listStopWords} from '/lib/enonic/yase/admin/stopWords/list';
-import {newOrEdit as newOrEditStopWords} from '/lib/enonic/yase/admin/stopWords/newOrEdit';
-import {createOrUpdate as createOrUpdateStopWords} from '/lib/enonic/yase/admin/stopWords/createOrUpdate';
-import {handleDelete as deleteStopWords} from '/lib/enonic/yase/admin/stopWords/handleDelete';
+import {list as listStopWords} from '/lib/explorer/admin/stopWords/list';
+import {newOrEdit as newOrEditStopWords} from '/lib/explorer/admin/stopWords/newOrEdit';
+import {createOrUpdate as createOrUpdateStopWords} from '/lib/explorer/admin/stopWords/createOrUpdate';
+import {handleDelete as deleteStopWords} from '/lib/explorer/admin/stopWords/handleDelete';
 
-import {list as listThesauri} from '/lib/enonic/yase/admin/thesauri/list';
-import {newOrEdit as newOrEditThesaurus} from '/lib/enonic/yase/admin/thesauri/newOrEdit';
-import {confirmDelete as confirmDeleteThesaurus} from '/lib/enonic/yase/admin/thesauri/confirmDelete';
-import {importPage} from '/lib/enonic/yase/admin/thesauri/importPage';
-import {exportThesaurus} from '/lib/enonic/yase/admin/thesauri/exportThesaurus';
-import {handleThesauriPost} from '/lib/enonic/yase/admin/thesauri/handleThesauriPost';
+import {list as listThesauri} from '/lib/explorer/admin/thesauri/list';
+import {newOrEdit as newOrEditThesaurus} from '/lib/explorer/admin/thesauri/newOrEdit';
+import {confirmDelete as confirmDeleteThesaurus} from '/lib/explorer/admin/thesauri/confirmDelete';
+import {importPage} from '/lib/explorer/admin/thesauri/importPage';
+import {exportThesaurus} from '/lib/explorer/admin/thesauri/exportThesaurus';
+import {handleThesauriPost} from '/lib/explorer/admin/thesauri/handleThesauriPost';
 
-import {newOrEdit as newOrEditSynonym} from '/lib/enonic/yase/admin/thesauri/synonyms/newOrEdit';
-import {handlePost as handleSynonymsPost} from '/lib/enonic/yase/admin/thesauri/synonyms/handlePost';
+import {newOrEdit as newOrEditSynonym} from '/lib/explorer/admin/thesauri/synonyms/newOrEdit';
+import {handlePost as handleSynonymsPost} from '/lib/explorer/admin/thesauri/synonyms/handlePost';
 
-import {list as listInterfaces} from '/lib/enonic/yase/admin/interfaces/list';
-import {newOrEdit as newOrEditInterface} from '/lib/enonic/yase/admin/interfaces/newOrEdit';
-import {confirmDelete as confirmDeleteInterface} from '/lib/enonic/yase/admin/interfaces/confirmDelete';
-import {handlePost as handleInterfacesPost} from '/lib/enonic/yase/admin/interfaces/handlePost';
+import {list as listInterfaces} from '/lib/explorer/admin/interfaces/list';
+import {newOrEdit as newOrEditInterface} from '/lib/explorer/admin/interfaces/newOrEdit';
+import {confirmDelete as confirmDeleteInterface} from '/lib/explorer/admin/interfaces/confirmDelete';
+import {handlePost as handleInterfacesPost} from '/lib/explorer/admin/interfaces/handlePost';
 
 
 const router = newRouter();

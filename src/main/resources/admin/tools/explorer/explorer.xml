@@ -1,7 +1,7 @@
 <?xml version="1.0" standalone="yes"?>
 <tool xmlns="urn:enonic:xp:model:1.0">
-	<display-name>YASE</display-name>
-	<description>Manage collections, fields, thesauri and interfaces.</description>
+	<display-name>Explorer</display-name>
+	<description>Manage collections, fields, stop-words, thesauri and interfaces.</description>
 	<allow>
 		<principal>role:com.enonic.admin.yase.admin</principal>
 		<principal>role:system.admin</principal>

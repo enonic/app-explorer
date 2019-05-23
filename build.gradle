@@ -16,7 +16,7 @@ repositories {
 
 app {
 	name = project.appName
-	displayName = 'YASE'
+	displayName = 'Explorer'
 	vendorName = 'Enonic AS'
 	vendorUrl = 'http://enonic.com'
 	systemVersion = "${xpVersion}"
@@ -63,8 +63,8 @@ dependencies {
 	include 'com.enonic.lib:lib-router:2.0.0'
 	//include 'com.enonic.lib:menu:1.3.3'
 
-	//include 'com.enonic.lib:yase:1.0.0-SNAPSHOT'
-	include files('../lib-yase/build/libs/lib-yase-1.0.0-SNAPSHOT.jar')
+	//include 'com.enonic.lib:lib-explorer:1.0.0-SNAPSHOT'
+	include files('../lib-explorer/build/libs/lib-explorer-1.0.0-SNAPSHOT.jar')
 
 	include files('../lib-cron/build/libs/lib-cron-0.1.0.jar')
 
