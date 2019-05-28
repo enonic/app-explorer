@@ -10,9 +10,9 @@ import {hasRole} from '/lib/xp/auth';
 //──────────────────────────────────────────────────────────────────────────────
 import {
 	ROLE_SYSTEM_ADMIN,
-	ROLE_YASE_ADMIN,
+	ROLE_EXPLORER_ADMIN,
 	TOOL_PATH
-} from '/lib/explorer/constants';
+} from '/lib/explorer/model/2/constants';
 import {toolPage} from '/lib/explorer/admin/toolPage';
 
 import {list as listCollections} from '/lib/explorer/admin/collections/list';
@@ -65,7 +65,7 @@ const router = newRouter();
 // And possibly a few instances of POST.
 //──────────────────────────────────────────────────────────────────────────────
 router.filter((req/*, next*/) => {
-	if (!(hasRole(ROLE_YASE_ADMIN) || hasRole(ROLE_SYSTEM_ADMIN))) { return { status: 401 }; }
+	if (!(hasRole(ROLE_EXPLORER_ADMIN) || hasRole(ROLE_SYSTEM_ADMIN))) { return { status: 401 }; }
 	//log.info(toStr({method: req.method})); // form method only supports get and post
 
 	const {method, path} = req;
