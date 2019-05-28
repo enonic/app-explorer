@@ -65,9 +65,13 @@ module.exports = {
             'no-tabs': ['off'],
             'no-underscore-dangle': ['error', {
                 allow: [
+					'__connection', // My own stupidity
                     '_id', // content-type property
+					'_indexConfig', // node property
+					'_name', // node property
 					'_parentPath', // node property
                     '_path', // content-type property
+					'_permissions', // node property
                     '_selected' // option-set property
                 ],
                 allowAfterThis: false,
