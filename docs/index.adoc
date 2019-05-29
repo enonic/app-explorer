@@ -95,35 +95,3 @@ Typically each language has it's own list of stop-words.
 Stop-words are normally short words that are used a lot in text.
 They can be found in most documents and thus does not provide much value in terms of saying which result should be scored higher than another.
 So it can be a good idea to remove them from the query for a simpler, clean scoring.
-
-== Services
-
-There are a bunch of services used internally by the Explorer application.
-
-They can only be access by these roles:
-* com.enonic.app.explorer.admin
-* system.admin
-
-
-=== Custom interfaceSelector service
-
-The application provides a service that can be used by a custom selector in a site application.
-
-[source,xml]
-----
-<input name="interface" type="CustomSelector">
-	<label>Interface</label>
-	<occurrences minimum="1" maximum="1"/>
-	<config>
-		<service>interfaceSelector</service>
-	</config>
-</input>
-----
-
-The service can be accessed with any of these roles:
-
-* cms.admin
-* cms.cm.app
-* cms.expert
-* system.admin
-* system.admin.login
