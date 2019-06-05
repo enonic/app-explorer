@@ -13,6 +13,7 @@
     "babel-eslint": "^10.0.1",
     "babel-loader": "^8.0.5",
     "babel-plugin-array-includes": "^2.0.3",
+    "babel-plugin-transform-es2017-object-entries": "0.0.5",
     "eslint": "^5.13.0",
     "eslint-config-airbnb-base": "^13.1.0",
     "eslint-plugin-import": "^2.16.0",
