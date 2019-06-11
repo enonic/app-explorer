@@ -68,6 +68,7 @@ dependencies {
 
 	// Via filesystem
 	include files('../lib-explorer/build/libs/lib-explorer-1.0.0-SNAPSHOT.jar')
+	include files('../lib-explorer/build/libs/lib-explorer-client-1.0.0-SNAPSHOT.jar')
 
 	include files('../lib-cron/build/libs/lib-cron-0.1.0.jar')
 
