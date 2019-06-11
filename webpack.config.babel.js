@@ -116,6 +116,7 @@ const CLIENT_JS_CONFIG = {
 const WEBPACK_CONFIG = [webpackServerSideJs({
 	__dirname,
 	externals: [
+		/\/lib\/cache/,
 		// /\/lib\/cron/,
 		/\/lib\/explorer\/(?!client)/,
 
@@ -133,6 +134,7 @@ const WEBPACK_CONFIG = [webpackServerSideJs({
 		/\/lib\/xp\/cluster/,
 		/\/lib\/xp\/context/,
 		/\/lib\/xp\/event/,
+		/\/lib\/xp\/i18n/,
 		/\/lib\/xp\/node/,
 		/\/lib\/xp\/portal/,
 		/\/lib\/xp\/repo/,
@@ -141,12 +143,13 @@ const WEBPACK_CONFIG = [webpackServerSideJs({
 	],
 	serverSideFiles: [
 		'src/main/resources/main',
+		'src/main/resources/services/search/search',
 		'src/main/resources/admin/tools/explorer/explorer'
 	],
 	mode: MODE,
 	resolveAlias: {
 		'/admin/tools/explorer': path.resolve(__dirname, 'src/main/resources/admin/tools/explorer/'),
-		// '/lib/explorer/client': path.resolve(__dirname, '../lib-explorer-client/src/main/resources/lib/explorer/client/'),
+		'/lib/explorer/client': path.resolve(__dirname, '../lib-explorer-client/src/main/resources/lib/explorer/client/'),
 		// '/lib/explorer': path.resolve(__dirname, '../lib-explorer/src/main/resources/lib/explorer/'),
 		'/lib/cron': path.resolve(__dirname, '../lib-cron/src/main/resources/lib/cron/')
 	}
