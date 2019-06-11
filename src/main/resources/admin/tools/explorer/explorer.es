@@ -13,42 +13,42 @@ import {
 	ROLE_EXPLORER_ADMIN,
 	TOOL_PATH
 } from '/lib/explorer/model/2/constants';
-import {toolPage} from '/lib/explorer/admin/toolPage';
+import {toolPage} from '/admin/tools/explorer/toolPage';
 
-import {list as listCollections} from '/lib/explorer/admin/collections/list';
-import {newOrEdit as newOrEditCollection} from '/lib/explorer/admin/collections/newOrEdit';
-import {confirmDelete as confirmDeleteCollection} from '/lib/explorer/admin/collections/confirmDelete';
-import {collect} from '/lib/explorer/admin/collections/collect';
-import {stop} from '/lib/explorer/admin/collections/stop';
-import {handleDelete as deleteCollection} from '/lib/explorer/admin/collections/handleDelete';
-import {createOrUpdate as createOrUpdateCollection} from '/lib/explorer/admin/collections/createOrUpdate';
-import {status as collectorStatus} from '/lib/explorer/admin/collections/status';
-import {journal} from '/lib/explorer/admin/collections/journal';
+import {list as listCollections} from '/admin/tools/explorer/collections/list';
+import {newOrEdit as newOrEditCollection} from '/admin/tools/explorer/collections/newOrEdit';
+import {confirmDelete as confirmDeleteCollection} from '/admin/tools/explorer/collections/confirmDelete';
+import {collect} from '/admin/tools/explorer/collections/collect';
+import {stop} from '/admin/tools/explorer/collections/stop';
+import {handleDelete as deleteCollection} from '/admin/tools/explorer/collections/handleDelete';
+import {createOrUpdate as createOrUpdateCollection} from '/admin/tools/explorer/collections/createOrUpdate';
+import {status as collectorStatus} from '/admin/tools/explorer/collections/status';
+import {journal} from '/admin/tools/explorer/collections/journal';
 
-import {newOrEdit as newOrEditField} from '/lib/explorer/admin/fields/newOrEdit';
-import {newOrEdit as newOrEditValue} from '/lib/explorer/admin/fields/values/newOrEdit';
-import {handleFieldsPost} from '/lib/explorer/admin/fields/handleFieldsPost';
-import {list as listFields} from '/lib/explorer/admin/fields/list';
+import {newOrEdit as newOrEditField} from '/admin/tools/explorer/fields/newOrEdit';
+import {newOrEdit as newOrEditValue} from '/admin/tools/explorer/fields/values/newOrEdit';
+import {handleFieldsPost} from '/admin/tools/explorer/fields/handleFieldsPost';
+import {list as listFields} from '/admin/tools/explorer/fields/list';
 
-import {list as listStopWords} from '/lib/explorer/admin/stopWords/list';
-import {newOrEdit as newOrEditStopWords} from '/lib/explorer/admin/stopWords/newOrEdit';
-import {createOrUpdate as createOrUpdateStopWords} from '/lib/explorer/admin/stopWords/createOrUpdate';
-import {handleDelete as deleteStopWords} from '/lib/explorer/admin/stopWords/handleDelete';
+import {list as listStopWords} from '/admin/tools/explorer/stopWords/list';
+import {newOrEdit as newOrEditStopWords} from '/admin/tools/explorer/stopWords/newOrEdit';
+import {createOrUpdate as createOrUpdateStopWords} from '/admin/tools/explorer/stopWords/createOrUpdate';
+import {handleDelete as deleteStopWords} from '/admin/tools/explorer/stopWords/handleDelete';
 
-import {list as listThesauri} from '/lib/explorer/admin/thesauri/list';
-import {newOrEdit as newOrEditThesaurus} from '/lib/explorer/admin/thesauri/newOrEdit';
-import {confirmDelete as confirmDeleteThesaurus} from '/lib/explorer/admin/thesauri/confirmDelete';
-import {importPage} from '/lib/explorer/admin/thesauri/importPage';
-import {exportThesaurus} from '/lib/explorer/admin/thesauri/exportThesaurus';
-import {handleThesauriPost} from '/lib/explorer/admin/thesauri/handleThesauriPost';
+import {list as listThesauri} from '/admin/tools/explorer/thesauri/list';
+import {newOrEdit as newOrEditThesaurus} from '/admin/tools/explorer/thesauri/newOrEdit';
+import {confirmDelete as confirmDeleteThesaurus} from '/admin/tools/explorer/thesauri/confirmDelete';
+import {importPage} from '/admin/tools/explorer/thesauri/importPage';
+import {exportThesaurus} from '/admin/tools/explorer/thesauri/exportThesaurus';
+import {handleThesauriPost} from '/admin/tools/explorer/thesauri/handleThesauriPost';
 
-import {newOrEdit as newOrEditSynonym} from '/lib/explorer/admin/thesauri/synonyms/newOrEdit';
-import {handlePost as handleSynonymsPost} from '/lib/explorer/admin/thesauri/synonyms/handlePost';
+import {newOrEdit as newOrEditSynonym} from '/admin/tools/explorer/thesauri/synonyms/newOrEdit';
+import {handlePost as handleSynonymsPost} from '/admin/tools/explorer/thesauri/synonyms/handlePost';
 
-import {list as listInterfaces} from '/lib/explorer/admin/interfaces/list';
-import {newOrEdit as newOrEditInterface} from '/lib/explorer/admin/interfaces/newOrEdit';
-import {confirmDelete as confirmDeleteInterface} from '/lib/explorer/admin/interfaces/confirmDelete';
-import {handlePost as handleInterfacesPost} from '/lib/explorer/admin/interfaces/handlePost';
+import {list as listInterfaces} from '/admin/tools/explorer/interfaces/list';
+import {newOrEdit as newOrEditInterface} from '/admin/tools/explorer/interfaces/newOrEdit';
+import {confirmDelete as confirmDeleteInterface} from '/admin/tools/explorer/interfaces/confirmDelete';
+import {handlePost as handleInterfacesPost} from '/admin/tools/explorer/interfaces/handlePost';
 
 
 const router = newRouter();
