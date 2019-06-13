@@ -1,6 +1,12 @@
 import {Formik, getIn} from 'formik';
+//const {Formik, getIn} = window.Formik;
+//const {Formik, getIn} = global.Formik;
+
 import {Form, Header, Menu, Rail, Ref, Segment, Sticky} from 'semantic-ui-react'
+
 import {createRef} from 'react'
+//const {createRef} = React;
+
 import Scrollspy from 'react-scrollspy'
 import generateUuidv4 from 'uuid/v4';
 

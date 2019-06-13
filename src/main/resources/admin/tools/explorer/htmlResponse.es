@@ -30,11 +30,26 @@ export function htmlResponse({
 	return {
 		body: `<html>
 	<head>
-		<!--script type="text/javascript" src="${assetUrl({path: 'react/react.production.min.js'})}"></script-->
 		<script type="text/javascript" src="${assetUrl({path: 'react/react.development.js'})}"></script>
+		<!--
+			<script type="text/javascript" src="${assetUrl({path: 'react/react.production.min.js'})}"></script>
+		-->
 
-		<!--script type="text/javascript" src="${assetUrl({path: 'react-dom/react-dom.production.min.js'})}"></script-->
 		<script type="text/javascript" src="${assetUrl({path: 'react-dom/react-dom.development.js'})}"></script>
+		<!--
+			<script type="text/javascript" src="${assetUrl({path: 'react-dom/react-dom.production.min.js'})}"></script>
+		-->
+
+		<!--script type="text/javascript" src="${assetUrl({path: 'tslib/tslib.js'})}"></script-->
+		<!--script type="text/javascript" src="${assetUrl({path: 'tslib/tslib.es6.js'})}"></script--><!-- Unexpected token export -->
+
+		<!--
+			<script type="text/javascript" src="${assetUrl({path: 'formik/formik.umd.development.js'})}"></script>
+			<script type="text/javascript" src="${assetUrl({path: 'formik/formik.cjs.development.js'})}"></script>
+			<script type="text/javascript" src="${assetUrl({path: 'formik/formik.cjs.production.js'})}"></script>
+			<script type="text/javascript" src="${assetUrl({path: 'formik/formik.umd.production.js'})}"></script>
+			<script src="https://unpkg.com/formik/dist/formik.umd.production.js"></script>
+		-->
 
 		${headBegin.join('\n')}
 

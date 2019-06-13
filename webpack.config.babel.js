@@ -1,13 +1,14 @@
 /* eslint-disable no-console */
 import path from 'path';
 import CopyWebpackPlugin from 'copy-webpack-plugin';
+import TerserPlugin from 'terser-webpack-plugin';
 import UglifyJsPlugin from 'uglifyjs-webpack-plugin'; // Supports ECMAScript2015
 import {webpackEsmAssets} from '@enonic/webpack-esm-assets'
 import {webpackServerSideJs} from '@enonic/webpack-server-side-js'
 import {webpackStyleAssets} from '@enonic/webpack-style-assets'
 
-const MODE = 'development';
-// const MODE = 'production';
+//const MODE = 'development';
+const MODE = 'production';
 
 const SRC_DIR = 'src/main/resources';
 const SRC_DIR_ABS = path.resolve(__dirname, SRC_DIR);
@@ -68,14 +69,16 @@ const CLIENT_JS_CONFIG = {
 	},
 	optimization: {
 		minimizer: [
-			new UglifyJsPlugin({
-				parallel: true, // highly recommended
-				sourceMap: false/*,
-				uglifyOptions: {
-					mangle: false, // default is true?
-					keep_fnames: true // default is false?
-				}*/
+			new TerserPlugin({
+				terserOptions: {
+					compress: {},
+					mangle: true // Note `mangle.properties` is `false` by default.
+				}
 			})
+			/*new UglifyJsPlugin({
+				parallel: true,
+				sourceMap: false
+			})*/
 		]
 	},
 	output: {
@@ -91,11 +94,12 @@ const CLIENT_JS_CONFIG = {
 	plugins: [
 		new CopyWebpackPlugin([
 			//{ from: 'babel-standalone/', to: 'babel-standalone/' },
-			{ from: 'formik/dist/formik.umd*', to: 'formik/[name].[ext]' },
+			{ from: 'formik/dist/formik.*', to: 'formik/[name].[ext]' },
 			{ from: 'jquery/dist', to: 'jquery'},
 			{ from: 'react/umd/react.*.js', to: 'react/[name].[ext]' },
 			{ from: 'react-dom/umd/react-dom.*.js', to: 'react-dom/[name].[ext]' },
-			{ from: 'semantic-ui/dist', to: 'semantic-ui'}
+			{ from: 'semantic-ui/dist', to: 'semantic-ui'},
+			{ from: 'tslib/*.js', to: 'tslib/[name].[ext]'}
 			//{ from: 'redux/dist/', to: 'redux/' }
 		], {
 			context: path.resolve(__dirname, 'node_modules')
@@ -163,7 +167,26 @@ const WEBPACK_CONFIG = [webpackServerSideJs({
 		'src/main/resources/assets/react/Interface.jsx',
 		'src/main/resources/assets/react/Interfaces.jsx'
 	],
-	mode: MODE
+	externals: [
+		// Unable to load these via script or module:
+		//'formik',
+		//'semantic-ui-react',
+		//'react',
+		//'react-scrollspy',
+		//'uuid/v4',
+		//'traverse'
+	],
+	mode: MODE,
+	optimization: {
+    	minimizer: [
+			new TerserPlugin({
+				terserOptions: {
+					compress: {},
+					mangle: true // Note `mangle.properties` is `false` by default.
+				}
+			})
+		]
+	}
 })];
 
 //console.log(`WEBPACK_CONFIG:${JSON.stringify(WEBPACK_CONFIG, null, 4)}`);
