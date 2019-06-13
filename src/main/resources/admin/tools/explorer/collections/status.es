@@ -26,7 +26,7 @@ export const status = ({
 		bodyEnd: [
 			`<script type="text/javascript">
 	ReactDOM.render(
-		React.createElement(window.yase.Status, ${propsJson}),
+		React.createElement(window.explorer.Status, ${propsJson}),
 		document.getElementById('${ID_REACT_STATUS_CONTAINER}')
 	);
 </script>`

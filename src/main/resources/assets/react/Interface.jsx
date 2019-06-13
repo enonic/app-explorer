@@ -1,15 +1,15 @@
-import {Form, Formik} from 'formik';
-import {Menu, Rail, Ref, Segment, Sticky} from 'semantic-ui-react'
+import {Formik, getIn} from 'formik';
+import {Form, Header, Menu, Rail, Ref, Segment, Sticky} from 'semantic-ui-react'
 import {createRef} from 'react'
 import Scrollspy from 'react-scrollspy'
 import generateUuidv4 from 'uuid/v4';
 
+import {
+	Dropdown,
+	Input
+} from '@enonic/semantic-ui-react-formik-functional/dist/index.cjs';
+
 import {SubmitButton} from './semantic-ui/SubmitButton';
-
-import {Select} from './elements/Select';
-import {TextInput} from './elements/TextInput';
-
-import {Header} from './semantic-ui/Header';
 
 import {ExpressionSelector} from './query/ExpressionSelector';
 import {StopWordsSelector} from './query/StopWordsSelector';
@@ -23,7 +23,7 @@ import {ResultMappings} from './query/ResultMappings';
 
 export const Interface = ({
 	action,
-	collections,
+	collectionOptions,
 	fields,
 	initialValues = {
 		name: '',
@@ -55,13 +55,13 @@ export const Interface = ({
 		<Segment basic>
 			<Formik
 				initialValues={initialValues}
-				render={({
-					handleSubmit,
-					values
-				}) => {
+				render={formik => {
+					const {
+						values
+					} = formik;
 					/*console.debug(toStr({
 						component: 'Interface',
-						//collections,
+						//collectionOptions,
 						//fields,
 						//thesauriOptions,
 						values
@@ -78,18 +78,25 @@ export const Interface = ({
 							width: '100%'
 						}}
 					>
-						<TextInput
-							label="Name"
+						<Input
+							fluid
+							formik={formik}
 							id='name'
+							label={{ basic: true, content: 'Name' }}
 							name="name"
 						/>
-						<Header dividing text='Collection(s)' id='collections'/>
-						<Select
-							multiple={true}
-							name="collections"
-							options={collections}
-							values={values}
-						/>
+						<Header as='h2' content='Collection(s)' dividing id='collections'/>
+						<Form.Field>
+							<Dropdown
+								defaultValue={getIn(values, 'collections', [])}
+								formik={formik}
+								multiple={true}
+								options={collectionOptions}
+								path='collections'
+								placeholder='Please select one or more collections...'
+								selection
+							/>
+						</Form.Field>
 						<QueryFiltersBuilder
 							fields={fields}
 						/>

@@ -40,7 +40,7 @@ export function newOrEdit({
 		bodyEnd: [
 			`<script type="text/javascript">
 	ReactDOM.render(
-		React.createElement(window.yase.StopWords, ${propsJson}),
+		React.createElement(window.explorer.StopWords, ${propsJson}),
 		document.getElementById('${ID_REACT_STOP_WORDS_CONTAINER}')
 	);
 </script>`],

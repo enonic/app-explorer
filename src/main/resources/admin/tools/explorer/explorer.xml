@@ -3,7 +3,7 @@
 	<display-name>Explorer</display-name>
 	<description>Manage collections, fields, stop-words, thesauri and interfaces.</description>
 	<allow>
-		<principal>role:com.enonic.admin.yase.admin</principal>
+		<principal>role:com.enonic.app.explorer.admin</principal>
 		<principal>role:system.admin</principal>
 	</allow>
 </tool>

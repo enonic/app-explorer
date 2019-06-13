@@ -31,7 +31,7 @@ export const journal = ({
 		bodyEnd: [
 			`<script type="text/javascript">
 	ReactDOM.render(
-		React.createElement(window.yase.Journals, ${propsJson}),
+		React.createElement(window.explorer.Journals, ${propsJson}),
 		document.getElementById('${ID_REACT_JOURNALS_CONTAINER}')
 	);
 </script>`

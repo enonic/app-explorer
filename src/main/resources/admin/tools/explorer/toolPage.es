@@ -35,7 +35,7 @@ export function toolPage({
 		bodyEnd: [
 			`<script type="text/javascript">
 	ReactDOM.render(
-		React.createElement(window.yase.Search, ${propsJson}),
+		React.createElement(window.explorer.Search, ${propsJson}),
 		document.getElementById('${ID_REACT_SEARCH_CONTAINER}')
 	);
 </script>`],

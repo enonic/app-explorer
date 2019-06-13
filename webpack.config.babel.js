@@ -80,8 +80,8 @@ const CLIENT_JS_CONFIG = {
 	},
 	output: {
 		//filename: '[name].js',
-		filename: 'yase.js',
-		library: 'yase',
+		filename: 'explorer.js',
+		library: 'explorer',
 		libraryTarget: 'umd',
 		path: DST_ASSETS_DIR_ABS
 	},
@@ -160,6 +160,7 @@ const WEBPACK_CONFIG = [webpackServerSideJs({
 	__dirname,
 	assetFiles: [
 		'src/main/resources/assets/react/Collection.jsx',
+		'src/main/resources/assets/react/Interface.jsx',
 		'src/main/resources/assets/react/Interfaces.jsx'
 	],
 	mode: MODE

@@ -131,14 +131,6 @@ export function newOrEdit({
 			config: configJson ? JSON.parse(configJson) : config
 		};
 
-		// TODO Remove after all collections are resaved.
-		if (
-			collector.name === 'surgeon'
-			|| collector.name === 'com.enonic.app.yase.collector.surgeon'
-		) {
-			collector.name = 'com.enonic.app.explorer.collector.surgeon';
-		}
-
 		if (!collectorsAppToUri[collector.name]) {
 			status = 500;
 			messages.push(`${collector.name} is currently not installed!`);

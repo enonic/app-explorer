@@ -34,7 +34,7 @@ export function newOrEdit({
 			bodyEnd: [
 				`<script type="text/javascript">
 		ReactDOM.render(
-			React.createElement(window.yase.Synonym, ${JSON.stringify({action, secondaryAction})}),
+			React.createElement(window.explorer.Synonym, ${JSON.stringify({action, secondaryAction})}),
 			document.getElementById('${ID_REACT_SYNONYM_CONTAINER}')
 		);
 		</script>`],
@@ -57,7 +57,7 @@ export function newOrEdit({
 		bodyEnd: [
 			`<script type="text/javascript">
 	ReactDOM.render(
-		React.createElement(window.yase.Synonym, ${JSON.stringify({action, from: forceArray(from), secondaryAction, to: forceArray(to)})}),
+		React.createElement(window.explorer.Synonym, ${JSON.stringify({action, from: forceArray(from), secondaryAction, to: forceArray(to)})}),
 		document.getElementById('${ID_REACT_SYNONYM_CONTAINER}')
 	);
 	</script>`],

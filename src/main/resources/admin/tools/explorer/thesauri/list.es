@@ -42,7 +42,7 @@ export function list({
 		bodyEnd: [
 			`<script type="text/javascript">
 	ReactDOM.render(
-		React.createElement(window.yase.Thesauri, ${propsJson}),
+		React.createElement(window.explorer.Thesauri, ${propsJson}),
 		document.getElementById('${ID_REACT_THESAURI_CONTAINER}')
 	);
 </script>`],

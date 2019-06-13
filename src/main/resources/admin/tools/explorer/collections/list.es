@@ -58,13 +58,6 @@ export const list = ({
 			name: collectorName = ''
 		} = {}
 	}) => {
-		if (
-			collectorName === 'surgeon'
-			|| collectorName === 'com.enonic.app.yase.collector.surgeon'
-		) {
-			collectorName = 'com.enonic.app.explorer.collector.surgeon';
-		}
-		//log.info(toStr({collectorName}));
 		const disabledCssClass = !collectorName || collectorsAppObj[collectorName] ? '' : 'disabled ';
 		const tabIndexAttr = !collectorName || collectorsAppObj[collectorName] ? '' : 'tabIndex="-1"'
 		const count = getDocumentCount(name);

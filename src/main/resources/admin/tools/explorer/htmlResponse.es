@@ -88,7 +88,7 @@ export function htmlResponse({
 		};
 		</script>
 
-		<script type="text/javascript" src="${assetUrl({path: 'yase.js'})}"></script>
+		<script type="text/javascript" src="${assetUrl({path: 'explorer.js'})}"></script>
 		<script type="text/javascript" src="${assetUrl({path: 'jquery/jquery.js'})}"></script>
 		<script type="text/javascript">
 			jQuery = $;

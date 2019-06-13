@@ -140,7 +140,14 @@ export function newOrEdit({
 
 	const propsObj = {
 		action: `${TOOL_PATH}/interfaces/${action === 'edit' ? `update/${interfaceName}` : 'create'}`,
-		collections: queryCollections({connection}).hits.map(({displayName: label, _name: value}) => ({label, value})),
+		collectionOptions: queryCollections({connection}).hits.map(({
+			displayName: text,
+			_name: key
+		}) => ({
+			key,
+			text,
+			value: key
+		})),
 		fields: fieldsObj,
 		stopWordOptions,
 		thesauriOptions: getThesauri({connection}).hits.map(({displayName, name}) => ({
@@ -155,9 +162,10 @@ export function newOrEdit({
 
 	return htmlResponse({
 		bodyEnd: [
-			`<script type="text/javascript">
+			`<script type='module' defer>
+	import {Interface} from '${assetUrl({path: 'react/Interface.esm.js'})}'
 	ReactDOM.render(
-		React.createElement(window.yase.Interface, ${propsJson}),
+		React.createElement(Interface, JSON.parse('${propsJson}')),
 		document.getElementById('${ID_REACT_INTERFACE_CONTAINER}')
 	);
 </script>`
