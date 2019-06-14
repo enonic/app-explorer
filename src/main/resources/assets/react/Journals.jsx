@@ -1,11 +1,12 @@
 //import '@babel/runtime';
 //import {hash as fnv} from 'fnv-plus';
 import Uri from 'jsuri';
+import prettyMs from 'pretty-ms';
+import {createRef} from 'react';
 import {
 	Checkbox, Dimmer, Divider, Dropdown, Form, Header, Icon, Label, Loader,
 	Pagination, Rail, Ref, Segment, Sticky, Table
 } from 'semantic-ui-react';
-import {createRef} from 'react';
 
 
 /*export const hash = (object, bitlength = 128) =>
@@ -289,7 +290,7 @@ export class Journals extends React.Component {
 		        					{columns.collection ? <Table.Cell>{collection}</Table.Cell> : null}
 									{columns.startTime ? <Table.Cell>{startTime}</Table.Cell> : null}
 									{columns.endTime ? <Table.Cell>{endTime}</Table.Cell> : null}
-									{columns.duration ? <Table.Cell>{duration}</Table.Cell> : null}
+									{columns.duration ? <Table.Cell>{prettyMs(duration)}</Table.Cell> : null}
 									{columns.errorCount ? <Table.Cell>{errorCount}</Table.Cell> : null}
 									{columns.successCount ? <Table.Cell>{successCount}</Table.Cell> : null}
 								</Table.Row>)}
