@@ -1,4 +1,5 @@
-//import {toStr} from '/lib/util';
+import {toStr} from '/lib/util';
+import {forceArray} from '/lib/util/data';
 
 import {
 	PRINCIPAL_EXPLORER_READ,
@@ -44,6 +45,7 @@ export const list = ({
 			<th class="sorted ascending">Name</th>
 			<th>Documents</th>
 			<th>Collect</th>
+			<th>Cron</th>
 			<th class="no-sort">Interfaces</th>
 			<!--th class="no-sort">Collector</th-->
 			<th class="no-sort">Action(s)</th>
@@ -56,7 +58,8 @@ export const list = ({
 		doCollect = false,
 		collector: {
 			name: collectorName = ''
-		} = {}
+		} = {},
+		cron
 	}) => {
 		const disabledCssClass = !collectorName || collectorsAppObj[collectorName] ? '' : 'disabled ';
 		const tabIndexAttr = !collectorName || collectorsAppObj[collectorName] ? '' : 'tabIndex="-1"'
@@ -67,7 +70,8 @@ export const list = ({
 		return `<tr>
 			<td>${displayName}</td>
 			<td class="right aligned" data-sort-value="${count}">${count}</td>
-			<td>${doCollect}</td>
+			<td>${doCollect ? '<i class="green check icon"></i>' : '<i class="red close icon"></i>'}</td>
+			<td>${toStr(forceArray(cron).map(({minute, hour, dayOfMonth, month, dayOfWeek})=> `${minute} ${hour} ${dayOfMonth} ${month} ${dayOfWeek}`))}</td>
 			<td>${usedInInterfaces({
 		connection: readConnection,
 		name
