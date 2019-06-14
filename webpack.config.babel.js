@@ -147,7 +147,14 @@ const WEBPACK_CONFIG = [webpackServerSideJs({
 	],
 	serverSideFiles: [
 		'src/main/resources/main',
+		'src/main/resources/services/interfaceCopy/interfaceCopy',
+		'src/main/resources/services/interfaceDelete/interfaceDelete',
+		'src/main/resources/services/interfaceExists/interfaceExists',
+		'src/main/resources/services/interfaceList/interfaceList',
+		'src/main/resources/services/journals/journals',
+		'src/main/resources/services/listCollectors/listCollectors',
 		'src/main/resources/services/search/search',
+		'src/main/resources/services/thesauri/thesauri',
 		'src/main/resources/admin/tools/explorer/explorer'
 	],
 	mode: MODE,
