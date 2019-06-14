@@ -147,6 +147,7 @@ const WEBPACK_CONFIG = [webpackServerSideJs({
 	],
 	serverSideFiles: [
 		'src/main/resources/main',
+		'src/main/resources/services/cronJobList/cronJobList',
 		'src/main/resources/services/interfaceCopy/interfaceCopy',
 		'src/main/resources/services/interfaceDelete/interfaceDelete',
 		'src/main/resources/services/interfaceExists/interfaceExists',
