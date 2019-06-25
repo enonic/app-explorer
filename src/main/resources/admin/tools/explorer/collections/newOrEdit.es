@@ -143,7 +143,7 @@ export function newOrEdit({
 
 
 		//convert(collector); // TODO Surgeon specific
-		if (collector.name === 'com.enonic.app.explorer.collector.surgeon' && !collector.config.urls.length) {
+		if (collector.name === 'com.enonic.app.explorer.collector.surgeon' && collector.config.urls && !collector.config.urls.length) {
 			collector.config.urls.push('');
 		}
 		//log.info(toStr({collector}));
