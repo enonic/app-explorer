@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
 import path from 'path';
+import BrowserSyncPlugin from 'browser-sync-webpack-plugin';
 import CopyWebpackPlugin from 'copy-webpack-plugin';
 import TerserPlugin from 'terser-webpack-plugin';
 import UglifyJsPlugin from 'uglifyjs-webpack-plugin'; // Supports ECMAScript2015
@@ -95,6 +96,7 @@ const CLIENT_JS_CONFIG = {
 		new CopyWebpackPlugin([
 			//{ from: 'babel-standalone/', to: 'babel-standalone/' },
 			{ from: 'formik/dist/formik.*', to: 'formik/[name].[ext]' },
+			{ from: 'frappe-gannt/dist/*', to: 'frappe-gannt/[name].[ext]' },
 			{ from: 'jquery/dist', to: 'jquery'},
 			{ from: 'react/umd/react.*.js', to: 'react/[name].[ext]' },
 			{ from: 'react-dom/umd/react-dom.*.js', to: 'react-dom/[name].[ext]' },
@@ -127,23 +129,23 @@ const WEBPACK_CONFIG = [webpackServerSideJs({
 		/\/lib\/http-client/,
 		/\/lib\/router/,
 
-		// /\/lib\/util.*$/,
-		/\/lib\/util/,
-		/\/lib\/util\/value/,
+		'/lib/util',
+		/\/lib\/util\//,
+		//\/lib\/util\/value/,
 
-		// /\/lib\/xp.*$/
-		/\/lib\/xp\/admin/,
-		/\/lib\/xp\/auth/,
-		/\/lib\/xp\/common/,
-		/\/lib\/xp\/cluster/,
-		/\/lib\/xp\/context/,
-		/\/lib\/xp\/event/,
-		/\/lib\/xp\/i18n/,
-		/\/lib\/xp\/node/,
-		/\/lib\/xp\/portal/,
-		/\/lib\/xp\/repo/,
-		/\/lib\/xp\/task/,
-		/\/lib\/xp\/value/
+		/\/lib\/xp\//
+		//\/lib\/xp\/admin/,
+		//\/lib\/xp\/auth/,
+		//\/lib\/xp\/common/,
+		//\/lib\/xp\/cluster/,
+		//\/lib\/xp\/context/,
+		//\/lib\/xp\/event/,
+		//\/lib\/xp\/i18n/,
+		//\/lib\/xp\/node/,
+		//\/lib\/xp\/portal/,
+		//\/lib\/xp\/repo/,
+		//\/lib\/xp\/task/,
+		//\/lib\/xp\/value/
 	],
 	serverSideFiles: [
 		'src/main/resources/main',
@@ -158,9 +160,27 @@ const WEBPACK_CONFIG = [webpackServerSideJs({
 		'src/main/resources/services/thesauri/thesauri',
 		'src/main/resources/admin/tools/explorer/explorer'
 	],
+	optimization: {
+    	minimizer: [
+			new TerserPlugin({
+				terserOptions: {
+					compress: {},
+					mangle: true // Note `mangle.properties` is `false` by default.
+				}
+			})
+		]
+	},
+	plugins: [
+		new BrowserSyncPlugin({
+			host: 'localhost',
+			port: 3000,
+			proxy: 'http://localhost:8080/'
+		})
+	],
 	mode: MODE,
 	resolveAlias: {
 		'/admin/tools/explorer': path.resolve(__dirname, 'src/main/resources/admin/tools/explorer/'),
+		//'/lib/util': path.resolve(__dirname, '../lib-util/src/main/resources/lib/util'),
 		'/lib/explorer/client': path.resolve(__dirname, '../lib-explorer-client/src/main/resources/lib/explorer/client/'),
 		// '/lib/explorer': path.resolve(__dirname, '../lib-explorer/src/main/resources/lib/explorer/'),
 		'/lib/cron': path.resolve(__dirname, '../lib-cron/src/main/resources/lib/cron/')

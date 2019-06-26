@@ -73,7 +73,7 @@ dependencies {
 	include files('../lib-cron/build/libs/lib-cron-0.1.0.jar')
 
 	//include 'com.enonic.lib:text-encoding:1.2.0'
-	include 'com.enonic.lib:lib-util:2.0.0-RC1'
+	include 'com.enonic.lib:lib-util:2.1.0'
 }
 
 

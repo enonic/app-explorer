@@ -19,6 +19,7 @@ import {list as listCollections} from '/admin/tools/explorer/collections/list';
 import {newOrEdit as newOrEditCollection} from '/admin/tools/explorer/collections/newOrEdit';
 import {confirmDelete as confirmDeleteCollection} from '/admin/tools/explorer/collections/confirmDelete';
 import {collect} from '/admin/tools/explorer/collections/collect';
+import {gannt} from '/admin/tools/explorer/collections/gannt';
 import {stop} from '/admin/tools/explorer/collections/stop';
 import {handleDelete as deleteCollection} from '/admin/tools/explorer/collections/handleDelete';
 import {createOrUpdate as createOrUpdateCollection} from '/admin/tools/explorer/collections/createOrUpdate';
@@ -106,6 +107,7 @@ router.filter((req/*, next*/) => {
 		case 'update': return createOrUpdateCollection(req);
 
 		case 'collect': return collect(req);
+		case 'gannt': return gannt(req);
 		case 'stop': return stop(req);
 		case 'delete': return method === 'POST' ? deleteCollection(req) : confirmDeleteCollection(req);
 		case 'journal': return journal(req);
