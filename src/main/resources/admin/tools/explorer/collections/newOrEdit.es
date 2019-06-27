@@ -3,6 +3,7 @@
 //import {toStr} from '/lib/util';
 import {getSites} from '/lib/util/content/getSites';
 import {isSet} from '/lib/util/value';
+import {getTypes} from '/lib/xp/content';
 import {assetUrl} from '/lib/xp/portal';
 
 import {connect} from '/lib/explorer/repo/connect';
@@ -196,10 +197,18 @@ export function newOrEdit({
 		}));
 	//log.info(toStr({siteOptions}));
 
+	const contentTypeOptions = getTypes().map(({name: key, displayName: text}) => ({
+		key,
+		text,
+		value: key
+	}));
+	//log.info(toStr({contentTypeOptions}));
+
 	const propsObj = {
 		action: `${TOOL_PATH}/collections/${action === 'edit' ? `update/${collectionName}` : 'create'}`,
 		collectorOptions,
 		collectorsAppToUri,
+		contentTypeOptions,
 		fields: fieldsObj,
 		siteOptions,
 		initialValues
