@@ -8,8 +8,8 @@ import {webpackEsmAssets} from '@enonic/webpack-esm-assets'
 import {webpackServerSideJs} from '@enonic/webpack-server-side-js'
 import {webpackStyleAssets} from '@enonic/webpack-style-assets'
 
-//const MODE = 'development';
-const MODE = 'production';
+const MODE = 'development';
+//const MODE = 'production';
 
 const SRC_DIR = 'src/main/resources';
 const SRC_DIR_ABS = path.resolve(__dirname, SRC_DIR);
@@ -119,34 +119,34 @@ const CLIENT_JS_CONFIG = {
 };
 //console.log(`CLIENT_JS_CONFIG:${toStr(CLIENT_JS_CONFIG)}`); process.exit();
 
+const SS_EXTERNALS = [
+	/\/lib\/cache/,
+	// /\/lib\/cron/,
+	/\/lib\/explorer\/(?!client)/,
+
+	/\/lib\/http-client/,
+	/\/lib\/router/,
+
+	/\/lib\/xp\//
+];
+
+const SS_ALIAS = {
+	'/admin/tools/explorer': path.resolve(__dirname, 'src/main/resources/admin/tools/explorer/'),
+	'/lib/explorer/client': path.resolve(__dirname, '../lib-explorer-client/src/main/resources/lib/explorer/client/'),
+	// '/lib/explorer': path.resolve(__dirname, '../lib-explorer/src/main/resources/lib/explorer/'),
+	'/lib/cron': path.resolve(__dirname, '../lib-cron/src/main/resources/lib/cron/')
+};
+
+if (MODE === 'production') {
+	SS_EXTERNALS.push('/lib/util');
+	SS_EXTERNALS.push(/\/lib\/util\//);
+} else {
+	SS_ALIAS['/lib/util'] = path.resolve(__dirname, '../lib-util/src/main/resources/lib/util');
+}
+
 const WEBPACK_CONFIG = [webpackServerSideJs({
 	__dirname,
-	externals: [
-		/\/lib\/cache/,
-		// /\/lib\/cron/,
-		/\/lib\/explorer\/(?!client)/,
-
-		/\/lib\/http-client/,
-		/\/lib\/router/,
-
-		'/lib/util',
-		/\/lib\/util\//,
-		//\/lib\/util\/value/,
-
-		/\/lib\/xp\//
-		//\/lib\/xp\/admin/,
-		//\/lib\/xp\/auth/,
-		//\/lib\/xp\/common/,
-		//\/lib\/xp\/cluster/,
-		//\/lib\/xp\/context/,
-		//\/lib\/xp\/event/,
-		//\/lib\/xp\/i18n/,
-		//\/lib\/xp\/node/,
-		//\/lib\/xp\/portal/,
-		//\/lib\/xp\/repo/,
-		//\/lib\/xp\/task/,
-		//\/lib\/xp\/value/
-	],
+	externals: SS_EXTERNALS,
 	serverSideFiles: [
 		'src/main/resources/main',
 		'src/main/resources/services/cronJobList/cronJobList',
@@ -178,13 +178,7 @@ const WEBPACK_CONFIG = [webpackServerSideJs({
 		})
 	],
 	mode: MODE,
-	resolveAlias: {
-		'/admin/tools/explorer': path.resolve(__dirname, 'src/main/resources/admin/tools/explorer/'),
-		//'/lib/util': path.resolve(__dirname, '../lib-util/src/main/resources/lib/util'),
-		'/lib/explorer/client': path.resolve(__dirname, '../lib-explorer-client/src/main/resources/lib/explorer/client/'),
-		// '/lib/explorer': path.resolve(__dirname, '../lib-explorer/src/main/resources/lib/explorer/'),
-		'/lib/cron': path.resolve(__dirname, '../lib-cron/src/main/resources/lib/cron/')
-	}
+	resolveAlias: SS_ALIAS
 }), webpackStyleAssets({
 	__dirname,
 	mode: MODE

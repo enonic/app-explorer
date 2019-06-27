@@ -50,6 +50,7 @@ export const Collection = ({
 	collectorsObj,
 	collectorOptions,
 	fields = {},
+	siteOptions,
 	initialValues = {
 		name: ''
 	}
@@ -128,7 +129,7 @@ export const Collection = ({
 								{values.collector
 									&& values.collector.name
 									&& collectorsObj[values.collector.name]
-									? collectorsObj[values.collector.name]({fields, formik})
+									? collectorsObj[values.collector.name]({fields, formik, siteOptions})
 									: null}
 							</div>
 						</Segment>

@@ -1,6 +1,7 @@
 //import traverse from 'traverse';
 
 //import {toStr} from '/lib/util';
+import {getSites} from '/lib/util/content/getSites';
 import {isSet} from '/lib/util/value';
 import {assetUrl} from '/lib/xp/portal';
 
@@ -187,11 +188,20 @@ export function newOrEdit({
 	});
 	//log.info(toStr({fieldsObj}));
 
+	const siteOptions = getSites({branch: 'master'}).hits
+		.map(({_id: key, displayName: text}) => ({
+			key,
+			text,
+			value: key
+		}));
+	//log.info(toStr({siteOptions}));
+
 	const propsObj = {
 		action: `${TOOL_PATH}/collections/${action === 'edit' ? `update/${collectionName}` : 'create'}`,
 		collectorOptions,
 		collectorsAppToUri,
 		fields: fieldsObj,
+		siteOptions,
 		initialValues
 	};
 	//log.info(toStr({propsObj}));
