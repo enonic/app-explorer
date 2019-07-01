@@ -74,7 +74,7 @@ dependencies {
 	//include files('../lib-explorer/build/libs/lib-explorer-client-1.0.0-SNAPSHOT.jar')
 
 	//include 'com.enonic.lib:text-encoding:1.2.0'
-	include 'com.enonic.lib:lib-util:2.1.0'
+	include 'com.enonic.lib:lib-util:2.2.0'
 }
 
 
