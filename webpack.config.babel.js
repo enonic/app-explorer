@@ -132,7 +132,7 @@ const SS_ALIAS = {
 
 if (MODE === 'production') {
 	SS_EXTERNALS.push('/lib/cron');
-	SS_EXTERNALS.push(/\/lib\/explorer\/(?!client)/);
+	SS_EXTERNALS.push(/\/lib\/explorer\//);
 	SS_EXTERNALS.push('/lib/util');
 	SS_EXTERNALS.push(/\/lib\/util\//);
 } else {
