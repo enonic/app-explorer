@@ -1,9 +1,9 @@
 //import traverse from 'traverse';
 
-//import {toStr} from '/lib/util';
+import {toStr} from '/lib/util';
 import {getSites} from '/lib/util/content/getSites';
 import {isSet} from '/lib/util/value';
-import {getTypes} from '/lib/xp/content';
+import {getType, getTypes} from '/lib/xp/content';
 import {assetUrl} from '/lib/xp/portal';
 
 import {connect} from '/lib/explorer/repo/connect';
@@ -197,11 +197,33 @@ export function newOrEdit({
 		}));
 	//log.info(toStr({siteOptions}));
 
-	const contentTypeOptions = getTypes().map(({name: key, displayName: text}) => ({
-		key,
-		text,
-		value: key
-	}));
+	//const siteType = getType('portal:site'); log.info(toStr({siteType}));
+	const contentTypes = getTypes(); log.info(toStr({contentTypes}));
+	const contentTypeOptions = getTypes().map(({name: key, displayName: text, form}) => {
+		/*if (text === 'displayName') {
+			log.info(toStr({key, text, form}));
+		}*/
+		return {
+			key,
+			text,
+			value: key,
+			values: form.map(({
+				//formItemType OptionSet
+				name: key,
+				label: text//,
+				//options // OptionSet
+			}) => {
+				/*if (text === 'displayName') {
+					log.info(toStr({key, text}));
+				}*/
+				return {
+					key,
+					text,
+					value: key
+				};
+			})
+		};
+	});
 	//log.info(toStr({contentTypeOptions}));
 
 	const propsObj = {
