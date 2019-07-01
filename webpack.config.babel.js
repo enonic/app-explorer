@@ -121,26 +121,24 @@ const CLIENT_JS_CONFIG = {
 
 const SS_EXTERNALS = [
 	/\/lib\/cache/,
-	// /\/lib\/cron/,
-	/\/lib\/explorer\/(?!client)/,
-
 	/\/lib\/http-client/,
 	/\/lib\/router/,
-
 	/\/lib\/xp\//
 ];
 
 const SS_ALIAS = {
-	'/admin/tools/explorer': path.resolve(__dirname, 'src/main/resources/admin/tools/explorer/'),
-	'/lib/explorer/client': path.resolve(__dirname, '../lib-explorer-client/src/main/resources/lib/explorer/client/'),
-	// '/lib/explorer': path.resolve(__dirname, '../lib-explorer/src/main/resources/lib/explorer/'),
-	'/lib/cron': path.resolve(__dirname, '../lib-cron/src/main/resources/lib/cron/')
+	'/admin/tools/explorer': path.resolve(__dirname, 'src/main/resources/admin/tools/explorer/')
 };
 
 if (MODE === 'production') {
+	SS_EXTERNALS.push('/lib/cron');
+	SS_EXTERNALS.push(/\/lib\/explorer\/(?!client)/);
 	SS_EXTERNALS.push('/lib/util');
 	SS_EXTERNALS.push(/\/lib\/util\//);
 } else {
+	SS_ALIAS['/lib/cron'] = path.resolve(__dirname, '../lib-cron/src/main/resources/lib/cron/');
+	SS_ALIAS['/lib/explorer/client'] = path.resolve(__dirname, '../lib-explorer-client/src/main/resources/lib/explorer/client/');
+	SS_ALIAS['/lib/explorer'] = path.resolve(__dirname, '../lib-explorer/src/main/resources/lib/explorer/');
 	SS_ALIAS['/lib/util'] = path.resolve(__dirname, '../lib-util/src/main/resources/lib/util');
 }
 
