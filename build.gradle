@@ -62,19 +62,18 @@ dependencies {
 	include 'com.enonic.lib:lib-http-client:2.0.0'
 	include 'com.enonic.lib:lib-router:2.0.0'
 	//include 'com.enonic.lib:menu:1.3.3'
+	//include 'com.enonic.lib:text-encoding:1.2.0'
 
 	// Via xp.enonicRepo / mavenLocal
 	include 'com.enonic.lib:lib-cron:1.0.0-SNAPSHOT'
 	include 'com.enonic.lib:lib-explorer:1.0.0-SNAPSHOT'
 	include 'com.enonic.lib:lib-explorer-client:1.0.0-SNAPSHOT'
+	include 'com.enonic.lib:lib-util:2.2.0'
 
 	// Via filesystem:
 	//include files('../lib-cron/build/libs/lib-cron-0.1.0.jar')
 	//include files('../lib-explorer/build/libs/lib-explorer-1.0.0-SNAPSHOT.jar')
 	//include files('../lib-explorer/build/libs/lib-explorer-client-1.0.0-SNAPSHOT.jar')
-
-	//include 'com.enonic.lib:text-encoding:1.2.0'
-	include 'com.enonic.lib:lib-util:2.2.0'
 }
 
 

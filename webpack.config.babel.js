@@ -168,13 +168,13 @@ const WEBPACK_CONFIG = [webpackServerSideJs({
 			})
 		]
 	},
-	plugins: [
+	plugins: MODE === 'development' ? [
 		new BrowserSyncPlugin({
 			host: 'localhost',
 			port: 3000,
 			proxy: 'http://localhost:8080/'
 		})
-	],
+	] : [],
 	mode: MODE,
 	resolveAlias: SS_ALIAS
 }), webpackStyleAssets({
@@ -206,7 +206,14 @@ const WEBPACK_CONFIG = [webpackServerSideJs({
 				}
 			})
 		]
-	}
+	},
+	plugins: MODE === 'development' ? [
+		new BrowserSyncPlugin({
+			host: 'localhost',
+			port: 3002,
+			proxy: 'http://localhost:8080/'
+		})
+	] : []
 })];
 
 //console.log(`WEBPACK_CONFIG:${JSON.stringify(WEBPACK_CONFIG, null, 4)}`);

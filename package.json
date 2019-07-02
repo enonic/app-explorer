@@ -12,6 +12,7 @@
     "babel-eslint": "^10.0.2",
     "classnames": "^2.2.6",
     "copy-webpack-plugin": "^5.0.3",
+    "doctoc": "^1.4.0",
     "eslint": "^6.0.1",
     "eslint-config-airbnb-base": "^13.1.0",
     "eslint-plugin-import": "^2.18.0",
@@ -36,7 +37,7 @@
   "name": "TODO",
   "private": true,
   "scripts": {
-    "webpack": "node_modules/webpack-cli/bin/cli.js",
-    "webpack:watch": "node_modules/webpack-cli/bin/cli.js -w --stdin"
+    "watch": "node_modules/webpack-cli/bin/cli.js -w --stdin",
+    "webpack": "node_modules/webpack-cli/bin/cli.js"
   }
 }
