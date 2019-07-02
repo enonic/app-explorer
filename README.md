@@ -104,7 +104,7 @@ avn activated v10.16.0 (avn-nvm v10.16.0)
 
 ##### Webpack dependencies
 
-You will also have to get the source for the
+You will also have to get the source for these into the parent folder of app-explorer:
 
 - https://github.com/enonic/lib-explorer
 - https://github.com/enonic/lib-explorer-client
