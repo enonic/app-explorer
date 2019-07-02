@@ -49,9 +49,9 @@ export const Hits = ({
 					{forceMap(source, ({displayName}, i) =>
 						<Label basic pointing key={`source${i}`}><Icon className='database'/>{displayName}</Label>)}
 					{forceMap(informationType, ({displayName}, i) =>
-						<Label basic pointing key={`informationType{i}`}><Icon className='sitemap'/>{displayName}</Label>)}
+						<Label basic pointing key={`informationType${i}`}><Icon className='sitemap'/>{displayName}</Label>)}
 					{forceMap(language, ({displayName}, i) =>
-						<Label basic pointing key={`language{i}`}><Icon className='font'/>{displayName}</Label>)}
+						<Label basic pointing key={`language${i}`}><Icon className='font'/>{displayName}</Label>)}
 				</Labels>
 			</Item>)
 		}

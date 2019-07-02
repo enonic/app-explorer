@@ -1,4 +1,10 @@
-import {Form, Formik} from 'formik';
+import {Form, Formik, getIn} from 'formik';
+
+import {Dropdown} from 'semantic-ui-react';
+/*import {
+	Dropdown
+} from '@enonic/semantic-ui-react-formik-functional/dist/index.cjs';*/
+
 
 import {Select} from './elements/Select';
 
@@ -23,27 +29,59 @@ export class Search extends React.Component {
 
     	this.state = {
       		cache: {},
-			searchString: ''
+			searchString: '',
+			interfaceName: '',
+			interfaceOptions: []
     	};
 
 		this.handleChange = this.handleChange.bind(this);
   	} // constructor
 
 
+	updateInterfaces() {
+		this.setState({ isLoading: true });
+		fetch(`${this.props.servicesBaseUrl}/interfaceList`)
+			.then(response => response.json())
+			.then(data => this.setState(prevState => {
+				prevState.interfaceOptions = data.hits.map(({displayName: text, name: key}) => ({
+					key,
+					text,
+					value: key
+				}));
+				if (prevState.interfaceName && !prevState.interfaceOptions.map(({key}) => key).includes(prevState.interfaceName)) {
+					prevState.interfaceName = '';
+				}
+				if (!prevState.interfaceName && prevState.interfaceOptions.length) {
+					prevState.interfaceName = prevState.interfaceOptions[0].key;
+				}
+				prevState.isLoading = false;
+				return prevState;
+			}));
+	} // updateInterfaces
+
+
+	componentDidMount() {
+		console.debug('Search componentDidMount');
+		this.updateInterfaces();
+	} // componentDidMount
+
+
 	search({
 		searchString
 	} = {}) {
-		if(!searchString) {return;}
-		const {serviceUrl} = this.props;
-		const uri = `${serviceUrl}&name=searchString&searchString=${searchString}`;
+		const {servicesBaseUrl} = this.props;
+		const {interfaceName} = this.state;
+		if(!interfaceName || !searchString) {return;}
+		const uri = `${servicesBaseUrl}/search?interface=${interfaceName}&name=searchString&searchString=${searchString}`;
 		fetch(uri)
 			.then(response => response.json())
-			.then(data => this.setState(prevState => ({
-				cache: {
-					...prevState.cache,
-					[`${searchString}`]: data
+			.then(data => this.setState(prevState => {
+				if (!prevState.cache[interfaceName]) {
+					prevState.cache[interfaceName] = {};
 				}
-			})));
+				prevState.cache[interfaceName][searchString] = data;
+				return prevState;
+			}));
 	}
 
 
@@ -64,9 +102,10 @@ export class Search extends React.Component {
 			}
 		} = syntheticEvent;
 		//console.debug(name, searchString);
+		const {interfaceName} = this.state;
 		if (name === 'search') {
-			this.setState({searchString});
-			if (!this.state.cache[searchString]) {
+			this.setState({searchString}); // Async!
+			if (!this.state.cache[interfaceName] || !this.state.cache[interfaceName][searchString]) {
 				this.search({searchString});
 			}
 		}
@@ -79,8 +118,8 @@ export class Search extends React.Component {
 			thesaurusOptions = [],
 			initialValues = {}
 		} = this.props;
-		const {cache, searchString} = this.state;
-		const data = searchString && cache[searchString];
+		const {cache, interfaceName, interfaceOptions, searchString} = this.state;
+		const data = searchString && cache[interfaceName] && cache[interfaceName][searchString];
 		const hits = data ? data.hits : [];
 		const synonyms = data && data.synonymsObj;
 		const loading = searchString && !data;
@@ -94,13 +133,14 @@ export class Search extends React.Component {
 		}));*/
 		return <Formik
 			initialValues={initialValues}
-			render={({
-				handleChange,
-				values: {
-					collections = [],
-					thesauri = []
-				}
-			}) => {
+			render={formik => {
+				const {
+					handleChange,
+					values: {
+						//collections = [],
+						//thesauri = []
+					}
+				} = formik;
 				/*console.debug(toStr({
 					component: 'Search Formik',
 					collections,
@@ -113,6 +153,20 @@ export class Search extends React.Component {
 						}}
 					>
 						<Fields>
+							<Field>
+								<Dropdown
+									fluid
+									onChange={(ignored,{value}) => {
+										//console.debug(value);
+										this.setState({interfaceName: value});
+									}}
+									options={interfaceOptions}
+									placeholder={interfaceOptions.length ? 'Please select an interface' : 'You must first configure an interface!'}
+									search
+									selection
+									value={interfaceName}
+								/>
+							</Field>
 							{/*<Field>
 								<Select
 									label="Collections"
@@ -143,7 +197,7 @@ export class Search extends React.Component {
 							</Field>
 						</Fields>
 					</Form>
-					{synonyms ? <>
+					{/*synonyms ? <>
 						<Header dividing text='Synonyms'/>
 						<Table basic collapsing compact small very>
 							<thead>
@@ -163,7 +217,7 @@ export class Search extends React.Component {
 								</tr>))}
 							</tbody>
 						</Table>
-					</> : null}
+					</> : null*/}
 					<Hits
 						hits={hits}
 						loading={loading}
