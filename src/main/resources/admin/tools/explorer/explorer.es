@@ -15,6 +15,8 @@ import {
 } from '/lib/explorer/model/2/constants';
 import {toolPage} from '/admin/tools/explorer/toolPage';
 
+import {about} from '/admin/tools/explorer/about';
+
 import {list as listCollections} from '/admin/tools/explorer/collections/list';
 import {newOrEdit as newOrEditCollection} from '/admin/tools/explorer/collections/newOrEdit';
 import {confirmDelete as confirmDeleteCollection} from '/admin/tools/explorer/collections/confirmDelete';
@@ -77,6 +79,10 @@ router.filter((req/*, next*/) => {
 	const tab = pathParts[0];
 	const action = pathParts[1];
 	const secondaryAction = pathParts[3];
+
+	if (tab === 'about') {
+		return about(req);
+	}
 
 	/*──────────────────────────────────────────────────────────────────────────
 	GET  /collections      -> LIST collections

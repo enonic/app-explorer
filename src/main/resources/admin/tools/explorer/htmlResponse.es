@@ -76,6 +76,7 @@ export function htmlResponse({
 				<a class="item ${tab === 'stopwords' ? 'active' : ''}" href="${TOOL_PATH}/stopwords"><i class="crop icon"></i> StopWords</a>
 				<a class="item ${tab === 'thesauri' ? 'active' : ''}" href="${TOOL_PATH}/thesauri"><i class="font icon"></i> Thesauri</a>
 				<a class="item ${tab === 'interfaces' ? 'active' : ''}" href="${TOOL_PATH}/interfaces"><i class="plug icon"></i> Interfaces</a>
+				<a class="item ${tab === 'about' ? 'active' : ''}" href="${TOOL_PATH}/about"><i class="info icon"></i> About</a>
 				<!--div class="right item">
 					<div class="ui input"><input type="text" placeholder="Search..."></div>
 				</div-->
