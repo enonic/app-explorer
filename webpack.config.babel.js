@@ -138,6 +138,26 @@ if (MODE === 'production') {
 } else {
 	SS_ALIAS['/lib/cron'] = path.resolve(__dirname, '../lib-cron/src/main/resources/lib/cron/');
 	SS_ALIAS['/lib/explorer/client'] = path.resolve(__dirname, '../lib-explorer-client/src/main/resources/lib/explorer/client/');
+
+	SS_ALIAS['/lib/explorer/model/2/nodeTypes/com.enonic.app.explorer.collection.js'] = path.resolve(__dirname, '../lib-explorer/src/main/resources/lib/explorer/model/2/nodeTypes/com.enonic.app.explorer.collection.es');
+	SS_ALIAS['/lib/explorer/model/2/nodeTypes/com.enonic.app.explorer.document.js'] = path.resolve(__dirname, '../lib-explorer/src/main/resources/lib/explorer/model/2/nodeTypes/com.enonic.app.explorer.document.es');
+	SS_ALIAS['/lib/explorer/model/2/nodeTypes/com.enonic.app.explorer.field-value.js'] = path.resolve(__dirname, '../lib-explorer/src/main/resources/lib/explorer/model/2/nodeTypes/com.enonic.app.explorer.field-value.es');
+	SS_ALIAS['/lib/explorer/model/2/nodeTypes/com.enonic.app.explorer.field.js'] = path.resolve(__dirname, '../lib-explorer/src/main/resources/lib/explorer/model/2/nodeTypes/com.enonic.app.explorer.field.es');
+	SS_ALIAS['/lib/explorer/model/2/nodeTypes/com.enonic.app.explorer.interface.js'] = path.resolve(__dirname, '../lib-explorer/src/main/resources/lib/explorer/model/2/nodeTypes/com.enonic.app.explorer.interface.es');
+	SS_ALIAS['/lib/explorer/model/2/nodeTypes/com.enonic.app.explorer.journal.js'] = path.resolve(__dirname, '../lib-explorer/src/main/resources/lib/explorer/model/2/nodeTypes/com.enonic.app.explorer.journal.es');
+	SS_ALIAS['/lib/explorer/model/2/nodeTypes/com.enonic.app.explorer.stopwords.js'] = path.resolve(__dirname, '../lib-explorer/src/main/resources/lib/explorer/model/2/nodeTypes/com.enonic.app.explorer.stopwords.es');
+	SS_ALIAS['/lib/explorer/model/2/nodeTypes/com.enonic.app.explorer.synonym.js'] = path.resolve(__dirname, '../lib-explorer/src/main/resources/lib/explorer/model/2/nodeTypes/com.enonic.app.explorer.synonym.es');
+	SS_ALIAS['/lib/explorer/model/2/nodeTypes/com.enonic.app.explorer.thesaurus.js'] = path.resolve(__dirname, '../lib-explorer/src/main/resources/lib/explorer/model/2/nodeTypes/com.enonic.app.explorer.thesaurus.es');
+
+	SS_ALIAS['/lib/explorer/model/2/repositories/com.enonic.app.explorer.journals.js'] = path.resolve(__dirname, '../lib-explorer/src/main/resources/lib/explorer/model/2/repositories/com.enonic.app.explorer.journals.es');
+	SS_ALIAS['/lib/explorer/model/2/repositories/com.enonic.app.explorer.js'] = path.resolve(__dirname, '../lib-explorer/src/main/resources/lib/explorer/model/2/repositories/com.enonic.app.explorer.es');
+
+	SS_ALIAS['/lib/explorer/model/2/roles/com.enonic.app.explorer.admin.js'] = path.resolve(__dirname, '../lib-explorer/src/main/resources/lib/explorer/model/2/roles/com.enonic.app.explorer.admin.es');
+	SS_ALIAS['/lib/explorer/model/2/roles/com.enonic.app.explorer.read.js'] = path.resolve(__dirname, '../lib-explorer/src/main/resources/lib/explorer/model/2/roles/com.enonic.app.explorer.read.es');
+	SS_ALIAS['/lib/explorer/model/2/roles/com.enonic.app.explorer.write.js'] = path.resolve(__dirname, '../lib-explorer/src/main/resources/lib/explorer/model/2/roles/com.enonic.app.explorer.write.es');
+
+	SS_ALIAS['/lib/explorer/model/2/users/com.enonic.app.explorer.js'] = path.resolve(__dirname, '../lib-explorer/src/main/resources/lib/explorer/model/2/users/com.enonic.app.explorer.es');
+
 	SS_ALIAS['/lib/explorer'] = path.resolve(__dirname, '../lib-explorer/src/main/resources/lib/explorer/');
 	SS_ALIAS['/lib/util'] = path.resolve(__dirname, '../lib-util/src/main/resources/lib/util');
 }
