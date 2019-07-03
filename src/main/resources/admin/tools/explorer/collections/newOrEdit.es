@@ -198,7 +198,7 @@ export function newOrEdit({
 	//log.info(toStr({siteOptions}));
 
 	//const siteType = getType('portal:site'); log.info(toStr({siteType}));
-	const contentTypes = getTypes(); log.info(toStr({contentTypes}));
+	const contentTypes = getTypes(); //log.info(toStr({contentTypes}));
 	const contentTypeOptions = getTypes().map(({name: key, displayName: text, form}) => {
 		/*if (text === 'displayName') {
 			log.info(toStr({key, text, form}));
