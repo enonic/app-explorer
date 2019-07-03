@@ -1,4 +1,4 @@
-import {serviceUrl} from '/lib/xp/portal';
+import {assetUrl, serviceUrl} from '/lib/xp/portal';
 import {htmlResponse} from '/admin/tools/explorer/htmlResponse';
 import {menu} from '/admin/tools/explorer/collections/menu';
 
@@ -24,9 +24,10 @@ export const status = ({
 			menu({path})
 		],
 		bodyEnd: [
-			`<script type="text/javascript">
+			`<script type='module' defer>
+	import {Status} from '${assetUrl({path: 'react/Status.esm.js'})}'
 	ReactDOM.render(
-		React.createElement(window.explorer.Status, ${propsJson}),
+		React.createElement(Status, JSON.parse('${propsJson}')),
 		document.getElementById('${ID_REACT_STATUS_CONTAINER}')
 	);
 </script>`

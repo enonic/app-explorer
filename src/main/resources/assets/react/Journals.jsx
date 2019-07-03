@@ -28,9 +28,9 @@ export class Journals extends React.Component {
 			cache: {},
 			columns: {
 				collection: true,
-				startTime: false,
+				startTime: true,
 				endTime: true,
-				duration: false,
+				duration: true,
 				errorCount: true,
 				successCount: true
 			},

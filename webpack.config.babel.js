@@ -206,7 +206,8 @@ const WEBPACK_CONFIG = [webpackServerSideJs({
 		'src/main/resources/assets/react/Collection.jsx',
 		'src/main/resources/assets/react/Interface.jsx',
 		'src/main/resources/assets/react/Interfaces.jsx',
-		'src/main/resources/assets/react/Search.jsx'
+		'src/main/resources/assets/react/Search.jsx',
+		'src/main/resources/assets/react/Status.jsx'
 	],
 	externals: [
 		// Unable to load these via script or module:
