@@ -1,4 +1,5 @@
 //import traverse from 'traverse';
+import serialize from 'serialize-javascript';
 
 import {toStr} from '/lib/util';
 import {getSites} from '/lib/util/content/getSites';
@@ -127,11 +128,13 @@ export function newOrEdit({
 			}],
 			doCollect
 		} = node;
+		//log.info(toStr({config, configJson}));
 
 		const collector = {
 			name: collectorName,
 			config: configJson ? JSON.parse(configJson) : config
 		};
+		//log.info(toStr({collector}));
 
 		if (!collectorsAppToUri[collector.name]) {
 			status = 500;
@@ -237,9 +240,6 @@ export function newOrEdit({
 	};
 	//log.info(toStr({propsObj}));
 
-	const propsJson = JSON.stringify(propsObj);
-	//log.info(toStr({propsJson}));
-
 	return htmlResponse({
 		bodyBegin: [
 			menu({path})
@@ -252,10 +252,10 @@ export function newOrEdit({
 	${Object.entries(collectorsAppToUri).map(([a, u], i) => `import {Collector as Collector${i}} from '${u}';
 	collectorsObj['${a}'] = Collector${i};`
 	).join('\n')}
-	const propsObj = JSON.parse('${propsJson}');
+	const propsObj = eval(${serialize(propsObj)});
 	propsObj.collectorsObj = collectorsObj;
 	ReactDOM.render(
-		Collection(propsObj),
+		React.createElement(Collection, propsObj),
 		document.getElementById('${ID_REACT_COLLECTION_CONTAINER}')
 	);
 </script>`
