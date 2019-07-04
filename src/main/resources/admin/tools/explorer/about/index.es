@@ -25,15 +25,12 @@ const NODE_MODULES = [{
 	href: 'https://github.com/jquery/jquery/blob/master/LICENSE.txt'
 },{
 	header: 'jsUri',
-	description: 'MIT?',
 	href: 'https://github.com/derek-watson/jsUri/blob/master/LICENSE'
 },{
 	header: 'Moment.js',
-	description: 'MIT?',
 	href: 'https://github.com/moment/moment/blob/develop/LICENSE'
 },{
 	header: 'pretty-ms',
-	description: 'MIT?',
 	href: 'https://github.com/sindresorhus/pretty-ms/blob/master/license'
 },{
 	header: 'React and React-dom',
@@ -47,6 +44,9 @@ const NODE_MODULES = [{
 },{
 	header: 'Semantic UI React',
 	href: 'https://github.com/jhudson8/react-semantic-ui/blob/master/LICENSE'
+},{
+	header: 'striptags', // lib-explorer-client
+	href: 'https://github.com/ericnorris/striptags/blob/master/LICENSE'
 },{
 	header: 'traverse',
 	description: 'MIT/X11',
