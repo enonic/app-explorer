@@ -41,13 +41,13 @@ There are two main ways of developing:
 This will use java libraries listed under dependencies in build.gradle to build an application jar file. Depending upon you hardware this may take a minute.
 
 ```sh
-$ ./gradlew clean build deploy
+$ enonic project gradle clean build deploy
 ```
 
 If you are using SNAPSHOT versions of java libraries you can refresh dependencies like this:
 
 ```sh
-$ ./gradlew clean build deploy --refresh-dependencies
+$ enonic project gradle -- clean build deploy --refresh-dependencies
 ```
 
 ### Development watch
@@ -132,13 +132,7 @@ $ enonic sandbox start sandbox-name -dev
 #### Watching (using Gradle or Node)
 
 ```sh
-$ ./gradlew clean watch
-```
-
-or
-
-```sh
-$ npm run watch
+$ enonic project gradle clean watch
 ```
 
 #### Browser sync
