@@ -119,6 +119,8 @@ const CLIENT_JS_CONFIG = {
 };
 //console.log(`CLIENT_JS_CONFIG:${toStr(CLIENT_JS_CONFIG)}`); process.exit();
 
+const SS_ALIAS = {};
+
 const SS_EXTERNALS = [
 	/\/lib\/cache/,
 	/\/lib\/http-client/,
@@ -126,7 +128,19 @@ const SS_EXTERNALS = [
 	/\/lib\/xp\//
 ];
 
-const SS_ALIAS = {};
+const SS_FILES = [
+	'src/main/resources/main',
+	'src/main/resources/services/cronJobList/cronJobList',
+	'src/main/resources/services/interfaceCopy/interfaceCopy',
+	'src/main/resources/services/interfaceDelete/interfaceDelete',
+	'src/main/resources/services/interfaceExists/interfaceExists',
+	'src/main/resources/services/interfaceList/interfaceList',
+	'src/main/resources/services/journals/journals',
+	'src/main/resources/services/listCollectors/listCollectors',
+	'src/main/resources/services/search/search',
+	'src/main/resources/services/thesauri/thesauri',
+	'src/main/resources/admin/tools/explorer/explorer'
+];
 
 if (MODE === 'production') {
 	SS_EXTERNALS.push('/lib/cron');
@@ -134,11 +148,12 @@ if (MODE === 'production') {
 	SS_EXTERNALS.push('/lib/util');
 	SS_EXTERNALS.push(/^\/lib\/util\//);
 
-	// Avoid bundling and transpile library files seperately:
-	SS_EXTERNALS.push(/^\/admin\/tools\/explorer/);
-} else {
-	// Resolve dependencies within library and bundle them:
+	// Avoid bundling and transpile library files seperately.
+	// To do that you would have to list all files in SS_FILES!
+	//SS_EXTERNALS.push(/^\/admin\/tools\/explorer/);
+	// So instead lets: Resolve dependencies within library and bundle them:
 	SS_ALIAS['/admin/tools/explorer'] = path.resolve(__dirname, 'src/main/resources/admin/tools/explorer/');
+} else {
 
 	SS_ALIAS['/lib/cron'] = path.resolve(__dirname, '../lib-cron/src/main/resources/lib/cron/');
 	SS_ALIAS['/lib/explorer/client'] = path.resolve(__dirname, '../lib-explorer-client/src/main/resources/lib/explorer/client/');
@@ -150,19 +165,7 @@ if (MODE === 'production') {
 const WEBPACK_CONFIG = [webpackServerSideJs({
 	__dirname,
 	externals: SS_EXTERNALS,
-	serverSideFiles: [
-		'src/main/resources/main',
-		'src/main/resources/services/cronJobList/cronJobList',
-		'src/main/resources/services/interfaceCopy/interfaceCopy',
-		'src/main/resources/services/interfaceDelete/interfaceDelete',
-		'src/main/resources/services/interfaceExists/interfaceExists',
-		'src/main/resources/services/interfaceList/interfaceList',
-		'src/main/resources/services/journals/journals',
-		'src/main/resources/services/listCollectors/listCollectors',
-		'src/main/resources/services/search/search',
-		'src/main/resources/services/thesauri/thesauri',
-		'src/main/resources/admin/tools/explorer/explorer'
-	],
+	serverSideFiles: SS_FILES,
 	optimization: {
     	minimizer: [
 			new TerserPlugin({
