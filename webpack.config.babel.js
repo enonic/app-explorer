@@ -37,6 +37,7 @@ const CLIENT_JS_CONFIG = {
 		//'react'
 	],
 	devtool: false, // Don't waste time generating sourceMaps
+	//devtool: 'source-map',
 	mode: MODE,
 	module: {
 		rules: [{
@@ -121,6 +122,12 @@ const CLIENT_JS_CONFIG = {
 
 const SS_ALIAS = {};
 
+// Avoid bundling and transpile library files seperately.
+// To do that you would have to list all files in SS_FILES!
+//SS_EXTERNALS.push(/^\/admin\/tools\/explorer/);
+// So instead lets: Resolve dependencies within library and bundle them:
+SS_ALIAS['/admin/tools/explorer'] = path.resolve(__dirname, 'src/main/resources/admin/tools/explorer/');
+
 const SS_EXTERNALS = [
 	/\/lib\/cache/,
 	/\/lib\/http-client/,
@@ -147,17 +154,9 @@ if (MODE === 'production') {
 	SS_EXTERNALS.push(/^\/lib\/explorer\//);
 	SS_EXTERNALS.push('/lib/util');
 	SS_EXTERNALS.push(/^\/lib\/util\//);
-
-	// Avoid bundling and transpile library files seperately.
-	// To do that you would have to list all files in SS_FILES!
-	//SS_EXTERNALS.push(/^\/admin\/tools\/explorer/);
-	// So instead lets: Resolve dependencies within library and bundle them:
-	SS_ALIAS['/admin/tools/explorer'] = path.resolve(__dirname, 'src/main/resources/admin/tools/explorer/');
 } else {
-
 	SS_ALIAS['/lib/cron'] = path.resolve(__dirname, '../lib-cron/src/main/resources/lib/cron/');
 	SS_ALIAS['/lib/explorer/client'] = path.resolve(__dirname, '../lib-explorer-client/src/main/resources/lib/explorer/client/');
-
 	SS_ALIAS['/lib/explorer'] = path.resolve(__dirname, '../lib-explorer/src/main/resources/lib/explorer/');
 	SS_ALIAS['/lib/util'] = path.resolve(__dirname, '../lib-util/src/main/resources/lib/util');
 }
@@ -195,7 +194,8 @@ const WEBPACK_CONFIG = [webpackServerSideJs({
 		'src/main/resources/assets/react/Interface.jsx',
 		'src/main/resources/assets/react/Interfaces.jsx',
 		'src/main/resources/assets/react/Search.jsx',
-		'src/main/resources/assets/react/Status.jsx'
+		'src/main/resources/assets/react/Status.jsx',
+		'src/main/resources/assets/react/StopWords.jsx'
 	],
 	externals: [
 		// Unable to load these via script or module:
