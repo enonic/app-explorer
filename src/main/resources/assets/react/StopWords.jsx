@@ -4,7 +4,7 @@ import {
 } from 'semantic-ui-react';
 
 
-export class NewOrEditModal extends React.Component {
+class NewOrEditModal extends React.Component {
 	add = () => this.setState(prevState => {
 		prevState.words.push('');
 		return prevState;
@@ -268,6 +268,63 @@ export class NewOrEditModal extends React.Component {
 } // class NewOrEditModal
 
 
+class DeleteModal extends React.Component {
+	close = () => this.setState({ open: false })
+
+
+	open = () => this.setState({ open: true })
+
+
+	remove = () => {
+		const {name, servicesBaseUrl} = this.props;
+		console.debug({servicesBaseUrl});
+		fetch(`${servicesBaseUrl}/stopWordsDelete?name=${name}`, {
+			method: 'DELETE'
+		})
+			.then(response => {
+				if (response.status === 200) {
+					this.close();
+				}
+			})
+	} // remove
+
+
+	constructor(props) {
+		super(props);
+		this.state = {
+			open: false
+		}
+	} // constructor
+
+
+	render() {
+		const {name} = this.props;
+		return <Modal
+			closeIcon
+			onClose={this.close}
+			open={this.state.open}
+			trigger={<Button
+				compact
+				onClick={this.open}
+				size='tiny'
+			><Icon color='red' name='trash alternate outline'/>Delete</Button>}
+		>
+			<Modal.Header>Delete {name}</Modal.Header>
+			<Modal.Content>
+				<Header as='h2'>Do you really want to delete {name}?</Header>
+				<Form>
+					<Button
+						compact
+						onClick={this.remove}
+						size='tiny'
+					><Icon color='red' name='trash alternate outline'/>Confirm Delete</Button>
+				</Form>
+			</Modal.Content>
+		</Modal>;
+	} // render
+} // class DeleteModal
+
+
 export class StopWords extends React.Component {
 	constructor(props) {
 		//console.debug('StopWords constructor', props);
@@ -334,7 +391,10 @@ export class StopWords extends React.Component {
 										servicesBaseUrl={servicesBaseUrl}
 										words={words}
 									/>
-									<Button compact size='tiny'><Icon color='red' name='trash alternate outline'/>Delete</Button>
+									<DeleteModal
+										name={name}
+										servicesBaseUrl={servicesBaseUrl}
+									/>
 								</Table.Cell>
 							</Table.Row>;
 						})}
