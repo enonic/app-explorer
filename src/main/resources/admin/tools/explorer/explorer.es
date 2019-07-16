@@ -34,9 +34,6 @@ import {handleFieldsPost} from '/admin/tools/explorer/fields/handleFieldsPost';
 import {list as listFields} from '/admin/tools/explorer/fields/list';
 
 import {list as listStopWords} from '/admin/tools/explorer/stopWords/list';
-import {newOrEdit as newOrEditStopWords} from '/admin/tools/explorer/stopWords/newOrEdit';
-import {createOrUpdate as createOrUpdateStopWords} from '/admin/tools/explorer/stopWords/createOrUpdate';
-import {handleDelete as deleteStopWords} from '/admin/tools/explorer/stopWords/handleDelete';
 
 import {list as listThesauri} from '/admin/tools/explorer/thesauri/list';
 import {newOrEdit as newOrEditThesaurus} from '/admin/tools/explorer/thesauri/newOrEdit';
@@ -166,14 +163,7 @@ router.filter((req/*, next*/) => {
 	} // fields
 
 	if (tab === 'stopwords') {
-		switch (action) {
-		case 'new': // fallthrough to edit
-		case 'edit': return newOrEditStopWords(req);
-		case 'create': // fallthrough to update
-		case 'update': return createOrUpdateStopWords(req);
-		case 'delete': return deleteStopWords(req);
-		default: return listStopWords(req);
-		}
+		return listStopWords(req);
 	}
 
 	/*──────────────────────────────────────────────────────────────────────────

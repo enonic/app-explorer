@@ -144,6 +144,7 @@ const SS_FILES = [
 	'src/main/resources/services/interfaceList/interfaceList',
 	'src/main/resources/services/stopWordsCreateOrUpdate/stopWordsCreateOrUpdate',
 	'src/main/resources/services/stopWordsDelete/stopWordsDelete',
+	'src/main/resources/services/stopWordsList/stopWordsList',
 	'src/main/resources/services/journals/journals',
 	'src/main/resources/services/listCollectors/listCollectors',
 	'src/main/resources/services/search/search',

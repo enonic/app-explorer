@@ -11,7 +11,10 @@ class NewOrEditModal extends React.Component {
 	})
 
 
-	close = () => this.setState({ open: false })
+	close = () => {
+		this.setState({ open: false });
+		this.props.onClose();
+	}
 
 
 	change = (ignored, {name, value}) => {
@@ -95,9 +98,9 @@ class NewOrEditModal extends React.Component {
 
 	save = () => {
 		const {mode, servicesBaseUrl} = this.props;
-		console.debug({mode, servicesBaseUrl});
+		//console.debug({mode, servicesBaseUrl});
 		const {name, displayName, words} = this.state;
-		console.debug({name, displayName, words});
+		//console.debug({name, displayName, words});
 		fetch(`${servicesBaseUrl}/stopWordsCreateOrUpdate?mode=${mode === 'edit' ? 'update' : 'create'}&name=${name}&displayName=${displayName}&${words.map(w => `words=${w}`).join('&')}`, {
 			method: 'POST'
 		})
@@ -269,7 +272,10 @@ class NewOrEditModal extends React.Component {
 
 
 class DeleteModal extends React.Component {
-	close = () => this.setState({ open: false })
+	close = () => {
+		this.setState({ open: false });
+		this.props.onClose();
+	}
 
 
 	open = () => this.setState({ open: true })
@@ -277,7 +283,7 @@ class DeleteModal extends React.Component {
 
 	remove = () => {
 		const {name, servicesBaseUrl} = this.props;
-		console.debug({servicesBaseUrl});
+		//console.debug({servicesBaseUrl});
 		fetch(`${servicesBaseUrl}/stopWordsDelete?name=${name}`, {
 			method: 'DELETE'
 		})
@@ -330,27 +336,44 @@ export class StopWords extends React.Component {
 		//console.debug('StopWords constructor', props);
 		super(props);
 
-		const {
+		/*const {
 			stopWordsRes = {
 				count: 0,
 				hits: [],
 				total: 0
 			}
-		} = props;
+		} = props;*/
 
 		this.state = {
-			stopWordsRes
+			stopWordsRes: {
+				count: 0,
+				hits: [],
+				total: 0
+			},
+			isLoading: false
 		};
 		//console.debug(this.state);
 	} // constructor
 
 
-	/*componentDidMount() {
-		console.debug('StopWords componentDidMount', this.props, this.state);
+	updateStopwords() {
+		this.setState({ isLoading: true });
+		fetch(`${this.props.servicesBaseUrl}/stopWordsList`)
+			.then(response => response.json())
+			.then(data => this.setState({
+				stopWordsRes: data,
+				isLoading: false
+			}));
+	}
+
+
+	componentDidMount() {
+		//console.debug('StopWords componentDidMount', this.props, this.state);
+		this.updateStopwords();
 	} // componentDidMount
 
 
-	componentDidUpdate(prevProps) {
+	/*componentDidUpdate(prevProps) {
 		console.debug('StopWords componentDidUpdate', prevProps, this.props, this.state);
 	} // componentDidUpdate*/
 
@@ -388,11 +411,13 @@ export class StopWords extends React.Component {
 										header={`Edit ${displayName} stopWords`}
 										mode='edit'
 										name={name}
+										onClose={() => this.updateStopwords()}
 										servicesBaseUrl={servicesBaseUrl}
 										words={words}
 									/>
 									<DeleteModal
 										name={name}
+										onClose={() => this.updateStopwords()}
 										servicesBaseUrl={servicesBaseUrl}
 									/>
 								</Table.Cell>
@@ -407,6 +432,7 @@ export class StopWords extends React.Component {
 						header='New stopWords list'
 						mode='new'
 						name=''
+						onClose={() => this.updateStopwords()}
 						servicesBaseUrl={servicesBaseUrl}
 						words={['']}
 					/>
