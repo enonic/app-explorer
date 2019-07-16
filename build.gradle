@@ -55,7 +55,7 @@ dependencies {
 	//──────────────────────────────────────────────────────────────────────────
 
 	//include "com.enonic.lib:lib-admin-ui:1.3.5"
-	include "com.enonic.lib:lib-admin-ui:2.0.0"
+	include "com.enonic.lib:lib-admin-ui:2.0.1"
 
 	include 'com.enonic.lib:lib-cache:2.0.0'
 	//include 'com.enonic.lib:lib-guillotine:1.0.1'
@@ -70,10 +70,7 @@ dependencies {
 	include 'com.enonic.lib:lib-explorer-client:1.0.0-SNAPSHOT'
 	include 'com.enonic.lib:lib-util:2.2.0'
 
-	// Via filesystem:
-	//include files('../lib-cron/build/libs/lib-cron-0.1.0.jar')
-	//include files('../lib-explorer/build/libs/lib-explorer-1.0.0-SNAPSHOT.jar')
-	//include files('../lib-explorer/build/libs/lib-explorer-client-1.0.0-SNAPSHOT.jar')
+	// WARNING: Do NOT use include files, jar file will be missing dependencies!
 }
 
 
