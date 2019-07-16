@@ -1,7 +1,7 @@
 import serialize from 'serialize-javascript';
 
 //import {toStr} from '/lib/util';
-import {assetUrl} from '/lib/xp/portal';
+import {assetUrl, serviceUrl} from '/lib/xp/portal';
 
 import {PRINCIPAL_EXPLORER_READ, TOOL_PATH} from '/lib/explorer/model/2/constants';
 import {htmlResponse} from '/admin/tools/explorer/htmlResponse';
@@ -24,6 +24,9 @@ export const list = ({
 	});
 	const stopWordsRes = queryStopWords({connection});
 	const propsObj = {
+		servicesBaseUrl: serviceUrl({
+			service: 'whatever'
+		}).replace('/whatever', ''),
 		stopWordsRes,
 		TOOL_PATH
 	};

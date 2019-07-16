@@ -11,8 +11,11 @@ export class NewOrEditModal extends React.Component {
 	})
 
 
+	close = () => this.setState({ open: false })
+
+
 	change = (ignored, {name, value}) => {
-		console.debug({name, value});
+		//console.debug({name, value});
 		return this.setState({[name]: value});
 	}
 
@@ -75,6 +78,9 @@ export class NewOrEditModal extends React.Component {
 	}
 
 
+	open = () => this.setState({ open: true })
+
+
 	remove = (index) => {
 		//console.debug(`index:${index} at define function time`);
 		return () => this.setState(prevState => {
@@ -84,6 +90,22 @@ export class NewOrEditModal extends React.Component {
 			//console.debug(prevState.words);
 			return prevState;
 		});
+	}
+
+
+	save = () => {
+		const {mode, servicesBaseUrl} = this.props;
+		console.debug({mode, servicesBaseUrl});
+		const {name, displayName, words} = this.state;
+		console.debug({name, displayName, words});
+		fetch(`${servicesBaseUrl}/stopWordsCreateOrUpdate?mode=${mode === 'edit' ? 'update' : 'create'}&name=${name}&displayName=${displayName}&${words.map(w => `words=${w}`).join('&')}`, {
+			method: 'POST'
+		})
+			.then(response => {
+				if (response.status === 200) {
+					this.close();
+				}
+			})
 	}
 
 
@@ -104,7 +126,8 @@ export class NewOrEditModal extends React.Component {
 		this.state = {
 			displayName,
 			name,
-			words
+			words,
+			open: false
 		};
 	} // constructor
 
@@ -123,8 +146,10 @@ export class NewOrEditModal extends React.Component {
 		const {
 			boolShowNameField = false,
 			header,
-			trigger
+			mode,
+			servicesBaseUrl
 		} = this.props;
+		//console.debug({servicesBaseUrl});
 		const {
 			displayName,
 			name,
@@ -132,7 +157,21 @@ export class NewOrEditModal extends React.Component {
 		} = this.state;
 		return <Modal
 			closeIcon
-			trigger={trigger}
+			onClose={this.close}
+			open={this.state.open}
+			trigger={mode === 'edit'
+				? <Button
+					compact
+					onClick={this.open}
+					size='tiny'><Icon color='blue' name='edit'/>Edit</Button>
+				: <Button
+					circular
+					color='green'
+					floated='right'
+					icon
+					onClick={this.open}
+					size='massive'><Icon name='plus'/></Button>
+			}
 		>
 			<Modal.Header>{header}</Modal.Header>
 			<Modal.Content>
@@ -217,6 +256,11 @@ export class NewOrEditModal extends React.Component {
 						onClick={this.sort}
 						size='tiny'
 					><Icon color='blue' name='sort alphabet up'/>Sort</Button>
+					<Button
+						compact
+						onClick={this.save}
+						size='tiny'
+					><Icon color='blue' name='save'/>Save</Button>
 				</Form>
 			</Modal.Content>
 		</Modal>;
@@ -234,13 +278,11 @@ export class StopWords extends React.Component {
 				count: 0,
 				hits: [],
 				total: 0
-			},
-			TOOL_PATH
+			}
 		} = props;
 
 		this.state = {
-			stopWordsRes,
-			TOOL_PATH
+			stopWordsRes
 		};
 		//console.debug(this.state);
 	} // constructor
@@ -258,8 +300,11 @@ export class StopWords extends React.Component {
 
 	render() {
 		const {
-			stopWordsRes,
+			servicesBaseUrl,
 			TOOL_PATH
+		} = this.props;
+		const {
+			stopWordsRes
 		} = this.state;
 		//console.debug(this.state);
 		const innerRef = createRef();
@@ -284,8 +329,9 @@ export class StopWords extends React.Component {
 									<NewOrEditModal
 										displayName={displayName}
 										header={`Edit ${displayName} stopWords`}
+										mode='edit'
 										name={name}
-										trigger={<Button compact size='tiny'><Icon color='blue' name='edit'/>Edit</Button>}
+										servicesBaseUrl={servicesBaseUrl}
 										words={words}
 									/>
 									<Button compact size='tiny'><Icon color='red' name='trash alternate outline'/>Delete</Button>
@@ -299,13 +345,9 @@ export class StopWords extends React.Component {
 						boolShowNameField={true}
 						displayName=''
 						header='New stopWords list'
+						mode='new'
 						name=''
-						trigger={<Button
-							circular
-							color='green'
-							floated='right'
-							icon
-							size='massive'><Icon name='plus'/></Button>}
+						servicesBaseUrl={servicesBaseUrl}
 						words={['']}
 					/>
 				</Sticky>
