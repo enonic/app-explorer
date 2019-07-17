@@ -103,7 +103,7 @@ export function newOrEdit({
 
 	const fieldValuesArray = getFieldValues({connection}).hits;
 	const fieldValuesObj = {};
-	fieldValuesArray.forEach(({_name, _path, displayName, field}) => {
+	fieldValuesArray.forEach(({_path, displayName, field, value}) => {
 		/*if (!fieldValuesObj[field]) {fieldValuesObj[field] = []}
 		fieldValuesObj[field].push({
 			label: displayName,
@@ -111,7 +111,7 @@ export function newOrEdit({
 			path: _path
 		});*/
 		if (!fieldValuesObj[field]) {fieldValuesObj[field] = {}}
-		fieldValuesObj[field][_name] = {
+		fieldValuesObj[field][value] = {
 			label: displayName,
 			path: _path
 		};

@@ -21,6 +21,7 @@ export function toolPage({
 			collections: collectionHits.map(({_name}) => _name),
 			thesauri: []
 		},*/
+		interfaceName: 'default',
 		servicesBaseUrl: serviceUrl({
 			service: 'whatever'
 		}).replace('/whatever', '')//,

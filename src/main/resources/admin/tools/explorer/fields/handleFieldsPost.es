@@ -82,7 +82,8 @@ export function handleFieldsPost({
 			_parentPath: valueNodeParentPath,
 			_name: valueNodeName,
 			displayName,
-			field: fieldName
+			field: fieldName,
+			value
 		});
 		//log.info(toStr({fv}));
 		const node = valueName ? fv.modify() : fv.create();

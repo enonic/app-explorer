@@ -45,14 +45,14 @@ export const Hits = ({
 					<p>{uri}</p>
 				</a>
 				<p dangerouslySetInnerHTML={{__html: text}}/>
-				<Labels mini>
+				{/*<Labels mini>
 					{forceMap(source, ({displayName}, i) =>
 						<Label basic pointing key={`source${i}`}><Icon className='database'/>{displayName}</Label>)}
 					{forceMap(informationType, ({displayName}, i) =>
 						<Label basic pointing key={`informationType${i}`}><Icon className='sitemap'/>{displayName}</Label>)}
 					{forceMap(language, ({displayName}, i) =>
 						<Label basic pointing key={`language${i}`}><Icon className='font'/>{displayName}</Label>)}
-				</Labels>
+				</Labels>*/}
 			</Item>)
 		}
 	</List>;

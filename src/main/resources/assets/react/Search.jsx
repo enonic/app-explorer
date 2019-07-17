@@ -27,18 +27,22 @@ export class Search extends React.Component {
 	constructor(props) {
     	super(props);
 
+		const {interfaceName} = props;
+		//console.debug(interfaceName);
+
     	this.state = {
       		cache: {},
 			searchString: '',
-			interfaceName: '',
-			interfaceOptions: []
+			interfaceName/*,
+			interfaceOptions: []*/
     	};
+		//console.debug(this.state);
 
 		this.handleChange = this.handleChange.bind(this);
   	} // constructor
 
 
-	updateInterfaces() {
+	/*updateInterfaces() {
 		this.setState({ isLoading: true });
 		fetch(`${this.props.servicesBaseUrl}/interfaceList`)
 			.then(response => response.json())
@@ -57,13 +61,13 @@ export class Search extends React.Component {
 				prevState.isLoading = false;
 				return prevState;
 			}));
-	} // updateInterfaces
+	} // updateInterfaces*/
 
 
-	componentDidMount() {
+	/*componentDidMount() {
 		console.debug('Search componentDidMount');
 		this.updateInterfaces();
-	} // componentDidMount
+	} // componentDidMount*/
 
 
 	search({
@@ -73,6 +77,7 @@ export class Search extends React.Component {
 		const {interfaceName} = this.state;
 		if(!interfaceName || !searchString) {return;}
 		const uri = `${servicesBaseUrl}/search?interface=${interfaceName}&name=searchString&searchString=${searchString}`;
+		console.debug(uri);
 		fetch(uri)
 			.then(response => response.json())
 			.then(data => this.setState(prevState => {
@@ -118,7 +123,12 @@ export class Search extends React.Component {
 			thesaurusOptions = [],
 			initialValues = {}
 		} = this.props;
-		const {cache, interfaceName, interfaceOptions, searchString} = this.state;
+		const {
+			cache,
+			interfaceName,
+			//interfaceOptions,
+			searchString
+		} = this.state;
 		const data = searchString && cache[interfaceName] && cache[interfaceName][searchString];
 		const hits = data ? data.hits : [];
 		const synonyms = data && data.synonymsObj;
@@ -153,7 +163,7 @@ export class Search extends React.Component {
 						}}
 					>
 						<Fields>
-							<Field>
+							{/*<Field>
 								<Dropdown
 									fluid
 									onChange={(ignored,{value}) => {
@@ -167,6 +177,7 @@ export class Search extends React.Component {
 									value={interfaceName}
 								/>
 							</Field>
+							*/}
 							{/*<Field>
 								<Select
 									label="Collections"
