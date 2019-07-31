@@ -159,7 +159,6 @@ if (MODE === 'production') {
 	SS_EXTERNALS.push(/^\/lib\/util\//);
 } else {
 	SS_ALIAS['/lib/cron'] = path.resolve(__dirname, '../lib-cron/src/main/resources/lib/cron/');
-	SS_ALIAS['/lib/explorer/client'] = path.resolve(__dirname, '../lib-explorer-client/src/main/resources/lib/explorer/client/');
 	SS_ALIAS['/lib/explorer'] = path.resolve(__dirname, '../lib-explorer/src/main/resources/lib/explorer/');
 	SS_ALIAS['/lib/util'] = path.resolve(__dirname, '../lib-util/src/main/resources/lib/util');
 }
@@ -170,12 +169,12 @@ const WEBPACK_CONFIG = [webpackServerSideJs({
 	serverSideFiles: SS_FILES,
 	optimization: {
     	minimizer: [
-			new TerserPlugin({
+			new TerserPlugin(/*{
 				terserOptions: {
-					compress: {},
-					mangle: true // Note `mangle.properties` is `false` by default.
+					compress: {}
+					//mangle: true // This will DESTROY exports!
 				}
-			})
+			}*/)
 		]
 	},
 	plugins: MODE === 'development' ? [
@@ -212,12 +211,12 @@ const WEBPACK_CONFIG = [webpackServerSideJs({
 	mode: MODE,
 	optimization: {
     	minimizer: [
-			new TerserPlugin({
+			new TerserPlugin(/*{
 				terserOptions: {
-					compress: {},
-					mangle: true // Note `mangle.properties` is `false` by default.
+					compress: {}
+					//mangle: true // This will DESTROY exports!
 				}
-			})
+			}*/)
 		]
 	},
 	plugins: MODE === 'development' ? [
