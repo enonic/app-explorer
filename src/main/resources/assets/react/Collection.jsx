@@ -1,5 +1,4 @@
 import {
-	//Formik,
 	getIn,
 	ErrorMessage as FormikErrorMessage,
 	Field as FormikField,
@@ -172,14 +171,6 @@ const MainForm = (props) => {
 				selection
 			/>
 		</Form.Field>
-		{/*<Form.Field>
-			<Checkbox
-				formik={props}
-				name='doCollect'
-				label='Collect?'
-			/>
-		</Form.Field>
-		<Cron/>*/}
 	</Form>
 } // MainForm
 
@@ -195,6 +186,50 @@ const MainFormik = withFormik({
 	mapPropsToValues: (props) => props.values,
 	validationSchema: MAIN_SCHEMA
 })(MainForm);
+
+
+const CronForm = (props) => {
+	//console.debug('CronForm props', props);
+	const {
+		// Passed as props:
+		onChange,
+		values,
+
+		// FormikBag added by withFormik
+		isValid
+	} = props;
+
+	// Call onChange every time values changes
+	React.useEffect(() => {
+		if (onChange) {
+			onChange({
+				isValid,
+				values
+			});
+		}
+	}, [values]);
+
+	return <Form
+		autoComplete='off'
+		style={{
+			width: '100%'
+		}}
+	>
+		<Form.Field>
+			<Checkbox
+				formik={props}
+				name='doCollect'
+				label='Collect?'
+			/>
+		</Form.Field>
+		<Cron/>
+	</Form>
+} // CronForm
+
+
+const CronFormik = withFormik({
+	mapPropsToValues: (props) => props.values
+})(CronForm);
 
 
 export const Collection = ({
@@ -277,6 +312,21 @@ export const Collection = ({
 				: <p>Collector NOT found!</p>
 			: <p>Collector NOT selected!</p>
 		}
+		<Segment color='green'>
+			<Header as='h2' dividing content='Scheduling' id='cron'/>
+			<CronFormik
+				onChange={({
+					isValid,
+					values
+				}) => {
+					setFormValues({
+						...formValues,
+						...values
+					});
+				}}
+				values={formValues}
+			/>
+		</Segment>
 		<form action={action} method='POST'>
 			<input name='json' type='hidden' value={JSON.stringify(formValues)}/>
 			<button type='submit'>Save collection</button>
