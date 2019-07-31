@@ -5,8 +5,7 @@ import {
 	Field as FormikField,
 	withFormik
 } from 'formik';
-//import Nope from 'nope-validator';
-import {createRef, useEffect, useState} from 'react'
+//import {createRef, useEffect, useState} from 'react'; // Can lead to version mismatch
 import Scrollspy from 'react-scrollspy'
 import {
 	Form, Header, Icon,
@@ -220,7 +219,9 @@ export const Collection = ({
 	}));*/
 
 	const [formValues, setFormValues] = React.useState(initialValues);
-	console.debug('formValues', formValues);
+	const [formsValid, setFormsValid] = React.useState({});
+	//console.debug('formValues', formValues);
+	//console.debug('formsValid', formsValid);
 
 	return <>
 		<Segment color='black'>
@@ -235,6 +236,10 @@ export const Collection = ({
 					setFormValues({
 						...formValues,
 						...values
+					});
+					setFormsValid({
+						...formsValid,
+						main: isValid
 					});
 				}}
 				values={formValues}
@@ -261,6 +266,10 @@ export const Collection = ({
 									config: values
 								}
 							});
+							setFormsValid({
+								...formsValid,
+								collector: isValid
+							});
 						},
 						values: formValues.collector.config
 					})}
@@ -276,137 +285,10 @@ export const Collection = ({
 } // Collection
 
 /*
-const validate = (values, props) => {
-	console.debug('validate', values, props);
-	return {
-		name: 'Jalla'
-	};
-}
-
-
-const validateName = (values) => (value) => {
-	//console.debug('validateName', {values, value});
-	try {
-		COLLECTION_SCHEMA.validateSyncAt('name', values); // throws on validationError
-		return;
-	} catch (e) {
-		return e.message;
-	}
-}
-
-
-
-
-const contextRef = createRef();
-validate={values => COLLECTION_SCHEMA.validate(values)}
-validate={values => validate(values)}
-validateOnBlur={true}
-validateOnChange={true}
-validationSchema={COLLECTION_SCHEMA} // NOTE: Not passed on in formik bag!
+const contextRef = React.createRef();
 return <Ref innerRef={contextRef}>
 	<Segment basic compact style={{padding: 0}}>
-		<Formik
-			initialValues={initialValues}
-			onSubmit={(values, formikBag) => {
-				console.debug('In Formik.onSubmit');
-				//console.debug(values);
-				//console.debug(formikBag);
-				//setFormValues(values); // This works
-				//document.getElementById('json').setAttribute('value', JSON.stringify(values));
-				formikBag.setSubmitting(false);
-			}}
-			render={formik => {
-				const {
-					errors,
-					handleReset,
-					handleSubmit,
-					setFieldValue,
-					//submitForm, // Trigger a form submission. The promise will be rejected if form is invalid.
-					validateForm,
-					values
-				} = formik;
-				/*useEffect(() => { // Uncaught Invariant Violation: Invalid hook call. Hooks can only be called inside of the body of a function component.
-					setFormValues(values);
-				});
-				setFormValues(values); // Does it work before render? Yes, but happens twice.
-				//console.debug('Formik', {errors});
-				/*console.debug(toStr({
-					values
-				}));
-				return <Form
-					action={action}
-					autoComplete="off"
-					method="POST"
-					onReset={handleReset}
-					onSubmit={(e) => {
-						e.preventDefault(); // Don't submit
-						console.debug('In Form.onSubmit');
-						//setFormValues(values); // Doesn't work here!
-						//document.getElementById('json').setAttribute('value', JSON.stringify(values));
-						//const r =
-						handleSubmit(values, formik);
-						//console.debug(r); // undefined
-						//return validateForm();
-						//return handleSubmit();
-					}}
-					style={{
-						width: '100%'
-					}}
-				>
-					<Segment color='black'>
-						<Form.Field>
-							<Input
-								id='name'
-								fluid
-								formik={formik}
-								label={{ basic: true, content: 'Name' }}
-								name='name'
-								validate={validateName(values)}
-							/>
-						</Form.Field>
-						<Form.Field>
-							<Checkbox
-								formik={formik}
-								name='doCollect'
-								label='Collect?'
-							/>
-						</Form.Field>
-						<Cron/>
-					</Segment>
-					<Segment color='pink'>
-						<Header as='h2' dividing content='Collector' id='collector'/>
-						<Form.Field>
-							<Dropdown
-								defaultValue={getIn(values, 'collector.name', '')}
-								formik={formik}
-								path='collector.name'
-								onChange={(event, {value: collectorAppName}) => {
-									//console.debug({event, collectorAppName});
-									setFieldValue('collector', {
-										name: collectorAppName,
-										config: {}
-									});
-								}}
-								options={collectorOptions}
-								placeholder='Please select a collector'
-								selection
-							/>
-						</Form.Field>
-						<div>
-							{values.collector
-								&& values.collector.name
-								&& collectorsObj[values.collector.name]
-								? collectorsObj[values.collector.name]({contentTypeOptions, fields, formik, siteOptions})
-								: null}
-						</div>
-					</Segment>
-					<Form.Field>
-						<SubmitButton className='primary' text="Save collection" id='save'/>
-					</Form.Field>
-					<input id="json" name="json" type="hidden"/>
-				</Form>;
-			}}
-		/>
+		<Formik/>
 		<Rail position='right'>
 			<Sticky context={contextRef} offset={14}>
 				<Scrollspy
