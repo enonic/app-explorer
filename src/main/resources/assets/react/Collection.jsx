@@ -1,5 +1,5 @@
 import Scrollspy from 'react-scrollspy'
-import {Header, Menu, /*Rail, Ref, */Segment/*, Sticky*/} from 'semantic-ui-react';
+import {Button, Header, Icon, Menu, /*Rail, Ref, */Segment/*, Sticky*/} from 'semantic-ui-react';
 import traverse from 'traverse';
 
 import {SubmitButton} from './semantic-ui/SubmitButton';
@@ -46,6 +46,7 @@ export const Collection = ({
 	contentTypeOptions,
 	fields = {},
 	siteOptions,
+	TOOL_PATH,
 	initialValues = {
 		name: ''
 	}
@@ -60,61 +61,78 @@ export const Collection = ({
 		initialValues
 	}));*/
 
-	// Importing useState leads to React version mismatch
-	const [formValues, setFormValues] = React.useState(initialValues);
-	const [formsValid, setFormsValid] = React.useState({});
-	//console.debug('formValues', formValues);
-	//console.debug('formsValid', formsValid);
+	//const mainFormikRef = React.useRef(null);
+	//const mainFormikRef = React.createRef();
 
-	return <>
+	const [state, setState] = React.useState({ // Importing useState leads to React version mismatch
+		//dirty: {},
+		isValid: {},
+		values:	initialValues
+	});
+	//console.debug('state', state);
+	const rV = <>
 		<Segment color='black'>
 			<MainFormik
 				explorer={{
 					collectorOptions
 				}}
 				onChange={({
+					//dirty,
 					isValid,
 					values
 				}) => {
-					setFormValues({
-						...formValues,
-						...values
-					});
-					setFormsValid({
-						...formsValid,
-						main: isValid
+					setState({
+						/*dirty: {
+							...state.dirty,
+							main: dirty
+						},*/
+						isValid: {
+							...state.isValid,
+							main: isValid
+						},
+						values: {
+							...state.values,
+							...values
+						}
 					});
 				}}
-				values={formValues}
+				values={state.values}
 			/>
 		</Segment>
-		{formValues.collector && formValues.collector.name
-			? collectorsObj[formValues.collector.name]
+		{state.values.collector && state.values.collector.name
+			? collectorsObj[state.values.collector.name]
 				? <Segment color='pink'>
-					<Header as='h2' dividing content={formValues.collector.name} id='collector'/>
-					{collectorsObj[formValues.collector.name]({
+					<Header as='h2' dividing content={state.values.collector.name} id='collector'/>
+					{collectorsObj[state.values.collector.name]({
 						explorer: {
 							contentTypeOptions,
 							fields,
 							siteOptions
 						},
 						onChange: ({
+							//dirty,
 							isValid,
 							values
 						}) => {
-							setFormValues({
-								...formValues,
-								collector: {
-									name: formValues.collector.name,
-									config: values
+							setState({
+								/*dirty: {
+									...state.dirty,
+									collector: dirty
+								},*/
+								isValid: {
+									...state.isValid,
+									collector: isValid
+								},
+								values: {
+									...state.values,
+									collector: {
+										name: state.values.collector.name,
+										config: values
+									}
 								}
 							});
-							setFormsValid({
-								...formsValid,
-								collector: isValid
-							});
 						},
-						values: formValues.collector.config
+						values: state.values.collector.config
 					})}
 				</Segment>
 				: <p>Collector NOT found!</p>
@@ -124,22 +142,51 @@ export const Collection = ({
 			<Header as='h2' dividing content='Scheduling' id='cron'/>
 			<CronFormik
 				onChange={({
+					//dirty,
 					isValid,
 					values
 				}) => {
-					setFormValues({
-						...formValues,
-						...values
+					setState({
+						/*dirty: {
+							...state.dirty,
+							collector: dirty
+						},*/
+						isValid: {
+							...state.isValid,
+							collector: isValid
+						},
+						values: {
+							...state.values,
+							...values
+						}
 					});
 				}}
-				values={formValues}
+				values={state.values}
 			/>
 		</Segment>
 		<form action={action} method='POST'>
-			<input name='json' type='hidden' value={JSON.stringify(formValues)}/>
-			<button type='submit'>Save collection</button>
+			<input name='json' type='hidden' value={JSON.stringify(state.values)}/>
+			<Button
+				disabled={Object.keys(state.isValid).some(k => !state.isValid[k])}
+				primary
+				type='submit'
+			><Icon className='save outline'/>Save collection</Button>
+			{/*<Button
+				disabled={!Object.keys(state.dirty).some(k => state.dirty[k])}
+				secondary
+				type="reset"
+			>Reset</Button>*/}
+			<Button
+				as='a'
+				href={`${TOOL_PATH}/collections/list`}
+				secondary
+				type="Button"
+			>Cancel</Button>
 		</form>
 	</>;
+	//console.debug('mainFormikRef', mainFormikRef);
+	//console.debug('mainFormikRef.current', mainFormikRef.current);
+	return rV;
 } // Collection
 
 /*

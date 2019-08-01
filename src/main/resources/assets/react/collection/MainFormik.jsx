@@ -1,9 +1,18 @@
-import {getIn, withFormik} from 'formik';
+import {Formik, getIn, withFormik} from 'formik';
 import {Form, Header} from 'semantic-ui-react';
 import {Dropdown} from '@enonic/semantic-ui-react-formik-functional/dist/index.cjs';
 import * as Yup from 'yup';
 
 import {Input} from '../formik/semanticUi/Input';
+
+
+/*const FormikWithRefSupport = React.forwardRef(({children, ...rest}, ref) => {
+	const formikRef = React.useRef();
+	React.useImperativeHandle(ref, () => ({
+		resetForm: () => resetForm()
+	}));
+	return <Formik ref={formikRef} {...rest}>{children}</Formik>
+});*/
 
 
 const MainForm = (props) => {
@@ -16,6 +25,7 @@ const MainForm = (props) => {
 		values,
 
 		// FormikBag added by withFormik
+		dirty,
 		isValid,
 		setFieldValue
 	} = props;
@@ -26,6 +36,7 @@ const MainForm = (props) => {
 	React.useEffect(() => { // Importing useEffect leads to React version mismatch
 		if (onChange) {
 			onChange({
+				dirty,
 				isValid,
 				values
 			});
@@ -72,8 +83,12 @@ const MainForm = (props) => {
 const MAIN_SCHEMA = Yup.object().shape({
 	name: Yup.string()
 		.max(255, 'Too Long!')
-		.required('Required')
-});
+		.required('Required')/*,
+	collector: Yup.object().shape({
+		name: Yup.string().min(1,'Too short').required('Required'),
+		config: Yup.object().shape({})
+	})*/
+}); // MAIN_SCHEMA
 
 
 export const MainFormik = withFormik({

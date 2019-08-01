@@ -236,6 +236,7 @@ export function newOrEdit({
 		contentTypeOptions,
 		fields: fieldsObj,
 		siteOptions,
+		TOOL_PATH,
 		initialValues
 	};
 	//log.info(toStr({propsObj}));

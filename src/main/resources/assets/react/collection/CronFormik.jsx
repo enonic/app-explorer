@@ -13,6 +13,7 @@ const CronForm = (props) => {
 		values,
 
 		// FormikBag added by withFormik
+		dirty,
 		isValid
 	} = props;
 
@@ -20,6 +21,7 @@ const CronForm = (props) => {
 	React.useEffect(() => { // Importing useEffect leads to React version mismatch
 		if (onChange) {
 			onChange({
+				dirty,
 				isValid,
 				values
 			});
