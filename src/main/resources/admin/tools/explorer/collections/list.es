@@ -36,13 +36,12 @@ export const list = ({
 	//log.info(toStr({collections}));
 	return htmlResponse({
 		main: `<h1 class="ui header">Collections</h1>
-<table class="collapsing compact ui sortable selectable celled striped table">
-	<thead>
+<table class="compact ui sortable selectable celled striped table">
+	<thead class="full-width">
 		<tr>
 			<th class="sorted ascending">Name</th>
 			<th>Documents</th>
-			<th>Collect</th>
-			<th>Cron</th>
+			<th>Schedule</th>
 			<th class="no-sort">Interfaces</th>
 			<!--th class="no-sort">Collector</th-->
 			<th class="no-sort">Action(s)</th>
@@ -67,23 +66,21 @@ export const list = ({
 		return `<tr>
 			<td>${displayName}</td>
 			<td class="right aligned" data-sort-value="${count}">${count}</td>
-			<td>${doCollect ? '<i class="green check icon"></i>' : '<i class="red close icon"></i>'}</td>
-			<td>${toStr(forceArray(cron).map(({minute, hour, dayOfMonth, month, dayOfWeek})=> `${minute} ${hour} ${dayOfMonth} ${month} ${dayOfWeek}`))}</td>
+			<td class="collapsing">${doCollect ? toStr(forceArray(cron).map(({minute, hour, dayOfMonth, month, dayOfWeek})=> `${minute} ${hour} ${dayOfMonth} ${month} ${dayOfWeek}`))	: 'Not scheduled'}</td>
 			<td>${usedInInterfaces({
 		connection: readConnection,
 		name
 	}).join(', ')||''}</td>
 			<!--td>${collectorName}</td-->
-			<td>
+			<td class="collapsing">
 				<a ${tabIndexAttr} class="${disabledCssClass}tiny compact ui button" href="${TOOL_PATH}/collections/edit/${name}"><i class="blue edit icon"></i>Edit</a>
 				<a ${tabIndexAttr} class="${disabledCssClass}tiny compact ui button" href="${TOOL_PATH}/collections/collect/${name}"><i class="green cloud download icon"></i>Collect</a>
-				<a ${tabIndexAttr} class="${disabledCssClass}tiny compact ui button" href="${TOOL_PATH}/collections/collect/${name}?resume=true"><i class="green redo alternate icon"></i>Resume</a>
 				<a ${tabIndexAttr} class="${disabledCssClass}tiny compact ui button" href="${TOOL_PATH}/collections/stop/${name}"><i class="red stop icon"></i>Stop</a>
 				<a class="tiny compact ui button" href="${TOOL_PATH}/collections/delete/${name}"><i class="red trash alternate outline icon"></i>Delete</a>
 			</td>
 		</tr>`;}).join('\n')}
 	</tbody>
-	<tfoot>
+	<tfoot class="full-width">
 		<tr>
 			<th></th>
 			<th class="right aligned">${totalCount}</th>
