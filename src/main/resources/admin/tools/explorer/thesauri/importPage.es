@@ -1,6 +1,5 @@
 import {TOOL_PATH} from '/lib/explorer/model/2/constants';
 import {htmlResponse} from '/admin/tools/explorer/htmlResponse';
-import {menu} from '/admin/tools/explorer/thesauri/menu';
 
 
 export function importPage({
@@ -11,8 +10,7 @@ export function importPage({
 	const action = pathParts[1];
 	const thesaurusName = pathParts[2];
 	return htmlResponse({
-		main:`${menu({path})}
-<form
+		main:`<form
 	action="${TOOL_PATH}/thesauri/import/${thesaurusName}"
 	autocomplete="off"
 	class="ui form"

@@ -197,9 +197,6 @@ export class Interfaces extends React.Component {
 
 		return <>
 			<Header as='h1' content='Interfaces'/>
-			<Button onClick={() => {
-				window.location = `${TOOL_PATH}/interfaces/new`
-			}} type='button'><Icon color='green' name='plus'/>New</Button>
 			<Table celled collapsing compact selectable singleLine striped>
 				<Table.Header>
 					<Table.Row>

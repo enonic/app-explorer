@@ -12,7 +12,6 @@ import {htmlResponse} from '/admin/tools/explorer/htmlResponse';
 import {fieldFormHtml} from '/admin/tools/explorer/fields/fieldFormHtml';
 import {fieldValueFormHtml} from '/admin/tools/explorer/fields/values/fieldValueFormHtml';
 import {getFieldValues} from '/admin/tools/explorer/fields/getFieldValues';
-import {menu} from '/admin/tools/explorer/fields/menu';
 
 
 export function newOrEdit({
@@ -72,7 +71,7 @@ export function newOrEdit({
 		});
 
 		return htmlResponse({
-			main: `${menu({path: reqPath})}${fieldForm}
+			main: `${fieldForm}
 <table class="collapsing compact ui sortable selectable celled striped table">
 	<thead>
 		<tr>
@@ -103,7 +102,7 @@ ${valueForm}`,
 	}
 
 	return htmlResponse({
-		main: `${menu({path: reqPath})}${fieldFormHtml()}`,
+		main: fieldFormHtml(),
 		messages,
 		path: reqPath,
 		status,

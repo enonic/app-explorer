@@ -1,6 +1,5 @@
 import {TOOL_PATH} from '/lib/explorer/model/2/constants';
 import {htmlResponse} from '/admin/tools/explorer/htmlResponse';
-import {menu} from '/admin/tools/explorer/thesauri/menu';
 
 
 export function confirmDelete({
@@ -10,9 +9,6 @@ export function confirmDelete({
 	const pathParts = relPath.match(/[^/]+/g); //log.info(toStr({pathParts}));
 	const name = pathParts[2];
 	return htmlResponse({
-		bodyBegin: [
-			menu({path})
-		],
 		main: `<form action="${TOOL_PATH}/thesauri/delete/${name}" class="ui form" method="post">
 	<h1>Confirm delete thesaurus</h1>
 	<div class="ui field">

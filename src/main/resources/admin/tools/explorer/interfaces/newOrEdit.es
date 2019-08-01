@@ -170,7 +170,8 @@ export function newOrEdit({
 	);
 </script>`
 		],
-		main: `<div id="${ID_REACT_INTERFACE_CONTAINER}"/>`,
+		main: `<h1 class="header ui">New/Edit Interface</h1>
+<div id="${ID_REACT_INTERFACE_CONTAINER}"/>`,
 		path,
 		title: 'Create or edit interface'
 	});

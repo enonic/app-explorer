@@ -74,7 +74,7 @@ export function htmlResponse({
 			<div class="inverted left segment sidebar visible ui">
 				<div class="fluid inverted pointing menu secondary ui vertical">
 
-					<a class="item ${relPath === '' ? 'active' : ''}" href="${TOOL_PATH}""><i class="search icon"></i> Home</a>
+					<a class="${relPath === '' ? 'active ' : ''}item" href="${TOOL_PATH}""><i class="search icon"></i> Home</a>
 
 					<a class="${tab === 'collections' && !action ? 'active ' : ''}item" href="${TOOL_PATH}/collections"><i class="database icon"></i> Collections</a>
 					${tab === 'collections'	? `<div class="item">
@@ -83,11 +83,24 @@ export function htmlResponse({
 						<a class="${action === 'journal' ? 'active ' : ''}item" href="${TOOL_PATH}/collections/journal"><i class="newspaper outline icon"></i> Journal</a>
 					</div>`	: ''}
 
-					<a class="item ${tab === 'fields' ? 'active' : ''}" href="${TOOL_PATH}/fields"><i class="sitemap icon"></i> Fields</a>
-					<a class="item ${tab === 'stopwords' ? 'active' : ''}" href="${TOOL_PATH}/stopwords"><i class="crop icon"></i> StopWords</a>
-					<a class="item ${tab === 'thesauri' ? 'active' : ''}" href="${TOOL_PATH}/thesauri"><i class="font icon"></i> Thesauri</a>
-					<a class="item ${tab === 'interfaces' ? 'active' : ''}" href="${TOOL_PATH}/interfaces"><i class="plug icon"></i> Interfaces</a>
-					<a class="item ${tab === 'about' ? 'active' : ''}" href="${TOOL_PATH}/about"><i class="info icon"></i> About</a>
+					<a class="${tab === 'fields' ? 'active ' : ''}item" href="${TOOL_PATH}/fields"><i class="sitemap icon"></i> Fields</a>
+					${tab === 'fields' ? `<div class="item">
+						<a class="${action === 'new' ? ' active ' : ''} item" href="${TOOL_PATH}/fields/new"><i class="green plus icon"></i> New</a>
+					</div>` : ''}
+
+					<a class="${tab === 'stopwords' ? 'active ' : ''}item" href="${TOOL_PATH}/stopwords"><i class="crop icon"></i> StopWords</a>
+
+					<a class="${tab === 'thesauri' ? 'active ' : ''}item" href="${TOOL_PATH}/thesauri"><i class="font icon"></i> Thesauri</a>
+					${tab === 'thesauri' ? `<div class="item">
+						<a class="${action === 'new' ? ' active' : ''}item" href="${TOOL_PATH}/thesauri/new"><i class="green plus icon"></i> New</a>
+					</div>` : ''}
+
+					<a class="${tab === 'interfaces' ? 'active ' : ''}item" href="${TOOL_PATH}/interfaces"><i class="plug icon"></i> Interfaces</a>
+					${tab === 'interfaces' ? `<div class="item">
+						<a class="${action === 'new' ? ' active' : ''}item" href="${TOOL_PATH}/interfaces/new"><i class="green plus icon"></i> New</a>
+					</div>` : ''}
+
+					<a class="${tab === 'about' ? 'active ' : ''}item" href="${TOOL_PATH}/about"><i class="info icon"></i> About</a>
 
 				</div>
 			</div>

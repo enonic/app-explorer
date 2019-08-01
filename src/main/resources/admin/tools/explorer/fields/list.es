@@ -9,7 +9,6 @@ import {
 import {fieldFormHtml} from '/admin/tools/explorer/fields/fieldFormHtml';
 import {getFields} from '/admin/tools/explorer/fields/getFields';
 import {getFieldValues} from '/admin/tools/explorer/fields/getFieldValues';
-import {menu} from '/admin/tools/explorer/fields/menu';
 import {htmlResponse} from '/admin/tools/explorer/htmlResponse';
 import {connect} from '/lib/explorer/repo/connect';
 
@@ -54,7 +53,6 @@ export function list({
 	}).join('\n');
 	return htmlResponse({
 		main: `<h1 class="ui header">Fields</h1>
-${menu({path})}
 <table class="collapsing compact ui sortable selectable celled striped table">
 	<thead>
 		<tr>

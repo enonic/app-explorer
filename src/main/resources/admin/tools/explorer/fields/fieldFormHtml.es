@@ -34,7 +34,7 @@ export function fieldFormHtml({
 	method="POST"
 	style="width: 100%;"
 >
-	<h2>${key ? 'Edit' : 'New'} field ${displayName}</h2>
+	<h1 class="ui header">${key ? 'Edit' : 'New'} field ${displayName}</h1>
 	<div class="grouped fields">
 		<div class="field">
 			<label>Display name</label>

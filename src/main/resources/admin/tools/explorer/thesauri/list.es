@@ -6,7 +6,6 @@ import {
 	TOOL_PATH
 } from '/lib/explorer/model/2/constants';
 import {htmlResponse} from '/admin/tools/explorer/htmlResponse';
-import {menu} from '/admin/tools/explorer/thesauri/menu';
 import {connect} from '/lib/explorer/repo/connect';
 import {query as getThesauri} from '/lib/explorer/thesaurus/query';
 
@@ -47,7 +46,6 @@ export function list({
 	);
 </script>`],
 		main: `<h1 class="ui header">Thesauri</h1>
-${menu({path})}
 <table class="collapsing compact ui sortable selectable celled striped table">
 	<thead>
 		<tr>

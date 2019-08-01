@@ -14,7 +14,7 @@ export function thesaurusForm({
 	method="POST"
 	style="width: 100%;"
 >
-	<div class="ui header">Thesaurus</div>
+	<h1 class="ui header">Thesaurus</h1>
 	<div class="grouped fields">
 		<div class="field">
 			<label>Name</label>

@@ -15,7 +15,7 @@ export function fieldValueFormHtml({
 	method="POST"
 	style="width: 100%;"
 >
-	<h2>${value ? 'Edit' : 'New'} value</h2>
+	<h1 class="ui header">${value ? 'Edit' : 'New'} field value</h1>
 
 	<div class="grouped fields">
 		<div class="field">

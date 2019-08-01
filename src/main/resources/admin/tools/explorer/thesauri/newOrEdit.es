@@ -8,7 +8,6 @@ import {
 	TOOL_PATH
 } from '/lib/explorer/model/2/constants';
 import {htmlResponse} from '/admin/tools/explorer/htmlResponse';
-import {menu} from '/admin/tools/explorer/thesauri/menu';
 import {thesaurusForm} from '/admin/tools/explorer/thesauri/thesaurusForm';
 import {connect} from '/lib/explorer/repo/connect';
 
@@ -32,7 +31,7 @@ export function newOrEdit({
 
 	if(action !== 'edit') {
 		return htmlResponse({
-			main: `${menu({path})}${thesaurusForm()}`,
+			main: thesaurusForm(),
 			messages,
 			path,
 			status,
@@ -71,7 +70,7 @@ export function newOrEdit({
 		document.getElementById('${ID_REACT_THESAURI_CONTAINER}')
 	);
 </script>`],
-		main: `${menu({path})}${thesaurusForm({
+		main: `${thesaurusForm({
 			description,
 			displayName,
 			name: thesaurusName
