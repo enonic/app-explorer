@@ -70,8 +70,8 @@ export function htmlResponse({
 		${headEnd.join('\n')}
 	</head>
 	<body>
-		<div class="attached bottom pushable segment ui" style="border:0 none;">
-			<div class="inverted left segment sidebar visible ui">
+		<div class="left pushable sidebar ui">
+			<div class="attached inverted segment ui">
 				<div class="fluid inverted pointing menu secondary ui vertical">
 
 					<a class="${relPath === '' ? 'active ' : ''}item" href="${TOOL_PATH}""><i class="search icon"></i> Home</a>
@@ -102,24 +102,30 @@ export function htmlResponse({
 
 					<a class="${tab === 'about' ? 'active ' : ''}item" href="${TOOL_PATH}/about"><i class="info icon"></i> About</a>
 
-				</div>
-			</div>
-			<div class="pusher">
-				${bodyBegin.join('\n')}
-				<main class="container main ui">
-					${messagesArray.length ? `<div class="ui icon ${statusInt === 200 ? 'positive' : 'negative'} message">
-							<i class="${statusInt === 200 ? 'thumbs up' : 'exclamation triangle'} icon"></i>
-							<div class="content">
-		  						<div class="header">${statusInt === 200 ? 'Success' : 'Error'}</div>
-								<ul class="list">
-									${messagesArray.map(m => `<li>${m}</li>`)}
-								</ul>
-							</div>
-						</div>` : ''}
-					${main}
-				</main>
-			</div>
+				</div><!-- menu -->
+			</div><!-- segment -->
+		</div><!-- sidebar -->
+
+		<div class="fixed inverted menu top ui">
+			<a class="item" onClick="$('.ui.sidebar').sidebar('setting', 'transition', 'scale down').sidebar('toggle');"><i class="caret left icon"></i>Sidebar</a>
 		</div>
+
+		<div class="main pusher" style="padding-top:54px;">
+			<div class="container ui">
+				${bodyBegin.join('\n')}
+				${messagesArray.length ? `<div class="ui icon ${statusInt === 200 ? 'positive' : 'negative'} message">
+						<i class="${statusInt === 200 ? 'thumbs up' : 'exclamation triangle'} icon"></i>
+						<div class="content">
+	  						<div class="header">${statusInt === 200 ? 'Success' : 'Error'}</div>
+							<ul class="list">
+								${messagesArray.map(m => `<li>${m}</li>`)}
+							</ul>
+						</div>
+					</div>` : ''}
+				${main}
+			</div><!-- container -->
+		</div><!-- pusher -->
+
 
 		<script type="text/javascript">
 		var CONFIG = {
