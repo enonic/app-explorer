@@ -70,41 +70,37 @@ export function htmlResponse({
 		${headEnd.join('\n')}
 	</head>
 	<body>
-		<div class="left pushable sidebar ui">
-			<div class="attached inverted segment ui">
-				<div class="fluid inverted pointing menu secondary ui vertical">
+		<div class="inverted left menu sidebar ui vertical" style="padding-top:54px;">
 
-					<a class="${relPath === '' ? 'active ' : ''}item" href="${TOOL_PATH}""><i class="search icon"></i> Home</a>
+			<a class="${relPath === '' ? 'active ' : ''}item" href="${TOOL_PATH}""><i class="search icon"></i> Home</a>
 
-					<a class="${tab === 'collections' && !action ? 'active ' : ''}item" href="${TOOL_PATH}/collections"><i class="database icon"></i> Collections</a>
-					${tab === 'collections'	? `<div class="item">
-						<a class="${action === 'new' ? ' active ' : ''}item" href="${TOOL_PATH}/collections/new"><i class="green plus icon"></i> New</a>
-						<a class="${action === 'status' ? 'active ' : ''}item" href="${TOOL_PATH}/collections/status"><i class="cogs icon"></i> Status</a>
-						<a class="${action === 'journal' ? 'active ' : ''}item" href="${TOOL_PATH}/collections/journal"><i class="newspaper outline icon"></i> Journal</a>
-					</div>`	: ''}
+			<a class="${tab === 'collections' && !action ? 'active ' : ''}item" href="${TOOL_PATH}/collections"><i class="database icon"></i> Collections</a>
+			${tab === 'collections'	? `<div class="inverted menu">
+				<a class="${action === 'new' ? ' active ' : ''}item" href="${TOOL_PATH}/collections/new"><i class="green plus icon"></i> New</a>
+				<a class="${action === 'status' ? 'active ' : ''}item" href="${TOOL_PATH}/collections/status"><i class="cogs icon"></i> Status</a>
+				<a class="${action === 'journal' ? 'active ' : ''}item" href="${TOOL_PATH}/collections/journal"><i class="newspaper outline icon"></i> Journal</a>
+			</div>`	: ''}
 
-					<a class="${tab === 'fields' ? 'active ' : ''}item" href="${TOOL_PATH}/fields"><i class="sitemap icon"></i> Fields</a>
-					${tab === 'fields' ? `<div class="item">
-						<a class="${action === 'new' ? ' active ' : ''} item" href="${TOOL_PATH}/fields/new"><i class="green plus icon"></i> New</a>
-					</div>` : ''}
+			<a class="${tab === 'fields' ? 'active ' : ''}item" href="${TOOL_PATH}/fields"><i class="sitemap icon"></i> Fields</a>
+			${tab === 'fields' ? `<div class="inverted menu">
+				<a class="${action === 'new' ? ' active ' : ''} item" href="${TOOL_PATH}/fields/new"><i class="green plus icon"></i> New</a>
+			</div>` : ''}
 
-					<a class="${tab === 'stopwords' ? 'active ' : ''}item" href="${TOOL_PATH}/stopwords"><i class="crop icon"></i> StopWords</a>
+			<a class="${tab === 'stopwords' ? 'active ' : ''}item" href="${TOOL_PATH}/stopwords"><i class="crop icon"></i> StopWords</a>
 
-					<a class="${tab === 'thesauri' ? 'active ' : ''}item" href="${TOOL_PATH}/thesauri"><i class="font icon"></i> Thesauri</a>
-					${tab === 'thesauri' ? `<div class="item">
-						<a class="${action === 'new' ? ' active' : ''}item" href="${TOOL_PATH}/thesauri/new"><i class="green plus icon"></i> New</a>
-					</div>` : ''}
+			<a class="${tab === 'thesauri' ? 'active ' : ''}item" href="${TOOL_PATH}/thesauri"><i class="font icon"></i> Thesauri</a>
+			${tab === 'thesauri' ? `<div class="inverted menu">
+				<a class="${action === 'new' ? ' active' : ''}item" href="${TOOL_PATH}/thesauri/new"><i class="green plus icon"></i> New</a>
+			</div>` : ''}
 
-					<a class="${tab === 'interfaces' ? 'active ' : ''}item" href="${TOOL_PATH}/interfaces"><i class="plug icon"></i> Interfaces</a>
-					${tab === 'interfaces' ? `<div class="item">
-						<a class="${action === 'new' ? ' active' : ''}item" href="${TOOL_PATH}/interfaces/new"><i class="green plus icon"></i> New</a>
-					</div>` : ''}
+			<a class="${tab === 'interfaces' ? 'active ' : ''}item" href="${TOOL_PATH}/interfaces"><i class="plug icon"></i> Interfaces</a>
+			${tab === 'interfaces' ? `<div class="inverted menu">
+				<a class="${action === 'new' ? ' active' : ''}item" href="${TOOL_PATH}/interfaces/new"><i class="green plus icon"></i> New</a>
+			</div>` : ''}
 
-					<a class="${tab === 'about' ? 'active ' : ''}item" href="${TOOL_PATH}/about"><i class="info icon"></i> About</a>
+			<a class="${tab === 'about' ? 'active ' : ''}item" href="${TOOL_PATH}/about"><i class="info icon"></i> About</a>
 
-				</div><!-- menu -->
-			</div><!-- segment -->
-		</div><!-- sidebar -->
+		</div><!-- menu sidebar -->
 
 		<div class="fixed inverted menu top ui">
 			<a class="item" onClick="$('.ui.sidebar').sidebar('setting', 'transition', 'scale down').sidebar('toggle');"><i class="caret left icon"></i>Sidebar</a>
