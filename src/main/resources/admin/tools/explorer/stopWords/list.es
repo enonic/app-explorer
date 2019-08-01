@@ -40,7 +40,8 @@ export const list = ({
 		document.getElementById('${ID_REACT_STOPWORDS_CONTAINER}')
 	);
 </script>`],
-		main: `<div id="${ID_REACT_STOPWORDS_CONTAINER}"/>`,
+		main: `<h1 class="ui header">Stop word lists</h1>
+<div id="${ID_REACT_STOPWORDS_CONTAINER}"/>`,
 		messages,
 		path,
 		status,

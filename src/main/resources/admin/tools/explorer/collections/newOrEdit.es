@@ -15,7 +15,6 @@ import {
 } from '/lib/explorer/model/2/constants';
 
 import {htmlResponse} from '/admin/tools/explorer/htmlResponse';
-import {menu} from '/admin/tools/explorer/collections/menu';
 import {query as queryCollectors} from '/lib/explorer/collector/query';
 import {getFields} from '/admin/tools/explorer/fields/getFields';
 import {getFieldValues} from '/admin/tools/explorer/fields/getFieldValues';
@@ -242,10 +241,8 @@ export function newOrEdit({
 	//log.info(toStr({propsObj}));
 
 	return htmlResponse({
-		bodyBegin: [
-			menu({path})
-		],
-		main: `<div id="${ID_REACT_COLLECTION_CONTAINER}"/>`,
+		main: `<h1 class="ui header">New/Edit collection</h1>
+<div id="${ID_REACT_COLLECTION_CONTAINER}"/>`,
 		bodyEnd: [
 			`<script type='module' defer>
 	import {Collection} from '${assetUrl({path: 'react/Collection.esm.js'})}'

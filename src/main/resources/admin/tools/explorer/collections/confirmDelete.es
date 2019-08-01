@@ -1,7 +1,6 @@
 //import {toStr} from '/lib/util';
 import {TOOL_PATH} from '/lib/explorer/model/2/constants';
 import {htmlResponse} from '/admin/tools/explorer/htmlResponse';
-import {menu} from '/admin/tools/explorer/collections/menu';
 
 
 export const confirmDelete = ({
@@ -11,9 +10,6 @@ export const confirmDelete = ({
 	const pathParts = relPath.match(/[^/]+/g); //log.info(toStr({pathParts}));
 	const name = pathParts[2];
 	return htmlResponse({
-		bodyBegin: [
-			menu({path})
-		],
 		main: `<form action="${TOOL_PATH}/collections/delete/${name}" class="ui form" method="post">
 	<h1>Confirm delete collection</h1>
 	<div class="ui field">

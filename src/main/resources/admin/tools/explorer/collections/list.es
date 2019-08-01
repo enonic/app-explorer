@@ -5,7 +5,6 @@ import {
 	PRINCIPAL_EXPLORER_READ,
 	TOOL_PATH
 } from '/lib/explorer/model/2/constants';
-import {menu} from '/admin/tools/explorer/collections/menu';
 import {getDocumentCount} from '/lib/explorer/collection/getDocumentCount';
 import {query} from '/lib/explorer/collection/query';
 import {usedInInterfaces} from '/lib/explorer/collection/usedInInterfaces';
@@ -36,10 +35,8 @@ export const list = ({
 	let totalCount = 0;
 	//log.info(toStr({collections}));
 	return htmlResponse({
-		bodyBegin: [
-			menu({path})
-		],
-		main: `<table class="collapsing compact ui sortable selectable celled striped table">
+		main: `<h1 class="ui header">Collections</h1>
+<table class="collapsing compact ui sortable selectable celled striped table">
 	<thead>
 		<tr>
 			<th class="sorted ascending">Name</th>

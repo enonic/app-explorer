@@ -38,7 +38,8 @@ export function toolPage({
 		document.getElementById('${ID_REACT_SEARCH_CONTAINER}')
 	);
 </script>`],
-		main: `<div id="${ID_REACT_SEARCH_CONTAINER}"/>`,
+		main: `<h1 class="ui header">Explorer</h1>
+<div id="${ID_REACT_SEARCH_CONTAINER}"/>`,
 		path
 	});
 }

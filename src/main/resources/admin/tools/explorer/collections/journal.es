@@ -2,7 +2,6 @@
 import {serviceUrl} from '/lib/xp/portal';
 
 import {htmlResponse} from '/admin/tools/explorer/htmlResponse';
-import {menu} from '/admin/tools/explorer/collections/menu';
 import {query} from '/lib/explorer/journal/query';
 
 
@@ -25,9 +24,6 @@ export const journal = ({
 	};
 	const propsJson = JSON.stringify(propsObj);
 	return htmlResponse({
-		bodyBegin: [
-			menu({path})
-		],
 		bodyEnd: [
 			`<script type="text/javascript">
 	ReactDOM.render(
@@ -36,7 +32,8 @@ export const journal = ({
 	);
 </script>`
 		],
-		main: `<div id="${ID_REACT_JOURNALS_CONTAINER}"/>`,
+		main: `<h1 class="ui header">Collector tasks journal</h1>
+<div id="${ID_REACT_JOURNALS_CONTAINER}"/>`,
 		path,
 		title: 'Journal'
 	})

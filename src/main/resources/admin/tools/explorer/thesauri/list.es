@@ -46,7 +46,8 @@ export function list({
 		document.getElementById('${ID_REACT_THESAURI_CONTAINER}')
 	);
 </script>`],
-		main: `${menu({path})}
+		main: `<h1 class="ui header">Thesauri</h1>
+${menu({path})}
 <table class="collapsing compact ui sortable selectable celled striped table">
 	<thead>
 		<tr>

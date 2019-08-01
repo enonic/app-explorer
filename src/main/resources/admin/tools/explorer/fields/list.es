@@ -53,7 +53,8 @@ export function list({
 	</tr>`;
 	}).join('\n');
 	return htmlResponse({
-		main: `${menu({path})}
+		main: `<h1 class="ui header">Fields</h1>
+${menu({path})}
 <table class="collapsing compact ui sortable selectable celled striped table">
 	<thead>
 		<tr>

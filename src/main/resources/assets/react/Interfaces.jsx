@@ -1,4 +1,4 @@
-import {Button, Icon, Input, Message, Modal, Table} from 'semantic-ui-react';
+import {Button, Header, Icon, Input, Message, Modal, Table} from 'semantic-ui-react';
 
 
 export class CopyModal extends React.Component {
@@ -196,6 +196,10 @@ export class Interfaces extends React.Component {
 		//console.debug(hits);
 
 		return <>
+			<Header as='h1' content='Interfaces'/>
+			<Button onClick={() => {
+				window.location = `${TOOL_PATH}/interfaces/new`
+			}} type='button'><Icon color='green' name='plus'/>New</Button>
 			<Table celled collapsing compact selectable singleLine striped>
 				<Table.Header>
 					<Table.Row>
@@ -233,9 +237,6 @@ export class Interfaces extends React.Component {
 					})}
 				</Table.Body>
 			</Table>
-			<Button onClick={() => {
-				window.location = `${TOOL_PATH}/interfaces/new`
-			}} type='button'><Icon color='green' name='plus'/>New interface</Button>
 		</>;
 	} // render
 } // class Interfaces
