@@ -1,42 +1,9 @@
 import Scrollspy from 'react-scrollspy'
 import {Button, Header, Icon, Menu, /*Rail, Ref, */Segment/*, Sticky*/} from 'semantic-ui-react';
-import traverse from 'traverse';
 
 import {SubmitButton} from './semantic-ui/SubmitButton';
-//import {toStr} from './utils/toStr';
 import {MainFormik} from './collection/MainFormik';
 import {CronFormik} from './collection/CronFormik';
-
-
-function convert(node) {
-	traverse(node).forEach(function(value) { // Fat arrow destroys this
-		const key = this.key;
-		//log.info(toStr({key}));
-		if([
-			'crawl',
-			'cron',
-			'download',
-			'fields',
-			'headers',
-			'queryParams',
-			'scrape',
-			'scrapeExpression',
-			'scrapeJson',
-			'tags',
-			'urls',
-			'urlExpression'
-			//'value' // Nope this will destroy headers[index].value
-		].includes(key)) {
-			if (!value) {
-				this.update([]);
-			} else if (!Array.isArray(value)) {
-				const array = [value];
-				convert(array); // Recurse
-				this.update(array);
-			}
-		}
-	});
-} // convert
 
 
 export const Collection = ({
@@ -53,13 +20,7 @@ export const Collection = ({
 } = {}) => {
 	//console.debug('collectorsObj', collectorsObj);
 	//console.debug('collectorOptions', collectorOptions);
-	/*console.debug(toStr({
-		initialValues
-	}));*/
-	convert(initialValues);
-	/*console.debug(toStr({
-		initialValues
-	}));*/
+	//console.debug('initialValues',initialValues);
 
 	//const mainFormikRef = React.useRef(null);
 	//const mainFormikRef = React.createRef();
