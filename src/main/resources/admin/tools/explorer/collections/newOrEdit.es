@@ -1,4 +1,3 @@
-//import traverse from 'traverse';
 import serialize from 'serialize-javascript';
 
 import {toStr} from '/lib/util';
@@ -21,34 +20,6 @@ import {getFieldValues} from '/admin/tools/explorer/fields/getFieldValues';
 
 
 const ID_REACT_COLLECTION_CONTAINER = 'reactCollectionContainer';
-
-/*function convert(node) {
-	traverse(node).forEach(function(value) { // Fat arrow destroys this
-		const key = this.key;
-		//log.info(toStr({key}));
-		if([
-			'crawl',
-			'download',
-			'headers',
-			'queryParams',
-			'scrape',
-			'scrapeExpression',
-			'scrapeJson',
-			'tags',
-			'urls',
-			'urlExpression'
-			//'value' // Nope this will destroy headers[index].value
-		].includes(key)) {
-			if (!value) {
-				this.update([]);
-			} else if (!Array.isArray(value)) {
-				const array = [value];
-				convert(array); // Recurse
-				this.update(array);
-			}
-		}
-	});
-}*/
 
 
 export function newOrEdit({
@@ -118,16 +89,20 @@ export function newOrEdit({
 				configJson,
 				config
 			},
+			doCollect
+		} = node;
+		//log.info(toStr({config, configJson}));
+
+		let {
 			cron = [{
 				month: '*',
 				dayOfMonth: '*',
 				dayOfWeek: '*',
 				minute: '*',
 				hour: '*'
-			}],
-			doCollect
+			}]
 		} = node;
-		//log.info(toStr({config, configJson}));
+		if (!Array.isArray(cron)) { cron = [cron]; }
 
 		const collector = {
 			name: collectorName,
@@ -144,13 +119,6 @@ export function newOrEdit({
 				}&status=${status}`
 			}
 		}
-
-
-		//convert(collector); // TODO Surgeon specific
-		if (collector.name === 'com.enonic.app.explorer.collector.surgeon' && collector.config.urls && !collector.config.urls.length) {
-			collector.config.urls.push('');
-		}
-		//log.info(toStr({collector}));
 
 		initialValues = {
 			name: displayName,
