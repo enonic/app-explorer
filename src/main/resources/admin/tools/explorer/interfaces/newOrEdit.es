@@ -71,8 +71,8 @@ export function newOrEdit({
 			filters,
 			query,
 			stopWords,
-			resultMappings,
-			pagination
+			resultMappings//,
+			//pagination
 		} = node;
 		initialValues = convert({
 			object: {
@@ -83,7 +83,7 @@ export function newOrEdit({
 				stopWords,
 				resultMappings,
 				facets,
-				pagination,
+				//pagination,
 				thesauri
 			},
 			fields: [

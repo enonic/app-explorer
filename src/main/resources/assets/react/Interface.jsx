@@ -19,7 +19,7 @@ import {SubmitButton} from './semantic-ui/SubmitButton';
 
 import {ExpressionSelector} from './query/ExpressionSelector';
 import {StopWordsSelector} from './query/StopWordsSelector';
-import {Pagination} from './query/Pagination'
+//import {Pagination} from './query/Pagination'
 import {QueryFiltersBuilder} from './query/filter/QueryFiltersBuilder';
 import {Facets} from './query/Facets';
 import {ResultMappings} from './query/ResultMappings';
@@ -44,14 +44,14 @@ export const Interface = ({
 			to: '',
 			uuid4: generateUuidv4()
 		}],
-		facets: [],
+		facets: []/*,
 		pagination: {
 			pagesToShow: 10,
 			first: true,
 			prev: true,
 			next: true,
 			last: true
-		}
+		}*/
 	},
 	stopWordOptions,
 	thesauriOptions
@@ -126,10 +126,10 @@ export const Interface = ({
 							id='facets'
 							legend='Facet(s)'
 						/>
-						<Pagination
+						{/*<Pagination
 							id='pagination'
 							legend='Pagination'
-						/>
+						/>*/}
 						<SubmitButton className='primary' text="Save interface" id='save'/>
 						<input id="json" name="json" type="hidden"/>
 					</Form>;
@@ -147,7 +147,7 @@ export const Interface = ({
 							'query',
 							'resultmappings',
 							'facets',
-							'pagination',
+							//'pagination',
 							'save',
 						]}
 						currentClassName='active'
@@ -162,7 +162,7 @@ export const Interface = ({
 						<Menu.Item href='#stopwords'>Stop words</Menu.Item>
 						<Menu.Item href='#resultmappings'>Result mappings</Menu.Item>
 						<Menu.Item href='#facets'>Facets</Menu.Item>
-						<Menu.Item href='#pagination'>Pagination</Menu.Item>
+						{/*<Menu.Item href='#pagination'>Pagination</Menu.Item>*/}
 						<Menu.Item href='#save'>Save</Menu.Item>
 					</Scrollspy>
 				</Sticky>
