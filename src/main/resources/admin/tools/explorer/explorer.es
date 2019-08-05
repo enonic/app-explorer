@@ -49,6 +49,7 @@ import {list as listInterfaces} from '/admin/tools/explorer/interfaces/list';
 import {newOrEdit as newOrEditInterface} from '/admin/tools/explorer/interfaces/newOrEdit';
 import {confirmDelete as confirmDeleteInterface} from '/admin/tools/explorer/interfaces/confirmDelete';
 import {handlePost as handleInterfacesPost} from '/admin/tools/explorer/interfaces/handlePost';
+import {search as searchInterface} from '/admin/tools/explorer/interfaces/search';
 
 
 const router = newRouter();
@@ -214,6 +215,9 @@ router.filter((req/*, next*/) => {
 	/*──────────────────────────────────────────────────────────────────────────
 	GET  /interfaces      -> LIST interfaces
 	GET  /interfaces/list -> LIST interfaces
+	GET  /interfaces/new -> EDIT NEW interface
+	GET  /interfaces/edit/interfaceName -> EDIT interface
+	GET  /interfaces/search/interfaceName -> Search interface
 	──────────────────────────────────────────────────────────────────────────*/
 	if (tab === 'interfaces') {
 		switch (action) {
@@ -222,6 +226,7 @@ router.filter((req/*, next*/) => {
 		case 'create': // fallthrough to update
 		case 'update': return handleInterfacesPost(req);
 		case 'delete': return method === 'POST' ? handleInterfacesPost(req) : confirmDeleteInterface(req);
+		case 'search': return searchInterface(req);
 		default: return listInterfaces(req);
 		}
 	}

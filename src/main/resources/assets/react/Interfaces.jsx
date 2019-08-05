@@ -218,6 +218,13 @@ export class Interfaces extends React.Component {
 										size='tiny'
 										type='button'
 									><Icon color='blue' name='edit'/>Edit</Button>
+									<Button
+										as='a'
+										compact
+										href={`${TOOL_PATH}/interfaces/search/${name}`}
+										size='tiny'
+										type='button'
+									><Icon name='search'/>Search</Button>
 									<CopyModal
 										name={name}
 										updateInterfaces={() => this.updateInterfaces()}

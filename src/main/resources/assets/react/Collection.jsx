@@ -30,7 +30,7 @@ export const Collection = ({
 		isValid: {},
 		values:	initialValues
 	});
-	//console.debug('state', state);
+	console.debug('state', state);
 	const rV = <>
 		<Segment color='black'>
 			<MainFormik

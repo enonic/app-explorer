@@ -27,12 +27,12 @@ export class Search extends React.Component {
 	constructor(props) {
     	super(props);
 
-		const {interfaceName} = props;
+		const {interfaceName, searchString = ''} = props;
 		//console.debug(interfaceName);
 
     	this.state = {
       		cache: {},
-			searchString: '',
+			searchString,
 			interfaceName/*,
 			interfaceOptions: []*/
     	};
@@ -77,7 +77,7 @@ export class Search extends React.Component {
 		const {interfaceName} = this.state;
 		if(!interfaceName || !searchString) {return;}
 		const uri = `${servicesBaseUrl}/search?interface=${interfaceName}&name=searchString&searchString=${searchString}`;
-		console.debug(uri);
+		//console.debug(uri);
 		fetch(uri)
 			.then(response => response.json())
 			.then(data => this.setState(prevState => {
@@ -94,8 +94,12 @@ export class Search extends React.Component {
 	(inserted into the tree). Initialization that requires DOM nodes should go
 	here. If you need to load data from a remote endpoint, this is a good place
 	to instantiate the network request.*/
-	//componentDidMount() {
-	//} // componentDidMount
+	componentDidMount() {
+		const {searchString} = this.state;
+		if (searchString) {
+			this.search({searchString});
+		}
+	} // componentDidMount
 
 
 	handleChange(syntheticEvent) {
@@ -204,6 +208,7 @@ export class Search extends React.Component {
 										handleChange(syntheticEvent);
 										this.handleChange(syntheticEvent);
 									}}
+									value={searchString}
 								/>
 							</Field>
 						</Fields>
