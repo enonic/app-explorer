@@ -1,4 +1,5 @@
 import {TOOL_PATH} from '/lib/explorer/model/2/constants';
+import {validateLicense} from '/lib/license';
 //import {toStr} from '/lib/util';
 import {forceArray} from '/lib/util/data';
 import {
@@ -7,7 +8,6 @@ import {
 	getLauncherUrl
 } from '/lib/xp/admin';
 import {assetUrl} from '/lib/xp/portal';
-
 
 export function htmlResponse({
 	bodyBegin = [],
@@ -28,6 +28,10 @@ export function htmlResponse({
 	const preTitle = title ? `${title} - ` : '';
 	const messagesArray = forceArray(messages);
 	const statusInt = parseInt(status);
+
+	const licenseDetails = validateLicense({appKey: app.name});
+	//log.info(`licenseDetails:${toStr(licenseDetails)}`);
+	const licenseValid = licenseDetails && !licenseDetails.expired;
 
 	return {
 		body: `<html>
@@ -82,7 +86,7 @@ export function htmlResponse({
 			</div>`	: ''}
 
 			<a class="${tab === 'fields' ? 'active ' : ''}item" href="${TOOL_PATH}/fields"><i class="sitemap icon"></i> Fields</a>
-			${tab === 'fields' ? `<div class="inverted menu">
+			${licenseValid && tab === 'fields' ? `<div class="inverted menu">
 				<a class="${action === 'new' ? ' active ' : ''} item" href="${TOOL_PATH}/fields/new"><i class="green plus icon"></i> New</a>
 			</div>` : ''}
 
