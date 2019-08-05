@@ -20,7 +20,7 @@ export const get = () => ({
 			}
 			return task;
 		} catch (e) {
-			log.error(toStr({task}));
+			//log.error(toStr({task})); // Since status polls once a second this spams the log!
 			return null;
 		}
 	}).filter(x => x)
