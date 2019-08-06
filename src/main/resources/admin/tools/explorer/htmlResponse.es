@@ -73,8 +73,8 @@ export function htmlResponse({
 
 		${headEnd.join('\n')}
 	</head>
-	<body>
-		<div class="inverted left menu sidebar ui vertical" style="padding-top:54px;">
+	<body class='pushable'>
+		<div class="inverted left menu overlay sidebar ui vertical visible" style="padding-top:54px;">
 
 			<a class="${relPath === '' ? 'active ' : ''}item" href="${TOOL_PATH}""><i class="search icon"></i> Home</a>
 
@@ -107,7 +107,11 @@ export function htmlResponse({
 		</div><!-- menu sidebar -->
 
 		<div class="fixed inverted menu top ui">
-			<a class="item" onClick="$('.ui.sidebar').sidebar('setting', 'transition', 'scale down').sidebar('toggle');"><i class="caret left icon"></i>Sidebar</a>
+			<a class="item" onClick="$('.ui.sidebar')
+				.sidebar('setting', 'closable', false)
+				.sidebar('setting', 'dimPage', false)
+				.sidebar('setting', 'transition', 'overlay')
+				.sidebar('toggle');" style='margin-left:260px;'><i class="caret left icon"></i>Sidebar</a>
 		</div>
 
 		<div class="main pusher" style="padding-top:54px;">
