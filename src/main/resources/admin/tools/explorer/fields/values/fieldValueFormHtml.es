@@ -21,7 +21,7 @@ export function fieldValueFormHtml({
 		<div class="field">
 			<label>Value</label>
 			${value ? `<span>${value}</span><input name="value" type="hidden" value="${value}"/>` : `<input name="value" type="text" value="${value}"/>
-			<p class="help-text">Used to mark scraped documents and during aggregation.</p>`}
+			<p class="help-text">Used to mark documents and during aggregation.</p>`}
 		</div>
 		<div class="field">
 			<label>Display name</label>
