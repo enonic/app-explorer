@@ -41,7 +41,7 @@ const MainForm = (props) => {
 				values
 			});
 		}
-	}, [values]);
+	}, [dirty, isValid, values]);
 
 	return <Form
 		autoComplete='off'
@@ -93,5 +93,6 @@ const MAIN_SCHEMA = Yup.object().shape({
 
 export const MainFormik = withFormik({
 	mapPropsToValues: (props) => props.values,
+	//validateOnBlur: false,
 	validationSchema: MAIN_SCHEMA
 })(MainForm);

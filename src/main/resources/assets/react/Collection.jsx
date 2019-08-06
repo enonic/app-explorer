@@ -27,7 +27,9 @@ export const Collection = ({
 
 	const [state, setState] = React.useState({ // Importing useState leads to React version mismatch
 		//dirty: {},
-		isValid: {},
+		isValid: {
+			collector: false
+		},
 		values:	initialValues
 	});
 	//console.debug('state', state);
@@ -42,20 +44,22 @@ export const Collection = ({
 					isValid,
 					values
 				}) => {
-					setState({
+					//console.debug('MainFormik onChange', {state, isValid, values});
+					setState(prevState => ({
+						...prevState, // Unless this is here, initial isValid wont be set
 						/*dirty: {
-							...state.dirty,
+							...prevState.dirty,
 							main: dirty
 						},*/
 						isValid: {
-							...state.isValid,
+							...prevState.isValid,
 							main: isValid
 						},
 						values: {
-							...state.values,
+							...prevState.values,
 							...values
 						}
-					});
+					}));
 				}}
 				values={state.values}
 			/>
@@ -75,7 +79,9 @@ export const Collection = ({
 							isValid,
 							values
 						}) => {
-							setState({
+							//console.debug('Collector onChange', {state, isValid, values});
+							setState(prevState => ({
+								...prevState, // Unless this is here, initial isValid wont be set
 								/*dirty: {
 									...state.dirty,
 									collector: dirty
@@ -91,7 +97,7 @@ export const Collection = ({
 										config: values
 									}
 								}
-							});
+							}));
 						},
 						values: state.values.collector.config
 					})}
@@ -107,20 +113,23 @@ export const Collection = ({
 					isValid,
 					values
 				}) => {
-					//console.debug('CronFormik onChange values', values);
-					//console.debug('CronFormik onChange state', state);
-					setState({
+					//console.debug('CronFormik onChange', {state, isValid, values});
+					setState(prevState => ({
+						...prevState, // Unless this is here, initial isValid wont be set
 						/*dirty: {
 							...state.dirty,
 							cron: dirty
 						},*/
-						isValid: state.isValid,
+						isValid: {
+							...prevState.isValid,
+							cron: isValid
+						},
 						values: {
-							...state.values,
+							...prevState.values,
 							doCollect: values.doCollect,
 							cron: values.cron
 						}
-					});
+					}));
 				}}
 				values={{
 					doCollect: state.values.doCollect,
@@ -148,7 +157,7 @@ export const Collection = ({
 			>Cancel</Button>
 		</form>
 	</>;
-	//console.debug('mainFormikRef', mainFormikRef);
+	//console.debug('state', state);
 	//console.debug('mainFormikRef.current', mainFormikRef.current);
 	return rV;
 } // Collection

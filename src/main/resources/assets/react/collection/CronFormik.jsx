@@ -27,7 +27,7 @@ const CronForm = (props) => {
 				values
 			});
 		}
-	}, [values]);
+	}, [dirty, isValid, values]);
 
 	return <Form
 		autoComplete='off'
@@ -48,5 +48,6 @@ const CronForm = (props) => {
 
 
 export const CronFormik = withFormik({
+	isInitialValid: true,
 	mapPropsToValues: (props) => props.values
 })(CronForm);
