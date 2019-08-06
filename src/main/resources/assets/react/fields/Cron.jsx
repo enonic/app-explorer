@@ -155,7 +155,7 @@ export const Cron = connect(({
 										month: '*',
 										dayOfWeek: '*'
 									}}/>
-									<RemoveButton formik={formik} index={index} path={path}/>
+									<RemoveButton formik={formik} index={index} path={path} visible={value.length > 1}/>
 									<MoveDownButton formik={formik} index={index} path={path} visible={value.length > 1}/>
 									<MoveUpButton formik={formik} index={index} path={path} visible={value.length > 1}/>
 								</Button.Group>
