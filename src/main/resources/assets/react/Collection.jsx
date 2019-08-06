@@ -30,7 +30,7 @@ export const Collection = ({
 		isValid: {},
 		values:	initialValues
 	});
-	console.debug('state', state);
+	//console.debug('state', state);
 	const rV = <>
 		<Segment color='black'>
 			<MainFormik
@@ -107,22 +107,25 @@ export const Collection = ({
 					isValid,
 					values
 				}) => {
+					console.debug('CronFormik onChange values', values);
+					//console.debug('CronFormik onChange state', state);
 					setState({
 						/*dirty: {
 							...state.dirty,
-							collector: dirty
+							cron: dirty
 						},*/
-						isValid: {
-							...state.isValid,
-							collector: isValid
-						},
+						isValid: state.isValid,
 						values: {
 							...state.values,
-							...values
+							doCollect: values.doCollect,
+							cron: values.cron
 						}
 					});
 				}}
-				values={state.values}
+				values={{
+					doCollect: state.values.doCollect,
+					cron: state.values.cron
+				}}
 			/>
 		</Segment>
 		<form action={action} method='POST'>

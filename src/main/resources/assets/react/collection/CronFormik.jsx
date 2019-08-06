@@ -16,6 +16,7 @@ const CronForm = (props) => {
 		dirty,
 		isValid
 	} = props;
+	//console.debug('CronForm values', values);
 
 	// Call onChange every time values changes
 	React.useEffect(() => { // Importing useEffect leads to React version mismatch
@@ -41,7 +42,7 @@ const CronForm = (props) => {
 				label='Collect?'
 			/>
 		</Form.Field>
-		<Cron/>
+		<Cron formik={props}/>
 	</Form>
 } // CronForm
 
