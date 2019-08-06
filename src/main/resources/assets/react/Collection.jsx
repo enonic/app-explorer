@@ -107,7 +107,7 @@ export const Collection = ({
 					isValid,
 					values
 				}) => {
-					console.debug('CronFormik onChange values', values);
+					//console.debug('CronFormik onChange values', values);
 					//console.debug('CronFormik onChange state', state);
 					setState({
 						/*dirty: {
