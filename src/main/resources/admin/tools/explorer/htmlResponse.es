@@ -73,7 +73,7 @@ export function htmlResponse({
 
 		${headEnd.join('\n')}
 	</head>
-	<body class="pushable">
+	<body class="pushable" style="background-color: white !important;">
 		${bodyBegin.join('\n')}
 
 		<header class="fixed inverted menu ui" style="z-index:103;">
@@ -112,7 +112,7 @@ export function htmlResponse({
 			<a class="${tab === 'about' ? 'active ' : ''}item" href="${TOOL_PATH}/about"><i class="info icon"></i> About</a>
 		</aside>
 
-		<main class="pusher" id="myPusher" style="padding-top:14px;">
+		<main class="pusher" id="myPusher" style="padding:14px;width: calc(100% - 260px);">
 			${messagesArray.length ? `<div class="ui icon ${statusInt === 200 ? 'positive' : 'negative'} message">
 				<i class="${statusInt === 200 ? 'thumbs up' : 'exclamation triangle'} icon"></i>
 				<div class="content">
@@ -157,6 +157,7 @@ export function htmlResponse({
 						onHide: () => $('#myIcon').removeClass('close').addClass('sidebar'),
 						onVisible: () => $('#myIcon').removeClass('sidebar').addClass('close')
 					});
+					$('#myPusher').css('width', 'auto');
 					$('#mySidebar').sidebar('hide');
 				} else {
 					$('#mySidebar').sidebar({
