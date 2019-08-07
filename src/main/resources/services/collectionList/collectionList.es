@@ -5,6 +5,7 @@ import {
 import {connect} from '/lib/explorer/repo/connect';
 import {getDocumentCount} from '/lib/explorer/collection/getDocumentCount';
 import {query as queryCollections} from '/lib/explorer/collection/query';
+import {usedInInterfaces} from '/lib/explorer/collection/usedInInterfaces';
 import {query as queryCollectors} from '/lib/explorer/collector/query';
 
 
@@ -18,23 +19,28 @@ export function get() {
 	const collections = queryCollections({connection});
 	let totalCount = 0;
 	collections.hits = collections.hits.map(({
-		_name: name,
-		displayName,
-		doCollect = false,
 		collector: {
 			name: collectorName = ''
-		}
+		},
+		cron,
+		displayName,
+		doCollect = false,
+		//_id: id,
+		_name: name
 	}) => {
 		const count = getDocumentCount(name);
 		if (count) {
 			totalCount += count;
 		}
 		return {
-			name,
+			collectorName,
+			count,
+			cron,
 			displayName,
 			doCollect,
-			collectorName,
-			count
+			//id,
+			interfaces: usedInInterfaces({connection, name}),
+			name
 		};
 	});
 	return {
