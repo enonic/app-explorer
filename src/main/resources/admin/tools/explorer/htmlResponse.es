@@ -73,8 +73,15 @@ export function htmlResponse({
 
 		${headEnd.join('\n')}
 	</head>
-	<body class='pushable'>
-		<div class="inverted left menu overlay sidebar ui vertical visible" style="padding-top:54px;">
+	<body class="pushable">
+		${bodyBegin.join('\n')}
+
+		<header class="fixed inverted menu ui" style="z-index:103;">
+			<a class="item" onClick="$('#mySidebar').sidebar('toggle');"><i class="close icon" id="myIcon"></i></a>
+			<span class="item">Explorer</span>
+		</header>
+
+		<aside class="inverted left menu sidebar ui vertical visible" id="mySidebar">
 
 			<a class="${relPath === '' ? 'active ' : ''}item" href="${TOOL_PATH}""><i class="search icon"></i> Home</a>
 
@@ -103,33 +110,20 @@ export function htmlResponse({
 			</div>` : ''}
 
 			<a class="${tab === 'about' ? 'active ' : ''}item" href="${TOOL_PATH}/about"><i class="info icon"></i> About</a>
+		</aside>
 
-		</div><!-- menu sidebar -->
-
-		<div class="fixed inverted menu top ui">
-			<a class="item" onClick="$('.ui.sidebar')
-				.sidebar('setting', 'closable', false)
-				.sidebar('setting', 'dimPage', false)
-				.sidebar('setting', 'transition', 'overlay')
-				.sidebar('toggle');" style='margin-left:260px;'><i class="caret left icon"></i>Sidebar</a>
-		</div>
-
-		<div class="main pusher" style="padding-top:54px;">
-			<div class="container ui">
-				${bodyBegin.join('\n')}
-				${messagesArray.length ? `<div class="ui icon ${statusInt === 200 ? 'positive' : 'negative'} message">
-						<i class="${statusInt === 200 ? 'thumbs up' : 'exclamation triangle'} icon"></i>
-						<div class="content">
-	  						<div class="header">${statusInt === 200 ? 'Success' : 'Error'}</div>
-							<ul class="list">
-								${messagesArray.map(m => `<li>${m}</li>`)}
-							</ul>
-						</div>
-					</div>` : ''}
-				${main}
-			</div><!-- container -->
-		</div><!-- pusher -->
-
+		<main class="pusher" id="myPusher" style="padding-top:14px;">
+			${messagesArray.length ? `<div class="ui icon ${statusInt === 200 ? 'positive' : 'negative'} message">
+				<i class="${statusInt === 200 ? 'thumbs up' : 'exclamation triangle'} icon"></i>
+				<div class="content">
+					<div class="header">${statusInt === 200 ? 'Success' : 'Error'}</div>
+					<ul class="list">
+						${messagesArray.map(m => `<li>${m}</li>`)}
+					</ul>
+				</div>
+			</div>` : ''}
+			${main}
+		</main>
 
 		<script type="text/javascript">
 		var CONFIG = {
@@ -150,7 +144,45 @@ export function htmlResponse({
 			$(document).ready(function() {
 				$('select.dropdown').dropdown();
 				$('table').tablesort();
-		    });
+
+				const headerHeight = $('header').css('height');
+				$('#mySidebar').css('padding-top', headerHeight);
+				$('#myPusher').css('margin-top', headerHeight);
+
+				/*$('#mySidebar').sidebar({
+					onChange: () => {console.debug('onChange');},
+					onHidden: () => {console.debug('onHidden');},
+					onHide: () => {console.debug('onHide');},
+					onShow: () => {console.debug('onShow');},
+					onVisible: () => {console.debug('onVisible');}
+				});*/
+
+				if ($('#mySidebar').sidebar('is mobile')) {
+					$('#mySidebar').sidebar({
+						closable: true,
+						dimPage: true,
+						onHide: () => $('#myIcon').removeClass('close').addClass('sidebar'),
+						onVisible: () => $('#myIcon').removeClass('sidebar').addClass('close')
+					});
+					$('#mySidebar').sidebar('hide');
+				} else {
+					$('#mySidebar').sidebar({
+						closable: false,
+						dimPage: false,
+						onHide: () => $('#myIcon').removeClass('close').addClass('sidebar'),
+						onVisible: () => $('#myIcon').removeClass('sidebar').addClass('close')
+					});
+					//$('#mySidebar').sidebar('show');
+				}
+
+				jQuery(window).resize(function() {
+					if (Math.max(document.documentElement.clientWidth, window.innerWidth || 0) < 768) {
+						$('#mySidebar').sidebar('hide');
+					} else {
+						$('#mySidebar').sidebar('show');
+					}
+				});
+			});
 		</script>
 
 		<!-- Append the Admin UI -->
