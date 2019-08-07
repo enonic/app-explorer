@@ -5,56 +5,56 @@ import {
 } from 'formik';
 import {
 	Icon,
-	Input as SemanticUiReactInput,
+	Dropdown as SemanticUiReactDropdown,
 	Message
 } from 'semantic-ui-react';
 
 
-export const Input = (props) => {
-	//console.debug('FormikSemanticUiReactInput props', props);
+export const Dropdown = (props) => {
+	//console.debug('FormikSemanticUiReactDropdown props', props);
 	const {
-		label,
 		name,
 		parentPath,
 		path = parentPath ? `${parentPath}.${name}` : name,
-		...inputRest
+
+		// fluid, multiple, onChange, options, placeholder, search, selection
+		...dropdownRest
 	} = props;
-	//console.debug('FormikSemanticUiReactInput inputRest', inputRest);
+	//console.debug('FormikSemanticUiReactDropdown dropdownRest', dropdownRest);
+
 	return <Field
 		name={path}
 		render={(props) => {
-			//console.debug('Field.render props', props);
+			//console.debug('FormikSemanticUiReactDropdown Field.render props', props);
 			const {
 				field,
 				form: formik
 			} = props;
-			//console.debug('FormikSemanticUiReactInput formik', formik);
+			//console.debug('FormikSemanticUiReactDropdown Field.render formik', formik);
 			const {
 				//name,
-				onBlur, // Remove from fieldRest
-				//onChange, // Also in inputRest!
-				type = 'text',
+				//onBlur,
+				//onChange, // Also in dropdownRest!
 				//value,
 				...fieldRest
 			} = field;
-			//console.debug('FormikSemanticUiReactInput fieldRest', fieldRest);
+			//console.debug('FormikSemanticUiReactDropdown fieldRest', fieldRest);
 			const {
 				errors//,
 				//touched
 			} = formik;
-			//console.debug('FormikSemanticUiReactInput errors', errors);
+			//console.debug('FormikSemanticUiReactDropdown Field.render formik.errors', errors);
+			//console.debug('FormikSemanticUiReactDropdown Field.render formik.touched', touched);
 			const error = getIn(errors, path);
 			const boolError = !!error;
 			const boolTouched = getIn(formik.touched, path, false);
-			//console.debug('FormikSemanticUiReactInput touched', formik.touched, boolTouched);
-			//console.debug('FormikSemanticUiReactInput error', error, boolError);
+			//console.debug('FormikSemanticUiReactDropdown touched', formik.touched, boolTouched);
+			//console.debug('FormikSemanticUiReactDropdown error', error, boolError);
 			return <>
-				<SemanticUiReactInput
+				<SemanticUiReactDropdown
 					{...fieldRest}
-					{...inputRest}
+					{...dropdownRest}
 					error={boolTouched && boolError}
-					label={label}
-					type={type}
 				/>
 				<ErrorMessage
 					name={path}
@@ -74,4 +74,5 @@ export const Input = (props) => {
 			</>;
 		}}
 	/>; // Field
-} // Input
+
+}
