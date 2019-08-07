@@ -103,7 +103,7 @@ export const Collection = ({
 					})}
 				</Segment>
 				: <p>Collector NOT found!</p>
-			: <p>Collector NOT selected!</p>
+			: null
 		}
 		<Segment color='green'>
 			<Header as='h2' dividing content='Scheduling' id='cron'/>
