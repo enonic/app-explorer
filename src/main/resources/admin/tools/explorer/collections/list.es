@@ -1,5 +1,8 @@
+import serialize from 'serialize-javascript';
+
 import {toStr} from '/lib/util';
 import {forceArray} from '/lib/util/data';
+import {assetUrl, serviceUrl} from '/lib/xp/portal';
 
 import {
 	PRINCIPAL_EXPLORER_READ,
@@ -11,6 +14,9 @@ import {usedInInterfaces} from '/lib/explorer/collection/usedInInterfaces';
 import {connect} from '/lib/explorer/repo/connect';
 import {htmlResponse} from '/admin/tools/explorer/htmlResponse';
 import {query as queryCollectors} from '/lib/explorer/collector/query';
+
+
+const ID_REACT_COLLECTIONS_CONTAINER = 'reactCollectionsContainer';
 
 
 export const list = ({
@@ -34,7 +40,23 @@ export const list = ({
 	const collections = query({connection: readConnection});
 	let totalCount = 0;
 	//log.info(toStr({collections}));
+
+	const propsObj = {
+		servicesBaseUrl: serviceUrl({
+			service: ''
+		}),
+		TOOL_PATH
+	};
+
 	return htmlResponse({
+		bodyEnd: [`<script type='module' defer>
+	import {Collections} from '${assetUrl({path: 'react/Collections.esm.js'})}';
+	const propsObj = eval(${serialize(propsObj)});
+	ReactDOM.render(
+		React.createElement(Collections, propsObj),
+		document.getElementById('${ID_REACT_COLLECTIONS_CONTAINER}')
+	);
+</script>`],
 		main: `<h1 class="ui header">Collections</h1>
 <table class="compact ui sortable selectable celled striped table">
 	<thead class="full-width">
@@ -89,7 +111,7 @@ export const list = ({
 			<th></th>
 		</tr>
 	</tfoot>
-</table>`,
+</table><div id="${ID_REACT_COLLECTIONS_CONTAINER}"/>`,
 		messages,
 		path,
 		status,

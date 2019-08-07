@@ -138,6 +138,7 @@ const SS_EXTERNALS = [
 
 const SS_FILES = [
 	'src/main/resources/main',
+	'src/main/resources/services/collectionList/collectionList',
 	'src/main/resources/services/cronJobList/cronJobList',
 	'src/main/resources/services/interfaceCopy/interfaceCopy',
 	'src/main/resources/services/interfaceDelete/interfaceDelete',
@@ -196,6 +197,7 @@ const WEBPACK_CONFIG = [webpackServerSideJs({
 	__dirname,
 	assetFiles: [
 		'src/main/resources/assets/react/Collection.jsx',
+		'src/main/resources/assets/react/Collections.jsx',
 		'src/main/resources/assets/react/Interface.jsx',
 		'src/main/resources/assets/react/Interfaces.jsx',
 		'src/main/resources/assets/react/Search.jsx',
