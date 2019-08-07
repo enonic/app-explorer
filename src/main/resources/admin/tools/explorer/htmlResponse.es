@@ -149,18 +149,11 @@ export function htmlResponse({
 				$('#mySidebar').css('padding-top', headerHeight);
 				$('#myPusher').css('margin-top', headerHeight);
 
-				/*$('#mySidebar').sidebar({
-					onChange: () => {console.debug('onChange');},
-					onHidden: () => {console.debug('onHidden');},
-					onHide: () => {console.debug('onHide');},
-					onShow: () => {console.debug('onShow');},
-					onVisible: () => {console.debug('onVisible');}
-				});*/
-
 				if ($('#mySidebar').sidebar('is mobile')) {
 					$('#mySidebar').sidebar({
 						closable: true,
 						dimPage: true,
+						mobileTransition: 'overlay',
 						onHide: () => $('#myIcon').removeClass('close').addClass('sidebar'),
 						onVisible: () => $('#myIcon').removeClass('sidebar').addClass('close')
 					});
@@ -170,9 +163,9 @@ export function htmlResponse({
 						closable: false,
 						dimPage: false,
 						onHide: () => $('#myIcon').removeClass('close').addClass('sidebar'),
-						onVisible: () => $('#myIcon').removeClass('sidebar').addClass('close')
+						onVisible: () => $('#myIcon').removeClass('sidebar').addClass('close'),
+						transition: 'uncover'
 					});
-					//$('#mySidebar').sidebar('show');
 				}
 
 				jQuery(window).resize(function() {
