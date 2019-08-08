@@ -165,7 +165,7 @@ export function htmlResponse({
 						dimPage: false,
 						onHide: () => $('#myIcon').removeClass('close').addClass('sidebar'),
 						onVisible: () => $('#myIcon').removeClass('sidebar').addClass('close'),
-						transition: 'uncover'
+						transition: 'push'
 					});
 				}
 
