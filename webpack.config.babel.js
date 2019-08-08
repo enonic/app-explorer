@@ -202,6 +202,7 @@ const WEBPACK_CONFIG = [webpackServerSideJs({
 	assetFiles: [
 		'src/main/resources/assets/react/Collection.jsx',
 		'src/main/resources/assets/react/Collections.jsx',
+		'src/main/resources/assets/react/Fields.jsx',
 		'src/main/resources/assets/react/Interface.jsx',
 		'src/main/resources/assets/react/Interfaces.jsx',
 		'src/main/resources/assets/react/Search.jsx',

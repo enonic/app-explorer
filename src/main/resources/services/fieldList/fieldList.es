@@ -35,6 +35,7 @@ export function get() {
 			displayName,
 			fieldType,
 			indexConfig,
+			key,
 			name,
 			valuesRes
 		};
