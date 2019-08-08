@@ -87,7 +87,6 @@ export function htmlResponse({
 
 			<a class="${tab === 'collections' && !action ? 'active ' : ''}item" href="${TOOL_PATH}/collections"><i class="database icon"></i> Collections</a>
 			${tab === 'collections'	? `<div class="inverted menu">
-				<a class="${action === 'new' ? ' active ' : ''}item" href="${TOOL_PATH}/collections/new"><i class="green plus icon"></i> New</a>
 				<a class="${action === 'status' ? 'active ' : ''}item" href="${TOOL_PATH}/collections/status"><i class="cogs icon"></i> Status</a>
 				<a class="${action === 'journal' ? 'active ' : ''}item" href="${TOOL_PATH}/collections/journal"><i class="newspaper outline icon"></i> Journal</a>
 			</div>`	: ''}

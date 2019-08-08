@@ -11,6 +11,7 @@ function NewOrEditModal(props) {
 		collectorsObj,
 		collectorOptions,
 		contentTypeOptions,
+		disabled,
 		fields,
 		initialValues,
 		name,
@@ -32,12 +33,14 @@ function NewOrEditModal(props) {
 		size='fullscreen'
 		trigger={name ? <Button
 			compact
+			disabled={disabled}
 			onClick={onOpen}
 			size='tiny'
 		><Icon color='blue' name='edit'/>Edit</Button>
 			: <Button
 				circular
 				color='green'
+				disabled={disabled}
 				icon
 				onClick={onOpen}
 				size='massive'
@@ -116,9 +119,19 @@ export function Collections(props) {
 	} = props;
 
 	const [state, setState] = React.useState({
+		collections: {
+			count: 0,
+			hits: [],
+			total: 0
+		},
+		collectorOptions: [],
 		column: 'name',
+		contentTypeOptions: [],
 		direction: 'ascending',
-		isLoading: true
+		fields: {},
+		isLoading: true,
+		siteOptions: [],
+		totalCount: 0
 	});
 	//console.debug('Collections', {props, state});
 
@@ -220,6 +233,9 @@ export function Collections(props) {
 						name
 					}, index) => {
 						const key = `collection[${index}]`;
+
+						const disabled = !(collector.name && collectorOptions.filter(({key}) => collector.name).length);
+
 						return <Table.Row key={key}>
 							<Table.Cell>{displayName}</Table.Cell>
 							<Table.Cell>{count}</Table.Cell>
@@ -230,6 +246,7 @@ export function Collections(props) {
 									collectorOptions={collectorOptions}
 									collectorsObj={collectorsObj}
 									contentTypeOptions={contentTypeOptions}
+									disabled={disabled}
 									initialValues={{
 										name,
 										collector,
@@ -248,8 +265,8 @@ export function Collections(props) {
 										fetchCollections()
 									})
 								}} size='tiny'><Icon color='blue' name='copy'/>Duplicate</Button>
-								<Button as='a' compact href={`${TOOL_PATH}/collections/collect/${name}`} size='tiny'><Icon color='green' name='cloud download'/>Collect</Button>
-								<Button as='a' compact href={`${TOOL_PATH}/collections/stop/${name}`} size='tiny'><Icon color='red' name='stop'/>Stop</Button>
+								<Button as='a' compact disabled={disabled} href={`${TOOL_PATH}/collections/collect/${name}`} size='tiny'><Icon color='green' name='cloud download'/>Collect</Button>
+								<Button as='a' compact disabled={disabled} href={`${TOOL_PATH}/collections/stop/${name}`} size='tiny'><Icon color='red' name='stop'/>Stop</Button>
 								<DeleteModal name={name} onClose={() => fetchCollections()} servicesBaseUrl={servicesBaseUrl}/>
 							</Table.Cell>
 						</Table.Row>;
@@ -270,6 +287,7 @@ export function Collections(props) {
 			collectorOptions={collectorOptions}
 			collectorsObj={collectorsObj}
 			contentTypeOptions={contentTypeOptions}
+			disabled={collectorOptions.length === 0}
 			fields={fields}
 			servicesBaseUrl={servicesBaseUrl}
 			siteOptions={siteOptions}

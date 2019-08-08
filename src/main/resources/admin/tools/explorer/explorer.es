@@ -18,13 +18,9 @@ import {toolPage} from '/admin/tools/explorer/toolPage';
 import {about} from '/admin/tools/explorer/about';
 
 import {list as listCollections} from '/admin/tools/explorer/collections/list';
-import {newOrEdit as newOrEditCollection} from '/admin/tools/explorer/collections/newOrEdit';
-import {confirmDelete as confirmDeleteCollection} from '/admin/tools/explorer/collections/confirmDelete';
 import {collect} from '/admin/tools/explorer/collections/collect';
 import {gannt} from '/admin/tools/explorer/collections/gannt';
 import {stop} from '/admin/tools/explorer/collections/stop';
-import {handleDelete as deleteCollection} from '/admin/tools/explorer/collections/handleDelete';
-import {createOrUpdate as createOrUpdateCollection} from '/admin/tools/explorer/collections/createOrUpdate';
 import {status as collectorStatus} from '/admin/tools/explorer/collections/status';
 import {journal} from '/admin/tools/explorer/collections/journal';
 
@@ -86,15 +82,6 @@ router.filter((req/*, next*/) => {
 	GET  /collections      -> LIST collections
 	GET  /collections/list -> LIST collections
 
-	GET  /collections/new    -> EDIT new collection
-	POST /collections/create -> CREATE new collection
-
-	GET  /collections/edit/name   -> EDIT collection
-	POST /collections/update/name -> UPDATE collection
-
-	GET  /collections/delete/name -> CONFIRM DELETE collection
-	POST /collections/delete/name -> DELETE collection
-
 	GET  /collections/collect/name?params -> COLLECT collection
 	GET  /collections/stop/name           -> STOP collector
 
@@ -104,16 +91,9 @@ router.filter((req/*, next*/) => {
 
 	if (tab === 'collections') {
 		switch (action) {
-		case 'new': // fallthrough to edit
-		case 'edit': return newOrEditCollection(req);
-
-		case 'create': // fallthrough to update
-		case 'update': return createOrUpdateCollection(req);
-
 		case 'collect': return collect(req);
 		case 'gannt': return gannt(req);
 		case 'stop': return stop(req);
-		case 'delete': return method === 'POST' ? deleteCollection(req) : confirmDeleteCollection(req);
 		case 'journal': return journal(req);
 		case 'status': return collectorStatus(req);
 
