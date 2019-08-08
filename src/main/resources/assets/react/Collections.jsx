@@ -22,21 +22,24 @@ function NewOrEditModal(props) {
 	});
 	//console.debug('NewOrEditModal', {props, state});
 
+	const onClose = () => setState({open: false});
+	const onOpen = () => setState({open: true});
+
 	return <Modal
 		closeIcon
-		onClose={() => setState({open: false})}
+		onClose={onClose}
 		open={state.open}
 		size='fullscreen'
 		trigger={name ? <Button
 			compact
-			onClick={() => setState({open: true})}
+			onClick={onOpen}
 			size='tiny'
 		><Icon color='blue' name='edit'/>Edit</Button>
 			: <Button
 				circular
 				color='green'
 				icon
-				onClick={() => setState({open: true})}
+				onClick={onOpen}
 				size='massive'
 				style={{
 					bottom: 13.5,
@@ -54,6 +57,9 @@ function NewOrEditModal(props) {
 				contentTypeOptions={contentTypeOptions}
 				fields={fields}
 				initialValues={initialValues}
+				mode={name ? 'modify' : 'create'}
+				onClose={onClose}
+				servicesBaseUrl={servicesBaseUrl}
 				siteOptions={siteOptions}
 			/>
 		</Modal.Content>

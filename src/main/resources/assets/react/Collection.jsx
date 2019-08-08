@@ -7,13 +7,14 @@ import {CronFormik} from './collection/CronFormik';
 
 
 export const Collection = ({
-	action = '',
 	collectorsObj,
 	collectorOptions,
 	contentTypeOptions,
 	fields = {},
+	onClose,
+	mode,
+	servicesBaseUrl,
 	siteOptions,
-	TOOL_PATH = '',
 	initialValues = {
 		name: '',
 		collector: {
@@ -154,25 +155,27 @@ export const Collection = ({
 				}}
 			/>
 		</Segment>
-		<form action={action} method='POST'>
-			<input name='json' type='hidden' value={JSON.stringify(state.values)}/>
-			<Button
-				disabled={Object.keys(state.isValid).some(k => !state.isValid[k])}
-				primary
-				type='submit'
-			><Icon className='save outline'/>Save collection</Button>
-			{/*<Button
-				disabled={!Object.keys(state.dirty).some(k => state.dirty[k])}
-				secondary
-				type="reset"
-			>Reset</Button>*/}
-			<Button
-				as='a'
-				href={`${TOOL_PATH}/collections/list`}
-				secondary
-				type="Button"
-			>Cancel</Button>
-		</form>
+		<Button
+			disabled={Object.keys(state.isValid).some(k => !state.isValid[k])}
+			primary
+			onClick={() => {
+				fetch(`${servicesBaseUrl}/collection${mode === 'create' ? 'Create' : 'Modify'}?json=${JSON.stringify(state.values)}`, {
+					method: 'POST'
+				}).then(response => {
+					onClose()
+				})
+			}}
+		><Icon className='save outline'/>{mode === 'create' ? 'Create' : 'Modify'} collection</Button>
+		{/*<Button
+			disabled={!Object.keys(state.dirty).some(k => state.dirty[k])}
+			secondary
+			type="reset"
+		>Reset</Button>*/}
+		<Button
+			onClick={onClose}
+			secondary
+			type="button"
+		>Cancel</Button>
 	</>;
 	//console.debug('state', state);
 	//console.debug('mainFormikRef.current', mainFormikRef.current);

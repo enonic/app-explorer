@@ -137,9 +137,11 @@ const SS_EXTERNALS = [
 
 const SS_FILES = [
 	'src/main/resources/main',
+	'src/main/resources/services/collectionCreate/collectionCreate',
 	'src/main/resources/services/collectionDelete/collectionDelete',
 	'src/main/resources/services/collectionDuplicate/collectionDuplicate',
 	'src/main/resources/services/collectionList/collectionList',
+	'src/main/resources/services/collectionModify/collectionModify',
 	'src/main/resources/services/cronJobList/cronJobList',
 	'src/main/resources/services/interfaceCopy/interfaceCopy',
 	'src/main/resources/services/interfaceDelete/interfaceDelete',
