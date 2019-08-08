@@ -7,20 +7,37 @@ import {CronFormik} from './collection/CronFormik';
 
 
 export const Collection = ({
-	action,
+	action = '',
 	collectorsObj,
 	collectorOptions,
 	contentTypeOptions,
 	fields = {},
 	siteOptions,
-	TOOL_PATH,
+	TOOL_PATH = '',
 	initialValues = {
-		name: ''
+		name: '',
+		collector: {
+			name: '',
+			config: {}
+		},
+		cron: [{
+			month: '*',
+			dayOfMonth: '*',
+			dayOfWeek: '*',
+			minute: '*',
+			hour: '*'
+		}],
+		doCollect: false
 	}
 } = {}) => {
-	//console.debug('collectorsObj', collectorsObj);
-	//console.debug('collectorOptions', collectorOptions);
-	//console.debug('initialValues',initialValues);
+	/*console.debug('Collection', {
+		collectorsObj,
+		collectorOptions,
+		contentTypeOptions,
+		fields,
+		siteOptions,
+		initialValues
+	});*/
 
 	//const mainFormikRef = React.useRef(null);
 	//const mainFormikRef = React.createRef();

@@ -30,11 +30,21 @@ const STATS = {
 	version: false
 };
 
+const CS_MINIMIZER = [];
+if(MODE === 'production') {
+	CS_MINIMIZER.push(new TerserPlugin({
+		terserOptions: {
+			compress: {},
+			mangle: true // Note `mangle.properties` is `false` by default.
+		}
+	}));
+}
+
 const CLIENT_JS_CONFIG = {
 	context: SRC_ASSETS_DIR_ABS,
 	entry: './react/index.jsx',
 	externals: [
-		//'react'
+		//'react' // semantic-ui-react fails if this is commented in
 	],
 	devtool: false, // Don't waste time generating sourceMaps
 	//devtool: 'source-map',
@@ -70,18 +80,7 @@ const CLIENT_JS_CONFIG = {
 		}]
 	},
 	optimization: {
-		minimizer: [
-			new TerserPlugin({
-				terserOptions: {
-					compress: {},
-					mangle: true // Note `mangle.properties` is `false` by default.
-				}
-			})
-			/*new UglifyJsPlugin({
-				parallel: true,
-				sourceMap: false
-			})*/
-		]
+		minimizer: CS_MINIMIZER
 	},
 	output: {
 		//filename: '[name].js',

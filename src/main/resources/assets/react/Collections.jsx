@@ -2,12 +2,20 @@ import _ from 'lodash';
 import {
 	Button, Header, Icon, Loader, Modal, Table
 } from 'semantic-ui-react';
+import {Collection} from './Collection';
 
 
 function NewOrEditModal(props) {
 	const {
+		//collectors,
+		collectorsObj,
+		collectorOptions,
+		contentTypeOptions,
+		fields,
+		initialValues,
 		name,
-		servicesBaseUrl
+		servicesBaseUrl,
+		siteOptions
 	} = props;
 	const [state, setState] = React.useState({
 		open: false
@@ -16,9 +24,9 @@ function NewOrEditModal(props) {
 
 	return <Modal
 		closeIcon
-		header={name ? `Edit collection ${name}`: 'New collection'}
 		onClose={() => setState({open: false})}
 		open={state.open}
+		size='fullscreen'
 		trigger={name ? <Button
 			compact
 			onClick={() => setState({open: true})}
@@ -35,10 +43,21 @@ function NewOrEditModal(props) {
 					position: 'fixed',
 					right: 13.5
 				}}><Icon
-					color='white'
 					name='plus'
 				/></Button>}
-	/>;
+	>
+		<Modal.Header>{name ? `Edit collection ${name}`: 'New collection'}</Modal.Header>
+		<Modal.Content>
+			<Collection
+				collectorsObj={collectorsObj}
+				collectorOptions={collectorOptions}
+				contentTypeOptions={contentTypeOptions}
+				fields={fields}
+				initialValues={initialValues}
+				siteOptions={siteOptions}
+			/>
+		</Modal.Content>
+	</Modal>;
 } // NewOrEditModal
 
 
@@ -51,7 +70,7 @@ function DeleteModal(props) {
 	const [state, setState] = React.useState({
 		open: false
 	});
-	console.debug('DeleteModal', {props, state});
+	//console.debug('DeleteModal', {props, state});
 
 	return <Modal
 		closeIcon
@@ -85,6 +104,7 @@ function DeleteModal(props) {
 
 export function Collections(props) {
 	const {
+		collectorsObj,
 		servicesBaseUrl,
 		TOOL_PATH
 	} = props;
@@ -98,10 +118,13 @@ export function Collections(props) {
 
 	const {
 		collections,
-		collectorsAppObj,
+		collectorOptions,
+		contentTypeOptions,
 		column,
 		direction,
+		fields,
 		isLoading,
+		siteOptions,
 		totalCount
 	} = state;
 
@@ -125,12 +148,12 @@ export function Collections(props) {
 			column,
 			direction
 		} = state;
-		console.debug('handleSort', {
+		/*console.debug('handleSort', {
 			clickedColumn,
 			collections,
 			column,
 			direction
-		});
+		});*/
 
 	    if (column !== clickedColumn) {
 			collections.hits = _.sortBy(collections.hits, [clickedColumn]);
@@ -181,7 +204,7 @@ export function Collections(props) {
 				</Table.Header>
 				<Table.Body>
 					{collections.hits.map(({
-						collectorName,
+						collector,
 						count,
 						cron,
 						doCollect,
@@ -197,7 +220,21 @@ export function Collections(props) {
 							<Table.Cell>{doCollect ? JSON.stringify(cron) : 'Not scheduled'}</Table.Cell>
 							<Table.Cell>{interfaces}</Table.Cell>
 							<Table.Cell>
-								<NewOrEditModal name={name} servicesBaseUrl={servicesBaseUrl}/>
+								<NewOrEditModal
+									collectorOptions={collectorOptions}
+									collectorsObj={collectorsObj}
+									contentTypeOptions={contentTypeOptions}
+									initialValues={{
+										name,
+										collector,
+										cron,
+										doCollect
+									}}
+									fields={fields}
+									name={name}
+									servicesBaseUrl={servicesBaseUrl}
+									siteOptions={siteOptions}
+								/>
 								<Button compact onClick={() => {
 									fetch(`${servicesBaseUrl}/collectionDuplicate?name=${name}`, {
 										method: 'POST'
@@ -223,6 +260,13 @@ export function Collections(props) {
 				</Table.Footer>
 			</Table>
 		}
-		<NewOrEditModal servicesBaseUrl={servicesBaseUrl}/>
+		<NewOrEditModal
+			collectorOptions={collectorOptions}
+			collectorsObj={collectorsObj}
+			contentTypeOptions={contentTypeOptions}
+			fields={fields}
+			servicesBaseUrl={servicesBaseUrl}
+			siteOptions={siteOptions}
+		/>
 	</>;
 } // Collections

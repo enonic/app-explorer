@@ -29,10 +29,15 @@ export const list = ({
 	const readConnection = connect({principals: PRINCIPAL_EXPLORER_READ});
 
 	const collectorsAppObj = {};
+	const collectorsAppToUri = {};
 	const collectors = queryCollectors({
 		connection: readConnection
-	}).hits.map(({_name: application}) => {
+	}).hits.map(({_name: application, configAssetPath}) => {
 		collectorsAppObj[application] = true;
+		collectorsAppToUri[application] = assetUrl({
+			application,
+			path: configAssetPath
+		});
 		return {application};
 	});
 	//log.info(toStr({collectorsAppObj}));
@@ -50,7 +55,12 @@ export const list = ({
 	return htmlResponse({
 		bodyEnd: [`<script type='module' defer>
 	import {Collections} from '${assetUrl({path: 'react/Collections.esm.js'})}';
+	const collectorsObj = {};
+	${Object.entries(collectorsAppToUri).map(([a, u], i) => `import {Collector as Collector${i}} from '${u}';
+	collectorsObj['${a}'] = Collector${i};`
+	).join('\n')}
 	const propsObj = eval(${serialize(propsObj)});
+	propsObj.collectorsObj = collectorsObj;
 	ReactDOM.render(
 		React.createElement(Collections, propsObj),
 		document.getElementById('${ID_REACT_COLLECTIONS_CONTAINER}')
