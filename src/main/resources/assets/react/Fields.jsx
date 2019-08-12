@@ -4,32 +4,37 @@ import _ from 'lodash';
 import {
 	Button, Form, Header, Icon, Loader, Message, Modal, Table
 } from 'semantic-ui-react';
+import {Checkbox} from './semantic-ui/react/Checkbox';
+import {Dropdown} from './semantic-ui/react/Dropdown';
 import {Input} from './semantic-ui/react/Input';
-//import { string, object } from 'yup';
 
 
 function required(value) {
 	return value ? undefined : 'Required!';
 }
 
+
 const SCHEMA = {
 	displayName: (value) => required(value),
+	fieldType: (value) => required(value),
+	indexConfig: (value) => required(value),
 	key: (value) => required(value)
 };
-
-/*const SCHEMA = object({
-	key: string().required(),
-	displayName: string().required()
-});*/
 
 
 function NewOrEditModal(props) {
 	const {
 		initialValues = {
+			decideByType: true,
 			displayName: '',
+			enabled: true,
 			fieldType: 'text',
-			//indexConfig: '',
-			key: ''
+			fulltext: true,
+			includeInAllText: true,
+			indexConfig: 'type',
+			key: '',
+			ngram: true,
+			path: false
 		},
 		servicesBaseUrl
 	} = props;
@@ -39,18 +44,6 @@ function NewOrEditModal(props) {
 	const [open, setOpen] = React.useState(false);
 	const [touched, setTouched] = React.useState({});
 	const [values, setValues] = React.useState(JSON.parse(JSON.stringify(initialValues))); // Dereference
-
-	/*function validateSyncAt(path) {
-		try {
-			SCHEMA.validateSyncAt(path, values);
-			console.debug('validateSyncAt', path, 'valid', undefined);
-		} catch (e) {
-			//console.debug(e);
-			console.debug('validateSyncAt', path, 'invalid', e.message);
-			return e.message;
-		}
-		return undefined;
-	}*/
 
 	const onClose = () => setOpen(false);
 	const onReset = () => {
@@ -70,12 +63,10 @@ function NewOrEditModal(props) {
 		})
 		console.debug('onValidate errors', errors);
 		setErrors(errors);
-		/*setErrors({
-			displayName: validateSyncAt('displayName'),
-			key: validateSyncAt('key')
-		});*/
 		setTouched({
 			displayName: true,
+			fieldType: true,
+			indexConfig: true,
 			key: true
 		});
 	}
@@ -162,34 +153,128 @@ function NewOrEditModal(props) {
 						validate={(value) => SCHEMA.displayName(value)}
 					/>
 				</Form.Field>
-				{/*<Form.Field><Input
-					label={{basic: true, content: 'Description'}}
-					onChange={(eventIgnored, {value}) => setState(prev => ({
-						...prev,
-						description: value
-					}))}
-					value={description}
-				/></Form.Field>
 				<Form.Field>
 					<Input
-						label={{basic: true, content: 'Type'}}
-						onChange={(eventIgnored, {value}) => setState(prev => ({
-							...prev,
-							fieldType: value
-						}))}
-						value={fieldType}
+						callbacks={callbacks}
+						label={{basic: true, content: 'Description'}}
+						name='description'
 					/>
 				</Form.Field>
 				<Form.Field>
-					<Input
-						label={{basic: true, content: 'Index config'}}
-						onChange={(eventIgnored, {value}) => setState(prev => ({
-							...prev,
-							indexConfig: value
-						}))}
-						value={indexConfig}
+					<Dropdown
+						callbacks={callbacks}
+						fluid
+						name='fieldType'
+						options={[{
+							key: 'text',
+							text: 'Text',
+							value: 'text'
+						},{
+							key: 'tag',
+							text: 'Tag',
+							value: 'tag'
+						},{
+							key: 'uri',
+							text: 'Uri',
+							value: 'uri'
+						},{
+							key: 'html',
+							text: 'Html',
+							value: 'html'
+						},{
+							key: 'base64',
+							text: 'Base64 encoded data',
+							value: 'base64'
+						}]}
+						placeholder='Jalla!'
+						search
+						selection
 					/>
-				</Form.Field>*/}
+				</Form.Field>
+				<Form.Field>
+					<Dropdown
+						callbacks={callbacks}
+						fluid
+						name='indexConfig'
+						options={[{
+							key: 'type',
+							text: 'type (default) - Indexing is done based on type; e.g numeric values are indexed as both string and numeric.',
+							value: 'type'
+						},{
+							key: 'minimal',
+							text: 'minimal - Value is indexed as a string-value only, no matter what type of data.',
+							value: 'minimal'
+						},{
+							key: 'none',
+							text: 'none - Value is not indexed.',
+							value: 'none'
+						},{
+							key: 'fulltext',
+							text: 'fulltext - Values are stored as ‘ngram’, ‘analyzed’ and also added to the _allText-field',
+							value: 'fulltext'
+						},{
+							key: 'path',
+							text: 'path - Values are stored as ‘path’ type and applicable for the pathMatch-function',
+							value: 'path'
+						},{
+							key: 'custom',
+							text: 'custom - use settings below',
+							value: 'custom'
+						}]}
+						search
+						selection
+					/>
+				</Form.Field>
+				{getIn(values, 'indexConfig') === 'custom' && <>
+					<Form.Field>
+						<Checkbox
+							callbacks={callbacks}
+							label='Decide by type'
+							name='decideByType'
+							toggle
+						/>
+					</Form.Field>
+					<Form.Field>
+						<Checkbox
+							callbacks={callbacks}
+							label='Enabled'
+							name='enabled'
+							toggle
+						/>
+					</Form.Field>
+					<Form.Field>
+						<Checkbox
+							callbacks={callbacks}
+							label='nGram'
+							name='nGram'
+							toggle
+						/>
+					</Form.Field>
+					<Form.Field>
+						<Checkbox
+							callbacks={callbacks}
+							label='fulltext'
+							name='fulltext'
+							toggle
+						/>
+					</Form.Field>
+					<Form.Field>
+						<Checkbox
+							callbacks={callbacks}
+							label='includeInAllText'
+							name='includeInAllText'
+							toggle
+						/>
+					</Form.Field>
+					<Form.Field>
+						<Checkbox
+							callbacks={callbacks}
+							label='path'
+							name='path'
+							toggle
+						/>
+					</Form.Field>
+				</>}
 				<Button onClick={onValidate} type='button'>Validate</Button>
 				<Button
 					disabled={
