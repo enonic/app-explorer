@@ -5,10 +5,25 @@ import {
 	Button, Form, Header, Icon, Loader, Message, Modal, Table
 } from 'semantic-ui-react';
 import {Input} from './semantic-ui/react/Input';
+//import { string, object } from 'yup';
+
+
+function required(value) {
+	return value ? undefined : 'Required!';
+}
+
+const SCHEMA = {
+	displayName: (value) => required(value),
+	key: (value) => required(value)
+};
+
+/*const SCHEMA = object({
+	key: string().required(),
+	displayName: string().required()
+});*/
 
 
 function NewOrEditModal(props) {
-
 	const {
 		initialValues = {
 			displayName: '',
@@ -25,6 +40,18 @@ function NewOrEditModal(props) {
 	const [touched, setTouched] = React.useState({});
 	const [values, setValues] = React.useState(JSON.parse(JSON.stringify(initialValues))); // Dereference
 
+	/*function validateSyncAt(path) {
+		try {
+			SCHEMA.validateSyncAt(path, values);
+			console.debug('validateSyncAt', path, 'valid', undefined);
+		} catch (e) {
+			//console.debug(e);
+			console.debug('validateSyncAt', path, 'invalid', e.message);
+			return e.message;
+		}
+		return undefined;
+	}*/
+
 	const onClose = () => setOpen(false);
 	const onReset = () => {
 		setDirty({});
@@ -35,6 +62,22 @@ function NewOrEditModal(props) {
 	const onOpen = () => {
 		onReset();
 		setOpen(true);
+	};
+	function onValidate() {
+		const errors = {};
+		Object.entries(SCHEMA).forEach(([k,v]) => {
+			errors[k] = v(getIn(values, k));
+		})
+		console.debug('onValidate errors', errors);
+		setErrors(errors);
+		/*setErrors({
+			displayName: validateSyncAt('displayName'),
+			key: validateSyncAt('key')
+		});*/
+		setTouched({
+			displayName: true,
+			key: true
+		});
 	}
 
 	const callbacks = {
@@ -75,7 +118,7 @@ function NewOrEditModal(props) {
 		}
 	};
 
-	//console.debug('NewOrEditModal render', {props, dirty, errors, open, touched, values});
+	console.debug('NewOrEditModal render', {props, dirty, errors, open, touched, values});
 
 	return <Modal
 		closeIcon
@@ -108,7 +151,7 @@ function NewOrEditModal(props) {
 						callbacks={callbacks}
 						label={{basic: true, content: 'Key'}}
 						name='key'
-						validate={(value) => value ? undefined : 'Required'}
+						validate={(value) => SCHEMA.key(value)}
 					/>
 				</Form.Field>}
 				<Form.Field>
@@ -116,7 +159,7 @@ function NewOrEditModal(props) {
 						callbacks={callbacks}
 						label={{basic: true, content: 'Display name'}}
 						name='displayName'
-						validate={(value) => value ? undefined : 'Required'}
+						validate={(value) => SCHEMA.displayName(value)}
 					/>
 				</Form.Field>
 				{/*<Form.Field><Input
@@ -147,6 +190,7 @@ function NewOrEditModal(props) {
 						value={indexConfig}
 					/>
 				</Form.Field>*/}
+				<Button onClick={onValidate} type='button'>Validate</Button>
 				<Button
 					disabled={Object.values(errors).some((v) => v)}
 					type="submit">Submit</Button>

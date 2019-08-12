@@ -11,8 +11,8 @@ export function Input(props = {}) {
 	const { // Props are read-only
 		name,
 		callbacks: { // State is lifted to anchestor via get and set callbacks.
-			getTouched,
 			getError,
+			getTouched,
 			getValue,
 			setDirty,
 			setError,
@@ -20,19 +20,22 @@ export function Input(props = {}) {
 			setValue
 		},
 		validate = () => undefined,
+		validateOnBlur = true,
+		validateOnChange = true,
 		value = getValue(name),
 		...rest // value
 	} = props;
 
 	function onBlur() {
 		setTouched(name, true)
+		validateOnBlur && setError(name, validate(value));
 	};
 
 	function onChange(eventIgnored, {value: newValue}) {
 		//console.debug('Input onChange value', value);
 		setDirty(name, newValue !== value);
-		setError(name, validate(newValue));
 		setTouched(name, true);
+		validateOnChange && setError(name, validate(newValue));
 		setValue(name, newValue);
 	};
 
