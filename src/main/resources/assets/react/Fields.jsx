@@ -192,7 +192,10 @@ function NewOrEditModal(props) {
 				</Form.Field>*/}
 				<Button onClick={onValidate} type='button'>Validate</Button>
 				<Button
-					disabled={Object.values(errors).some((v) => v)}
+					disabled={
+						//Object.values(errors).some((v) => v)
+						Object.entries(SCHEMA).some(([k,v]) => v(getIn(values, k)))
+					}
 					type="submit">Submit</Button>
 				<Button
 					disabled={!Object.values(dirty).some((v) => v)}
