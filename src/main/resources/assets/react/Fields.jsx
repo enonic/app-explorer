@@ -8,9 +8,6 @@ import {Input} from './semantic-ui/react/Input';
 
 
 function NewOrEditModal(props) {
-	const [open, setOpen] = React.useState(false);
-	const onClose = () => setOpen(false);
-	const onOpen = () => setOpen(true);
 
 	const {
 		initialValues = {
@@ -24,60 +21,61 @@ function NewOrEditModal(props) {
 
 	const [dirty, setDirty] = React.useState({});
 	const [errors, setErrors] = React.useState({});
+	const [open, setOpen] = React.useState(false);
 	const [touched, setTouched] = React.useState({});
 	const [values, setValues] = React.useState(JSON.parse(JSON.stringify(initialValues))); // Dereference
 
+	const onClose = () => setOpen(false);
+	const onReset = () => {
+		setDirty({});
+		setErrors({});
+		setTouched({});
+		setValues(initialValues);
+	};
+	const onOpen = () => {
+		onReset();
+		setOpen(true);
+	}
+
 	const callbacks = {
-		getTouched: (name) => {
-			const value = getIn(touched, name, false);
-			console.debug('getTouched name', name, 'value', value);
-			return value;
-		},
-		getError: (name) => {
-			const value = getIn(errors, name);
-			console.debug('getError name', name, 'value', value);
-			return value;
-		},
-		getValue: (name) => {
-			const value = getIn(values, name);
-			console.debug('getValue name', name, 'value', value);
-			return value;
-		},
-		setDirty: (name, dirty) => {
-			return setDirty(prev => {
-				const deref = JSON.parse(JSON.stringify(prev));
-				setIn(prev, name, dirty);
-				console.debug('setDirty name', name, 'dirty', dirty, 'prev', deref, 'new', prev);
-				return prev;
+		getError: (name) => getIn(errors, name),
+		getTouched: (name) => getIn(touched, name, false),
+		getValue: (name) => getIn(values, name),
+		setDirty: (name, value) => {
+			const old = getIn(dirty, name, false);
+			if (value === old) { return; } // No need to change state, or cause render
+			setDirty(prev => {
+				const deref = JSON.parse(JSON.stringify(prev)); // So render gets triggered. Object.is comparison algorithm.
+				return setIn(deref, name, value);
 			});
 		},
-		setErrors: (name, error) => {
-			return setErrors(prev => {
-				const deref = JSON.parse(JSON.stringify(prev));
-				setIn(prev, name, error);
-				console.debug('setErrors name', name, 'error', error, 'prev', deref, 'new', prev);
-				return prev;
+		setError: (name, value) => {
+			const old = getIn(errors, name);
+			if (value === old) { return; } // No need to change state, or cause render
+			setErrors(prev => {
+				const deref = JSON.parse(JSON.stringify(prev)); // So render gets triggered. Object.is comparison algorithm.
+				return setIn(deref, name, value);
 			});
 		},
-		setTouched: (name, touched) => {
-			return setTouched(prev => {
-				const deref = JSON.parse(JSON.stringify(prev));
-				setIn(prev, name, touched);
-				console.debug('setTouched name', name, 'touched', touched, 'prev', deref, 'new', prev);
-				return prev;
+		setTouched: (name, value) => {
+			const old = getIn(touched, name);
+			if (value === old) { return; } // No need to change state, or cause render
+			setTouched(prev => {
+				const deref = JSON.parse(JSON.stringify(prev)); // So render gets triggered. Object.is comparison algorithm.
+				return setIn(deref, name, value);
 			});
 		},
-		setValues: (name, value) => {
-			return setValues(prev => {
-				const deref = JSON.parse(JSON.stringify(prev));
-				setIn(prev, name, value);
-				console.debug('setValues name', name, 'value', value, 'prev', deref, 'new', prev);
-				return prev;
+		setValue: (name, value) => {
+			const old = getIn(values, name);
+			if (value === old) { return; } // No need to change state, or cause render
+			setValues(prev => {
+				const deref = JSON.parse(JSON.stringify(prev)); // So render gets triggered. Object.is comparison algorithm.
+				return setIn(deref, name, value);
 			});
 		}
 	};
 
-	console.debug('NewOrEditModal', {props, dirty, errors, open, touched, values});
+	//console.debug('NewOrEditModal render', {props, dirty, errors, open, touched, values});
 
 	return <Modal
 		closeIcon
@@ -149,14 +147,12 @@ function NewOrEditModal(props) {
 						value={indexConfig}
 					/>
 				</Form.Field>*/}
-				<Button type="submit">Submit</Button>
+				<Button
+					disabled={Object.values(errors).some((v) => v)}
+					type="submit">Submit</Button>
 				<Button
 					disabled={!Object.values(dirty).some((v) => v)}
-					onClick={() => {
-						setDirty({});
-						setTouched({});
-						setValues(initialValues);
-					}}
+					onClick={onReset}
 					type="reset"
 				>Reset</Button>
 			</Form>

@@ -15,9 +15,9 @@ export function Input(props = {}) {
 			getError,
 			getValue,
 			setDirty,
-			setErrors,
+			setError,
 			setTouched,
-			setValues
+			setValue
 		},
 		validate = () => undefined,
 		value = getValue(name),
@@ -31,9 +31,9 @@ export function Input(props = {}) {
 	function onChange(eventIgnored, {value: newValue}) {
 		//console.debug('Input onChange value', value);
 		setDirty(name, newValue !== value);
-		setErrors(name, validate(newValue));
+		setError(name, validate(newValue));
 		setTouched(name, true);
-		setValues(name, newValue);
+		setValue(name, newValue);
 	};
 
 	const isTouched = getTouched(name);
