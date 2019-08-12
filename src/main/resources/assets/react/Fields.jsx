@@ -1,28 +1,83 @@
+import getIn from 'get-value';
+import setIn from 'set-value';
 import _ from 'lodash';
 import {
-	Button, Form, Header, Icon, Input, Loader, Message, Modal, Table
+	Button, Form, Header, Icon, Loader, Message, Modal, Table
 } from 'semantic-ui-react';
+import {Input} from './semantic-ui/react/Input';
 
 
 function NewOrEditModal(props) {
-	const {
-		initialValues = {},
-		servicesBaseUrl
-	} = props;
-
-	const [dirty, setDirty] = React.useState(false);
 	const [open, setOpen] = React.useState(false);
-	const [touched, setTouched] = React.useState({});
-	const [values, setValues] = React.useState(initialValues);
-
-	console.debug('NewOrEditModal', {props, open, touched, values});
-
 	const onClose = () => setOpen(false);
 	const onOpen = () => setOpen(true);
 
 	const {
-		displayName
-	} = values;
+		initialValues = {
+			displayName: '',
+			fieldType: 'text',
+			//indexConfig: '',
+			key: ''
+		},
+		servicesBaseUrl
+	} = props;
+
+	const [dirty, setDirty] = React.useState({});
+	const [errors, setErrors] = React.useState({});
+	const [touched, setTouched] = React.useState({});
+	const [values, setValues] = React.useState(JSON.parse(JSON.stringify(initialValues))); // Dereference
+
+	const callbacks = {
+		getTouched: (name) => {
+			const value = getIn(touched, name, false);
+			console.debug('getTouched name', name, 'value', value);
+			return value;
+		},
+		getError: (name) => {
+			const value = getIn(errors, name);
+			console.debug('getError name', name, 'value', value);
+			return value;
+		},
+		getValue: (name) => {
+			const value = getIn(values, name);
+			console.debug('getValue name', name, 'value', value);
+			return value;
+		},
+		setDirty: (name, dirty) => {
+			return setDirty(prev => {
+				const deref = JSON.parse(JSON.stringify(prev));
+				setIn(prev, name, dirty);
+				console.debug('setDirty name', name, 'dirty', dirty, 'prev', deref, 'new', prev);
+				return prev;
+			});
+		},
+		setErrors: (name, error) => {
+			return setErrors(prev => {
+				const deref = JSON.parse(JSON.stringify(prev));
+				setIn(prev, name, error);
+				console.debug('setErrors name', name, 'error', error, 'prev', deref, 'new', prev);
+				return prev;
+			});
+		},
+		setTouched: (name, touched) => {
+			return setTouched(prev => {
+				const deref = JSON.parse(JSON.stringify(prev));
+				setIn(prev, name, touched);
+				console.debug('setTouched name', name, 'touched', touched, 'prev', deref, 'new', prev);
+				return prev;
+			});
+		},
+		setValues: (name, value) => {
+			return setValues(prev => {
+				const deref = JSON.parse(JSON.stringify(prev));
+				setIn(prev, name, value);
+				console.debug('setValues name', name, 'value', value, 'prev', deref, 'new', prev);
+				return prev;
+			});
+		}
+	};
+
+	console.debug('NewOrEditModal', {props, dirty, errors, open, touched, values});
 
 	return <Modal
 		closeIcon
@@ -50,33 +105,21 @@ function NewOrEditModal(props) {
 		<Modal.Header>{initialValues.displayName ? `Edit field ${initialValues.displayName}`: 'New field'}</Modal.Header>
 		<Modal.Content>
 			<Form autoComplete='off'>
-				{/*{props.key || <Form.Field><Input
-					label={{basic: true, content: 'Key'}}
-					onChange={(eventIgnored, {value}) => setState(prev => ({
-						...prev,
-						key: value
-					}))}
-					value={key}
-				/></Form.Field>}*/}
+				{initialValues.displayName ? null : <Form.Field>
+					<Input
+						callbacks={callbacks}
+						label={{basic: true, content: 'Key'}}
+						name='key'
+						validate={(value) => value ? undefined : 'Required'}
+					/>
+				</Form.Field>}
 				<Form.Field>
 					<Input
-						name='displayName'
+						callbacks={callbacks}
 						label={{basic: true, content: 'Display name'}}
-						onBlur={() => setTouched(prev => ({...prev, displayName: true}))}
-						onChange={(eventIgnored, {value}) => {
-							setDirty(prev => ({...prev, displayName: initialValues.displayName !== value}));
-							setTouched(prev => ({...prev, displayName: true}));
-							setValues(prev => ({...prev, displayName: value}));
-						}}
-						value={displayName}
+						name='displayName'
+						validate={(value) => value ? undefined : 'Required'}
 					/>
-					{touched.displayName && !displayName && <Message icon negative>
-						<Icon name='warning'/>
-						<Message.Content>
-							<Message.Header>Display name</Message.Header>
-							Required!
-						</Message.Content>
-					</Message>}
 				</Form.Field>
 				{/*<Form.Field><Input
 					label={{basic: true, content: 'Description'}}
@@ -223,8 +266,8 @@ export function Fields(props) {
 					</Table.Header>
 					<Table.Body>
 						{fieldsRes.hits.map(({
-							displayName,
-							fieldType,
+							displayName = '',
+							fieldType = 'text',
 							indexConfig,
 							key,
 							valuesRes
