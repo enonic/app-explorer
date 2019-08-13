@@ -1,10 +1,13 @@
+import getIn from 'get-value';
+import {isString} from '/lib/util/value';
+
 import {
 	PRINCIPAL_EXPLORER_READ,
 	RT_JSON
 } from '/lib/explorer/model/2/constants';
 import {connect} from '/lib/explorer/repo/connect';
-import {getFields} from '/admin/tools/explorer/fields/getFields';
-import {getFieldValues} from '/admin/tools/explorer/fields/getFieldValues';
+import {getFields} from '/lib/explorer/field/getFields';
+import {getFieldValues} from '/lib/explorer/field/getFieldValues';
 
 
 export function get() {
@@ -14,7 +17,7 @@ export function get() {
 		_name: name,
 		displayName,
 		fieldType,
-		indexConfig,
+		indexConfig, // String or object
 		key
 	}) => {
 		const valuesRes = getFieldValues({
@@ -34,9 +37,18 @@ export function get() {
 		return {
 			displayName,
 			fieldType,
-			indexConfig,
 			key,
 			name,
+
+			instruction: isString(indexConfig) ? indexConfig : 'custom',
+
+			decideByType: getIn(indexConfig, 'decideByType', true),
+			enabled: getIn(indexConfig, 'enabled', true),
+			fulltext: getIn(indexConfig, 'fulltext', true),
+			includeInAllText: getIn(indexConfig, 'includeInAllText', true),
+			ngram: getIn(indexConfig, 'ngram', true),
+			path: getIn(indexConfig, 'path', false),
+
 			valuesRes
 		};
 	});

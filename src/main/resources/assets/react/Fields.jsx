@@ -17,25 +17,28 @@ function required(value) {
 const SCHEMA = {
 	displayName: (value) => required(value),
 	fieldType: (value) => required(value),
-	indexConfig: (value) => required(value),
+	instruction: (value) => required(value),
 	key: (value) => required(value)
 };
 
 
 function NewOrEditModal(props) {
 	const {
+		disabled = false,
 		initialValues = {
-			decideByType: true,
+			description: '',
 			displayName: '',
-			enabled: true,
 			fieldType: 'text',
+			key: '',
+			instruction: 'type',
+			decideByType: true,
+			enabled: true,
 			fulltext: true,
 			includeInAllText: true,
-			indexConfig: 'type',
-			key: '',
 			ngram: true,
 			path: false
 		},
+		onClose,
 		servicesBaseUrl
 	} = props;
 
@@ -43,9 +46,25 @@ function NewOrEditModal(props) {
 	const [errors, setErrors] = React.useState({});
 	const [open, setOpen] = React.useState(false);
 	const [touched, setTouched] = React.useState({});
-	const [values, setValues] = React.useState(JSON.parse(JSON.stringify(initialValues))); // Dereference
+	const [values, setValues] = React.useState(JSON.parse(JSON.stringify(initialValues)));
+	const {
+		description,
+		displayName,
+		fieldType,
+		key,
+		instruction,
+		decideByType,
+		enabled,
+		fulltext,
+		includeInAllText,
+		ngram,
+		path
+	} = values;
 
-	const onClose = () => setOpen(false);
+	const doClose = () => {
+		onClose();
+		setOpen(false);
+	}
 	const onReset = () => {
 		setDirty({});
 		setErrors({});
@@ -66,7 +85,7 @@ function NewOrEditModal(props) {
 		setTouched({
 			displayName: true,
 			fieldType: true,
-			indexConfig: true,
+			instruction: true,
 			key: true
 		});
 	}
@@ -109,20 +128,23 @@ function NewOrEditModal(props) {
 		}
 	};
 
-	console.debug('NewOrEditModal render', {props, dirty, errors, open, touched, values});
+	//console.debug('NewOrEditModal render', {props, dirty, errors, open, touched, values});
+	//console.debug('NewOrEditModal render values', values);
 
 	return <Modal
 		closeIcon
-		onClose={onClose}
+		onClose={doClose}
 		open={open}
 		trigger={initialValues.displayName ? <Button
 			compact
+			disabled={disabled}
 			onClick={onOpen}
 			size='tiny'
 		><Icon color='blue' name='edit'/>Edit</Button>
 			: <Button
 				circular
 				color='green'
+				disabled={disabled}
 				icon
 				onClick={onOpen}
 				size='massive'
@@ -195,7 +217,7 @@ function NewOrEditModal(props) {
 					<Dropdown
 						callbacks={callbacks}
 						fluid
-						name='indexConfig'
+						name='instruction'
 						options={[{
 							key: 'type',
 							text: 'type (default) - Indexing is done based on type; e.g numeric values are indexed as both string and numeric.',
@@ -225,7 +247,7 @@ function NewOrEditModal(props) {
 						selection
 					/>
 				</Form.Field>
-				{getIn(values, 'indexConfig') === 'custom' && <>
+				{getIn(values, 'instruction') === 'custom' && <>
 					<Form.Field>
 						<Checkbox
 							callbacks={callbacks}
@@ -245,15 +267,15 @@ function NewOrEditModal(props) {
 					<Form.Field>
 						<Checkbox
 							callbacks={callbacks}
-							label='nGram'
-							name='nGram'
+							label='Ngram'
+							name='ngram'
 							toggle
 						/>
 					</Form.Field>
 					<Form.Field>
 						<Checkbox
 							callbacks={callbacks}
-							label='fulltext'
+							label='Fulltext'
 							name='fulltext'
 							toggle
 						/>
@@ -261,7 +283,7 @@ function NewOrEditModal(props) {
 					<Form.Field>
 						<Checkbox
 							callbacks={callbacks}
-							label='includeInAllText'
+							label='Include in _allText'
 							name='includeInAllText'
 							toggle
 						/>
@@ -269,7 +291,7 @@ function NewOrEditModal(props) {
 					<Form.Field>
 						<Checkbox
 							callbacks={callbacks}
-							label='path'
+							label='Path'
 							name='path'
 							toggle
 						/>
@@ -281,6 +303,27 @@ function NewOrEditModal(props) {
 						//Object.values(errors).some((v) => v)
 						Object.entries(SCHEMA).some(([k,v]) => v(getIn(values, k)))
 					}
+					onClick={() => {
+						const params = {
+							description,
+							displayName,
+							fieldType,
+							key,
+							instruction,
+							decideByType,
+							enabled,
+							fulltext,
+							includeInAllText,
+							ngram,
+							path
+						};
+						//console.debug('params', params);
+						fetch(`${servicesBaseUrl}/fieldCreate?json=${JSON.stringify(params)}`, {
+							method: 'POST'
+						}).then(response => {
+							doClose();
+						})
+					}}
 					type="submit">Submit</Button>
 				<Button
 					disabled={!Object.values(dirty).some((v) => v)}
@@ -295,6 +338,8 @@ function NewOrEditModal(props) {
 
 export function Fields(props) {
 	const {
+		defaultFields = [],
+		noValuesFields = [],
 		servicesBaseUrl
 	} = props;
 
@@ -396,8 +441,15 @@ export function Fields(props) {
 						{fieldsRes.hits.map(({
 							displayName = '',
 							fieldType = 'text',
-							indexConfig,
 							key,
+							name,
+							instruction,
+							decideByType,
+							enabled,
+							fulltext,
+							includeInAllText,
+							ngram,
+							path,
 							valuesRes
 						}, index) => <Table.Row key={`field[${index}]`}>
 							<Table.Cell>{key}</Table.Cell>
@@ -406,12 +458,20 @@ export function Fields(props) {
 							<Table.Cell>{valuesRes.hits.map(({displayName})=>displayName)}</Table.Cell>
 							<Table.Cell>
 								<NewOrEditModal
+									disabled={defaultFields.includes(name)}
 									initialValues={{
 										displayName,
 										fieldType,
-										indexConfig,
-										key
+										key,
+										instruction,
+										decideByType,
+										enabled,
+										fulltext,
+										includeInAllText,
+										ngram,
+										path
 									}}
+									onClose={fetchFields}
 									servicesBaseUrl={servicesBaseUrl}
 								/>
 							</Table.Cell>
@@ -419,6 +479,7 @@ export function Fields(props) {
 					</Table.Body>
 				</Table>
 				<NewOrEditModal
+					onClose={fetchFields}
 					servicesBaseUrl={servicesBaseUrl}
 				/>
 			</>

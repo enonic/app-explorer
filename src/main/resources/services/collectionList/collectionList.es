@@ -11,8 +11,8 @@ import {getDocumentCount} from '/lib/explorer/collection/getDocumentCount';
 import {query as queryCollections} from '/lib/explorer/collection/query';
 import {usedInInterfaces} from '/lib/explorer/collection/usedInInterfaces';
 import {query as queryCollectors} from '/lib/explorer/collector/query';
-import {getFields} from '/admin/tools/explorer/fields/getFields';
-import {getFieldValues} from '/admin/tools/explorer/fields/getFieldValues';
+import {getFields} from '/lib/explorer/field/getFields';
+import {getFieldValues} from '/lib/explorer/field/getFieldValues';
 
 
 export function get() {

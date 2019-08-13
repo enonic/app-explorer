@@ -24,7 +24,6 @@ import {stop} from '/admin/tools/explorer/collections/stop';
 import {status as collectorStatus} from '/admin/tools/explorer/collections/status';
 import {journal} from '/admin/tools/explorer/collections/journal';
 
-import {newOrEdit as newOrEditField} from '/admin/tools/explorer/fields/newOrEdit';
 import {newOrEdit as newOrEditValue} from '/admin/tools/explorer/fields/values/newOrEdit';
 import {handleFieldsPost} from '/admin/tools/explorer/fields/handleFieldsPost';
 import {list as listFields} from '/admin/tools/explorer/fields/list';
@@ -107,10 +106,6 @@ router.filter((req/*, next*/) => {
 	 GET  /fields      -> LIST fields
 	 GET  /fields/list -> LIST fields
 
-	 GET  /fields/new    -> EDIT new field
-	 POST /fields/create -> CREATE new field
-
-	 GET  /fields/edit/fieldName   -> EDIT field (lists values)
 	 POST /fields/update/fieldName -> UPDATE field
 	 POST /fields/delete/fieldName -> DELETE field
 
@@ -125,9 +120,6 @@ router.filter((req/*, next*/) => {
 	──────────────────────────────────────────────────────────────────────────*/
 	if (tab === 'fields') {
 		switch (action) {
-		case 'new': // fallthrough to edit
-		case 'edit': return newOrEditField(req);
-		case 'create': // fallthrough to update
 		case 'delete': // fallthrough to update
 		case 'update': return handleFieldsPost(req);
 		case 'values':

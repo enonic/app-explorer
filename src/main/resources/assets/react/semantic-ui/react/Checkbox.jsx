@@ -32,7 +32,7 @@ export function Checkbox(props = {}) {
 		//validateOnBlur && setError(name, validate(value));
 	};
 
-	function onChange(eventIgnored, {value: newValue}) {
+	function onChange(eventIgnored, {checked: newValue}) {
 		//console.debug('Checkbox onChange value', value, 'newValue', newValue);
 		setDirty(name, newValue !== value);
 		setTouched(name, true);

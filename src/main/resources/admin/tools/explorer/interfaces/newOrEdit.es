@@ -13,8 +13,8 @@ import {
 import {connect} from '/lib/explorer/repo/connect';
 import {htmlResponse} from '/admin/tools/explorer/htmlResponse';
 import {query as queryCollections} from '/lib/explorer/collection/query';
-import {getFields} from '/admin/tools/explorer/fields/getFields';
-import {getFieldValues} from '/admin/tools/explorer/fields/getFieldValues';
+import {getFields} from '/lib/explorer/field/getFields';
+import {getFieldValues} from '/lib/explorer/field/getFieldValues';
 import {query as getThesauri} from '/lib/explorer/thesaurus/query';
 import {query as getStopWords} from '/lib/explorer/stopWords/query';
 

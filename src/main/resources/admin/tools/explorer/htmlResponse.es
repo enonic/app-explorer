@@ -111,7 +111,7 @@ export function htmlResponse({
 			<a class="${tab === 'about' ? 'active ' : ''}item" href="${TOOL_PATH}/about"><i class="info icon"></i> About</a>
 		</aside>
 
-		<main class="pusher" id="myPusher" style="padding:14px;width: calc(100% - 260px);">
+		<main class="pusher" id="myPusher" style="padding:54px 14px 14px;width: calc(100% - 260px);">
 			${messagesArray.length ? `<div class="ui icon ${statusInt === 200 ? 'positive' : 'negative'} message">
 				<i class="${statusInt === 200 ? 'thumbs up' : 'exclamation triangle'} icon"></i>
 				<div class="content">
