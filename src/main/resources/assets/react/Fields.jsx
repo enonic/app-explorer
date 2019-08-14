@@ -337,6 +337,45 @@ function NewOrEditModal(props) {
 } // NewOrEditModal
 
 
+function DeleteModal(props) {
+	const {
+		disabled,
+		name,
+		onClose,
+		servicesBaseUrl
+	} = props;
+	const [open, setOpen] = React.useState(false);
+	return <Modal
+		closeIcon
+		onClose={onClose}
+		open={open}
+		trigger={<Button
+			compact
+			disabled={disabled}
+			onClick={() => setOpen(true)}
+			size='tiny'><Icon color='red' name='trash alternate outline'/>Delete</Button>}
+	>
+		<Modal.Header>Delete field {name}</Modal.Header>
+		<Modal.Content>
+			<Header as='h2'>Do you really want to delete {name}?</Header>
+			<Button
+				compact
+				onClick={() => {
+					fetch(`${servicesBaseUrl}/fieldDelete?name=${name}`, {
+						method: 'DELETE'
+					}).then(response => {
+						//if (response.status === 200) {}
+						setOpen(false);
+						onClose();
+					})
+				}}
+				size='tiny'
+			><Icon color='red' name='trash alternate outline'/>Confirm Delete</Button>
+		</Modal.Content>
+	</Modal>;
+} // DeleteModal
+
+
 export function Fields(props) {
 	const {
 		defaultFields = [],
@@ -452,31 +491,40 @@ export function Fields(props) {
 							ngram,
 							path,
 							valuesRes
-						}, index) => <Table.Row key={`field[${index}]`}>
-							<Table.Cell>{key}</Table.Cell>
-							<Table.Cell>{displayName}</Table.Cell>
-							<Table.Cell>{fieldType}</Table.Cell>
-							<Table.Cell>{valuesRes.hits.map(({displayName})=>displayName)}</Table.Cell>
-							<Table.Cell>
-								<NewOrEditModal
-									disabled={defaultFields.includes(name)}
-									initialValues={{
-										displayName,
-										fieldType,
-										key,
-										instruction,
-										decideByType,
-										enabled,
-										fulltext,
-										includeInAllText,
-										ngram,
-										path
-									}}
-									onClose={fetchFields}
-									servicesBaseUrl={servicesBaseUrl}
-								/>
-							</Table.Cell>
-						</Table.Row>)}
+						}, index) => {
+							const boolDefaultField = defaultFields.includes(name);
+							return <Table.Row key={`field[${index}]`}>
+								<Table.Cell>{key}</Table.Cell>
+								<Table.Cell>{displayName}</Table.Cell>
+								<Table.Cell>{fieldType}</Table.Cell>
+								<Table.Cell>{valuesRes.hits.map(({displayName})=>displayName)}</Table.Cell>
+								<Table.Cell>
+									<NewOrEditModal
+										disabled={boolDefaultField}
+										initialValues={{
+											displayName,
+											fieldType,
+											key,
+											instruction,
+											decideByType,
+											enabled,
+											fulltext,
+											includeInAllText,
+											ngram,
+											path
+										}}
+										onClose={fetchFields}
+										servicesBaseUrl={servicesBaseUrl}
+									/>
+									<DeleteModal
+										disabled={boolDefaultField}
+										name={name}
+										onClose={fetchFields}
+										servicesBaseUrl={servicesBaseUrl}
+									/>
+								</Table.Cell>
+							</Table.Row>;
+						})}
 					</Table.Body>
 				</Table>
 				<NewOrEditModal

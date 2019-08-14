@@ -92,9 +92,6 @@ export function htmlResponse({
 			</div>`	: ''}
 
 			<a class="${tab === 'fields' ? 'active ' : ''}item" href="${TOOL_PATH}/fields"><i class="sitemap icon"></i> Fields</a>
-			${licenseValid && tab === 'fields' ? `<div class="inverted menu">
-				<a class="${action === 'new' ? ' active ' : ''} item" href="${TOOL_PATH}/fields/new"><i class="green plus icon"></i> New</a>
-			</div>` : ''}
 
 			<a class="${tab === 'stopwords' ? 'active ' : ''}item" href="${TOOL_PATH}/stopwords"><i class="crop icon"></i> StopWords</a>
 
@@ -111,7 +108,7 @@ export function htmlResponse({
 			<a class="${tab === 'about' ? 'active ' : ''}item" href="${TOOL_PATH}/about"><i class="info icon"></i> About</a>
 		</aside>
 
-		<main class="pusher" id="myPusher" style="padding:54px 14px 14px;width: calc(100% - 260px);">
+		<main class="pusher" id="myPusher" style="padding:54px 14px 14px;width: calc(100% - 260px)">
 			${messagesArray.length ? `<div class="ui icon ${statusInt === 200 ? 'positive' : 'negative'} message">
 				<i class="${statusInt === 200 ? 'thumbs up' : 'exclamation triangle'} icon"></i>
 				<div class="content">
@@ -146,7 +143,9 @@ export function htmlResponse({
 
 				const headerHeight = $('header').css('height');
 				$('#mySidebar').css('padding-top', headerHeight);
-				$('#myPusher').css('margin-top', headerHeight);
+				//$('#myPusher').css('margin-top', headerHeight);
+				$('#myPusher').css('padding', 14);
+				$('#myPusher').css('padding-top', 14 + headerHeight);
 
 				if ($('#mySidebar').sidebar('is mobile')) {
 					$('#mySidebar').sidebar({

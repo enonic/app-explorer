@@ -120,7 +120,6 @@ router.filter((req/*, next*/) => {
 	──────────────────────────────────────────────────────────────────────────*/
 	if (tab === 'fields') {
 		switch (action) {
-		case 'delete': // fallthrough to update
 		case 'update': return handleFieldsPost(req);
 		case 'values':
 			switch (secondaryAction) {

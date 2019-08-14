@@ -10,8 +10,6 @@ import {
 	TOOL_PATH
 } from '/lib/explorer/model/2/constants';
 import {connect} from '/lib/explorer/repo/connect';
-import {create} from '/lib/explorer/node/create';
-import {modify} from '/lib/explorer/node/modify';
 import {ucFirst} from '/lib/explorer/ucFirst';
 import {FieldValue} from '/lib/explorer/nodeTypes/FieldValue';
 
@@ -101,92 +99,4 @@ export function handleFieldsPost({
 			}&status=${status}`
 		}
 	} // values
-
-	if (action === 'delete') {
-		const path = `/fields/${fieldName}`;
-		const deleteRes = connection.delete(path);
-		//log.info(toStr({deleteRes}));
-		messages.push(deleteRes.length
-			? `Field with path:${path} deleted.`
-			: `Something went wrong when trying to delete field with path:${path}.`);
-		if(!deleteRes.length) { status = 500; }
-		return {
-			redirect: `${TOOL_PATH}/fields?${
-				messages.map(m => `messages=${encodeURIComponent(m)}`).join('&')
-			}&status=${status}`
-		}
-	} // if action === 'delete'
-
-	let {
-		key,
-		displayName
-	} = params;
-	const {
-		description = '',
-		//iconUrl = '',
-		instruction = 'type',
-		decideByType = 'on',
-		enabled = 'on',
-		nGram = 'on',
-		fulltext = 'on',
-		includeInAllText = 'on',
-		path,
-		fieldType = 'text'
-	} = params;
-	if (!key) {
-		if (!displayName) {
-			messages.push('You must provide either key or Display name!');
-			status = 400;
-			return {
-				redirect: `${TOOL_PATH}/fields?${
-					messages.map(m => `messages=${encodeURIComponent(m)}`).join('&')
-				}&status=${status}`
-			}
-		}
-		key = sanitize(displayName);
-	} else if (!displayName) {
-		displayName = ucFirst(key);
-	}
-	/*log.info(toStr({
-		key,
-		instruction,
-		decideByType,
-		enabled,
-		nGram,
-		fulltext,
-		includeInAllText,
-		path,
-	}));*/
-	const lcKey = key.toLowerCase();
-	const nodeParams = {
-		__connection: connection,
-		_indexConfig: {default: 'byType'},
-		_name: lcKey,
-		_parentPath: '/fields',
-		description,
-		displayName,
-		fieldType,
-		key: lcKey,
-		//iconUrl,
-		indexConfig: instruction === 'custom' ? {
-			decideByType: decideByType && decideByType === 'on',
-			enabled: enabled && enabled === 'on',
-			nGram: nGram && nGram === 'on',
-			fulltext: fulltext && fulltext === 'on',
-			includeInAllText: includeInAllText && includeInAllText === 'on',
-			path: path && path === 'on'
-		} : instruction,
-		type: NT_FIELD
-	};
-	const node = fieldName ? modify(nodeParams) : create(nodeParams);
-	//log.info(toStr({node}));
-	messages.push(node
-		? `Field with key:${lcKey} ${fieldName ? 'modified' : 'created'}.`
-		: `Something went wrong when trying to ${fieldName ? 'modify' : 'create'} field with key:${lcKey}.`);
-	if (!node) { status = 500;}
-	return {
-		redirect: `${TOOL_PATH}/fields?${
-			messages.map(m => `messages=${encodeURIComponent(m)}`).join('&')
-		}&status=${status}`
-	}
 } // function post
