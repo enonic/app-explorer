@@ -41,6 +41,7 @@ function NewOrEditModal(props) {
 		onClose,
 		servicesBaseUrl
 	} = props;
+	const editMode = !!initialValues.displayName;
 
 	const [dirty, setDirty] = React.useState({});
 	const [errors, setErrors] = React.useState({});
@@ -135,7 +136,7 @@ function NewOrEditModal(props) {
 		closeIcon
 		onClose={doClose}
 		open={open}
-		trigger={initialValues.displayName ? <Button
+		trigger={editMode ? <Button
 			compact
 			disabled={disabled}
 			onClick={onOpen}
@@ -156,10 +157,10 @@ function NewOrEditModal(props) {
 					name='plus'
 				/></Button>}
 	>
-		<Modal.Header>{initialValues.displayName ? `Edit field ${initialValues.displayName}`: 'New field'}</Modal.Header>
+		<Modal.Header>{editMode ? `Edit field ${initialValues.displayName}`: 'New field'}</Modal.Header>
 		<Modal.Content>
 			<Form autoComplete='off'>
-				{initialValues.displayName ? null : <Form.Field>
+				{editMode ? null : <Form.Field>
 					<Input
 						callbacks={callbacks}
 						label={{basic: true, content: 'Key'}}
@@ -318,7 +319,7 @@ function NewOrEditModal(props) {
 							path
 						};
 						//console.debug('params', params);
-						fetch(`${servicesBaseUrl}/fieldCreate?json=${JSON.stringify(params)}`, {
+						fetch(`${servicesBaseUrl}/field${editMode ? 'Modify' : 'Create'}?json=${JSON.stringify(params)}`, {
 							method: 'POST'
 						}).then(response => {
 							doClose();
