@@ -8,6 +8,9 @@ import {Checkbox} from './semantic-ui/react/Checkbox';
 import {Dropdown} from './semantic-ui/react/Dropdown';
 import {Input} from './semantic-ui/react/Input';
 
+import {Form as EnonicForm} from './enonic/Form';
+import {Input as EnonicInput} from './enonic/Input';
+
 
 function required(value) {
 	return value ? undefined : 'Required!';
@@ -70,7 +73,7 @@ function NewOrEditModal(props) {
 		setDirty({});
 		setErrors({});
 		setTouched({});
-		setValues(initialValues);
+		setValues(JSON.parse(JSON.stringify(initialValues)));
 	};
 	const onOpen = () => {
 		onReset();
@@ -376,6 +379,55 @@ function DeleteModal(props) {
 } // DeleteModal
 
 
+function EditFieldValuesModal(props) {
+	const {
+		disabled,
+		name,
+		onClose,
+		servicesBaseUrl,
+		valuesRes
+	} = props;
+	const [open, setOpen] = React.useState(false);
+	return <Modal
+		closeIcon
+		onClose={onClose}
+		open={open}
+		trigger={<Button
+			compact
+			disabled={disabled}
+			onClick={() => setOpen(true)}
+			size='tiny'><Icon color='blue' name='edit'/>Edit values</Button>}
+	>
+		<Modal.Header>Edit values for field {name}</Modal.Header>
+		<Modal.Content>
+			<Table celled collapsing compact selectable singleLine sortable striped>
+				<Table.Header>
+					<Table.Row>
+						<Table.HeaderCell>value</Table.HeaderCell>
+						<Table.HeaderCell>Display name</Table.HeaderCell>
+						<Table.HeaderCell>Actions</Table.HeaderCell>
+					</Table.Row>
+				</Table.Header>
+				<Table.Body>
+					{valuesRes.hits.map((initialData, index) => {
+						const [data, setData] = React.useState(initialData);
+						const {displayName, value} = data;
+						const key = `${name}-value-${index}`;
+						return <Table.Row key={key}>
+							<EnonicForm>
+								<Table.Cell>{value}</Table.Cell>
+								<Table.Cell>{displayName}</Table.Cell>
+								<Table.Cell><EnonicInput/></Table.Cell>
+							</EnonicForm>
+						</Table.Row>;
+					})}
+				</Table.Body>
+			</Table>
+		</Modal.Content>
+	</Modal>;
+} // EditFieldValuesModal
+
+
 export function Fields(props) {
 	const {
 		defaultFields = [],
@@ -515,6 +567,13 @@ export function Fields(props) {
 										}}
 										onClose={fetchFields}
 										servicesBaseUrl={servicesBaseUrl}
+									/>
+									<EditFieldValuesModal
+										disabled={noValuesFields.includes(name)}
+										name={name}
+										onClose={fetchFields}
+										servicesBaseUrl={servicesBaseUrl}
+										valuesRes={valuesRes}
 									/>
 									<DeleteModal
 										disabled={boolDefaultField}

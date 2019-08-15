@@ -141,7 +141,7 @@ export function htmlResponse({
 				$('select.dropdown').dropdown();
 				$('table').tablesort();
 
-				const headerHeight = $('header').css('height');
+				const headerHeight = parseInt($('header').css('height'));
 				$('#mySidebar').css('padding-top', headerHeight);
 				//$('#myPusher').css('margin-top', headerHeight);
 				$('#myPusher').css('padding', 14);

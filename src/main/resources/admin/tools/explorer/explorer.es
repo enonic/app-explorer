@@ -128,7 +128,6 @@ router.filter((req/*, next*/) => {
 			case 'create': // fallthrough to update
 			case 'delete': // fallthrough to update
 			case 'update': return handleFieldsPost(req);
-			default: return newOrEditField(req);
 			} // values
 		default: return listFields(req);
 		} // action
