@@ -10,6 +10,7 @@ import {Input} from './semantic-ui/react/Input';
 
 import {Form as EnonicForm} from './enonic/Form';
 import {Input as EnonicInput} from './enonic/Input';
+import {DeleteButton} from './enonic/DeleteButton';
 import {ResetButton} from './enonic/ResetButton';
 import {SubmitButton} from './enonic/SubmitButton';
 import {ValidateFormButton} from './enonic/ValidateFormButton';
@@ -417,6 +418,9 @@ function EditFieldValuesModal(props) {
 						return <Table.Row key={key}>
 							<EnonicForm
 								initialValues={initialValues}
+								onDelete={({value}) => fetch(`${servicesBaseUrl}/fieldValueDelete?field=${field}&value=${value}`, {
+									method: 'DELETE'
+								})}
 								onSubmit={({displayName, value}) => fetch(`${servicesBaseUrl}/fieldValueCreateOrUpdate?displayName=${displayName}&field=${field}&value=${value}`, {
 									method: 'POST'
 								})}
@@ -428,9 +432,12 @@ function EditFieldValuesModal(props) {
 								<Table.Cell><EnonicInput fluid path='value'/></Table.Cell>
 								<Table.Cell><EnonicInput fluid path='displayName'/></Table.Cell>
 								<Table.Cell>
-									<ValidateFormButton/>
-									<ResetButton/>
-									<SubmitButton/>
+									<Button.Group>
+										<SubmitButton/>
+										{/*<ResetButton/>
+										<ValidateFormButton/>*/}
+										<DeleteButton/>
+									</Button.Group>
 								</Table.Cell>
 							</EnonicForm>
 						</Table.Row>;

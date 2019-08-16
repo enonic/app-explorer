@@ -24,8 +24,6 @@ import {stop} from '/admin/tools/explorer/collections/stop';
 import {status as collectorStatus} from '/admin/tools/explorer/collections/status';
 import {journal} from '/admin/tools/explorer/collections/journal';
 
-import {newOrEdit as newOrEditValue} from '/admin/tools/explorer/fields/values/newOrEdit';
-import {handleFieldsPost} from '/admin/tools/explorer/fields/handleFieldsPost';
 import {list as listFields} from '/admin/tools/explorer/fields/list';
 
 import {list as listStopWords} from '/admin/tools/explorer/stopWords/list';
@@ -105,32 +103,9 @@ router.filter((req/*, next*/) => {
 	/*──────────────────────────────────────────────────────────────────────────
 	 GET  /fields      -> LIST fields
 	 GET  /fields/list -> LIST fields
-
-	 POST /fields/update/fieldName -> UPDATE field
-	 POST /fields/delete/fieldName -> DELETE field
-
-	 GET  /fields/values/fieldName -> LIST field values
-
-	 GET  /fields/values/fieldName/new    -> EDIT new field value
-	 POST /fields/values/fieldName/create -> CREATE new field value
-
-	 GET  /fields/values/fieldName/edit/valueName   -> EDIT field value
-	 POST /fields/values/fieldName/update/valueName -> UPDATE new field value
-	 POST /fields/values/fieldName/delete/valueName -> DELETE new field value
 	──────────────────────────────────────────────────────────────────────────*/
 	if (tab === 'fields') {
-		switch (action) {
-		case 'update': return handleFieldsPost(req);
-		case 'values':
-			switch (secondaryAction) {
-			case 'new': // fallthrough to edit
-			case 'edit': return newOrEditValue(req);
-			case 'create': // fallthrough to update
-			case 'delete': // fallthrough to update
-			case 'update': return handleFieldsPost(req);
-			} // values
-		default: return listFields(req);
-		} // action
+		return listFields(req);
 	} // fields
 
 	if (tab === 'stopwords') {

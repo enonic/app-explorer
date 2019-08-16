@@ -1,4 +1,5 @@
 import {Button, Icon} from 'semantic-ui-react';
+import traverse from 'traverse';
 
 import {getEnonicContext} from './Context';
 import {submit} from './Form';
@@ -10,9 +11,21 @@ export function SubmitButton(props) {
 	const [context, dispatch] = getEnonicContext();
 	//console.debug('SubmitButton context', context);
 
-	// disabled={}
+	const changesArr = traverse(context.changes).reduce(function (acc, x) {
+		if (this.notRoot && this.isLeaf && x === true) acc.push(x);
+		return acc;
+	}, []);
+	//console.dir(changesArr);
+
+	const errorsArr = traverse(context.errors).reduce(function (acc, x) {
+    	if (this.notRoot && this.isLeaf) acc.push(x);
+    	return acc;
+	}, []);
+ 	//console.dir(errorsArr);
+
 	return <Button
 		color='green'
+		disabled={!!errorsArr.length || !changesArr.length}
 		onClick={() => dispatch(submit())}
 		type='submit'
 	><Icon name='save'/>Submit</Button>;

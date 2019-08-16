@@ -1,9 +1,12 @@
 import getIn from 'get-value';
 import setIn from 'set-value';
 //import {Form as SemanticUiReactForm} from 'semantic-ui-react';
+import traverse from 'traverse';
+
 import {EnonicProvider} from './Context';
 
 
+const REMOVE = 'REMOVE';
 const RESET = 'RESET';
 const SET_VALUE = 'SET_VALUE';
 const SET_VISITED = 'SET_VISITED';
@@ -11,6 +14,10 @@ const SUBMIT = 'SUBMIT';
 const VALIDATE_FIELD = 'VALIDATE_FIELD';
 const VALIDATE_FORM = 'VALIDATE_FORM';
 
+
+export const remove = () => ({
+	type: REMOVE
+});
 
 export const reset = () => ({
 	type: RESET
@@ -53,6 +60,7 @@ export function Form(props) {
 	const {
 		children,
 		initialValues = {},
+		onDelete,
 		onSubmit,
 		schema = {},
 		...rest
@@ -69,17 +77,21 @@ export function Form(props) {
 	const reducer = (state, action) => {
 		//console.debug('reducer state', state, 'action', action);
 		switch (action.type) {
+		case REMOVE: {
+			onRemove(state.values);
+			return state;
+		}
 		case RESET: return initialState;
 		case SET_VALUE: {
 			if (action.value === getIn(state.values, action.path)) {
-				console.debug('reducer action', action, 'did not change state', state);
+				//console.debug('reducer action', action, 'did not change state', state);
 				return state;
 			}
 			const deref = JSON.parse(JSON.stringify(state));
 			setIn(deref.values, action.path, action.value);
 			const initialValue = getIn(initialValues, action.path);
 			setIn(deref.changes, action.path, action.value !== initialValue);
-			console.debug('reducer action', action, 'deref', deref);
+			//console.debug('reducer action', action, 'deref', deref);
 			return deref;
 		}
 		case SET_VISITED: {
@@ -89,7 +101,7 @@ export function Form(props) {
 			}
 			const deref = JSON.parse(JSON.stringify(state));
 			setIn(deref.visits, action.path, action.value);
-			console.debug('reducer action', action, 'deref', deref);
+			//console.debug('reducer action', action, 'deref', deref);
 			return deref;
 		}
 		case SUBMIT: {
@@ -99,34 +111,43 @@ export function Form(props) {
 		case VALIDATE_FIELD: {
 			const fn = getIn(schema, action.path);
 			if (!isFunction(fn)) {
-				console.debug('reducer action', action, "doesn't have a validator function state", state);
+				//console.debug('reducer action', action, "doesn't have a validator function state", state);
 				return state;
 			}
 			const error = fn(action.value);
 			if (error === getIn(state.errors, action.path)) {
-				console.debug('reducer action', action, 'did not change state', state);
+				//console.debug('reducer action', action, 'did not change state', state);
 				return state;
 			}
 			const deref = JSON.parse(JSON.stringify(state));
 			setIn(deref.errors, action.path, error);
-			console.debug('reducer action', action, 'deref', deref);
+			//console.debug('reducer action', action, 'deref', deref);
 			return deref;
 		}
 		case VALIDATE_FORM: {
-			/*const errors = {};
+			const errors = {};
 			const visits = {};
-			Object.entries(SCHEMA).forEach(([k,v]) => {
-				errors[k] = v(getIn(values, k));
-				visits[k] = true;
-			})
-			console.debug('validateSchema errors', errors, 'visits', visits);
-			setErrors(errors);
-			setVisits(visits);*/
-			return state;
+			traverse(schema).forEach(function (x) { // fat-arrow destroys this
+				if (this.notRoot && this.isLeaf && isFunction(x)) {
+					const path = this.path; //console.debug('path', path);
+					const value = getIn(state.values, path); //console.debug('value', value);
+					//const prevError = getIn(state.errors, path); console.debug('prevError', prevError);
+					const newError = x(value); //console.debug('newError', newError);
+					newError && setIn(errors, path, newError);
+					setIn(visits, path, true);
+					//console.debug('node', this.node);
+				}
+			});
+			//console.debug('errors', errors);
+			//console.debug('visits', visits);
+			const deref = JSON.parse(JSON.stringify(state));
+			deref.errors = errors;
+			deref.visits = visits;
+			return deref;
 		}
 		default: return state;
-		}
-	};
+		} // switch
+	}; // reducer
 
 	return <EnonicProvider
 		children={children}

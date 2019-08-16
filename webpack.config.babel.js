@@ -148,6 +148,7 @@ const SS_FILES = [
 	'src/main/resources/services/fieldList/fieldList',
 	'src/main/resources/services/fieldModify/fieldModify',
 	'src/main/resources/services/fieldValueCreateOrUpdate/fieldValueCreateOrUpdate',
+	'src/main/resources/services/fieldValueDelete/fieldValueDelete',
 	'src/main/resources/services/interfaceCopy/interfaceCopy',
 	'src/main/resources/services/interfaceDelete/interfaceDelete',
 	'src/main/resources/services/interfaceExists/interfaceExists',
