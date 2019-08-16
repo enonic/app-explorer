@@ -53,6 +53,7 @@ export function Form(props) {
 	const {
 		children,
 		initialValues = {},
+		onSubmit,
 		schema = {},
 		...rest
 	} = props;
@@ -92,6 +93,7 @@ export function Form(props) {
 			return deref;
 		}
 		case SUBMIT: {
+			onSubmit(state.values);
 			return state;
 		}
 		case VALIDATE_FIELD: {

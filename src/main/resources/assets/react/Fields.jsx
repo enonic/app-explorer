@@ -385,7 +385,7 @@ function DeleteModal(props) {
 function EditFieldValuesModal(props) {
 	const {
 		disabled,
-		name,
+		field,
 		onClose,
 		servicesBaseUrl,
 		valuesRes
@@ -401,7 +401,7 @@ function EditFieldValuesModal(props) {
 			onClick={() => setOpen(true)}
 			size='tiny'><Icon color='blue' name='edit'/>Edit values</Button>}
 	>
-		<Modal.Header>Edit values for field {name}</Modal.Header>
+		<Modal.Header>Edit values for field {field}</Modal.Header>
 		<Modal.Content>
 			<Table celled compact selectable singleLine sortable striped>
 				<Table.Header>
@@ -413,10 +413,13 @@ function EditFieldValuesModal(props) {
 				</Table.Header>
 				<Table.Body>
 					{valuesRes.hits.map((initialValues, index) => {
-						const key = `${name}-value-${index}`;
+						const key = `${field}-value-${index}`;
 						return <Table.Row key={key}>
 							<EnonicForm
 								initialValues={initialValues}
+								onSubmit={({displayName, value}) => fetch(`${servicesBaseUrl}/fieldValueCreateOrUpdate?displayName=${displayName}&field=${field}&value=${value}`, {
+									method: 'POST'
+								})}
 								schema={{
 									displayName: (value) => required(value),
 									value: (value) => required(value)
@@ -581,7 +584,7 @@ export function Fields(props) {
 									/>
 									<EditFieldValuesModal
 										disabled={noValuesFields.includes(name)}
-										name={name}
+										field={name}
 										onClose={fetchFields}
 										servicesBaseUrl={servicesBaseUrl}
 										valuesRes={valuesRes}
