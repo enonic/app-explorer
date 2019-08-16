@@ -10,6 +10,9 @@ import {Input} from './semantic-ui/react/Input';
 
 import {Form as EnonicForm} from './enonic/Form';
 import {Input as EnonicInput} from './enonic/Input';
+import {ResetButton} from './enonic/ResetButton';
+import {SubmitButton} from './enonic/SubmitButton';
+import {ValidateFormButton} from './enonic/ValidateFormButton';
 
 
 function required(value) {
@@ -400,24 +403,32 @@ function EditFieldValuesModal(props) {
 	>
 		<Modal.Header>Edit values for field {name}</Modal.Header>
 		<Modal.Content>
-			<Table celled collapsing compact selectable singleLine sortable striped>
+			<Table celled compact selectable singleLine sortable striped>
 				<Table.Header>
 					<Table.Row>
-						<Table.HeaderCell>value</Table.HeaderCell>
-						<Table.HeaderCell>Display name</Table.HeaderCell>
-						<Table.HeaderCell>Actions</Table.HeaderCell>
+						<Table.HeaderCell width={6}>value</Table.HeaderCell>
+						<Table.HeaderCell width={6}>Display name</Table.HeaderCell>
+						<Table.HeaderCell width={4}>Actions</Table.HeaderCell>
 					</Table.Row>
 				</Table.Header>
 				<Table.Body>
-					{valuesRes.hits.map((initialData, index) => {
-						const [data, setData] = React.useState(initialData);
-						const {displayName, value} = data;
+					{valuesRes.hits.map((initialValues, index) => {
 						const key = `${name}-value-${index}`;
 						return <Table.Row key={key}>
-							<EnonicForm>
-								<Table.Cell>{value}</Table.Cell>
-								<Table.Cell>{displayName}</Table.Cell>
-								<Table.Cell><EnonicInput/></Table.Cell>
+							<EnonicForm
+								initialValues={initialValues}
+								schema={{
+									displayName: (value) => required(value),
+									value: (value) => required(value)
+								}}
+							>
+								<Table.Cell><EnonicInput fluid path='value'/></Table.Cell>
+								<Table.Cell><EnonicInput fluid path='displayName'/></Table.Cell>
+								<Table.Cell>
+									<ValidateFormButton/>
+									<ResetButton/>
+									<SubmitButton/>
+								</Table.Cell>
 							</EnonicForm>
 						</Table.Row>;
 					})}

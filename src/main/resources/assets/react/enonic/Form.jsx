@@ -1,78 +1,131 @@
+import getIn from 'get-value';
+import setIn from 'set-value';
+//import {Form as SemanticUiReactForm} from 'semantic-ui-react';
 import {EnonicProvider} from './Context';
 
+
+const RESET = 'RESET';
+const SET_VALUE = 'SET_VALUE';
+const SET_VISITED = 'SET_VISITED';
+const SUBMIT = 'SUBMIT';
+const VALIDATE_FIELD = 'VALIDATE_FIELD';
+const VALIDATE_FORM = 'VALIDATE_FORM';
+
+
+export const reset = () => ({
+	type: RESET
+});
+
+export const setValue = ({path, value}) => ({
+	path,
+	type: SET_VALUE,
+	value
+});
+
+export const setVisited = ({path, value = true}) => ({
+	path,
+	type: SET_VISITED,
+	value
+});
+
+export const submit = () => ({
+	type: SUBMIT
+});
+
+export const validateField = ({path, value}) => ({
+	path,
+	type: VALIDATE_FIELD,
+	value
+});
+
+export const validateForm = () => ({
+	type: VALIDATE_FORM
+});
+
+
+function isFunction(value) {
+	return !!(value && value.constructor && value.call && value.apply); // highly performant from underscore
+}
+
+
 export function Form(props) {
+	//console.debug('Form props', props);
 	const {
 		children,
 		initialValues = {},
-		SCHEMA = {}
+		schema = {},
+		...rest
 	} = props;
+	//console.debug('Form schema', schema);
 
-	const [dirties, setDirties] = React.useState({});
-	const [errors, setErrors] = React.useState({});
-	const [touches, setTouches] = React.useState({});
-	const [values, setValues] = React.useState(JSON.parse(JSON.stringify(initialValues)));
+	const initialState = {
+		changes: {},
+		errors: {},
+		values: initialValues,
+		visits: {}
+	};
 
-	function reset() {
-		setDirties({});
-		setErrors({});
-		setTouches({});
-		setValues(JSON.parse(JSON.stringify(initialValues)));
-	}
-
-	function validateSchema() {
-		const errors = {};
-		const touches = {};
-		Object.entries(SCHEMA).forEach(([k,v]) => {
-			errors[k] = v(getIn(values, k));
-			touches[k] = true;
-		})
-		console.debug('validateSchema errors', errors, 'touches', touches);
-		setErrors(errors);
-		setTouches(touches);
-	} // validateSchema
-
-	const callbacks = {
-		getError: (name) => getIn(errors, name),
-		getTouched: (name) => getIn(touches, name, false),
-		getValue: (name) => getIn(values, name),
-		setDirty: (name, value) => {
-			const old = getIn(dirties, name, false);
-			if (value === old) { return; } // No need to change state, or cause render
-			setDirties(prev => {
-				const deref = JSON.parse(JSON.stringify(prev)); // So render gets triggered. Object.is comparison algorithm.
-				return setIn(deref, name, value);
-			});
-		},
-		setError: (name, value) => {
-			const old = getIn(errors, name);
-			if (value === old) { return; } // No need to change state, or cause render
-			setErrors(prev => {
-				const deref = JSON.parse(JSON.stringify(prev)); // So render gets triggered. Object.is comparison algorithm.
-				return setIn(deref, name, value);
-			});
-		},
-		setTouched: (name, value) => {
-			const old = getIn(touches, name);
-			if (value === old) { return; } // No need to change state, or cause render
-			setTouches(prev => {
-				const deref = JSON.parse(JSON.stringify(prev)); // So render gets triggered. Object.is comparison algorithm.
-				return setIn(deref, name, value);
-			});
-		},
-		setValue: (name, value) => {
-			const old = getIn(values, name);
-			if (value === old) { return; } // No need to change state, or cause render
-			setValues(prev => {
-				const deref = JSON.parse(JSON.stringify(prev)); // So render gets triggered. Object.is comparison algorithm.
-				return setIn(deref, name, value);
-			});
+	const reducer = (state, action) => {
+		//console.debug('reducer state', state, 'action', action);
+		switch (action.type) {
+		case RESET: return initialState;
+		case SET_VALUE: {
+			if (action.value === getIn(state.values, action.path)) {
+				console.debug('reducer action', action, 'did not change state', state);
+				return state;
+			}
+			const deref = JSON.parse(JSON.stringify(state));
+			setIn(deref.values, action.path, action.value);
+			const initialValue = getIn(initialValues, action.path);
+			setIn(deref.changes, action.path, action.value !== initialValue);
+			console.debug('reducer action', action, 'deref', deref);
+			return deref;
+		}
+		case SET_VISITED: {
+			if (action.value === getIn(state.visits, action.path)) {
+				//console.debug('reducer action', action, 'did not change state', state);
+				return state;
+			}
+			const deref = JSON.parse(JSON.stringify(state));
+			setIn(deref.visits, action.path, action.value);
+			console.debug('reducer action', action, 'deref', deref);
+			return deref;
+		}
+		case SUBMIT: {
+			return state;
+		}
+		case VALIDATE_FIELD: {
+			const fn = getIn(schema, action.path);
+			if (!isFunction(fn)) {
+				console.debug('reducer action', action, "doesn't have a validator function state", state);
+				return state;
+			}
+			const error = fn(action.value);
+			if (error === getIn(state.errors, action.path)) {
+				console.debug('reducer action', action, 'did not change state', state);
+				return state;
+			}
+			const deref = JSON.parse(JSON.stringify(state));
+			setIn(deref.errors, action.path, error);
+			console.debug('reducer action', action, 'deref', deref);
+			return deref;
+		}
+		case VALIDATE_FORM: {
+			/*const errors = {};
+			const visits = {};
+			Object.entries(SCHEMA).forEach(([k,v]) => {
+				errors[k] = v(getIn(values, k));
+				visits[k] = true;
+			})
+			console.debug('validateSchema errors', errors, 'visits', visits);
+			setErrors(errors);
+			setVisits(visits);*/
+			return state;
+		}
+		default: return state;
 		}
 	};
 
-	const initialState = {what: 'ever'};
-	const reducer = (state, action) => {
-		return state;
-	};
 	return <EnonicProvider
 		children={children}
 		initialState={initialState}
