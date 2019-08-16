@@ -391,7 +391,23 @@ function EditFieldValuesModal(props) {
 		servicesBaseUrl,
 		valuesRes
 	} = props;
+
+	const [isLoading, setLoading] = React.useState(false);
 	const [open, setOpen] = React.useState(false);
+	const [values, setValues] = React.useState([]);
+
+	function fetchFieldValues() {
+		setLoading(true);
+		fetch(`${servicesBaseUrl}/fieldValueList?field=${field}`)
+			.then(response => response.json())
+			.then(data => {
+				setValues(data.valuesRes.hits);
+				setLoading(false);
+			});
+	} // fetchFieldValues
+
+	React.useEffect(() => fetchFieldValues(), []); // Runs once
+
 	return <Modal
 		closeIcon
 		onClose={onClose}
@@ -413,17 +429,17 @@ function EditFieldValuesModal(props) {
 					</Table.Row>
 				</Table.Header>
 				<Table.Body>
-					{valuesRes.hits.map((initialValues, index) => {
+					{isLoading ? null : values.map((initialValues, index) => {
 						const key = `${field}-value-${index}`;
 						return <Table.Row key={key}>
 							<EnonicForm
 								initialValues={initialValues}
 								onDelete={({value}) => fetch(`${servicesBaseUrl}/fieldValueDelete?field=${field}&value=${value}`, {
 									method: 'DELETE'
-								})}
+								}).then(fetchFieldValues)}
 								onSubmit={({displayName, value}) => fetch(`${servicesBaseUrl}/fieldValueCreateOrUpdate?displayName=${displayName}&field=${field}&value=${value}`, {
 									method: 'POST'
-								})}
+								}).then(fetchFieldValues)}
 								schema={{
 									displayName: (value) => required(value),
 									value: (value) => required(value)
@@ -443,7 +459,17 @@ function EditFieldValuesModal(props) {
 						</Table.Row>;
 					})}
 				</Table.Body>
+				{isLoading && <Table.Footer>
+					<Table.Row>
+						<Table.HeaderCell colSpan='3'><Loader active inverted>Loading</Loader></Table.HeaderCell>
+					</Table.Row>
+				</Table.Footer>}
 			</Table>
+			<Button onClick={() => setValues(prev => {
+				const deref = JSON.parse(JSON.stringify(prev));
+				deref.push({displayName: '', value: ''});
+				return deref;
+			})} type='button'>Add</Button>
 		</Modal.Content>
 	</Modal>;
 } // EditFieldValuesModal
@@ -570,7 +596,7 @@ export function Fields(props) {
 								<Table.Cell>{key}</Table.Cell>
 								<Table.Cell>{displayName}</Table.Cell>
 								<Table.Cell>{fieldType}</Table.Cell>
-								<Table.Cell>{valuesRes.hits.map(({displayName})=>displayName)}</Table.Cell>
+								<Table.Cell>{valuesRes.hits.map(({displayName})=>displayName).join(', ')}</Table.Cell>
 								<Table.Cell>
 									<NewOrEditModal
 										disabled={boolDefaultField}

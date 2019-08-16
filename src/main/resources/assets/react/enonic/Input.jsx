@@ -15,19 +15,19 @@ import {
 
 export function Input(props = {}) {
 	//console.debug('Input props', props);
+	const [context, dispatch] = getEnonicContext();
+	//console.debug('Input context', context);
 	const {
 		path,
 		validateOnBlur = true,
 		validateOnChange = true,
+		value = getIn(context.values, path),
 		...rest
 	} = props;
 
-	const [context, dispatch] = getEnonicContext();
-	//console.debug('Input context', context);
 
 	//const changed = getIn(context.changes, path);
 	const error = getIn(context.errors, path);
-	const value = getIn(context.values, path);
 	const visited = getIn(context.visits, path);
 	//console.debug('Input value', value);
 

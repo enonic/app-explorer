@@ -78,7 +78,7 @@ export function Form(props) {
 		//console.debug('reducer state', state, 'action', action);
 		switch (action.type) {
 		case REMOVE: {
-			onRemove(state.values);
+			onDelete(state.values);
 			return state;
 		}
 		case RESET: return initialState;
