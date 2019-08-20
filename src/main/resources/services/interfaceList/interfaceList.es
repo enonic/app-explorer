@@ -2,16 +2,75 @@ import {
 	PRINCIPAL_EXPLORER_READ,
 	RT_JSON
 } from '/lib/explorer/model/2/constants';
-import {connect} from '/lib/explorer/repo/connect';
+import {query as queryCollections} from '/lib/explorer/collection/query';
+import {getFields} from '/lib/explorer/field/getFields';
+import {getFieldValues} from '/lib/explorer/field/getFieldValues';
 import {query} from '/lib/explorer/interface/query';
+import {connect} from '/lib/explorer/repo/connect';
+import {query as getStopWords} from '/lib/explorer/stopWords/query';
+import {query as getThesauri} from '/lib/explorer/thesaurus/query';
 
 
 export function get() {
-	const connection = connect({ principals: [PRINCIPAL_EXPLORER_READ] });
+	const connection = connect({principals: [PRINCIPAL_EXPLORER_READ]});
+
+	const fieldValuesArray = getFieldValues({connection}).hits;
+	const fieldValuesObj = {};
+	fieldValuesArray.forEach(({_path, displayName, field, value}) => {
+		/*if (!fieldValuesObj[field]) {fieldValuesObj[field] = []}
+		fieldValuesObj[field].push({
+			label: displayName,
+			value: _name,
+			path: _path
+		});*/
+		if (!fieldValuesObj[field]) {fieldValuesObj[field] = {}}
+		fieldValuesObj[field][value] = {
+			label: displayName,
+			path: _path
+		};
+	});
+
+	const fieldsArray = getFields({connection}).hits.map(({displayName, key, _path}) => ({
+		label: displayName,
+		path: _path,
+		value: key,
+		values: fieldValuesObj[key]
+	}));
+	const fieldsObj = {};
+	fieldsArray.forEach(({label, path, value, values}) => {
+		fieldsObj[value] = {
+			label, path, values
+		};
+	});
+
 	const interfaces = query({connection});
-	interfaces.hits = interfaces.hits.map(({_name: name, displayName}) => ({displayName, name}));
+	interfaces.hits = interfaces.hits.map(({_id: id, _name: name, displayName}) => ({displayName, id, name}));
+
+	const stopWordOptions = getStopWords({connection}).hits.map(({displayName, name}) => ({
+		key: name,
+		text: displayName,
+		value: name
+	}));
+
 	return {
-		body: interfaces,
+		body: {
+			collectionOptions: queryCollections({connection}).hits.map(({
+				displayName: text,
+				_name: key
+			}) => ({
+				key,
+				text,
+				value: key
+			})),
+			fields: fieldsObj,
+			interfaces,
+			stopWordOptions,
+			thesauriOptions: getThesauri({connection}).hits.map(({displayName, name}) => ({
+				key: name,
+				text: displayName,
+				value: name
+			}))
+		},
 		contentType: RT_JSON
 	};
-}
+} // function get

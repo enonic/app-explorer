@@ -39,9 +39,6 @@ import {newOrEdit as newOrEditSynonym} from '/admin/tools/explorer/thesauri/syno
 import {handlePost as handleSynonymsPost} from '/admin/tools/explorer/thesauri/synonyms/handlePost';
 
 import {list as listInterfaces} from '/admin/tools/explorer/interfaces/list';
-import {newOrEdit as newOrEditInterface} from '/admin/tools/explorer/interfaces/newOrEdit';
-import {confirmDelete as confirmDeleteInterface} from '/admin/tools/explorer/interfaces/confirmDelete';
-import {handlePost as handleInterfacesPost} from '/admin/tools/explorer/interfaces/handlePost';
 import {search as searchInterface} from '/admin/tools/explorer/interfaces/search';
 
 
@@ -166,11 +163,6 @@ router.filter((req/*, next*/) => {
 	──────────────────────────────────────────────────────────────────────────*/
 	if (tab === 'interfaces') {
 		switch (action) {
-		case 'new': // fallthrough to edit
-		case 'edit': return newOrEditInterface(req);
-		case 'create': // fallthrough to update
-		case 'update': return handleInterfacesPost(req);
-		case 'delete': return method === 'POST' ? handleInterfacesPost(req) : confirmDeleteInterface(req);
 		case 'search': return searchInterface(req);
 		default: return listInterfaces(req);
 		}

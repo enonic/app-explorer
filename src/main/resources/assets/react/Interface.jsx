@@ -2,12 +2,14 @@ import {Formik, getIn} from 'formik';
 //const {Formik, getIn} = window.Formik;
 //const {Formik, getIn} = global.Formik;
 
-import {Form, Header, Menu, Rail, Ref, Segment, Sticky} from 'semantic-ui-react'
+import {
+	Form, Header, Menu, /*Rail, */Ref, Segment, Sticky
+} from 'semantic-ui-react';
 
 import {createRef} from 'react'
 //const {createRef} = React;
 
-import Scrollspy from 'react-scrollspy'
+//import Scrollspy from 'react-scrollspy'
 import generateUuidv4 from 'uuid/v4';
 
 import {
@@ -30,7 +32,9 @@ import {ResultMappings} from './query/ResultMappings';
 export const Interface = ({
 	action,
 	collectionOptions,
+	doClose,
 	fields,
+	id,
 	initialValues = {
 		name: '',
 		collections: [],
@@ -53,6 +57,8 @@ export const Interface = ({
 			last: true
 		}*/
 	},
+	name,
+	servicesBaseUrl,
 	stopWordOptions,
 	thesauriOptions
 } = {}) => {
@@ -74,17 +80,23 @@ export const Interface = ({
 					}));*/
 					return <Form
 						action={action}
-						autoComplete="off"
+						autoComplete='off'
 						className='ui form'
-						method="POST"
+						method='POST'
 						onSubmit={() => {
-							document.getElementById('json').setAttribute('value', JSON.stringify(values))
+							//document.getElementById('json').setAttribute('value', JSON.stringify(values))
+							fetch(`${servicesBaseUrl}/interface${id ? 'Modify' : 'Create'}?json=${JSON.stringify(values)}${name ? `&name=${name}` : ''}`, {
+								method: 'POST'
+							}).then(response => {
+								if (response.status === 200) { doClose(); }
+							})
 						}}
 						style={{
 							width: '100%'
 						}}
 					>
 						<Input
+							autoComplete='off'
 							fluid
 							formik={formik}
 							id='name'
@@ -131,11 +143,11 @@ export const Interface = ({
 							legend='Pagination'
 						/>*/}
 						<SubmitButton className='primary' text="Save interface" id='save'/>
-						<input id="json" name="json" type="hidden"/>
+						{/*<input id="json" name="json" type="hidden"/>*/}
 					</Form>;
 				}}
 			/>
-			<Rail position='right'>
+			{/*<Rail position='right'>
 				<Sticky context={contextRef} offset={14}>
 					<Scrollspy
 						items={[
@@ -162,11 +174,10 @@ export const Interface = ({
 						<Menu.Item href='#stopwords'>Stop words</Menu.Item>
 						<Menu.Item href='#resultmappings'>Result mappings</Menu.Item>
 						<Menu.Item href='#facets'>Facets</Menu.Item>
-						{/*<Menu.Item href='#pagination'>Pagination</Menu.Item>*/}
 						<Menu.Item href='#save'>Save</Menu.Item>
 					</Scrollspy>
 				</Sticky>
-			</Rail>
+			</Rail>*/}
 		</Segment>
 	</Ref>;
 } // Interface

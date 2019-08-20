@@ -40,7 +40,7 @@ export const ExpressionSelector = connect(({
 	parentPath,
 	path = parentPath ? `${parentPath}.${name}` : name,
 	thesauriOptions,
-	value = values && getIn(values, path)
+	value = getIn(values, path, {})
 }) => {
 	/*console.debug(toStr({
 		component: 'ExpressionSelector',

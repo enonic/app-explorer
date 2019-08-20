@@ -1,4 +1,113 @@
-import {Button, Header, Icon, Input, Message, Modal, Table} from 'semantic-ui-react';
+import {
+	Button, Header, Icon, Input, Loader, Message, Modal, Table
+} from 'semantic-ui-react';
+import generateUuidv4 from 'uuid/v4';
+
+import {Interface} from './Interface';
+
+
+function NewOrEditModal(props) {
+	const {
+		collectionOptions,
+		disabled = false,
+		fields,
+		initialValues = {},
+		onClose,
+		servicesBaseUrl,
+		stopWordOptions,
+		thesauriOptions
+	} = props;
+	//console.debug('initialValues', initialValues);
+
+	const editMode = !!initialValues.id;
+
+	const [isLoading, setLoading] = React.useState(false);
+	const [node, setNode] = React.useState({
+		collections: [],
+		displayName: '',
+		facets: [],
+		filters: {},
+		name: '',
+		//query,
+		resultMappings: [{
+			field: '',
+			highlight: false,
+			join: true,
+			lengthLimit: '',
+			separator: ' ',
+			to: '',
+			uuid4: generateUuidv4()
+		}],
+		//stopWords,
+		thesauri: []
+	});
+	const [open, setOpen] = React.useState(false);
+	//console.debug('node', node);
+
+	function fetchInterface() {
+		setLoading(true);
+		fetch(`${servicesBaseUrl}/interfaceGet?id=${initialValues.id}`)
+			.then(response => response.json())
+			.then(data => {
+				setNode(data);
+				setLoading(false);
+			});
+	} // fetchInterface
+
+	function doOpen() {
+		editMode && fetchInterface();
+		setOpen(true);
+	}
+
+	function doClose() {
+		onClose();
+		setOpen(false);
+	}
+
+	//React.useEffect(() => fetchInterface(), []); // Once on init?
+
+	return <Modal
+		closeIcon
+		onClose={doClose}
+		open={open}
+		size='large'
+		trigger={editMode ? <Button
+			compact
+			disabled={disabled}
+			onClick={doOpen}
+			size='tiny'
+		><Icon color='blue' name='edit'/>Edit</Button>
+			: <Button
+				circular
+				color='green'
+				disabled={disabled}
+				icon
+				onClick={doOpen}
+				size='massive'
+				style={{
+					bottom: 13.5,
+					position: 'fixed',
+					right: 13.5
+				}}><Icon
+					name='plus'
+				/></Button>}
+	>
+		<Modal.Header>{editMode ? `Edit interface ${initialValues.displayName}`: 'New interface'}</Modal.Header>
+		<Modal.Content>
+			{isLoading ? <Loader active inverted>Loading</Loader> : <Interface
+				collectionOptions={collectionOptions}
+				doClose={doClose}
+				fields={fields}
+				id={initialValues.id}
+				name={initialValues.name}
+				initialValues={node}
+				servicesBaseUrl={servicesBaseUrl}
+				stopWordOptions={stopWordOptions}
+				thesauriOptions={thesauriOptions}
+			/>}
+		</Modal.Content>
+	</Modal>;
+} // NewOrEditModal
 
 
 export class CopyModal extends React.Component {
@@ -165,14 +274,16 @@ export class Interfaces extends React.Component {
 		fetch(`${this.props.servicesBaseUrl}/interfaceList`)
 			.then(response => response.json())
 			.then(data => this.setState({
-				interfaces: data,
+				collectionOptions: data.collectionOptions,
+				fields: data.fields,
+				interfaces: data.interfaces,
 				isLoading: false
 			}));
 	} // updateInterfaces
 
 
 	componentDidMount() {
-		console.debug('Interfaces componentDidMount');
+		//console.debug('Interfaces componentDidMount');
 		this.updateInterfaces();
 	} // componentDidMount
 
@@ -189,10 +300,15 @@ export class Interfaces extends React.Component {
 		//console.debug(TOOL_PATH);
 
 		const {
+			collectionOptions,
+			fields,
 			interfaces: {
 				hits
-			}
+			},
+			stopWordOptions,
+			thesauriOptions
 		} = this.state;
+		//console.debug('fields', fields);
 		//console.debug(hits);
 
 		return <>
@@ -205,19 +321,22 @@ export class Interfaces extends React.Component {
 					</Table.Row>
 				</Table.Header>
 				<Table.Body>
-					{hits.map(({displayName, name}, index) => {
+					{hits.map((initialValues, index) => {
+						const {displayName, id, name} = initialValues;
 						//console.debug({displayName, name, index});
 						return <Table.Row key={index}>
 							<Table.Cell collapsing>{displayName}</Table.Cell>
 							<Table.Cell collapsing>
 								<Button.Group>
-									<Button
-										as='a'
-										compact
-										href={`${TOOL_PATH}/interfaces/edit/${name}`}
-										size='tiny'
-										type='button'
-									><Icon color='blue' name='edit'/>Edit</Button>
+									<NewOrEditModal
+										collectionOptions={collectionOptions}
+										fields={fields}
+										initialValues={initialValues}
+										onClose={() => this.updateInterfaces()}
+										servicesBaseUrl={servicesBaseUrl}
+										stopWordOptions={stopWordOptions}
+										thesauriOptions={thesauriOptions}
+									/>
 									<Button
 										as='a'
 										compact
@@ -241,6 +360,14 @@ export class Interfaces extends React.Component {
 					})}
 				</Table.Body>
 			</Table>
+			<NewOrEditModal
+				collectionOptions={collectionOptions}
+				fields={fields}
+				onClose={() => this.updateInterfaces()}
+				servicesBaseUrl={servicesBaseUrl}
+				stopWordOptions={stopWordOptions}
+				thesauriOptions={thesauriOptions}
+			/>
 		</>;
 	} // render
 } // class Interfaces

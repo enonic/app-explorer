@@ -138,10 +138,7 @@ class NewOrEditModal extends React.Component {
 						position: 'fixed',
 						right: 13.5
 					}}
-				><Icon
-						color='white'
-						name='plus'
-					/></Button>
+				><Icon name='plus'/></Button>
 			}
 		>
 			<Modal.Header>{header}</Modal.Header>
