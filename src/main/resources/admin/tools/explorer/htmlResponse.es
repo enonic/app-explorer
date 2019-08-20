@@ -101,9 +101,6 @@ export function htmlResponse({
 			</div>` : ''}
 
 			<a class="${tab === 'interfaces' ? 'active ' : ''}item" href="${TOOL_PATH}/interfaces"><i class="plug icon"></i> Interfaces</a>
-			${tab === 'interfaces' ? `<div class="inverted menu">
-				<a class="${action === 'new' ? ' active' : ''}item" href="${TOOL_PATH}/interfaces/new"><i class="green plus icon"></i> New</a>
-			</div>` : ''}
 
 			<a class="${tab === 'about' ? 'active ' : ''}item" href="${TOOL_PATH}/about"><i class="info icon"></i> About</a>
 		</aside>
