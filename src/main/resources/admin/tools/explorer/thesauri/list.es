@@ -1,5 +1,7 @@
+import serialize from 'serialize-javascript';
+
 //import {toStr} from '/lib/util';
-import {serviceUrl} from '/lib/xp/portal';
+import {assetUrl, serviceUrl} from '/lib/xp/portal';
 
 import {
 	PRINCIPAL_EXPLORER_READ,
@@ -30,18 +32,20 @@ export function list({
 		.reduce((accumulator, currentValue) => accumulator + currentValue) : 0;
 
 	const propsObj = {
+		servicesBaseUrl: serviceUrl({service: ''}),
 		serviceUrl: serviceUrl({
 			service: 'thesauri'
 		}),
 		TOOL_PATH
 	};
-	const propsJson = JSON.stringify(propsObj);
 
 	return htmlResponse({
 		bodyEnd: [
-			`<script type="text/javascript">
+			`<script type='module' defer>
+	import {Thesauri} from '${assetUrl({path: 'react/Thesauri.esm.js'})}';
+	const propsObj = eval(${serialize(propsObj)});
 	ReactDOM.render(
-		React.createElement(window.explorer.Thesauri, ${propsJson}),
+		React.createElement(Thesauri, propsObj),
 		document.getElementById('${ID_REACT_THESAURI_CONTAINER}')
 	);
 </script>`],

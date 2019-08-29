@@ -1,12 +1,96 @@
 import Uri from 'jsuri';
 import {
-	Button, Dropdown, Form, Header, Icon, Input, Pagination, Rail, Ref, Segment,
-	Sticky, Table
+	Button, Dropdown, Form, Header, Icon, Input, Loader, Modal, Pagination,
+	Rail, Ref, Segment, Sticky, Table
 } from 'semantic-ui-react';
 import {createRef} from 'react';
 
 
-export class Thesauri extends React.Component {
+function NewOrEdit(props) {
+	const {
+		id,
+		servicesBaseUrl
+	} = props;
+
+	const [displayName, setDisplayName] = React.useState(props.displayName || '');
+	const [name, setName] = React.useState(props.name || '');
+	const [open, setOpen] = React.useState(false);
+
+	function doOpen() { setOpen(true); }
+	function doClose() { setOpen(false); }
+
+	return <Modal
+		closeIcon
+		onClose={doClose}
+		open={open}
+		trigger={id ? <Button
+			compact
+			onClick={doOpen}
+			size='tiny'
+		><Icon color='blue' name='edit'/>Edit</Button>
+			: <Button
+				circular
+				color='green'
+				icon
+				onClick={doOpen}
+				size='massive'
+				style={{
+					bottom: 13.5,
+					position: 'fixed',
+					right: 13.5
+				}}><Icon
+					name='plus'
+				/></Button>}
+	>
+		<Modal.Header>{id ? `Edit thesaurus ${displayName}` : 'New thesaurus'}</Modal.Header>
+		<Modal.Content>
+			<Form>
+				{!id && <Form.Field>
+					<Input
+						fluid
+						label={{basic: true, content: 'Name'}}
+						name='name'
+						onChange={(e, {value}) => {
+							setName(value);
+						}}
+						placeholder='Please input name'
+						value={name}
+					/>
+				</Form.Field>}
+				<Form.Field>
+					<Input
+						fluid
+						label={{basic: true, content: 'Display name'}}
+						name='displayName'
+						onChange={(e, {value}) => {
+							setDisplayName(value);
+						}}
+						placeholder='Please input display name'
+						value={displayName}
+					/>
+				</Form.Field>
+				<Button
+					onClick={() => {
+						fetch(`${servicesBaseUrl}/thesaurus${id ? 'Update' : 'Create'}?displayName=${displayName}${id ? `&id=${id}` : `&name=${name}`}`, {
+							method: 'POST'
+						}).then(response => {
+							doClose();
+						})
+					}}
+					type='submit'>{id ? 'Save' : 'Create'}</Button>
+				<Button
+					onClick={() => {
+						setDisplayName(props.displayName || '');
+						setName(props.name || '');
+					}}
+					type='reset'>Reset</Button>
+			</Form>
+		</Modal.Content>
+	</Modal>;
+} // NewOrEdit
+
+
+export class EditThesauri extends React.Component {
 	contextRef = createRef();
 
 	constructor(props) {
@@ -226,4 +310,81 @@ export class Thesauri extends React.Component {
 			</Segment>
 		</Ref>;
 	} // render
-} // class Thesauri
+} // class EditThesauri
+
+
+export function Thesauri(props) {
+	//console.debug('Thesauri props', props);
+	const {servicesBaseUrl} = props;
+
+	const [isLoading, setLoading] = React.useState(false);
+	const [thesauriRes, setThesauriRes] = React.useState({
+		count: 0,
+		hits: [],
+		total: 0
+	});
+	const [synonymsSum, setSynonymsSum] = React.useState(0);
+
+	function fetchThesauri() {
+		setLoading(true);
+		fetch(`${servicesBaseUrl}/thesaurusList`)
+			.then(response => response.json())
+			.then(data => {
+				//console.debug('fetchThesauri data', data);
+				let sum = data.total ? data.hits
+					.map(({synonymsCount}) => synonymsCount)
+					.reduce((accumulator, currentValue) => accumulator + currentValue) : 0
+				setThesauriRes(data);
+				setSynonymsSum(sum);
+				setLoading(false);
+			});
+	}
+
+	React.useEffect(() => fetchThesauri(), []);
+
+	return <>
+		{isLoading
+			? <Loader active inverted>Loading</Loader>
+			: <Table celled compact selectable sortable striped attached='top'>
+				<Table.Header>
+					<Table.Row>
+						<Table.HeaderCell>Display name</Table.HeaderCell>
+						<Table.HeaderCell>Synonyms</Table.HeaderCell>
+						<Table.HeaderCell>Actions</Table.HeaderCell>
+					</Table.Row>
+				</Table.Header>
+				<Table.Body>
+					{thesauriRes.hits.map(({
+						//description,
+						displayName,
+						id,
+						name,
+						synonymsCount
+					}, index) => {
+						return <Table.Row key={index}>
+							<Table.Cell>{displayName}</Table.Cell>
+							<Table.Cell>{synonymsCount}</Table.Cell>
+							<Table.Cell>
+								<NewOrEdit
+									displayName={displayName}
+									id={id}
+									name={name}
+									servicesBaseUrl={servicesBaseUrl}
+								/>
+							</Table.Cell>
+						</Table.Row>
+					})}
+				</Table.Body>
+				<Table.Footer>
+					<Table.Row>
+						<Table.HeaderCell></Table.HeaderCell>
+						<Table.HeaderCell>{synonymsSum}</Table.HeaderCell>
+						<Table.HeaderCell></Table.HeaderCell>
+					</Table.Row>
+				</Table.Footer>
+			</Table>}
+		<NewOrEdit
+			servicesBaseUrl={servicesBaseUrl}
+		/>
+	</>;
+} // Thesauri

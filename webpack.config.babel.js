@@ -164,6 +164,7 @@ const SS_FILES = [
 	'src/main/resources/services/listCollectors/listCollectors',
 	'src/main/resources/services/search/search',
 	'src/main/resources/services/thesauri/thesauri',
+	'src/main/resources/services/thesaurusList/thesaurusList',
 	'src/main/resources/services/uninstallLicense/uninstallLicense',
 	//'src/main/resources/services/uploadLicense/uploadLicense',
 	'src/main/resources/admin/tools/explorer/explorer',
@@ -216,7 +217,8 @@ const WEBPACK_CONFIG = [webpackServerSideJs({
 		'src/main/resources/assets/react/Interfaces.jsx',
 		'src/main/resources/assets/react/Search.jsx',
 		'src/main/resources/assets/react/Status.jsx',
-		'src/main/resources/assets/react/StopWords.jsx'
+		'src/main/resources/assets/react/StopWords.jsx',
+		'src/main/resources/assets/react/Thesauri.jsx'
 	],
 	externals: [
 		// Unable to load these via script or module:
