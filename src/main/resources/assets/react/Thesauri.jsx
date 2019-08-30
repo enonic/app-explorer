@@ -44,7 +44,7 @@ function NewOrEdit(props) {
 	>
 		<Modal.Header>{id ? `Edit thesaurus ${displayName}` : 'New thesaurus'}</Modal.Header>
 		<Modal.Content>
-			<Form>
+			<Form autoComplete='off'>
 				{!id && <Form.Field>
 					<Input
 						fluid
@@ -71,7 +71,7 @@ function NewOrEdit(props) {
 				</Form.Field>
 				<Button
 					onClick={() => {
-						fetch(`${servicesBaseUrl}/thesaurus${id ? 'Update' : 'Create'}?displayName=${displayName}${id ? `&id=${id}` : `&name=${name}`}`, {
+						fetch(`${servicesBaseUrl}/thesaurus${id ? 'Update' : 'Create'}?displayName=${displayName}${id ? `&id=${id}` : ''}&name=${name}`, {
 							method: 'POST'
 						}).then(response => {
 							doClose();
