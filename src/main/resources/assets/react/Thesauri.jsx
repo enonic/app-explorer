@@ -143,6 +143,63 @@ function Delete(props) {
 } // Delete
 
 
+function Import(props) {
+	const {
+		name,
+		onClose,
+		servicesBaseUrl,
+		TOOL_PATH
+	} = props;
+	const [open, setOpen] = React.useState(false);
+	function doOpen() { setOpen(true); }
+	function doClose() {
+		onClose();
+		setOpen(false);
+	}
+	return <Modal
+		closeIcon
+		onClose={doClose}
+		open={open}
+		trigger={<Button
+			compact
+			onClick={() => setOpen(true)}
+			size='tiny'><Icon color='blue' name='upload'/> Import csv</Button>}
+	>
+		<Modal.Header>Import to thesaurus {name}</Modal.Header>
+		<Modal.Content>
+			<Form>
+				<Form.Field>
+					<Input
+						accept='text/csv'
+						name='file'
+						id='file'
+						type='file'
+					/>
+				</Form.Field>
+				<Button
+					compact
+					onClick={() => {
+						const body = new FormData();
+						const fileInput = document.querySelector('#file') ;
+						console.debug('fileInput', fileInput);
+						body.append('name', name);
+						body.append('file', fileInput.files[0]);
+						fetch(`${servicesBaseUrl}/thesaurusImport`, {
+							body,
+							method: 'POST'
+						}).then(response => {
+							doClose();
+						})
+					}}
+					size='tiny'
+					type='submit'
+				><Icon color='green' name='upload'/>Import to thesaurus {name}</Button>
+			</Form>
+		</Modal.Content>
+	</Modal>;
+} // Import
+
+
 export class EditThesauri extends React.Component {
 	contextRef = createRef();
 
@@ -366,7 +423,7 @@ export class EditThesauri extends React.Component {
 } // class EditThesauri
 
 
-export function Thesauri(props) {
+export function ThesauriList(props) {
 	//console.debug('Thesauri props', props);
 	const {
 		servicesBaseUrl,
@@ -434,6 +491,12 @@ export function Thesauri(props) {
 									onClose={fetchThesauri}
 									servicesBaseUrl={servicesBaseUrl}
 								/>
+								<Import
+									name={name}
+									onClose={fetchThesauri}
+									servicesBaseUrl={servicesBaseUrl}
+									TOOL_PATH={TOOL_PATH}
+								/>
 								<Button
 									as='a'
 									compact
@@ -457,4 +520,25 @@ export function Thesauri(props) {
 			servicesBaseUrl={servicesBaseUrl}
 		/>
 	</>;
-} // Thesauri
+} // ThesauriList
+
+
+export function Thesauri(props) {
+	//console.debug('Thesauri props', props);
+	const {
+		serviceUrl,
+		servicesBaseUrl,
+		TOOL_PATH
+	} = props;
+	return <>
+		<Header as='h1'>Thesauri</Header>
+		<ThesauriList
+			servicesBaseUrl={servicesBaseUrl}
+			TOOL_PATH={TOOL_PATH}
+		/>
+		<EditThesauri
+			serviceUrl={serviceUrl}
+			TOOL_PATH={TOOL_PATH}
+		/>
+	</>;
+}

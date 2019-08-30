@@ -29,10 +29,7 @@ import {list as listFields} from '/admin/tools/explorer/fields/list';
 import {list as listStopWords} from '/admin/tools/explorer/stopWords/list';
 
 import {list as listThesauri} from '/admin/tools/explorer/thesauri/list';
-import {confirmDelete as confirmDeleteThesaurus} from '/admin/tools/explorer/thesauri/confirmDelete';
-import {importPage} from '/admin/tools/explorer/thesauri/importPage';
 import {exportThesaurus} from '/admin/tools/explorer/thesauri/exportThesaurus';
-import {handleThesauriPost} from '/admin/tools/explorer/thesauri/handleThesauriPost';
 
 import {newOrEdit as newOrEditSynonym} from '/admin/tools/explorer/thesauri/synonyms/newOrEdit';
 import {handlePost as handleSynonymsPost} from '/admin/tools/explorer/thesauri/synonyms/handlePost';
@@ -112,11 +109,6 @@ router.filter((req/*, next*/) => {
 	GET  /thesauri      -> LIST thesauri
 	GET  /thesauri/list -> LIST thesauri
 
-	GET  /thesauri/new    -> EDIT new thesaurus
-	POST /thesauri/create -> CREATE new thesaurus
-
-	GET  /thesauri/import/thesaurusName -> IMPORT FORM
-	POST /thesauri/import/thesaurusName -> IMPORT synonyms
 	GET  /thesauri/export/thesaurusName -> EXPORT thesaurus
 
 	GET  /thesauri/edit/thesaurusName   -> EDIT thesaurus (lists values)
@@ -133,9 +125,7 @@ router.filter((req/*, next*/) => {
 	──────────────────────────────────────────────────────────────────────────*/
 	if (tab === 'thesauri') {
 		switch (action) {
-		case 'import': return method === 'POST' ? handleThesauriPost(req) : importPage(req);
 		case 'export': return exportThesaurus(req);
-		case 'delete': return method === 'POST' ? handleThesauriPost(req) : confirmDeleteThesaurus(req);
 		case 'synonyms':
 			switch (secondaryAction) {
 			case 'new': // fallthrough to edit
