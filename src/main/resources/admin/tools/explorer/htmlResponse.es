@@ -96,9 +96,6 @@ export function htmlResponse({
 			<a class="${tab === 'stopwords' ? 'active ' : ''}item" href="${TOOL_PATH}/stopwords"><i class="crop icon"></i> StopWords</a>
 
 			<a class="${tab === 'thesauri' ? 'active ' : ''}item" href="${TOOL_PATH}/thesauri"><i class="font icon"></i> Thesauri</a>
-			${tab === 'thesauri' ? `<div class="inverted menu">
-				<a class="${action === 'new' ? ' active' : ''}item" href="${TOOL_PATH}/thesauri/new"><i class="green plus icon"></i> New</a>
-			</div>` : ''}
 
 			<a class="${tab === 'interfaces' ? 'active ' : ''}item" href="${TOOL_PATH}/interfaces"><i class="plug icon"></i> Interfaces</a>
 

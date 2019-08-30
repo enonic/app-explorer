@@ -5,19 +5,33 @@ import {
 } from 'semantic-ui-react';
 import {createRef} from 'react';
 
+import {Form as EnonicForm} from './enonic/Form';
+import {Input as EnonicInput} from './enonic/Input';
+import {ResetButton} from './enonic/ResetButton';
+import {SubmitButton} from './enonic/SubmitButton';
+
+
+function required(value) {
+	return value ? undefined : 'Required!';
+}
+
 
 function NewOrEdit(props) {
 	const {
 		id,
+		displayName = '',
+		name = '',
+		onClose,
 		servicesBaseUrl
 	} = props;
 
-	const [displayName, setDisplayName] = React.useState(props.displayName || '');
-	const [name, setName] = React.useState(props.name || '');
 	const [open, setOpen] = React.useState(false);
 
 	function doOpen() { setOpen(true); }
-	function doClose() { setOpen(false); }
+	function doClose() {
+		onClose();
+		setOpen(false);
+	}
 
 	return <Modal
 		closeIcon
@@ -44,47 +58,45 @@ function NewOrEdit(props) {
 	>
 		<Modal.Header>{id ? `Edit thesaurus ${displayName}` : 'New thesaurus'}</Modal.Header>
 		<Modal.Content>
-			<Form autoComplete='off'>
+			<EnonicForm
+				initialValues={{
+					name,
+					displayName
+				}}
+				onSubmit={({
+					name,
+					displayName
+				}) => {
+					fetch(`${servicesBaseUrl}/thesaurus${id ? 'Update' : 'Create'}?displayName=${displayName}${id ? `&id=${id}` : ''}&name=${name}`, {
+						method: 'POST'
+					}).then(response => {
+						doClose();
+					})
+				}}
+				schema={{
+					displayName: (value) => required(value),
+					name: (value) => required(value)
+				}}
+			>
 				{!id && <Form.Field>
-					<Input
+					<EnonicInput
 						fluid
 						label={{basic: true, content: 'Name'}}
-						name='name'
-						onChange={(e, {value}) => {
-							setName(value);
-						}}
+						path='name'
 						placeholder='Please input name'
-						value={name}
 					/>
 				</Form.Field>}
 				<Form.Field>
-					<Input
+					<EnonicInput
 						fluid
 						label={{basic: true, content: 'Display name'}}
-						name='displayName'
-						onChange={(e, {value}) => {
-							setDisplayName(value);
-						}}
+						path='displayName'
 						placeholder='Please input display name'
-						value={displayName}
 					/>
 				</Form.Field>
-				<Button
-					onClick={() => {
-						fetch(`${servicesBaseUrl}/thesaurus${id ? 'Update' : 'Create'}?displayName=${displayName}${id ? `&id=${id}` : ''}&name=${name}`, {
-							method: 'POST'
-						}).then(response => {
-							doClose();
-						})
-					}}
-					type='submit'>{id ? 'Save' : 'Create'}</Button>
-				<Button
-					onClick={() => {
-						setDisplayName(props.displayName || '');
-						setName(props.name || '');
-					}}
-					type='reset'>Reset</Button>
-			</Form>
+				<SubmitButton/>
+				<ResetButton/>
+			</EnonicForm>
 		</Modal.Content>
 	</Modal>;
 } // NewOrEdit
@@ -369,6 +381,7 @@ export function Thesauri(props) {
 									displayName={displayName}
 									id={id}
 									name={name}
+									onClose={fetchThesauri}
 									servicesBaseUrl={servicesBaseUrl}
 								/>
 							</Table.Cell>
@@ -384,6 +397,7 @@ export function Thesauri(props) {
 				</Table.Footer>
 			</Table>}
 		<NewOrEdit
+			onClose={fetchThesauri}
 			servicesBaseUrl={servicesBaseUrl}
 		/>
 	</>;

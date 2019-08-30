@@ -101,30 +101,4 @@ export function handleThesauriPost(req) {
 			}&status=${status}`
 		}
 	} // import
-
-	// Create or Update
-	const params = {
-		__connection: connection,
-		_parentPath: '/thesauri',
-		_name: action === 'update' ? thesaurusName : name,
-		_indexConfig: {
-			default: 'byType'
-		},
-		description,
-		displayName,
-		type: NT_THESAURUS
-	};
-
-	const node = action === 'update' ? modify(params) : create(params);
-	if (node) {
-		messages.push(`${action === 'update' ? 'Updated' : 'Created'} thesaurus ${displayName}.`);
-	} else {
-		messages.push(`Something went wrong when trying to ${action === 'update' ? 'update' : 'create'} thesauri ${displayName}!`);
-		status = 500;
-	}
-	return {
-		redirect: `${TOOL_PATH}/thesauri/?${
-			messages.map(m => `messages=${encodeURIComponent(m)}`).join('&')
-		}&status=${status}`
-	}
 } // handleThesauriPost

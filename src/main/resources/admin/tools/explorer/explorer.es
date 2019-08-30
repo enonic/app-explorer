@@ -29,7 +29,6 @@ import {list as listFields} from '/admin/tools/explorer/fields/list';
 import {list as listStopWords} from '/admin/tools/explorer/stopWords/list';
 
 import {list as listThesauri} from '/admin/tools/explorer/thesauri/list';
-import {newOrEdit as newOrEditThesaurus} from '/admin/tools/explorer/thesauri/newOrEdit';
 import {confirmDelete as confirmDeleteThesaurus} from '/admin/tools/explorer/thesauri/confirmDelete';
 import {importPage} from '/admin/tools/explorer/thesauri/importPage';
 import {exportThesaurus} from '/admin/tools/explorer/thesauri/exportThesaurus';
@@ -134,12 +133,8 @@ router.filter((req/*, next*/) => {
 	──────────────────────────────────────────────────────────────────────────*/
 	if (tab === 'thesauri') {
 		switch (action) {
-		case 'new': // fallthrough to edit
-		case 'edit': return newOrEditThesaurus(req);
 		case 'import': return method === 'POST' ? handleThesauriPost(req) : importPage(req);
 		case 'export': return exportThesaurus(req);
-		case 'create': // fallthrough to update
-		case 'update': return handleThesauriPost(req);
 		case 'delete': return method === 'POST' ? handleThesauriPost(req) : confirmDeleteThesaurus(req);
 		case 'synonyms':
 			switch (secondaryAction) {
@@ -148,7 +143,6 @@ router.filter((req/*, next*/) => {
 			case 'create': // fallthrough to update
 			case 'delete': // fallthrough to update
 			case 'update': return handleSynonymsPost(req);
-			default: return newOrEditThesaurus(req);
 			} // synonyms
 		default: return listThesauri(req);
 		}
