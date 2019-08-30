@@ -368,7 +368,10 @@ export class EditThesauri extends React.Component {
 
 export function Thesauri(props) {
 	//console.debug('Thesauri props', props);
-	const {servicesBaseUrl} = props;
+	const {
+		servicesBaseUrl,
+		TOOL_PATH
+	} = props;
 
 	const [isLoading, setLoading] = React.useState(false);
 	const [thesauriRes, setThesauriRes] = React.useState({
@@ -431,6 +434,12 @@ export function Thesauri(props) {
 									onClose={fetchThesauri}
 									servicesBaseUrl={servicesBaseUrl}
 								/>
+								<Button
+									as='a'
+									compact
+									href={`${TOOL_PATH}/thesauri/export/${name}.csv`}
+									size='tiny'
+								><Icon color='blue' name='download'/>{`${name}.csv`}</Button>
 							</Table.Cell>
 						</Table.Row>
 					})}

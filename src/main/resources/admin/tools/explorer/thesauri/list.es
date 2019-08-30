@@ -64,7 +64,6 @@ export function list({
 			<td>${t.synonymsCount}</td>
 			<td>
 				<a class="tiny compact ui button" href="${TOOL_PATH}/thesauri/import/${t.name}"><i class="blue upload icon"></i>Import</a>
-				<a class="tiny compact ui button" href="${TOOL_PATH}/thesauri/export/${t.name}.csv"><i class="blue download icon"></i> ${t.name}.csv</a>
 			</td>
 		</tr>`).join('\n')}
 	</tbody>

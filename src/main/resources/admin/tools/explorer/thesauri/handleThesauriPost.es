@@ -42,30 +42,6 @@ export function handleThesauriPost(req) {
 		principals: [PRINCIPAL_EXPLORER_WRITE]
 	});
 
-	if (action === 'delete') {
-		if (!typedThesaurusName) {
-			messages.push('Missing required parameter "typedThesaurusName"!');
-			status = 400;
-		} else if (typedThesaurusName !== thesaurusName) {
-			messages.push(`Typed thesaurus name: "${typedThesaurusName}" doesn't match actual thesaurus name: "${thesaurusName}"!`);
-			status = 400;
-		} else {
-			const nodePath = `/thesauri/${thesaurusName}`;
-			const deleteRes = connection.delete(nodePath);
-			if(deleteRes) {
-				messages.push(`Thesaurus with path:${nodePath} deleted.`)
-			} else {
-				messages.push(`Something went wrong when trying to delete thesaurus with path:${nodePath}.`)
-				status = 500;
-			}
-		}
-		return {
-			redirect: `${TOOL_PATH}/thesauri?${
-				messages.map(m => `messages=${encodeURIComponent(m)}`).join('&')
-			}&status=${status}`
-		}
-	} // delete
-
 	if (action === 'import') {
 		//const form = getMultipartForm(); log.info(toStr({form}));
 
