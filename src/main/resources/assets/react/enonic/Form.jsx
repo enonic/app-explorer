@@ -1,3 +1,4 @@
+import deepEqual from 'fast-deep-equal';
 import getIn from 'get-value';
 import setIn from 'set-value';
 //import {Form as SemanticUiReactForm} from 'semantic-ui-react';
@@ -5,7 +6,10 @@ import traverse from 'traverse';
 
 import {EnonicProvider} from './Context';
 
-
+const INSERT = 'INSERT';
+const MOVE_DOWN = 'MOVE_DOWN';
+const MOVE_UP = 'MOVE_UP';
+//const PUSH = 'PUSH';
 const REMOVE = 'REMOVE';
 const RESET = 'RESET';
 const SET_VALUE = 'SET_VALUE';
@@ -14,6 +18,32 @@ const SUBMIT = 'SUBMIT';
 const VALIDATE_FIELD = 'VALIDATE_FIELD';
 const VALIDATE_FORM = 'VALIDATE_FORM';
 
+
+export const insert = ({index, path, value}) => ({
+	index,
+	path,
+	type: INSERT,
+	value
+});
+
+export const moveDown = ({index, path}) => ({
+	index,
+	path,
+	type: MOVE_DOWN
+});
+
+export const moveUp = ({index, path}) => ({
+	index,
+	path,
+	type: MOVE_UP
+});
+
+/*export const push = ({index, path, value}) => ({
+	index,
+	path,
+	type: PUSH,
+	value
+});*/
 
 export const remove = () => ({
 	type: REMOVE
@@ -77,6 +107,70 @@ export function Form(props) {
 	const reducer = (state, action) => {
 		//console.debug('reducer state', state, 'action', action);
 		switch (action.type) {
+		case INSERT: {
+			//console.debug('reducer state', state, 'action', action);
+			const deref = JSON.parse(JSON.stringify(state));
+			const array = getIn(deref.values, action.path);
+			//console.debug('reducer state', state, 'action', action, 'array', array);
+			if (!Array.isArray(array)) {
+				return state;
+			}
+			array.splice(array.index, 0, action.value)
+			const initialValue = getIn(initialValues, action.path);
+			setIn(deref.changes, action.path, !deepEqual(array, initialValue));
+			//console.debug('reducer state', state, 'action', action, 'array', array);
+			console.debug('reducer action', action, 'state', state, 'deref', deref);
+			return deref;
+		}
+		case MOVE_DOWN: {
+			const deref = JSON.parse(JSON.stringify(state));
+			const array = getIn(deref.values, action.path);
+			if (!Array.isArray(array)) {
+				console.error(`path: ${action.path}, not an array!`);
+				return state;
+			}
+			if(action.index + 1 >= array.length) {
+				console.error(`path: ${action.path} Can't move item beyond array!`);
+				return state;
+			}
+			const tmp = array[action.index];
+			array[action.index] = array[action.index + 1];
+			array[action.index + 1] = tmp;
+			const initialValue = getIn(initialValues, action.path);
+			setIn(deref.changes, action.path, !deepEqual(array, initialValue));
+			console.debug('reducer action', action, 'state', state, 'deref', deref);
+			return deref;
+		}
+		case MOVE_UP: {
+			const deref = JSON.parse(JSON.stringify(state));
+			const array = getIn(deref.values, action.path);
+			if (!Array.isArray(array)) {
+				console.error(`path: ${action.path}, not an array!`);
+				return state;
+			}
+			if(action.index === 0) {
+				console.error(`path: ${action.path} Can't move item to index -1!`);
+				return state;
+			}
+			const tmp = array[action.index];
+			array[action.index] = array[action.index - 1];
+			array[action.index - 1] = tmp;
+			const initialValue = getIn(initialValues, action.path);
+			setIn(deref.changes, action.path, !deepEqual(array, initialValue));
+			console.debug('reducer action', action, 'state', state, 'deref', deref);
+			return deref;
+		}
+		/*case PUSH: {
+			const deref = JSON.parse(JSON.stringify(state));
+			const array = getIn(deref.values, action.path);
+			if (!Array.isArray(array)) {
+				return state;
+			}
+			array.push(action.value)
+			const initialValue = getIn(initialValues, action.path);
+			setIn(deref.changes, action.path, deepEqual(array, initialValue));
+			return deref;
+		}*/
 		case REMOVE: {
 			onDelete(state.values);
 			return state;

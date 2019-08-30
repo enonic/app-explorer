@@ -6,6 +6,9 @@ import {
 
 import {Form as EnonicForm} from './enonic/Form';
 import {Input as EnonicInput} from './enonic/Input';
+import {InsertButton} from './enonic/InsertButton';
+import {MoveDownButton} from './enonic/MoveDownButton';
+import {MoveUpButton} from './enonic/MoveUpButton';
 import {ResetButton} from './enonic/ResetButton';
 import {SubmitButton} from './enonic/SubmitButton';
 
@@ -15,7 +18,7 @@ function required(value) {
 }
 
 
-function NewOrEdit(props) {
+function NewOrEditThesaurus(props) {
 	const {
 		id,
 		displayName = '',
@@ -98,10 +101,10 @@ function NewOrEdit(props) {
 			</EnonicForm>
 		</Modal.Content>
 	</Modal>;
-} // NewOrEdit
+} // NewOrEditThesaurus
 
 
-function Delete(props) {
+function DeleteThesaurus(props) {
 	const {
 		onClose,
 		id,
@@ -139,7 +142,7 @@ function Delete(props) {
 			><Icon color='red' name='trash alternate outline'/>Confirm Delete</Button>
 		</Modal.Content>
 	</Modal>;
-} // Delete
+} // DeleteThesaurus
 
 
 function Import(props) {
@@ -197,6 +200,90 @@ function Import(props) {
 		</Modal.Content>
 	</Modal>;
 } // Import
+
+
+function NewOrEditSynonym(props) {
+	const {
+		id,
+		onClose,
+		servicesBaseUrl,
+		thesaurusId
+	} = props;
+	const [open, setOpen] = React.useState(false);
+	function doOpen() { setOpen(true); }
+	function doClose() {
+		onClose();
+		setOpen(false);
+	}
+	const from = ['a', 'b', 'c'];
+	const to = [''];
+	return <Modal
+		closeIcon
+		onClose={doClose}
+		open={open}
+		trigger={id ? <Button
+			compact
+			onClick={() => setOpen(true)}
+			size='tiny'><Icon color='blue' name='edit'/> Edit synonym</Button>
+			: <Button
+				compact
+				onClick={() => setOpen(true)}
+				size='tiny'><Icon color='green' name='plus'/> New synonym</Button>
+		}
+	>
+		<Modal.Header>{id ? `Edit synonym ${id}` : `New synonym`}</Modal.Header>
+		<Modal.Content>
+			<EnonicForm
+				initialValues={{
+					from,
+					to
+				}}
+				onSubmit={({
+					from,
+					to
+				}) => {
+					console.debug({from, to});
+				}}
+			>
+				<Header as='h2'>From</Header>
+				{from.map((fromValue, fromIndex) => {
+					const fromPath = `from.${fromIndex}`;
+					return <React.Fragment key={fromPath}>
+						<EnonicInput
+							fluid
+							path={fromPath}
+						/>
+						<InsertButton
+							path='from'
+							index={fromIndex}
+							value={'inserted'}
+						/>
+						<MoveDownButton
+							disabled={fromIndex + 1 >= from.length}
+							path='from'
+							index={fromIndex}
+						/>
+						<MoveUpButton
+							path='from'
+							index={fromIndex}
+						/>
+					</React.Fragment>
+				})}
+				<Header as='h2'>To</Header>
+				{to.map((toValue, toIndex) => {
+					const toPath = `to.${toIndex}`;
+					return <EnonicInput
+						fluid
+						key={toPath}
+						path={toPath}
+					/>
+				})}
+				<SubmitButton/>
+				<ResetButton/>
+			</EnonicForm>
+		</Modal.Content>
+	</Modal>;
+} // NewOrEditSynonym
 
 
 export class EditThesauri extends React.Component {
@@ -467,14 +554,19 @@ export function ThesauriList(props) {
 							<Table.Cell>{displayName}</Table.Cell>
 							<Table.Cell>{synonymsCount}</Table.Cell>
 							<Table.Cell>
-								<NewOrEdit
+								<NewOrEditSynonym
+									thesaurusId={id}
+									onClose={fetchThesauri}
+									servicesBaseUrl={servicesBaseUrl}
+								/>
+								<NewOrEditThesaurus
 									displayName={displayName}
 									id={id}
 									name={name}
 									onClose={fetchThesauri}
 									servicesBaseUrl={servicesBaseUrl}
 								/>
-								<Delete
+								<DeleteThesaurus
 									id={id}
 									name={name}
 									onClose={fetchThesauri}
@@ -504,7 +596,7 @@ export function ThesauriList(props) {
 					</Table.Row>
 				</Table.Footer>
 			</Table>}
-		<NewOrEdit
+		<NewOrEditThesaurus
 			onClose={fetchThesauri}
 			servicesBaseUrl={servicesBaseUrl}
 		/>
