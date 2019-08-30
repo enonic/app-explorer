@@ -1,9 +1,8 @@
 import Uri from 'jsuri';
 import {
 	Button, Dropdown, Form, Header, Icon, Input, Loader, Modal, Pagination,
-	Rail, Ref, Segment, Sticky, Table
+	Segment, Table
 } from 'semantic-ui-react';
-import {createRef} from 'react';
 
 import {Form as EnonicForm} from './enonic/Form';
 import {Input as EnonicInput} from './enonic/Input';
@@ -201,8 +200,6 @@ function Import(props) {
 
 
 export class EditThesauri extends React.Component {
-	contextRef = createRef();
-
 	constructor(props) {
 		super(props);
 
@@ -290,7 +287,80 @@ export class EditThesauri extends React.Component {
 			}
 		} = this.state;
 		//console.debug(hits);
-		return <Ref innerRef={this.contextRef}>
+		return <>
+			<Segment basic>
+				<Form>
+					<Header as='h4'><Icon name='filter'/> Filter</Header>
+					<Form.Field>
+						<input
+							fluid='true'
+							label='From'
+							onChange={({target:{value}}) => this.changeParam({name: 'from', value})}
+							placeholder='From'
+							value={from}
+						/>
+					</Form.Field>
+					<Form.Field>
+						<input
+							fluid='true'
+							label='To'
+							onChange={({target:{value}}) => this.changeParam({name: 'to', value})}
+							placeholder='To'
+							value={to}
+						/>
+					</Form.Field>
+				</Form>
+			</Segment>
+			<Segment basic>
+				<Form>
+					<Header as='h4'><Icon name='font'/> Thesauri</Header>
+					<Dropdown
+						defaultValue={thesauri}
+						fluid
+						multiple={true}
+						name='thesauri'
+						onChange={(e, {value}) => this.changeParam({name: 'thesauri', value})}
+						options={aggregations.thesaurus.buckets.map(({key, docCount}) => {
+							const tName = key.replace('/thesauri/', '');
+							return {
+								key: tName,
+								text: `${tName} (${docCount})`,
+								value: tName
+							};
+						})}
+						search
+						selection
+					/>
+					<Header as='h4'><Icon name='resize vertical'/> Per page</Header>
+					<Form.Field>
+						<Dropdown
+							defaultValue={perPage}
+							fluid
+							onChange={(e,{value}) => this.changeParam({name: 'perPage', value})}
+							options={[5,10,25,50,100].map(key => ({key, text: `${key}`, value: key}))}
+							selection
+						/>
+					</Form.Field>
+					<Header as='h4'><Icon name='sort'/> Sort</Header>
+					<Form.Field>
+						<Dropdown
+							defaultValue={sort}
+							fluid
+							onChange={(e,{value}) => this.changeParam({name: 'sort', value})}
+							options={[{
+								key: '_score DESC',
+								text: 'Score descending',
+								value: '_score DESC'
+							}, {
+								key: 'from ASC',
+								text: 'From ascending',
+								value: 'from ASC'
+							}]}
+							selection
+						/>
+					</Form.Field>
+				</Form>
+			</Segment>
 			<Segment basic style={{padding: 0}}>
 				<Table celled compact selectable sortable striped attached='top'>
 					<Table.Header>
@@ -336,89 +406,8 @@ export class EditThesauri extends React.Component {
 					onPageChange={(e,{activePage}) => this.changeParam({name: 'page', value: activePage})}
 				/>
 				<p>Displaying {start}-{end} of {total}</p>
-				<Rail position='left'>
-					<Sticky context={this.contextRef} offset={14}>
-						<Segment basic>
-							<Form>
-								<Header as='h4'><Icon name='filter'/> Filter</Header>
-								<Form.Field>
-									<input
-										fluid='true'
-										label='From'
-										onChange={({target:{value}}) => this.changeParam({name: 'from', value})}
-										placeholder='From'
-										value={from}
-									/>
-								</Form.Field>
-								<Form.Field>
-									<input
-										fluid='true'
-										label='To'
-										onChange={({target:{value}}) => this.changeParam({name: 'to', value})}
-										placeholder='To'
-										value={to}
-									/>
-								</Form.Field>
-							</Form>
-						</Segment>
-					</Sticky>
-				</Rail>
-				<Rail position='right'>
-					<Sticky context={this.contextRef} offset={14}>
-						<Segment basic>
-							<Form>
-								<Header as='h4'><Icon name='font'/> Thesauri</Header>
-								<Dropdown
-									defaultValue={thesauri}
-									fluid
-									multiple={true}
-									name='thesauri'
-									onChange={(e, {value}) => this.changeParam({name: 'thesauri', value})}
-									options={aggregations.thesaurus.buckets.map(({key, docCount}) => {
-										const tName = key.replace('/thesauri/', '');
-										return {
-											key: tName,
-											text: `${tName} (${docCount})`,
-											value: tName
-										};
-									})}
-									search
-									selection
-								/>
-								<Header as='h4'><Icon name='resize vertical'/> Per page</Header>
-								<Form.Field>
-									<Dropdown
-										defaultValue={perPage}
-										fluid
-										onChange={(e,{value}) => this.changeParam({name: 'perPage', value})}
-										options={[5,10,25,50,100].map(key => ({key, text: `${key}`, value: key}))}
-										selection
-									/>
-								</Form.Field>
-								<Header as='h4'><Icon name='sort'/> Sort</Header>
-								<Form.Field>
-									<Dropdown
-										defaultValue={sort}
-										fluid
-										onChange={(e,{value}) => this.changeParam({name: 'sort', value})}
-										options={[{
-											key: '_score DESC',
-											text: 'Score descending',
-											value: '_score DESC'
-										}, {
-											key: 'from ASC',
-											text: 'From ascending',
-											value: 'from ASC'
-										}]}
-										selection
-									/>
-								</Form.Field>
-							</Form>
-						</Segment>
-					</Sticky>
-				</Rail>
 			</Segment>
-		</Ref>;
+		</>;
 	} // render
 } // class EditThesauri
 
@@ -536,6 +525,7 @@ export function Thesauri(props) {
 			servicesBaseUrl={servicesBaseUrl}
 			TOOL_PATH={TOOL_PATH}
 		/>
+		<Header as='h2'>All synonyms</Header>
 		<EditThesauri
 			serviceUrl={serviceUrl}
 			TOOL_PATH={TOOL_PATH}
