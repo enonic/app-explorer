@@ -6,6 +6,8 @@ import traverse from 'traverse';
 
 import {EnonicProvider} from './Context';
 
+
+const DELETE_ITEM = 'DELETE_ITEM';
 const INSERT = 'INSERT';
 const MOVE_DOWN = 'MOVE_DOWN';
 const MOVE_UP = 'MOVE_UP';
@@ -18,6 +20,12 @@ const SUBMIT = 'SUBMIT';
 const VALIDATE_FIELD = 'VALIDATE_FIELD';
 const VALIDATE_FORM = 'VALIDATE_FORM';
 
+
+export const deleteItem = ({index, path}) => ({
+	index,
+	path,
+	type: DELETE_ITEM
+});
 
 export const insert = ({index, path, value}) => ({
 	index,
@@ -107,6 +115,20 @@ export function Form(props) {
 	const reducer = (state, action) => {
 		//console.debug('reducer state', state, 'action', action);
 		switch (action.type) {
+		case DELETE_ITEM: {
+			//console.debug('reducer state', state, 'action', action);
+			const deref = JSON.parse(JSON.stringify(state));
+			const array = getIn(deref.values, action.path);
+			//console.debug('reducer state', state, 'action', action, 'array', array);
+			if (!Array.isArray(array)) {
+				return state;
+			}
+			array.splice(array.index, 1);
+			const initialValue = getIn(initialValues, action.path);
+			setIn(deref.changes, action.path, !deepEqual(array, initialValue));
+			//console.debug('reducer action', action, 'state', state, 'deref', deref);
+			return deref;
+		}
 		case INSERT: {
 			//console.debug('reducer state', state, 'action', action);
 			const deref = JSON.parse(JSON.stringify(state));
@@ -115,11 +137,11 @@ export function Form(props) {
 			if (!Array.isArray(array)) {
 				return state;
 			}
-			array.splice(array.index, 0, action.value)
+			array.splice(array.index, 0, action.value);
 			const initialValue = getIn(initialValues, action.path);
 			setIn(deref.changes, action.path, !deepEqual(array, initialValue));
 			//console.debug('reducer state', state, 'action', action, 'array', array);
-			console.debug('reducer action', action, 'state', state, 'deref', deref);
+			//console.debug('reducer action', action, 'state', state, 'deref', deref);
 			return deref;
 		}
 		case MOVE_DOWN: {
@@ -138,7 +160,7 @@ export function Form(props) {
 			array[action.index + 1] = tmp;
 			const initialValue = getIn(initialValues, action.path);
 			setIn(deref.changes, action.path, !deepEqual(array, initialValue));
-			console.debug('reducer action', action, 'state', state, 'deref', deref);
+			//console.debug('reducer action', action, 'state', state, 'deref', deref);
 			return deref;
 		}
 		case MOVE_UP: {
@@ -157,7 +179,7 @@ export function Form(props) {
 			array[action.index - 1] = tmp;
 			const initialValue = getIn(initialValues, action.path);
 			setIn(deref.changes, action.path, !deepEqual(array, initialValue));
-			console.debug('reducer action', action, 'state', state, 'deref', deref);
+			//console.debug('reducer action', action, 'state', state, 'deref', deref);
 			return deref;
 		}
 		/*case PUSH: {

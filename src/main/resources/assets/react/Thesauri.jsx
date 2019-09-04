@@ -1,11 +1,15 @@
+import getIn from 'get-value';
 import Uri from 'jsuri';
 import {
 	Button, Dropdown, Form, Header, Icon, Input, Loader, Modal, Pagination,
 	Segment, Table
 } from 'semantic-ui-react';
 
+import {getEnonicContext} from './enonic/Context';
 import {Form as EnonicForm} from './enonic/Form';
 import {Input as EnonicInput} from './enonic/Input';
+import {List} from './enonic/List';
+import {DeleteItemButton} from './enonic/DeleteItemButton';
 import {InsertButton} from './enonic/InsertButton';
 import {MoveDownButton} from './enonic/MoveDownButton';
 import {MoveUpButton} from './enonic/MoveUpButton';
@@ -246,38 +250,108 @@ function NewOrEditSynonym(props) {
 				}}
 			>
 				<Header as='h2'>From</Header>
-				{from.map((fromValue, fromIndex) => {
-					const fromPath = `from.${fromIndex}`;
-					return <React.Fragment key={fromPath}>
-						<EnonicInput
-							fluid
-							path={fromPath}
-						/>
-						<InsertButton
+				<Table celled compact selectable sortable striped>
+					<Table.Body>
+						<List
 							path='from'
-							index={fromIndex}
-							value={'inserted'}
+							render={(fromValue, fromIndex, fromArray) => {
+								//console.debug('fromValue', fromValue, 'fromIndex', fromIndex);
+								const fromPath = `from.${fromIndex}`;
+								return <Table.Row key={fromPath}>
+									<Table.Cell>
+										<EnonicInput
+											fluid
+											path={fromPath}
+										/>
+									</Table.Cell>
+									<Table.Cell collapsing>
+										<Button.Group>
+											<InsertButton
+												path='from'
+												index={fromIndex}
+												value={''}
+											/>
+											<MoveDownButton
+												disabled={fromIndex + 1 >= fromArray.length}
+												path='from'
+												index={fromIndex}
+											/>
+											<MoveUpButton
+												path='from'
+												index={fromIndex}
+											/>
+											<DeleteItemButton
+												disabled={fromArray.length < 2}
+												path='from'
+												index={fromIndex}
+											/>
+										</Button.Group>
+									</Table.Cell>
+								</Table.Row>
+							}}
 						/>
-						<MoveDownButton
-							disabled={fromIndex + 1 >= from.length}
-							path='from'
-							index={fromIndex}
-						/>
-						<MoveUpButton
-							path='from'
-							index={fromIndex}
-						/>
-					</React.Fragment>
-				})}
+					</Table.Body>
+				</Table>
+				{/*<InsertButton
+					path='from'
+					index={getIn(getEnonicContext()[0].values, 'from').length}
+					value={''}
+				/>;*/}
+				{(() => {
+					console.debug('Test IIFE 1');
+					const [enonicContext, ignored] = getEnonicContext(); console.debug('enonicContext', enonicContext);
+					console.debug('Test IIFE 2');
+					return null;
+					/*
+					const fromArray = getIn(enonicContext.values, 'from'); console.debug('fromArray', fromArray);
+					return <InsertButton
+						path='from'
+						index={fromArray.length}
+						value={''}
+					/>;*/
+				})()}
 				<Header as='h2'>To</Header>
-				{to.map((toValue, toIndex) => {
-					const toPath = `to.${toIndex}`;
-					return <EnonicInput
-						fluid
-						key={toPath}
-						path={toPath}
-					/>
-				})}
+				<Table celled compact selectable sortable striped>
+					<Table.Body>
+						<List
+							path='to'
+							render={(toValue, toIndex, toArray) => {
+								const toPath = `to.${toIndex}`;
+								return <Table.Row key={toPath}>
+									<Table.Cell>
+										<EnonicInput
+											fluid
+											path={toPath}
+										/>
+									</Table.Cell>
+									<Table.Cell collapsing>
+										<Button.Group>
+											<InsertButton
+												path='to'
+												index={toPath}
+												value={''}
+											/>
+											<MoveDownButton
+												disabled={toIndex + 1 >= toArray.length}
+												path='to'
+												index={toPath}
+											/>
+											<MoveUpButton
+												path='to'
+												index={toPath}
+											/>
+											<DeleteItemButton
+												disabled={toArray.length < 2}
+												path='to'
+												index={toPath}
+											/>
+										</Button.Group>
+									</Table.Cell>
+								</Table.Row>
+							}}
+						/>
+					</Table.Body>
+				</Table>
 				<SubmitButton/>
 				<ResetButton/>
 			</EnonicForm>
