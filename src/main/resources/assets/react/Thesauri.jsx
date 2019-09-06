@@ -694,7 +694,7 @@ export class EditThesauri extends React.Component {
 
 
 function EditSynonyms(props) {
-	console.debug('EditSynonyms props', props);
+	//console.debug('EditSynonyms props', props);
 	const {
 		onClose,
 		servicesBaseUrl,
@@ -704,6 +704,8 @@ function EditSynonyms(props) {
 
 	const [open, setOpen] = React.useState(false);
 	const [state, setState] = React.useState({
+		column: 'from',
+		direction: 'ascending',
 		isLoading: true,
 		params: {
 			from: '',
@@ -712,7 +714,6 @@ function EditSynonyms(props) {
 			query: '',
 			sort: 'from ASC',
 			thesauri: thesaurusName ? [thesaurusName] : [],
-			//thesauri: [],
 			to: ''
 		},
 		result: {
@@ -725,11 +726,13 @@ function EditSynonyms(props) {
 	});
 
 	function querySynonyms() {
+		console.debug('querySynonyms state', state);
 		const {params} = state;
-		setState(prev => ({
-			...prev,
-			isLoading: true
-		}));
+		setState(prev => {
+			const deref = JSON.parse(JSON.stringify(prev));
+			deref.isLoading = true;
+			return deref;
+		});
 		const uri = new Uri(`${servicesBaseUrl}/thesauri`);
 		Object.entries(params).forEach(([k, v]) => {
 			//console.debug({k, v});
@@ -741,33 +744,64 @@ function EditSynonyms(props) {
 			.then(response => response.json())
 			.then(data => {
 				//console.debug('data', data);
-				setState(prev => ({
-					...prev,
-					isLoading: false,
-					result: data.queryResult
-				}));
+				setState(prev => {
+					const deref = JSON.parse(JSON.stringify(prev));
+					deref.isLoading = false;
+					deref.result = data.queryResult;
+					return deref;
+				});
 			})
 	} // querySynonyms
 
-	async function changeParam({name, value}) {
-		await setState(prevState => {
-			prevState.params[name] = value;
+	function changeParam({name, value}) {
+		console.debug('changeParam name', name, 'value', value);
+		setState(prevState => {
+			const deref = JSON.parse(JSON.stringify(prevState));
+			deref.params[name] = value;
 			if (name !== 'page') {
-				prevState.params.page = 1;
+				deref.params.page = 1;
 			}
-			return prevState;
+			return deref;
 		});
-		querySynonyms();
 	} // changeParam
+
+	function setSort({column, direction}) {
+		console.debug('setSort column', column, 'direction', direction);
+		setState(prev => {
+			const deref = JSON.parse(JSON.stringify(prev));
+			deref.column = column;
+			deref.direction = direction;
+			deref.params.sort = `${column} ${direction === 'ascending' ? 'ASC' : 'DESC'}`;
+			return deref;
+		});
+	} // changeSort
 
 	function doClose() {
 		onClose();
 		setOpen(false);
 	}
 
+	const handleSortGenerator = (clickedColumn) => () => {
+		const {
+			column,
+			direction
+		} = state;
+		console.debug('handleSortGenerator clickedColumn', clickedColumn, 'column', column, 'direction', direction);
+
+		setSort({
+			column: clickedColumn,
+			direction: clickedColumn === column
+				? (direction === 'ascending'
+					? 'descending'
+					: 'ascending'
+				) : 'ascending'
+		});
+	} // handleSortGenerator
 	//console.debug('state', state);
 
 	const {
+		column,
+		direction,
 		isLoading,
 		params: {
 			from,
@@ -778,6 +812,22 @@ function EditSynonyms(props) {
 		},
 		result
 	} = state;
+	//console.debug('column', column, 'direction', direction, 'sort', sort);
+
+	/*React.useEffect(() => {
+		querySynonyms();
+		/*return () => {
+			console.debug('useEffect from', from, 'perPage', perPage, 'sort', sort, 'thesauri', thesauri, 'to', to);
+			querySynonyms();
+		};
+	}, [from, perPage, sort, thesauri, to]);*/
+
+	/*React.useLayoutEffect(() => {
+		//querySynonyms();
+		return () => {
+			console.debug('useLayoutEffect from', from, 'perPage', perPage, 'sort', sort, 'thesauri', thesauri, 'to', to);
+		};
+	}, [from, perPage, sort, thesauri, to]);*/
 
 	const {
 		aggregations,
@@ -791,7 +841,10 @@ function EditSynonyms(props) {
 	return <Modal
 		closeIcon
 		onClose={doClose}
-		onOpen={querySynonyms}
+		onOpen={() => {
+			console.debug('onOpen');
+			//querySynonyms();
+		}}
 		open={open}
 		size='fullscreen'
 		trigger={thesaurusId ? <Button
@@ -824,7 +877,7 @@ function EditSynonyms(props) {
 					/>
 				</Form.Field>
 
-				{thesaurusName ? null : <>
+				{thesaurusId ? null : <>
 					<Header as='h4'><Icon name='font'/> Thesauri</Header>
 					<Dropdown
 						defaultValue={thesauri}
@@ -856,7 +909,7 @@ function EditSynonyms(props) {
 					/>
 				</Form.Field>
 
-				<Header as='h4'><Icon name='sort'/> Sort</Header>
+				{/*<Header as='h4'><Icon name='sort'/> Sort</Header>
 				<Form.Field>
 					<Dropdown
 						defaultValue={sort}
@@ -873,7 +926,7 @@ function EditSynonyms(props) {
 						}]}
 						selection
 					/>
-				</Form.Field>
+				</Form.Field>*/}
 			</Form>
 			{isLoading
 				? <Loader active inverted>Loading</Loader>
@@ -881,10 +934,22 @@ function EditSynonyms(props) {
 					<Table celled compact selectable sortable striped attached='top'>
 						<Table.Header>
 							<Table.Row>
-								<Table.HeaderCell>From</Table.HeaderCell>
-								<Table.HeaderCell>To</Table.HeaderCell>
-								<Table.HeaderCell>Thesaurus</Table.HeaderCell>
-								<Table.HeaderCell>Score</Table.HeaderCell>
+								<Table.HeaderCell
+									onClick={handleSortGenerator('from')}
+									sorted={column === 'from' ? direction : null}
+								>From</Table.HeaderCell>
+								<Table.HeaderCell
+									onClick={handleSortGenerator('to')}
+									sorted={column === 'to' ? direction : null}
+								>To</Table.HeaderCell>
+								{thesaurusId ? null : <Table.HeaderCell
+									onClick={handleSortGenerator('_parentPath')}
+									sorted={column === '_parentPath' ? direction : null}
+								>Thesaurus</Table.HeaderCell>}
+								<Table.HeaderCell
+									onClick={handleSortGenerator('_score')}
+									sorted={column === '_score' ? direction : null}
+								>Score</Table.HeaderCell>
 								<Table.HeaderCell>Actions</Table.HeaderCell>
 							</Table.Row>
 						</Table.Header>
@@ -900,7 +965,7 @@ function EditSynonyms(props) {
 							}, i) => <Table.Row key={i}>
 								<Table.Cell>{(Array.isArray(from) ? from : [from]).join(', ')}</Table.Cell>
 								<Table.Cell>{(Array.isArray(to) ? to : [to]).join(', ')}</Table.Cell>
-								<Table.Cell>{thesaurus}</Table.Cell>
+								{thesaurusId ? null : <Table.Cell>{thesaurus}</Table.Cell>}
 								<Table.Cell>{score}</Table.Cell>
 								<Table.Cell>
 									<NewOrEditSynonym
