@@ -220,7 +220,7 @@ function NewOrEditSynonym(props) {
 		onClose();
 		setOpen(false);
 	}
-	const from = ['a', 'b', 'c'];
+	const from = [''];
 	const to = [''];
 	return <Modal
 		closeIcon
@@ -247,7 +247,7 @@ function NewOrEditSynonym(props) {
 					from,
 					to
 				}) => {
-					console.debug({from, thesaurusId, to});
+					//console.debug({from, thesaurusId, to});
 					fetch(`${servicesBaseUrl}/synonymCreate?fromJson=${JSON.stringify(from)}&thesaurusId=${thesaurusId}&toJson=${JSON.stringify(to)}`, {
 						method: 'POST'
 					}).then(response => {
