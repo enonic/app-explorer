@@ -27,15 +27,16 @@ export function Input(props = {}) {
 
 
 	//const changed = getIn(context.changes, path);
-	const error = getIn(context.errors, path);
+	const errorMsg = getIn(context.errors, path);
 	const visited = getIn(context.visits, path);
+	const error = !!(visited && errorMsg);
 	//console.debug('Input value', value);
 
 	return <>
 		<SemanticUiReactInput
 			autoComplete='off'
 			{...rest}
-			error={!!error}
+			error={error}
 			name={path}
 			onBlur={() => {
 				dispatch(setVisited({path}));
@@ -48,11 +49,11 @@ export function Input(props = {}) {
 			}}
 			value={value}
 		/>
-		{visited && error && <Message icon negative>
+		{error && <Message icon negative>
 			<Icon name='warning'/>
 			<Message.Content>
 				<Message.Header>{path}</Message.Header>
-				{error}
+				{errorMsg}
 			</Message.Content>
 		</Message>}
 	</>;
