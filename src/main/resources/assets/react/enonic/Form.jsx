@@ -16,6 +16,7 @@ const REMOVE = 'REMOVE';
 const RESET = 'RESET';
 const SET_VALUE = 'SET_VALUE';
 const SET_VISITED = 'SET_VISITED';
+const SORT = 'SORT';
 const SUBMIT = 'SUBMIT';
 const VALIDATE_FIELD = 'VALIDATE_FIELD';
 const VALIDATE_FORM = 'VALIDATE_FORM';
@@ -73,6 +74,11 @@ export const setVisited = ({path, value = true}) => ({
 	value
 });
 
+export const sort = ({path}) => ({
+	path,
+	type: SORT
+});
+
 export const submit = () => ({
 	type: SUBMIT
 });
@@ -123,7 +129,7 @@ export function Form(props) {
 			if (!Array.isArray(array)) {
 				return state;
 			}
-			array.splice(array.index, 1);
+			array.splice(action.index, 1);
 			const initialValue = getIn(initialValues, action.path);
 			setIn(deref.changes, action.path, !deepEqual(array, initialValue));
 			//console.debug('reducer action', action, 'state', state, 'deref', deref);
@@ -137,7 +143,7 @@ export function Form(props) {
 			if (!Array.isArray(array)) {
 				return state;
 			}
-			array.splice(array.index, 0, action.value);
+			array.splice(action.index, 0, action.value);
 			const initialValue = getIn(initialValues, action.path);
 			setIn(deref.changes, action.path, !deepEqual(array, initialValue));
 			//console.debug('reducer state', state, 'action', action, 'array', array);
@@ -218,6 +224,19 @@ export function Form(props) {
 			const deref = JSON.parse(JSON.stringify(state));
 			setIn(deref.visits, action.path, action.value);
 			//console.debug('reducer action', action, 'deref', deref);
+			return deref;
+		}
+		case SORT: {
+			const deref = JSON.parse(JSON.stringify(state));
+			const array = getIn(deref.values, action.path);
+			if (!Array.isArray(array)) {
+				console.error(`path: ${action.path}, not an array!`);
+				return state;
+			}
+			array.sort();
+			const initialValue = getIn(initialValues, action.path);
+			setIn(deref.changes, action.path, !deepEqual(array, initialValue));
+			//console.debug('reducer action', action, 'state', state, 'deref', deref);
 			return deref;
 		}
 		case SUBMIT: {

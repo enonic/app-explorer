@@ -7,6 +7,7 @@ import {insert} from './Form';
 export function InsertButton(props) {
 	//console.debug('InsertButton props', props);
 	const {
+		children = <Icon color='green' name='add'/>,
 		index = 0,
 		path,
 		value
@@ -15,14 +16,20 @@ export function InsertButton(props) {
 	const [context, dispatch] = getEnonicContext();
 	//console.debug('InsertButton context', context);
 
-	// disabled={}
 	return <Button
 		icon
-		onClick={() => dispatch(insert({
-			index,
-			path,
-			value
-		}))}
+		onClick={() => {
+			/*console.debug('InsertButton onClick', {
+				index,
+				path,
+				value
+			});*/
+			dispatch(insert({
+				index,
+				path,
+				value
+			}));
+		}}
 		type='button'
-	><Icon color='green' name='plus'/></Button>;
+	>{children}</Button>;
 } // InsertButton

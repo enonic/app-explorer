@@ -14,6 +14,7 @@ import {InsertButton} from './enonic/InsertButton';
 import {MoveDownButton} from './enonic/MoveDownButton';
 import {MoveUpButton} from './enonic/MoveUpButton';
 import {ResetButton} from './enonic/ResetButton';
+import {SortButton} from './enonic/SortButton';
 import {SubmitButton} from './enonic/SubmitButton';
 
 
@@ -250,18 +251,19 @@ function NewOrEditSynonym(props) {
 				}}
 			>
 				<Header as='h2'>From</Header>
-				<Table celled compact selectable sortable striped>
-					<Table.Body>
-						<List
-							path='from'
-							render={(fromValue, fromIndex, fromArray) => {
-								//console.debug('fromValue', fromValue, 'fromIndex', fromIndex);
+				<List
+					path='from'
+					render={(fromArray) => <>
+						<Table celled compact selectable sortable striped>
+							<Table.Body>{fromArray.map((fromValue, fromIndex) => {
+							//console.debug('fromValue', fromValue, 'fromIndex', fromIndex);
 								const fromPath = `from.${fromIndex}`;
 								return <Table.Row key={fromPath}>
 									<Table.Cell>
 										<EnonicInput
 											fluid
 											path={fromPath}
+											value={fromValue}
 										/>
 									</Table.Cell>
 									<Table.Cell collapsing>
@@ -288,40 +290,30 @@ function NewOrEditSynonym(props) {
 										</Button.Group>
 									</Table.Cell>
 								</Table.Row>
-							}}
+							})}
+							</Table.Body>
+						</Table>
+						<InsertButton
+							path='from'
+							index={fromArray.length}
+							value={''}
 						/>
-					</Table.Body>
-				</Table>
-				{/*<InsertButton
-					path='from'
-					index={getIn(getEnonicContext()[0].values, 'from').length}
-					value={''}
-				/>;*/}
-				{(() => {
-					console.debug('Test IIFE 1');
-					const [enonicContext, ignored] = getEnonicContext(); console.debug('enonicContext', enonicContext);
-					console.debug('Test IIFE 2');
-					return null;
-					/*
-					const fromArray = getIn(enonicContext.values, 'from'); console.debug('fromArray', fromArray);
-					return <InsertButton
-						path='from'
-						index={fromArray.length}
-						value={''}
-					/>;*/
-				})()}
+						<SortButton path='from'/>
+					</>}
+				/>
 				<Header as='h2'>To</Header>
-				<Table celled compact selectable sortable striped>
-					<Table.Body>
-						<List
-							path='to'
-							render={(toValue, toIndex, toArray) => {
+				<List
+					path='to'
+					render={(toArray) => <>
+						<Table celled compact selectable sortable striped>
+							<Table.Body>{toArray.map((toValue, toIndex) => {
 								const toPath = `to.${toIndex}`;
 								return <Table.Row key={toPath}>
 									<Table.Cell>
 										<EnonicInput
 											fluid
 											path={toPath}
+											value={toValue}
 										/>
 									</Table.Cell>
 									<Table.Cell collapsing>
@@ -347,13 +339,21 @@ function NewOrEditSynonym(props) {
 											/>
 										</Button.Group>
 									</Table.Cell>
-								</Table.Row>
-							}}
+								</Table.Row>;
+							})}</Table.Body>
+						</Table>
+						<InsertButton
+							path='to'
+							index={toArray.length}
+							value={''}
 						/>
-					</Table.Body>
-				</Table>
-				<SubmitButton/>
-				<ResetButton/>
+						<SortButton path='to'/>
+					</>}
+				/>
+				<div style={{marginTop: 14}}>
+					<SubmitButton/>
+					<ResetButton/>
+				</div>
 			</EnonicForm>
 		</Modal.Content>
 	</Modal>;

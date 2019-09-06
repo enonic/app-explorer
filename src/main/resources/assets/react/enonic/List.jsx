@@ -9,5 +9,5 @@ export function List(props) {
 	//console.debug('List context', context);
 	const array = getIn(context.values, path, []);
 	//console.debug('List array', array);
-	return array.map((v,i) => render(v, i, array));
+	return render(array);
 } // List
