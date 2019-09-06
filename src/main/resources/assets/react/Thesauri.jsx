@@ -188,7 +188,7 @@ function Import(props) {
 					onClick={() => {
 						const body = new FormData();
 						const fileInput = document.querySelector('#file') ;
-						console.debug('fileInput', fileInput);
+						//console.debug('fileInput', fileInput);
 						body.append('name', name);
 						body.append('file', fileInput.files[0]);
 						fetch(`${servicesBaseUrl}/thesaurusImport`, {
@@ -247,7 +247,12 @@ function NewOrEditSynonym(props) {
 					from,
 					to
 				}) => {
-					console.debug({from, to});
+					console.debug({from, thesaurusId, to});
+					fetch(`${servicesBaseUrl}/synonymCreate?fromJson=${JSON.stringify(from)}&thesaurusId=${thesaurusId}&toJson=${JSON.stringify(to)}`, {
+						method: 'POST'
+					}).then(response => {
+						doClose();
+					})
 				}}
 			>
 				<Header as='h2'>From</Header>
