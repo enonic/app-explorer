@@ -164,6 +164,7 @@ const SS_FILES = [
 	'src/main/resources/services/listCollectors/listCollectors',
 	'src/main/resources/services/search/search',
 	'src/main/resources/services/synonymCreate/synonymCreate',
+	'src/main/resources/services/synonymModify/synonymModify',
 	'src/main/resources/services/thesauri/thesauri',
 	'src/main/resources/services/thesaurusCreate/thesaurusCreate',
 	'src/main/resources/services/thesaurusDelete/thesaurusDelete',

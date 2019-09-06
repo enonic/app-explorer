@@ -1,4 +1,4 @@
-import {toStr} from '/lib/util';
+//import {toStr} from '/lib/util';
 import {forceArray} from '/lib/util/data';
 
 import {PRINCIPAL_EXPLORER_READ, RT_JSON} from '/lib/explorer/model/2/constants';
@@ -9,7 +9,10 @@ import {query as querySynonyms} from '/lib/explorer/synonym/query';
 
 
 export function get({
-	params: {
+	params = {}
+}) {
+	//log.info(`service thesauri get params:${toStr(params)}`);
+	const {
 		from,
 		to,
 		page = 1, // NOTE First index is 1 not 0
@@ -18,8 +21,7 @@ export function get({
 		//sort = 'from ASC',
 		sort = '_score DESC',
 		thesauri = ''
-	} = {}
-}) {
+	} = params;
 	const intPerPage = parseInt(perPage, 10);
 	const intPage = parseInt(page, 10);
 	const start = (intPage - 1 ) * intPerPage;
@@ -48,15 +50,17 @@ export function get({
 		principals: [PRINCIPAL_EXPLORER_READ]
 	});
 	const count = intPerPage;
-	const result = querySynonyms({
+	const queryParams = {
 		connection,
 		count,
 		filters,
 		query,
 		sort,
 		start
-	});
-	//log.info(toStr({result}));
+	};
+	//log.info(`service thesauri get queryParams:${toStr(queryParams)}`);
+	const result = querySynonyms(queryParams);
+	//log.info(`service thesauri get result:${toStr(result)}`);
 	result.page = intPage;
 	result.start = start + 1;
 	result.end = Math.min(start + intPerPage, result.total);
@@ -71,13 +75,16 @@ export function get({
 			}
 		}
 	};
-	const thesauriAggRes = querySynonyms({
+	const aggQueryParams = {
 		connection,
 		aggregations,
 		count: 0,
 		filters: {},
 		query
-	});
+	};
+	//log.info(`service thesauri get aggQueryParams:${toStr(aggQueryParams)}`);
+	const thesauriAggRes = querySynonyms(aggQueryParams);
+	//log.info(`service thesauri get thesauriAggRes:${toStr(thesauriAggRes)}`);
 	result.aggregations.thesaurus = thesauriAggRes.aggregations.thesaurus;
 
 	return {

@@ -224,10 +224,12 @@ function Import(props) {
 
 function NewOrEditSynonym(props) {
 	const {
+		from = [''],
 		id,
 		onClose,
 		servicesBaseUrl,
-		thesaurusId
+		thesaurusId,
+		to = ['']
 	} = props;
 	const [open, setOpen] = React.useState(false);
 	function doOpen() { setOpen(true); }
@@ -235,8 +237,6 @@ function NewOrEditSynonym(props) {
 		onClose();
 		setOpen(false);
 	}
-	const from = [''];
-	const to = [''];
 	return <Modal
 		closeIcon
 		onClose={doClose}
@@ -263,7 +263,7 @@ function NewOrEditSynonym(props) {
 					to
 				}) => {
 					//console.debug({from, thesaurusId, to});
-					fetch(`${servicesBaseUrl}/synonymCreate?fromJson=${JSON.stringify(from)}&thesaurusId=${thesaurusId}&toJson=${JSON.stringify(to)}`, {
+					fetch(`${servicesBaseUrl}/synonym${id ? 'Modify' : 'Create'}?fromJson=${JSON.stringify(from)}${id ? `&id=${id}`: ''}&thesaurusId=${thesaurusId}&toJson=${JSON.stringify(to)}`, {
 						method: 'POST'
 					}).then(response => {
 						doClose();
@@ -455,7 +455,10 @@ export class EditThesauri extends React.Component {
 
 
 	render() {
-		const {TOOL_PATH} = this.props;
+		const {
+			servicesBaseUrl,
+			TOOL_PATH
+		} = this.props;
 		const {
 			data: {
 				queryResult: {
@@ -563,14 +566,30 @@ export class EditThesauri extends React.Component {
 						</Table.Row>
 					</Table.Header>
 					<Table.Body>
-						{hits.map(({from, name, score, thesaurus, to}, i) => <Table.Row key={i}>
+						{hits.map(({
+							from = [''],
+							id,
+							name,
+							score,
+							thesaurus,
+							thesaurusReference,
+							to = ['']
+						}, i) => <Table.Row key={i}>
 							<Table.Cell>{(Array.isArray(from) ? from : [from]).join(', ')}</Table.Cell>
 							<Table.Cell>{(Array.isArray(to) ? to : [to]).join(', ')}</Table.Cell>
 							<Table.Cell>{thesaurus}</Table.Cell>
 							<Table.Cell>{score}</Table.Cell>
 							<Table.Cell>
 								<Button.Group>
-									<a className="ui button" href={`${TOOL_PATH}/thesauri/synonyms/${thesaurus}/edit/${name}`}><i className="blue edit icon"></i> Edit</a>
+									<NewOrEditSynonym
+										id={id}
+										from={from}
+										onClose={this.search}
+										servicesBaseUrl={servicesBaseUrl}
+										to={to}
+										thesaurusId={thesaurusReference}
+									/>
+									{/*<a className="ui button" href={`${TOOL_PATH}/thesauri/synonyms/${thesaurus}/edit/${name}`}><i className="blue edit icon"></i> Edit</a>*/}
 									<a className="ui button" href={`${TOOL_PATH}/thesauri/synonyms/${thesaurus}/delete/${name}`}><i className="red trash alternate outline icon"></i> Delete</a>
 								</Button.Group>
 							</Table.Cell>
@@ -722,6 +741,7 @@ export function Thesauri(props) {
 		/>
 		<Header as='h2'>All synonyms</Header>
 		<EditThesauri
+			servicesBaseUrl={servicesBaseUrl}
 			serviceUrl={serviceUrl}
 			TOOL_PATH={TOOL_PATH}
 		/>

@@ -1,21 +1,20 @@
 //import {toStr} from '/lib/util';
-import {reference} from '/lib/xp/value';
 
 import {
 	PRINCIPAL_EXPLORER_READ,
 	PRINCIPAL_EXPLORER_WRITE,
-	NT_SYNONYM,
 	RT_JSON
 } from '/lib/explorer/model/2/constants';
-import {connect} from '/lib/explorer/repo/connect';
-import {createRandomNamed} from '/lib/explorer/node/createRandomNamed';
 import {get} from '/lib/explorer/node/get';
-//import {synonym} from '/lib/explorer/model/2/nodeTypes/synonym'; // Requires _name :(
+import {modify} from '/lib/explorer/node/modify';
+import {dirname} from '/lib/explorer/path/dirname';
+import {connect} from '/lib/explorer/repo/connect';
 
 
 export function post({
 	params: {
 		fromJson,
+		id,
 		thesaurusId,
 		toJson
 	}
@@ -27,7 +26,8 @@ export function post({
 		const from = JSON.parse(fromJson);
 		const to = JSON.parse(toJson);
 		//log.info(`synonymCreate from:${toStr(from)} thesaurusId:${thesaurusId} to:${toStr(to)}`);
-		const thesaurusNode = get({
+
+		/*const thesaurusNode = get({
 			connection: connect({
 				principals: [PRINCIPAL_EXPLORER_READ]
 			}),
@@ -36,23 +36,34 @@ export function post({
 		//log.info(`synonymCreate thesaurusNode:${toStr(thesaurusNode)}`);
 		if (!thesaurusNode) {
 			throw new Error(`Unable to find thesaurus with id:${thesaurusId}!`);
+		}*/
+
+		const synonymNode = get({
+			connection: connect({
+				principals: [PRINCIPAL_EXPLORER_READ]
+			}),
+			path: id
+		});
+		if (!synonymNode) {
+			throw new Error(`Unable to find synonym with id:${id}!`);
 		}
-		const createRes = createRandomNamed({
+
+		const modifyRes = modify({
 			__connection: connect({
 				principals: [PRINCIPAL_EXPLORER_WRITE]
 			}),
-			_indexConfig: {default: 'byType'},
-			_parentPath: thesaurusNode._path,
+			//_id: id, // Gets stripped!!!
+			//_parentPath: thesaurusNode._path,
+			_parentPath: dirname(synonymNode._path),
+			_name: synonymNode._name,
 			displayName: `${Array.isArray(from) ? from.join(', ') : from} => ${Array.isArray(to) ? to.join(', ') : to}`,
 			from,
-			thesaurusReference: reference(thesaurusNode._id),
-			to,
-			type: NT_SYNONYM
+			to
 		});
-		if (!createRes) {
-			throw new Error(`Something went wrong when trying to create synonym from:${fromJson} to:${toJson} in thesaurus with id:${thesaurusId}!`);
+		if (!modifyRes) {
+			throw new Error(`Something went wrong when trying to modify synonym id:${id} from:${fromJson} to:${toJson} in thesaurus with id:${thesaurusId}!`);
 		}
-		body.message=`Created synonym from:${fromJson} to:${toJson} in thesaurus with id:${thesaurusId}`;
+		body.message=`Modified synonym id:${id} from:${fromJson} to:${toJson} in thesaurus with id:${thesaurusId}`;
 	} catch (e) {
 		body.error=e.message;
 		status=500;
