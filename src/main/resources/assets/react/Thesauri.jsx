@@ -223,6 +223,7 @@ function Import(props) {
 
 
 function NewOrEditSynonym(props) {
+	//console.debug('NewOrEditSynonym props', props);
 	const {
 		from = [''],
 		id,
@@ -389,6 +390,74 @@ function NewOrEditSynonym(props) {
 } // NewOrEditSynonym
 
 
+function DeleteSynonym(props) {
+	console.debug('DeleteSynonym props', props);
+	const {
+		id,
+		from,
+		onClose,
+		servicesBaseUrl,
+		thesaurusReference,
+		to
+	} = props;
+	const [open, setOpen] = React.useState(false);
+	function doOpen() { setOpen(true); }
+	function doClose() {
+		onClose();
+		setOpen(false);
+	}
+	return <Modal
+		closeIcon
+		onClose={doClose}
+		open={open}
+		trigger={<Button
+			compact
+			onClick={() => setOpen(true)}
+			size='tiny'><Icon color='red' name='trash alternate outline'/>Delete</Button>}
+	>
+		<Modal.Header>Delete synonym?</Modal.Header>
+		<Modal.Content>
+			<Header as='h2'>Do you really want to delete this synonym?</Header>
+			<Table celled compact selectable sortable striped>
+				<Table.Header>
+					<Table.Row>
+						<Table.HeaderCell>From</Table.HeaderCell>
+					</Table.Row>
+				</Table.Header>
+				<Table.Body>
+					{from.map((v,i) => <Table.Row key={i}>
+						<Table.HeaderCell>{v}</Table.HeaderCell>
+					</Table.Row>)}
+				</Table.Body>
+			</Table>
+			<Table celled compact selectable sortable striped>
+				<Table.Header>
+					<Table.Row>
+						<Table.HeaderCell>To</Table.HeaderCell>
+					</Table.Row>
+				</Table.Header>
+				<Table.Body>
+					{to.map((v,i) => <Table.Row key={i}>
+						<Table.HeaderCell>{v}</Table.HeaderCell>
+					</Table.Row>)}
+				</Table.Body>
+			</Table>
+			<Button
+				compact
+				onClick={() => {
+					fetch(`${servicesBaseUrl}/synonymDelete?id=${id}`, {
+						method: 'DELETE'
+					}).then(response => {
+						doClose();
+					})
+				}}
+				size='tiny'
+			><Icon color='red' name='trash alternate outline'/>Confirm Delete</Button>
+		</Modal.Content>
+	</Modal>
+} // DeleteSynonym
+
+
 export class EditThesauri extends React.Component {
 	constructor(props) {
 		super(props);
@@ -456,8 +525,7 @@ export class EditThesauri extends React.Component {
 
 	render() {
 		const {
-			servicesBaseUrl,
-			TOOL_PATH
+			servicesBaseUrl
 		} = this.props;
 		const {
 			data: {
@@ -580,18 +648,22 @@ export class EditThesauri extends React.Component {
 							<Table.Cell>{thesaurus}</Table.Cell>
 							<Table.Cell>{score}</Table.Cell>
 							<Table.Cell>
-								<Button.Group>
-									<NewOrEditSynonym
-										id={id}
-										from={from}
-										onClose={this.search}
-										servicesBaseUrl={servicesBaseUrl}
-										to={to}
-										thesaurusId={thesaurusReference}
-									/>
-									{/*<a className="ui button" href={`${TOOL_PATH}/thesauri/synonyms/${thesaurus}/edit/${name}`}><i className="blue edit icon"></i> Edit</a>*/}
-									<a className="ui button" href={`${TOOL_PATH}/thesauri/synonyms/${thesaurus}/delete/${name}`}><i className="red trash alternate outline icon"></i> Delete</a>
-								</Button.Group>
+								<NewOrEditSynonym
+									id={id}
+									from={from}
+									onClose={() => this.search()}
+									servicesBaseUrl={servicesBaseUrl}
+									to={to}
+									thesaurusId={thesaurusReference}
+								/>
+								<DeleteSynonym
+									id={id}
+									from={from}
+									onClose={() => this.search()}
+									servicesBaseUrl={servicesBaseUrl}
+									thesaurusId={thesaurusReference}
+									to={to}
+								/>
 							</Table.Cell>
 						</Table.Row>)}
 					</Table.Body>
