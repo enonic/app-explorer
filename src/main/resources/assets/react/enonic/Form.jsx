@@ -107,16 +107,31 @@ export function Form(props) {
 		onDelete,
 		onSubmit,
 		schema = {},
+		validateOnInit = false,
 		...rest
 	} = props;
 	//console.debug('Form schema', schema);
 
+	function validateValues(values) {
+		const errors = {};
+		traverse(schema).forEach(function (x) { // fat-arrow destroys this
+			if (this.notRoot && this.isLeaf && isFunction(x)) {
+				const path = this.path; //console.debug('path', path);
+				const value = getIn(values, path); //console.debug('value', value);
+				const newError = x(value); //console.debug('newError', newError);
+				newError && setIn(errors, path, newError);
+			}
+		});
+		return errors;
+	} // validateValues
+
 	const initialState = {
 		changes: {},
-		errors: {},
+		errors: validateOnInit ? validateValues(initialValues) : {},
 		values: initialValues,
 		visits: {}
 	};
+	//console.debug('Form initialState', initialState);
 
 	const reducer = (state, action) => {
 		//console.debug('reducer state', state, 'action', action);

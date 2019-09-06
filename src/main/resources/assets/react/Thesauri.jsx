@@ -16,10 +16,25 @@ import {MoveUpButton} from './enonic/MoveUpButton';
 import {ResetButton} from './enonic/ResetButton';
 import {SortButton} from './enonic/SortButton';
 import {SubmitButton} from './enonic/SubmitButton';
+import {ValidateFormButton} from './enonic/ValidateFormButton';
 
 
 function required(value) {
 	return value ? undefined : 'Required!';
+}
+
+
+/*function atLeastOneValue(array) {
+	if (!Array.isArray(array)) return 'Must be an array!';
+	if (!array.length) return 'Must have at least one item!';
+	return array[0] ? undefined : 'Must have at least one item with a value!';
+}*/
+
+
+function everyItemRequired(array) {
+	if (!Array.isArray(array)) return 'Must be an array!';
+	if (!array.length) return 'Must have at least one item!';
+	return array.map(v => required(v));
 }
 
 
@@ -255,6 +270,14 @@ function NewOrEditSynonym(props) {
 					})
 				}}
 			>
+				{/*schema={{
+					from: (array) => everyItemRequired(array),
+					 //[(value) => required(value)],
+					 //(array) => atLeastOneValue(array),
+					to: (array) => everyItemRequired(array)
+					//[(value) => required(value)]
+					//(array) => atLeastOneValue(array)
+				}}*/}
 				<Header as='h2'>From</Header>
 				<List
 					path='from'
@@ -357,6 +380,7 @@ function NewOrEditSynonym(props) {
 				/>
 				<div style={{marginTop: 14}}>
 					<SubmitButton/>
+					{/*<ValidateFormButton/>*/}
 					<ResetButton/>
 				</div>
 			</EnonicForm>
