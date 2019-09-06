@@ -63,7 +63,7 @@ function NewOrEditThesaurus(props) {
 			compact
 			onClick={doOpen}
 			size='tiny'
-		><Icon color='blue' name='edit'/>Edit</Button>
+		><Icon color='blue' name='edit'/>Edit thesaurus</Button>
 			: <Button
 				circular
 				color='green'
@@ -144,7 +144,7 @@ function DeleteThesaurus(props) {
 		trigger={<Button
 			compact
 			onClick={() => setOpen(true)}
-			size='tiny'><Icon color='red' name='trash alternate outline'/>Delete</Button>}
+			size='tiny'><Icon color='red' name='trash alternate outline'/>Delete thesaurus</Button>}
 	>
 		<Modal.Header>Delete thesaurus {name}</Modal.Header>
 		<Modal.Content>
@@ -391,7 +391,7 @@ function NewOrEditSynonym(props) {
 
 
 function DeleteSynonym(props) {
-	console.debug('DeleteSynonym props', props);
+	//console.debug('DeleteSynonym props', props);
 	const {
 		id,
 		from,
@@ -495,7 +495,7 @@ export class EditThesauri extends React.Component {
 
 
 	search() {
-		const {serviceUrl, TOOL_PATH} = this.props;
+		const {serviceUrl} = this.props;
 		const {params} = this.state;
 		const uri = new Uri(serviceUrl);
 		Object.entries(params).forEach(([k, v]) => {
@@ -693,6 +693,262 @@ export class EditThesauri extends React.Component {
 } // class EditThesauri
 
 
+function EditSynonyms(props) {
+	console.debug('EditSynonyms props', props);
+	const {
+		onClose,
+		servicesBaseUrl,
+		thesaurusId,
+		thesaurusName
+	} = props;
+
+	const [open, setOpen] = React.useState(false);
+	const [state, setState] = React.useState({
+		isLoading: true,
+		params: {
+			from: '',
+			perPage: 10,
+			page: 1,
+			query: '',
+			sort: 'from ASC',
+			thesauri: thesaurusName ? [thesaurusName] : [],
+			//thesauri: [],
+			to: ''
+		},
+		result: {
+			aggregations: {
+				thesaurus: {
+					buckets: []
+				}
+			}
+		}
+	});
+
+	function querySynonyms() {
+		const {params} = state;
+		setState(prev => ({
+			...prev,
+			isLoading: true
+		}));
+		const uri = new Uri(`${servicesBaseUrl}/thesauri`);
+		Object.entries(params).forEach(([k, v]) => {
+			//console.debug({k, v});
+			uri.replaceQueryParam(k, v);
+		});
+		const uriStr = uri.toString();
+		//console.debug('uriStr', uriStr);
+		fetch(uriStr)
+			.then(response => response.json())
+			.then(data => {
+				//console.debug('data', data);
+				setState(prev => ({
+					...prev,
+					isLoading: false,
+					result: data.queryResult
+				}));
+			})
+	} // querySynonyms
+
+	async function changeParam({name, value}) {
+		await setState(prevState => {
+			prevState.params[name] = value;
+			if (name !== 'page') {
+				prevState.params.page = 1;
+			}
+			return prevState;
+		});
+		querySynonyms();
+	} // changeParam
+
+	function doClose() {
+		onClose();
+		setOpen(false);
+	}
+
+	//console.debug('state', state);
+
+	const {
+		isLoading,
+		params: {
+			from,
+			perPage,
+			sort,
+			thesauri,
+			to
+		},
+		result
+	} = state;
+
+	const {
+		aggregations,
+		end,
+		page,
+		start,
+		total,
+		totalPages
+	} = result;
+
+	return <Modal
+		closeIcon
+		onClose={doClose}
+		onOpen={querySynonyms}
+		open={open}
+		size='fullscreen'
+		trigger={thesaurusId ? <Button
+			compact
+			onClick={() => setOpen(true)}
+			size='tiny'><Icon color='blue' name='edit'/> Edit synonyms</Button> : <Button
+			compact
+			onClick={() => setOpen(true)}
+			size='tiny'><Icon color='blue' name='edit'/> Edit all synonyms</Button>}>
+		<Modal.Header>{thesaurusId ? 'Edit synonyms' : 'Edit all synonyms'}</Modal.Header>
+		<Modal.Content>
+			<Form>
+				<Header as='h4'><Icon name='filter'/> Filter</Header>
+				<Form.Field>
+					<input
+						fluid='true'
+						label='From'
+						onChange={({target:{value}}) => changeParam({name:'from', value})}
+						placeholder='From'
+						value={from}
+					/>
+				</Form.Field>
+				<Form.Field>
+					<input
+						fluid='true'
+						label='To'
+						onChange={({target:{value}}) => changeParam({name:'to', value})}
+						placeholder='To'
+						value={to}
+					/>
+				</Form.Field>
+
+				{thesaurusName ? null : <>
+					<Header as='h4'><Icon name='font'/> Thesauri</Header>
+					<Dropdown
+						defaultValue={thesauri}
+						fluid
+						multiple={true}
+						name='thesauri'
+						onChange={(e, {value}) => changeParam({name: 'thesauri', value})}
+						options={aggregations.thesaurus.buckets.map(({key, docCount}) => {
+							const tName = key.replace('/thesauri/', '');
+							return {
+								key: tName,
+								text: `${tName} (${docCount})`,
+								value: tName
+							};
+						})}
+						search
+						selection
+					/>
+				</>}
+
+				<Header as='h4'><Icon name='resize vertical'/> Per page</Header>
+				<Form.Field>
+					<Dropdown
+						defaultValue={perPage}
+						fluid
+						onChange={(e,{value}) => changeParam({name: 'perPage', value})}
+						options={[5,10,25,50,100].map(key => ({key, text: `${key}`, value: key}))}
+						selection
+					/>
+				</Form.Field>
+
+				<Header as='h4'><Icon name='sort'/> Sort</Header>
+				<Form.Field>
+					<Dropdown
+						defaultValue={sort}
+						fluid
+						onChange={(e,{value}) => changeParam({name: 'sort', value})}
+						options={[{
+							key: '_score DESC',
+							text: 'Score descending',
+							value: '_score DESC'
+						}, {
+							key: 'from ASC',
+							text: 'From ascending',
+							value: 'from ASC'
+						}]}
+						selection
+					/>
+				</Form.Field>
+			</Form>
+			{isLoading
+				? <Loader active inverted>Loading</Loader>
+				: <>
+					<Table celled compact selectable sortable striped attached='top'>
+						<Table.Header>
+							<Table.Row>
+								<Table.HeaderCell>From</Table.HeaderCell>
+								<Table.HeaderCell>To</Table.HeaderCell>
+								<Table.HeaderCell>Thesaurus</Table.HeaderCell>
+								<Table.HeaderCell>Score</Table.HeaderCell>
+								<Table.HeaderCell>Actions</Table.HeaderCell>
+							</Table.Row>
+						</Table.Header>
+						<Table.Body>
+							{result.hits.map(({
+								from = [''],
+								id,
+								name,
+								score,
+								thesaurus,
+								thesaurusReference,
+								to = ['']
+							}, i) => <Table.Row key={i}>
+								<Table.Cell>{(Array.isArray(from) ? from : [from]).join(', ')}</Table.Cell>
+								<Table.Cell>{(Array.isArray(to) ? to : [to]).join(', ')}</Table.Cell>
+								<Table.Cell>{thesaurus}</Table.Cell>
+								<Table.Cell>{score}</Table.Cell>
+								<Table.Cell>
+									<NewOrEditSynonym
+										id={id}
+										from={from}
+										onClose={querySynonyms}
+										servicesBaseUrl={servicesBaseUrl}
+										to={to}
+										thesaurusId={thesaurusReference}
+									/>
+									<DeleteSynonym
+										id={id}
+										from={from}
+										onClose={querySynonyms}
+										servicesBaseUrl={servicesBaseUrl}
+										thesaurusId={thesaurusReference}
+										to={to}
+									/>
+								</Table.Cell>
+							</Table.Row>)}
+						</Table.Body>
+					</Table>
+					<Pagination
+						attached='bottom'
+						fluid
+						size='mini'
+
+						activePage={page}
+						boundaryRange={1}
+						siblingRange={1}
+						totalPages={totalPages}
+
+						ellipsisItem={{content: <Icon name='ellipsis horizontal' />, icon: true}}
+						firstItem={{content: <Icon name='angle double left' />, icon: true}}
+						prevItem={{content: <Icon name='angle left' />, icon: true}}
+						nextItem={{content: <Icon name='angle right' />, icon: true}}
+						lastItem={{content: <Icon name='angle double right' />, icon: true}}
+
+						onPageChange={(e,{activePage}) => changeParam({name: 'page', value: activePage})}
+					/>
+					<p>Displaying {start}-{end} of {total}</p>
+				</>
+			}
+		</Modal.Content>
+	</Modal>;
+} // EditSynonyms
+
+
 export function ThesauriList(props) {
 	//console.debug('Thesauri props', props);
 	const {
@@ -749,9 +1005,15 @@ export function ThesauriList(props) {
 							<Table.Cell>{synonymsCount}</Table.Cell>
 							<Table.Cell>
 								<NewOrEditSynonym
-									thesaurusId={id}
 									onClose={fetchThesauri}
 									servicesBaseUrl={servicesBaseUrl}
+									thesaurusId={id}
+								/>
+								<EditSynonyms
+									onClose={fetchThesauri}
+									servicesBaseUrl={servicesBaseUrl}
+									thesaurusId={id}
+									thesaurusName={name}
 								/>
 								<NewOrEditThesaurus
 									displayName={displayName}
@@ -786,7 +1048,12 @@ export function ThesauriList(props) {
 					<Table.Row>
 						<Table.HeaderCell></Table.HeaderCell>
 						<Table.HeaderCell>{synonymsSum}</Table.HeaderCell>
-						<Table.HeaderCell></Table.HeaderCell>
+						<Table.HeaderCell>
+							<EditSynonyms
+								onClose={fetchThesauri}
+								servicesBaseUrl={servicesBaseUrl}
+							/>
+						</Table.HeaderCell>
 					</Table.Row>
 				</Table.Footer>
 			</Table>}
@@ -811,11 +1078,10 @@ export function Thesauri(props) {
 			servicesBaseUrl={servicesBaseUrl}
 			TOOL_PATH={TOOL_PATH}
 		/>
-		<Header as='h2'>All synonyms</Header>
+		{/*<Header as='h2'>All synonyms</Header>
 		<EditThesauri
 			servicesBaseUrl={servicesBaseUrl}
 			serviceUrl={serviceUrl}
-			TOOL_PATH={TOOL_PATH}
-		/>
+		/>*/}
 	</>;
 }
