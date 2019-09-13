@@ -40,6 +40,7 @@ export function get({
 	if(thesauri) {
 		thesauriArr.forEach(thesaurus => {
 			addFilter({
+				clause: 'should',
 				filters,
 				filter: hasValue('_parentPath', `/thesauri/${thesaurus}`)
 			});

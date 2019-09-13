@@ -39,14 +39,32 @@ export function EditSynonyms(props) {
 		}
 	});
 
-	function querySynonyms() {
-		console.debug('querySynonyms state', state);
-		const {params} = state;
+	function querySynonyms(params = state.params) {
+		//console.debug('querySynonyms params', params, 'state', state);
+
+		// Get fallback params from prev state
+		Object.entries(state.params).forEach(([k, v]) => {
+			//console.debug('querySynonyms k', k, 'v', v, `params[${k}]`, params[k], `typeof params[${k}]`, typeof params[k]);
+			if (typeof params[k] === 'undefined') {
+				params[k] = v;
+			}
+		});
+		//console.debug('querySynonyms params', params, 'state', state);
+
+		// Dispatch isLoading and all params to state
 		setState(prev => {
 			const deref = JSON.parse(JSON.stringify(prev));
 			deref.isLoading = true;
+			Object.entries(params).forEach(([k, v]) => {
+				deref.params[k] = v;
+			});
+			const [column, direction] = params.sort.split(' '); // 'from ASC'
+			deref.column = column;
+			deref.direction = direction === 'DESC' ? 'descending' : 'ascending';
+			//console.debug('querySynonyms deref', deref);
 			return deref;
 		});
+
 		const uri = new Uri(`${servicesBaseUrl}/thesauri`);
 		Object.entries(params).forEach(([k, v]) => {
 			//console.debug({k, v});
@@ -67,27 +85,9 @@ export function EditSynonyms(props) {
 			})
 	} // querySynonyms
 
-	function changeParam({name, value}) {
-		console.debug('changeParam name', name, 'value', value);
-		setState(prevState => {
-			const deref = JSON.parse(JSON.stringify(prevState));
-			deref.params[name] = value;
-			if (name !== 'page') {
-				deref.params.page = 1;
-			}
-			return deref;
-		});
-	} // changeParam
-
 	function setSort({column, direction}) {
-		console.debug('setSort column', column, 'direction', direction);
-		setState(prev => {
-			const deref = JSON.parse(JSON.stringify(prev));
-			deref.column = column;
-			deref.direction = direction;
-			deref.params.sort = `${column} ${direction === 'ascending' ? 'ASC' : 'DESC'}`;
-			return deref;
-		});
+		//console.debug('setSort column', column, 'direction', direction);
+		querySynonyms({sort: `${column} ${direction === 'ascending' ? 'ASC' : 'DESC'}`});
 	} // changeSort
 
 	function doClose() {
@@ -100,7 +100,7 @@ export function EditSynonyms(props) {
 			column,
 			direction
 		} = state;
-		console.debug('handleSortGenerator clickedColumn', clickedColumn, 'column', column, 'direction', direction);
+		//console.debug('handleSortGenerator clickedColumn', clickedColumn, 'column', column, 'direction', direction);
 
 		setSort({
 			column: clickedColumn,
@@ -128,21 +128,6 @@ export function EditSynonyms(props) {
 	} = state;
 	//console.debug('column', column, 'direction', direction, 'sort', sort);
 
-	/*React.useEffect(() => {
-		querySynonyms();
-		/*return () => {
-			console.debug('useEffect from', from, 'perPage', perPage, 'sort', sort, 'thesauri', thesauri, 'to', to);
-			querySynonyms();
-		};
-	}, [from, perPage, sort, thesauri, to]);*/
-
-	/*React.useLayoutEffect(() => {
-		//querySynonyms();
-		return () => {
-			console.debug('useLayoutEffect from', from, 'perPage', perPage, 'sort', sort, 'thesauri', thesauri, 'to', to);
-		};
-	}, [from, perPage, sort, thesauri, to]);*/
-
 	const {
 		aggregations,
 		end,
@@ -156,8 +141,8 @@ export function EditSynonyms(props) {
 		closeIcon
 		onClose={doClose}
 		onOpen={() => {
-			console.debug('onOpen');
-			//querySynonyms();
+			//console.debug('onOpen');
+			querySynonyms();
 		}}
 		open={open}
 		size='fullscreen'
@@ -176,7 +161,7 @@ export function EditSynonyms(props) {
 					<input
 						fluid='true'
 						label='From'
-						onChange={({target:{value}}) => changeParam({name:'from', value})}
+						onChange={({target:{value}}) => querySynonyms({from: value})}
 						placeholder='From'
 						value={from}
 					/>
@@ -185,7 +170,7 @@ export function EditSynonyms(props) {
 					<input
 						fluid='true'
 						label='To'
-						onChange={({target:{value}}) => changeParam({name:'to', value})}
+						onChange={({target:{value}}) => querySynonyms({to: value})}
 						placeholder='To'
 						value={to}
 					/>
@@ -198,7 +183,7 @@ export function EditSynonyms(props) {
 						fluid
 						multiple={true}
 						name='thesauri'
-						onChange={(e, {value}) => changeParam({name: 'thesauri', value})}
+						onChange={(e, {value}) => querySynonyms({thesauri: value})}
 						options={aggregations.thesaurus.buckets.map(({key, docCount}) => {
 							const tName = key.replace('/thesauri/', '');
 							return {
@@ -217,7 +202,7 @@ export function EditSynonyms(props) {
 					<Dropdown
 						defaultValue={perPage}
 						fluid
-						onChange={(e,{value}) => changeParam({name: 'perPage', value})}
+						onChange={(e,{value}) => querySynonyms({perPage: value})}
 						options={[5,10,25,50,100].map(key => ({key, text: `${key}`, value: key}))}
 						selection
 					/>
@@ -228,7 +213,7 @@ export function EditSynonyms(props) {
 					<Dropdown
 						defaultValue={sort}
 						fluid
-						onChange={(e,{value}) => changeParam({name: 'sort', value})}
+						onChange={(e,{value}) => querySynonyms({sort: value})}
 						options={[{
 							key: '_score DESC',
 							text: 'Score descending',
@@ -318,7 +303,7 @@ export function EditSynonyms(props) {
 						nextItem={{content: <Icon name='angle right' />, icon: true}}
 						lastItem={{content: <Icon name='angle double right' />, icon: true}}
 
-						onPageChange={(e,{activePage}) => changeParam({name: 'page', value: activePage})}
+						onPageChange={(e,{activePage}) => querySynonyms({page: activePage})}
 					/>
 					<p>Displaying {start}-{end} of {total}</p>
 				</>
