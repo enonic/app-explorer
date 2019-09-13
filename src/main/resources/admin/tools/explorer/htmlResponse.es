@@ -1,4 +1,5 @@
-import {TOOL_PATH} from '/lib/explorer/model/2/constants';
+import serialize from 'serialize-javascript';
+
 import {validateLicense} from '/lib/license';
 //import {toStr} from '/lib/util';
 import {forceArray} from '/lib/util/data';
@@ -7,7 +8,20 @@ import {
 	getLauncherPath,
 	getLauncherUrl
 } from '/lib/xp/admin';
-import {assetUrl} from '/lib/xp/portal';
+import {assetUrl, serviceUrl} from '/lib/xp/portal';
+
+import {
+	DEFAULT_FIELDS,
+	NO_VALUES_FIELDS,
+	PRINCIPAL_EXPLORER_READ,
+	TOOL_PATH
+} from '/lib/explorer/model/2/constants';
+import {connect} from '/lib/explorer/repo/connect';
+import {query as queryCollectors} from '/lib/explorer/collector/query';
+
+
+const ID_REACT_EXPLORER_CONTAINER = 'reactExplorerContainer';
+
 
 export function htmlResponse({
 	bodyBegin = [],
@@ -33,6 +47,25 @@ export function htmlResponse({
 	//log.info(`licenseDetails:${toStr(licenseDetails)}`);
 	const licenseValid = licenseDetails && !licenseDetails.expired;
 
+	const propsObj = {
+		defaultFields: DEFAULT_FIELDS.map(({_name})=>_name),
+		noValuesFields: NO_VALUES_FIELDS.map(({_name})=>_name),
+		servicesBaseUrl: serviceUrl({service: ''}),
+		TOOL_PATH
+	};
+
+	const collectorsAppToUri = {};
+	queryCollectors({
+		connection: connect({principals: PRINCIPAL_EXPLORER_READ})
+	}).hits.forEach(({
+		_name: application, configAssetPath
+	}) => {
+		collectorsAppToUri[application] = assetUrl({
+			application,
+			path: configAssetPath
+		});
+	});
+
 	return {
 		body: `<html>
 	<head>
@@ -57,7 +90,7 @@ export function htmlResponse({
 			<script src="https://unpkg.com/formik/dist/formik.umd.production.js"></script>
 		-->
 
-		${headBegin.join('\n')}
+		${''/*headBegin.join('\n')*/}
 
 		<title>${preTitle}Explorer</title>
 		<link rel="shortcut icon" href="${assetUrl({path: 'favicon.ico'})}">
@@ -71,10 +104,12 @@ export function htmlResponse({
 		<!-- Append the Admin libraries -->
 		<script type="text/javascript" src="${assetUrl({path: '/admin/common/lib/_all.js'})}"></script>
 
-		${headEnd.join('\n')}
+		${''/*headEnd.join('\n')*/}
 	</head>
-	<body class="pushable" style="background-color: white !important;">
-		${bodyBegin.join('\n')}
+	<body style="background-color: white !important;">
+		${''/*bodyBegin.join('\n')*/}
+
+		<div id="${ID_REACT_EXPLORER_CONTAINER}"/>
 
 		<header class="fixed inverted menu ui" style="z-index:103;">
 			<a class="item" onClick="$('#mySidebar').sidebar('toggle');"><i class="close icon" id="myIcon"></i></a>
@@ -112,7 +147,7 @@ export function htmlResponse({
 					</ul>
 				</div>
 			</div>` : ''}
-			${main}
+			${''/*main*/}
 		</main>
 
 		<script type="text/javascript">
@@ -131,7 +166,7 @@ export function htmlResponse({
 		<script type="text/javascript" src="${assetUrl({path: 'semantic-ui/semantic.js'})}"></script>
 		<script type="text/javascript" src="${assetUrl({path: 'js/tablesort.js'})}"></script>
 		<script type="text/javascript">
-			$(document).ready(function() {
+			/*$(document).ready(function() {
 				$('select.dropdown').dropdown();
 				$('table').tablesort();
 
@@ -168,7 +203,7 @@ export function htmlResponse({
 						$('#mySidebar').sidebar('show');
 					}
 				});
-			});
+			});*/
 		</script>
 
 		<!-- Append the Admin UI -->
@@ -183,13 +218,30 @@ export function htmlResponse({
     		var scroll = new SmoothScroll('a[href*="#"]');
 		</script>
 
-		${bodyEnd.join('\n')}
+		<script type='module' defer>
+			import {Explorer} from '${assetUrl({path: 'react/Explorer.esm.js'})}';
+			const propsObj = eval(${serialize(propsObj)});
+			const collectorsObj = {};
+			${Object.entries(collectorsAppToUri)
+		.map(([a, u], i) => `import {Collector as Collector${i}} from '${u}';
+collectorsObj['${a}'] = Collector${i};`)
+		.join('\n')}
+			propsObj.collectorsObj = collectorsObj;
+			ReactDOM.render(
+				React.createElement(Explorer, propsObj),
+				document.getElementById('${ID_REACT_EXPLORER_CONTAINER}')
+			);
+		</script>
+
+		${''/*bodyEnd.join('\n')*/}
 	</body>
 </html>`,
 		contentType: 'text/html; charset=utf-8',
 		status
 	};
 }
+
+
 /*
 $('.ui.checkbox').checkbox();
 <script type="text/javascript" src="${assetUrl({path: 'scripts.js'})}"></script>

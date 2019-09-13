@@ -326,12 +326,10 @@ export class StopWords extends React.Component {
 
 
 	render() {
-		const {
-			servicesBaseUrl,
-			TOOL_PATH
-		} = this.props;
+		const {servicesBaseUrl} = this.props;
 		const {stopWordsRes} = this.state;
 		return <>
+			<Header as='h1' content='Stop words'/>
 			<Table celled collapsing compact selectable singleLine sortable striped>
 				<Table.Header>
 					<Table.Row>

@@ -87,8 +87,8 @@ export class Journals extends React.Component {
 
 		await this.setState({loading: true});
 
-		const {serviceUrl} = this.props;
-		const uri = new Uri(serviceUrl);
+		const {servicesBaseUrl} = this.props;
+		const uri = new Uri(`${servicesBaseUrl}/journals`);
 		Object.entries(params).forEach(([k, v]) => {
 			//console.debug({k, v});
 			uri.replaceQueryParam(k, v);

@@ -19,9 +19,6 @@ export function list({
 }) {
 	const propsObj = {
 		servicesBaseUrl: serviceUrl({service: ''}),
-		serviceUrl: serviceUrl({
-			service: 'thesauri'
-		}),
 		TOOL_PATH
 	};
 

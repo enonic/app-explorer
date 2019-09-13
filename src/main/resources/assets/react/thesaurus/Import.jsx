@@ -5,8 +5,7 @@ export function Import(props) {
 	const {
 		name,
 		onClose,
-		servicesBaseUrl,
-		TOOL_PATH
+		servicesBaseUrl
 	} = props;
 	const [open, setOpen] = React.useState(false);
 	function doClose() {

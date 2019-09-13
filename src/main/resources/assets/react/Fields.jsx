@@ -70,8 +70,8 @@ function NewOrEditModal(props) {
 	} = values;
 
 	const doClose = () => {
-		onClose();
-		setOpen(false);
+		setOpen(false); // This needs to be before unmount.
+		onClose(); // This could trigger render in parent, and unmount this Component.
 	}
 	const onReset = () => {
 		setDirty({});
@@ -372,8 +372,8 @@ function DeleteModal(props) {
 						method: 'DELETE'
 					}).then(response => {
 						//if (response.status === 200) {}
-						setOpen(false);
-						onClose();
+						setOpen(false); // This needs to be before unmount.
+						onClose(); // This could trigger render in parent, and unmount this Component.
 					})
 				}}
 				size='tiny'

@@ -217,15 +217,7 @@ const WEBPACK_CONFIG = [webpackServerSideJs({
 }), CLIENT_JS_CONFIG, webpackEsmAssets({
 	__dirname,
 	assetFiles: [
-		'src/main/resources/assets/react/Collection.jsx',
-		'src/main/resources/assets/react/Collections.jsx',
-		'src/main/resources/assets/react/Fields.jsx',
-		'src/main/resources/assets/react/Interface.jsx',
-		'src/main/resources/assets/react/Interfaces.jsx',
-		'src/main/resources/assets/react/Search.jsx',
-		'src/main/resources/assets/react/Status.jsx',
-		'src/main/resources/assets/react/StopWords.jsx',
-		'src/main/resources/assets/react/Thesauri.jsx'
+		'src/main/resources/assets/react/Explorer.jsx'
 	],
 	externals: [
 		// Unable to load these via script or module:

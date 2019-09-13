@@ -30,7 +30,7 @@ function NewOrEditModal(props) {
 		closeIcon
 		onClose={onClose}
 		open={state.open}
-		size='fullscreen'
+		size='large'
 		trigger={name ? <Button
 			compact
 			disabled={disabled}

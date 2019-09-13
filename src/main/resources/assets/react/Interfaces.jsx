@@ -4,6 +4,7 @@ import {
 import generateUuidv4 from 'uuid/v4';
 
 import {Interface} from './Interface';
+import {Search} from './Search';
 
 
 function NewOrEditModal(props) {
@@ -108,6 +109,34 @@ function NewOrEditModal(props) {
 		</Modal.Content>
 	</Modal>;
 } // NewOrEditModal
+
+
+function SearchModal(props) {
+	const {
+		interfaceName,
+		servicesBaseUrl
+	} = props;
+	const [open, setOpen] = React.useState(false);
+	return <Modal
+		closeIcon
+		onClose={() => setOpen(false)}
+		open={open}
+		size='large'
+		trigger={<Button
+			compact
+			onClick={() => setOpen(true)}
+			size='tiny'
+		><Icon name='search'/>Search</Button>}
+	>
+		<Modal.Header>Search interface: {interfaceName}</Modal.Header>
+		<Modal.Content>
+			<Search
+				interfaceName={interfaceName}
+				servicesBaseUrl={servicesBaseUrl}
+			/>
+		</Modal.Content>
+	</Modal>;
+} // SearchModal
 
 
 export class CopyModal extends React.Component {
@@ -293,11 +322,7 @@ export class Interfaces extends React.Component {
 		//console.debug(this.props);
 		//console.debug(this.state.interfaces);
 
-		const {
-			servicesBaseUrl,
-			TOOL_PATH
-		} = this.props;
-		//console.debug(TOOL_PATH);
+		const {servicesBaseUrl} = this.props;
 
 		const {
 			collectionOptions,
@@ -337,13 +362,10 @@ export class Interfaces extends React.Component {
 										stopWordOptions={stopWordOptions}
 										thesauriOptions={thesauriOptions}
 									/>
-									<Button
-										as='a'
-										compact
-										href={`${TOOL_PATH}/interfaces/search/${name}`}
-										size='tiny'
-										type='button'
-									><Icon name='search'/>Search</Button>
+									<SearchModal
+										interfaceName={name}
+										servicesBaseUrl={servicesBaseUrl}
+									/>
 									<CopyModal
 										name={name}
 										updateInterfaces={() => this.updateInterfaces()}

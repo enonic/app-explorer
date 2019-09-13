@@ -126,7 +126,6 @@ export function ThesauriList(props) {
 export function Thesauri(props) {
 	//console.debug('Thesauri props', props);
 	const {
-		serviceUrl,
 		servicesBaseUrl,
 		TOOL_PATH
 	} = props;

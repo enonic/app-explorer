@@ -15,27 +15,14 @@ import {
 } from '/lib/explorer/model/2/constants';
 import {toolPage} from '/admin/tools/explorer/toolPage';
 
-import {about} from '/admin/tools/explorer/about';
-
-import {list as listCollections} from '/admin/tools/explorer/collections/list';
 import {collect} from '/admin/tools/explorer/collections/collect';
 import {gannt} from '/admin/tools/explorer/collections/gannt';
 import {stop} from '/admin/tools/explorer/collections/stop';
-import {status as collectorStatus} from '/admin/tools/explorer/collections/status';
-import {journal} from '/admin/tools/explorer/collections/journal';
 
-import {list as listFields} from '/admin/tools/explorer/fields/list';
 
-import {list as listStopWords} from '/admin/tools/explorer/stopWords/list';
-
-import {list as listThesauri} from '/admin/tools/explorer/thesauri/list';
 import {exportThesaurus} from '/admin/tools/explorer/thesauri/exportThesaurus';
 
-import {newOrEdit as newOrEditSynonym} from '/admin/tools/explorer/thesauri/synonyms/newOrEdit';
 import {handlePost as handleSynonymsPost} from '/admin/tools/explorer/thesauri/synonyms/handlePost';
-
-import {list as listInterfaces} from '/admin/tools/explorer/interfaces/list';
-import {search as searchInterface} from '/admin/tools/explorer/interfaces/search';
 
 
 const router = newRouter();
@@ -64,10 +51,6 @@ router.filter((req/*, next*/) => {
 	const action = pathParts[1];
 	const secondaryAction = pathParts[3];
 
-	if (tab === 'about') {
-		return about(req);
-	}
-
 	/*──────────────────────────────────────────────────────────────────────────
 	GET  /collections      -> LIST collections
 	GET  /collections/list -> LIST collections
@@ -84,26 +67,9 @@ router.filter((req/*, next*/) => {
 		case 'collect': return collect(req);
 		case 'gannt': return gannt(req);
 		case 'stop': return stop(req);
-		case 'journal': return journal(req);
-		case 'status': return collectorStatus(req);
-
-		case 'list': // fallthrough to default
-		default: return listCollections(req);
 		}
 	} // collections
 
-
-	/*──────────────────────────────────────────────────────────────────────────
-	 GET  /fields      -> LIST fields
-	 GET  /fields/list -> LIST fields
-	──────────────────────────────────────────────────────────────────────────*/
-	if (tab === 'fields') {
-		return listFields(req);
-	} // fields
-
-	if (tab === 'stopwords') {
-		return listStopWords(req);
-	}
 
 	/*──────────────────────────────────────────────────────────────────────────
 	GET  /thesauri      -> LIST thesauri
@@ -128,8 +94,6 @@ router.filter((req/*, next*/) => {
 		case 'export': return exportThesaurus(req);
 		case 'synonyms':
 			switch (secondaryAction) {
-			case 'new': // fallthrough to edit
-			case 'edit': return newOrEditSynonym(req);
 			case 'create': // fallthrough to update
 			case 'delete': // fallthrough to update
 			case 'update': return handleSynonymsPost(req);
@@ -137,20 +101,6 @@ router.filter((req/*, next*/) => {
 		default: return listThesauri(req);
 		}
 	} // thesauri
-
-	/*──────────────────────────────────────────────────────────────────────────
-	GET  /interfaces      -> LIST interfaces
-	GET  /interfaces/list -> LIST interfaces
-	GET  /interfaces/new -> EDIT NEW interface
-	GET  /interfaces/edit/interfaceName -> EDIT interface
-	GET  /interfaces/search/interfaceName -> Search interface
-	──────────────────────────────────────────────────────────────────────────*/
-	if (tab === 'interfaces') {
-		switch (action) {
-		case 'search': return searchInterface(req);
-		default: return listInterfaces(req);
-		}
-	}
 
 	return toolPage(req);
 });

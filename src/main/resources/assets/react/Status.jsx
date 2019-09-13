@@ -32,11 +32,11 @@ export class Status extends React.Component {
 
 
 	componentDidMount() {
-		const {serviceUrl} = this.props;
+		const {servicesBaseUrl} = this.props;
 
 		this.interval = setInterval(() => {
 			this.setState({ isLoading: true });
-			fetch(serviceUrl)
+			fetch(`${servicesBaseUrl}/listCollectors`)
 	      		.then(response => {
 					//console.debug(response);
 					return response.json()
