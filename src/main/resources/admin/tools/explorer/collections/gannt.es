@@ -1,11 +1,11 @@
-import {assetUrl} from '/lib/xp/portal';
+/*import {assetUrl} from '/lib/xp/portal';
 
 import {
 	PRINCIPAL_EXPLORER_READ,
 	TOOL_PATH
 } from '/lib/explorer/model/2/constants';
 import {connect} from '/lib/explorer/repo/connect';
-import {htmlResponse} from '/admin/tools/explorer/htmlResponse';
+import {htmlResponse} from '/admin/tools/explorer/htmlResponse';*/
 
 
 export function gannt({
@@ -15,7 +15,7 @@ export function gannt({
 	},
 	path
 }) {
-	const readConnection = connect({principals: PRINCIPAL_EXPLORER_READ});
+	/*const readConnection = connect({principals: PRINCIPAL_EXPLORER_READ});
 	return htmlResponse({
 		main: `
 <script src="${assetUrl({path: 'frappe-gantt/frappe-gantt.min.js'})}" />
@@ -38,5 +38,5 @@ var gantt = new Gantt("#gantt", tasks);
 		path,
 		status,
 		title: 'Gannt'
-	});
+	});*/
 } // function gannt

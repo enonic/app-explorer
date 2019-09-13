@@ -143,6 +143,7 @@ const SS_FILES = [
 	'src/main/resources/services/collectionDuplicate/collectionDuplicate',
 	'src/main/resources/services/collectionList/collectionList',
 	'src/main/resources/services/collectionModify/collectionModify',
+	'src/main/resources/services/collectorStop/collectorStop',
 	'src/main/resources/services/cronJobList/cronJobList',
 	'src/main/resources/services/fieldCreate/fieldCreate',
 	'src/main/resources/services/fieldDelete/fieldDelete',

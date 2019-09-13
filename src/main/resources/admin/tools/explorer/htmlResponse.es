@@ -50,8 +50,7 @@ export function htmlResponse({
 	const propsObj = {
 		defaultFields: DEFAULT_FIELDS.map(({_name})=>_name),
 		noValuesFields: NO_VALUES_FIELDS.map(({_name})=>_name),
-		servicesBaseUrl: serviceUrl({service: ''}),
-		TOOL_PATH
+		servicesBaseUrl: serviceUrl({service: ''})
 	};
 
 	const collectorsAppToUri = {};

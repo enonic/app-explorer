@@ -114,8 +114,7 @@ function DeleteModal(props) {
 export function Collections(props) {
 	const {
 		collectorsObj,
-		servicesBaseUrl,
-		TOOL_PATH
+		servicesBaseUrl
 	} = props;
 
 	const [state, setState] = React.useState({
@@ -266,7 +265,7 @@ export function Collections(props) {
 									})
 								}} size='tiny'><Icon color='blue' name='copy'/>Duplicate</Button>
 								<Button as='a' compact disabled={disabled} href={`${servicesBaseUrl}/collectionCollect?name=${name}`} size='tiny'><Icon color='green' name='cloud download'/>Collect</Button>
-								<Button as='a' compact disabled={disabled} href={`${TOOL_PATH}/collections/stop/${name}`} size='tiny'><Icon color='red' name='stop'/>Stop</Button>
+								<Button as='a' compact disabled={disabled} href={`${servicesBaseUrl}/collectorStop?collectionName=${name}`} size='tiny'><Icon color='red' name='stop'/>Stop</Button>
 								<DeleteModal name={name} onClose={() => fetchCollections()} servicesBaseUrl={servicesBaseUrl}/>
 							</Table.Cell>
 						</Table.Row>;

@@ -72,8 +72,7 @@ export function Explorer(props) {
 		collectorsObj,
 		defaultFields,
 		noValuesFields,
-		servicesBaseUrl,
-		TOOL_PATH
+		servicesBaseUrl
 	} = props;
 
 	const [page, setPage] = React.useState('home');
@@ -165,7 +164,6 @@ export function Explorer(props) {
 				{page === 'collections' && <Collections
 					collectorsObj={collectorsObj}
 					servicesBaseUrl={servicesBaseUrl}
-					TOOL_PATH={TOOL_PATH}
 				/>}
 				{page === 'status' && <Status
 					servicesBaseUrl={servicesBaseUrl}

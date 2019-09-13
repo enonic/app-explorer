@@ -10,13 +10,9 @@ import {hasRole} from '/lib/xp/auth';
 //──────────────────────────────────────────────────────────────────────────────
 import {
 	ROLE_SYSTEM_ADMIN,
-	ROLE_EXPLORER_ADMIN,
-	TOOL_PATH
+	ROLE_EXPLORER_ADMIN
 } from '/lib/explorer/model/2/constants';
 import {toolPage} from '/admin/tools/explorer/toolPage';
-
-import {gannt} from '/admin/tools/explorer/collections/gannt';
-import {stop} from '/admin/tools/explorer/collections/stop';
 
 
 const router = newRouter();
@@ -35,32 +31,6 @@ const router = newRouter();
 router.filter((req/*, next*/) => {
 	if (!(hasRole(ROLE_EXPLORER_ADMIN) || hasRole(ROLE_SYSTEM_ADMIN))) { return { status: 401 }; }
 	//log.info(toStr({method: req.method})); // form method only supports get and post
-
-	const {method, path} = req;
-	const relPath = path.replace(TOOL_PATH, ''); //log.info(toStr({relPath}));
-	if (!relPath) { return toolPage(req); }
-
-	const pathParts = relPath.match(/[^/]+/g); //log.info(toStr({pathParts}));
-	const tab = pathParts[0];
-	const action = pathParts[1];
-	const secondaryAction = pathParts[3];
-
-	/*──────────────────────────────────────────────────────────────────────────
-	GET  /collections      -> LIST collections
-	GET  /collections/list -> LIST collections
-
-	GET  /collections/stop/name           -> STOP collector
-
-	GET  /collections/status
-	GET  /collections/journal
-	──────────────────────────────────────────────────────────────────────────*/
-
-	if (tab === 'collections') {
-		switch (action) {
-		case 'gannt': return gannt(req);
-		case 'stop': return stop(req);
-		}
-	} // collections
 
 	return toolPage(req);
 });
