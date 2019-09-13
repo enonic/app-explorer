@@ -265,7 +265,7 @@ export function Collections(props) {
 										fetchCollections()
 									})
 								}} size='tiny'><Icon color='blue' name='copy'/>Duplicate</Button>
-								<Button as='a' compact disabled={disabled} href={`${TOOL_PATH}/collections/collect/${name}`} size='tiny'><Icon color='green' name='cloud download'/>Collect</Button>
+								<Button as='a' compact disabled={disabled} href={`${servicesBaseUrl}/collectionCollect?name=${name}`} size='tiny'><Icon color='green' name='cloud download'/>Collect</Button>
 								<Button as='a' compact disabled={disabled} href={`${TOOL_PATH}/collections/stop/${name}`} size='tiny'><Icon color='red' name='stop'/>Stop</Button>
 								<DeleteModal name={name} onClose={() => fetchCollections()} servicesBaseUrl={servicesBaseUrl}/>
 							</Table.Cell>

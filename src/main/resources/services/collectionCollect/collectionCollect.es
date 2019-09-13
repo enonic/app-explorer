@@ -1,13 +1,10 @@
-//import {parse as parseCookie} from 'cookie';
-
 //import {toStr} from '/lib/util';
-import {forceArray} from '/lib/util/data';
 import {assetUrl} from '/lib/xp/portal';
 import {submitNamed} from '/lib/xp/task';
-import {request as httpClientRequest} from '/lib/http-client';
+
 import {
 	PRINCIPAL_EXPLORER_READ,
-	TOOL_PATH
+	RT_JSON
 } from '/lib/explorer/model/2/constants';
 import {connect} from '/lib/explorer/repo/connect';
 import {get as getCollection} from '/lib/explorer/collection/get';
@@ -15,35 +12,25 @@ import {query as queryCollectors} from '/lib/explorer/collector/query';
 import {getTasksWithPropertyValue} from '/lib/explorer/task/getTasksWithPropertyValue';
 
 
-//import {TASK_COLLECT} from '/lib/explorer/model/2/constants';
-
-
-
-export const collect = ({
-	path,
-	method,
+export function get({
 	params: {
-		resume
+		name,
+		resume = false
 	}
-}) => {
-	//log.info(toStr({path, method}));
-
-	const relPath = path.replace(TOOL_PATH, '');
-
-	const pathParts = relPath.match(/[^/]+/g);
-	const collectionName = pathParts[2];
-
-	const messages = [];
+}) {
+	//log.info(`name:${name} resume:${resume}`);
+	const body = {};
 	let status = 200;
 
 	const runningTasksWithName = getTasksWithPropertyValue({
-		value: collectionName,
+		value: name,
 		state: 'RUNNING'
 	});
+
 	if (runningTasksWithName.length) {
 		const alreadyRunningtaskId = runningTasksWithName[0].id;
 		status = 500;
-		messages.push(`Already collecting to ${collectionName} under taskId ${alreadyRunningtaskId}!`);
+		body.error = `Already collecting to ${name} under taskId ${alreadyRunningtaskId}!`;
 		//log.info(toStr({alreadyRunningtaskId}));
 	} else {
 		const connection = connect({
@@ -51,12 +38,11 @@ export const collect = ({
 		});
 		const collectionNode = getCollection({
 			connection,
-			name: collectionName
+			name
 		});
 		//log.info(toStr({collectionNode}));
 
 		const {
-			_name: name,
 			collector: {
 				name: collectorName,
 				configJson: incomingConfigJson
@@ -104,12 +90,12 @@ export const collect = ({
 		//log.info(toStr({submitNamedParams}));
 
 		const taskId = submitNamed(submitNamedParams);
-		messages.push(`Started collecting ${collectionName} with taskId ${taskId}`);
-		//log.info(toStr({taskId}));
+		body.messages = `Started collecting ${name} with taskId ${taskId}`;
 	}
+
 	return {
-		redirect: `${TOOL_PATH}/collections/list?${
-			messages.map(m => `messages=${encodeURIComponent(m)}`).join('&')
-		}&status=${status}`
-	}
-}; // collect
+		body,
+		contentType: RT_JSON,
+		status
+	};
+} // get

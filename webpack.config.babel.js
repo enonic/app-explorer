@@ -137,6 +137,7 @@ const SS_EXTERNALS = [
 
 const SS_FILES = [
 	'src/main/resources/main',
+	'src/main/resources/services/collectionCollect/collectionCollect',
 	'src/main/resources/services/collectionCreate/collectionCreate',
 	'src/main/resources/services/collectionDelete/collectionDelete',
 	'src/main/resources/services/collectionDuplicate/collectionDuplicate',

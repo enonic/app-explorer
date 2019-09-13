@@ -15,7 +15,6 @@ import {
 } from '/lib/explorer/model/2/constants';
 import {toolPage} from '/admin/tools/explorer/toolPage';
 
-import {collect} from '/admin/tools/explorer/collections/collect';
 import {gannt} from '/admin/tools/explorer/collections/gannt';
 import {stop} from '/admin/tools/explorer/collections/stop';
 
@@ -50,7 +49,6 @@ router.filter((req/*, next*/) => {
 	GET  /collections      -> LIST collections
 	GET  /collections/list -> LIST collections
 
-	GET  /collections/collect/name?params -> COLLECT collection
 	GET  /collections/stop/name           -> STOP collector
 
 	GET  /collections/status
@@ -59,7 +57,6 @@ router.filter((req/*, next*/) => {
 
 	if (tab === 'collections') {
 		switch (action) {
-		case 'collect': return collect(req);
 		case 'gannt': return gannt(req);
 		case 'stop': return stop(req);
 		}
