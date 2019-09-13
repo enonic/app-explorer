@@ -20,11 +20,6 @@ import {gannt} from '/admin/tools/explorer/collections/gannt';
 import {stop} from '/admin/tools/explorer/collections/stop';
 
 
-import {exportThesaurus} from '/admin/tools/explorer/thesauri/exportThesaurus';
-
-import {handlePost as handleSynonymsPost} from '/admin/tools/explorer/thesauri/synonyms/handlePost';
-
-
 const router = newRouter();
 
 
@@ -69,38 +64,6 @@ router.filter((req/*, next*/) => {
 		case 'stop': return stop(req);
 		}
 	} // collections
-
-
-	/*──────────────────────────────────────────────────────────────────────────
-	GET  /thesauri      -> LIST thesauri
-	GET  /thesauri/list -> LIST thesauri
-
-	GET  /thesauri/export/thesaurusName -> EXPORT thesaurus
-
-	GET  /thesauri/edit/thesaurusName   -> EDIT thesaurus (lists values)
-	GET  /thesauri/delete/thesaurusName -> CONFIRM DELETE thesaurus
-	POST /thesauri/delete/thesaurusName -> DELETE thesaurus
-	POST /thesauri/update/thesaurusName -> UPDATE thesaurus
-
-	GET  /thesauri/synonyms/thesaurusName/new -> EDIT new synonym
-	POST  /thesauri/synonyms/thesaurusName/create/synonymName -> Create new synonym
-
-	GET  /thesauri/synonyms/thesaurusName/edit/synonymName -> EDIT synonym
-	GET  /thesauri/synonyms/thesaurusName/delete/synonymName -> DELETE synonym
-	GET  /thesauri/synonyms/thesaurusName/update/synonymName -> UPDATE synonym
-	──────────────────────────────────────────────────────────────────────────*/
-	if (tab === 'thesauri') {
-		switch (action) {
-		case 'export': return exportThesaurus(req);
-		case 'synonyms':
-			switch (secondaryAction) {
-			case 'create': // fallthrough to update
-			case 'delete': // fallthrough to update
-			case 'update': return handleSynonymsPost(req);
-			} // synonyms
-		default: return listThesauri(req);
-		}
-	} // thesauri
 
 	return toolPage(req);
 });

@@ -19,7 +19,7 @@ export function Import(props) {
 		trigger={<Button
 			compact
 			onClick={() => setOpen(true)}
-			size='tiny'><Icon color='blue' name='upload'/> Import csv</Button>}
+			size='tiny'><Icon color='blue' name='upload'/>Import</Button>}
 	>
 		<Modal.Header>Import to thesaurus {name}</Modal.Header>
 		<Modal.Content>

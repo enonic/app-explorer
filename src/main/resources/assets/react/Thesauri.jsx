@@ -10,8 +10,7 @@ import {Import} from './thesaurus/Import';
 export function ThesauriList(props) {
 	//console.debug('Thesauri props', props);
 	const {
-		servicesBaseUrl,
-		TOOL_PATH
+		servicesBaseUrl
 	} = props;
 
 	const [isLoading, setLoading] = React.useState(false);
@@ -90,14 +89,13 @@ export function ThesauriList(props) {
 									name={name}
 									onClose={fetchThesauri}
 									servicesBaseUrl={servicesBaseUrl}
-									TOOL_PATH={TOOL_PATH}
 								/>
 								<Button
 									as='a'
 									compact
-									href={`${TOOL_PATH}/thesauri/export/${name}.csv`}
+									href={`${servicesBaseUrl}/thesaurusExport?name=${name}`}
 									size='tiny'
-								><Icon color='blue' name='download'/>{`${name}.csv`}</Button>
+								><Icon color='blue' name='download'/>Export</Button>
 							</Table.Cell>
 						</Table.Row>
 					})}
@@ -125,15 +123,11 @@ export function ThesauriList(props) {
 
 export function Thesauri(props) {
 	//console.debug('Thesauri props', props);
-	const {
-		servicesBaseUrl,
-		TOOL_PATH
-	} = props;
+	const {servicesBaseUrl} = props;
 	return <>
 		<Header as='h1'>Thesauri</Header>
 		<ThesauriList
 			servicesBaseUrl={servicesBaseUrl}
-			TOOL_PATH={TOOL_PATH}
 		/>
 	</>;
 }

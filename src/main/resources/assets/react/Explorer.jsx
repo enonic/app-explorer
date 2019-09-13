@@ -183,7 +183,6 @@ export function Explorer(props) {
 				/>}
 				{page === 'thesauri' && <Thesauri
 					servicesBaseUrl={servicesBaseUrl}
-					TOOL_PATH={TOOL_PATH}
 				/>}
 				{page === 'interfaces' && <Interfaces
 					servicesBaseUrl={servicesBaseUrl}

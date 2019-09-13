@@ -169,6 +169,7 @@ const SS_FILES = [
 	'src/main/resources/services/thesauri/thesauri',
 	'src/main/resources/services/thesaurusCreate/thesaurusCreate',
 	'src/main/resources/services/thesaurusDelete/thesaurusDelete',
+	'src/main/resources/services/thesaurusExport/thesaurusExport',
 	'src/main/resources/services/thesaurusImport/thesaurusImport',
 	'src/main/resources/services/thesaurusList/thesaurusList',
 	'src/main/resources/services/thesaurusUpdate/thesaurusUpdate',
