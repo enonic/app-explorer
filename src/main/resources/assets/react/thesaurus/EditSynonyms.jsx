@@ -1,0 +1,328 @@
+import Uri from 'jsuri';
+import {
+	Button, Dropdown, Form, Header, Icon, Loader, Modal, Pagination, Table
+} from 'semantic-ui-react';
+
+import {NewOrEditSynonym} from './NewOrEditSynonym';
+import {DeleteSynonym} from './DeleteSynonym';
+
+
+export function EditSynonyms(props) {
+	//console.debug('EditSynonyms props', props);
+	const {
+		onClose,
+		servicesBaseUrl,
+		thesaurusId,
+		thesaurusName
+	} = props;
+
+	const [open, setOpen] = React.useState(false);
+	const [state, setState] = React.useState({
+		column: 'from',
+		direction: 'ascending',
+		isLoading: true,
+		params: {
+			from: '',
+			perPage: 10,
+			page: 1,
+			query: '',
+			sort: 'from ASC',
+			thesauri: thesaurusName ? [thesaurusName] : [],
+			to: ''
+		},
+		result: {
+			aggregations: {
+				thesaurus: {
+					buckets: []
+				}
+			}
+		}
+	});
+
+	function querySynonyms() {
+		console.debug('querySynonyms state', state);
+		const {params} = state;
+		setState(prev => {
+			const deref = JSON.parse(JSON.stringify(prev));
+			deref.isLoading = true;
+			return deref;
+		});
+		const uri = new Uri(`${servicesBaseUrl}/thesauri`);
+		Object.entries(params).forEach(([k, v]) => {
+			//console.debug({k, v});
+			uri.replaceQueryParam(k, v);
+		});
+		const uriStr = uri.toString();
+		//console.debug('uriStr', uriStr);
+		fetch(uriStr)
+			.then(response => response.json())
+			.then(data => {
+				//console.debug('data', data);
+				setState(prev => {
+					const deref = JSON.parse(JSON.stringify(prev));
+					deref.isLoading = false;
+					deref.result = data.queryResult;
+					return deref;
+				});
+			})
+	} // querySynonyms
+
+	function changeParam({name, value}) {
+		console.debug('changeParam name', name, 'value', value);
+		setState(prevState => {
+			const deref = JSON.parse(JSON.stringify(prevState));
+			deref.params[name] = value;
+			if (name !== 'page') {
+				deref.params.page = 1;
+			}
+			return deref;
+		});
+	} // changeParam
+
+	function setSort({column, direction}) {
+		console.debug('setSort column', column, 'direction', direction);
+		setState(prev => {
+			const deref = JSON.parse(JSON.stringify(prev));
+			deref.column = column;
+			deref.direction = direction;
+			deref.params.sort = `${column} ${direction === 'ascending' ? 'ASC' : 'DESC'}`;
+			return deref;
+		});
+	} // changeSort
+
+	function doClose() {
+		onClose();
+		setOpen(false);
+	}
+
+	const handleSortGenerator = (clickedColumn) => () => {
+		const {
+			column,
+			direction
+		} = state;
+		console.debug('handleSortGenerator clickedColumn', clickedColumn, 'column', column, 'direction', direction);
+
+		setSort({
+			column: clickedColumn,
+			direction: clickedColumn === column
+				? (direction === 'ascending'
+					? 'descending'
+					: 'ascending'
+				) : 'ascending'
+		});
+	} // handleSortGenerator
+	//console.debug('state', state);
+
+	const {
+		column,
+		direction,
+		isLoading,
+		params: {
+			from,
+			perPage,
+			sort,
+			thesauri,
+			to
+		},
+		result
+	} = state;
+	//console.debug('column', column, 'direction', direction, 'sort', sort);
+
+	/*React.useEffect(() => {
+		querySynonyms();
+		/*return () => {
+			console.debug('useEffect from', from, 'perPage', perPage, 'sort', sort, 'thesauri', thesauri, 'to', to);
+			querySynonyms();
+		};
+	}, [from, perPage, sort, thesauri, to]);*/
+
+	/*React.useLayoutEffect(() => {
+		//querySynonyms();
+		return () => {
+			console.debug('useLayoutEffect from', from, 'perPage', perPage, 'sort', sort, 'thesauri', thesauri, 'to', to);
+		};
+	}, [from, perPage, sort, thesauri, to]);*/
+
+	const {
+		aggregations,
+		end,
+		page,
+		start,
+		total,
+		totalPages
+	} = result;
+
+	return <Modal
+		closeIcon
+		onClose={doClose}
+		onOpen={() => {
+			console.debug('onOpen');
+			//querySynonyms();
+		}}
+		open={open}
+		size='fullscreen'
+		trigger={thesaurusId ? <Button
+			compact
+			onClick={() => setOpen(true)}
+			size='tiny'><Icon color='blue' name='edit'/> Edit synonyms</Button> : <Button
+			compact
+			onClick={() => setOpen(true)}
+			size='tiny'><Icon color='blue' name='edit'/> Edit all synonyms</Button>}>
+		<Modal.Header>{thesaurusId ? 'Edit synonyms' : 'Edit all synonyms'}</Modal.Header>
+		<Modal.Content>
+			<Form>
+				<Header as='h4'><Icon name='filter'/> Filter</Header>
+				<Form.Field>
+					<input
+						fluid='true'
+						label='From'
+						onChange={({target:{value}}) => changeParam({name:'from', value})}
+						placeholder='From'
+						value={from}
+					/>
+				</Form.Field>
+				<Form.Field>
+					<input
+						fluid='true'
+						label='To'
+						onChange={({target:{value}}) => changeParam({name:'to', value})}
+						placeholder='To'
+						value={to}
+					/>
+				</Form.Field>
+
+				{thesaurusId ? null : <>
+					<Header as='h4'><Icon name='font'/> Thesauri</Header>
+					<Dropdown
+						defaultValue={thesauri}
+						fluid
+						multiple={true}
+						name='thesauri'
+						onChange={(e, {value}) => changeParam({name: 'thesauri', value})}
+						options={aggregations.thesaurus.buckets.map(({key, docCount}) => {
+							const tName = key.replace('/thesauri/', '');
+							return {
+								key: tName,
+								text: `${tName} (${docCount})`,
+								value: tName
+							};
+						})}
+						search
+						selection
+					/>
+				</>}
+
+				<Header as='h4'><Icon name='resize vertical'/> Per page</Header>
+				<Form.Field>
+					<Dropdown
+						defaultValue={perPage}
+						fluid
+						onChange={(e,{value}) => changeParam({name: 'perPage', value})}
+						options={[5,10,25,50,100].map(key => ({key, text: `${key}`, value: key}))}
+						selection
+					/>
+				</Form.Field>
+
+				{/*<Header as='h4'><Icon name='sort'/> Sort</Header>
+				<Form.Field>
+					<Dropdown
+						defaultValue={sort}
+						fluid
+						onChange={(e,{value}) => changeParam({name: 'sort', value})}
+						options={[{
+							key: '_score DESC',
+							text: 'Score descending',
+							value: '_score DESC'
+						}, {
+							key: 'from ASC',
+							text: 'From ascending',
+							value: 'from ASC'
+						}]}
+						selection
+					/>
+				</Form.Field>*/}
+			</Form>
+			{isLoading
+				? <Loader active inverted>Loading</Loader>
+				: <>
+					<Table celled compact selectable sortable striped attached='top'>
+						<Table.Header>
+							<Table.Row>
+								<Table.HeaderCell
+									onClick={handleSortGenerator('from')}
+									sorted={column === 'from' ? direction : null}
+								>From</Table.HeaderCell>
+								<Table.HeaderCell
+									onClick={handleSortGenerator('to')}
+									sorted={column === 'to' ? direction : null}
+								>To</Table.HeaderCell>
+								{thesaurusId ? null : <Table.HeaderCell
+									onClick={handleSortGenerator('_parentPath')}
+									sorted={column === '_parentPath' ? direction : null}
+								>Thesaurus</Table.HeaderCell>}
+								<Table.HeaderCell
+									onClick={handleSortGenerator('_score')}
+									sorted={column === '_score' ? direction : null}
+								>Score</Table.HeaderCell>
+								<Table.HeaderCell>Actions</Table.HeaderCell>
+							</Table.Row>
+						</Table.Header>
+						<Table.Body>
+							{result.hits.map(({
+								from = [''],
+								id,
+								name,
+								score,
+								thesaurus,
+								thesaurusReference,
+								to = ['']
+							}, i) => <Table.Row key={i}>
+								<Table.Cell>{(Array.isArray(from) ? from : [from]).join(', ')}</Table.Cell>
+								<Table.Cell>{(Array.isArray(to) ? to : [to]).join(', ')}</Table.Cell>
+								{thesaurusId ? null : <Table.Cell>{thesaurus}</Table.Cell>}
+								<Table.Cell>{score}</Table.Cell>
+								<Table.Cell>
+									<NewOrEditSynonym
+										id={id}
+										from={from}
+										onClose={querySynonyms}
+										servicesBaseUrl={servicesBaseUrl}
+										to={to}
+										thesaurusId={thesaurusReference}
+									/>
+									<DeleteSynonym
+										id={id}
+										from={from}
+										onClose={querySynonyms}
+										servicesBaseUrl={servicesBaseUrl}
+										thesaurusId={thesaurusReference}
+										to={to}
+									/>
+								</Table.Cell>
+							</Table.Row>)}
+						</Table.Body>
+					</Table>
+					<Pagination
+						attached='bottom'
+						fluid
+						size='mini'
+
+						activePage={page}
+						boundaryRange={1}
+						siblingRange={1}
+						totalPages={totalPages}
+
+						ellipsisItem={{content: <Icon name='ellipsis horizontal' />, icon: true}}
+						firstItem={{content: <Icon name='angle double left' />, icon: true}}
+						prevItem={{content: <Icon name='angle left' />, icon: true}}
+						nextItem={{content: <Icon name='angle right' />, icon: true}}
+						lastItem={{content: <Icon name='angle double right' />, icon: true}}
+
+						onPageChange={(e,{activePage}) => changeParam({name: 'page', value: activePage})}
+					/>
+					<p>Displaying {start}-{end} of {total}</p>
+				</>
+			}
+		</Modal.Content>
+	</Modal>;
+} // EditSynonyms
