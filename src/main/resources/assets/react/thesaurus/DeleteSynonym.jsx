@@ -14,10 +14,9 @@ export function DeleteSynonym(props) {
 		to
 	} = props;
 	const [open, setOpen] = React.useState(false);
-	function doOpen() { setOpen(true); }
 	function doClose() {
-		onClose();
-		setOpen(false);
+		setOpen(false); // This needs to be before unmount.
+		onClose(); // This could trigger render in parent, and unmount this Component.
 	}
 	return <Modal
 		closeIcon

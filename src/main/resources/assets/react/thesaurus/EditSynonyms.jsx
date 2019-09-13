@@ -90,11 +90,6 @@ export function EditSynonyms(props) {
 		querySynonyms({sort: `${column} ${direction === 'ascending' ? 'ASC' : 'DESC'}`});
 	} // changeSort
 
-	function doClose() {
-		onClose();
-		setOpen(false);
-	}
-
 	const handleSortGenerator = (clickedColumn) => () => {
 		const {
 			column,
@@ -139,7 +134,7 @@ export function EditSynonyms(props) {
 
 	return <Modal
 		closeIcon
-		onClose={doClose}
+		onClose={onClose}
 		onOpen={() => {
 			//console.debug('onOpen');
 			querySynonyms();
@@ -306,6 +301,11 @@ export function EditSynonyms(props) {
 						onPageChange={(e,{activePage}) => querySynonyms({page: activePage})}
 					/>
 					<p>Displaying {start}-{end} of {total}</p>
+					{thesaurusId && <NewOrEditSynonym
+						onClose={querySynonyms}
+						servicesBaseUrl={servicesBaseUrl}
+						thesaurusId={thesaurusId}
+					/>}
 				</>
 			}
 		</Modal.Content>
