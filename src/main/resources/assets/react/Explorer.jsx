@@ -79,6 +79,11 @@ export function Explorer(props) {
 	const [sideBarVisible, setSideBarVisible] = React.useState(true);
 	const [pusherWidth, setPusherWidth] = React.useState('calc(100% - 260px)');
 
+	React.useEffect(() => {
+		const hashPage = window.location.hash.substring(1);
+		if (hashPage) { setPage(hashPage); }
+	}, []);
+
 	return <>
 		<Menu fixed='top' inverted style={{zIndex: 103}}>
 			<Menu.Item as='a' onClick={() => setSideBarVisible(!sideBarVisible)}>
@@ -105,43 +110,61 @@ export function Explorer(props) {
 				visible={sideBarVisible}
 			>
 				<Menu.Item
+					as='a'
+					href='#home'
 					active={page === 'home'}
 					onClick={() => setPage('home')}
 				><Icon name='search'/> Home</Menu.Item>
 
 				<Menu.Item
+					as='a'
+					href='#collections'
 					active={page === 'collections'}
 					onClick={() => setPage('collections')}
 				><Icon name='database'/> Collections</Menu.Item>
 				{['collections', 'status', 'journal'].includes(page) &&
 				<Menu.Menu>
 					<Menu.Item
+						as='a'
+						href='#status'
 						active={page === 'status'}
 						onClick={() => setPage('status')}
 					><Icon name='cogs'/> Status</Menu.Item>
 					<Menu.Item
+						as='a'
+						href='#journal'
 						active={page === 'journal'}
 						onClick={() => setPage('journal')}
 					><Icon name='newspaper'/> Journal</Menu.Item>
 				</Menu.Menu>}
 
 				<Menu.Item
+					as='a'
+					href='#fields'
 					active={page === 'fields'}
 					onClick={() => setPage('fields')}
 				><Icon name='sitemap'/> Fields</Menu.Item>
 				<Menu.Item
+					as='a'
+					href='#stopWords'
 					active={page === 'stopWords'}
 					onClick={() => setPage('stopWords')}
 				><Icon name='crop'/> StopWords</Menu.Item>
 				<Menu.Item
+					as='a'
+					href='#thesauri'
 					active={page === 'thesauri'}
 					onClick={() => setPage('thesauri')}
 				><Icon name='font'/> Thesauri</Menu.Item>
 				<Menu.Item
+					as='a'
+					href='#interfaces'
 					active={page === 'interfaces'}
 					onClick={() => setPage('interfaces')}
 				><Icon name='plug'/> Interfaces</Menu.Item>
 				<Menu.Item
+					as='a'
+					href='#about'
 					active={page === 'about'}
 					onClick={() => setPage('about')}
 				><Icon name='info'/> About</Menu.Item>
