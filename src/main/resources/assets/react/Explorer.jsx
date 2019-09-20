@@ -113,6 +113,7 @@ export function Explorer(props) {
 					active={page === 'collections'}
 					onClick={() => setPage('collections')}
 				><Icon name='database'/> Collections</Menu.Item>
+				{['collections', 'status', 'journal'].includes(page) &&
 				<Menu.Menu>
 					<Menu.Item
 						active={page === 'status'}
@@ -122,7 +123,7 @@ export function Explorer(props) {
 						active={page === 'journal'}
 						onClick={() => setPage('journal')}
 					><Icon name='newspaper'/> Journal</Menu.Item>
-				</Menu.Menu>
+				</Menu.Menu>}
 
 				<Menu.Item
 					active={page === 'fields'}
