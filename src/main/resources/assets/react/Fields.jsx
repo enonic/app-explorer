@@ -9,8 +9,6 @@ import {DeleteModal} from './fields/DeleteModal';
 
 export function Fields(props) {
 	const {
-		defaultFields = [],
-		noValuesFields = [],
 		servicesBaseUrl
 	} = props;
 
@@ -110,6 +108,8 @@ export function Fields(props) {
 					</Table.Header>
 					<Table.Body>
 						{fieldsRes.hits.map(({
+							denyDelete = false,
+							denyValues = false,
 							displayName = '',
 							fieldType = 'text',
 							key,
@@ -123,7 +123,6 @@ export function Fields(props) {
 							path,
 							valuesRes
 						}, index) => {
-							const boolDefaultField = defaultFields.includes(name);
 							return <Table.Row key={`field[${index}]`}>
 								<Table.Cell>{key}</Table.Cell>
 								<Table.Cell>{displayName}</Table.Cell>
@@ -132,7 +131,7 @@ export function Fields(props) {
 								<Table.Cell>
 									<Button.Group>
 										<NewOrEditModal
-											disabled={boolDefaultField}
+											disabled={denyValues}
 											field={name}
 											initialValues={{
 												displayName,
@@ -150,7 +149,7 @@ export function Fields(props) {
 											servicesBaseUrl={servicesBaseUrl}
 										/>
 										<DeleteModal
-											disabled={boolDefaultField}
+											disabled={denyDelete}
 											name={name}
 											onClose={fetchFields}
 											servicesBaseUrl={servicesBaseUrl}

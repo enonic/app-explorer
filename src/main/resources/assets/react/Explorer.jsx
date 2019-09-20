@@ -70,8 +70,6 @@ export function Explorer(props) {
 	//console.debug('Explorer props', props);
 	const {
 		collectorsObj,
-		defaultFields,
-		noValuesFields,
 		servicesBaseUrl
 	} = props;
 
@@ -196,8 +194,6 @@ export function Explorer(props) {
 					servicesBaseUrl={servicesBaseUrl}
 				/>}
 				{page === 'fields' && <Fields
-					defaultFields={defaultFields}
-					noValuesFields={noValuesFields}
 					servicesBaseUrl={servicesBaseUrl}
 				/>}
 				{page === 'stopWords' && <StopWords

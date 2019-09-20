@@ -11,8 +11,6 @@ import {
 import {assetUrl, serviceUrl} from '/lib/xp/portal';
 
 import {
-	DEFAULT_FIELDS,
-	NO_VALUES_FIELDS,
 	PRINCIPAL_EXPLORER_READ,
 	TOOL_PATH
 } from '/lib/explorer/model/2/constants';
@@ -48,8 +46,6 @@ export function htmlResponse({
 	const licenseValid = licenseDetails && !licenseDetails.expired;
 
 	const propsObj = {
-		defaultFields: DEFAULT_FIELDS.map(({_name})=>_name),
-		noValuesFields: NO_VALUES_FIELDS.map(({_name})=>_name),
 		servicesBaseUrl: serviceUrl({service: ''})
 	};
 
