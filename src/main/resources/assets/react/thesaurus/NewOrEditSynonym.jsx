@@ -1,5 +1,5 @@
 import {
-	Button, Form, Header, Icon, Input, Modal, Table
+	Button, Form, Header, Icon, Input, Modal, Popup, Table
 } from 'semantic-ui-react';
 
 import {Form as EnonicForm} from '../enonic/Form';
@@ -54,14 +54,20 @@ export function NewOrEditSynonym(props) {
 		closeIcon
 		onClose={doClose}
 		open={open}
-		trigger={id ? <Button
-			compact
-			onClick={() => setOpen(true)}
-			size='tiny'><Icon color='blue' name='edit'/> Edit synonym</Button>
-			: <Button
-				compact
+		trigger={id ? <Popup
+			content={`Edit synonym`}
+			inverted
+			trigger={<Button
+				icon
 				onClick={() => setOpen(true)}
-				size='tiny'><Icon color='green' name='plus'/> New synonym</Button>
+			><Icon color='blue' name='edit'/></Button>}/>
+			: <Popup
+				content={`New synonym`}
+				inverted
+				trigger={<Button
+					icon
+					onClick={() => setOpen(true)}
+				><Icon color='green' name='plus'/></Button>}/>
 		}
 	>
 		<Modal.Header>{id ? `Edit synonym ${id}` : `New synonym`}</Modal.Header>

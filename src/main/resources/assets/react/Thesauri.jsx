@@ -1,7 +1,7 @@
-import {Button, Header, Icon, Loader, Table} from 'semantic-ui-react';
+import {Button, Header, Icon, Loader, Popup, Table} from 'semantic-ui-react';
 
-import {EditSynonyms} from './thesaurus/EditSynonyms';
-import {NewOrEditSynonym} from './thesaurus/NewOrEditSynonym';
+import {EditSynonymsModal} from './thesaurus/EditSynonymsModal';
+//import {NewOrEditSynonym} from './thesaurus/NewOrEditSynonym';
 import {NewOrEditThesaurus} from './thesaurus/NewOrEditThesaurus';
 import {DeleteThesaurus} from './thesaurus/DeleteThesaurus';
 import {Import} from './thesaurus/Import';
@@ -61,41 +61,46 @@ export function ThesauriList(props) {
 							<Table.Cell>{displayName}</Table.Cell>
 							<Table.Cell>{synonymsCount}</Table.Cell>
 							<Table.Cell>
-								<NewOrEditSynonym
-									onClose={fetchThesauri}
-									servicesBaseUrl={servicesBaseUrl}
-									thesaurusId={id}
-								/>
-								<EditSynonyms
-									onClose={fetchThesauri}
-									servicesBaseUrl={servicesBaseUrl}
-									thesaurusId={id}
-									thesaurusName={name}
-								/>
-								<NewOrEditThesaurus
-									displayName={displayName}
-									id={id}
-									name={name}
-									onClose={fetchThesauri}
-									servicesBaseUrl={servicesBaseUrl}
-								/>
-								<DeleteThesaurus
-									id={id}
-									name={name}
-									onClose={fetchThesauri}
-									servicesBaseUrl={servicesBaseUrl}
-								/>
-								<Import
-									name={name}
-									onClose={fetchThesauri}
-									servicesBaseUrl={servicesBaseUrl}
-								/>
-								<Button
-									as='a'
-									compact
-									href={`${servicesBaseUrl}/thesaurusExport?name=${name}`}
-									size='tiny'
-								><Icon color='blue' name='download'/>Export</Button>
+								<Button.Group>
+									{/*<NewOrEditSynonym
+										onClose={fetchThesauri}
+										servicesBaseUrl={servicesBaseUrl}
+										thesaurusId={id}
+									/>*/}
+									{/*<EditSynonymsModal
+										onClose={fetchThesauri}
+										servicesBaseUrl={servicesBaseUrl}
+										thesaurusId={id}
+										thesaurusName={name}
+									/>*/}
+									<NewOrEditThesaurus
+										displayName={displayName}
+										id={id}
+										name={name}
+										onClose={fetchThesauri}
+										servicesBaseUrl={servicesBaseUrl}
+									/>
+									<DeleteThesaurus
+										id={id}
+										name={name}
+										onClose={fetchThesauri}
+										servicesBaseUrl={servicesBaseUrl}
+									/>
+									<Import
+										name={name}
+										onClose={fetchThesauri}
+										servicesBaseUrl={servicesBaseUrl}
+									/>
+									<Popup
+										content={`Export from thesaurus ${name}`}
+										inverted
+										trigger={<Button
+											as='a'
+											icon
+											href={`${servicesBaseUrl}/thesaurusExport?name=${name}`}
+										><Icon color='blue' name='download'/></Button>}
+									/>
+								</Button.Group>
 							</Table.Cell>
 						</Table.Row>
 					})}
@@ -105,7 +110,7 @@ export function ThesauriList(props) {
 						<Table.HeaderCell></Table.HeaderCell>
 						<Table.HeaderCell>{synonymsSum}</Table.HeaderCell>
 						<Table.HeaderCell>
-							<EditSynonyms
+							<EditSynonymsModal
 								onClose={fetchThesauri}
 								servicesBaseUrl={servicesBaseUrl}
 							/>

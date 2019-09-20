@@ -1,4 +1,6 @@
-import {Button, Form, Header, Icon, Input, Modal} from 'semantic-ui-react';
+import {
+	Button, Form, Header, Icon, Input, Modal, Popup
+} from 'semantic-ui-react';
 
 
 export function Import(props) {
@@ -16,10 +18,14 @@ export function Import(props) {
 		closeIcon
 		onClose={doClose}
 		open={open}
-		trigger={<Button
-			compact
-			onClick={() => setOpen(true)}
-			size='tiny'><Icon color='blue' name='upload'/>Import</Button>}
+		trigger={<Popup
+			content={`Import to thesaurus ${name}`}
+			inverted
+			trigger={<Button
+				icon
+				onClick={() => setOpen(true)}
+			><Icon color='blue' name='upload'/></Button>}
+		/>}
 	>
 		<Modal.Header>Import to thesaurus {name}</Modal.Header>
 		<Modal.Content>

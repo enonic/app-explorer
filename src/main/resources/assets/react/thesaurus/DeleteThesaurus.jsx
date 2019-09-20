@@ -1,4 +1,4 @@
-import {Button, Header, Icon, Modal} from 'semantic-ui-react';
+import {Button, Header, Icon, Modal, Popup} from 'semantic-ui-react';
 
 
 export function DeleteThesaurus(props) {
@@ -17,10 +17,13 @@ export function DeleteThesaurus(props) {
 		closeIcon
 		onClose={doClose}
 		open={open}
-		trigger={<Button
-			compact
-			onClick={() => setOpen(true)}
-			size='tiny'><Icon color='red' name='trash alternate outline'/>Delete thesaurus</Button>}
+		trigger={<Popup
+			content={`Delete thesaurus ${name}`}
+			inverted
+			trigger={<Button
+				icon
+				onClick={() => setOpen(true)}
+			><Icon color='red' name='trash alternate outline'/></Button>}/>}
 	>
 		<Modal.Header>Delete thesaurus {name}</Modal.Header>
 		<Modal.Content>

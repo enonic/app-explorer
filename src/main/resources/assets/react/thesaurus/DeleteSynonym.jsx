@@ -1,5 +1,5 @@
 import {
-	Button, Header, Icon, Modal, Table
+	Button, Header, Icon, Modal, Popup, Table
 } from 'semantic-ui-react';
 
 
@@ -22,10 +22,13 @@ export function DeleteSynonym(props) {
 		closeIcon
 		onClose={doClose}
 		open={open}
-		trigger={<Button
-			compact
-			onClick={() => setOpen(true)}
-			size='tiny'><Icon color='red' name='trash alternate outline'/>Delete</Button>}
+		trigger={<Popup
+			content={`Delete synonym`}
+			inverted
+			trigger={<Button
+				icon
+				onClick={() => setOpen(true)}
+			><Icon color='red' name='trash alternate outline'/></Button>}/>}
 	>
 		<Modal.Header>Delete synonym?</Modal.Header>
 		<Modal.Content>

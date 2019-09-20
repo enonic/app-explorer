@@ -1,9 +1,13 @@
-import {Button, Form, Header, Icon, Input, Modal} from 'semantic-ui-react';
+import {
+	Button, Form, Header, Icon, Input, Modal, Popup
+} from 'semantic-ui-react';
 
 import {Form as EnonicForm} from '../enonic/Form';
 import {Input as EnonicInput} from '../enonic/Input';
 import {ResetButton} from '../enonic/ResetButton';
 import {SubmitButton} from '../enonic/SubmitButton';
+
+import {EditSynonyms} from './EditSynonyms';
 
 
 function required(value) {
@@ -33,11 +37,14 @@ export function NewOrEditThesaurus(props) {
 		closeIcon
 		onClose={doClose}
 		open={open}
-		trigger={id ? <Button
-			compact
-			onClick={doOpen}
-			size='tiny'
-		><Icon color='blue' name='edit'/>Edit thesaurus</Button>
+		trigger={id ? <Popup
+			content={`Edit thesaurus ${displayName}`}
+			inverted
+			trigger={<Button
+				icon
+				onClick={doOpen}
+			><Icon color='blue' name='edit'/></Button>}
+		/>
 			: <Button
 				circular
 				color='green'
@@ -74,25 +81,37 @@ export function NewOrEditThesaurus(props) {
 					name: (value) => required(value)
 				}}
 			>
-				{!id && <Form.Field>
-					<EnonicInput
-						fluid
-						label={{basic: true, content: 'Name'}}
-						path='name'
-						placeholder='Please input name'
-					/>
-				</Form.Field>}
-				<Form.Field>
-					<EnonicInput
-						fluid
-						label={{basic: true, content: 'Display name'}}
-						path='displayName'
-						placeholder='Please input display name'
-					/>
-				</Form.Field>
-				<SubmitButton/>
-				<ResetButton/>
+				<Form as='div'>
+					{!id && <Form.Field>
+						<EnonicInput
+							fluid
+							label={{basic: true, content: 'Name'}}
+							path='name'
+							placeholder='Please input name'
+						/>
+					</Form.Field>}
+					<Form.Field>
+						<EnonicInput
+							fluid
+							label={{basic: true, content: 'Display name'}}
+							path='displayName'
+							placeholder='Please input display name'
+						/>
+					</Form.Field>
+					<Form.Field>
+						<SubmitButton/>
+						<ResetButton/>
+					</Form.Field>
+				</Form>
 			</EnonicForm>
+			{id && <>
+				<Header as='h2' content='Synonyms'/>
+				<EditSynonyms
+					servicesBaseUrl={servicesBaseUrl}
+					thesaurusId={id}
+					thesaurusName={name}
+				/>
+			</>}
 		</Modal.Content>
 	</Modal>;
 } // NewOrEditThesaurus
