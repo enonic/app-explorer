@@ -1,6 +1,10 @@
+import getIn from 'get-value';
+
+//import {toStr} from '/lib/util';
 import {getSites} from '/lib/util/content/getSites';
 import {getTypes} from '/lib/xp/content';
 //import {assetUrl} from '/lib/xp/portal';
+import {list as listTasks} from '/lib/xp/task';
 
 import {
 	PRINCIPAL_EXPLORER_READ,
@@ -17,6 +21,25 @@ import {getFieldValues} from '/lib/explorer/field/getFieldValues';
 
 export function get() {
 	const connection = connect({ principals: [PRINCIPAL_EXPLORER_READ] });
+
+	const activeCollections = {};
+	listTasks({
+		state: 'RUNNING'
+	}).forEach((runningTask) => {
+		//log.info(`runningTask:${toStr(runningTask)}`);
+		const maybeJson = getIn(runningTask, 'progress.info');
+		if (maybeJson) {
+			try {
+				const info = JSON.parse(maybeJson);
+				if (info.name) {
+					activeCollections[info.name] = true;
+				}
+			} catch (e) {
+				//no-op
+			}
+		}
+	});
+	//log.info(`activeCollections:${toStr(activeCollections)}`);
 
 	//const collectors = {};
 	const collectorOptions = queryCollectors({connection}).hits.map(({
@@ -53,6 +76,7 @@ export function get() {
 			totalCount += count;
 		}
 		return {
+			collecting: !!activeCollections[name],
 			collector,
 			count,
 			cron: Array.isArray(cron) ? cron : [cron],

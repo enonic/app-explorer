@@ -1,8 +1,9 @@
 import _ from 'lodash';
 import {
-	Button, Header, Icon, Loader, Modal, Table
+	Button, Header, Icon, Modal, Popup, Table
 } from 'semantic-ui-react';
 import {Collection} from './Collection';
+import {useInterval} from './utils/useInterval';
 
 
 function NewOrEditModal(props) {
@@ -31,12 +32,14 @@ function NewOrEditModal(props) {
 		onClose={onClose}
 		open={state.open}
 		size='large'
-		trigger={name ? <Button
-			compact
-			disabled={disabled}
-			onClick={onOpen}
-			size='tiny'
-		><Icon color='blue' name='edit'/>Edit</Button>
+		trigger={name ? <Popup
+			content={`Edit collection ${name}`}
+			inverted
+			trigger={<Button
+				icon
+				disabled={disabled}
+				onClick={onOpen}
+			><Icon color='blue' name='edit'/></Button>}/>
 			: <Button
 				circular
 				color='green'
@@ -85,10 +88,12 @@ function DeleteModal(props) {
 		closeIcon
 		onClose={() => setState({open: false})}
 		open={state.open}
-		trigger={<Button
-			compact
-			onClick={() => setState({open: true})}
-			size='tiny'><Icon color='red' name='trash alternate outline'/>Delete</Button>}
+		trigger={<Popup
+			content={`Delete collection ${name}`}
+			inverted
+			trigger={<Button
+				icon
+				onClick={() => setState({open: true})}><Icon color='red' name='trash alternate outline'/></Button>}/>}
 	>
 		<Modal.Header>Delete collection {name}</Modal.Header>
 		<Modal.Content>
@@ -104,7 +109,6 @@ function DeleteModal(props) {
 						onClose();
 					})
 				}}
-				size='tiny'
 			><Icon color='red' name='trash alternate outline'/>Confirm Delete</Button>
 		</Modal.Content>
 	</Modal>;
@@ -194,53 +198,57 @@ export function Collections(props) {
 
 	React.useEffect(() => fetchCollections(), []);
 
+	useInterval(() => {
+    	fetchCollections();
+  	}, 1000);
+
 	return <>
 		<Header as='h1'>Collections</Header>
-		{isLoading
-			? <Loader active inverted>Loading</Loader>
-			: <Table celled collapsing compact selectable singleLine sortable striped>
-				<Table.Header>
-					<Table.Row>
-						<Table.HeaderCell
-							onClick={handleSortGenerator('name')}
-							sorted={column === 'name' ? direction : null}
-						>Name</Table.HeaderCell>
-						<Table.HeaderCell
-							onClick={handleSortGenerator('documents')}
-							sorted={column === 'documents' ? direction : null}
-						>Documents</Table.HeaderCell>
-						<Table.HeaderCell
-							onClick={handleSortGenerator('schedule')}
-							sorted={column === 'schedule' ? direction : null}
-						>Schedule</Table.HeaderCell>
-						<Table.HeaderCell
-							onClick={handleSortGenerator('interfaces')}
-							sorted={column === 'interfaces' ? direction : null}
-						>Interfaces</Table.HeaderCell>
-						<Table.HeaderCell>Actions</Table.HeaderCell>
-					</Table.Row>
-				</Table.Header>
-				<Table.Body>
-					{collections.hits.map(({
-						collector,
-						count,
-						cron,
-						doCollect,
-						displayName,
-						//id,
-						interfaces,
-						name
-					}, index) => {
-						const key = `collection[${index}]`;
+		<Table celled collapsing compact selectable singleLine sortable striped>
+			<Table.Header>
+				<Table.Row>
+					<Table.HeaderCell
+						onClick={handleSortGenerator('name')}
+						sorted={column === 'name' ? direction : null}
+					>Name</Table.HeaderCell>
+					<Table.HeaderCell
+						onClick={handleSortGenerator('documents')}
+						sorted={column === 'documents' ? direction : null}
+					>Documents</Table.HeaderCell>
+					<Table.HeaderCell
+						onClick={handleSortGenerator('schedule')}
+						sorted={column === 'schedule' ? direction : null}
+					>Schedule</Table.HeaderCell>
+					<Table.HeaderCell
+						onClick={handleSortGenerator('interfaces')}
+						sorted={column === 'interfaces' ? direction : null}
+					>Interfaces</Table.HeaderCell>
+					<Table.HeaderCell>Actions</Table.HeaderCell>
+				</Table.Row>
+			</Table.Header>
+			<Table.Body>
+				{collections.hits.map(({
+					collector,
+					collecting,
+					count,
+					cron,
+					doCollect,
+					displayName,
+					//id,
+					interfaces,
+					name
+				}, index) => {
+					const key = `collection[${index}]`;
 
-						const disabled = !(collector.name && collectorOptions.filter(({key}) => collector.name).length);
+					const disabled = !(collector.name && collectorOptions.filter(({key}) => collector.name).length);
 
-						return <Table.Row key={key}>
-							<Table.Cell>{displayName}</Table.Cell>
-							<Table.Cell>{count}</Table.Cell>
-							<Table.Cell>{doCollect ? JSON.stringify(cron) : 'Not scheduled'}</Table.Cell>
-							<Table.Cell>{interfaces}</Table.Cell>
-							<Table.Cell>
+					return <Table.Row key={key}>
+						<Table.Cell>{displayName}</Table.Cell>
+						<Table.Cell>{count}</Table.Cell>
+						<Table.Cell>{doCollect ? JSON.stringify(cron) : 'Not scheduled'}</Table.Cell>
+						<Table.Cell>{interfaces}</Table.Cell>
+						<Table.Cell>
+							<Button.Group>
 								<NewOrEditModal
 									collectorOptions={collectorOptions}
 									collectorsObj={collectorsObj}
@@ -257,31 +265,54 @@ export function Collections(props) {
 									servicesBaseUrl={servicesBaseUrl}
 									siteOptions={siteOptions}
 								/>
-								<Button compact onClick={() => {
-									fetch(`${servicesBaseUrl}/collectionDuplicate?name=${name}`, {
-										method: 'POST'
-									}).then(response => {
-										fetchCollections()
-									})
-								}} size='tiny'><Icon color='blue' name='copy'/>Duplicate</Button>
-								<Button as='a' compact disabled={disabled} href={`${servicesBaseUrl}/collectionCollect?name=${name}`} size='tiny'><Icon color='green' name='cloud download'/>Collect</Button>
-								<Button as='a' compact disabled={disabled} href={`${servicesBaseUrl}/collectorStop?collectionName=${name}`} size='tiny'><Icon color='red' name='stop'/>Stop</Button>
+								<Popup
+									content={`Duplicate collection ${name}`}
+									inverted
+									trigger={<Button icon onClick={() => {
+										fetch(`${servicesBaseUrl}/collectionDuplicate?name=${name}`, {
+											method: 'POST'
+										}).then(response => {
+											fetchCollections()
+										})
+									}}><Icon color='blue' name='copy'/></Button>}/>
+								{collecting
+									? <Popup
+										content={`Stop collecting to ${name}`}
+										inverted
+										trigger={<Button disabled={disabled} icon onClick={() => {
+											fetch(`${servicesBaseUrl}/collectorStop?collectionName=${name}`, {
+												method: 'POST'
+											}).then(response => {
+												fetchCollections()
+											})
+										}}><Icon color='red' name='stop'/></Button>}/>
+									: <Popup
+										content={`Start collecting to ${name}`}
+										inverted
+										trigger={<Button disabled={disabled} icon onClick={() => {
+											fetch(`${servicesBaseUrl}/collectionCollect?name=${name}`, {
+												method: 'POST'
+											}).then(response => {
+												fetchCollections()
+											})
+										}}><Icon color='green' name='cloud download'/></Button>}/>
+								}
 								<DeleteModal name={name} onClose={() => fetchCollections()} servicesBaseUrl={servicesBaseUrl}/>
-							</Table.Cell>
-						</Table.Row>;
-					})}
-				</Table.Body>
-				<Table.Footer>
-					<Table.Row>
-						<Table.HeaderCell></Table.HeaderCell>
-						<Table.HeaderCell>{totalCount}</Table.HeaderCell>
-						<Table.HeaderCell></Table.HeaderCell>
-						<Table.HeaderCell></Table.HeaderCell>
-						<Table.HeaderCell></Table.HeaderCell>
-					</Table.Row>
-				</Table.Footer>
-			</Table>
-		}
+							</Button.Group>
+						</Table.Cell>
+					</Table.Row>;
+				})}
+			</Table.Body>
+			<Table.Footer>
+				<Table.Row>
+					<Table.HeaderCell></Table.HeaderCell>
+					<Table.HeaderCell>{totalCount}</Table.HeaderCell>
+					<Table.HeaderCell></Table.HeaderCell>
+					<Table.HeaderCell></Table.HeaderCell>
+					<Table.HeaderCell></Table.HeaderCell>
+				</Table.Row>
+			</Table.Footer>
+		</Table>
 		<NewOrEditModal
 			collectorOptions={collectorOptions}
 			collectorsObj={collectorsObj}

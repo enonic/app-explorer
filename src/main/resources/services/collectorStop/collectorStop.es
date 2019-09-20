@@ -10,7 +10,7 @@ import {get as getTask} from '/lib/explorer/task/get';
 import {modify as modifyTask} from '/lib/explorer/task/modify';
 
 
-export function get({
+export function post({
 	params: {
 		collectionName
 	}
@@ -39,4 +39,4 @@ export function get({
 		},
 		contentType: RT_JSON
 	};
-} // get
+} // post

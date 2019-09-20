@@ -12,7 +12,7 @@ import {query as queryCollectors} from '/lib/explorer/collector/query';
 import {getTasksWithPropertyValue} from '/lib/explorer/task/getTasksWithPropertyValue';
 
 
-export function get({
+export function post({
 	params: {
 		name,
 		resume = false
@@ -98,4 +98,4 @@ export function get({
 		contentType: RT_JSON,
 		status
 	};
-} // get
+} // post
