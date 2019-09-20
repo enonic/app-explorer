@@ -90,7 +90,7 @@ export function Fields(props) {
 							<Table.HeaderCell
 								onClick={handleSortGenerator('key')}
 								sorted={column === 'key' ? direction : null}
-							>Key</Table.HeaderCell>
+							>Name</Table.HeaderCell>
 							<Table.HeaderCell
 								onClick={handleSortGenerator('displayName')}
 								sorted={column === 'displayName' ? direction : null}

@@ -11,6 +11,10 @@ import {Input} from '../semantic-ui/react/Input';
 import {EditValues} from './EditValues';
 
 
+function notStartWithUnderscore(value) {
+	return value.startsWith('_') ? "Can't start with underscore!" : undefined;
+}
+
 function required(value) {
 	return value ? undefined : 'Required!';
 }
@@ -20,7 +24,7 @@ const SCHEMA = {
 	displayName: (value) => required(value),
 	fieldType: (value) => required(value),
 	instruction: (value) => required(value),
-	key: (value) => required(value)
+	key: (value) => required(value) || notStartWithUnderscore(value)
 };
 
 
@@ -168,7 +172,7 @@ export function NewOrEditModal(props) {
 				{editMode ? null : <Form.Field>
 					<Input
 						callbacks={callbacks}
-						label={{basic: true, content: 'Key'}}
+						label={{basic: true, content: 'Name'}}
 						name='key'
 						validate={(value) => SCHEMA.key(value)}
 					/>
