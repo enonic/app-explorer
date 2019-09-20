@@ -106,45 +106,6 @@ export function htmlResponse({
 
 		<div id="${ID_REACT_EXPLORER_CONTAINER}"/>
 
-		<header class="fixed inverted menu ui" style="z-index:103;">
-			<a class="item" onClick="$('#mySidebar').sidebar('toggle');"><i class="close icon" id="myIcon"></i></a>
-			<span class="item">Explorer</span>
-		</header>
-
-		<aside class="inverted left menu sidebar ui vertical visible" id="mySidebar">
-
-			<a class="${relPath === '' ? 'active ' : ''}item" href="${TOOL_PATH}""><i class="search icon"></i> Home</a>
-
-			<a class="${tab === 'collections' && !action ? 'active ' : ''}item" href="${TOOL_PATH}/collections"><i class="database icon"></i> Collections</a>
-			${tab === 'collections'	? `<div class="inverted menu">
-				<a class="${action === 'status' ? 'active ' : ''}item" href="${TOOL_PATH}/collections/status"><i class="cogs icon"></i> Status</a>
-				<a class="${action === 'journal' ? 'active ' : ''}item" href="${TOOL_PATH}/collections/journal"><i class="newspaper outline icon"></i> Journal</a>
-			</div>`	: ''}
-
-			<a class="${tab === 'fields' ? 'active ' : ''}item" href="${TOOL_PATH}/fields"><i class="sitemap icon"></i> Fields</a>
-
-			<a class="${tab === 'stopwords' ? 'active ' : ''}item" href="${TOOL_PATH}/stopwords"><i class="crop icon"></i> StopWords</a>
-
-			<a class="${tab === 'thesauri' ? 'active ' : ''}item" href="${TOOL_PATH}/thesauri"><i class="font icon"></i> Thesauri</a>
-
-			<a class="${tab === 'interfaces' ? 'active ' : ''}item" href="${TOOL_PATH}/interfaces"><i class="plug icon"></i> Interfaces</a>
-
-			<a class="${tab === 'about' ? 'active ' : ''}item" href="${TOOL_PATH}/about"><i class="info icon"></i> About</a>
-		</aside>
-
-		<main class="pusher" id="myPusher" style="padding:54px 14px 14px;width: calc(100% - 260px)">
-			${messagesArray.length ? `<div class="ui icon ${statusInt === 200 ? 'positive' : 'negative'} message">
-				<i class="${statusInt === 200 ? 'thumbs up' : 'exclamation triangle'} icon"></i>
-				<div class="content">
-					<div class="header">${statusInt === 200 ? 'Success' : 'Error'}</div>
-					<ul class="list">
-						${messagesArray.map(m => `<li>${m}</li>`)}
-					</ul>
-				</div>
-			</div>` : ''}
-			${''/*main*/}
-		</main>
-
 		<script type="text/javascript">
 		var CONFIG = {
 			adminUrl: '${getBaseUri()}',
