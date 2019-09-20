@@ -39,7 +39,7 @@ const CronForm = (props) => {
 			<Checkbox
 				formik={props}
 				name='doCollect'
-				label='Collect?'
+				label='Activate scheduling'
 			/>
 		</Form.Field>
 		<Cron formik={props}/>
