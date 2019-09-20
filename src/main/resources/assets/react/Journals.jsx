@@ -2,10 +2,9 @@
 //import {hash as fnv} from 'fnv-plus';
 import Uri from 'jsuri';
 import prettyMs from 'pretty-ms';
-import {createRef} from 'react';
 import {
 	Checkbox, Dimmer, Divider, Dropdown, Form, Header, Icon, Label, Loader,
-	Pagination, Rail, Ref, Segment, Sticky, Table
+	Pagination, Segment, Table
 } from 'semantic-ui-react';
 
 
@@ -17,8 +16,6 @@ export const hash = (object) =>
 
 
 export class Journals extends React.Component {
-	contextRef = createRef();
-
 	constructor(props) {
 		//console.debug({function: 'constructor', props});
     	super(props);
@@ -245,8 +242,9 @@ export class Journals extends React.Component {
 			return <Dimmer active inverted><Loader content='Loading' size='massive' style={{display: 'table-row'}}/></Dimmer>;
 		}
 
-		return <Ref innerRef={this.contextRef}>
+		return <>
 			<Segment basic>
+				<Header as='h1' content='Journal'/>
 				{ loading
 					? <Dimmer active inverted><Loader content='Loading' size='massive' style={{display: 'table-row'}}/></Dimmer>
 					: <>
@@ -317,126 +315,120 @@ export class Journals extends React.Component {
 						<p>Displaying {start}-{end} of {total}</p>
 					</>
 				}
-				<Rail position='left'>
-					<Sticky context={this.contextRef} offset={14}>
-						<Segment basic>
-							<Form>
-								<Form.Field>
-									<Header as='h4'><Icon name='database'/> Collections</Header>
-									<Dropdown
-										defaultValue={params.collections}
-										fluid
-										multiple={true}
-										name='collections'
-										onChange={this.handleInputChange}
-										options={aggregations.collection.buckets.map(({key, docCount}) => ({key, text: `${key} (${docCount})`, value: key}))}
-										search
-										selection
-									/>
-								</Form.Field>
-								<Divider hidden/>
-								<Form.Field>
-									<Header as='h4'><Icon name='resize vertical'/> Per page</Header>
-									<Dropdown
-										defaultValue={params.perPage}
-										fluid
-										name='perPage'
-										onChange={this.handleInputChange}
-										options={[5,10,25,50,100].map(key => ({key, text: `${key}`, value: key}))}
-										selection
-									/>
-								</Form.Field>
-								<Divider hidden/>
-								<Form.Field>
-									<Header as='h4'><Icon name='filter'/> Errors</Header>
-									<Checkbox
-										checked={this.state.params.showWithoutErrors}
-										label='Show journals without errors'
-										name='showWithoutErrors'
-										onChange={this.handleCheckboxChange}
-										toggle
-									/>
-								</Form.Field>
-								{/*<Divider hidden/>
-								<Form.Field>
-									<Header as='h4'><Icon name='filter'/> Endtime</Header>
-									{aggregations.endTime.buckets.map(({docCount, from = '*', key, to = '*'}, i) => <Checkbox
-										key={i}
-										checked={endTimeRanges[`${from};${to}`]}
-										label={to}
-										name={`endTimeRange.${from};${to}`}
-										onChange={this.handleCheckboxChange}
-										toggle
-									/>)}
-								</Form.Field>*/}
-							</Form>
-						</Segment>
-					</Sticky>
-				</Rail>
-				<Rail position='right'>
-					<Sticky context={this.contextRef} offset={14}>
-						<Segment basic>
-							<Header as='h4'><Icon name='columns'/> Columns</Header>
-							<Form>
-								<Form.Field>
-									<Checkbox
-										checked={this.state.columns.collection}
-										label='Collection'
-										name='collection'
-										onChange={this.handleCheckboxChange}
-										toggle
-									/>
-								</Form.Field>
-								<Form.Field>
-									<Checkbox
-										checked={this.state.columns.startTime}
-										label='Start time'
-										name='startTime'
-										onChange={this.handleCheckboxChange}
-										toggle
-									/>
-								</Form.Field>
-								<Form.Field>
-									<Checkbox
-										checked={this.state.columns.endTime}
-										label='End time'
-										name='endTime'
-										onChange={this.handleCheckboxChange}
-										toggle
-									/>
-								</Form.Field>
-								<Form.Field>
-									<Checkbox
-										checked={this.state.columns.duration}
-										label='Duration'
-										name='duration'
-										onChange={this.handleCheckboxChange}
-										toggle
-									/>
-								</Form.Field>
-								<Form.Field>
-									<Checkbox
-										checked={this.state.columns.errorCount}
-										label='Errors'
-										name='errorCount'
-										onChange={this.handleCheckboxChange}
-										toggle
-									/>
-								</Form.Field>
-								<Form.Field>
-									<Checkbox
-										checked={this.state.columns.successCount}
-										label='Successes'
-										name='successCount'
-										onChange={this.handleCheckboxChange}
-										toggle
-									/>
-								</Form.Field>
-							</Form>
-						</Segment>
-					</Sticky>
-				</Rail>
+				<Header as='h2' content='Filters'/>
+				<Segment>
+					<Form>
+						<Form.Field>
+							<Header as='h4'><Icon name='database'/> Collections</Header>
+							<Dropdown
+								defaultValue={params.collections}
+								fluid
+								multiple={true}
+								name='collections'
+								onChange={this.handleInputChange}
+								options={aggregations.collection.buckets.map(({key, docCount}) => ({key, text: `${key} (${docCount})`, value: key}))}
+								search
+								selection
+							/>
+						</Form.Field>
+						<Divider hidden/>
+						<Form.Field>
+							<Header as='h4'><Icon name='resize vertical'/> Per page</Header>
+							<Dropdown
+								defaultValue={params.perPage}
+								fluid
+								name='perPage'
+								onChange={this.handleInputChange}
+								options={[5,10,25,50,100].map(key => ({key, text: `${key}`, value: key}))}
+								selection
+							/>
+						</Form.Field>
+						<Divider hidden/>
+						<Form.Field>
+							<Header as='h4'><Icon name='filter'/> Errors</Header>
+							<Checkbox
+								checked={this.state.params.showWithoutErrors}
+								label='Show journals without errors'
+								name='showWithoutErrors'
+								onChange={this.handleCheckboxChange}
+								toggle
+							/>
+						</Form.Field>
+						{/*<Divider hidden/>
+						<Form.Field>
+							<Header as='h4'><Icon name='filter'/> Endtime</Header>
+							{aggregations.endTime.buckets.map(({docCount, from = '*', key, to = '*'}, i) => <Checkbox
+								key={i}
+								checked={endTimeRanges[`${from};${to}`]}
+								label={to}
+								name={`endTimeRange.${from};${to}`}
+								onChange={this.handleCheckboxChange}
+								toggle
+							/>)}
+						</Form.Field>*/}
+					</Form>
+				</Segment>
+				<Header as='h2' content='Options'/>
+				<Segment>
+					<Header as='h4'><Icon name='columns'/> Columns</Header>
+					<Form>
+						<Form.Field>
+							<Checkbox
+								checked={this.state.columns.collection}
+								label='Collection'
+								name='collection'
+								onChange={this.handleCheckboxChange}
+								toggle
+							/>
+						</Form.Field>
+						<Form.Field>
+							<Checkbox
+								checked={this.state.columns.startTime}
+								label='Start time'
+								name='startTime'
+								onChange={this.handleCheckboxChange}
+								toggle
+							/>
+						</Form.Field>
+						<Form.Field>
+							<Checkbox
+								checked={this.state.columns.endTime}
+								label='End time'
+								name='endTime'
+								onChange={this.handleCheckboxChange}
+								toggle
+							/>
+						</Form.Field>
+						<Form.Field>
+							<Checkbox
+								checked={this.state.columns.duration}
+								label='Duration'
+								name='duration'
+								onChange={this.handleCheckboxChange}
+								toggle
+							/>
+						</Form.Field>
+						<Form.Field>
+							<Checkbox
+								checked={this.state.columns.errorCount}
+								label='Errors'
+								name='errorCount'
+								onChange={this.handleCheckboxChange}
+								toggle
+							/>
+						</Form.Field>
+						<Form.Field>
+							<Checkbox
+								checked={this.state.columns.successCount}
+								label='Successes'
+								name='successCount'
+								onChange={this.handleCheckboxChange}
+								toggle
+							/>
+						</Form.Field>
+					</Form>
+				</Segment>
 			</Segment>
-		</Ref>;
+		</>;
 	}
 } // Journals
