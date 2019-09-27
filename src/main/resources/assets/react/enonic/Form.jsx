@@ -103,15 +103,15 @@ export function Form(props) {
 	//console.debug('Form props', props);
 	const {
 		children,
-		initialValues = {},
 		onChange = () => {/*no-op*/},
 		onDelete,
 		onSubmit,
 		schema = {},
-		validateOnInit = false,
-		...rest
+		validateOnInit = false
 	} = props;
 	//console.debug('Form schema', schema);
+
+	const initialValues = isFunction(props.initialValues) ? props.initialValues() : props.initialValues;
 
 	function validateValues(values) {
 		const errors = {};
