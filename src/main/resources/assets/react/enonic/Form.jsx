@@ -104,6 +104,7 @@ export function Form(props) {
 	const {
 		children,
 		initialValues = {},
+		onChange = () => {/*no-op*/},
 		onDelete,
 		onSubmit,
 		schema = {},
@@ -148,6 +149,7 @@ export function Form(props) {
 			const initialValue = getIn(initialValues, action.path);
 			setIn(deref.changes, action.path, !deepEqual(array, initialValue));
 			//console.debug('reducer action', action, 'state', state, 'deref', deref);
+			onChange(deref.values);
 			return deref;
 		}
 		case INSERT: {
@@ -163,6 +165,7 @@ export function Form(props) {
 			setIn(deref.changes, action.path, !deepEqual(array, initialValue));
 			//console.debug('reducer state', state, 'action', action, 'array', array);
 			//console.debug('reducer action', action, 'state', state, 'deref', deref);
+			onChange(deref.values);
 			return deref;
 		}
 		case MOVE_DOWN: {
@@ -182,6 +185,7 @@ export function Form(props) {
 			const initialValue = getIn(initialValues, action.path);
 			setIn(deref.changes, action.path, !deepEqual(array, initialValue));
 			//console.debug('reducer action', action, 'state', state, 'deref', deref);
+			onChange(deref.values);
 			return deref;
 		}
 		case MOVE_UP: {
@@ -201,6 +205,7 @@ export function Form(props) {
 			const initialValue = getIn(initialValues, action.path);
 			setIn(deref.changes, action.path, !deepEqual(array, initialValue));
 			//console.debug('reducer action', action, 'state', state, 'deref', deref);
+			onChange(deref.values);
 			return deref;
 		}
 		/*case PUSH: {
@@ -218,7 +223,10 @@ export function Form(props) {
 			onDelete(state.values);
 			return state;
 		}
-		case RESET: return initialState;
+		case RESET: {
+			onChange(initialState.values);
+			return initialState;
+		}
 		case SET_VALUE: {
 			//console.debug('reducer action', action, 'state', state);
 			if (action.value === getIn(state.values, action.path)) {
@@ -230,6 +238,7 @@ export function Form(props) {
 			const initialValue = getIn(initialValues, action.path);
 			setIn(deref.changes, action.path, action.value !== initialValue);
 			//console.debug('reducer state', state, 'action', action, 'deref', deref);
+			onChange(deref.values);
 			return deref;
 		}
 		case SET_VISITED: {
@@ -253,6 +262,7 @@ export function Form(props) {
 			const initialValue = getIn(initialValues, action.path);
 			setIn(deref.changes, action.path, !deepEqual(array, initialValue));
 			//console.debug('reducer action', action, 'state', state, 'deref', deref);
+			onChange(deref.values);
 			return deref;
 		}
 		case SUBMIT: {
