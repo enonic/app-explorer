@@ -220,6 +220,7 @@ export function Form(props) {
 		}
 		case RESET: return initialState;
 		case SET_VALUE: {
+			//console.debug('reducer action', action, 'state', state);
 			if (action.value === getIn(state.values, action.path)) {
 				//console.debug('reducer action', action, 'did not change state', state);
 				return state;
@@ -228,7 +229,7 @@ export function Form(props) {
 			setIn(deref.values, action.path, action.value);
 			const initialValue = getIn(initialValues, action.path);
 			setIn(deref.changes, action.path, action.value !== initialValue);
-			//console.debug('reducer action', action, 'deref', deref);
+			//console.debug('reducer state', state, 'action', action, 'deref', deref);
 			return deref;
 		}
 		case SET_VISITED: {
