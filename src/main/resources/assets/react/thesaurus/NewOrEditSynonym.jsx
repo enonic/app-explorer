@@ -155,6 +155,7 @@ export function NewOrEditSynonym(props) {
 						<Table celled compact selectable sortable striped>
 							<Table.Body>{toArray.map((toValue, toIndex) => {
 								const toPath = `to.${toIndex}`;
+								//console.debug('NewOrEditSynonym toValue', toValue, 'toIndex', toIndex, 'toPath', toPath);
 								return <Table.Row key={toPath}>
 									<Table.Cell>
 										<EnonicInput
@@ -167,22 +168,22 @@ export function NewOrEditSynonym(props) {
 										<Button.Group>
 											<InsertButton
 												path='to'
-												index={toPath}
+												index={toIndex}
 												value={''}
 											/>
 											<MoveDownButton
 												disabled={toIndex + 1 >= toArray.length}
 												path='to'
-												index={toPath}
+												index={toIndex}
 											/>
 											<MoveUpButton
 												path='to'
-												index={toPath}
+												index={toIndex}
 											/>
 											<DeleteItemButton
 												disabled={toArray.length < 2}
 												path='to'
-												index={toPath}
+												index={toIndex}
 											/>
 										</Button.Group>
 									</Table.Cell>
