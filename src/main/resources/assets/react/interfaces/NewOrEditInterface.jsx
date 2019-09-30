@@ -8,6 +8,7 @@ import {Input} from '../enonic/Input';
 import {ResetButton} from '../enonic/ResetButton';
 import {SubmitButton} from '../enonic/SubmitButton';
 
+import {QueryBuilder} from './query/QueryBuilder';
 import {QueryFiltersBuilder} from './query/QueryFiltersBuilder';
 
 
@@ -98,6 +99,12 @@ export function NewOrEditInterface(props) {
 			</Form.Field>
 			<QueryFiltersBuilder
 				fieldsObj={fieldsObj}
+			/>
+			<QueryBuilder
+				fieldsObj={fieldsObj}
+				id='query'
+				legend='Query'
+				thesauriOptions={thesauriOptions}
 			/>
 			<Header as='h3' content='Stop words' dividing id='stopwords'/>
 			<Dropdown

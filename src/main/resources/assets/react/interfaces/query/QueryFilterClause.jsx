@@ -14,21 +14,9 @@ import {SetValueButton} from '../../enonic/SetValueButton';
 
 import {ucFirst} from '../../utils/ucFirst';
 
+import {fieldObjToFieldArr} from './fieldObjToFieldArr';
 import {QueryFilterSelector} from './QueryFilterSelector';
 import {QueryFieldSelector} from './QueryFieldSelector';
-
-
-function fieldObjToFieldArr(obj) {
-	const arr = [];
-	Object.entries(obj).forEach(([k, v]) => {
-		arr.push({
-			key: k,
-			text: v.text,
-			value: k
-		});
-	});
-	return arr;
-}
 
 
 export function QueryFilterClause(props) {
@@ -139,7 +127,7 @@ export function QueryFilterClause(props) {
 														<Button.Group>
 															<InsertButton
 																path={valuesPath}
-																index={index}
+																index={idIndex}
 																value={''}
 															/>
 															<MoveDownButton
