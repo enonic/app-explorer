@@ -10,6 +10,8 @@ import {setValue} from '../../enonic/Form';
 
 import {CompareExpression} from './CompareExpression';
 import {Fulltext} from './Fulltext';
+import {PathMatch} from './PathMatch';
+import {Range} from './Range';
 
 
 export function QueryBuilder(props) {
@@ -111,16 +113,21 @@ export function QueryBuilder(props) {
 			path={`${path}.type`}
 			placeholder='Please select expression type'
 		/>
-		{['fulltext', 'ngram', 'synonyms'].includes(type)
-			? <Fulltext
-				fieldsObj={fieldsObj}
-				path={paramsPath}
-				type={type}
-				thesauriOptions={thesauriOptions}
-			/>
-			: null
-		}
+		{['fulltext', 'ngram', 'synonyms'].includes(type) && <Fulltext
+			fieldsObj={fieldsObj}
+			path={paramsPath}
+			type={type}
+			thesauriOptions={thesauriOptions}
+		/>}
 		{type === 'compareExpr' && <CompareExpression
+			fieldsObj={fieldsObj}
+			path={paramsPath}
+		/>}
+		{type === 'range' && <Range
+			fieldsObj={fieldsObj}
+			path={paramsPath}
+		/>}
+		{type === 'pathMatch' && <PathMatch
 			fieldsObj={fieldsObj}
 			path={paramsPath}
 		/>}
