@@ -10,6 +10,6 @@ export function QueryFiltersBuilder(props) {
 	} = props;
 	return <>
 		<QueryFilterClause fieldsObj={fieldsObj} name='must' id='must' parentPath={path}/>
-		{/*<QueryFilterClause fieldsObj={fieldsObj} name='mustNot' id='mustnot' parentPath={path}/>*/}
+		<QueryFilterClause fieldsObj={fieldsObj} name='mustNot' id='mustnot' parentPath={path}/>
 	</>
 } // function QueryFiltersBuilder
