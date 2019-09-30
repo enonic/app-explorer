@@ -8,6 +8,7 @@ import {
 import {getEnonicContext} from '../../enonic/Context';
 import {setValue} from '../../enonic/Form';
 
+import {CompareExpression} from './CompareExpression';
 import {Fulltext} from './Fulltext';
 
 
@@ -119,6 +120,10 @@ export function QueryBuilder(props) {
 			/>
 			: null
 		}
+		{type === 'compareExpr' && <CompareExpression
+			fieldsObj={fieldsObj}
+			path={paramsPath}
+		/>}
 	</>;
 	if (parentPath) {
 		return fragment;
