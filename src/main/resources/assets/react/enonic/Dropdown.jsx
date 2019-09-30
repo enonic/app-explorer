@@ -16,6 +16,7 @@ export function Dropdown(props = {}) {
 		value = getIn(context.values, path),
 		...rest
 	} = props;
+	//console.debug('Dropdown path', path, 'value', value, 'rest', rest);
 
 	return <SemanticUiReactDropdown
 		{...rest}

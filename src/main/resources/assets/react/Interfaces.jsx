@@ -31,7 +31,7 @@ export class Interfaces extends React.Component {
 			.then(response => response.json())
 			.then(data => this.setState({
 				collectionOptions: data.collectionOptions,
-				fields: data.fields,
+				fieldsObj: data.fieldsObj,
 				interfaces: data.interfaces,
 				isLoading: false
 			}));
@@ -53,14 +53,14 @@ export class Interfaces extends React.Component {
 
 		const {
 			collectionOptions,
-			fields,
+			fieldsObj,
 			interfaces: {
 				hits
 			},
 			stopWordOptions,
 			thesauriOptions
 		} = this.state;
-		//console.debug('fields', fields);
+		//console.debug('fieldsObj', fieldsObj);
 		//console.debug(hits);
 
 		return <>
@@ -83,7 +83,7 @@ export class Interfaces extends React.Component {
 									<NewOrEditInterfaceModal
 										collectionOptions={collectionOptions}
 										displayName={displayName}
-										fields={fields}
+										fieldsObj={fieldsObj}
 										id={id}
 										afterClose={() => this.updateInterfaces()}
 										servicesBaseUrl={servicesBaseUrl}
@@ -112,7 +112,7 @@ export class Interfaces extends React.Component {
 			</Table>
 			<NewOrEditInterfaceModal
 				collectionOptions={collectionOptions}
-				fields={fields}
+				fieldsObj={fieldsObj}
 				onClose={() => this.updateInterfaces()}
 				servicesBaseUrl={servicesBaseUrl}
 				stopWordOptions={stopWordOptions}

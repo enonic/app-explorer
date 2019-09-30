@@ -10,7 +10,7 @@ export function NewOrEditInterfaceModal(props) {
 		collectionOptions,
 		disabled = false,
 		displayName,
-		fields,
+		fieldsObj,
 		id, // nullable
 		//initialValues = {},
 		servicesBaseUrl,
@@ -58,7 +58,7 @@ export function NewOrEditInterfaceModal(props) {
 		<Modal.Content>
 			<NewOrEditInterface
 				collectionOptions={collectionOptions}
-				fields={fields}
+				fieldsObj={fieldsObj}
 				id={id}
 				servicesBaseUrl={servicesBaseUrl}
 				stopWordOptions={stopWordOptions}

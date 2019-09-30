@@ -8,11 +8,13 @@ import {Input} from '../enonic/Input';
 import {ResetButton} from '../enonic/ResetButton';
 import {SubmitButton} from '../enonic/SubmitButton';
 
+import {QueryFiltersBuilder} from './query/QueryFiltersBuilder';
+
 
 export function NewOrEditInterface(props) {
 	const {
 		collectionOptions,
-		fields,
+		fieldsObj,
 		id, // nullable
 		name, // nullable
 		servicesBaseUrl,
@@ -92,6 +94,9 @@ export function NewOrEditInterface(props) {
 					selection
 				/>
 			</Form.Field>
+			<QueryFiltersBuilder
+				fieldsObj={fieldsObj}
+			/>
 			<Form.Field>
 				<SubmitButton/>
 				<ResetButton/>

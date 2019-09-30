@@ -25,21 +25,35 @@ export function get() {
 		});*/
 		if (!fieldValuesObj[field]) {fieldValuesObj[field] = {}}
 		fieldValuesObj[field][value] = {
-			label: displayName,
-			path: _path
+			//key: value,
+			text: displayName,
+			path: _path//,
+			//value
 		};
 	});
 
 	const fieldsArray = getFields({connection}).hits.map(({displayName, key, _path}) => ({
-		label: displayName,
+		key,
+		text: displayName,
 		path: _path,
 		value: key,
 		values: fieldValuesObj[key]
 	}));
 	const fieldsObj = {};
-	fieldsArray.forEach(({label, path, value, values}) => {
-		fieldsObj[value] = {
-			label, path, values
+	fieldsArray.forEach(({
+		key,
+		//label,
+		path,
+		text,
+		//value,
+		values
+	}) => {
+		fieldsObj[key] = {
+			//key,
+			//label,
+			path,
+			text,
+			values
 		};
 	});
 
@@ -62,7 +76,7 @@ export function get() {
 				text,
 				value: key
 			})),
-			fields: fieldsObj,
+			fieldsObj,
 			interfaces,
 			stopWordOptions,
 			thesauriOptions: getThesauri({connection}).hits.map(({displayName, name}) => ({
