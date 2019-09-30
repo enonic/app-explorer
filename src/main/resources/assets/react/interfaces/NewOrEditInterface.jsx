@@ -21,6 +21,8 @@ export function NewOrEditInterface(props) {
 		stopWordOptions,
 		thesauriOptions
 	} = props;
+	//console.debug('NewOrEditInterface stopWordOptions', stopWordOptions);
+	//console.debug('NewOrEditInterface thesauriOptions', thesauriOptions);
 
 	//const [isLoading, setLoading] = React.useState(!!id);
 	const [state, setState] = React.useState({
@@ -40,7 +42,7 @@ export function NewOrEditInterface(props) {
 				to: '',
 				uuid4: generateUuidv4()
 			}],
-			//stopWords,
+			stopWords: [],
 			thesauri: []
 		},
 		isLoading: !!id
@@ -96,6 +98,15 @@ export function NewOrEditInterface(props) {
 			</Form.Field>
 			<QueryFiltersBuilder
 				fieldsObj={fieldsObj}
+			/>
+			<Header as='h3' content='Stop words' dividing id='stopwords'/>
+			<Dropdown
+				fluid
+				multiple={true}
+				options={stopWordOptions}
+				path='stopWords'
+				search
+				selection
 			/>
 			<Form.Field>
 				<SubmitButton/>

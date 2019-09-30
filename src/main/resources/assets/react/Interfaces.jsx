@@ -33,7 +33,9 @@ export class Interfaces extends React.Component {
 				collectionOptions: data.collectionOptions,
 				fieldsObj: data.fieldsObj,
 				interfaces: data.interfaces,
-				isLoading: false
+				isLoading: false,
+				stopWordOptions: data.stopWordOptions,
+				thesauriOptions: data.thesauriOptions
 			}));
 	} // updateInterfaces
 
