@@ -198,9 +198,9 @@ export function Collections(props) {
 
 	React.useEffect(() => fetchCollections(), []);
 
-	useInterval(() => {
+	/*useInterval(() => {
     	fetchCollections();
-  	}, 1000);
+  	}, 1000);*/
 
 	return <>
 		<Header as='h1'>Collections</Header>

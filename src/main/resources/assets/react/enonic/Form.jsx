@@ -111,7 +111,7 @@ export function Form(props) {
 	} = props;
 	//console.debug('Form schema', schema);
 
-	const initialValues = isFunction(props.initialValues) ? props.initialValues() : props.initialValues;
+	const initialValues = JSON.parse(JSON.stringify(isFunction(props.initialValues) ? props.initialValues() : props.initialValues));
 
 	function validateValues(values) {
 		const errors = {};
