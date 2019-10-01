@@ -8,6 +8,7 @@ import {Input} from '../enonic/Input';
 import {ResetButton} from '../enonic/ResetButton';
 import {SubmitButton} from '../enonic/SubmitButton';
 
+import {Facets} from './Facets';
 import {QueryBuilder} from './query/QueryBuilder';
 import {QueryFiltersBuilder} from './query/QueryFiltersBuilder';
 import {ResultMappings} from './ResultMappings';
@@ -121,6 +122,11 @@ export function NewOrEditInterface(props) {
 				fieldsObj={fieldsObj}
 				id='resultmappings'
 				legend='Result mapping(s)'
+			/>
+			<Facets
+				fieldsObj={fieldsObj}
+				id='facets'
+				legend='Facet(s)'
 			/>
 			<Form.Field>
 				<SubmitButton/>
