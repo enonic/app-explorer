@@ -1,5 +1,5 @@
 import {Form, Header, Loader} from 'semantic-ui-react';
-import generateUuidv4 from 'uuid/v4';
+//import generateUuidv4 from 'uuid/v4';
 
 import {Form as EnonicForm} from '../enonic/Form';
 import {Dropdown} from '../enonic/Dropdown';
@@ -10,6 +10,7 @@ import {SubmitButton} from '../enonic/SubmitButton';
 
 import {QueryBuilder} from './query/QueryBuilder';
 import {QueryFiltersBuilder} from './query/QueryFiltersBuilder';
+import {ResultMappings} from './ResultMappings';
 
 
 export function NewOrEditInterface(props) {
@@ -41,7 +42,8 @@ export function NewOrEditInterface(props) {
 				lengthLimit: '',
 				separator: ' ',
 				to: '',
-				uuid4: generateUuidv4()
+				type: 'string'
+				//uuid4: generateUuidv4()
 			}],
 			stopWords: [],
 			thesauri: []
@@ -114,6 +116,11 @@ export function NewOrEditInterface(props) {
 				path='stopWords'
 				search
 				selection
+			/>
+			<ResultMappings
+				fieldsObj={fieldsObj}
+				id='resultmappings'
+				legend='Result mapping(s)'
 			/>
 			<Form.Field>
 				<SubmitButton/>
