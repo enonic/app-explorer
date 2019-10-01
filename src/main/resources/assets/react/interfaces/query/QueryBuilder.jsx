@@ -2,14 +2,17 @@ import getIn from 'get-value';
 import {
 	Dropdown as SemanticUiReactDropdown,
 	Header,
+	Icon,
 	Segment
 } from 'semantic-ui-react';
 
 import {getEnonicContext} from '../../enonic/Context';
 import {setValue} from '../../enonic/Form';
+import {DeleteItemButton} from '../../enonic/DeleteItemButton';
 
 import {CompareExpression} from './CompareExpression';
 import {Fulltext} from './Fulltext';
+import {Logic} from './Logic';
 import {PathMatch} from './PathMatch';
 import {Range} from './Range';
 
@@ -32,6 +35,14 @@ export function QueryBuilder(props) {
 	//console.debug('QueryBuilder type', type);
 	const paramsPath = `${path}.params`;
 	const fragment = <>
+		{parentPath && <DeleteItemButton
+			basic compact icon floated='right'
+			style={{
+				boxShadow: 'none'
+			}}
+			index={name}
+			path={parentPath}
+		><Icon color='black' name='close'/></DeleteItemButton>}
 		<SemanticUiReactDropdown
 			onChange={(ignoredEvent,{value: newType}) => {
 				let params;
@@ -112,11 +123,17 @@ export function QueryBuilder(props) {
 			}]}
 			path={`${path}.type`}
 			placeholder='Please select expression type'
+			value={type}
 		/>
 		{['fulltext', 'ngram', 'synonyms'].includes(type) && <Fulltext
 			fieldsObj={fieldsObj}
 			path={paramsPath}
 			type={type}
+			thesauriOptions={thesauriOptions}
+		/>}
+		{type === 'group' && <Logic
+			fieldsObj={fieldsObj}
+			path={paramsPath}
 			thesauriOptions={thesauriOptions}
 		/>}
 		{type === 'compareExpr' && <CompareExpression
@@ -136,7 +153,7 @@ export function QueryBuilder(props) {
 		return fragment;
 	}
 	return <>
-		{legend ? <Header dividing id={id} text={legend}/> : null}
+		{legend && <Header dividing id={id} content={legend}/>}
 		<Segment>
 			{fragment}
 		</Segment>

@@ -8,6 +8,7 @@ export function InsertButton(props) {
 	//console.debug('InsertButton props', props);
 	const {
 		children = <Icon color='green' name='add'/>,
+		icon = true,
 		index = 0,
 		path,
 		value
@@ -17,7 +18,7 @@ export function InsertButton(props) {
 	//console.debug('InsertButton context', context);
 
 	return <Button
-		icon
+		icon={icon}
 		onClick={() => {
 			/*console.debug('InsertButton onClick', {
 				index,

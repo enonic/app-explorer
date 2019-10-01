@@ -160,7 +160,7 @@ export function QueryFilterClause(props) {
 										inverted
 										trigger={<InsertButton
 											path={path}
-											index={index}
+											index={index+1}
 											value={{
 												filter: 'exists',
 												params: {
@@ -196,7 +196,7 @@ export function QueryFilterClause(props) {
 					})}
 					</Table.Body>
 				</Table>
-			<Popup
+			{/*<Popup
 				content='Add'
 				inverted
 				trigger={<InsertButton
@@ -208,7 +208,7 @@ export function QueryFilterClause(props) {
 							field: ''
 						}
 					}}
-				/>}/>
+				/>}/>*/}
 			</>;
 		}}
 	/>;
