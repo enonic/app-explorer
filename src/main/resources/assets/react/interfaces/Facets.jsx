@@ -16,11 +16,6 @@ import {fieldObjToFieldArr} from './query/fieldObjToFieldArr';
 
 export function Facets(props) {
 	const [context, dispatch] = getEnonicContext();
-	let {
-		level = 0
-	} = props;
-	level += 1;
-	const allowChildren = level !== levels;
 	const {
 		fieldsObj,
 		id,
@@ -31,7 +26,12 @@ export function Facets(props) {
 		path = parentPath ? `${parentPath}.${name}` : name,
 		value = getIn(context.values, path)
 	} = props;
-
+	let {
+		level = 0
+	} = props;
+	level += 1;
+	const allowChildren = level !== levels;
+	//console.debug('Facets level', level, 'levels', levels, 'allowChildren', allowChildren);
 	const fieldOptions = fieldObjToFieldArr(fieldsObj);
 
 	if (!(Array.isArray(value) && value.length)) {
