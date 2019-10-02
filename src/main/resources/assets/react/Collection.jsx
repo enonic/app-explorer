@@ -74,6 +74,9 @@ export function Collection(props) {
 		</Segment>
 		<CollectorOptions
 			collectorsObj={collectorsObj}
+			contentTypeOptions={contentTypeOptions}
+			fields={fields}
+			siteOptions={siteOptions}
 		/>
 		<Segment color='green'>
 			<Header as='h2' dividing content='Scheduling' id='cron'/>
