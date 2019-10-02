@@ -12,7 +12,7 @@ export function ValidateFormButton(props) {
 
 	return <Button
 		color='yellow'
-		onClick={() => dispatch(validateForm())}
-		type='reset'
+		onClick={() => dispatch(validateForm({visitAllFields: true}))}
+		type='button'
 	><Icon name='eye'/>Validate</Button>;
 } // ValidateFormButton

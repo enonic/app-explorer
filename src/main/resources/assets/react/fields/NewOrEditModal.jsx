@@ -9,7 +9,7 @@ import {Input} from '../enonic/Input';
 
 import {ResetButton} from '../enonic/ResetButton';
 import {SubmitButton} from '../enonic/SubmitButton';
-import {ValidateFormButton} from '../enonic/ValidateFormButton';
+//import {ValidateFormButton} from '../enonic/ValidateFormButton';
 
 import {CustomInstructionOptions} from './CustomInstructionOptions';
 import {EditValues} from './EditValues';
@@ -186,7 +186,7 @@ export function NewOrEditModal(props) {
 					<CustomInstructionOptions/>
 					<SubmitButton/>
 					<ResetButton/>
-					<ValidateFormButton/>
+					{/*<ValidateFormButton/>*/}
 				</Form>
 			</EnonicForm>
 			{editMode && <>

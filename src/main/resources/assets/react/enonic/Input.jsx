@@ -9,7 +9,8 @@ import {getEnonicContext} from './Context';
 import {
 	setValue,
 	setVisited,
-	validateField
+	//validateField,
+	validateForm
 } from './Form';
 
 
@@ -40,12 +41,14 @@ export function Input(props = {}) {
 			name={path}
 			onBlur={() => {
 				dispatch(setVisited({path}));
-				validateOnBlur && dispatch(validateField({path, value}));
+				//validateOnBlur && dispatch(validateField({path, value}));
+				validateOnBlur && dispatch(validateForm());
 			}}
 			onChange={(event, {value: newValue}) => {
 				dispatch(setValue({path, value: newValue}));
 				dispatch(setVisited({path}));
-				validateOnChange && dispatch(validateField({path, value: newValue}));
+				//validateOnChange && dispatch(validateField({path, value: newValue}));
+				validateOnChange && dispatch(validateForm());
 			}}
 			value={value}
 		/>

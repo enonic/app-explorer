@@ -1,3 +1,17 @@
+/*
+
+The submit button should be disabled if the form doesn't validate.
+(Perhaps also if there are no changes?,
+but that could make it impossible to submit a form that is initially valid.)
+
+* Thus we need to validate the entire form on init.
+
+* When you leave a field it should be set to visited.
+
+* When you change or leave a field it should be validated.
+
+*/
+
 import deepEqual from 'fast-deep-equal';
 import getIn from 'get-value';
 import setIn from 'set-value';
@@ -89,8 +103,11 @@ export const validateField = ({path, value}) => ({
 	value
 });
 
-export const validateForm = () => ({
-	type: VALIDATE_FORM
+export const validateForm = ({
+	visitAllFields = false
+} = {}) => ({
+	type: VALIDATE_FORM,
+	visitAllFields
 });
 
 export const actions = {
@@ -117,7 +134,7 @@ export function Form(props) {
 		onDelete,
 		onSubmit,
 		schema = {},
-		validateOnInit = false
+		validateOnInit = true
 	} = props;
 	//console.debug('Form schema', schema);
 
@@ -145,7 +162,7 @@ export function Form(props) {
 	//console.debug('Form initialState', initialState);
 
 	const reducer = (state, action) => {
-		//console.debug('reducer state', state, 'action', action);
+		//console.debug('reducer action', action, 'state', state);
 		switch (action.type) {
 		case DELETE_ITEM: {
 			//console.debug('reducer state', state, 'action', action);
@@ -296,8 +313,10 @@ export function Form(props) {
 			return deref;
 		}
 		case VALIDATE_FORM: {
-			const errors = {};
-			const visits = {};
+			//console.debug('reducer action', action);
+			const {visitAllFields} = action;
+			const deref = JSON.parse(JSON.stringify(state));
+			const errors = {}; // forgetting old errors here
 			traverse(schema).forEach(function (x) { // fat-arrow destroys this
 				if (this.notRoot && this.isLeaf && isFunction(x)) {
 					const path = this.path; //console.debug('path', path);
@@ -305,15 +324,14 @@ export function Form(props) {
 					//const prevError = getIn(state.errors, path); console.debug('prevError', prevError);
 					const newError = x(value); //console.debug('newError', newError);
 					newError && setIn(errors, path, newError);
-					setIn(visits, path, true);
+					visitAllFields && setIn(deref.visits, path, true);
 					//console.debug('node', this.node);
 				}
 			});
 			//console.debug('errors', errors);
 			//console.debug('visits', visits);
-			const deref = JSON.parse(JSON.stringify(state));
 			deref.errors = errors;
-			deref.visits = visits;
+			//console.debug('reducer action', action, 'state', state, 'deref', deref);
 			return deref;
 		}
 		default: return state;
