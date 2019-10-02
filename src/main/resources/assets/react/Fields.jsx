@@ -119,7 +119,7 @@ export function Fields(props) {
 							enabled,
 							fulltext,
 							includeInAllText,
-							ngram,
+							nGram, // node._indexConfig.default.nGram uses uppercase G in nGram
 							path,
 							valuesRes
 						}, index) => {
@@ -142,7 +142,7 @@ export function Fields(props) {
 												enabled,
 												fulltext,
 												includeInAllText,
-												ngram,
+												nGram, // node._indexConfig.default.nGram uses uppercase G in nGram
 												path
 											}}
 											onClose={fetchFields}

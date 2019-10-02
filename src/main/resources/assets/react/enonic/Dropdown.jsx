@@ -12,11 +12,19 @@ export function Dropdown(props = {}) {
 	//console.debug('Dropdown context', context);
 
 	const {
-		path,
+		name,
+		parentPath,
+		path = parentPath ? `${parentPath}.${name}` : name,
 		value = getIn(context.values, path),
 		...rest
 	} = props;
-	//console.debug('Dropdown path', path, 'value', value, 'rest', rest);
+	/*console.debug('Dropdown',
+		'name', name,
+		'parentPath', parentPath,
+		'path', path,
+		'value', value,
+		'rest', rest
+	);*/
 
 	return <SemanticUiReactDropdown
 		{...rest}

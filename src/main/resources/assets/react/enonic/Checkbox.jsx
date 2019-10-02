@@ -9,10 +9,19 @@ export function Checkbox(props) {
 	const [context, dispatch] = getEnonicContext();
 
 	const {
-		path,
+		name,
+		parentPath,
+		path = parentPath ? `${parentPath}.${name}` : name,
 		value = getIn(context.values, path),
 		...rest //defaultChecked
 	} = props;
+	/*console.debug('Checkbox',
+		'name', name,
+		'parentPath', parentPath,
+		'path', path,
+		'value', value,
+		'rest', rest
+	);*/
 
 	return <SemanticUiReactCheckbox
 		{...rest}

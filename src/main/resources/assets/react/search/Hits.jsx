@@ -1,9 +1,6 @@
-import {Header} from '../semantic-ui/Header';
-import {Icon} from '../semantic-ui/Icon';
-import {Item} from '../semantic-ui/Item';
-import {Label} from '../semantic-ui/Label';
-import {Labels} from '../semantic-ui/Labels';
-import {List} from '../semantic-ui/List';
+import ReactHtmlParser from 'react-html-parser';
+
+import {Header, List} from 'semantic-ui-react';
 
 //import {toStr} from '../utils/toStr';
 
@@ -39,9 +36,9 @@ export const Hits = ({
 				source,
 				informationType,
 				language
-			}, index) => <Item key={index}>
+			}, index) => <List.Item key={index}>
 				<a href={uri}>
-					<Header dangerouslySetInnerHTML={{__html: title}}/>
+					<Header>{ReactHtmlParser(title)}</Header>
 					<p>{uri}</p>
 				</a>
 				<p dangerouslySetInnerHTML={{__html: text}}/>
@@ -53,7 +50,7 @@ export const Hits = ({
 					{forceMap(language, ({displayName}, i) =>
 						<Label basic pointing key={`language${i}`}><Icon className='font'/>{displayName}</Label>)}
 				</Labels>*/}
-			</Item>)
+			</List.Item>)
 		}
 	</List>;
 } // Hits

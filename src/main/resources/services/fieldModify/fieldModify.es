@@ -27,7 +27,7 @@ export function post({params: {
 		instruction = 'type',
 		decideByType = true,
 		enabled = true,
-		nGram = true,
+		nGram = true, // node._indexConfig.default.nGram uses uppercase G in nGram
 		fulltext = true,
 		includeInAllText = true,
 		path = false,

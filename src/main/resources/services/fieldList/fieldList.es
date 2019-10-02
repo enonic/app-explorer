@@ -50,7 +50,7 @@ export function get() {
 			enabled: getIn(indexConfig, 'enabled', true),
 			fulltext: getIn(indexConfig, 'fulltext', true),
 			includeInAllText: getIn(indexConfig, 'includeInAllText', true),
-			ngram: getIn(indexConfig, 'ngram', true),
+			nGram: getIn(indexConfig, 'nGram', true), // node._indexConfig.default.nGram uses uppercase G in nGram
 			path: getIn(indexConfig, 'path', false),
 
 			valuesRes
