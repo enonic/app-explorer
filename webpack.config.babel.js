@@ -248,7 +248,10 @@ const WEBPACK_CONFIG = [webpackServerSideJs({
 			port: 3002,
 			proxy: 'http://localhost:8080/'
 		})
-	] : []
+	] : [],
+	resolveAlias: {
+		'semantic-ui-react-form': path.resolve(__dirname, '../enonic-npm-modules/packages/semantic-ui-react-form/src')
+	}
 })];
 
 //console.log(`WEBPACK_CONFIG:${JSON.stringify(WEBPACK_CONFIG, null, 4)}`);

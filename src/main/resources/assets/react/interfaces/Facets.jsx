@@ -1,15 +1,15 @@
 import getIn from 'get-value';
 import {Button, Dropdown, Form, Header, Icon, Table} from 'semantic-ui-react';
 
-import {getEnonicContext} from '../enonic/Context';
-import {setValue} from '../enonic/Form';
-import {DeleteItemButton} from '../enonic/DeleteItemButton';
-//import {Dropdown} from '../enonic/Dropdown';
-import {InsertButton} from '../enonic/InsertButton';
-import {List} from '../enonic/List';
-import {MoveDownButton} from '../enonic/MoveDownButton';
-import {MoveUpButton} from '../enonic/MoveUpButton';
-import {SetValueButton} from '../enonic/SetValueButton';
+import {getEnonicContext} from 'semantic-ui-react-form/Context';
+import {setValue} from 'semantic-ui-react-form/actions';
+import {DeleteItemButton} from 'semantic-ui-react-form/buttons/DeleteItemButton';
+//import {Dropdown} from 'semantic-ui-react-form/inputs/Dropdown';
+import {InsertButton} from 'semantic-ui-react-form/buttons/InsertButton';
+import {List} from 'semantic-ui-react-form/List';
+import {MoveDownButton} from 'semantic-ui-react-form/buttons/MoveDownButton';
+import {MoveUpButton} from 'semantic-ui-react-form/buttons/MoveUpButton';
+import {SetValueButton} from 'semantic-ui-react-form/buttons/SetValueButton';
 
 import {fieldObjToFieldArr} from './query/fieldObjToFieldArr';
 

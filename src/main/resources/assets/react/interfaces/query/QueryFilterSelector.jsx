@@ -1,9 +1,9 @@
 import getIn from 'get-value';
-//import {Dropdown} from '../../enonic/Dropdown';
+//import {Dropdown} from 'semantic-ui-react-form/inputs/Dropdown';
 import {Dropdown as SemanticUiReactDropdown} from 'semantic-ui-react';
 
-import {getEnonicContext} from '../../enonic/Context';
-import {setValue} from '../../enonic/Form';
+import {getEnonicContext} from 'semantic-ui-react-form/Context';
+import {setValue} from 'semantic-ui-react-form/actions';
 
 
 const OPTIONS = [{

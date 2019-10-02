@@ -1,8 +1,8 @@
 import {Form} from 'semantic-ui-react';
 
-import {Checkbox} from '../../enonic/Checkbox';
-import {Dropdown} from '../../enonic/Dropdown';
-import {Input} from '../../enonic/Input';
+import {Checkbox} from 'semantic-ui-react-form/inputs/Checkbox';
+import {Dropdown} from 'semantic-ui-react-form/inputs/Dropdown';
+import {Input} from 'semantic-ui-react-form/inputs/Input';
 
 import {fieldObjToFieldArr} from './fieldObjToFieldArr';
 

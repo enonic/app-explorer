@@ -1,8 +1,8 @@
 import {Header, Segment} from 'semantic-ui-react';
 import getIn from 'get-value';
 
-import {getEnonicContext} from '../enonic/Context';
-import {actions} from '../enonic/Form';
+import {getEnonicContext} from 'semantic-ui-react-form/Context';
+import {actions} from 'semantic-ui-react-form/actions';
 
 
 export function CollectorOptions(props) {

@@ -2,17 +2,17 @@ import {
 	Button, Form, Header, Icon, Input, Modal, Popup, Table
 } from 'semantic-ui-react';
 
-import {Form as EnonicForm} from '../enonic/Form';
-import {Input as EnonicInput} from '../enonic/Input';
-import {List} from '../enonic/List';
-import {DeleteItemButton} from '../enonic/DeleteItemButton';
-import {InsertButton} from '../enonic/InsertButton';
-import {MoveDownButton} from '../enonic/MoveDownButton';
-import {MoveUpButton} from '../enonic/MoveUpButton';
-import {ResetButton} from '../enonic/ResetButton';
-import {SortButton} from '../enonic/SortButton';
-import {SubmitButton} from '../enonic/SubmitButton';
-import {ValidateFormButton} from '../enonic/ValidateFormButton';
+import {Form as EnonicForm} from 'semantic-ui-react-form/Form';
+import {Input as EnonicInput} from 'semantic-ui-react-form/inputs/Input';
+import {List} from 'semantic-ui-react-form/List';
+import {DeleteItemButton} from 'semantic-ui-react-form/buttons/DeleteItemButton';
+import {InsertButton} from 'semantic-ui-react-form/buttons/InsertButton';
+import {MoveDownButton} from 'semantic-ui-react-form/buttons/MoveDownButton';
+import {MoveUpButton} from 'semantic-ui-react-form/buttons/MoveUpButton';
+import {ResetButton} from 'semantic-ui-react-form/buttons/ResetButton';
+import {SortButton} from 'semantic-ui-react-form/buttons/SortButton';
+import {SubmitButton} from 'semantic-ui-react-form/buttons/SubmitButton';
+import {ValidateFormButton} from 'semantic-ui-react-form/buttons/ValidateFormButton';
 
 
 /*function required(value) {

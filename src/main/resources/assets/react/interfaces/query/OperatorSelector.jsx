@@ -1,8 +1,8 @@
 import getIn from 'get-value';
 import {Form, Radio} from 'semantic-ui-react';
 
-import {getEnonicContext} from '../../enonic/Context';
-import {setValue} from '../../enonic/Form';
+import {getEnonicContext} from 'semantic-ui-react-form/Context';
+import {setValue} from 'semantic-ui-react-form/actions';
 
 
 export function OperatorSelector(props) {

@@ -3,13 +3,13 @@ import {
 	Button, Form, Header, Icon, Modal, Popup
 } from 'semantic-ui-react';
 
-import {Form as EnonicForm} from '../enonic/Form';
-import {Dropdown} from '../enonic/Dropdown';
-import {Input} from '../enonic/Input';
+import {Form as EnonicForm} from 'semantic-ui-react-form/Form';
+import {Dropdown} from 'semantic-ui-react-form/inputs/Dropdown';
+import {Input} from 'semantic-ui-react-form/inputs/Input';
 
-import {ResetButton} from '../enonic/ResetButton';
-import {SubmitButton} from '../enonic/SubmitButton';
-//import {ValidateFormButton} from '../enonic/ValidateFormButton';
+import {ResetButton} from 'semantic-ui-react-form/buttons/ResetButton';
+import {SubmitButton} from 'semantic-ui-react-form/buttons/SubmitButton';
+//import {ValidateFormButton} from 'semantic-ui-react-form/buttons/ValidateFormButton';
 
 import {CustomInstructionOptions} from './CustomInstructionOptions';
 import {EditValues} from './EditValues';

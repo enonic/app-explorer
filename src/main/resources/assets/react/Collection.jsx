@@ -1,17 +1,17 @@
 import {Button, Form, Header, Segment, Table} from 'semantic-ui-react';
 
-import {Form as EnonicForm} from './enonic/Form';
-import {Checkbox} from './enonic/Checkbox';
-import {Input} from './enonic/Input';
-import {List} from './enonic/List';
-import {Dropdown} from './enonic/Dropdown';
-import {ResetButton} from './enonic/ResetButton';
-import {SubmitButton} from './enonic/SubmitButton';
+import {Form as EnonicForm} from 'semantic-ui-react-form/Form';
+import {Checkbox} from 'semantic-ui-react-form/inputs/Checkbox';
+import {Input} from 'semantic-ui-react-form/inputs/Input';
+import {List} from 'semantic-ui-react-form/List';
+import {Dropdown} from 'semantic-ui-react-form/inputs/Dropdown';
+import {ResetButton} from 'semantic-ui-react-form/buttons/ResetButton';
+import {SubmitButton} from 'semantic-ui-react-form/buttons/SubmitButton';
 
-import {DeleteItemButton} from './enonic/DeleteItemButton';
-import {InsertButton} from './enonic/InsertButton';
-import {MoveDownButton} from './enonic/MoveDownButton';
-import {MoveUpButton} from './enonic/MoveUpButton';
+import {DeleteItemButton} from 'semantic-ui-react-form/buttons/DeleteItemButton';
+import {InsertButton} from 'semantic-ui-react-form/buttons/InsertButton';
+import {MoveDownButton} from 'semantic-ui-react-form/buttons/MoveDownButton';
+import {MoveUpButton} from 'semantic-ui-react-form/buttons/MoveUpButton';
 
 import {CollectorOptions} from './collection/CollectorOptions';
 import {CollectorSelector} from './collection/CollectorSelector';

@@ -1,11 +1,11 @@
 import getIn from 'get-value';
 import {Button, Divider, Form, Icon, Segment} from 'semantic-ui-react';
 
-import {getEnonicContext} from '../../enonic/Context';
-import {InsertButton} from '../../enonic/InsertButton';
-import {MoveDownButton} from '../../enonic/MoveDownButton';
-import {MoveUpButton} from '../../enonic/MoveUpButton';
-import {List} from '../../enonic/List';
+import {getEnonicContext} from 'semantic-ui-react-form/Context';
+import {InsertButton} from 'semantic-ui-react-form/buttons/InsertButton';
+import {MoveDownButton} from 'semantic-ui-react-form/buttons/MoveDownButton';
+import {MoveUpButton} from 'semantic-ui-react-form/buttons/MoveUpButton';
+import {List} from 'semantic-ui-react-form/List';
 
 import {OperatorSelector} from './OperatorSelector';
 import {QueryBuilder} from './QueryBuilder';

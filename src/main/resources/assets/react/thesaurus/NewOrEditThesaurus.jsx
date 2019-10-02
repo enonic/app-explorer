@@ -2,10 +2,10 @@ import {
 	Button, Form, Header, Icon, Input, Modal, Popup
 } from 'semantic-ui-react';
 
-import {Form as EnonicForm} from '../enonic/Form';
-import {Input as EnonicInput} from '../enonic/Input';
-import {ResetButton} from '../enonic/ResetButton';
-import {SubmitButton} from '../enonic/SubmitButton';
+import {Form as EnonicForm} from 'semantic-ui-react-form/Form';
+import {Input as EnonicInput} from 'semantic-ui-react-form/inputs/Input';
+import {ResetButton} from 'semantic-ui-react-form/buttons/ResetButton';
+import {SubmitButton} from 'semantic-ui-react-form/buttons/SubmitButton';
 
 import {EditSynonyms} from './EditSynonyms';
 

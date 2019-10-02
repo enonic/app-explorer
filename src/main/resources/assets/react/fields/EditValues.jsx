@@ -2,12 +2,12 @@ import {
 	Button, Loader, Table
 } from 'semantic-ui-react';
 
-import {Form as EnonicForm} from '../enonic/Form';
-import {Input as EnonicInput} from '../enonic/Input';
-import {DeleteButton} from '../enonic/DeleteButton';
-import {ResetButton} from '../enonic/ResetButton';
-import {SubmitButton} from '../enonic/SubmitButton';
-import {ValidateFormButton} from '../enonic/ValidateFormButton';
+import {Form as EnonicForm} from 'semantic-ui-react-form/Form';
+import {Input as EnonicInput} from 'semantic-ui-react-form/inputs/Input';
+import {DeleteButton} from 'semantic-ui-react-form/buttons/DeleteButton';
+import {ResetButton} from 'semantic-ui-react-form/buttons/ResetButton';
+import {SubmitButton} from 'semantic-ui-react-form/buttons/SubmitButton';
+import {ValidateFormButton} from 'semantic-ui-react-form/buttons/ValidateFormButton';
 
 
 function required(value) {

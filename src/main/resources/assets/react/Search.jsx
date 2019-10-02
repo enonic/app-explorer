@@ -1,8 +1,8 @@
 import getIn from 'get-value';
 import setIn from 'set-value';
 
-import {Form as EnonicForm} from './enonic/Form';
-import {Input as EnonicInput} from './enonic/Input';
+import {Form as EnonicForm} from 'semantic-ui-react-form/Form';
+import {Input as EnonicInput} from 'semantic-ui-react-form/inputs/Input';
 
 import {Hits} from './search/Hits';
 

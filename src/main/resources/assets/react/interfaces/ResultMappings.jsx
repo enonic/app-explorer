@@ -1,16 +1,16 @@
 //import getIn from 'get-value';
 import {Button, Form, Header, Table} from 'semantic-ui-react';
 
-//import {getEnonicContext} from '../enonic/Context';
-import {Checkbox} from '../enonic/Checkbox';
-import {Dropdown} from '../enonic/Dropdown';
-import {Input} from '../enonic/Input';
-import {List} from '../enonic/List';
+//import {getEnonicContext} from 'semantic-ui-react-form/Context';
+import {Checkbox} from 'semantic-ui-react-form/inputs/Checkbox';
+import {Dropdown} from 'semantic-ui-react-form/inputs/Dropdown';
+import {Input} from 'semantic-ui-react-form/inputs/Input';
+import {List} from 'semantic-ui-react-form/List';
 
-import {DeleteItemButton} from '../enonic/DeleteItemButton';
-import {InsertButton} from '../enonic/InsertButton';
-import {MoveDownButton} from '../enonic/MoveDownButton';
-import {MoveUpButton} from '../enonic/MoveUpButton';
+import {DeleteItemButton} from 'semantic-ui-react-form/buttons/DeleteItemButton';
+import {InsertButton} from 'semantic-ui-react-form/buttons/InsertButton';
+import {MoveDownButton} from 'semantic-ui-react-form/buttons/MoveDownButton';
+import {MoveUpButton} from 'semantic-ui-react-form/buttons/MoveUpButton';
 
 import {fieldObjToFieldArr} from './query/fieldObjToFieldArr';
 

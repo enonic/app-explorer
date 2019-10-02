@@ -1,12 +1,12 @@
 import {Form, Header, Loader} from 'semantic-ui-react';
 //import generateUuidv4 from 'uuid/v4';
 
-import {Form as EnonicForm} from '../enonic/Form';
-import {Dropdown} from '../enonic/Dropdown';
-import {Input} from '../enonic/Input';
+import {Form as EnonicForm} from 'semantic-ui-react-form/Form';
+import {Dropdown} from 'semantic-ui-react-form/inputs/Dropdown';
+import {Input} from 'semantic-ui-react-form/inputs/Input';
 
-import {ResetButton} from '../enonic/ResetButton';
-import {SubmitButton} from '../enonic/SubmitButton';
+import {ResetButton} from 'semantic-ui-react-form/buttons/ResetButton';
+import {SubmitButton} from 'semantic-ui-react-form/buttons/SubmitButton';
 
 import {Facets} from './Facets';
 import {QueryBuilder} from './query/QueryBuilder';

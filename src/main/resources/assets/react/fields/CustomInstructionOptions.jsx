@@ -1,8 +1,8 @@
 import getIn from 'get-value';
 import {Form} from 'semantic-ui-react';
 
-import {getEnonicContext} from '../enonic/Context';
-import {Checkbox} from '../enonic/Checkbox';
+import {getEnonicContext} from 'semantic-ui-react-form/Context';
+import {Checkbox} from 'semantic-ui-react-form/inputs/Checkbox';
 
 
 export function CustomInstructionOptions(props) {

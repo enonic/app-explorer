@@ -6,9 +6,9 @@ import {
 	Segment
 } from 'semantic-ui-react';
 
-import {getEnonicContext} from '../../enonic/Context';
-import {setValue} from '../../enonic/Form';
-import {DeleteItemButton} from '../../enonic/DeleteItemButton';
+import {getEnonicContext} from 'semantic-ui-react-form/Context';
+import {setValue} from 'semantic-ui-react-form/actions';
+import {DeleteItemButton} from 'semantic-ui-react-form/buttons/DeleteItemButton';
 
 import {CompareExpression} from './CompareExpression';
 import {Fulltext} from './Fulltext';
