@@ -1,4 +1,4 @@
-import {Button, Header, Segment, Table} from 'semantic-ui-react';
+import {Button, Form, Header, Segment, Table} from 'semantic-ui-react';
 
 import {Form as EnonicForm} from './enonic/Form';
 import {Checkbox} from './enonic/Checkbox';
@@ -13,6 +13,7 @@ import {InsertButton} from './enonic/InsertButton';
 import {MoveDownButton} from './enonic/MoveDownButton';
 import {MoveUpButton} from './enonic/MoveUpButton';
 
+import {CollectorOptions} from './collection/CollectorOptions';
 import {CollectorSelector} from './collection/CollectorSelector';
 
 
@@ -52,6 +53,11 @@ export function Collection(props) {
 		initialValues={initialValues}
 		onSubmit={(values) => {
 			console.debug('submit values', values);
+			/*fetch(`${servicesBaseUrl}/collection${mode === 'create' ? 'Create' : 'Modify'}?json=${JSON.stringify(values)}`, {
+				method: 'POST'
+			}).then(response => {
+				onClose()
+			})*/
 		}}
 	>
 		<Segment color='black'>
@@ -66,6 +72,9 @@ export function Collection(props) {
 				options={collectorOptions}
 			/>
 		</Segment>
+		<CollectorOptions
+			collectorsObj={collectorsObj}
+		/>
 		<Segment color='green'>
 			<Header as='h2' dividing content='Scheduling' id='cron'/>
 			<Checkbox
@@ -198,10 +207,10 @@ export function Collection(props) {
 				}}
 			/>
 		</Segment>
-		{/*<Form.Field>
+		<Form.Field>
 			<SubmitButton/>
 			<ResetButton/>
-		</Form.Field>*/}
+		</Form.Field>
 	</EnonicForm>;
 } // function Collection
 

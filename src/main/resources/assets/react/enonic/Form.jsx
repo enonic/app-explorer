@@ -93,6 +93,16 @@ export const validateForm = () => ({
 	type: VALIDATE_FORM
 });
 
+export const actions = {
+	deleteItem,
+	insert,
+	moveDown,
+	moveUp,
+	setValue,
+	setVisited,
+	sort,
+	validateField
+};
 
 function isFunction(value) {
 	return !!(value && value.constructor && value.call && value.apply); // highly performant from underscore
