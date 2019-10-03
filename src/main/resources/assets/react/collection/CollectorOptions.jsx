@@ -17,6 +17,8 @@ export function CollectorOptions(props) {
 	//console.debug('CollectorOptions context', context);
 	const collectorName = getIn(context.values, 'collector.name');
 
+	const isFirstRun = React.useRef(true);
+
 	if (!collectorName) { return null; }
 
 	if (!collectorsObj[collectorName]) { return <p>Collector {collectorName} NOT found!</p>; }
@@ -30,7 +32,8 @@ export function CollectorOptions(props) {
 				contentTypeOptions,
 				fields,
 				siteOptions
-			}
+			},
+			isFirstRun
 		})}
 	</Segment>;
 } // function CollectorOptions

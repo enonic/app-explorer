@@ -1,17 +1,18 @@
 import {Button, Form, Header, Segment, Table} from 'semantic-ui-react';
 
-import {Form as EnonicForm} from 'semantic-ui-react-form/Form';
-import {Checkbox} from 'semantic-ui-react-form/inputs/Checkbox';
-import {Input} from 'semantic-ui-react-form/inputs/Input';
-import {List} from 'semantic-ui-react-form/List';
-import {Dropdown} from 'semantic-ui-react-form/inputs/Dropdown';
-import {ResetButton} from 'semantic-ui-react-form/buttons/ResetButton';
-import {SubmitButton} from 'semantic-ui-react-form/buttons/SubmitButton';
-
-import {DeleteItemButton} from 'semantic-ui-react-form/buttons/DeleteItemButton';
-import {InsertButton} from 'semantic-ui-react-form/buttons/InsertButton';
-import {MoveDownButton} from 'semantic-ui-react-form/buttons/MoveDownButton';
-import {MoveUpButton} from 'semantic-ui-react-form/buttons/MoveUpButton';
+import {
+	Checkbox,
+	DeleteItemButton,
+	Dropdown,
+	Form as EnonicForm,
+	Input,
+	InsertButton,
+	List,
+	MoveDownButton,
+	MoveUpButton,
+	ResetButton,
+	SubmitButton
+} from 'semantic-ui-react-form';
 
 import {CollectorOptions} from './collection/CollectorOptions';
 import {CollectorSelector} from './collection/CollectorSelector';
@@ -47,7 +48,7 @@ export function Collection(props) {
 	} = props;
 	//console.debug('Collection initialValues', initialValues);
 
-	const path = 'cron';
+	const cronPath = 'cron';
 
 	return <EnonicForm
 		initialValues={initialValues}
@@ -85,8 +86,9 @@ export function Collection(props) {
 				label='Activate scheduling'
 			/>
 			<List
-				path={path}
+				path={cronPath}
 				render={(cronArray) => {
+					//console.debug('Collection List cronArray', cronArray);
 					return cronArray.map(({
 						minute,
 						hour,
@@ -177,7 +179,7 @@ export function Collection(props) {
 									<Table.Cell>
 										<Button.Group icon>
 											<InsertButton
-												path={path}
+												path={cronPath}
 												index={index+1}
 												value={{
 													month: '*',
@@ -189,16 +191,16 @@ export function Collection(props) {
 											/>
 											<MoveDownButton
 												disabled={index + 1 >= cronArray.length}
-												path={path}
+												path={cronPath}
 												index={index}
 											/>
 											<MoveUpButton
-												path={path}
+												path={cronPath}
 												index={index}
 											/>
 											<DeleteItemButton
 												disabled={cronArray.length < 2}
-												path={path}
+												path={cronPath}
 												index={index}
 											/>
 										</Button.Group>
