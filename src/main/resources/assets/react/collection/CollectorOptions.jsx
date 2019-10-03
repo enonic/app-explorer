@@ -33,7 +33,8 @@ export function CollectorOptions(props) {
 				fields,
 				siteOptions
 			},
-			isFirstRun
+			isFirstRun,
+			path: 'collector.config'
 		})}
 	</Segment>;
 } // function CollectorOptions
