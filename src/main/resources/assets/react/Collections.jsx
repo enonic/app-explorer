@@ -8,6 +8,7 @@ import {useInterval} from './utils/useInterval';
 
 function NewOrEditModal(props) {
 	const {
+		afterClose,
 		//collectors,
 		collectorsObj,
 		collectorOptions,
@@ -24,7 +25,10 @@ function NewOrEditModal(props) {
 	});
 	//console.debug('NewOrEditModal', {props, state});
 
-	const onClose = () => setState({open: false});
+	const onClose = () => {
+		setState({open: false});
+		afterClose();
+	}
 	const onOpen = () => setState({open: true});
 
 	return <Modal
@@ -250,6 +254,7 @@ export function Collections(props) {
 						<Table.Cell>
 							<Button.Group>
 								<NewOrEditModal
+									afterClose={fetchCollections}
 									collectorOptions={collectorOptions}
 									collectorsObj={collectorsObj}
 									contentTypeOptions={contentTypeOptions}
@@ -314,6 +319,7 @@ export function Collections(props) {
 			</Table.Footer>
 		</Table>
 		<NewOrEditModal
+			afterClose={fetchCollections}
 			collectorOptions={collectorOptions}
 			collectorsObj={collectorsObj}
 			contentTypeOptions={contentTypeOptions}

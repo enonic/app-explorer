@@ -53,12 +53,12 @@ export function Collection(props) {
 	return <EnonicForm
 		initialValues={initialValues}
 		onSubmit={(values) => {
-			console.debug('submit values', values);
-			/*fetch(`${servicesBaseUrl}/collection${mode === 'create' ? 'Create' : 'Modify'}?json=${JSON.stringify(values)}`, {
+			//console.debug('submit values', values);
+			fetch(`${servicesBaseUrl}/collection${mode === 'create' ? 'Create' : 'Modify'}?json=${JSON.stringify(values)}`, {
 				method: 'POST'
 			}).then(response => {
 				onClose()
-			})*/
+			})
 		}}
 	>
 		<Segment color='black'>
