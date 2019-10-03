@@ -2,7 +2,6 @@ import {Header, Segment} from 'semantic-ui-react';
 import getIn from 'get-value';
 
 import {getEnonicContext} from 'semantic-ui-react-form/Context';
-import {actions} from 'semantic-ui-react-form/actions';
 
 
 export function CollectorOptions(props) {
@@ -25,7 +24,6 @@ export function CollectorOptions(props) {
 	return <Segment color='pink'>
 		<Header as='h2' dividing content={collectorName} id='collector'/>
 		{collectorsObj[collectorName]({
-			actions,
 			context,
 			dispatch,
 			explorer: {
