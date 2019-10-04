@@ -18,6 +18,16 @@ import {CollectorOptions} from './collection/CollectorOptions';
 import {CollectorSelector} from './collection/CollectorSelector';
 
 
+function required(value) {
+	return value ? undefined : 'Required!';
+}
+
+
+const SCHEMA = {
+	name: (v) => required(v)
+};
+
+
 export function Collection(props) {
 	//console.debug('Collection props', props);
 
@@ -60,6 +70,7 @@ export function Collection(props) {
 				onClose()
 			})
 		}}
+		schema={SCHEMA}
 	>
 		<Segment color='black'>
 			<Header as='h1' dividing content='Collection' id='collection'/>
