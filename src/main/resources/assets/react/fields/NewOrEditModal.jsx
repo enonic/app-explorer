@@ -10,7 +10,7 @@ import {Input} from 'semantic-ui-react-form/inputs/Input';
 import {ResetButton} from 'semantic-ui-react-form/buttons/ResetButton';
 import {SubmitButton} from 'semantic-ui-react-form/buttons/SubmitButton';
 //import {ValidateFormButton} from 'semantic-ui-react-form/buttons/ValidateFormButton';
-import {VisitAllButton} from 'semantic-ui-react-form/buttons/VisitAllButton';
+//import {VisitAllButton} from 'semantic-ui-react-form/buttons/VisitAllButton';
 
 import {CustomInstructionOptions} from './CustomInstructionOptions';
 import {EditValues} from './EditValues';
@@ -187,7 +187,7 @@ export function NewOrEditModal(props) {
 					<CustomInstructionOptions/>
 					<SubmitButton/>
 					<ResetButton/>
-					<VisitAllButton/>
+					{/*<VisitAllButton/>*/}
 					{/*<ValidateFormButton/>*/}
 				</Form>
 			</EnonicForm>
