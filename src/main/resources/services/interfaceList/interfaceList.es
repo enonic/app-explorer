@@ -32,8 +32,14 @@ export function get() {
 		};
 	});
 
-	const fieldsArray = getFields({connection}).hits.map(({displayName, key, _path}) => ({
+	const fieldsArray = getFields({connection}).hits.map(({
+		displayName,
 		key,
+		inResults = true,
+		_path
+	}) => ({
+		key,
+		inResults,
 		text: displayName,
 		path: _path,
 		value: key,
@@ -43,18 +49,22 @@ export function get() {
 	fieldsArray.forEach(({
 		key,
 		//label,
+		inResults,
 		path,
 		text,
 		//value,
 		values
 	}) => {
-		fieldsObj[key] = {
-			//key,
-			//label,
-			path,
-			text,
-			values
-		};
+		if (inResults) {
+			fieldsObj[key] = {
+				//key,
+				//label,
+				//inResults,
+				path,
+				text,
+				values
+			};
+		}
 	});
 
 	const interfaces = query({connection});
