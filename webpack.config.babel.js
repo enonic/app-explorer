@@ -94,15 +94,11 @@ const CLIENT_JS_CONFIG = {
 	},
 	plugins: [
 		new CopyWebpackPlugin([
-			//{ from: 'babel-standalone/', to: 'babel-standalone/' },
-			{ from: 'formik/dist/formik.*', to: 'formik/[name].[ext]' },
-			{ from: 'frappe-gannt/dist/*', to: 'frappe-gannt/[name].[ext]' },
+			//{ from: 'frappe-gannt/dist/*', to: 'frappe-gannt/[name].[ext]' },
 			{ from: 'jquery/dist', to: 'jquery'},
 			{ from: 'react/umd/react.*.js', to: 'react/[name].[ext]' },
 			{ from: 'react-dom/umd/react-dom.*.js', to: 'react-dom/[name].[ext]' },
 			{ from: 'semantic-ui/dist', to: 'semantic-ui'},
-			{ from: 'tslib/*.js', to: 'tslib/[name].[ext]'}
-			//{ from: 'redux/dist/', to: 'redux/' }
 		], {
 			context: path.resolve(__dirname, 'node_modules')
 		}),

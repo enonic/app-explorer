@@ -24,9 +24,6 @@ const NODE_MODULES = [{
 	header: 'fnv-plus', // lib-explorer
 	href: 'https://github.com/tjwebb/fnv-plus#license'
 },{
-	header: 'Formik',
-	href: 'https://github.com/jaredpalmer/formik/blob/master/LICENSE'
-},{
 	header: 'highlight-search-result', // lib-explorer
 	href: 'https://github.com/dominictarr/highlight-search-result/blob/master/LICENSE'
 },{
