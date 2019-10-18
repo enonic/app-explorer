@@ -30,7 +30,7 @@ export function CollectorSelector(props) {
 				path: parentPath,
 				value: {
 					name: newName,
-					config: {}
+					config: null // Always let child form set initial config value!
 				}
 			}));
 		}}

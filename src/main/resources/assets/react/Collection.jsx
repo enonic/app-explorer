@@ -43,8 +43,8 @@ export function Collection(props) {
 		initialValues = {
 			name: '',
 			collector: {
-				name: ''/*,
-				config: {}*/ // Lets child form set it instead...
+				name: ''//,
+				//config: null // CollectorSelector onChange will set this.
 			},
 			cron: [{
 				month: '*',
