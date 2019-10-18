@@ -19,7 +19,6 @@ export function NewOrEditInterface(props) {
 		collectionOptions,
 		fieldsObj,
 		id, // nullable
-		name, // nullable
 		onClose,
 		servicesBaseUrl,
 		stopWordOptions,
@@ -72,6 +71,7 @@ export function NewOrEditInterface(props) {
 	return isLoading ? <Loader active inverted>Loading</Loader> : <EnonicForm
 		initialValues={initialValues}
 		onSubmit={(values) => {
+			const {name} = values;
 			//console.debug('submit values', values);
 			fetch(`${servicesBaseUrl}/interface${id ? 'Modify' : 'Create'}?json=${JSON.stringify(values)}${name ? `&name=${name}` : ''}`, {
 				method: 'POST'
