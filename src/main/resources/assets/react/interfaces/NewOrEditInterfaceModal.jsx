@@ -23,12 +23,14 @@ export function NewOrEditInterfaceModal(props) {
 
 	const header = id ? `Edit interface ${displayName}`: 'New interface';
 
+	const onClose = () => {
+		setOpen(false);
+		afterClose();
+	}
+
 	return <Modal
 		closeIcon
-		onClose={() => {
-			setOpen(false);
-			afterClose();
-		}}
+		onClose={onClose}
 		open={open}
 		size='large'
 		trigger={<Popup
@@ -60,6 +62,7 @@ export function NewOrEditInterfaceModal(props) {
 				collectionOptions={collectionOptions}
 				fieldsObj={fieldsObj}
 				id={id}
+				onClose={onClose}
 				servicesBaseUrl={servicesBaseUrl}
 				stopWordOptions={stopWordOptions}
 				thesauriOptions={thesauriOptions}

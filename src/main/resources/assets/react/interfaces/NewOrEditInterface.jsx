@@ -20,6 +20,7 @@ export function NewOrEditInterface(props) {
 		fieldsObj,
 		id, // nullable
 		name, // nullable
+		onClose,
 		servicesBaseUrl,
 		stopWordOptions,
 		thesauriOptions
@@ -71,14 +72,12 @@ export function NewOrEditInterface(props) {
 	return isLoading ? <Loader active inverted>Loading</Loader> : <EnonicForm
 		initialValues={initialValues}
 		onSubmit={(values) => {
-			console.debug('submit values', values);
-			/*
-				fetch(`${servicesBaseUrl}/interface${id ? 'Modify' : 'Create'}?json=${JSON.stringify(values)}${name ? `&name=${name}` : ''}`, {
-					method: 'POST'
-				}).then(response => {
-					if (response.status === 200) { doClose(); }
-				})
-			*/
+			//console.debug('submit values', values);
+			fetch(`${servicesBaseUrl}/interface${id ? 'Modify' : 'Create'}?json=${JSON.stringify(values)}${name ? `&name=${name}` : ''}`, {
+				method: 'POST'
+			}).then(response => {
+				if (response.status === 200) { onClose(); }
+			})
 		}}
 	>
 		<Form as='div'>

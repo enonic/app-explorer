@@ -115,7 +115,7 @@ export class Interfaces extends React.Component {
 			<NewOrEditInterfaceModal
 				collectionOptions={collectionOptions}
 				fieldsObj={fieldsObj}
-				onClose={() => this.updateInterfaces()}
+				afterClose={() => this.updateInterfaces()}
 				servicesBaseUrl={servicesBaseUrl}
 				stopWordOptions={stopWordOptions}
 				thesauriOptions={thesauriOptions}
