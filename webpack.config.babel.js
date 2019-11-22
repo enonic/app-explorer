@@ -8,6 +8,8 @@ import {webpackEsmAssets} from '@enonic/webpack-esm-assets'
 import {webpackServerSideJs} from '@enonic/webpack-server-side-js'
 import {webpackStyleAssets} from '@enonic/webpack-style-assets'
 
+//console.debug(process.env.NODE_ENV);
+
 //const MODE = 'development';
 const MODE = 'production';
 
