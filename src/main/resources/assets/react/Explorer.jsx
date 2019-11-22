@@ -4,6 +4,7 @@ import {Collections} from './Collections';
 import {Fields} from './Fields';
 import {Interfaces} from './Interfaces';
 import {Journals} from './Journals';
+import {Notifications} from './Notifications';
 import {Search} from './Search';
 import {Status} from './Status';
 import {StopWords} from './StopWords';
@@ -117,7 +118,7 @@ export function Explorer(props) {
 					active={page === 'collections'}
 					onClick={() => setPage('collections')}
 				><Icon name='database'/> Collections</Menu.Item>
-				{['collections', 'status', 'journal'].includes(page) &&
+				{['collections', 'status', 'journal', 'notifications'].includes(page) &&
 				<Menu.Menu>
 					<Menu.Item
 						as='a'
@@ -131,6 +132,12 @@ export function Explorer(props) {
 						active={page === 'journal'}
 						onClick={() => setPage('journal')}
 					><Icon name='newspaper'/> Journal</Menu.Item>
+					<Menu.Item
+						as='a'
+						href='#notifications'
+						active={page === 'notifications'}
+						onClick={() => setPage('notifications')}
+					><Icon name='warning'/> Notifications</Menu.Item>
 				</Menu.Menu>}
 
 				<Menu.Item
@@ -188,6 +195,9 @@ export function Explorer(props) {
 					servicesBaseUrl={servicesBaseUrl}
 				/>}
 				{page === 'journal' && <Journals
+					servicesBaseUrl={servicesBaseUrl}
+				/>}
+				{page === 'notifications' && <Notifications
 					servicesBaseUrl={servicesBaseUrl}
 				/>}
 				{page === 'fields' && <Fields
