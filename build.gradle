@@ -54,15 +54,17 @@ dependencies {
 	//include "com.enonic.lib:lib-admin-ui:1.3.5"
 	include "com.enonic.lib:lib-admin-ui:2.0.1"
 
-	include 'com.enonic.lib:lib-cache:2.0.0'
+	include 'com.enonic.lib:lib-cache:2.1.1'
 	//include 'com.enonic.lib:lib-guillotine:1.0.1'
 	include 'com.enonic.lib:lib-http-client:2.0.0'
 	include 'com.enonic.lib:lib-license:2.0.0'
-	include 'com.enonic.lib:lib-router:2.0.0'
+	include 'com.enonic.lib:lib-router:2.1.0'
 
-	include 'com.enonic.lib:lib-cron:1.0.0-SNAPSHOT'
-	include 'com.enonic.lib:lib-explorer:1.0.0-SNAPSHOT'
-	include 'com.enonic.lib:lib-util:2.2.0'
+	//include 'com.enonic.lib:lib-cron:1.0.0-SNAPSHOT'
+	include 'com.enonic.lib:lib-cron:1.0.0'
+
+	include 'com.enonic.lib:lib-explorer:1.1.1'
+	include 'com.enonic.lib:lib-util:2.2.1'
 
 	// WARNING: Do NOT use include files, jar file will be missing dependencies!
 }
