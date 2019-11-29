@@ -208,7 +208,7 @@ export function Collections(props) {
 
 	return <>
 		<Header as='h1'>Collections</Header>
-		<Table celled collapsing compact selectable singleLine sortable striped>
+		<Table celled collapsing compact selectable sortable striped>
 			<Table.Header>
 				<Table.Row>
 					<Table.HeaderCell
@@ -250,7 +250,7 @@ export function Collections(props) {
 						<Table.Cell>{displayName}</Table.Cell>
 						<Table.Cell>{count}</Table.Cell>
 						<Table.Cell>{doCollect ? JSON.stringify(cron) : 'Not scheduled'}</Table.Cell>
-						<Table.Cell>{interfaces}</Table.Cell>
+						<Table.Cell>{interfaces.join(', ')}</Table.Cell>
 						<Table.Cell>
 							<Button.Group>
 								<NewOrEditModal
