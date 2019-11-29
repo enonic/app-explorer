@@ -84,7 +84,7 @@ export function Fields(props) {
 		{isLoading
 			? <Loader active inverted>Loading</Loader>
 			: <>
-				<Table celled collapsing compact selectable singleLine sortable striped>
+				<Table celled collapsing compact selectable sortable striped>
 					<Table.Header>
 						<Table.Row>
 							<Table.HeaderCell
