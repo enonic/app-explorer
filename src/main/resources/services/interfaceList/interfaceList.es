@@ -18,9 +18,9 @@ export function get() {
 
 	const fieldValuesArray = getFieldValues({connection}).hits;
 	const fieldValuesObj = {};
-	fieldValuesArray.forEach(({_path, displayName, field, value}) => {
-		//log.info(toStr({field, displayName, value}));
-		//log.info(toStr({field, _name, displayName, value}));
+	fieldValuesArray.forEach(({_name, _path, displayName, field, value}) => {
+		const key = value || _name;
+		//log.info(toStr({field, displayName, value, _name, key}));
 		/*if (!fieldValuesObj[field]) {fieldValuesObj[field] = []}
 		fieldValuesObj[field].push({
 			label: displayName,
@@ -28,8 +28,8 @@ export function get() {
 			path: _path
 		});*/
 		if (!fieldValuesObj[field]) {fieldValuesObj[field] = {}}
-		fieldValuesObj[field][value] = {
-			//key: value,
+		fieldValuesObj[field][key] = {
+			key,
 			text: displayName,
 			path: _path//,
 			//value
