@@ -26,6 +26,7 @@ export function Facets(props) {
 		path = parentPath ? `${parentPath}.${name}` : name,
 		value = getIn(context.values, path)
 	} = props;
+	//console.debug('Facets fieldsObj', fieldsObj);
 	let {
 		level = 0
 	} = props;
@@ -33,6 +34,7 @@ export function Facets(props) {
 	const allowChildren = level !== levels;
 	//console.debug('Facets level', level, 'levels', levels, 'allowChildren', allowChildren);
 	const fieldOptions = fieldObjToFieldArr(fieldsObj);
+	//console.debug('Facets fieldOptions', fieldOptions);
 
 	if (!(Array.isArray(value) && value.length)) {
 		return <Form.Field id={id}>

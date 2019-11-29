@@ -1,3 +1,5 @@
+//import {toStr} from '/lib/util';
+
 import {
 	PRINCIPAL_EXPLORER_READ,
 	RT_JSON
@@ -17,6 +19,8 @@ export function get() {
 	const fieldValuesArray = getFieldValues({connection}).hits;
 	const fieldValuesObj = {};
 	fieldValuesArray.forEach(({_path, displayName, field, value}) => {
+		//log.info(toStr({field, displayName, value}));
+		//log.info(toStr({field, _name, displayName, value}));
 		/*if (!fieldValuesObj[field]) {fieldValuesObj[field] = []}
 		fieldValuesObj[field].push({
 			label: displayName,
