@@ -96,7 +96,7 @@ const CLIENT_JS_CONFIG = {
 	},
 	plugins: [
 		new CopyWebpackPlugin([
-			//{ from: 'frappe-gannt/dist/*', to: 'frappe-gannt/[name].[ext]' },
+			//{ from: 'frappe-gantt/dist/*', to: 'frappe-gantt/[name].[ext]' },
 			{ from: 'jquery/dist', to: 'jquery'},
 			{ from: 'react/umd/react.*.js', to: 'react/[name].[ext]' },
 			{ from: 'react-dom/umd/react-dom.*.js', to: 'react-dom/[name].[ext]' },

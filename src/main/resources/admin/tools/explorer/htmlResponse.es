@@ -72,6 +72,7 @@ export function htmlResponse({
 		<script type="text/javascript" src="${assetUrl({path: 'react-dom/react-dom.development.js'})}"></script>
 		<!--
 			<script type="text/javascript" src="${assetUrl({path: 'react-dom/react-dom.production.min.js'})}"></script>
+			<script type="text/javascript" src="${assetUrl({path: 'frappe-gantt/frappe-gantt.min.js'})}"></script>
 		-->
 
 		${''/*headBegin.join('\n')*/}
@@ -81,6 +82,10 @@ export function htmlResponse({
 
 		<!--link rel="stylesheet" type="text/css" href="${assetUrl({path: 'style.css'})}"-->
 		<link rel="stylesheet" type="text/css" href="${assetUrl({path: 'semantic-ui/semantic.css'})}">
+
+		<!--
+			<link rel="stylesheet" type="text/css" href="${assetUrl({path: 'frappe-gantt/frappe-gantt.css'})}">
+		-->
 
 		<!-- Common style and library used by the Launcher Panel -->
 		<!--link rel="stylesheet" type="text/css" href="${assetUrl({path: '/admin/common/styles/_all.css'})}"-->
