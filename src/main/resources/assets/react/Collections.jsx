@@ -208,9 +208,11 @@ export function Collections(props) {
 
 	return <>
 		<Header as='h1'>Collections</Header>
-		<Table celled collapsing compact selectable sortable striped>
+		<Table celled compact selectable sortable striped>
 			<Table.Header>
 				<Table.Row>
+					{/* Width is X columns of total 16 */}
+					<Table.HeaderCell>Edit</Table.HeaderCell>
 					<Table.HeaderCell
 						onClick={handleSortGenerator('name')}
 						sorted={column === 'name' ? direction : null}
@@ -220,13 +222,13 @@ export function Collections(props) {
 						sorted={column === 'documents' ? direction : null}
 					>Documents</Table.HeaderCell>
 					<Table.HeaderCell
-						onClick={handleSortGenerator('schedule')}
-						sorted={column === 'schedule' ? direction : null}
-					>Schedule</Table.HeaderCell>
-					<Table.HeaderCell
 						onClick={handleSortGenerator('interfaces')}
 						sorted={column === 'interfaces' ? direction : null}
 					>Interfaces</Table.HeaderCell>
+					<Table.HeaderCell
+						onClick={handleSortGenerator('schedule')}
+						sorted={column === 'schedule' ? direction : null}
+					>Schedule</Table.HeaderCell>
 					<Table.HeaderCell>Actions</Table.HeaderCell>
 				</Table.Row>
 			</Table.Header>
@@ -247,29 +249,32 @@ export function Collections(props) {
 					const disabled = !(collector.name && collectorOptions.filter(({key}) => collector.name).length);
 
 					return <Table.Row key={key}>
-						<Table.Cell>{displayName}</Table.Cell>
-						<Table.Cell>{count}</Table.Cell>
+						<Table.Cell collapsing><NewOrEditModal
+							afterClose={fetchCollections}
+							collectorOptions={collectorOptions}
+							collectorsObj={collectorsObj}
+							contentTypeOptions={contentTypeOptions}
+							disabled={disabled}
+							initialValues={{
+								name,
+								collector,
+								cron,
+								doCollect
+							}}
+							fields={fields}
+							name={name}
+							servicesBaseUrl={servicesBaseUrl}
+							siteOptions={siteOptions}
+						/></Table.Cell>
+						<Table.Cell collapsing>{displayName}</Table.Cell>
+						<Table.Cell collapsing>{count}</Table.Cell>
+						<Table.Cell collapsing>{interfaces.map((iface, i) => <>
+							{i === 0 ? null : <br/>}
+							<span style={{whitespace: 'nowrap'}}>{iface}</span>
+						</>)}</Table.Cell>
 						<Table.Cell>{doCollect ? JSON.stringify(cron) : 'Not scheduled'}</Table.Cell>
-						<Table.Cell>{interfaces.join(', ')}</Table.Cell>
-						<Table.Cell>
+						<Table.Cell collapsing>
 							<Button.Group>
-								<NewOrEditModal
-									afterClose={fetchCollections}
-									collectorOptions={collectorOptions}
-									collectorsObj={collectorsObj}
-									contentTypeOptions={contentTypeOptions}
-									disabled={disabled}
-									initialValues={{
-										name,
-										collector,
-										cron,
-										doCollect
-									}}
-									fields={fields}
-									name={name}
-									servicesBaseUrl={servicesBaseUrl}
-									siteOptions={siteOptions}
-								/>
 								<Popup
 									content={`Duplicate collection ${name}`}
 									inverted
@@ -310,6 +315,7 @@ export function Collections(props) {
 			</Table.Body>
 			<Table.Footer>
 				<Table.Row>
+					<Table.HeaderCell></Table.HeaderCell>
 					<Table.HeaderCell></Table.HeaderCell>
 					<Table.HeaderCell>{totalCount}</Table.HeaderCell>
 					<Table.HeaderCell></Table.HeaderCell>
