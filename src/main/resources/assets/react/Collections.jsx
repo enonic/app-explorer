@@ -1,6 +1,7 @@
-import _ from 'lodash';
+//import _ from 'lodash';
 import {
-	Button, Dimmer, Header, Icon, Loader, Modal, Pagination, Popup, Table
+	Button, Dimmer, Divider, Dropdown, Form, Header, Icon, Loader, Modal,
+	Pagination,	Popup, Table
 } from 'semantic-ui-react';
 import {Collection} from './Collection';
 import {useInterval} from './utils/useInterval';
@@ -136,14 +137,15 @@ export function Collections(props) {
 			total: 0
 		},
 		collectorOptions: [],
-		column: 'name',
+		column: 'displayName',
 		contentTypeOptions: [],
 		direction: 'ascending',
 		fields: {},
 		isLoading: true,
 		page: 1,
 		perPage: 10,
-		siteOptions: []/*,
+		siteOptions: [],
+		sort: 'displayName ASC'/*,
 		totalCount: 0*/
 	});
 	//console.debug('Collections', {props, state});
@@ -158,9 +160,11 @@ export function Collections(props) {
 		isLoading,
 		page,
 		perPage,
+		sort,
 		siteOptions,
 		totalCount
 	} = state;
+	//console.debug({column, direction, sort});
 
 	const {
 		pageStart,
@@ -169,18 +173,35 @@ export function Collections(props) {
 		total
 	} = collections;
 
-	function fetchCollections({activePage = page} = {}) {
+	function fetchCollections({
+		activePage = page,
+		activePerPage = perPage,
+		clickedColumn = column,
+		newDirection = direction
+	} = {}) {
 		setState(prev => ({
 			...prev,
 			isLoading: true
 		}));
-		fetch(`${servicesBaseUrl}/collectionList?page=${activePage}&perPage=${perPage}`)
+		const newSort = `${clickedColumn} ${newDirection === 'ascending' ? 'ASC' : 'DESC'}`;
+		/*console.debug('fetchCollections', {
+			activePage,
+			activePerPage,
+			clickedColumn,
+			newDirection,
+			newSort
+		});*/
+		fetch(`${servicesBaseUrl}/collectionList?page=${activePage}&perPage=${activePerPage}&sort=${newSort}`)
 			.then(response => response.json())
 			.then(data => setState(prev => ({
 				...prev,
 				...data,
+				column: clickedColumn,
+				direction: newDirection,
 				isLoading: false,
-				page: activePage
+				page: activePage,
+				perPage: activePerPage,
+				sort: newSort
 			})));
 	} // fetchCollections
 
@@ -189,36 +210,48 @@ export function Collections(props) {
 		fetchCollections({activePage})
 	}
 
+	function handlePerPageChange(e, {name, value}) {
+		fetchCollections({activePerPage:value});
+	}
+
 	const handleSortGenerator = (clickedColumn) => () => {
 	    const {
-			collections,
+			//collections,
 			column,
 			direction
 		} = state;
 		/*console.debug('handleSort', {
 			clickedColumn,
-			collections,
+			//collections,
 			column,
 			direction
 		});*/
 
 	    if (column !== clickedColumn) {
-			collections.hits = _.sortBy(collections.hits, [clickedColumn]);
+			fetchCollections({
+				clickedColumn,
+				newDirection: 'ascending'
+			});
+			/*collections.hits = _.sortBy(collections.hits, [clickedColumn]);
 	    	setState(prev => ({
 				...prev,
 				column: clickedColumn,
 		        collections,
 		        direction: 'ascending'
-			}));
+			}));*/
 			return;
 	    }
 
-		collections.hits = collections.hits.reverse();
+		fetchCollections({
+			clickedColumn,
+			newDirection: direction === 'ascending' ? 'descending' : 'ascending'
+		});
+		/*collections.hits = collections.hits.reverse();
 	    setState(prev => ({
 			...prev,
 			collections,
 			direction: direction === 'ascending' ? 'descending' : 'ascending'
-	  	}));
+	  	}));*/
 	} // handleSortGenerator
 
 	React.useEffect(() => fetchCollections(), []);
@@ -237,21 +270,12 @@ export function Collections(props) {
 						{/* Width is X columns of total 16 */}
 						<Table.HeaderCell>Edit</Table.HeaderCell>
 						<Table.HeaderCell
-							onClick={handleSortGenerator('name')}
-							sorted={column === 'name' ? direction : null}
+							onClick={handleSortGenerator('displayName')}
+							sorted={column === 'displayName' ? direction : null}
 						>Name</Table.HeaderCell>
-						<Table.HeaderCell
-							onClick={handleSortGenerator('documents')}
-							sorted={column === 'documents' ? direction : null}
-						>Documents</Table.HeaderCell>
-						<Table.HeaderCell
-							onClick={handleSortGenerator('interfaces')}
-							sorted={column === 'interfaces' ? direction : null}
-						>Interfaces</Table.HeaderCell>
-						<Table.HeaderCell
-							onClick={handleSortGenerator('schedule')}
-							sorted={column === 'schedule' ? direction : null}
-						>Schedule</Table.HeaderCell>
+						<Table.HeaderCell>Documents</Table.HeaderCell>
+						<Table.HeaderCell>Interfaces</Table.HeaderCell>
+						<Table.HeaderCell>Schedule</Table.HeaderCell>
 						<Table.HeaderCell>Actions</Table.HeaderCell>
 					</Table.Row>
 				</Table.Header>
@@ -370,6 +394,18 @@ export function Collections(props) {
 				onPageChange={handlePaginationChange}
 			/>
 			<p>Displaying {pageStart}-{pageEnd} of {total}</p>
+			<Divider hidden/>
+			<Form.Field>
+				<Header as='h4'><Icon name='resize vertical'/> Per page</Header>
+				<Dropdown
+					defaultValue={perPage}
+					fluid
+					name='perPage'
+					onChange={handlePerPageChange}
+					options={[5,10,25,50,100].map(key => ({key, text: `${key}`, value: key}))}
+					selection
+				/>
+			</Form.Field>
 			<NewOrEditModal
 				afterClose={fetchCollections}
 				collectorOptions={collectorOptions}
