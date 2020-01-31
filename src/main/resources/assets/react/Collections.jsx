@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import {
-	Button, Dimmer, Header, Icon, Loader, Modal, Popup, Segment, Table
+	Button, Dimmer, Header, Icon, Loader, Modal, Pagination, Popup, Table
 } from 'semantic-ui-react';
 import {Collection} from './Collection';
 import {useInterval} from './utils/useInterval';
@@ -129,6 +129,10 @@ export function Collections(props) {
 		collections: {
 			count: 0,
 			hits: [],
+			page: 1,
+			pageStart: 0,
+			pageEnd: 0,
+			pageTotal: 1,
 			total: 0
 		},
 		collectorOptions: [],
@@ -137,8 +141,10 @@ export function Collections(props) {
 		direction: 'ascending',
 		fields: {},
 		isLoading: true,
-		siteOptions: [],
-		totalCount: 0
+		page: 1,
+		perPage: 10,
+		siteOptions: []/*,
+		totalCount: 0*/
 	});
 	//console.debug('Collections', {props, state});
 
@@ -150,23 +156,38 @@ export function Collections(props) {
 		direction,
 		fields,
 		isLoading,
+		page,
+		perPage,
 		siteOptions,
 		totalCount
 	} = state;
 
-	function fetchCollections() {
+	const {
+		pageStart,
+		pageEnd,
+		pagesTotal,
+		total
+	} = collections;
+
+	function fetchCollections({activePage = page} = {}) {
 		setState(prev => ({
 			...prev,
 			isLoading: true
 		}));
-		fetch(`${servicesBaseUrl}/collectionList`)
+		fetch(`${servicesBaseUrl}/collectionList?page=${activePage}&perPage=${perPage}`)
 			.then(response => response.json())
 			.then(data => setState(prev => ({
 				...prev,
 				...data,
-				isLoading: false
+				isLoading: false,
+				page: activePage
 			})));
 	} // fetchCollections
+
+	function handlePaginationChange(e, {activePage}) {
+		//console.debug({function: 'handlePaginationChange', activePage});
+		fetchCollections({activePage})
+	}
 
 	const handleSortGenerator = (clickedColumn) => () => {
 	    const {
@@ -315,17 +336,40 @@ export function Collections(props) {
 						</Table.Row>;
 					})}
 				</Table.Body>
-				<Table.Footer>
-					<Table.Row>
-						<Table.HeaderCell></Table.HeaderCell>
-						<Table.HeaderCell></Table.HeaderCell>
-						<Table.HeaderCell>{totalCount}</Table.HeaderCell>
-						<Table.HeaderCell></Table.HeaderCell>
-						<Table.HeaderCell></Table.HeaderCell>
-						<Table.HeaderCell></Table.HeaderCell>
-					</Table.Row>
-				</Table.Footer>
+				{totalCount
+					? <Table.Footer>
+						<Table.Row>
+							<Table.HeaderCell></Table.HeaderCell>
+							<Table.HeaderCell></Table.HeaderCell>
+							<Table.HeaderCell>{totalCount}</Table.HeaderCell>
+							<Table.HeaderCell></Table.HeaderCell>
+							<Table.HeaderCell></Table.HeaderCell>
+							<Table.HeaderCell></Table.HeaderCell>
+						</Table.Row>
+					</Table.Footer>
+					: null
+				}
 			</Table>
+			<Pagination
+				attached='bottom'
+				fluid
+				size='mini'
+
+				boundaryRange={1}
+				siblingRange={1}
+
+				ellipsisItem={null/*{content: <Icon name='ellipsis horizontal' />, icon: true}*/}
+				firstItem={{content: <Icon name='angle double left' />, icon: true}}
+				prevItem={{content: <Icon name='angle left' />, icon: true}}
+				nextItem={{content: <Icon name='angle right' />, icon: true}}
+				lastItem={{content: <Icon name='angle double right' />, icon: true}}
+
+				activePage={page}
+				totalPages={pagesTotal}
+
+				onPageChange={handlePaginationChange}
+			/>
+			<p>Displaying {pageStart}-{pageEnd} of {total}</p>
 			<NewOrEditModal
 				afterClose={fetchCollections}
 				collectorOptions={collectorOptions}

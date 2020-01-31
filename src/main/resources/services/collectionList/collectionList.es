@@ -19,7 +19,15 @@ import {getFields} from '/lib/explorer/field/getFields';
 import {getFieldValues} from '/lib/explorer/field/getFieldValues';
 
 
-export function get() {
+export function get({
+	params: { // These are just passed on
+		count,
+		page,// = 1, // NOTE First index is 1 not 0
+		perPage,// = 10,
+		sort,// = 'displayName ASC',
+		start// = 0
+	}
+}) {
 	const connection = connect({ principals: [PRINCIPAL_EXPLORER_READ] });
 
 	const activeCollections = {};
@@ -61,8 +69,16 @@ export function get() {
 		};
 	});
 
-	const collections = queryCollections({connection});
-	let totalCount = 0;
+	const collections = queryCollections({
+		connection,
+		count,
+		page,
+		perPage,
+		sort,
+		start
+	});
+	//log.info(toStr({collections}));
+	//let totalCount = 0;
 	collections.hits = collections.hits.map(({
 		collector,
 		cron,
@@ -71,14 +87,14 @@ export function get() {
 		//_id: id,
 		_name: name
 	}) => {
-		const count = getDocumentCount(name);
-		if (count > 0) {
-			totalCount += count;
-		}
+		const documentCount = getDocumentCount(name);
+		/*if (count > 0) {
+			totalCount += documentCount;
+		}*/
 		return {
 			collecting: !!activeCollections[name],
 			collector,
-			count,
+			count: documentCount,
 			cron: Array.isArray(cron) ? cron : [cron],
 			displayName,
 			doCollect,
@@ -149,13 +165,20 @@ export function get() {
 
 	return {
 		body: {
+			params: {
+				count,
+				page,
+				perPage,
+				sort,
+				start
+			},
 			collections,
 			collectorOptions,
 			//collectors,
 			contentTypeOptions,
 			fields,
-			siteOptions,
-			totalCount
+			siteOptions/*,
+			totalCount*/
 		},
 		contentType: RT_JSON
 	};
