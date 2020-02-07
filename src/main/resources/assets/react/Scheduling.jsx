@@ -23,7 +23,7 @@ export const Scheduling = (props) => {
 		<h1>Scheduling</h1>
 		<FrappeGantt
 			tasks={TASKS}
-			viewMode={this.state.mode}
+			viewMode={'Week'/*this.state.mode this is undefined*/}
 			onClick={task => console.log(task)}
 			onDateChange={(task, start, end) => console.log(task, start, end)}
 			onProgressChange={(task, progress) => console.log(task, progress)}
