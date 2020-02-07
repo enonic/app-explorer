@@ -13,9 +13,9 @@
     "doctoc": "^1.4.0",
     "eslint": "^6.8.0",
     "eslint-config-airbnb-base": "^14.0.0",
-    "eslint-plugin-import": "^2.20.0",
+    "eslint-plugin-import": "^2.20.1",
     "eslint-plugin-jsx-a11y": "^6.2.3",
-    "eslint-plugin-react": "^7.18.0",
+    "eslint-plugin-react": "^7.18.3",
     "frappe-gantt": "^0.3.0",
     "frappe-gantt-react": "^0.2.2",
     "jquery": "^3.4.1",
@@ -28,7 +28,7 @@
     "semantic-ui": "^2.4.2",
     "semantic-ui-react": "0.87.3",
     "serialize-javascript": "^2.1.2",
-    "terser-webpack-plugin": "^2.3.2",
+    "terser-webpack-plugin": "^2.3.4",
     "traverse": "^0.6.6",
     "tslib": "^1.10.0",
     "uuid": "^3.4.0"
@@ -44,6 +44,6 @@
     "get-value": "^3.0.1",
     "react-html-parser": "^2.0.2",
     "set-value": "^3.0.1",
-    "yup": "^0.28.0"
+    "yup": "^0.28.1"
   }
 }
