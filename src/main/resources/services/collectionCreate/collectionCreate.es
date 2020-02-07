@@ -11,9 +11,7 @@ import {create} from '/lib/explorer/node/create';
 
 
 export function post({
-	params: {
-		json
-	}
+	body: json
 }) {
 	log.info(`json:${json}`);
 

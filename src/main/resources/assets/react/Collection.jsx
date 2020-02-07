@@ -73,8 +73,12 @@ export function Collection(props) {
 		}}
 		onSubmit={(values) => {
 			//console.debug('submit values', values);
-			fetch(`${servicesBaseUrl}/collection${mode === 'create' ? 'Create' : 'Modify'}?json=${JSON.stringify(values)}`, {
-				method: 'POST'
+			fetch(`${servicesBaseUrl}/collection${mode === 'create' ? 'Create' : 'Modify'}`, {
+				method: 'POST',
+				headers: {
+					'Content-Type':	'application/json'
+				},
+				body: JSON.stringify(values)
 			}).then(response => {
 				onClose()
 			})

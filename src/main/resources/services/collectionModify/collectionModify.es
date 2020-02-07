@@ -11,9 +11,7 @@ import {modify} from '/lib/explorer/node/modify';
 
 
 export function post({
-	params: {
-		json
-	}
+	body: json
 }) {
 	log.info(`json:${json}`);
 
