@@ -44,6 +44,7 @@ export function Collection(props) {
 			name: '',
 			collector: {
 				name: ''//,
+				//taskName: 'collect'//, // TODO
 				//config: null // CollectorSelector onChange will set this.
 			},
 			cron: [{

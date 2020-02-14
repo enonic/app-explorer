@@ -1,4 +1,4 @@
-import {toStr} from '/lib/util';
+//import {toStr} from '/lib/util';
 
 import {
 	NT_COLLECTION,
@@ -13,15 +13,15 @@ import {modify} from '/lib/explorer/node/modify';
 export function post({
 	body: json
 }) {
-	log.info(`json:${json}`);
+	//log.info(`json:${json}`);
 
 	const obj = JSON.parse(json);
 	obj._name = obj.name;
 	obj.collector.configJson = JSON.stringify(obj.collector.config); // ForceArray workaround:
-	log.info(`obj:${toStr({obj})}`);
+	//log.info(`obj:${toStr({obj})}`);
 
 	const params = collection(obj);
-	log.info(`params:${toStr({params})}`);
+	//log.info(`params:${toStr({params})}`);
 
 	const node = modify({
 		__connection: connect({

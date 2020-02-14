@@ -3,9 +3,12 @@
 //──────────────────────────────────────────────────────────────────────────────
 import {isMaster} from '/lib/xp/cluster';
 import {listener} from '/lib/xp/event';
+//import {toStr} from '/lib/util';
 
 import {
-	PRINCIPAL_EXPLORER_WRITE
+	BRANCH_ID_EXPLORER,
+	PRINCIPAL_EXPLORER_READ,
+	REPO_ID_EXPLORER
 } from '/lib/explorer/model/2/constants';
 import {init} from '/lib/explorer/init';
 import {runAsSu} from '/lib/explorer/runAsSu';
@@ -27,12 +30,18 @@ const cron = app.config.cron === 'true';
 if (cron) {
 	log.info('This cluster node has cron=true in app.config, rescheduling all cron jobs :)');
 	runAsSu(() => {
-		const connection = connect({principals:[PRINCIPAL_EXPLORER_WRITE]});
-		const collectors = getCollectors({connection});
+		const explorerRepoReadConnection = connect({
+			branch: BRANCH_ID_EXPLORER,
+			repoId: REPO_ID_EXPLORER,
+			principals:[PRINCIPAL_EXPLORER_READ]
+		});
+		const collectors = getCollectors({
+			connection: explorerRepoReadConnection
+		});
 		//log.info(toStr({collectors}));
 
 		const collectionsRes = query({
-			connection,
+			connection: explorerRepoReadConnection,
 			filters: addFilter({
 				filter: hasValue('doCollect', true)
 			})
@@ -41,7 +50,7 @@ if (cron) {
 		collectionsRes.hits.forEach(node => reschedule({
 			collectors,
 			node
-		}))
+		}));
 		/*const jobs = listJobs();
 		log.info(toStr({jobs}));
 		jobs.jobs.forEach(({name}) => {

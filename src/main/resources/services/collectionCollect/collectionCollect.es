@@ -33,11 +33,11 @@ export function post({
 		body.error = `Already collecting to ${name} under taskId ${alreadyRunningtaskId}!`;
 		//log.info(toStr({alreadyRunningtaskId}));
 	} else {
-		const connection = connect({
+		const readConnection = connect({
 			principals: [PRINCIPAL_EXPLORER_READ]
 		});
 		const collectionNode = getCollection({
-			connection,
+			connection: readConnection,
 			name
 		});
 		//log.info(toStr({collectionNode}));
@@ -45,6 +45,7 @@ export function post({
 		const {
 			collector: {
 				name: collectorName,
+				taskName: incomingTaskName = 'collect',
 				configJson: incomingConfigJson
 			}
 		} = collectionNode;
@@ -54,23 +55,25 @@ export function post({
 		//log.info(toStr({name, collectorName/*, config*/}));
 
 		const collector = queryCollectors({
-			connection
+			connection: readConnection
 		}).hits.map(({
-			_name: application,
+			_name: collectorId,
+			appName,
 			displayName,
 			collectTaskName: taskName,
 			configAssetPath
 		}) => {
 			return {
-				application,
+				application: appName,
+				collectorId,
 				displayName,
 				taskName,
 				uri: assetUrl({
-					application,
+					application: appName,
 					path: configAssetPath
 				})
 			};
-		}).filter(({application}) => application === collectorName)[0];
+		}).filter(({collectorId}) => collectorId === collectorName)[0];
 		//log.info(toStr({collector}));
 
 		if (resume === 'true') { // Surgeon specific
@@ -81,9 +84,10 @@ export function post({
 		//log.info(toStr({configJson}));
 
 		const submitNamedParams = {
-			name: `${collector.application}:${collector.taskName}`, // Task name
+			name: collector.collectorId, // <appname>:<taskname>
 			config: {
 				name, // Collection name
+				collectorId: collector.collectorId, // <appname>:<taskname>
 				configJson
 			}
 		};

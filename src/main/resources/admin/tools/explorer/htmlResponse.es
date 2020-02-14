@@ -53,13 +53,16 @@ export function htmlResponse({
 	queryCollectors({
 		connection: connect({principals: PRINCIPAL_EXPLORER_READ})
 	}).hits.forEach(({
-		_name: application, configAssetPath
+		_name: collectorId,
+		appName,
+		configAssetPath
 	}) => {
-		collectorsAppToUri[application] = assetUrl({
-			application,
+		collectorsAppToUri[collectorId] = assetUrl({
+			application: appName,
 			path: configAssetPath
 		});
 	});
+	//log.info(toStr({collectorsAppToUri}));
 
 	return {
 		body: `<html>
