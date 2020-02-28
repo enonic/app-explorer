@@ -1,11 +1,21 @@
 {
   "author": "Christian Andreas Westgaard <cwe@enonic.com>",
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.3",
+    "fast-deep-equal": "^3.1.1",
+    "get-value": "^3.0.1",
+    "react-html-parser": "^2.0.2",
+    "robots-txt-guard": "^0.2.1",
+    "set-value": "^3.0.1",
+    "yup": "^0.28.1"
+  },
   "devDependencies": {
     "@enonic/semantic-ui-react-form": "0.0.4",
-    "@enonic/webpack-esm-assets": "^0.0.8",
+    "@enonic/webpack-esm-assets": "^0.1.0",
     "@enonic/webpack-server-side-js": "^0.1.4",
     "@enonic/webpack-style-assets": "^0.0.5",
-    "babel-eslint": "^10.0.3",
+    "array.prototype.find": "^2.1.0",
+    "babel-eslint": "^10.1.0",
     "browser-sync": "^2.26.7",
     "browser-sync-webpack-plugin": "^2.2.2",
     "classnames": "^2.2.6",
@@ -21,29 +31,22 @@
     "jquery": "^3.4.1",
     "jsuri": "^1.3.1",
     "moment": "^2.24.0",
-    "pretty-ms": "^5.1.0",
-    "react": "16.12.0",
-    "react-dom": "16.12.0",
+    "pretty-ms": "^6.0.0",
+    "react": "16.13.0",
+    "react-dom": "16.13.0",
     "react-scrollspy": "^3.4.2",
     "semantic-ui": "^2.4.2",
     "semantic-ui-react": "0.87.3",
-    "serialize-javascript": "^2.1.2",
-    "terser-webpack-plugin": "^2.3.4",
+    "serialize-javascript": "^3.0.0",
+    "terser-webpack-plugin": "^2.3.5",
     "traverse": "^0.6.6",
-    "tslib": "^1.10.0",
-    "uuid": "^3.4.0"
+    "tslib": "^1.11.1",
+    "uuid": "^7.0.1"
   },
   "name": "TODO",
   "private": true,
   "scripts": {
     "watch": "node_modules/webpack-cli/bin/cli.js -w --stdin",
     "webpack": "node_modules/webpack-cli/bin/cli.js"
-  },
-  "dependencies": {
-    "fast-deep-equal": "^3.1.1",
-    "get-value": "^3.0.1",
-    "react-html-parser": "^2.0.2",
-    "set-value": "^3.0.1",
-    "yup": "^0.28.1"
   }
 }
