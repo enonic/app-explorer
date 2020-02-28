@@ -66,6 +66,8 @@ dependencies {
 	include 'com.enonic.lib:lib-explorer:2.0.0'
 	include 'com.enonic.lib:lib-util:2.2.1'
 
+	include 'com.enonic.lib:lib-galimatias:1.0.0-SNAPSHOT'
+
 	// WARNING: Do NOT use include files, jar file will be missing dependencies!
 }
 

@@ -7,6 +7,7 @@ import UglifyJsPlugin from 'uglifyjs-webpack-plugin'; // Supports ECMAScript2015
 import {webpackEsmAssets} from '@enonic/webpack-esm-assets'
 import {webpackServerSideJs} from '@enonic/webpack-server-side-js'
 import {webpackStyleAssets} from '@enonic/webpack-style-assets'
+import webpack from 'webpack';
 
 //console.debug(process.env.NODE_ENV);
 
@@ -117,7 +118,10 @@ const CLIENT_JS_CONFIG = {
 };
 //console.log(`CLIENT_JS_CONFIG:${toStr(CLIENT_JS_CONFIG)}`); process.exit();
 
-const SS_ALIAS = {};
+const SS_ALIAS = {
+	// Fixes: TypeError: Cannot read property "TYPED_ARRAY_SUPPORT" from undefined
+	myGlobal: path.resolve(__dirname, 'src/main/resources/tasks/webcrawl/global')
+};
 
 // Avoid bundling and transpile library files seperately.
 // To do that you would have to list all files in SS_FILES!
@@ -127,6 +131,7 @@ SS_ALIAS['/admin/tools/explorer'] = path.resolve(__dirname, 'src/main/resources/
 
 const SS_EXTERNALS = [
 	/\/lib\/cache/,
+	'/lib/galimatias',
 	/\/lib\/http-client/,
 	/\/lib\/license/,
 	/\/lib\/router/,
@@ -134,6 +139,7 @@ const SS_EXTERNALS = [
 ];
 
 const SS_FILES = [
+	'src/main/resources/admin/tools/explorer/explorer',
 	'src/main/resources/main',
 	'src/main/resources/services/collectionCollect/collectionCollect',
 	'src/main/resources/services/collectionCreate/collectionCreate',
@@ -176,7 +182,13 @@ const SS_FILES = [
 	'src/main/resources/services/thesaurusUpdate/thesaurusUpdate',
 	'src/main/resources/services/uninstallLicense/uninstallLicense',
 	//'src/main/resources/services/uploadLicense/uploadLicense',
-	'src/main/resources/admin/tools/explorer/explorer',
+	'src/main/resources/tasks/webcrawl/webcrawl'
+];
+
+const SS_PLUGINS = [
+	new webpack.ProvidePlugin({
+		global: 'myGlobal' // Without it will get: Cannot read property "ES6" from undefined
+	})
 ];
 
 if (MODE === 'production') {
@@ -188,6 +200,11 @@ if (MODE === 'production') {
 	SS_ALIAS['/lib/cron'] = path.resolve(__dirname, '../lib-cron/src/main/resources/lib/cron/');
 	SS_ALIAS['/lib/explorer'] = path.resolve(__dirname, '../lib-explorer/src/main/resources/lib/explorer/');
 	SS_ALIAS['/lib/util'] = path.resolve(__dirname, '../lib-util/src/main/resources/lib/util');
+	SS_PLUGINS.push(new BrowserSyncPlugin({
+		host: 'localhost',
+		port: 3000,
+		proxy: 'http://localhost:8080/'
+	}));
 }
 
 const WEBPACK_CONFIG = [webpackServerSideJs({
@@ -204,13 +221,7 @@ const WEBPACK_CONFIG = [webpackServerSideJs({
 			}*/)
 		]
 	},
-	plugins: MODE === 'development' ? [
-		new BrowserSyncPlugin({
-			host: 'localhost',
-			port: 3000,
-			proxy: 'http://localhost:8080/'
-		})
-	] : [],
+	plugins: SS_PLUGINS,
 	mode: MODE,
 	resolveAlias: SS_ALIAS
 }), webpackStyleAssets({
@@ -219,7 +230,8 @@ const WEBPACK_CONFIG = [webpackServerSideJs({
 }), CLIENT_JS_CONFIG, webpackEsmAssets({
 	__dirname,
 	assetFiles: [
-		'src/main/resources/assets/react/Explorer.jsx'
+		'src/main/resources/assets/react/Explorer.jsx',
+		'src/main/resources/assets/react/WebCrawler.jsx'
 	],
 	externals: [
 		// Unable to load these via script or module:

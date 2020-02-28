@@ -13,6 +13,7 @@ import {
 	REPO_ID_EXPLORER
 } from '/lib/explorer/model/2/constants';
 import {init} from '/lib/explorer/init';
+import {register, unregister} from '/lib/explorer/collector';
 import {runAsSu} from '/lib/explorer/runAsSu';
 import {connect} from '/lib/explorer/repo/connect';
 import {remove} from '/lib/explorer/node/remove';
@@ -22,12 +23,21 @@ import {query} from '/lib/explorer/collection/query';
 import {getCollectors, reschedule} from '/lib/explorer/collection/reschedule';
 
 
+const COLLECT_TASK_NAME_WEBCRAWL = 'webcrawl';
+
 //──────────────────────────────────────────────────────────────────────────────
 // Main
 //──────────────────────────────────────────────────────────────────────────────
 if (isMaster()) {
 	init();
 }
+
+register({
+	appName: app.name,
+	collectTaskName: COLLECT_TASK_NAME_WEBCRAWL,
+	configAssetPath: 'react/WebCrawler.esm.js',
+	displayName: 'Web crawler'
+});
 
 listener({
 	type: `custom.${EVENT_COLLECTOR_UNREGISTER}`,
@@ -97,3 +107,10 @@ if (cron) {
 } else {
 	log.info('This cluster node does NOT have cron=true in app.config, NOT listening for reschedule events :)');
 }
+
+__.disposer(() => {
+	unregister({
+		appName: app.name,
+		collectTaskName: COLLECT_TASK_NAME_WEBCRAWL
+	});
+});
