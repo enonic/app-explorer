@@ -10,8 +10,8 @@ import {webpackStyleAssets} from '@enonic/webpack-style-assets'
 
 //console.debug(process.env.NODE_ENV);
 
-//const MODE = 'development';
-const MODE = 'production';
+const MODE = 'development';
+//const MODE = 'production';
 
 const SRC_DIR = 'src/main/resources';
 const SRC_DIR_ABS = path.resolve(__dirname, SRC_DIR);

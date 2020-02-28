@@ -3,16 +3,19 @@
 //──────────────────────────────────────────────────────────────────────────────
 import {isMaster} from '/lib/xp/cluster';
 import {listener} from '/lib/xp/event';
-//import {toStr} from '/lib/util';
+import {toStr} from '/lib/util';
 
 import {
 	BRANCH_ID_EXPLORER,
+	EVENT_COLLECTOR_UNREGISTER,
 	PRINCIPAL_EXPLORER_READ,
+	PRINCIPAL_EXPLORER_WRITE,
 	REPO_ID_EXPLORER
 } from '/lib/explorer/model/2/constants';
 import {init} from '/lib/explorer/init';
 import {runAsSu} from '/lib/explorer/runAsSu';
 import {connect} from '/lib/explorer/repo/connect';
+import {remove} from '/lib/explorer/node/remove';
 import {addFilter} from '/lib/explorer/query/addFilter';
 import {hasValue} from '/lib/explorer/query/hasValue';
 import {query} from '/lib/explorer/collection/query';
@@ -25,6 +28,25 @@ import {getCollectors, reschedule} from '/lib/explorer/collection/reschedule';
 if (isMaster()) {
 	init();
 }
+
+listener({
+	type: `custom.${EVENT_COLLECTOR_UNREGISTER}`,
+	localOnly: true, // Only listen to local event? Yes
+	callback: (event) => {
+		log.info(`Received event ${toStr(event)}`);
+		const {collectorId} = event.data;
+		if (collectorId) {
+			log.info(`Trying to remove collectorId ${collectorId}`);
+			return remove({
+				connection: connect({
+					principals: [PRINCIPAL_EXPLORER_WRITE]
+				}),
+				_parentPath: '/collectors',
+				_name: collectorId
+			});
+		}
+	} // callback
+}); // listener
 
 const cron = app.config.cron === 'true';
 if (cron) {
