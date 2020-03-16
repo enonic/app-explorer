@@ -72,7 +72,15 @@ export function get() {
 	});
 
 	const interfaces = query({connection});
-	interfaces.hits = interfaces.hits.map(({_id: id, _name: name, displayName}) => ({displayName, id, name}));
+	interfaces.hits = interfaces.hits.map(({
+		_id: id,
+		_name: name,
+		displayName
+	}) => ({
+		displayName,
+		id,
+		name
+	}));
 
 	const stopWordOptions = getStopWords({connection}).hits.map(({displayName, name}) => ({
 		key: name,
