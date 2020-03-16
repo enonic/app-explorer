@@ -187,6 +187,31 @@ const SS_FILES = [
 
 const SS_PLUGINS = [
 	new webpack.ProvidePlugin({
+		console: { // Attempt at avoiding ReferenceError: "console" is not defined
+			assert: (params) => {log.debug(params)},
+			clear: () => {log.warning('console.clear called')},
+			count: () => {log.warning('console.count called')},
+			countReset: () => {log.warning('console.countReset called')},
+			debug: (params) => {log.debug(params)},
+			dir: (params) => {log.debug(params)},
+			dirxml: (params) => {log.debug(params)},
+			error: (params) => {log.error(params)},
+			exception: (params) => {log.error(params)},
+			group: () => {log.warning('console.group called')},
+			groupCollapsed: () => {log.warning('console.groupCollapsed called')},
+			groupEnd: () => {log.warning('console.groupEnd called')},
+			info: (params) => {log.info(params)},
+			log: (params) => {log.info(params)},
+			profile: (params) => {log.debug(params)},
+			profileEnd: () => {log.warning('console.profileEnd called')},
+			table: (params) => {log.info(params)},
+			time: () => {log.warning('console.time called')},
+			timeEnd: () => {log.warning('console.timeEnd called')},
+			timeLog: () => {log.warning('console.timeLog called')},
+			timeStamp: () => {log.warning('console.timeStamp called')},
+			trace: (params) => {log.debug(params)},
+			warn: (params) => {log.warning(params)}
+		},
 		global: 'myGlobal' // Without it will get: Cannot read property "ES6" from undefined
 	})
 ];
