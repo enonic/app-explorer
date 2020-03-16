@@ -5,17 +5,24 @@ import {
 import {modify} from '/lib/explorer/node/modify';
 import {connect} from '/lib/explorer/repo/connect';
 import {interfaceModel} from '/lib/explorer/model/2/nodeTypes/interface';
+import {jsonError} from '/lib/explorer/jsonError';
 
 
 export function post({
 	params: {
-		json,
-		name
+		id,
+		json
 	}
 }) {
+	if (!id) {
+		return jsonError('Missing required parameter id!');
+	}
+	if (!json) {
+		return jsonError('Missing required parameter json!');
+	}
 	const obj = JSON.parse(json);
 	obj.__connection = connect({principals: [PRINCIPAL_EXPLORER_WRITE]}); // eslint-disable-line no-underscore-dangle
-	obj._name = name;
+	//obj._name = name; // This would cause a rename, which is not a modify, so it fails!
 	obj.displayName = obj.name;
 	const node = modify(interfaceModel(obj));
 	const body = {};

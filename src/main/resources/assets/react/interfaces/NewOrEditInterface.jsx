@@ -71,9 +71,15 @@ export function NewOrEditInterface(props) {
 	return isLoading ? <Loader active inverted>Loading</Loader> : <EnonicForm
 		initialValues={initialValues}
 		onSubmit={(values) => {
-			const {name} = values;
+			//const {_name} = values;
 			//console.debug('submit values', values);
-			fetch(`${servicesBaseUrl}/interface${id ? 'Modify' : 'Create'}?json=${JSON.stringify(values)}${name ? `&name=${name}` : ''}`, {
+			let url = `${servicesBaseUrl}/interface`;
+			if (id) {
+				url = `${url}Modify?id=${id}&json=${JSON.stringify(values)}`;
+			} else {
+				url = `${url}Create?json=${JSON.stringify(values)}`;
+			}
+			fetch(url, {
 				method: 'POST'
 			}).then(response => {
 				if (response.status === 200) { onClose(); }

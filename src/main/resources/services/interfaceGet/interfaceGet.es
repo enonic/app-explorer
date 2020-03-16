@@ -3,7 +3,7 @@ import traverse from 'traverse';
 import generateUuidv4 from 'uuid/v4';
 //import { v4 as generateUuidv4 } from 'uuid'; // As of uuid 7.0.0
 
-//import {toStr} from '/lib/util';
+import {toStr} from '/lib/util';
 import {forceArray} from '/lib/util/data';
 import {isString} from '/lib/util/value';
 
@@ -57,9 +57,10 @@ export function get({
 		key
 		//interfaceName
 	});
-	//log.info(`iFace:${toStr(iFace)}`);
+	log.info(`iFace:${toStr(iFace)}`);
 	const {
 		_id: id,
+		_name,
 		collections = [],
 		displayName = '',
 		facets = [],
@@ -76,6 +77,7 @@ export function get({
 		facets: forceArray(facets),
 		filters: convert({object: filters, fields: ['must', 'mustNot', 'values']}),
 		id,
+		_name,
 		name,
 		query: convert({object: query, fields: ['expressions', 'fields']}),
 		resultMappings: forceArray(resultMappings),

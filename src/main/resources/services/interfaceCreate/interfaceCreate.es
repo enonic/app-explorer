@@ -5,6 +5,7 @@ import {
 import {create} from '/lib/explorer/node/create';
 import {connect} from '/lib/explorer/repo/connect';
 import {interfaceModel} from '/lib/explorer/model/2/nodeTypes/interface';
+import {jsonError} from '/lib/explorer/jsonError';
 
 
 export function post({
@@ -12,6 +13,9 @@ export function post({
 		json
 	}
 }) {
+	if (!json) {
+		return jsonError('Missing required parameter json!');
+	}
 	const obj = JSON.parse(json);
 	obj.__connection = connect({principals: [PRINCIPAL_EXPLORER_WRITE]}); // eslint-disable-line no-underscore-dangle
 	obj._name = obj.name;
