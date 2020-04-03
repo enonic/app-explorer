@@ -11,8 +11,8 @@ import webpack from 'webpack';
 
 //console.debug(process.env.NODE_ENV);
 
-const MODE = 'development';
-//const MODE = 'production';
+//const MODE = 'development';
+const MODE = 'production';
 
 const SRC_DIR = 'src/main/resources';
 const SRC_DIR_ABS = path.resolve(__dirname, SRC_DIR);
@@ -135,7 +135,18 @@ const SS_EXTERNALS = [
 	/\/lib\/http-client/,
 	/\/lib\/license/,
 	/\/lib\/router/,
-	/\/lib\/xp\//
+
+	///^\/lib\/xp\/.+/
+	'/lib/xp/admin',
+	'/lib/xp/auth',
+	'/lib/xp/cluster',
+	'/lib/xp/common',
+	'/lib/xp/content',
+	'/lib/xp/event',
+	'/lib/xp/io',
+	'/lib/xp/portal',
+	'/lib/xp/task',
+	'/lib/xp/value'
 ];
 
 const SS_FILES = [
@@ -187,6 +198,7 @@ const SS_FILES = [
 
 const SS_PLUGINS = [
 	new webpack.ProvidePlugin({
+		/* ERROR: For some reason this breaks the webcrawl task!
 		console: { // Attempt at avoiding ReferenceError: "console" is not defined
 			assert: (params) => {log.debug(params)},
 			clear: () => {log.warning('console.clear called')},
@@ -211,7 +223,7 @@ const SS_PLUGINS = [
 			timeStamp: () => {log.warning('console.timeStamp called')},
 			trace: (params) => {log.debug(params)},
 			warn: (params) => {log.warning(params)}
-		},
+		},*/
 		global: 'myGlobal' // Without it will get: Cannot read property "ES6" from undefined
 	})
 ];
@@ -222,6 +234,13 @@ if (MODE === 'production') {
 	SS_EXTERNALS.push('/lib/util');
 	SS_EXTERNALS.push(/^\/lib\/util\//);
 } else {
+	// Needed by lib-explorer
+	SS_EXTERNALS.push('/lib/xp/context');
+	SS_EXTERNALS.push('/lib/xp/i18n');
+	SS_EXTERNALS.push('/lib/xp/mail');
+	SS_EXTERNALS.push('/lib/xp/node');
+	SS_EXTERNALS.push('/lib/xp/repo');
+
 	SS_ALIAS['/lib/cron'] = path.resolve(__dirname, '../lib-cron/src/main/resources/lib/cron/');
 	SS_ALIAS['/lib/explorer'] = path.resolve(__dirname, '../lib-explorer/src/main/resources/lib/explorer/');
 	SS_ALIAS['/lib/util'] = path.resolve(__dirname, '../lib-util/src/main/resources/lib/util');

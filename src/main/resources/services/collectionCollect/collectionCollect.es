@@ -1,4 +1,4 @@
-//import {toStr} from '/lib/util';
+import {toStr} from '/lib/util';
 import {assetUrl} from '/lib/xp/portal';
 import {submitNamed} from '/lib/xp/task';
 
@@ -12,13 +12,16 @@ import {query as queryCollectors} from '/lib/explorer/collector/query';
 import {getTasksWithPropertyValue} from '/lib/explorer/task/getTasksWithPropertyValue';
 
 
+const DEBUG = false;
+
+
 export function post({
 	params: {
 		name,
 		resume = false
 	}
 }) {
-	//log.info(`name:${name} resume:${resume}`);
+	DEBUG && log.info(`name:${name} resume:${resume}`);
 	const body = {};
 	let status = 200;
 
@@ -26,12 +29,13 @@ export function post({
 		value: name,
 		state: 'RUNNING'
 	});
+	DEBUG && log.info(`runningTasksWithName:${runningTasksWithName}`);
 
 	if (runningTasksWithName.length) {
 		const alreadyRunningtaskId = runningTasksWithName[0].id;
 		status = 500;
 		body.error = `Already collecting to ${name} under taskId ${alreadyRunningtaskId}!`;
-		//log.info(toStr({alreadyRunningtaskId}));
+		DEBUG && log.info(`alreadyRunningtaskId:${alreadyRunningtaskId}`);
 	} else {
 		const readConnection = connect({
 			principals: [PRINCIPAL_EXPLORER_READ]
@@ -40,19 +44,20 @@ export function post({
 			connection: readConnection,
 			name
 		});
-		//log.info(toStr({collectionNode}));
+		DEBUG && log.info(`collectionNode:${toStr(collectionNode)}`);
 
 		const {
 			collector: {
-				name: collectorName,
-				taskName: incomingTaskName = 'collect',
+				name: currentCollectorId,
 				configJson: incomingConfigJson
 			}
 		} = collectionNode;
+		DEBUG && log.info(`currentCollectorId:${currentCollectorId} incomingConfigJson:${toStr(incomingConfigJson)}`);
+
 		const config = incomingConfigJson
 			? JSON.parse(incomingConfigJson)
 			: collectionNode.collector.config;
-		//log.info(toStr({name, collectorName/*, config*/}));
+		DEBUG && log.info(`config:${toStr(config)}`);
 
 		const collector = queryCollectors({
 			connection: readConnection
@@ -73,15 +78,15 @@ export function post({
 					path: configAssetPath
 				})
 			};
-		}).filter(({collectorId}) => collectorId === collectorName)[0];
-		//log.info(toStr({collector}));
+		}).filter(({collectorId}) => collectorId === currentCollectorId)[0];
+		DEBUG && log.info(`collector:${toStr({collector})}`);
 
 		if (resume === 'true') { // Surgeon specific
 			config.resume = true;
 		}
 
 		const configJson = JSON.stringify(config);
-		//log.info(toStr({configJson}));
+		DEBUG && log.info(`configJson:${toStr({configJson})}`);
 
 		const submitNamedParams = {
 			name: collector.collectorId, // <appname>:<taskname>
@@ -91,9 +96,11 @@ export function post({
 				configJson
 			}
 		};
-		//log.info(toStr({submitNamedParams}));
+		DEBUG && log.info(`submitNamedParams:${toStr({submitNamedParams})}`);
 
 		const taskId = submitNamed(submitNamedParams);
+		DEBUG && log.info(`taskId:${toStr({taskId})}`);
+
 		body.messages = `Started collecting ${name} with taskId ${taskId}`;
 	}
 

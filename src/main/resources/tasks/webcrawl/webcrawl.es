@@ -40,7 +40,7 @@ import {URL} from '/lib/galimatias';
 
 
 import {request as httpClientRequest} from '/lib/http-client';
-//import {toStr} from '/lib/util';
+import {toStr} from '/lib/util';
 
 import {
 	NT_DOCUMENT
@@ -62,6 +62,8 @@ import {parseRobotsTxt} from './parseRobotsTxt';
 }*/
 
 
+const DEBUG = false;
+
 const DEFAULT_UA = 'Mozilla/5.0 (compatible; Enonic XP Explorer Collector Web crawler/1.0.0)';
 
 
@@ -71,13 +73,13 @@ const querySelectorAll = (node, selector) => node.find(selector).toArray()
 	.map((element) => cheerio(element));
 
 const getAttributeValue = (node, name) => {
-  const attributeValue = node.attr(name);
+	const attributeValue = node.attr(name);
 
-  if (typeof attributeValue === 'string') {
-    return attributeValue;
-  }
+	if (typeof attributeValue === 'string') {
+		return attributeValue;
+	}
 
-  //throw new Error(`Could not find a string value attribute:${name}!`);
+	//throw new Error(`Could not find a string value attribute:${name}!`);
 	return undefined;
 };
 
@@ -91,7 +93,8 @@ export function run({
 	collectorId,
 	configJson
 }) {
-	//log.info(toStr({name, collectorId, configJson}));
+	DEBUG && log.info(toStr({name, collectorId, configJson}));
+
 	const collector = new Collector({name, collectorId, configJson})
 	if (!collector.config.baseUri) { throw new Error('Config is missing required parameter baseUri!'); }
 	collector.start();
@@ -102,15 +105,21 @@ export function run({
 		excludes = [],
 		userAgent = DEFAULT_UA
 	} = collector.config;
-	//log.info(toStr({userAgent}));
+	DEBUG && log.info(`userAgent:${userAgent}`);
 
 	const excludeRegExps = excludes.map(str => new RegExp(str));
 
 	// Galimatias
 	const entryPointUrlObj = new URL(baseUri);
-	const normalizedentryPointUrl = entryPointUrlObj.normalize(); log.info(`normalizedentryPointUrl:${normalizedentryPointUrl}`);
-	const domain = entryPointUrlObj.getHost(); log.info(`domain:${domain}`);
-	const scheme = entryPointUrlObj.getScheme(); log.info(`scheme:${scheme}`);
+
+	const normalizedentryPointUrl = entryPointUrlObj.normalize();
+	DEBUG && log.info(`normalizedentryPointUrl:${normalizedentryPointUrl}`);
+
+	const domain = entryPointUrlObj.getHost();
+	DEBUG && log.info(`domain:${domain}`);
+
+	const scheme = entryPointUrlObj.getScheme();
+	DEBUG && log.info(`scheme:${scheme}`);
 
 	// jsuri
 	/*
@@ -137,13 +146,13 @@ export function run({
 		},
 		method: 'GET',
 		url: `${scheme}://${domain}/robots.txt`
-	};//log.info(toStr({robotsReq}));
+	}; DEBUG && log.info(toStr({robotsReq}));
 	const robotsRes = httpClientRequest(robotsReq); //log.info(toStr({robotsRes}));
 	let robots;
 	if(robotsRes.status === 200 && robotsRes.contentType === 'text/plain') {
 		robots = guard(parseRobotsTxt(robotsRes.body));
 	}
-	//log.info(toStr({robots}));
+	DEBUG && log.info(toStr({robots}));
 
 	const seenUrisObj = {[normalizedentryPointUrl]: true};
 	const queueArr = [normalizedentryPointUrl];
@@ -167,181 +176,184 @@ export function run({
 	} // handleNormalizedUri
 
 	whileQueueLoop:
-		while(queueArr.length) {
-			if (collector.shouldStop()) {
-				break whileQueueLoop;
-			}
-			const uri = queueArr.shift(); // Normalized before added to queue
-			//log.info(toStr({uri}));
-			const baseUrlObj = new URL(uri); //log.info(toStr({baseUrlObj}));
-			try {
-				collector.taskProgressObj.info.uri = uri; // eslint-disable-line no-param-reassign
-				if (resume) {
-					collector.taskProgressObj.info.message = `Resuming ${uri}`;
-					collector.progress();
-					collector.taskProgressObj.current += 1; // eslint-disable-line no-param-reassign
-					const nodeName = hash(uri);
-					if (exists({
-						connection: collector.collection.connection,
-						_parentPath: '/',
-						_name: nodeName
-					})) {
-						const node = get({
-							connection: collector.collection.connection,
-							_name: nodeName
-						});
-						const {uris} = node;
-						uris.Each(normalized => handleNormalizedUri(normalized));
-					} // exists
-				} else { // !resume
-					collector.taskProgressObj.info.message = `Processing ${uri}`;
-					collector.progress();
-					collector.taskProgressObj.current += 1; // eslint-disable-line no-param-reassign
-					if (robots && !robots.isAllowed('', uri)) {
-						throw new Error('Not allowed in robots.txt');
-					}
-					throwIfExcluded(uri);
-					const res = httpClientRequest({
-						followRedirects: true, // https://www.enonic.com uses 302
-						headers: {
-							'User-Agent': userAgent
-						},
-						url: uri
-					}); //log.info(toStr({res}));
-					if (res.status != 200) {
-						throw new Error(`Status: ${res.status}!`);
-					}
-					if (!res.contentType.includes('html')) {
-						throw new Error(`ContentType:${res.contentType} does not include html!`);
-					}
+	while(queueArr.length) {
+		if (collector.shouldStop()) {
+			break whileQueueLoop;
+		}
+		const uri = queueArr.shift(); // Normalized before added to queue
+		DEBUG && log.info(`uri:${uri}`);
 
-					// X-Robots-Tag HTTP header http://www.searchtools.com/robots/x-robots-tag.html
-					//log.info(toStr({headers: res.headers}));
-					let boolFollow = true;
-					let boolIndex = true;
-					if (res.headers['X-Robots-Tag']) {
-						const xRobotsTag = res.headers['X-Robots-Tag'].toUpperCase();
-						if (xRobotsTag.includes('NOFOLLOW')) {
-							boolFollow = false;
+		const baseUrlObj = new URL(uri);
+		//log.info(toStr({baseUrlObj}));
+
+		try {
+			collector.taskProgressObj.info.uri = uri; // eslint-disable-line no-param-reassign
+			if (resume) {
+				collector.taskProgressObj.info.message = `Resuming ${uri}`;
+				collector.progress();
+				collector.taskProgressObj.current += 1; // eslint-disable-line no-param-reassign
+				const nodeName = hash(uri);
+				if (exists({
+					connection: collector.collection.connection,
+					_parentPath: '/',
+					_name: nodeName
+				})) {
+					const node = get({
+						connection: collector.collection.connection,
+						_name: nodeName
+					});
+					const {uris} = node;
+					uris.Each(normalized => handleNormalizedUri(normalized));
+				} // exists
+			} else { // !resume
+				collector.taskProgressObj.info.message = `Processing ${uri}`;
+				collector.progress();
+				collector.taskProgressObj.current += 1; // eslint-disable-line no-param-reassign
+				if (robots && !robots.isAllowed('', uri)) {
+					throw new Error('Not allowed in robots.txt');
+				}
+				throwIfExcluded(uri);
+				const res = httpClientRequest({
+					followRedirects: true, // https://www.enonic.com uses 302
+					headers: {
+						'User-Agent': userAgent
+					},
+					url: uri
+				}); //log.info(toStr({res}));
+				if (res.status != 200) {
+					throw new Error(`Status: ${res.status}!`);
+				}
+				if (!res.contentType.includes('html')) {
+					throw new Error(`ContentType:${res.contentType} does not include html!`);
+				}
+
+				// X-Robots-Tag HTTP header http://www.searchtools.com/robots/x-robots-tag.html
+				//log.info(toStr({headers: res.headers}));
+				let boolFollow = true;
+				let boolIndex = true;
+				if (res.headers['X-Robots-Tag']) {
+					const xRobotsTag = res.headers['X-Robots-Tag'].toUpperCase();
+					if (xRobotsTag.includes('NOFOLLOW')) {
+						boolFollow = false;
+					}
+					if (xRobotsTag.includes('NOINDEX')) {
+						if(!boolFollow) {
+							throw new Error(`HTTP header X-Robots-Tag:${res.headers['X-Robots-Tag']} includes both NOFOLLOW and NOINDEX`);
 						}
-						if (xRobotsTag.includes('NOINDEX')) {
-							if(!boolFollow) {
-								throw new Error(`HTTP header X-Robots-Tag:${res.headers['X-Robots-Tag']} includes both NOFOLLOW and NOINDEX`);
+						boolIndex = false;
+					}
+				}
+				//log.info(toStr({boolFollow, boolIndex}));
+
+				//const dom = parseDOM(res.body, options);
+				const rootNode = cheerio.load(res.body, {
+					xmlMode: false
+		    }).root(); //log.info(safeStringify({rootNode})); // Huuuuuuuge!!!
+				//log.info(safeStringify({html: rootNode.html()}));
+
+				const headEl = querySelector(rootNode, 'head');
+				//log.info(safeStringify({head: head.html()}));
+
+				// Robots <META> tag http://www.searchtools.com/robots/robots-meta.html
+				const robotsMetaEl = querySelector(headEl, 'meta[name=robots]');
+				if (robotsMetaEl) {
+					const robotsMetaHtml = outerHTML(robotsMetaEl);
+					//log.info(toStr({robotsMetaHtml}));
+					const robotsMetaContentAttr = getAttributeValue(robotsMetaEl, 'content');
+					if (robotsMetaContentAttr) {
+						const robotsMetaUc = robotsMetaContentAttr.toUpperCase();
+						if (robotsMetaUc.includes('NOFOLLOW')) {
+							boolFollow = false;
+							if (robotsMetaUc.includes('NOINDEX')) {
+								throw new Error(`Found both NOFOLLOW and NOINDEX in ${robotsMetaHtml}`);
 							}
+						}
+						if (robotsMetaUc.includes('NOINDEX')) {
 							boolIndex = false;
 						}
-					}
-					//log.info(toStr({boolFollow, boolIndex}));
-
-					//const dom = parseDOM(res.body, options);
-					const rootNode = cheerio.load(res.body, {
-						xmlMode: false
-			    }).root(); //log.info(safeStringify({rootNode})); // Huuuuuuuge!!!
-					//log.info(safeStringify({html: rootNode.html()}));
-
-					const headEl = querySelector(rootNode, 'head');
-					//log.info(safeStringify({head: head.html()}));
-
-					// Robots <META> tag http://www.searchtools.com/robots/robots-meta.html
-					const robotsMetaEl = querySelector(headEl, 'meta[name=robots]');
-					if (robotsMetaEl) {
-						const robotsMetaHtml = outerHTML(robotsMetaEl);
-						//log.info(toStr({robotsMetaHtml}));
-						const robotsMetaContentAttr = getAttributeValue(robotsMetaEl, 'content');
-						if (robotsMetaContentAttr) {
-							const robotsMetaUc = robotsMetaContentAttr.toUpperCase();
-							if (robotsMetaUc.includes('NOFOLLOW')) {
-								boolFollow = false;
-								if (robotsMetaUc.includes('NOINDEX')) {
-									throw new Error(`Found both NOFOLLOW and NOINDEX in ${robotsMetaHtml}`);
-								}
-							}
-							if (robotsMetaUc.includes('NOINDEX')) {
-								boolIndex = false;
-							}
-							if(!boolFollow && !boolIndex) {
-								throw new Error(`Found both NOFOLLOW and NOINDEX combined from HTTP header X-Robots-Tag:${res.headers['X-Robots-Tag']} and ${robotsMetaHtml}`);
-							}
+						if(!boolFollow && !boolIndex) {
+							throw new Error(`Found both NOFOLLOW and NOINDEX combined from HTTP header X-Robots-Tag:${res.headers['X-Robots-Tag']} and ${robotsMetaHtml}`);
 						}
 					}
-					//log.info(toStr({boolFollow, boolIndex}));
+				}
+				//log.info(toStr({boolFollow, boolIndex}));
 
-					const titleEl = querySelector(headEl, 'title');
-					const title = titleEl ? titleEl.text() : '';
+				const titleEl = querySelector(headEl, 'title');
+				const title = titleEl ? titleEl.text() : '';
 
-					const bodyEl = querySelector(rootNode, 'body');
-					//log.info(safeStringify({body: body.html()}));
+				const bodyEl = querySelector(rootNode, 'body');
+				//log.info(safeStringify({body: body.html()}));
 
-					const uris = [];
-					if (boolFollow) {
-						const linkEls = querySelectorAll(bodyEl, "a[href]:not([href^='#']):not([href^='mailto:']):not([href^='tel:'])");
-						linksForLoop:
-							for (var i = 0; i < linkEls.length; i += 1) {
-								const el = linkEls[i];
-								const rel = getAttributeValue(el, 'rel');
-								if (rel && rel.toUpperCase().includes('NOFOLLOW')) {
-									continue linksForLoop;
-								}
-								const href = getAttributeValue(el, 'href');
+				const uris = [];
+				if (boolFollow) {
+					const linkEls = querySelectorAll(bodyEl, "a[href]:not([href^='#']):not([href^='mailto:']):not([href^='tel:'])");
+					linksForLoop:
+					for (var i = 0; i < linkEls.length; i += 1) {
+						const el = linkEls[i];
+						const rel = getAttributeValue(el, 'rel');
+						if (rel && rel.toUpperCase().includes('NOFOLLOW')) {
+							continue linksForLoop;
+						}
+						const href = getAttributeValue(el, 'href');
 
-								// Galimatias
-								const resolved = baseUrlObj.resolve(href); //log.info(toStr({resolved}));
-								const resolvedUriObj = new URL(resolved);
-								const currentHost = resolvedUriObj.getHost(); //log.info(toStr({currentHost}));
+						// Galimatias
+						const resolved = baseUrlObj.resolve(href); //log.info(toStr({resolved}));
+						const resolvedUriObj = new URL(resolved);
+						const currentHost = resolvedUriObj.getHost(); //log.info(toStr({currentHost}));
 
-								// jsuri
-								/*
-								const uriObj = new Uri(href);
-								const resolved = resolve(href, uri); //log.info(toStr({resolved}));
-								const resolvedUriObj = new Uri(resolved);
-								const currentHost = resolvedUriObj.host(); //log.info(toStr({currentHost}));
-								*/
+						// jsuri
+						/*
+						const uriObj = new Uri(href);
+						const resolved = resolve(href, uri); //log.info(toStr({resolved}));
+						const resolvedUriObj = new Uri(resolved);
+						const currentHost = resolvedUriObj.host(); //log.info(toStr({currentHost}));
+						*/
 
-								// uri-js
-								/*
-								const resolved = resolve(uri, href); //log.info(toStr({resolved}));
-								const uriObj = parse(resolved); //log.info(toStr({uriObj}));
-								const currentHost = uriObj.host; //log.info(toStr({host}));
-								*/
+						// uri-js
+						/*
+						const resolved = resolve(uri, href); //log.info(toStr({resolved}));
+						const uriObj = parse(resolved); //log.info(toStr({uriObj}));
+						const currentHost = uriObj.host; //log.info(toStr({host}));
+						*/
 
-								if (currentHost === domain) {
-									// Galimatias
-									const normalized = resolvedUriObj.setFragment('').normalize(); //log.info(toStr({normalized}));
+						if (currentHost === domain) {
+							// Galimatias
+							const normalized = resolvedUriObj.setFragment('').normalize(); //log.info(toStr({normalized}));
 
-									// jsuri
-									//resolvedUriObj.setAnchor('');
-									//const normalized = normalizeUrl(resolvedUriObj.toString()); log.info(toStr({normalized}));
-									//const normalized = normalizeUri(resolvedUriObj.toString()); //log.info(toStr({normalized}));
+							// jsuri
+							//resolvedUriObj.setAnchor('');
+							//const normalized = normalizeUrl(resolvedUriObj.toString()); log.info(toStr({normalized}));
+							//const normalized = normalizeUri(resolvedUriObj.toString()); //log.info(toStr({normalized}));
 
-									// uri-js
-									//delete uriObj.fragment;
-									//const normalized = normalize(serialize(uriObj)); //log.info(toStr({normalized}));
+							// uri-js
+							//delete uriObj.fragment;
+							//const normalized = normalize(serialize(uriObj)); //log.info(toStr({normalized}));
 
-									if (!uris.includes(normalized)) {
-										uris.push(normalized);
-									}
-									handleNormalizedUri(normalized);
-								}
-							} // for linkEls
-					} // boolFollow
+							if (!uris.includes(normalized)) {
+								uris.push(normalized);
+							}
+							handleNormalizedUri(normalized);
+						}
+					} // for linkEls
+				} // boolFollow
 
-					if (boolIndex && (!robots || robots.isIndexable('', uri))) {
-						collector.persistDocument({
-							displayName: title,
-							title,
-							text: bodyEl.text(),
-							uri,
-							uris
-						});
-					} // indexable
-				} // resume ... else
-				//log.info(`success:${uri}`);
-				collector.addSuccess({uri});
-			} catch (e) {
-				//log.error(`uri:${uri} message:${e.message}`);
-				collector.addError({uri, message: e.message});
-			} // try ... catch
-		} // while
+				if (boolIndex && (!robots || robots.isIndexable('', uri))) {
+					collector.persistDocument({
+						displayName: title,
+						title,
+						text: bodyEl.text(),
+						uri,
+						uris
+					});
+				} // indexable
+			} // resume ... else
+			//log.info(`success:${uri}`);
+			collector.addSuccess({uri});
+		} catch (e) {
+			//log.error(`uri:${uri} message:${e.message}`);
+			collector.addError({uri, message: e.message});
+		} // try ... catch
+	} // while
 
 
 	//──────────────────────────────────────────────────────────────────────────

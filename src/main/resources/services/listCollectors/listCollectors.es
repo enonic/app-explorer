@@ -1,4 +1,4 @@
-import {toStr} from '/lib/util';
+//import {toStr} from '/lib/util';
 import {RT_JSON} from '/lib/explorer/model/2/constants';
 import {listCollectors} from '/lib/explorer/collector/listCollectors';
 import {currentTimeMillis} from '/lib/explorer/time/currentTimeMillis';
@@ -46,6 +46,7 @@ import {currentTimeMillis} from '/lib/explorer/time/currentTimeMillis';
 export const get = () => ({
 	contentType: RT_JSON,
 	body: /*TEST_DATA*/listCollectors().map(task => {
+		//log.info(`task:${toStr(task)}`);
 		try {
 			// If a task fails in a uncontrolled way task.progress.info is just a string, not json.
 			task.progress.info = JSON.parse(task.progress.info);
