@@ -45,25 +45,25 @@ export const Collector = (props) => {
 	//console.debug('Collector initialValues', initialValues);
 
 	if (isFirstRun.current) {
-			//console.debug('isFirstRun');
-      isFirstRun.current = false;
-			dispatch(setSchema({path, schema: SCHEMA}));
-			// There are no changes, errors or visits yet!
-			if (initialValues) {
-				if (initialValues[EXCLUDES_PATH] && !Array.isArray(initialValues[EXCLUDES_PATH])) {
-					initialValues[EXCLUDES_PATH] = [initialValues[EXCLUDES_PATH]];
-				}
-			} else {
-				initialValues = {
-					baseUri: ''
-				};
-				dispatch(setValue({path, value: initialValues}));
+		//console.debug('isFirstRun');
+		isFirstRun.current = false;
+		dispatch(setSchema({path, schema: SCHEMA}));
+		// There are no changes, errors or visits yet!
+		if (initialValues) {
+			if (initialValues[EXCLUDES_PATH] && !Array.isArray(initialValues[EXCLUDES_PATH])) {
+				initialValues[EXCLUDES_PATH] = [initialValues[EXCLUDES_PATH]];
 			}
-  }
+		} else {
+			initialValues = {
+				baseUri: ''
+			};
+			dispatch(setValue({path, value: initialValues}));
+		}
+	}
 
 
 	return <EnonicForm
-	  afterValidate={(dereffed) => {
+		afterValidate={(dereffed) => {
 			// console.debug('Collector afterValidate dereffed', dereffed);
 			dispatch(setError({path, error: dereffed.errors}));
 			dispatch(setVisited({path, value: dereffed.visited}));
