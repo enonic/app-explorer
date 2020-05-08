@@ -14,25 +14,79 @@ export function DeleteSynonym(props) {
 		to
 	} = props;
 	const [open, setOpen] = React.useState(false);
+
 	function doClose() {
 		setOpen(false); // This needs to be before unmount.
 		onClose(); // This could trigger render in parent, and unmount this Component.
 	}
+
+	const [state, setState] = React.useState({
+		modalHeader: 'Delete synonym?',
+		modalContentHeader: 'Do you really want to delete this synonym?',
+		buttonDisabled: false,
+		buttonIcon: 'trash alternate outline',
+		buttonLoading: false,
+		buttonText: 'Confirm Delete',
+		buttonOnClick: () => {
+			setState(prev => {
+				const next = JSON.parse(JSON.stringify(prev));
+				next.buttonDisabled = true;
+				next.buttonLoading = true;
+				return next;
+			});
+			//setButtonText('Deleting...');
+			fetch(`${servicesBaseUrl}/synonymDelete?id=${id}`, {
+				method: 'DELETE'
+			}).then(response => {
+				//console.debug(response);
+				if (response.status == 200) {
+					setState(prev => {
+						const next = JSON.parse(JSON.stringify(prev));
+						next.modalHeader = 'Synonym deleted';
+						next.modalContentHeader = '';
+						next.buttonDisabled = false;
+						next.buttonIcon = 'close';
+						next.buttonLoading = false;
+						next.buttonText = 'Click to close dialogue';
+						next.buttonOnClick = () => {
+							doClose();
+						}
+						return next;
+					});
+				} else {
+					setState(prev => {
+						const next = JSON.parse(JSON.stringify(prev));
+						next.modalHeader = 'Failed to delete synonym!';
+						next.modalContentHeader = '';
+						next.buttonDisabled = false;
+						next.buttonIcon = 'close';
+						next.buttonLoading = false;
+						next.buttonText = 'Click to close dialogue';
+						next.buttonOnClick = () => {
+							doClose();
+						}
+						return next;
+					});
+				}
+			})
+		}
+	});
+
 	return <Modal
 		closeIcon
 		onClose={doClose}
 		open={open}
 		trigger={<Popup
-			content={`Delete synonym`}
+			content='Delete synonym'
 			inverted
 			trigger={<Button
 				icon
 				onClick={() => setOpen(true)}
 			><Icon color='red' name='trash alternate outline'/></Button>}/>}
 	>
-		<Modal.Header>Delete synonym?</Modal.Header>
+		<Modal.Header>{state.modalHeader}</Modal.Header>
 		<Modal.Content>
-			<Header as='h2'>Do you really want to delete this synonym?</Header>
+			<Header as='h2'>{state.modalContentHeader}</Header>
 			<Table celled compact selectable sortable striped>
 				<Table.Header>
 					<Table.Row>
@@ -59,15 +113,11 @@ export function DeleteSynonym(props) {
 			</Table>
 			<Button
 				compact
-				onClick={() => {
-					fetch(`${servicesBaseUrl}/synonymDelete?id=${id}`, {
-						method: 'DELETE'
-					}).then(response => {
-						doClose();
-					})
-				}}
+				disabled={state.buttonDisabled}
+				loading={state.buttonLoading}
+				onClick={state.buttonOnClick}
 				size='tiny'
-			><Icon color='red' name='trash alternate outline'/>Confirm Delete</Button>
+			><Icon color='red' name={state.buttonIcon}/>{state.buttonText}</Button>
 		</Modal.Content>
 	</Modal>
 } // DeleteSynonym
