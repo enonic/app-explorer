@@ -2,6 +2,7 @@ import {Button, Header, Icon, Modal, Popup} from 'semantic-ui-react';
 //import generateUuidv4 from 'uuid/v4';
 
 import {NewOrEditInterface} from './NewOrEditInterface';
+import {UploadLicense} from '../UploadLicense';
 
 
 export function NewOrEditInterfaceModal(props) {
@@ -13,9 +14,12 @@ export function NewOrEditInterfaceModal(props) {
 		fieldsObj,
 		id, // nullable
 		//initialValues = {},
+		licenseValid,
 		servicesBaseUrl,
+		setLicenseValid,
 		stopWordOptions,
-		thesauriOptions
+		thesauriOptions,
+		total
 	} = props;
 	//console.debug('initialValues', initialValues);
 
@@ -55,18 +59,24 @@ export function NewOrEditInterfaceModal(props) {
 					}}><Icon
 						name='plus'
 					/></Button>}/>}
-	>
-		<Modal.Header>{header}</Modal.Header>
-		<Modal.Content>
-			<NewOrEditInterface
-				collectionOptions={collectionOptions}
-				fieldsObj={fieldsObj}
-				id={id}
-				onClose={onClose}
+	>{licenseValid || total <= 2
+			? <>
+				<Modal.Header>{header}</Modal.Header>
+				<Modal.Content>
+					<NewOrEditInterface
+						collectionOptions={collectionOptions}
+						fieldsObj={fieldsObj}
+						id={id}
+						onClose={onClose}
+						servicesBaseUrl={servicesBaseUrl}
+						stopWordOptions={stopWordOptions}
+						thesauriOptions={thesauriOptions}
+					/>
+				</Modal.Content>
+			</>
+			: <UploadLicense
 				servicesBaseUrl={servicesBaseUrl}
-				stopWordOptions={stopWordOptions}
-				thesauriOptions={thesauriOptions}
-			/>
-		</Modal.Content>
+				setLicenseValid={setLicenseValid}
+			/>}
 	</Modal>;
 } // NewOrEditInterfaceModal

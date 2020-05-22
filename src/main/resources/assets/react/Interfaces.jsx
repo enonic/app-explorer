@@ -51,13 +51,18 @@ export class Interfaces extends React.Component {
 		//console.debug(this.props);
 		//console.debug(this.state.interfaces);
 
-		const {servicesBaseUrl} = this.props;
+		const {
+			licenseValid,
+			servicesBaseUrl,
+			setLicenseValid
+		} = this.props;
 
 		const {
 			collectionOptions,
 			fieldsObj,
 			interfaces: {
-				hits
+				hits,
+				total
 			},
 			stopWordOptions,
 			thesauriOptions
@@ -88,9 +93,12 @@ export class Interfaces extends React.Component {
 										fieldsObj={fieldsObj}
 										id={id}
 										afterClose={() => this.updateInterfaces()}
+										licenseValid={licenseValid}
 										servicesBaseUrl={servicesBaseUrl}
+										setLicenseValid={setLicenseValid}
 										stopWordOptions={stopWordOptions}
 										thesauriOptions={thesauriOptions}
+										total={total}
 									/>
 									<SearchModal
 										interfaceName={name}
@@ -116,9 +124,12 @@ export class Interfaces extends React.Component {
 				collectionOptions={collectionOptions}
 				fieldsObj={fieldsObj}
 				afterClose={() => this.updateInterfaces()}
+				licenseValid={licenseValid}
 				servicesBaseUrl={servicesBaseUrl}
+				setLicenseValid={setLicenseValid}
 				stopWordOptions={stopWordOptions}
 				thesauriOptions={thesauriOptions}
+				total={total}
 			/>
 		</>;
 	} // render

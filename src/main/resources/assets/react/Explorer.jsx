@@ -232,7 +232,9 @@ export function Explorer(props) {
 					setLicenseValid={setLicenseValid}
 				/>}
 				{page === 'interfaces' && <Interfaces
+					licenseValid={licenseValid}
 					servicesBaseUrl={servicesBaseUrl}
+					setLicenseValid={setLicenseValid}
 				/>}
 				{page === 'about' && <>
 					<Header as='h1' content='Licenses'/>
