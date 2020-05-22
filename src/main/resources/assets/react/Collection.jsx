@@ -546,7 +546,7 @@ MONTH_OPTIONS.forEach(({text, value}) => {
 
 // Day of the week 0-6 Sunday to Saturday 7 is also Sunday on some systems
 const DAY_OF_WEEK_OPTIONS = [{
-	text: 'Every day of the week',
+	text: 'Every day',
 	value: '*'
 },{
 	text: 'Sunday',

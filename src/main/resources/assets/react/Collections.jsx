@@ -349,7 +349,7 @@ export function Collections(props) {
 									dayOfWeek,
 									minute,
 									hour
-								}) => <pre>{`${rpad(MONTH_TO_HUMAN[month], 11)} dayOfMonth:${lpad(dayOfMonth)} ${DAY_OF_WEEK_TO_HUMAN[dayOfWeek]} ${zeroPad(hour)}:${zeroPad(minute)}`}</pre>)
+								}) => <pre>{`${hour === '*' ? '**' : zeroPad(hour)}:${minute === '*' ? '**' : zeroPad(minute)} ${rpad(DAY_OF_WEEK_TO_HUMAN[dayOfWeek], 9)} in ${rpad(MONTH_TO_HUMAN[month], 11)} (dayOfMonth:${lpad(dayOfMonth)})`}</pre>)
 								: 'Not scheduled'
 							}</Table.Cell>
 							<Table.Cell collapsing>
