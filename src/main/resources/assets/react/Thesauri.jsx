@@ -10,6 +10,7 @@ import {Import} from './thesaurus/Import';
 export function ThesauriList(props) {
 	//console.debug('Thesauri props', props);
 	const {
+		licenseValid,
 		servicesBaseUrl
 	} = props;
 
@@ -76,6 +77,7 @@ export function ThesauriList(props) {
 									<NewOrEditThesaurus
 										displayName={displayName}
 										id={id}
+										licenseValid={licenseValid}
 										name={name}
 										onClose={fetchThesauri}
 										servicesBaseUrl={servicesBaseUrl}
@@ -128,10 +130,14 @@ export function ThesauriList(props) {
 
 export function Thesauri(props) {
 	//console.debug('Thesauri props', props);
-	const {servicesBaseUrl} = props;
+	const {
+		licenseValid,
+		servicesBaseUrl
+	} = props;
 	return <>
 		<Header as='h1'>Thesauri</Header>
 		<ThesauriList
+			licenseValid={licenseValid}
 			servicesBaseUrl={servicesBaseUrl}
 		/>
 	</>;

@@ -192,7 +192,7 @@ const SS_FILES = [
 	'src/main/resources/services/thesaurusList/thesaurusList',
 	'src/main/resources/services/thesaurusUpdate/thesaurusUpdate',
 	'src/main/resources/services/uninstallLicense/uninstallLicense',
-	//'src/main/resources/services/uploadLicense/uploadLicense',
+	'src/main/resources/services/uploadLicense/uploadLicense',
 	'src/main/resources/tasks/webcrawl/webcrawl'
 ];
 

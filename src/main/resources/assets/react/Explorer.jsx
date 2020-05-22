@@ -69,6 +69,7 @@ export function Explorer(props) {
 	//console.debug('Explorer props', props);
 	const {
 		collectorsObj,
+		licenseValid,
 		servicesBaseUrl
 	} = props;
 
@@ -222,6 +223,7 @@ export function Explorer(props) {
 					servicesBaseUrl={servicesBaseUrl}
 				/>}
 				{page === 'thesauri' && <Thesauri
+					licenseValid={licenseValid}
 					servicesBaseUrl={servicesBaseUrl}
 				/>}
 				{page === 'interfaces' && <Interfaces

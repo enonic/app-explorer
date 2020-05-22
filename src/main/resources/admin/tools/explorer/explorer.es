@@ -12,7 +12,7 @@ import {
 	ROLE_SYSTEM_ADMIN,
 	ROLE_EXPLORER_ADMIN
 } from '/lib/explorer/model/2/constants';
-import {toolPage} from '/admin/tools/explorer/toolPage';
+import {htmlResponse} from '/admin/tools/explorer/htmlResponse';
 
 
 const router = newRouter();
@@ -32,7 +32,7 @@ router.filter((req/*, next*/) => {
 	if (!(hasRole(ROLE_EXPLORER_ADMIN) || hasRole(ROLE_SYSTEM_ADMIN))) { return { status: 401 }; }
 	//log.info(toStr({method: req.method})); // form method only supports get and post
 
-	return toolPage(req);
+	return htmlResponse(req);
 });
 
 // NOTE https://github.com/enonic/xp/issues/6793

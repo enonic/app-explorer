@@ -8,7 +8,7 @@ import {ResetButton} from 'semantic-ui-react-form/buttons/ResetButton';
 import {SubmitButton} from 'semantic-ui-react-form/buttons/SubmitButton';
 
 import {EditSynonyms} from './EditSynonyms';
-
+import {UploadLicense} from '../UploadLicense';
 
 function required(value) {
 	return value ? undefined : 'Required!';
@@ -19,6 +19,7 @@ export function NewOrEditThesaurus(props) {
 	const {
 		id,
 		displayName = '',
+		licenseValid,
 		name = '',
 		onClose,
 		servicesBaseUrl
@@ -58,60 +59,63 @@ export function NewOrEditThesaurus(props) {
 				}}><Icon
 					name='plus'
 				/></Button>}
-	>
-		<Modal.Header>{id ? `Edit thesaurus ${displayName}` : 'New thesaurus'}</Modal.Header>
-		<Modal.Content>
-			<EnonicForm
-				initialValues={{
-					name,
-					displayName
-				}}
-				onSubmit={({
-					name,
-					displayName
-				}) => {
-					fetch(`${servicesBaseUrl}/thesaurus${id ? 'Update' : 'Create'}?displayName=${displayName}${id ? `&id=${id}` : ''}&name=${name}`, {
-						method: 'POST'
-					}).then(response => {
-						doClose();
-					})
-				}}
-				schema={{
-					displayName: (value) => required(value),
-					name: (value) => required(value)
-				}}
-			>
-				<Form as='div'>
-					{!id && <Form.Field>
-						<EnonicInput
-							fluid
-							label={{basic: true, content: 'Name'}}
-							path='name'
-							placeholder='Please input name'
+	>{licenseValid
+			? <>
+				<Modal.Header>{id ? `Edit thesaurus ${displayName}` : 'New thesaurus'}</Modal.Header>
+				<Modal.Content>
+					<EnonicForm
+						initialValues={{
+							name,
+							displayName
+						}}
+						onSubmit={({
+							name,
+							displayName
+						}) => {
+							fetch(`${servicesBaseUrl}/thesaurus${id ? 'Update' : 'Create'}?displayName=${displayName}${id ? `&id=${id}` : ''}&name=${name}`, {
+								method: 'POST'
+							}).then(response => {
+								doClose();
+							})
+						}}
+						schema={{
+							displayName: (value) => required(value),
+							name: (value) => required(value)
+						}}
+					>
+						<Form as='div'>
+							{!id && <Form.Field>
+								<EnonicInput
+									fluid
+									label={{basic: true, content: 'Name'}}
+									path='name'
+									placeholder='Please input name'
+								/>
+							</Form.Field>}
+							<Form.Field>
+								<EnonicInput
+									fluid
+									label={{basic: true, content: 'Display name'}}
+									path='displayName'
+									placeholder='Please input display name'
+								/>
+							</Form.Field>
+							<Form.Field>
+								<SubmitButton/>
+								<ResetButton/>
+							</Form.Field>
+						</Form>
+					</EnonicForm>
+					{id && <>
+						<Header as='h2' content='Synonyms'/>
+						<EditSynonyms
+							servicesBaseUrl={servicesBaseUrl}
+							thesaurusId={id}
+							thesaurusName={name}
 						/>
-					</Form.Field>}
-					<Form.Field>
-						<EnonicInput
-							fluid
-							label={{basic: true, content: 'Display name'}}
-							path='displayName'
-							placeholder='Please input display name'
-						/>
-					</Form.Field>
-					<Form.Field>
-						<SubmitButton/>
-						<ResetButton/>
-					</Form.Field>
-				</Form>
-			</EnonicForm>
-			{id && <>
-				<Header as='h2' content='Synonyms'/>
-				<EditSynonyms
-					servicesBaseUrl={servicesBaseUrl}
-					thesaurusId={id}
-					thesaurusName={name}
-				/>
-			</>}
-		</Modal.Content>
-	</Modal>;
+					</>}
+				</Modal.Content>
+			</>
+			: <UploadLicense servicesBaseUrl={servicesBaseUrl}/>
+		}</Modal>;
 } // NewOrEditThesaurus

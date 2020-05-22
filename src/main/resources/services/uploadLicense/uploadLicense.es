@@ -20,7 +20,7 @@ export function post(req) {
 	}
 
 	return {
-		status: 200,
+		status: isValid ? 200 : 500,
 		contentType: 'application/json',
 		body: {
 			licenseValid: !!isValid,

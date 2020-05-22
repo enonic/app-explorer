@@ -22,30 +22,19 @@ const ID_REACT_EXPLORER_CONTAINER = 'reactExplorerContainer';
 
 
 export function htmlResponse({
-	bodyBegin = [],
-	bodyEnd = [],
-	headBegin = [],
-	headEnd = [],
-	main = '',
-	messages = [],
 	path = TOOL_PATH,
 	title = '',
 	status = 200
 } = {}) {
 	//log.info(toStr({path}));
-	const relPath = path.replace(TOOL_PATH, ''); //log.info(toStr({relPath}));
-	const pathParts = relPath.match(/[^/]+/g); //log.info(`pathParts:${pathParts}`);
-	const tab = pathParts ? pathParts[0] : ''; //log.info(toStr({tab}));
-	const action = pathParts ? pathParts[1] : ''; //log.info(`action:${action}`);
 	const preTitle = title ? `${title} - ` : '';
-	const messagesArray = forceArray(messages);
-	const statusInt = parseInt(status);
 
 	const licenseDetails = validateLicense({appKey: app.name});
 	//log.info(`licenseDetails:${toStr(licenseDetails)}`);
-	const licenseValid = licenseDetails && !licenseDetails.expired;
+	const licenseValid = !!(licenseDetails && !licenseDetails.expired);
 
 	const propsObj = {
+		licenseValid,
 		servicesBaseUrl: serviceUrl({service: ''})
 	};
 
@@ -78,8 +67,6 @@ export function htmlResponse({
 			<script type="text/javascript" src="${assetUrl({path: 'frappe-gantt/frappe-gantt.min.js'})}"></script>
 		-->
 
-		${''/*headBegin.join('\n')*/}
-
 		<title>${preTitle}Explorer</title>
 		<link rel="shortcut icon" href="${assetUrl({path: 'favicon.ico'})}">
 
@@ -96,11 +83,8 @@ export function htmlResponse({
 		<!-- Append the Admin libraries -->
 		<script type="text/javascript" src="${assetUrl({path: '/admin/common/lib/_all.js'})}"></script>
 
-		${''/*headEnd.join('\n')*/}
 	</head>
 	<body style="background-color: white !important;">
-		${''/*bodyBegin.join('\n')*/}
-
 		<div id="${ID_REACT_EXPLORER_CONTAINER}"/>
 
 		<script type="text/javascript">
@@ -185,8 +169,6 @@ collectorsObj['${a}'] = Collector${i};`)
 				document.getElementById('${ID_REACT_EXPLORER_CONTAINER}')
 			);
 		</script>
-
-		${''/*bodyEnd.join('\n')*/}
 	</body>
 </html>`,
 		contentType: 'text/html; charset=utf-8',
