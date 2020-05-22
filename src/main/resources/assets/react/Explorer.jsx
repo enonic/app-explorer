@@ -69,11 +69,12 @@ export function Explorer(props) {
 	//console.debug('Explorer props', props);
 	const {
 		collectorsObj,
-		licenseValid,
+		licenseValid: initialLicenseValid,
 		servicesBaseUrl
 	} = props;
-	//console.debug('Explorer licenseValid', licenseValid);
+	//console.debug('Explorer initialLicenseValid', initialLicenseValid);
 
+	const [licenseValid, setLicenseValid] = React.useState(initialLicenseValid);
 	const [page, setPage] = React.useState('home');
 	const [sideBarVisible, setSideBarVisible] = React.useState(true);
 	const [pusherWidth, setPusherWidth] = React.useState('calc(100% - 260px)');
@@ -226,6 +227,7 @@ export function Explorer(props) {
 				{page === 'thesauri' && <Thesauri
 					licenseValid={licenseValid}
 					servicesBaseUrl={servicesBaseUrl}
+					setLicenseValid={setLicenseValid}
 				/>}
 				{page === 'interfaces' && <Interfaces
 					servicesBaseUrl={servicesBaseUrl}

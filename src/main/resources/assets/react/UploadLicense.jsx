@@ -4,7 +4,10 @@ import {
 
 
 export const UploadLicense = (props) => {
-	const {servicesBaseUrl} = props;
+	const {
+		servicesBaseUrl,
+		setLicenseValid
+	} = props;
 	const [file, setFile] = React.useState();
 	return <>
 		<Modal.Header>Upload license</Modal.Header>
@@ -18,10 +21,15 @@ export const UploadLicense = (props) => {
 					body: formData,
 					'Content-type': 'multipart/form-data',
 					method: 'POST'
-				}).then(response => {
-					console.debug(response);
-					// TODO Handle response
-				});
+				}).then(response => response.json())
+					.then(data => {
+						//console.debug(data);
+						const {licenseValid} = data;
+						//console.debug(licenseValid);
+						if (licenseValid) {
+							setLicenseValid(true);
+						}
+					});
 			}}>
 				<Form.Field>
 					<Input

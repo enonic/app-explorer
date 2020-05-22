@@ -11,7 +11,8 @@ export function ThesauriList(props) {
 	//console.debug('Thesauri props', props);
 	const {
 		licenseValid,
-		servicesBaseUrl
+		servicesBaseUrl,
+		setLicenseValid
 	} = props;
 	//console.debug('ThesauriList licenseValid', licenseValid);
 
@@ -125,6 +126,7 @@ export function ThesauriList(props) {
 			licenseValid={licenseValid}
 			onClose={fetchThesauri}
 			servicesBaseUrl={servicesBaseUrl}
+			setLicenseValid={setLicenseValid}
 		/>
 	</>;
 } // ThesauriList
@@ -134,7 +136,8 @@ export function Thesauri(props) {
 	//console.debug('Thesauri props', props);
 	const {
 		licenseValid,
-		servicesBaseUrl
+		servicesBaseUrl,
+		setLicenseValid
 	} = props;
 	//console.debug('Thesauri licenseValid', licenseValid);
 	return <>
@@ -142,6 +145,7 @@ export function Thesauri(props) {
 		<ThesauriList
 			licenseValid={licenseValid}
 			servicesBaseUrl={servicesBaseUrl}
+			setLicenseValid={setLicenseValid}
 		/>
 	</>;
 }
