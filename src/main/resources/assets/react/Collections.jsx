@@ -8,6 +8,7 @@ import {
 	MONTH_TO_HUMAN,
 	DAY_OF_WEEK_TO_HUMAN
 } from './Collection';
+import {UploadLicense} from './UploadLicense';
 import {useInterval} from './utils/useInterval';
 
 
@@ -40,9 +41,12 @@ function NewOrEditModal(props) {
 		disabled,
 		fields,
 		initialValues,
+		licenseValid,
 		name,
 		servicesBaseUrl,
-		siteOptions
+		setLicenseValid,
+		siteOptions,
+		totalCount
 	} = props;
 	const [state, setState] = React.useState({
 		open: false
@@ -82,21 +86,27 @@ function NewOrEditModal(props) {
 				}}><Icon
 					name='plus'
 				/></Button>}
-	>
-		<Modal.Header>{name ? `Edit collection ${name}`: 'New collection'}</Modal.Header>
-		<Modal.Content>
-			<Collection
-				collectorsObj={collectorsObj}
-				collectorOptions={collectorOptions}
-				contentTypeOptions={contentTypeOptions}
-				fields={fields}
-				initialValues={initialValues}
-				mode={name ? 'modify' : 'create'}
-				onClose={onClose}
+	>{licenseValid || totalCount <= 3
+			? <>
+				<Modal.Header>{name ? `Edit collection ${name}`: 'New collection'}</Modal.Header>
+				<Modal.Content>
+					<Collection
+						collectorsObj={collectorsObj}
+						collectorOptions={collectorOptions}
+						contentTypeOptions={contentTypeOptions}
+						fields={fields}
+						initialValues={initialValues}
+						mode={name ? 'modify' : 'create'}
+						onClose={onClose}
+						servicesBaseUrl={servicesBaseUrl}
+						siteOptions={siteOptions}
+					/>
+				</Modal.Content>
+			</>
+			: <UploadLicense
 				servicesBaseUrl={servicesBaseUrl}
-				siteOptions={siteOptions}
-			/>
-		</Modal.Content>
+				setLicenseValid={setLicenseValid}
+			/>}
 	</Modal>;
 } // NewOrEditModal
 
@@ -146,7 +156,9 @@ function DeleteModal(props) {
 export function Collections(props) {
 	const {
 		collectorsObj,
-		servicesBaseUrl
+		licenseValid,
+		servicesBaseUrl,
+		setLicenseValid
 	} = props;
 
 	const [state, setState] = React.useState({
@@ -332,9 +344,12 @@ export function Collections(props) {
 									doCollect
 								}}
 								fields={fields}
+								licenseValid={licenseValid}
 								name={name}
 								servicesBaseUrl={servicesBaseUrl}
+								setLicenseValid={setLicenseValid}
 								siteOptions={siteOptions}
+								totalCount={totalCount}
 							/></Table.Cell>
 							<Table.Cell collapsing>{displayName}</Table.Cell>
 							<Table.Cell collapsing>{count}</Table.Cell>
@@ -445,8 +460,11 @@ export function Collections(props) {
 				contentTypeOptions={contentTypeOptions}
 				disabled={collectorOptions.length === 0}
 				fields={fields}
+				licenseValid={licenseValid}
 				servicesBaseUrl={servicesBaseUrl}
+				setLicenseValid={setLicenseValid}
 				siteOptions={siteOptions}
+				totalCount={totalCount}
 			/>
 		</Dimmer.Dimmable>
 	</>;
