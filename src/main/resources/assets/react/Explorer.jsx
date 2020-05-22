@@ -72,6 +72,7 @@ export function Explorer(props) {
 		licenseValid,
 		servicesBaseUrl
 	} = props;
+	//console.debug('Explorer licenseValid', licenseValid);
 
 	const [page, setPage] = React.useState('home');
 	const [sideBarVisible, setSideBarVisible] = React.useState(true);

@@ -13,6 +13,7 @@ export function ThesauriList(props) {
 		licenseValid,
 		servicesBaseUrl
 	} = props;
+	//console.debug('ThesauriList licenseValid', licenseValid);
 
 	const [isLoading, setLoading] = React.useState(false);
 	const [thesauriRes, setThesauriRes] = React.useState({
@@ -121,6 +122,7 @@ export function ThesauriList(props) {
 				</Table.Footer>
 			</Table>}
 		<NewOrEditThesaurus
+			licenseValid={licenseValid}
 			onClose={fetchThesauri}
 			servicesBaseUrl={servicesBaseUrl}
 		/>
@@ -134,6 +136,7 @@ export function Thesauri(props) {
 		licenseValid,
 		servicesBaseUrl
 	} = props;
+	//console.debug('Thesauri licenseValid', licenseValid);
 	return <>
 		<Header as='h1'>Thesauri</Header>
 		<ThesauriList

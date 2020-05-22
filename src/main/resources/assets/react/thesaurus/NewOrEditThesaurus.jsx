@@ -24,6 +24,7 @@ export function NewOrEditThesaurus(props) {
 		onClose,
 		servicesBaseUrl
 	} = props;
+	//console.debug('NewOrEditThesaurus licenseValid', licenseValid);
 
 	const [open, setOpen] = React.useState(false);
 

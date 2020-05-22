@@ -32,6 +32,7 @@ export function htmlResponse({
 	const licenseDetails = validateLicense({appKey: app.name});
 	//log.info(`licenseDetails:${toStr(licenseDetails)}`);
 	const licenseValid = !!(licenseDetails && !licenseDetails.expired);
+	//log.info(`licenseValid:${toStr(licenseValid)}`);
 
 	const propsObj = {
 		licenseValid,
