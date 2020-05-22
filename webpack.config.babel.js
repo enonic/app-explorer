@@ -305,7 +305,8 @@ const WEBPACK_CONFIG = [webpackServerSideJs({
 		})
 	] : [],
 	resolveAlias: {
-		'semantic-ui-react-form': path.resolve(__dirname, '../enonic-npm-modules/packages/semantic-ui-react-form/src')
+		//'semantic-ui-react-form': path.resolve(__dirname, '../enonic-npm-modules/packages/semantic-ui-react-form/src')
+		'semantic-ui-react-form': path.resolve(__dirname, './node_modules/@enonic/semantic-ui-react-form/src')
 	}
 })];
 
