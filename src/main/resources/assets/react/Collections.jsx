@@ -3,8 +3,31 @@ import {
 	Button, Dimmer, Divider, Dropdown, Form, Header, Icon, Loader, Modal,
 	Pagination,	Popup, Table
 } from 'semantic-ui-react';
-import {Collection} from './Collection';
+import {
+	Collection,
+	MONTH_TO_HUMAN,
+	DAY_OF_WEEK_TO_HUMAN
+} from './Collection';
 import {useInterval} from './utils/useInterval';
+
+
+function rpad(s, w = 2, z = ' ') {
+	s = s + '';
+	return s.length >= w
+		? s
+		: s + new Array(w - s.length + 1).join(z);
+}
+
+
+function lpad(s, w = 2, z = ' ') {
+	s = s + '';
+	return s.length >= w ? s : new Array(w - s.length + 1).join(z) + s;
+}
+
+
+function zeroPad(s, w=2) {
+	return lpad(s,w,'0');
+}
 
 
 function NewOrEditModal(props) {
@@ -319,7 +342,16 @@ export function Collections(props) {
 								{i === 0 ? null : <br/>}
 								<span style={{whitespace: 'nowrap'}}>{iface}</span>
 							</>)}</Table.Cell>
-							<Table.Cell>{doCollect ? JSON.stringify(cron) : 'Not scheduled'}</Table.Cell>
+							<Table.Cell>{doCollect
+								? cron.map(({
+									month,
+									dayOfMonth,
+									dayOfWeek,
+									minute,
+									hour
+								}) => <pre>{`${rpad(MONTH_TO_HUMAN[month], 11)} dayOfMonth:${lpad(dayOfMonth)} ${DAY_OF_WEEK_TO_HUMAN[dayOfWeek]} ${zeroPad(hour)}:${zeroPad(minute)}`}</pre>)
+								: 'Not scheduled'
+							}</Table.Cell>
 							<Table.Cell collapsing>
 								<Button.Group>
 									<Popup

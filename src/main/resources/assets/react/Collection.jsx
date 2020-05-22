@@ -538,6 +538,11 @@ const MONTH_OPTIONS = [{
 	value: '12'
 }];
 
+export const MONTH_TO_HUMAN = {};
+MONTH_OPTIONS.forEach(({text, value}) => {
+	MONTH_TO_HUMAN[value] = text;
+});
+
 
 // Day of the week 0-6 Sunday to Saturday 7 is also Sunday on some systems
 const DAY_OF_WEEK_OPTIONS = [{
@@ -565,3 +570,8 @@ const DAY_OF_WEEK_OPTIONS = [{
 	text: 'Saturday',
 	value: '6'
 }];
+
+export const DAY_OF_WEEK_TO_HUMAN = {};
+DAY_OF_WEEK_OPTIONS.forEach(({text, value}) => {
+	DAY_OF_WEEK_TO_HUMAN[value] = text;
+});
