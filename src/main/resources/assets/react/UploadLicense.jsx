@@ -1,5 +1,5 @@
 import {
-	Button, Form, Icon, Input, Modal
+	Button, Form, Icon, Input, Message, Modal
 } from 'semantic-ui-react';
 
 
@@ -8,6 +8,7 @@ export const UploadLicense = (props) => {
 		servicesBaseUrl,
 		setLicenseValid
 	} = props;
+	const [uploadedLicenseValid, setUploadedLicenseValid] = React.useState(true);
 	const [file, setFile] = React.useState();
 	return <>
 		<Modal.Header>Upload license</Modal.Header>
@@ -27,11 +28,18 @@ export const UploadLicense = (props) => {
 						const {licenseValid} = data;
 						//console.debug(licenseValid);
 						if (licenseValid) {
+							setUploadedLicenseValid(true);
 							setLicenseValid(true);
+						} else {
+							setUploadedLicenseValid(false);
 						}
 					});
 			}}>
 				<Form.Field>
+					{uploadedLicenseValid ? null : <Message icon negative>
+						<Icon name='warning sign'/>
+						<Message.Content>Uploaded license invalid, please try again.</Message.Content>
+					</Message>}
 					<Input
 						onChange={(event) => {
 							//console.debug(event);
