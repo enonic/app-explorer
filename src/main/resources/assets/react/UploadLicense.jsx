@@ -11,7 +11,7 @@ export const UploadLicense = (props) => {
 	const [uploadedLicenseValid, setUploadedLicenseValid] = React.useState(true);
 	const [file, setFile] = React.useState();
 	return <>
-		<Modal.Header>Upload license</Modal.Header>
+		<Modal.Header>License check</Modal.Header>
 		<Modal.Content>
 			<Form onSubmit={(event) => {
 				event.preventDefault(); // Stop form submit
@@ -36,10 +36,14 @@ export const UploadLicense = (props) => {
 					});
 			}}>
 				<Form.Field>
-					{uploadedLicenseValid ? null : <Message icon negative>
-						<Icon name='warning sign'/>
-						<Message.Content>Uploaded license invalid, please try again.</Message.Content>
-					</Message>}
+					{uploadedLicenseValid
+						? <Message>
+							<Message.Content>No license found. Please upload your license.<br/>Don't have a license? &rarr; <a href="https://enonic.com/contact-us" target="_blank">Contact Enonic</a>.</Message.Content>
+						</Message>
+						: <Message icon negative>
+							<Icon name='warning sign'/>
+							<Message.Content>Uploaded license invalid, please try again.</Message.Content>
+						</Message>}
 					<Input
 						onChange={(event) => {
 							//console.debug(event);
