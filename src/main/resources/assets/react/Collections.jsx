@@ -46,8 +46,9 @@ function NewOrEditModal(props) {
 		servicesBaseUrl,
 		setLicenseValid,
 		siteOptions,
-		totalCount
+		totalNumberOfCollections
 	} = props;
+	//console.debug('NewOrEditModal totalNumberOfCollections', totalNumberOfCollections);
 	const [state, setState] = React.useState({
 		open: false
 	});
@@ -86,7 +87,7 @@ function NewOrEditModal(props) {
 				}}><Icon
 					name='plus'
 				/></Button>}
-	>{licenseValid || totalCount <= 3
+	>{licenseValid || totalNumberOfCollections <= 3
 			? <>
 				<Modal.Header>{name ? `Edit collection ${name}`: 'New collection'}</Modal.Header>
 				<Modal.Content>
@@ -196,10 +197,12 @@ export function Collections(props) {
 		page,
 		perPage,
 		sort,
-		siteOptions,
-		totalCount
+		siteOptions/*,
+		totalCount No longer provided by the collectionList service*/
 	} = state;
+	const {total: totalNumberOfCollections} = collections;
 	//console.debug({column, direction, sort});
+	//console.debug('Collections totalNumberOfCollections', totalNumberOfCollections);
 
 	const {
 		pageStart,
@@ -349,7 +352,7 @@ export function Collections(props) {
 								servicesBaseUrl={servicesBaseUrl}
 								setLicenseValid={setLicenseValid}
 								siteOptions={siteOptions}
-								totalCount={totalCount}
+								totalNumberOfCollections={totalNumberOfCollections}
 							/></Table.Cell>
 							<Table.Cell collapsing>{displayName}</Table.Cell>
 							<Table.Cell collapsing>{count}</Table.Cell>
@@ -407,7 +410,7 @@ export function Collections(props) {
 						</Table.Row>;
 					})}
 				</Table.Body>
-				{totalCount
+				{/*totalCount
 					? <Table.Footer>
 						<Table.Row>
 							<Table.HeaderCell></Table.HeaderCell>
@@ -419,7 +422,7 @@ export function Collections(props) {
 						</Table.Row>
 					</Table.Footer>
 					: null
-				}
+				*/}
 			</Table>
 			<Pagination
 				attached='bottom'
@@ -464,7 +467,7 @@ export function Collections(props) {
 				servicesBaseUrl={servicesBaseUrl}
 				setLicenseValid={setLicenseValid}
 				siteOptions={siteOptions}
-				totalCount={totalCount}
+				totalNumberOfCollections={totalNumberOfCollections}
 			/>
 		</Dimmer.Dimmable>
 	</>;
