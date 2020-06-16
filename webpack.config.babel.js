@@ -132,6 +132,8 @@ SS_ALIAS['/admin/tools/explorer'] = path.resolve(__dirname, 'src/main/resources/
 const SS_EXTERNALS = [
 	/\/lib\/cache/,
 	'/lib/galimatias',
+	'/lib/graphql',
+	'/lib/guillotine',
 	/\/lib\/http-client/,
 	/\/lib\/license/,
 	/\/lib\/router/,
@@ -169,6 +171,7 @@ const SS_FILES = [
 	'src/main/resources/services/fieldValueCreateOrUpdate/fieldValueCreateOrUpdate',
 	'src/main/resources/services/fieldValueDelete/fieldValueDelete',
 	'src/main/resources/services/fieldValueList/fieldValueList',
+	'src/main/resources/services/graphQL/graphQL',
 	'src/main/resources/services/interfaceCopy/interfaceCopy',
 	'src/main/resources/services/interfaceCreate/interfaceCreate',
 	'src/main/resources/services/interfaceDelete/interfaceDelete',
