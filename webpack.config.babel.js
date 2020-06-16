@@ -146,7 +146,8 @@ const SS_EXTERNALS = [
 	'/lib/xp/io',
 	'/lib/xp/portal',
 	'/lib/xp/task',
-	'/lib/xp/value'
+	'/lib/xp/value',
+	'/lib/xp/websocket'
 ];
 
 const SS_FILES = [
@@ -157,6 +158,7 @@ const SS_FILES = [
 	'src/main/resources/services/collectionDelete/collectionDelete',
 	'src/main/resources/services/collectionDuplicate/collectionDuplicate',
 	'src/main/resources/services/collectionList/collectionList',
+	'src/main/resources/services/collectionListWs/collectionListWs',
 	'src/main/resources/services/collectionModify/collectionModify',
 	'src/main/resources/services/collectorStop/collectorStop',
 	'src/main/resources/services/cronJobList/cronJobList',
