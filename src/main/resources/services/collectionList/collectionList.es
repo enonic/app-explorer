@@ -21,11 +21,11 @@ import {getFieldValues} from '/lib/explorer/field/getFieldValues';
 
 export function get({
 	params: { // These are just passed on
-		count,
+		//count,
 		page,// = 1, // NOTE First index is 1 not 0
 		perPage,// = 10,
-		sort,// = 'displayName ASC',
-		start// = 0
+		sort/*,// = 'displayName ASC',
+		start// = 0*/
 	}
 }) {
 	const connection = connect({ principals: [PRINCIPAL_EXPLORER_READ] });
@@ -71,11 +71,11 @@ export function get({
 
 	const collections = queryCollections({
 		connection,
-		count,
+		//count,
 		page,
 		perPage,
-		sort,
-		start
+		sort/*,
+		start*/
 	});
 	//log.info(toStr({collections}));
 	//let totalCount = 0;
@@ -88,13 +88,13 @@ export function get({
 		_name: name
 	}) => {
 		const documentCount = getDocumentCount(name);
-		/*if (count > 0) {
+		/*if (documentCount > 0) {
 			totalCount += documentCount;
 		}*/
 		return {
 			collecting: !!activeCollections[name],
 			collector,
-			count: documentCount,
+			documentCount,
 			cron: Array.isArray(cron) ? cron : [cron],
 			displayName,
 			doCollect,
@@ -166,11 +166,11 @@ export function get({
 	return {
 		body: {
 			params: {
-				count,
+				//count,
 				page,
 				perPage,
-				sort,
-				start
+				sort/*,
+				start*/
 			},
 			collections,
 			collectorOptions,

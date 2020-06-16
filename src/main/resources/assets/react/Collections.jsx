@@ -164,7 +164,7 @@ export function Collections(props) {
 
 	const [state, setState] = React.useState({
 		collections: {
-			count: 0,
+			//count: 0, // Unused?
 			hits: [],
 			page: 1,
 			pageStart: 0,
@@ -200,16 +200,15 @@ export function Collections(props) {
 		siteOptions/*,
 		totalCount No longer provided by the collectionList service*/
 	} = state;
-	const {total: totalNumberOfCollections} = collections;
 	//console.debug({column, direction, sort});
-	//console.debug('Collections totalNumberOfCollections', totalNumberOfCollections);
 
 	const {
 		pageStart,
 		pageEnd,
-		pagesTotal,
-		total
+		pagesTotal = 1,
+		total: totalNumberOfCollections
 	} = collections;
+	//console.debug('Collections totalNumberOfCollections', totalNumberOfCollections);
 
 	function fetchCollections({
 		activePage = page,
@@ -321,7 +320,7 @@ export function Collections(props) {
 					{collections.hits.map(({
 						collector,
 						collecting,
-						count,
+						documentCount,
 						cron,
 						doCollect,
 						displayName,
@@ -355,7 +354,7 @@ export function Collections(props) {
 								totalNumberOfCollections={totalNumberOfCollections}
 							/></Table.Cell>
 							<Table.Cell collapsing>{displayName}</Table.Cell>
-							<Table.Cell collapsing>{count}</Table.Cell>
+							<Table.Cell collapsing>{documentCount}</Table.Cell>
 							<Table.Cell collapsing>{interfaces.map((iface, i) => <>
 								{i === 0 ? null : <br/>}
 								<span style={{whitespace: 'nowrap'}}>{iface}</span>
@@ -443,7 +442,7 @@ export function Collections(props) {
 
 				onPageChange={handlePaginationChange}
 			/>
-			<p>Displaying {pageStart}-{pageEnd} of {total}</p>
+			<p>Displaying {pageStart}-{pageEnd} of {totalNumberOfCollections}</p>
 			<Divider hidden/>
 			<Form.Field>
 				<Header as='h4'><Icon name='resize vertical'/> Per page</Header>
