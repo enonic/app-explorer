@@ -79,10 +79,10 @@ export function htmlResponse({
 		-->
 
 		<!-- Common style and library used by the Launcher Panel -->
-		<!--link rel="stylesheet" type="text/css" href="${assetUrl({path: '/admin/common/styles/_all.css'})}"-->
+		<!--link rel="stylesheet" type="text/css" href="${assetUrl({path: '/admin/common/styles/lib.css'})}"-->
 
 		<!-- Append the Admin libraries -->
-		<script type="text/javascript" src="${assetUrl({path: '/admin/common/lib/_all.js'})}"></script>
+		<script type="text/javascript" src="${assetUrl({path: '/admin/common/js/lib.js'})}"></script>
 
 	</head>
 	<body style="background-color: white !important;">
@@ -92,7 +92,8 @@ export function htmlResponse({
 		var CONFIG = {
 			adminUrl: '${getBaseUri()}',
 			appId: '${app.name}',
-			launcherUrl: '${getLauncherUrl()}'
+			launcherUrl: '${getLauncherUrl()}',
+			services: {}, // Workaround for i18nUrl BUG
 		};
 		</script>
 
@@ -143,9 +144,6 @@ export function htmlResponse({
 				});
 			});*/
 		</script>
-
-		<!-- Append the Admin UI -->
-		<script type="text/javascript" src="${assetUrl({path: '/admin/common/js/_all.js'})}"></script>
 
 		<!-- Append the launcher -->
 		<script type="text/javascript" src="${getLauncherPath()}" async></script>
