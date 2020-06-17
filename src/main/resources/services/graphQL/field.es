@@ -16,6 +16,21 @@ import {connect} from '/lib/explorer/repo/connect';
 import {getFields} from '/lib/explorer/field/getFields';
 import {getFieldValues} from '/lib/explorer/field/getFieldValues';
 
+const FIELD_VALUE_OBJECT_TYPE = createObjectType({
+	name: 'FieldValue',
+	//description:
+	fields: {
+		_id: { type: nonNull(GraphQLString) },
+		_name: { type: nonNull(GraphQLString) },
+		_path: { type: nonNull(GraphQLString) },
+		displayName: { type: nonNull(GraphQLString) },
+		field: { type: nonNull(GraphQLString) },
+		fieldReference: { type: nonNull(GraphQLString) },
+		type: { type: nonNull(GraphQLString) },
+		value: { type: nonNull(GraphQLString) }
+	}
+});
+
 
 const FIELD_OBJECT_TYPE = createObjectType({
 	name: 'Field',
@@ -31,7 +46,8 @@ const FIELD_OBJECT_TYPE = createObjectType({
 		inResults: { type: GraphQLBoolean },
 		fieldType: { type: nonNull(GraphQLString) },
 		key: { type: nonNull(GraphQLString) },
-		type: { type: nonNull(GraphQLString) }
+		type: { type: nonNull(GraphQLString) },
+		values: { type: list(FIELD_VALUE_OBJECT_TYPE)}
 	}
 });
 
@@ -40,29 +56,42 @@ export const queryFields = {
 	resolve: (env) => {
 		//log.info(`env:${toStr(env)}`);
 		const connection = connect({ principals: [PRINCIPAL_EXPLORER_READ] });
-		//const fields = {};
-		const fieldValues = {};
-		getFieldValues({connection}).hits.forEach(({
-			_name: name,
-			_path: path,
-			displayName: label,
-			field
+
+		const fieldValuesRes = getFieldValues({connection});
+		//log.info(`fieldValuesRes:${toStr(fieldValuesRes)}`);
+
+		const fieldValuesObjArr = {};
+		fieldValuesRes.hits.forEach(({
+			_id,
+			_name,
+			_path,
+			displayName,
+			field,
+			fieldReference,
+			type,
+			value
 		}) => {
-			if (!fieldValues[field]) {fieldValues[field] = {}}
-			fieldValues[field][name] = {
-				label,
-				path
-			};
+			if (!fieldValuesObjArr[field]) {fieldValuesObjArr[field] = []}
+			fieldValuesObjArr[field].push({
+				_id,
+				_name,
+				_path,
+				displayName,
+				field,
+				fieldReference,
+				type,
+				value
+			})
 		});
-		log.info(`fieldValues:${toStr(fieldValues)}`);
+		log.info(`fieldValuesObjArr:${toStr(fieldValuesObjArr)}`);
 
 		const fieldsRes = getFields({connection});
 		log.info(`fieldsRes:${toStr(fieldsRes)}`);
 
 		fieldsRes.hits = fieldsRes.hits.map(({
 			_id,
-			_path,
 			_name,
+			_path,
 			denyDelete,
 			denyValues,
 			displayName,
@@ -73,8 +102,8 @@ export const queryFields = {
 			type
 		}) => ({
 			_id,
-			_path,
 			_name,
+			_path,
 			denyDelete,
 			denyValues,
 			displayName,
@@ -82,22 +111,11 @@ export const queryFields = {
 			inResults,
 			fieldType,
 			key,
-			type
+			type,
+			values: fieldValuesObjArr[_name]
 		}));
-		log.info(`mapped fieldsRes:${toStr(fieldsRes)}`);
+		//log.info(`mapped fieldsRes:${toStr(fieldsRes)}`);
 
-		/*fieldsRes.hits.forEach(({
-			_path: path,
-			displayName: label,
-			key: field
-		}) => {
-			fields[field] = {
-				label,
-				path,
-				values: fieldValues[field]
-			};
-		});
-		log.info(`fields:${toStr(fields)}`);*/
 		return fieldsRes;
 	},
 	type: createObjectType({
@@ -123,8 +141,8 @@ export const queryFields = {
 		count
 		hits {
 			_id
-			_path
 			_name
+			_path
 			denyDelete
 			denyValues
 			displayName
@@ -133,6 +151,16 @@ export const queryFields = {
 			fieldType
 			key
 			type
+			values {
+				_id
+				_name
+				_path
+				displayName
+				field
+				fieldReference
+				type
+				value
+			}
 		}
 	}
 }
