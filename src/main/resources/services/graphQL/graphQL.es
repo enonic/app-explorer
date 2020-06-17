@@ -14,6 +14,7 @@ import {RT_JSON} from '/lib/explorer/model/2/constants';
 
 
 import {queryCollections} from './collection';
+import {queryCollectors} from './collector';
 
 
 //const CONTEXT = createContext();
@@ -33,7 +34,8 @@ const SCHEMA = createSchema({
 	query: createObjectType({
 		name: 'Query',
 		fields: {
-			queryCollections
+			queryCollections,
+			queryCollectors
 		} // fields
 	}) // query
 }); // SCHEMA

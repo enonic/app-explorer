@@ -38,7 +38,7 @@ const COLLECTION_OBJECT_TYPE = createObjectType({
 		displayName: { type: nonNull(GraphQLString) },
 		type: { type: nonNull(GraphQLString) },
 		collector: { type: createObjectType({
-			name: 'Collector',
+			name: 'CollectionCollector',
 			//description: 'Collector description',
 			fields: {
 				name: { type: nonNull(GraphQLString) },
