@@ -54,49 +54,40 @@ export function htmlResponse({
 	});
 	//log.info(toStr({collectorsAppToUri}));
 
+	/*
+<script type="text/javascript" src="${assetUrl({path: 'react/react.production.min.js'})}"></script>
+<script type="text/javascript" src="${assetUrl({path: 'react-dom/react-dom.production.min.js'})}"></script>
+<script type="text/javascript" src="${assetUrl({path: 'frappe-gantt/frappe-gantt.min.js'})}"></script>
+<link rel="stylesheet" type="text/css" href="${assetUrl({path: 'style.css'})}">
+<link rel="stylesheet" type="text/css" href="${assetUrl({path: 'frappe-gantt/frappe-gantt.css'})}">
+
+// Not needed for the XP Menu
+<link rel="stylesheet" type="text/css" href="${assetUrl({path: '/admin/common/styles/lib.css'})}">
+<script type="text/javascript" src="${assetUrl({path: '/admin/common/js/lib.js'})}"></script>
+
+// Destroys icons in semantic-ui
+<script type="text/javascript">
+var CONFIG = {
+adminUrl: '${getBaseUri()}',
+appId: '${app.name}',
+launcherUrl: '${getLauncherUrl()}',
+services: {}, // Workaround for i18nUrl BUG
+};
+</script>
+<script type="text/javascript" src="${getLauncherPath()}" async></script>
+*/
+
 	return {
 		body: `<html>
 	<head>
 		<script type="text/javascript" src="${assetUrl({path: 'react/react.development.js'})}"></script>
-		<!--
-			<script type="text/javascript" src="${assetUrl({path: 'react/react.production.min.js'})}"></script>
-		-->
-
 		<script type="text/javascript" src="${assetUrl({path: 'react-dom/react-dom.development.js'})}"></script>
-		<!--
-			<script type="text/javascript" src="${assetUrl({path: 'react-dom/react-dom.production.min.js'})}"></script>
-			<script type="text/javascript" src="${assetUrl({path: 'frappe-gantt/frappe-gantt.min.js'})}"></script>
-		-->
-
-		<title>${preTitle}Explorer</title>
 		<link rel="shortcut icon" href="${assetUrl({path: 'favicon.ico'})}">
-
-		<!--link rel="stylesheet" type="text/css" href="${assetUrl({path: 'style.css'})}"-->
 		<link rel="stylesheet" type="text/css" href="${assetUrl({path: 'semantic-ui/semantic.css'})}">
-
-		<!--
-			<link rel="stylesheet" type="text/css" href="${assetUrl({path: 'frappe-gantt/frappe-gantt.css'})}">
-		-->
-
-		<!-- Common style and library used by the Launcher Panel -->
-		<!--link rel="stylesheet" type="text/css" href="${assetUrl({path: '/admin/common/styles/lib.css'})}"-->
-
-		<!-- Append the Admin libraries -->
-		<script type="text/javascript" src="${assetUrl({path: '/admin/common/js/lib.js'})}"></script>
-
+		<title>${preTitle}Explorer</title>
 	</head>
 	<body style="background-color: white !important;">
 		<div id="${ID_REACT_EXPLORER_CONTAINER}"/>
-
-		<script type="text/javascript">
-		var CONFIG = {
-			adminUrl: '${getBaseUri()}',
-			appId: '${app.name}',
-			launcherUrl: '${getLauncherUrl()}',
-			services: {}, // Workaround for i18nUrl BUG
-		};
-		</script>
-
 		<script type="text/javascript" src="${assetUrl({path: 'explorer.js'})}"></script>
 		<script type="text/javascript" src="${assetUrl({path: 'jquery/jquery.js'})}"></script>
 		<script type="text/javascript">
@@ -145,8 +136,6 @@ export function htmlResponse({
 			});*/
 		</script>
 
-		<!-- Append the launcher -->
-		<script type="text/javascript" src="${getLauncherPath()}" async></script>
 
 		<script src="https://cdn.jsdelivr.net/gh/cferdinandi/smooth-scroll/dist/smooth-scroll.polyfills.min.js"></script>
 
