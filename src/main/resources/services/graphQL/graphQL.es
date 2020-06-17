@@ -15,6 +15,7 @@ import {RT_JSON} from '/lib/explorer/model/2/constants';
 
 import {queryCollections} from './collection';
 import {queryCollectors} from './collector';
+import {queryFields} from './field';
 
 
 //const CONTEXT = createContext();
@@ -35,7 +36,8 @@ const SCHEMA = createSchema({
 		name: 'Query',
 		fields: {
 			queryCollections,
-			queryCollectors
+			queryCollectors,
+			queryFields
 		} // fields
 	}) // query
 }); // SCHEMA

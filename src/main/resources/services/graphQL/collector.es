@@ -85,9 +85,9 @@ export const queryCollectors = {
 			_id
 			_path
 			_name
-		appName
-		collectTaskName
-		configAssetPath
+			appName
+			collectTaskName
+			configAssetPath
 			displayName
 			type
 		}
