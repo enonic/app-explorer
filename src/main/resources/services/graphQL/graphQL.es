@@ -14,6 +14,7 @@ import {RT_JSON} from '/lib/explorer/model/2/constants';
 
 
 import {getContentTypes} from './contentType';
+import {getSites} from './site';
 import {queryCollections} from './collection';
 import {queryCollectors} from './collector';
 import {queryFields} from './field';
@@ -37,6 +38,7 @@ const SCHEMA = createSchema({
 		name: 'Query',
 		fields: {
 			getContentTypes,
+			getSites,
 			queryCollections,
 			queryCollectors,
 			queryFields
