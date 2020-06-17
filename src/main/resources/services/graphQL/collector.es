@@ -78,19 +78,19 @@ export const queryCollectors = {
 
 /* Example query
 {
-  queryCollectors {
-    total
-    count
-    hits {
-    	_id
-    	_path
-    	_name
+	queryCollectors {
+		total
+		count
+		hits {
+			_id
+			_path
+			_name
 		appName
 		collectTaskName
 		configAssetPath
-    	displayName
-    	type
-    }
-  }
+			displayName
+			type
+		}
+	}
 }
 */

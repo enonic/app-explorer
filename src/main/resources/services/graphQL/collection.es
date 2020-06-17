@@ -13,7 +13,9 @@ import {toStr} from '/lib/util';
 
 import {PRINCIPAL_EXPLORER_READ} from '/lib/explorer/model/2/constants';
 import {connect} from '/lib/explorer/repo/connect';
+import {getDocumentCount} from '/lib/explorer/collection/getDocumentCount';
 import {query} from '/lib/explorer/collection/query';
+import {usedInInterfaces} from '/lib/explorer/collection/usedInInterfaces';
 
 
 /*const COLLECTIONS_INPUT_TYPE = createInputObjectType({
@@ -45,7 +47,7 @@ const COLLECTION_OBJECT_TYPE = createObjectType({
 				configJson: { type: nonNull(GraphQLString) }
 			}
 		})},
-		cron: { type: createObjectType({
+		cron: { type: list(createObjectType({
 			name: 'Cron',
 			//description: 'Cron description',
 			fields: {
@@ -55,8 +57,10 @@ const COLLECTION_OBJECT_TYPE = createObjectType({
 				hour: { type: nonNull(GraphQLString) },
 				minute: { type: nonNull(GraphQLString) }
 			}
-		})},
-		doCollect: { type: GraphQLBoolean }
+		}))},
+		doCollect: { type: GraphQLBoolean },
+		documentCount: { type: nonNull(GraphQLInt) },
+		interfaces: { type: list(GraphQLString)}
 	}
 }); // COLLECTION_OBJECT_TYPE
 
@@ -99,9 +103,11 @@ export const queryCollections = {
 			_path,
 			_name,
 			collector,
-			cron,
+			cron: Array.isArray(cron) ? cron : [cron],
 			displayName,
 			doCollect,
+			documentCount: getDocumentCount(_name),
+			interfaces: usedInInterfaces({connection, name: _name}),
 			type
 		}));
 		log.info(`mapped collectionsRes:${toStr(collectionsRes)}`);
@@ -124,36 +130,38 @@ export const queryCollections = {
 
 /* Example query
 {
-  queryCollections(
-    page: 1
-    perPage: 1
-    sort: "displayName ASC"
-  ) {
-    total
-    count
-    page
-    pageStart
-    pageEnd
-    pagesTotal
-    hits {
-    	_id
-    	_path
-    	_name
-    	displayName
-    	type
-    	cron {
-	      month
-	      dayOfMonth
-	      dayOfWeek
-	      hour
-	      minute
-	    }
-	    doCollect
-	    collector {
-	      name
-	      configJson
-	    }
-    }
-  }
+	queryCollections(
+		page: 1
+		perPage: 1
+		sort: "displayName ASC"
+	) {
+		total
+		count
+		page
+		pageStart
+		pageEnd
+		pagesTotal
+		hits {
+			_id
+			_name
+			_path
+			collector {
+				name
+				configJson
+			}
+			cron {
+				month
+				dayOfMonth
+				dayOfWeek
+				hour
+				minute
+			}
+			displayName
+			doCollect
+			documentCount
+			interfaces
+			type
+		}
+	}
 }
 */
