@@ -13,6 +13,7 @@ import {toStr} from '/lib/util';
 import {RT_JSON} from '/lib/explorer/model/2/constants';
 
 
+import {getContentTypes} from './contentType';
 import {queryCollections} from './collection';
 import {queryCollectors} from './collector';
 import {queryFields} from './field';
@@ -35,6 +36,7 @@ const SCHEMA = createSchema({
 	query: createObjectType({
 		name: 'Query',
 		fields: {
+			getContentTypes,
 			queryCollections,
 			queryCollectors,
 			queryFields
