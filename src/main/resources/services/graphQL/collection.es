@@ -68,74 +68,82 @@ const COLLECTION_OBJECT_TYPE = createObjectType({
 }); // COLLECTION_OBJECT_TYPE
 
 
+export const queryCollectionsResolver = ({
+	count = -1,
+	page,
+	perPage,
+	sort
+} = {}) => {
+	//log.info(`count:${toStr(count)}`);
+	//log.info(`page:${toStr(page)}`);
+	//log.info(`perPage:${toStr(perPage)}`);
+	//log.info(`sort:${toStr(sort)}`);
+	const connection = connect({ principals: [PRINCIPAL_EXPLORER_READ] });
+	const collectionsRes = query({
+		connection,
+		page,
+		perPage,
+		sort
+	});
+	//log.info(`collectionsRes:${toStr(collectionsRes)}`);
+
+	const activeCollections = {};
+	listTasks({
+		state: 'RUNNING'
+	}).forEach((runningTask) => {
+		//log.info(`runningTask:${toStr(runningTask)}`);
+		const maybeJson = getIn(runningTask, 'progress.info');
+		if (maybeJson) {
+			try {
+				const info = JSON.parse(maybeJson);
+				if (info.name) {
+					activeCollections[info.name] = true;
+				}
+			} catch (e) {
+				//no-op
+			}
+		}
+	});
+	//log.info(`activeCollections:${toStr(activeCollections)}`);
+
+	collectionsRes.hits = collectionsRes.hits.map(({
+		_id,
+		_path,
+		_name,
+		collector,
+		cron,
+		displayName,
+		doCollect,
+		type
+	}) => ({
+		_id,
+		_path,
+		_name,
+		collecting: !!activeCollections[_name],
+		collector,
+		cron: Array.isArray(cron) ? cron : [cron],
+		displayName,
+		doCollect,
+		documentCount: getDocumentCount(_name),
+		interfaces: usedInInterfaces({connection, name: _name}),
+		type
+	}));
+	//log.info(`mapped collectionsRes:${toStr(collectionsRes)}`);
+	return collectionsRes;
+}; // queryCollectionsResolver
+
+
 export const queryCollections = {
 	args: {
+		count: GraphQLInt,
 		page: GraphQLInt,
 		perPage: GraphQLInt,
-		sort: GraphQLString
+		sort: GraphQLString,
+		start: GraphQLInt
 	},
 	resolve: (env) => {
 		log.info(`env:${toStr(env)}`);
-		const {args: {
-			page = 1,
-			perPage = 10,
-			sort
-		}} = env;
-		log.info(`page:${toStr(page)}`);
-		log.info(`perPage:${toStr(perPage)}`);
-		log.info(`sort:${toStr(sort)}`);
-		const connection = connect({ principals: [PRINCIPAL_EXPLORER_READ] });
-		const collectionsRes = query({
-			connection,
-			page,
-			perPage,
-			sort
-		});
-		log.info(`collectionsRes:${toStr(collectionsRes)}`);
-
-		const activeCollections = {};
-		listTasks({
-			state: 'RUNNING'
-		}).forEach((runningTask) => {
-			//log.info(`runningTask:${toStr(runningTask)}`);
-			const maybeJson = getIn(runningTask, 'progress.info');
-			if (maybeJson) {
-				try {
-					const info = JSON.parse(maybeJson);
-					if (info.name) {
-						activeCollections[info.name] = true;
-					}
-				} catch (e) {
-					//no-op
-				}
-			}
-		});
-		//log.info(`activeCollections:${toStr(activeCollections)}`);
-
-		collectionsRes.hits = collectionsRes.hits.map(({
-			_id,
-			_path,
-			_name,
-			collector,
-			cron,
-			displayName,
-			doCollect,
-			type
-		}) => ({
-			_id,
-			_path,
-			_name,
-			collecting: !!activeCollections[_name],
-			collector,
-			cron: Array.isArray(cron) ? cron : [cron],
-			displayName,
-			doCollect,
-			documentCount: getDocumentCount(_name),
-			interfaces: usedInInterfaces({connection, name: _name}),
-			type
-		}));
-		log.info(`mapped collectionsRes:${toStr(collectionsRes)}`);
-		return collectionsRes;
+		return queryCollectionsResolver(env.args);
 	},
 	type: createObjectType({
 		name: 'QueryCollections',
@@ -143,10 +151,10 @@ export const queryCollections = {
 		fields: {
 			total: { type: nonNull(GraphQLInt) },
 			count: { type: nonNull(GraphQLInt) },
-			page: { type: nonNull(GraphQLInt) },
-			pageStart: { type: nonNull(GraphQLInt) },
-			pageEnd: { type: nonNull(GraphQLInt) },
-			pagesTotal: { type: nonNull(GraphQLInt) },
+			page: { type: GraphQLInt },
+			pageStart: { type: GraphQLInt },
+			pageEnd: { type: GraphQLInt },
+			pagesTotal: { type: GraphQLInt },
 			hits: { type: list(COLLECTION_OBJECT_TYPE) }
 		} // fields
 	})
@@ -155,6 +163,7 @@ export const queryCollections = {
 /* Example query
 {
 	queryCollections(
+		count: -1
 		page: 1
 		perPage: 1
 		sort: "displayName ASC"

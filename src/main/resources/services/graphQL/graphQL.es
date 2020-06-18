@@ -21,7 +21,7 @@ import {queryFields} from './field';
 
 
 //const CONTEXT = createContext();
-const SCHEMA = createSchema({
+export const SCHEMA = createSchema({
 	/*dictionary: CONTEXT.dictionary,
 	query: createObjectType({
 		name: 'Query',
