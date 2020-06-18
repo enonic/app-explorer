@@ -156,6 +156,7 @@ function DeleteModal(props) {
 
 export function Collections(props) {
 	const {
+		collectionsObj,
 		collectorsObj,
 		licenseValid,
 		servicesBaseUrl,
@@ -291,7 +292,12 @@ export function Collections(props) {
 	  	}));*/
 	} // handleSortGenerator
 
-	React.useEffect(() => fetchCollections(), []);
+	React.useEffect(() => fetchCollections(), []); // Only once
+
+	React.useEffect(() => {
+		//console.debug('collectionsObj changed');
+		fetchCollections()
+	}, [collectionsObj]); // Whenever collectionsObj changes
 
 	/*useInterval(() => {
     	fetchCollections();

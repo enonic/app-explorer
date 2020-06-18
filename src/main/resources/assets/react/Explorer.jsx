@@ -222,6 +222,7 @@ export function Explorer(props) {
 					/>
 				</>}
 				{page === 'collections' && <Collections
+					collectionsObj={collections}
 					collectorsObj={collectorsObj}
 					licenseValid={licenseValid}
 					servicesBaseUrl={servicesBaseUrl}
