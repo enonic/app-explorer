@@ -36,7 +36,8 @@ export function htmlResponse({
 
 	const propsObj = {
 		licenseValid,
-		servicesBaseUrl: serviceUrl({service: ''})
+		servicesBaseUrl: serviceUrl({service: ''}),
+		wsBaseUrl: serviceUrl({service: '', type: 'absolute'}).replace('http', 'ws')
 	};
 
 	const collectorsAppToUri = {};

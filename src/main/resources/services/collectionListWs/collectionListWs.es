@@ -10,7 +10,7 @@ import {
 
 
 import {SCHEMA} from '../graphQL/graphQL';
-import {queryCollectionsResolver} from '../graphQL/collection';
+//import {queryCollectionsResolver} from '../graphQL/collection';
 
 
 const WEBSOCKET_GROUP_COLLECTIONS = 'collections';
@@ -118,7 +118,7 @@ export function webSocketEvent(event) {
 } // webSocketEvent
 
 
-log.info('Starting to listen for changes to collections');
+//log.info('Starting to listen for changes to collections');
 listener({
 	type: 'node.*',
 	localOnly: false,

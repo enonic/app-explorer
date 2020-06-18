@@ -70,7 +70,8 @@ export function Explorer(props) {
 	const {
 		collectorsObj,
 		licenseValid: initialLicenseValid,
-		servicesBaseUrl
+		servicesBaseUrl,
+		wsBaseUrl
 	} = props;
 	//console.debug('Explorer initialLicenseValid', initialLicenseValid);
 
@@ -78,11 +79,29 @@ export function Explorer(props) {
 	const [page, setPage] = React.useState('home');
 	const [sideBarVisible, setSideBarVisible] = React.useState(true);
 	const [pusherWidth, setPusherWidth] = React.useState('calc(100% - 260px)');
+	const [collections, setCollections] = React.useState({});
+	//console.debug('collections', collections);
 
 	React.useEffect(() => {
 		const hashPage = window.location.hash.substring(1);
 		if (hashPage) { setPage(hashPage); }
-	}, []);
+
+		const wsUrl = wsBaseUrl + '/collectionListWs';
+		//console.debug('wsUrl', wsUrl);
+		const ws = new WebSocket(wsUrl); //open
+
+		ws.onopen = (event) => {
+			//console.debug('event', event);
+			ws.send('subscribe');
+		} // onopen
+
+		ws.onmessage = (event) => {
+			//console.debug('event', event);
+			const {data: {queryCollections}} = JSON.parse(event.data);
+			//console.debug('queryCollections', queryCollections);
+			setCollections(queryCollections);
+		} // onmessage
+	}, []); // useEffect
 
 	return <>
 		<Menu fixed='top' inverted style={{zIndex: 103}}>
