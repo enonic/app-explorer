@@ -1,5 +1,5 @@
 import {execute} from '/lib/graphql';
-//import {toStr} from '/lib/util';
+import {toStr} from '/lib/util';
 import {listener} from '/lib/xp/event';
 import {
 	addToGroup,
@@ -113,7 +113,7 @@ export function webSocketEvent(event) {
 		//send(sessionId, 'websocket closed'); // Not received on client
 		break;
 	default:
-		log.error(`unhandeled websocket event event:${event}`);
+		log.error(`unhandeled websocket event event:${toStr(event)}`);
 	}
 } // webSocketEvent
 
