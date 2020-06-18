@@ -295,7 +295,7 @@ export function Collections(props) {
 
 	/*useInterval(() => {
     	fetchCollections();
-  	}, 1000);*/
+  	}, 1000); // Loading dimmer screen gives flicker every second :( */
 
 	return <>
 		<Header as='h1'>Collections</Header>
