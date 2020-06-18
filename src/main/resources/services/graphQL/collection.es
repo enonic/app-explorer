@@ -142,7 +142,7 @@ export const queryCollections = {
 		start: GraphQLInt
 	},
 	resolve: (env) => {
-		log.info(`env:${toStr(env)}`);
+		//log.info(`env:${toStr(env)}`);
 		return queryCollectionsResolver(env.args);
 	},
 	type: createObjectType({
