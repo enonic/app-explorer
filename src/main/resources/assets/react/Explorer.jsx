@@ -1,4 +1,6 @@
-import {Header, Icon, List, Menu, Modal, Sidebar} from 'semantic-ui-react';
+import {
+	Header, Icon, List, Menu, Modal, Popup, Sidebar
+} from 'semantic-ui-react';
 
 import {Collections} from './Collections';
 import {Fields} from './Fields';
@@ -101,6 +103,8 @@ export function Explorer(props) {
 	} = props;
 	//console.debug('Explorer initialLicenseValid', initialLicenseValid);
 
+	const [wsColor, setWsColor] = React.useState('#888888');
+	const [wsStatus, setWsStatus] = React.useState('');
 	const [licenseValid, setLicenseValid] = React.useState(initialLicenseValid);
 	const [licensedTo, setLicensedTo] = React.useState(initialLicensedTo);
 	const [page, setPage] = React.useState('home');
@@ -119,8 +123,12 @@ export function Explorer(props) {
 		//console.debug('wsUrl', wsUrl);
 
 		const reconnectingWs = () => {
+			setWsColor('#000000');
+			setWsStatus('WebSocket Connecting...');
 			const ws = new WebSocket(wsUrl); //open
 			ws.onopen = (event) => {
+				setWsColor('#00FF00');
+				setWsStatus('WebSocket Connection Open');
 				//console.debug('event', event);
 				ws.send('subscribe');
 				//const intervalId =
@@ -134,7 +142,9 @@ export function Explorer(props) {
 						3	CLOSED	The connection is closed or couldn't be opened.
 					*/
 					if (ws.readyState === 1) {
-						ws.send('ping')
+						setWsColor('#FFFF00');
+						ws.send('ping');
+						setWsStatus('WebSocket Client Sent Ping...');
 					} else if (ws.readyState === 2 || ws.readyState === 3) {
 						reconnectingWs();
 						// Fails to connect when server is still down.
@@ -151,6 +161,8 @@ export function Explorer(props) {
 
 			ws.onmessage = (event) => {
 				//console.debug('event', event);
+				setWsColor('#00FF00');
+				setWsStatus('WebSocket Client Received Message');
 				const {data, type} = JSON.parse(event.data);
 				//console.debug('data', data);
 				//console.debug('type', type);
@@ -200,12 +212,16 @@ export function Explorer(props) {
 
 			ws.onerror = (event) => {
 				console.error('WebSocket error observed:', event);
+				setWsColor('#FF0000');
+				setWsStatus('WebSocket Client Error!')
 				ws.close();
 			};
 
 			ws.onclose = (event) => {
 				// As soon as I stop the Enonic Server I get this event :)
 				console.log('WebSocket is closed now.', event);
+				setWsColor('#FF0000');
+				setWsStatus('WebSocket Connection Closed!')
 			};
 		} // reconnectingWs
 		reconnectingWs();
@@ -326,6 +342,26 @@ export function Explorer(props) {
 					width: pusherWidth
 				}}
 			>
+				<Popup
+					content={wsStatus}
+					trigger={<svg
+						height="16"
+						style={{
+							position: 'fixed',
+							right: 13.5,
+							top: 53.5
+						}}
+						preserveAspectRatio="xMidYMid"
+						viewBox="0 0 256 193"
+						xmlns="http://www.w3.org/2000/svg"
+					>
+						<path
+							fill={wsColor}
+							d="M192 145h32V68l-36-35-22 22 26 27v63zm32 16H113l-26-27 11-11 22 22h45l-44-45 11-11 44 44V88l-21-22 11-11-55-55H0l32 32h65l24 23-34 34-24-23V48H32v31l55 55-23 22 36 36h156l-32-31z"
+						/>
+					</svg>}
+				/>
+
 				{page === 'home' && <>
 					<Header as='h1' content='Explorer'/>
 					<Search
