@@ -1,4 +1,5 @@
 import {execute} from '/lib/graphql';
+import {validateLicense} from '/lib/license';
 import {toStr} from '/lib/util';
 import {listener} from '/lib/xp/event';
 import {
@@ -7,7 +8,6 @@ import {
 	send,
 	sendToGroup
 } from '/lib/xp/websocket';
-
 
 import {SCHEMA} from '../graphQL/graphQL';
 //import {queryCollectionsResolver} from '../graphQL/collection';
@@ -261,7 +261,23 @@ listener({
 							// thesauri...
 							// synonym... // Too much data to sync to client
 						}
-					} /*else if (repo.startsWith('com.enonic.app.explorer.')) {
+					} else if (repo === 'system-repo') {
+						if (path === '/licenses/com.enonic.app.explorer') {
+							const licenseDetails = validateLicense({appKey: app.name});
+							//log.info(`licenseDetails:${toStr(licenseDetails)}`);
+							const licenseValid = !!(licenseDetails && !licenseDetails.expired);
+							//log.info(`licenseValid:${toStr(licenseValid)}`);
+							const licensedTo = licenseDetails ? `Licensed to ${licenseDetails.issuedTo}` : 'Unlicensed';
+							sendToGroup(WEBSOCKET_GROUP, JSON.stringify({
+								type: 'license',
+								data: {
+									licensedTo,
+									licenseValid
+								}
+							}));
+						}
+					}
+					 /*else if (repo.startsWith('com.enonic.app.explorer.')) {
 						// document counts?
 					}*/
 					// contenttypes?

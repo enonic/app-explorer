@@ -1,4 +1,4 @@
-import {Header, Icon, List, Menu, Sidebar} from 'semantic-ui-react';
+import {Header, Icon, List, Menu, Modal, Sidebar} from 'semantic-ui-react';
 
 import {Collections} from './Collections';
 import {Fields} from './Fields';
@@ -10,6 +10,7 @@ import {Search} from './Search';
 import {Status} from './Status';
 import {StopWords} from './StopWords';
 import {Thesauri} from './Thesauri';
+import {UploadLicense} from './UploadLicense';
 
 
 const NODE_MODULES = [{
@@ -65,10 +66,35 @@ const NODE_MODULES = [{
 }];
 
 
+const UploadLicenseModal = (props) => {
+	//console.debug('props', props);
+	const {
+		licensedTo,
+		servicesBaseUrl,
+		setLicenseValid
+	} = props;
+	const [open, setOpen] = React.useState(false);
+	return <Modal
+		closeIcon
+		onClose={() => {setOpen(false);}}
+		open={open}
+		size='large'
+		trigger={<Menu.Item onClick={() => {setOpen(true);}}>{licensedTo}</Menu.Item>}
+	>
+		<UploadLicense
+			servicesBaseUrl={servicesBaseUrl}
+			setLicenseValid={setLicenseValid}
+			whenValid={() => {setOpen(false);}}
+		/>
+	</Modal>;
+} // UploadLicenseModal
+
+
 export function Explorer(props) {
 	//console.debug('Explorer props', props);
 	const {
 		collectorsObj,
+		licensedTo: initialLicensedTo,
 		licenseValid: initialLicenseValid,
 		servicesBaseUrl,
 		wsBaseUrl
@@ -76,6 +102,7 @@ export function Explorer(props) {
 	//console.debug('Explorer initialLicenseValid', initialLicenseValid);
 
 	const [licenseValid, setLicenseValid] = React.useState(initialLicenseValid);
+	const [licensedTo, setLicensedTo] = React.useState(initialLicensedTo);
 	const [page, setPage] = React.useState('home');
 	const [sideBarVisible, setSideBarVisible] = React.useState(true);
 	const [pusherWidth, setPusherWidth] = React.useState('calc(100% - 260px)');
@@ -111,7 +138,7 @@ export function Explorer(props) {
 			//console.debug('event', event);
 			const {data, type} = JSON.parse(event.data);
 			//console.debug('data', data);
-			console.debug('type', type);
+			//console.debug('type', type);
 			if (type === 'pong') {
 				// Do nothing
 			} else if (type === 'initialize') {
@@ -120,9 +147,9 @@ export function Explorer(props) {
 					queryCollectors,
 					queryFields
 				}} = data;
-				console.debug('queryCollections', queryCollections);
-				console.debug('queryCollectors', queryCollectors);
-				console.debug('queryFields', queryFields);
+				//console.debug('queryCollections', queryCollections);
+				//console.debug('queryCollectors', queryCollectors);
+				//console.debug('queryFields', queryFields);
 				setCollections(queryCollections);
 				setCollectors(queryCollectors);
 				setFields(queryFields);
@@ -130,20 +157,25 @@ export function Explorer(props) {
 				const {data:{
 					queryCollections
 				}} = data;
-				console.debug('queryCollections', queryCollections);
+				//console.debug('queryCollections', queryCollections);
 				setCollections(queryCollections);
 			} else if (type === 'collectors') {
 				const {data:{
 					queryCollectors
 				}} = data;
-				console.debug('queryCollectors', queryCollectors);
+				//console.debug('queryCollectors', queryCollectors);
 				setCollectors(queryCollectors);
 			} else if (type === 'fields') {
 				const {data:{
 					queryFields
 				}} = data;
-				console.debug('queryFields', queryFields);
+				//console.debug('queryFields', queryFields);
 				setFields(queryFields);
+			} else if (type === 'license') {
+				//console.debug('type', type);
+				//console.debug('data', data);
+				setLicensedTo(data.licensedTo);
+				setLicenseValid(data.licenseValid);
 			}
 			/*setTimeout(() => { // Keep-alive
 				console.debug('Sending ping');
@@ -158,6 +190,11 @@ export function Explorer(props) {
 				<Icon name='close'/>
 			</Menu.Item>
 			<Menu.Item header>Explorer</Menu.Item>
+			<UploadLicenseModal
+				licensedTo={licensedTo}
+				servicesBaseUrl={servicesBaseUrl}
+				setLicenseValid={setLicenseValid}
+			/>
 		</Menu>
 
 		<Sidebar.Pushable>

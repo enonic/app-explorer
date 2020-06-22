@@ -6,7 +6,8 @@ import {
 export const UploadLicense = (props) => {
 	const {
 		servicesBaseUrl,
-		setLicenseValid
+		setLicenseValid,
+		whenValid = () => {}
 	} = props;
 	const [uploadedLicenseValid, setUploadedLicenseValid] = React.useState(true);
 	const [file, setFile] = React.useState();
@@ -30,6 +31,7 @@ export const UploadLicense = (props) => {
 						if (licenseValid) {
 							setUploadedLicenseValid(true);
 							setLicenseValid(true);
+							whenValid();
 						} else {
 							setUploadedLicenseValid(false);
 						}

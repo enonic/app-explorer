@@ -35,6 +35,7 @@ export function htmlResponse({
 	//log.info(`licenseValid:${toStr(licenseValid)}`);
 
 	const propsObj = {
+		licensedTo: licenseDetails ? `Licensed to ${licenseDetails.issuedTo}` : 'Unlicensed',
 		licenseValid,
 		servicesBaseUrl: serviceUrl({service: ''}),
 		wsBaseUrl: serviceUrl({service: '', type: 'absolute'}).replace('http', 'ws')
