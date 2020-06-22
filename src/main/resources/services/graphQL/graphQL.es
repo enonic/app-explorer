@@ -18,6 +18,7 @@ import {getSites} from './site';
 import {queryCollections} from './collection';
 import {queryCollectors} from './collector';
 import {queryFields} from './field';
+import {queryInterfaces} from './interface';
 
 
 //const CONTEXT = createContext();
@@ -41,7 +42,8 @@ export const SCHEMA = createSchema({
 			getSites,
 			queryCollections,
 			queryCollectors,
-			queryFields
+			queryFields,
+			queryInterfaces
 		} // fields
 	}) // query
 }); // SCHEMA
