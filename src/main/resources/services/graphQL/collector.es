@@ -8,7 +8,7 @@ import {
 	list,
 	nonNull
 } from '/lib/graphql';
-import {toStr} from '/lib/util';
+//import {toStr} from '/lib/util';
 
 
 import {PRINCIPAL_EXPLORER_READ} from '/lib/explorer/model/2/constants';
@@ -38,7 +38,7 @@ export const queryCollectors = {
 		const collectorsReq = query({
 			connection: connect({ principals: [PRINCIPAL_EXPLORER_READ] })
 		});
-		log.info(`collectorsReq:${toStr(collectorsReq)}`);
+		//log.info(`collectorsReq:${toStr(collectorsReq)}`);
 		collectorsReq.hits = collectorsReq.hits.map(({
 			_id,
 			_path,
@@ -58,7 +58,7 @@ export const queryCollectors = {
 			displayName,
 			type
 		}));
-		log.info(`mapped collectorsReq:${toStr(collectorsReq)}`);
+		//log.info(`mapped collectorsReq:${toStr(collectorsReq)}`);
 		return collectorsReq;
 	},
 	type: createObjectType({

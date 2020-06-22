@@ -31,7 +31,7 @@ const CONTENT_TYPE_OBJECT_TYPE = createObjectType({
 			}
 		})},
 		name: { type: nonNull(GraphQLString) },
-		supertype: { type: GraphQLString }
+		supertype: { type: GraphQLString } // For some reason still says undefined?
 	}
 });
 
@@ -65,7 +65,7 @@ export const getContentTypes = {
 			modifiedTime
 		}
 		name
-		superType
+		#superType
 	}
 }
 */

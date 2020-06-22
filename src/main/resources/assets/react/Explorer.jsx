@@ -80,6 +80,8 @@ export function Explorer(props) {
 	const [sideBarVisible, setSideBarVisible] = React.useState(true);
 	const [pusherWidth, setPusherWidth] = React.useState('calc(100% - 260px)');
 	const [collections, setCollections] = React.useState({});
+	const [collectors, setCollectors] = React.useState({});
+	const [fields, setFields] = React.useState({});
 	//console.debug('collections', collections);
 
 	React.useEffect(() => {
@@ -93,13 +95,60 @@ export function Explorer(props) {
 		ws.onopen = (event) => {
 			//console.debug('event', event);
 			ws.send('subscribe');
+			//const intervalId =
+			setInterval(() => { // Keep-alive
+				//console.debug('Sending ping', Date.now());
+    			ws.send('ping')
+  			}, 30000); // Every 30 seconds
+			//clearInterval(intervalId);
+			/*setTimeout(() => { // Keep-alive
+				console.debug('Sending initial ping');
+    			ws.send('ping'); // Date.now()
+  			}, 30000); // In 30 seconds*/
 		} // onopen
 
 		ws.onmessage = (event) => {
 			//console.debug('event', event);
-			const {data: {queryCollections}} = JSON.parse(event.data);
-			//console.debug('queryCollections', queryCollections);
-			setCollections(queryCollections);
+			const {data, type} = JSON.parse(event.data);
+			//console.debug('data', data);
+			console.debug('type', type);
+			if (type === 'pong') {
+				// Do nothing
+			} else if (type === 'initialize') {
+				const {data:{
+					queryCollections,
+					queryCollectors,
+					queryFields
+				}} = data;
+				console.debug('queryCollections', queryCollections);
+				console.debug('queryCollectors', queryCollectors);
+				console.debug('queryFields', queryFields);
+				setCollections(queryCollections);
+				setCollectors(queryCollectors);
+				setFields(queryFields);
+			} else if (type === 'collections') {
+				const {data:{
+					queryCollections
+				}} = data;
+				console.debug('queryCollections', queryCollections);
+				setCollections(queryCollections);
+			} else if (type === 'collectors') {
+				const {data:{
+					queryCollectors
+				}} = data;
+				console.debug('queryCollectors', queryCollectors);
+				setCollectors(queryCollectors);
+			} else if (type === 'fields') {
+				const {data:{
+					queryFields
+				}} = data;
+				console.debug('queryFields', queryFields);
+				setFields(queryFields);
+			}
+			/*setTimeout(() => { // Keep-alive
+				console.debug('Sending ping');
+    			ws.send('ping'); // Date.now()
+  			}, 30000);*/ // In 30 seconds
 		} // onmessage
 	}, []); // useEffect
 

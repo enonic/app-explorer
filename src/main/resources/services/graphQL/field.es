@@ -8,7 +8,7 @@ import {
 	list,
 	nonNull
 } from '/lib/graphql';
-import {toStr} from '/lib/util';
+//import {toStr} from '/lib/util';
 
 
 import {PRINCIPAL_EXPLORER_READ} from '/lib/explorer/model/2/constants';
@@ -83,10 +83,10 @@ export const queryFields = {
 				value
 			})
 		});
-		log.info(`fieldValuesObjArr:${toStr(fieldValuesObjArr)}`);
+		//log.info(`fieldValuesObjArr:${toStr(fieldValuesObjArr)}`);
 
 		const fieldsRes = getFields({connection});
-		log.info(`fieldsRes:${toStr(fieldsRes)}`);
+		//log.info(`fieldsRes:${toStr(fieldsRes)}`);
 
 		fieldsRes.hits = fieldsRes.hits.map(({
 			_id,

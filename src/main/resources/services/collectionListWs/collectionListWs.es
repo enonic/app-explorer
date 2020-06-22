@@ -13,42 +13,117 @@ import {SCHEMA} from '../graphQL/graphQL';
 //import {queryCollectionsResolver} from '../graphQL/collection';
 
 
-const WEBSOCKET_GROUP_COLLECTIONS = 'collections';
+const WEBSOCKET_GROUP = 'subscribers';
 
+const COLLECTIONS_GQL = `queryCollections {
+	total
+	count
+	page
+	pageStart
+	pageEnd
+	pagesTotal
+	hits {
+		_id
+		_name
+		_path
+		collecting
+		collector {
+			name
+			configJson
+		}
+		cron {
+			month
+			dayOfMonth
+			dayOfWeek
+			hour
+			minute
+		}
+		displayName
+		doCollect
+		documentCount
+		interfaces
+		type
+	}
+}`;
 
-const GRAPHQL_QUERY = `{
-	queryCollections {
-		total
-		count
-		page
-		pageStart
-		pageEnd
-		pagesTotal
-		hits {
+const COLLECTORS_GQL = `queryCollectors {
+	total
+	count
+	hits {
+		_id
+		_path
+		_name
+		appName
+		collectTaskName
+		configAssetPath
+		displayName
+		type
+	}
+}`;
+
+const CONTENT_TYPES_GQL = `getContentTypes {
+	abstract
+	allowChildContent
+	description
+	displayName
+	final
+	formJson
+	icon {
+		mimeType
+		modifiedTime
+	}
+	name
+	#superType
+}`;
+
+const FIELDS_GQL = `queryFields {
+	total
+	count
+	hits {
+		_id
+		_name
+		_path
+		denyDelete
+		denyValues
+		displayName
+		indexConfig
+		inResults
+		fieldType
+		key
+		type
+		values {
 			_id
 			_name
 			_path
-			collecting
-			collector {
-				name
-				configJson
-			}
-			cron {
-				month
-				dayOfMonth
-				dayOfWeek
-				hour
-				minute
-			}
 			displayName
-			doCollect
-			documentCount
-			interfaces
+			field
+			fieldReference
 			type
+			value
 		}
 	}
 }`;
-const GRAPHQL_VARIABLES = null;
+
+const SITES_GQL = `getSites {
+	total
+	count
+	hits {
+		_id
+		_name
+		_path
+		displayName
+	}
+}`;
+
+const ALL_GQL = `{
+	${COLLECTIONS_GQL}
+	${COLLECTORS_GQL}
+	${CONTENT_TYPES_GQL}
+	${FIELDS_GQL}
+	${SITES_GQL}
+}`;
+
+const NULL = null;
 
 
 export function get(request) {
@@ -94,14 +169,25 @@ export function webSocketEvent(event) {
 		break;
 	case 'message':
 		switch (message) {
+		case 'ping':
+			//log.info(`Received ping from ${sessionId}`);
+			// Respond so that client will send new keep-alive in 30 seconds.
+			send(sessionId, JSON.stringify({
+				type: 'pong'
+			}));
+			break;
 		case 'subscribe':
-			addToGroup(WEBSOCKET_GROUP_COLLECTIONS, sessionId);
+			addToGroup(WEBSOCKET_GROUP, sessionId);
+			//log.info(`ALL_GQL:${ALL_GQL}`);
 			// NOTE https://stackoverflow.com/questions/22034824/websocket-not-able-to-send-receive-string-longer-than-65536-characters
-			send(sessionId, JSON.stringify(execute(SCHEMA, GRAPHQL_QUERY, GRAPHQL_VARIABLES)));
+			send(sessionId, JSON.stringify({
+				type: 'initialize',
+				data: execute(SCHEMA, ALL_GQL, NULL)
+			}));
 			//send(sessionId, JSON.stringify(queryCollectionsResolver()));
 			break;
 		case 'unsubscribe':
-			removeToGroup(WEBSOCKET_GROUP_COLLECTIONS, sessionId);
+			removeToGroup(WEBSOCKET_GROUP, sessionId);
 			//send(sessionId, 'unsubscribed');
 			break;
 		default:
@@ -109,7 +195,7 @@ export function webSocketEvent(event) {
 		}
 		break;
 	case 'close':
-		removeFromGroup(WEBSOCKET_GROUP_COLLECTIONS, sessionId);
+		removeFromGroup(WEBSOCKET_GROUP, sessionId);
 		//send(sessionId, 'websocket closed'); // Not received on client
 		break;
 	default:
@@ -117,6 +203,10 @@ export function webSocketEvent(event) {
 	}
 } // webSocketEvent
 
+
+//https://www.npmjs.com/package/jiff
+//https://www.npmjs.com/package/bsdp
+//https://www.npmjs.com/package/bitowl
 
 //log.info('Starting to listen for changes to collections');
 listener({
@@ -137,14 +227,45 @@ listener({
 			nodes.forEach((node, i) => {
 				//log.info(`node:${toStr(node)}`);
 				const {id, path, branch, repo} = node;
-				if (
-					repo === 'com.enonic.app.explorer' &&
-					branch === 'master' &&
-					path.startsWith('/collections/')
-				) {
-					// NOTE https://github.com/enonic/xp/issues/8163 lib-websocket.getGroupCount('groupName')
-					sendToGroup(WEBSOCKET_GROUP_COLLECTIONS, JSON.stringify(execute(SCHEMA, GRAPHQL_QUERY, GRAPHQL_VARIABLES)));
-					//sendToGroup(WEBSOCKET_GROUP_COLLECTIONS, JSON.stringify(queryCollectionsResolver()));
+				if (branch === 'master') {
+					if (repo === 'com.enonic.app.explorer') {
+						if (path.startsWith('/collections/')) {
+							// NOTE https://github.com/enonic/xp/issues/8163 lib-websocket.getGroupCount('groupName')
+							sendToGroup(WEBSOCKET_GROUP, JSON.stringify({
+								type: 'collections',
+								data: execute(SCHEMA, `{
+									${COLLECTIONS_GQL}
+								}`, NULL)
+							}));
+						} else if (path.startsWith('/collectors/')) {
+							sendToGroup(WEBSOCKET_GROUP, JSON.stringify({
+								type: 'collectors',
+								data: execute(SCHEMA, `{
+									${COLLECTORS_GQL}
+								}`, NULL)
+							}));
+						} else if (path.startsWith('/fields/')) {
+							// fields...
+							// fieldvalues...
+							sendToGroup(WEBSOCKET_GROUP, JSON.stringify({
+								type: 'fields',
+								data: execute(SCHEMA, `{
+									${FIELDS_GQL}
+								}`, NULL)
+							}));
+						} else if (path.startsWith('/interfaces/')) {
+							//...
+						} else if (path.startsWith('/stopwords/')) {
+							//...
+						} else if (path.startsWith('/thesauri/')) {
+							// thesauri...
+							// synonym... // Too much data to sync to client
+						}
+					} /*else if (repo.startsWith('com.enonic.app.explorer.')) {
+						// document counts?
+					}*/
+					// contenttypes?
+					// sites?
 				}
 			});
 		}
