@@ -106,10 +106,10 @@ export function Explorer(props) {
 	const [page, setPage] = React.useState('home');
 	const [sideBarVisible, setSideBarVisible] = React.useState(true);
 	const [pusherWidth, setPusherWidth] = React.useState('calc(100% - 260px)');
-	const [collections, setCollections] = React.useState({});
+	const [queryCollectionsGraph, setQueryCollectionsGraph] = React.useState({});
 	const [queryCollectorsGraph, setQueryCollectorsGraph] = React.useState({});
 	const [fields, setFields] = React.useState({});
-	//console.debug('collections', collections);
+	//console.debug('queryCollectionsGraph', queryCollectionsGraph);
 
 	React.useEffect(() => {
 		const hashPage = window.location.hash.substring(1);
@@ -117,79 +117,98 @@ export function Explorer(props) {
 
 		const wsUrl = wsBaseUrl + '/collectionListWs';
 		//console.debug('wsUrl', wsUrl);
-		const ws = new WebSocket(wsUrl); //open
 
-		ws.onopen = (event) => {
-			//console.debug('event', event);
-			ws.send('subscribe');
-			//const intervalId =
-			setInterval(() => { // Keep-alive
-				//console.debug('Sending ping', Date.now());
-    			ws.send('ping')
-  			}, 30000); // Every 30 seconds
-			//clearInterval(intervalId);
-			/*setTimeout(() => { // Keep-alive
-				console.debug('Sending initial ping');
-    			ws.send('ping'); // Date.now()
-  			}, 30000); // In 30 seconds*/
-		}; // onopen
+		const reconnectingWs = () => {
+			const ws = new WebSocket(wsUrl); //open
+			ws.onopen = (event) => {
+				//console.debug('event', event);
+				ws.send('subscribe');
+				//const intervalId =
+				setInterval(() => { // Keep-alive
+					//console.debug('Sending ping', Date.now());
+					console.debug('ws.readyState', ws.readyState);
+					/*
+						0	CONNECTING	Socket has been created. The connection is not yet open.
+						1	OPEN	The connection is open and ready to communicate.
+						2	CLOSING	The connection is in the process of closing.
+						3	CLOSED	The connection is closed or couldn't be opened.
+					*/
+					if (ws.readyState === 1) {
+						ws.send('ping')
+					} else if (ws.readyState === 2 || ws.readyState === 3) {
+						reconnectingWs();
+						// Fails to connect when server is still down.
+						// Fails to connect to restarted server because credentials are no longer valid.
+						// But should work when server has not been down, aka other reasons why socket has been closed. For example client has been sleeping.
+					}
+				}, 30000); // Every 30 seconds
+				//clearInterval(intervalId);
+				/*setTimeout(() => { // Keep-alive
+					console.debug('Sending initial ping');
+					ws.send('ping'); // Date.now()
+				}, 30000); // In 30 seconds*/
+			}; // onopen
 
-		ws.onmessage = (event) => {
-			//console.debug('event', event);
-			const {data, type} = JSON.parse(event.data);
-			//console.debug('data', data);
-			//console.debug('type', type);
-			if (type === 'pong') {
-				// Do nothing
-			} else if (type === 'initialize') {
-				const {data:{
-					queryCollections,
-					queryCollectors,
-					queryFields
-				}} = data;
-				//console.debug('queryCollections', queryCollections);
-				//console.debug('queryCollectors', queryCollectors);
-				//console.debug('queryFields', queryFields);
-				setCollections(queryCollections);
-				setQueryCollectorsGraph(queryCollectors);
-				setFields(queryFields);
-			} else if (type === 'collections') {
-				const {data:{
-					queryCollections
-				}} = data;
-				//console.debug('queryCollections', queryCollections);
-				setCollections(queryCollections);
-			} else if (type === 'collectors') {
-				const {data:{
-					queryCollectors
-				}} = data;
-				//console.debug('queryCollectors', queryCollectors);
-				setQueryCollectorsGraph(queryCollectors);
-			} else if (type === 'fields') {
-				const {data:{
-					queryFields
-				}} = data;
-				//console.debug('queryFields', queryFields);
-				setFields(queryFields);
-			} else if (type === 'license') {
-				//console.debug('type', type);
+			ws.onmessage = (event) => {
+				//console.debug('event', event);
+				const {data, type} = JSON.parse(event.data);
 				//console.debug('data', data);
-				setLicensedTo(data.licensedTo);
-				setLicenseValid(data.licenseValid);
-			}
-			/*setTimeout(() => { // Keep-alive
-				console.debug('Sending ping');
-    			ws.send('ping'); // Date.now()
-  			}, 30000);*/ // In 30 seconds
-		}; // onmessage
+				//console.debug('type', type);
+				if (type === 'pong') {
+					// Do nothing
+				} else if (type === 'initialize') {
+					const {data:{
+						queryCollections,
+						queryCollectors,
+						queryFields
+					}} = data;
+					//console.debug('queryCollections', queryCollections);
+					//console.debug('queryCollectors', queryCollectors);
+					//console.debug('queryFields', queryFields);
+					setQueryCollectionsGraph(queryCollections);
+					setQueryCollectorsGraph(queryCollectors);
+					setFields(queryFields);
+				} else if (type === 'collections') {
+					const {data:{
+						queryCollections
+					}} = data;
+					//console.debug('queryCollections', queryCollections);
+					setQueryCollectionsGraph(queryCollections);
+				} else if (type === 'collectors') {
+					const {data:{
+						queryCollectors
+					}} = data;
+					//console.debug('queryCollectors', queryCollectors);
+					setQueryCollectorsGraph(queryCollectors);
+				} else if (type === 'fields') {
+					const {data:{
+						queryFields
+					}} = data;
+					//console.debug('queryFields', queryFields);
+					setFields(queryFields);
+				} else if (type === 'license') {
+					//console.debug('type', type);
+					//console.debug('data', data);
+					setLicensedTo(data.licensedTo);
+					setLicenseValid(data.licenseValid);
+				}
+				/*setTimeout(() => { // Keep-alive
+					console.debug('Sending ping');
+					ws.send('ping'); // Date.now()
+				}, 30000);*/ // In 30 seconds
+			}; // onmessage
 
-		ws.onError = (event) => {
-			console.error('WebSocket error observed:', event);
-		};
+			ws.onerror = (event) => {
+				console.error('WebSocket error observed:', event);
+				ws.close();
+			};
 
-		ws.onClose = (event) => {
-			console.log('WebSocket is closed now.', event);
-		};
+			ws.onclose = (event) => {
+				// As soon as I stop the Enonic Server I get this event :)
+				console.log('WebSocket is closed now.', event);
+			};
+		} // reconnectingWs
+		reconnectingWs();
 	}, []); // useEffect
 
 	return <>
@@ -316,10 +335,10 @@ export function Explorer(props) {
 					/>
 				</>}
 				{page === 'collections' && <Collections
-					collectionsObj={collections}
-					queryCollectorsGraph={queryCollectorsGraph}
 					collectorComponents={collectorComponents}
 					licenseValid={licenseValid}
+					queryCollectionsGraph={queryCollectionsGraph}
+					queryCollectorsGraph={queryCollectorsGraph}
 					servicesBaseUrl={servicesBaseUrl}
 					setLicenseValid={setLicenseValid}
 				/>}

@@ -154,7 +154,7 @@ function DeleteModal(props) {
 
 export function Collections(props) {
 	const {
-		collectionsObj = {},
+		queryCollectionsGraph = {},
 		collectorComponents,
 		licenseValid,
 		queryCollectorsGraph = {},
@@ -306,9 +306,9 @@ export function Collections(props) {
 	//React.useEffect(() => fetchCollections(), []); // Only once
 
 	/*React.useEffect(() => {
-		//console.debug('collectionsObj changed');
+		//console.debug('queryCollectionsGraph changed');
 		fetchCollections()
-	}, [collectionsObj]); // Whenever collectionsObj changes
+	}, [queryCollectionsGraph]); // Whenever queryCollectionsGraph changes
 	*/
 	/*useInterval(() => {
     	fetchCollections();
@@ -334,7 +334,7 @@ export function Collections(props) {
 					</Table.Row>
 				</Table.Header>
 				<Table.Body>
-					{collectionsObj.hits && collectionsObj.hits.map(({
+					{queryCollectionsGraph.hits && queryCollectionsGraph.hits.map(({
 						collector,
 						collecting,
 						documentCount,
