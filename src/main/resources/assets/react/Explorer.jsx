@@ -122,6 +122,7 @@ export function Explorer(props) {
 		const wsUrl = wsBaseUrl + '/collectionListWs';
 		//console.debug('wsUrl', wsUrl);
 
+		let intervalId = null;
 		const reconnectingWs = () => {
 			setWsColor('#000000');
 			setWsStatus('WebSocket Connecting...');
@@ -131,8 +132,8 @@ export function Explorer(props) {
 				setWsStatus('WebSocket Connection Open');
 				//console.debug('event', event);
 				ws.send('subscribe');
-				//const intervalId =
-				setInterval(() => { // Keep-alive
+				clearInterval(intervalId); // Make sure there are never more than one interval going.
+				intervalId = setInterval(() => { // Keep-alive
 					//console.debug('Sending ping', Date.now());
 					console.debug('ws.readyState', ws.readyState);
 					/*
@@ -146,13 +147,14 @@ export function Explorer(props) {
 						ws.send('ping');
 						setWsStatus('WebSocket Client Sent Ping...');
 					} else if (ws.readyState === 2 || ws.readyState === 3) {
+						setWsColor('#FFA500');
+						setWsStatus('WebSocket Client Reconnecting...');
 						reconnectingWs();
 						// Fails to connect when server is still down.
 						// Fails to connect to restarted server because credentials are no longer valid.
 						// But should work when server has not been down, aka other reasons why socket has been closed. For example client has been sleeping.
 					}
 				}, 30000); // Every 30 seconds
-				//clearInterval(intervalId);
 				/*setTimeout(() => { // Keep-alive
 					console.debug('Sending initial ping');
 					ws.send('ping'); // Date.now()
