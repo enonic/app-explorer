@@ -33,9 +33,8 @@ function zeroPad(s, w=2) {
 
 function NewOrEditModal(props) {
 	const {
-		afterClose,
 		//collectors,
-		collectorsObj,
+		collectorComponents,
 		collectorOptions,
 		contentTypeOptions,
 		disabled,
@@ -45,8 +44,8 @@ function NewOrEditModal(props) {
 		name,
 		servicesBaseUrl,
 		setLicenseValid,
-		siteOptions,
-		totalNumberOfCollections
+		siteOptions//,
+		//totalNumberOfCollections
 	} = props;
 	//console.debug('NewOrEditModal totalNumberOfCollections', totalNumberOfCollections);
 	const [state, setState] = React.useState({
@@ -56,7 +55,6 @@ function NewOrEditModal(props) {
 
 	const onClose = () => {
 		setState({open: false});
-		afterClose();
 	}
 	const onOpen = () => setState({open: true});
 
@@ -87,12 +85,12 @@ function NewOrEditModal(props) {
 				}}><Icon
 					name='plus'
 				/></Button>}
-	>{licenseValid || totalNumberOfCollections <= 3
+	>{licenseValid /*|| totalNumberOfCollections <= 3*/
 			? <>
 				<Modal.Header>{name ? `Edit collection ${name}`: 'New collection'}</Modal.Header>
 				<Modal.Content>
 					<Collection
-						collectorsObj={collectorsObj}
+						collectorComponents={collectorComponents}
 						collectorOptions={collectorOptions}
 						contentTypeOptions={contentTypeOptions}
 						fields={fields}
@@ -156,15 +154,28 @@ function DeleteModal(props) {
 
 export function Collections(props) {
 	const {
-		collectionsObj,
-		collectorsObj,
+		collectionsObj = {},
+		collectorComponents,
 		licenseValid,
+		queryCollectorsGraph = {},
 		servicesBaseUrl,
 		setLicenseValid
 	} = props;
+	//console.debug('queryCollectorsGraph', queryCollectorsGraph);
+	const collectorOptions = queryCollectorsGraph.hits
+		? queryCollectorsGraph.hits.map(({
+			_name: key,
+			displayName: text
+		}) => ({
+			key,
+			text,
+			value: key
+		}))
+		: [];
+	//console.debug('collectorOptions', collectorOptions);
 
 	const [state, setState] = React.useState({
-		collections: {
+		/*collections: {
 			//count: 0, // Unused?
 			hits: [],
 			page: 1,
@@ -172,13 +183,12 @@ export function Collections(props) {
 			pageEnd: 0,
 			pageTotal: 1,
 			total: 0
-		},
-		collectorOptions: [],
+		},*/
 		column: 'displayName',
 		contentTypeOptions: [],
 		direction: 'ascending',
 		fields: {},
-		isLoading: true,
+		isLoading: false,//true,
 		page: 1,
 		perPage: 10,
 		siteOptions: [],
@@ -188,8 +198,7 @@ export function Collections(props) {
 	//console.debug('Collections', {props, state});
 
 	const {
-		collections,
-		collectorOptions,
+		//collections,
 		contentTypeOptions,
 		column,
 		direction,
@@ -203,14 +212,15 @@ export function Collections(props) {
 	} = state;
 	//console.debug({column, direction, sort});
 
-	const {
+	/*const {
 		pageStart,
 		pageEnd,
 		pagesTotal = 1,
 		total: totalNumberOfCollections
-	} = collections;
+	} = collections;*/
 	//console.debug('Collections totalNumberOfCollections', totalNumberOfCollections);
 
+	/*
 	function fetchCollections({
 		activePage = page,
 		activePerPage = perPage,
@@ -228,7 +238,7 @@ export function Collections(props) {
 			clickedColumn,
 			newDirection,
 			newSort
-		});*/
+		});
 		fetch(`${servicesBaseUrl}/collectionList?page=${activePage}&perPage=${activePerPage}&sort=${newSort}`)
 			.then(response => response.json())
 			.then(data => setState(prev => ({
@@ -263,7 +273,7 @@ export function Collections(props) {
 			//collections,
 			column,
 			direction
-		});*/
+		});
 
 	    if (column !== clickedColumn) {
 			fetchCollections({
@@ -276,7 +286,7 @@ export function Collections(props) {
 				column: clickedColumn,
 		        collections,
 		        direction: 'ascending'
-			}));*/
+			}));
 			return;
 	    }
 
@@ -289,16 +299,17 @@ export function Collections(props) {
 			...prev,
 			collections,
 			direction: direction === 'ascending' ? 'descending' : 'ascending'
-	  	}));*/
+	  	}));
 	} // handleSortGenerator
+	*/
 
-	React.useEffect(() => fetchCollections(), []); // Only once
+	//React.useEffect(() => fetchCollections(), []); // Only once
 
-	React.useEffect(() => {
+	/*React.useEffect(() => {
 		//console.debug('collectionsObj changed');
 		fetchCollections()
 	}, [collectionsObj]); // Whenever collectionsObj changes
-
+	*/
 	/*useInterval(() => {
     	fetchCollections();
   	}, 1000); // Loading dimmer screen gives flicker every second :( */
@@ -313,7 +324,7 @@ export function Collections(props) {
 						{/* Width is X columns of total 16 */}
 						<Table.HeaderCell>Edit</Table.HeaderCell>
 						<Table.HeaderCell
-							onClick={handleSortGenerator('displayName')}
+							onClick={null/*handleSortGenerator('displayName')*/}
 							sorted={column === 'displayName' ? direction : null}
 						>Name</Table.HeaderCell>
 						<Table.HeaderCell>Documents</Table.HeaderCell>
@@ -323,7 +334,7 @@ export function Collections(props) {
 					</Table.Row>
 				</Table.Header>
 				<Table.Body>
-					{collections.hits.map(({
+					{collectionsObj.hits && collectionsObj.hits.map(({
 						collector,
 						collecting,
 						documentCount,
@@ -332,7 +343,7 @@ export function Collections(props) {
 						displayName,
 						//id,
 						interfaces,
-						name
+						_name: name
 					}, index) => {
 						const key = `collection[${index}]`;
 
@@ -340,9 +351,8 @@ export function Collections(props) {
 
 						return <Table.Row key={key}>
 							<Table.Cell collapsing><NewOrEditModal
-								afterClose={fetchCollections}
 								collectorOptions={collectorOptions}
-								collectorsObj={collectorsObj}
+								collectorComponents={collectorComponents}
 								contentTypeOptions={contentTypeOptions}
 								disabled={disabled}
 								initialValues={{
@@ -357,7 +367,7 @@ export function Collections(props) {
 								servicesBaseUrl={servicesBaseUrl}
 								setLicenseValid={setLicenseValid}
 								siteOptions={siteOptions}
-								totalNumberOfCollections={totalNumberOfCollections}
+								totalNumberOfCollections={0/*totalNumberOfCollections*/}
 							/></Table.Cell>
 							<Table.Cell collapsing>{displayName}</Table.Cell>
 							<Table.Cell collapsing>{documentCount}</Table.Cell>
@@ -384,7 +394,7 @@ export function Collections(props) {
 											fetch(`${servicesBaseUrl}/collectionDuplicate?name=${name}`, {
 												method: 'POST'
 											}).then(response => {
-												fetchCollections()
+												//fetchCollections()
 											})
 										}}><Icon color='blue' name='copy'/></Button>}/>
 									{collecting
@@ -395,7 +405,7 @@ export function Collections(props) {
 												fetch(`${servicesBaseUrl}/collectorStop?collectionName=${name}`, {
 													method: 'POST'
 												}).then(response => {
-													fetchCollections()
+													//fetchCollections()
 												})
 											}}><Icon color='red' name='stop'/></Button>}/>
 										: <Popup
@@ -405,11 +415,11 @@ export function Collections(props) {
 												fetch(`${servicesBaseUrl}/collectionCollect?name=${name}`, {
 													method: 'POST'
 												}).then(response => {
-													fetchCollections()
+													//fetchCollections()
 												})
 											}}><Icon color='green' name='cloud download'/></Button>}/>
 									}
-									<DeleteModal name={name} onClose={() => fetchCollections()} servicesBaseUrl={servicesBaseUrl}/>
+									<DeleteModal name={name} onClose={null/*() => fetchCollections()*/} servicesBaseUrl={servicesBaseUrl}/>
 								</Button.Group>
 							</Table.Cell>
 						</Table.Row>;
@@ -429,7 +439,7 @@ export function Collections(props) {
 					: null
 				*/}
 			</Table>
-			<Pagination
+			{/*<Pagination
 				attached='bottom'
 				fluid
 				size='mini'
@@ -437,7 +447,7 @@ export function Collections(props) {
 				boundaryRange={1}
 				siblingRange={1}
 
-				ellipsisItem={null/*{content: <Icon name='ellipsis horizontal' />, icon: true}*/}
+				ellipsisItem={null}
 				firstItem={{content: <Icon name='angle double left' />, icon: true}}
 				prevItem={{content: <Icon name='angle left' />, icon: true}}
 				nextItem={{content: <Icon name='angle right' />, icon: true}}
@@ -460,11 +470,10 @@ export function Collections(props) {
 					options={[5,10,25,50,100].map(key => ({key, text: `${key}`, value: key}))}
 					selection
 				/>
-			</Form.Field>
+			</Form.Field>*/}
 			<NewOrEditModal
-				afterClose={fetchCollections}
 				collectorOptions={collectorOptions}
-				collectorsObj={collectorsObj}
+				collectorComponents={collectorComponents}
 				contentTypeOptions={contentTypeOptions}
 				disabled={collectorOptions.length === 0}
 				fields={fields}
@@ -472,7 +481,7 @@ export function Collections(props) {
 				servicesBaseUrl={servicesBaseUrl}
 				setLicenseValid={setLicenseValid}
 				siteOptions={siteOptions}
-				totalNumberOfCollections={totalNumberOfCollections}
+				totalNumberOfCollections={0/*totalNumberOfCollections*/}
 			/>
 		</Dimmer.Dimmable>
 	</>;

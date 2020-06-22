@@ -32,7 +32,7 @@ export function Collection(props) {
 	//console.debug('Collection props', props);
 
 	const {
-		collectorsObj,
+		collectorComponents,
 		collectorOptions,
 		contentTypeOptions,
 		fields = {},
@@ -99,7 +99,7 @@ export function Collection(props) {
 			/>
 		</Segment>
 		<CollectorOptions
-			collectorsObj={collectorsObj}
+			collectorComponents={collectorComponents}
 			contentTypeOptions={contentTypeOptions}
 			fields={fields}
 			siteOptions={siteOptions}

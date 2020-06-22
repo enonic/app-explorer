@@ -93,7 +93,7 @@ const UploadLicenseModal = (props) => {
 export function Explorer(props) {
 	//console.debug('Explorer props', props);
 	const {
-		collectorsObj,
+		collectorComponents,
 		licensedTo: initialLicensedTo,
 		licenseValid: initialLicenseValid,
 		servicesBaseUrl,
@@ -107,7 +107,7 @@ export function Explorer(props) {
 	const [sideBarVisible, setSideBarVisible] = React.useState(true);
 	const [pusherWidth, setPusherWidth] = React.useState('calc(100% - 260px)');
 	const [collections, setCollections] = React.useState({});
-	const [collectors, setCollectors] = React.useState({});
+	const [queryCollectorsGraph, setQueryCollectorsGraph] = React.useState({});
 	const [fields, setFields] = React.useState({});
 	//console.debug('collections', collections);
 
@@ -132,7 +132,7 @@ export function Explorer(props) {
 				console.debug('Sending initial ping');
     			ws.send('ping'); // Date.now()
   			}, 30000); // In 30 seconds*/
-		} // onopen
+		}; // onopen
 
 		ws.onmessage = (event) => {
 			//console.debug('event', event);
@@ -151,7 +151,7 @@ export function Explorer(props) {
 				//console.debug('queryCollectors', queryCollectors);
 				//console.debug('queryFields', queryFields);
 				setCollections(queryCollections);
-				setCollectors(queryCollectors);
+				setQueryCollectorsGraph(queryCollectors);
 				setFields(queryFields);
 			} else if (type === 'collections') {
 				const {data:{
@@ -164,7 +164,7 @@ export function Explorer(props) {
 					queryCollectors
 				}} = data;
 				//console.debug('queryCollectors', queryCollectors);
-				setCollectors(queryCollectors);
+				setQueryCollectorsGraph(queryCollectors);
 			} else if (type === 'fields') {
 				const {data:{
 					queryFields
@@ -181,7 +181,15 @@ export function Explorer(props) {
 				console.debug('Sending ping');
     			ws.send('ping'); // Date.now()
   			}, 30000);*/ // In 30 seconds
-		} // onmessage
+		}; // onmessage
+
+		ws.onError = (event) => {
+			console.error('WebSocket error observed:', event);
+		};
+
+		ws.onClose = (event) => {
+			console.log('WebSocket is closed now.', event);
+		};
 	}, []); // useEffect
 
 	return <>
@@ -309,7 +317,8 @@ export function Explorer(props) {
 				</>}
 				{page === 'collections' && <Collections
 					collectionsObj={collections}
-					collectorsObj={collectorsObj}
+					queryCollectorsGraph={queryCollectorsGraph}
+					collectorComponents={collectorComponents}
 					licenseValid={licenseValid}
 					servicesBaseUrl={servicesBaseUrl}
 					setLicenseValid={setLicenseValid}

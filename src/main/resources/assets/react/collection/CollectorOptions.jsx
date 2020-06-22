@@ -7,7 +7,7 @@ import {getEnonicContext} from 'semantic-ui-react-form/Context';
 export function CollectorOptions(props) {
 	//console.debug('CollectorOptions props', props);
 	const {
-		collectorsObj,
+		collectorComponents,
 		contentTypeOptions,
 		fields,
 		siteOptions
@@ -21,11 +21,11 @@ export function CollectorOptions(props) {
 
 	if (!collectorName) { return null; }
 
-	if (!collectorsObj[collectorName]) { return <p>Collector {collectorName} NOT found!</p>; }
+	if (!collectorComponents[collectorName]) { return <p>Collector {collectorName} NOT found!</p>; }
 
 	return <Segment color='pink'>
 		<Header as='h2' dividing content={collectorName} id='collector'/>
-		{collectorsObj[collectorName]({
+		{collectorComponents[collectorName]({
 			context,
 			dispatch,
 			explorer: {
