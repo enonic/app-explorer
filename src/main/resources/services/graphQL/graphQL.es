@@ -20,6 +20,7 @@ import {queryCollectors} from './collector';
 import {queryFields} from './field';
 import {queryInterfaces} from './interface';
 import {queryStopWords} from './stopWord';
+import {querySynonyms, queryThesauri} from './thesaurus';
 
 
 //const CONTEXT = createContext();
@@ -45,7 +46,9 @@ export const SCHEMA = createSchema({
 			queryCollectors,
 			queryFields,
 			queryInterfaces,
-			queryStopWords
+			queryStopWords,
+			querySynonyms,
+			queryThesauri
 		} // fields
 	}) // query
 }); // SCHEMA
