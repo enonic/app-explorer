@@ -21,6 +21,7 @@ import {queryFields} from './field';
 import {queryInterfaces} from './interface';
 import {queryStopWords} from './stopWord';
 import {querySynonyms, queryThesauri} from './thesaurus';
+import {queryTasks} from './task';
 
 
 //const CONTEXT = createContext();
@@ -48,7 +49,8 @@ export const SCHEMA = createSchema({
 			queryInterfaces,
 			queryStopWords,
 			querySynonyms,
-			queryThesauri
+			queryThesauri,
+			queryTasks
 		} // fields
 	}) // query
 }); // SCHEMA
@@ -64,8 +66,8 @@ export function post(request) {
 	//log.info(`body:${toStr(body)}`);
 
 	const {query, variables} = body;
-	log.info(`query:${toStr(query)}`);
-	log.info(`variables:${toStr(variables)}`);
+	//log.info(`query:${toStr(query)}`);
+	//log.info(`variables:${toStr(variables)}`);
 
 	return {
 		contentType: RT_JSON,

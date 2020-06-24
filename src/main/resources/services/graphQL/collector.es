@@ -32,34 +32,39 @@ const COLLECTOR_OBJECT_TYPE = createObjectType({
 }); // COLLECTOR_OBJECT_TYPE
 
 
+export const queryCollectorsResolver = () => {
+	const collectorsReq = query({
+		connection: connect({ principals: [PRINCIPAL_EXPLORER_READ] })
+	});
+	//log.info(`collectorsReq:${toStr(collectorsReq)}`);
+	collectorsReq.hits = collectorsReq.hits.map(({
+		_id,
+		_path,
+		_name,
+		appName,
+		collectTaskName,
+		configAssetPath,
+		displayName,
+		type
+	}) => ({
+		_id,
+		_path,
+		_name,
+		appName,
+		collectTaskName,
+		configAssetPath,
+		displayName,
+		type
+	}));
+	//log.info(`mapped collectorsReq:${toStr(collectorsReq)}`);
+	return collectorsReq;
+}; // queryCollectorsResolver
+
+
 export const queryCollectors = {
 	resolve: (env) => {
 		//log.info(`env:${toStr(env)}`);
-		const collectorsReq = query({
-			connection: connect({ principals: [PRINCIPAL_EXPLORER_READ] })
-		});
-		//log.info(`collectorsReq:${toStr(collectorsReq)}`);
-		collectorsReq.hits = collectorsReq.hits.map(({
-			_id,
-			_path,
-			_name,
-			appName,
-			collectTaskName,
-			configAssetPath,
-			displayName,
-			type
-		}) => ({
-			_id,
-			_path,
-			_name,
-			appName,
-			collectTaskName,
-			configAssetPath,
-			displayName,
-			type
-		}));
-		//log.info(`mapped collectorsReq:${toStr(collectorsReq)}`);
-		return collectorsReq;
+		return queryCollectorsResolver();
 	},
 	type: createObjectType({
 		name: 'QueryCollectors',
