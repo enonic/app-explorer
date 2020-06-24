@@ -160,7 +160,6 @@ const SS_FILES = [
 	'src/main/resources/services/collectionDelete/collectionDelete',
 	'src/main/resources/services/collectionDuplicate/collectionDuplicate',
 	'src/main/resources/services/collectionList/collectionList',
-	'src/main/resources/services/collectionListWs/collectionListWs',
 	'src/main/resources/services/collectionModify/collectionModify',
 	'src/main/resources/services/collectorStop/collectorStop',
 	'src/main/resources/services/cronJobList/cronJobList',
@@ -198,7 +197,8 @@ const SS_FILES = [
 	'src/main/resources/services/thesaurusUpdate/thesaurusUpdate',
 	'src/main/resources/services/uninstallLicense/uninstallLicense',
 	'src/main/resources/services/uploadLicense/uploadLicense',
-	'src/main/resources/tasks/webcrawl/webcrawl'
+	'src/main/resources/tasks/webcrawl/webcrawl',
+	'src/main/resources/services/ws/ws'
 ];
 
 const SS_PLUGINS = [

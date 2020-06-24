@@ -119,7 +119,7 @@ export function Explorer(props) {
 		const hashPage = window.location.hash.substring(1);
 		if (hashPage) { setPage(hashPage); }
 
-		const wsUrl = wsBaseUrl + '/collectionListWs';
+		const wsUrl = wsBaseUrl + '/ws';
 		//console.debug('wsUrl', wsUrl);
 
 		let intervalId = null;
