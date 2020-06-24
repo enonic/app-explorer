@@ -113,7 +113,9 @@ export function Explorer(props) {
 	const [queryCollectionsGraph, setQueryCollectionsGraph] = React.useState({});
 	const [queryCollectorsGraph, setQueryCollectorsGraph] = React.useState({});
 	const [fields, setFields] = React.useState({});
+	const [tasks, setTasks] = React.useState([]);
 	//console.debug('queryCollectionsGraph', queryCollectionsGraph);
+	//console.debug('Explorer tasks', tasks);
 
 	React.useEffect(() => {
 		const hashPage = window.location.hash.substring(1);
@@ -135,7 +137,7 @@ export function Explorer(props) {
 				clearInterval(intervalId); // Make sure there are never more than one interval going.
 				intervalId = setInterval(() => { // Keep-alive
 					//console.debug('Sending ping', Date.now());
-					console.debug('ws.readyState', ws.readyState);
+					//console.debug('ws.readyState', ws.readyState);
 					/*
 						0	CONNECTING	Socket has been created. The connection is not yet open.
 						1	OPEN	The connection is open and ready to communicate.
@@ -174,14 +176,17 @@ export function Explorer(props) {
 					const {data:{
 						queryCollections,
 						queryCollectors,
-						queryFields
+						queryFields,
+						queryTasks
 					}} = data;
 					//console.debug('queryCollections', queryCollections);
 					//console.debug('queryCollectors', queryCollectors);
 					//console.debug('queryFields', queryFields);
+					//console.debug('queryTasks', queryTasks);
 					setQueryCollectionsGraph(queryCollections);
 					setQueryCollectorsGraph(queryCollectors);
 					setFields(queryFields);
+					setTasks(queryTasks);
 				} else if (type === 'collections') {
 					const {data:{
 						queryCollections
@@ -379,6 +384,8 @@ export function Explorer(props) {
 					queryCollectorsGraph={queryCollectorsGraph}
 					servicesBaseUrl={servicesBaseUrl}
 					setLicenseValid={setLicenseValid}
+					tasks={tasks}
+					setTasks={setTasks}
 				/>}
 				{page === 'status' && <Status
 					servicesBaseUrl={servicesBaseUrl}

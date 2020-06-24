@@ -159,9 +159,32 @@ export function Collections(props) {
 		licenseValid,
 		queryCollectorsGraph = {},
 		servicesBaseUrl,
-		setLicenseValid
+		setLicenseValid,
+		tasks, // []
+		setTasks
 	} = props;
 	//console.debug('queryCollectorsGraph', queryCollectorsGraph);
+	//console.debug('tasks', tasks);
+
+	const collectionsTaskState = {};
+	const anyTaskWithoutCollectionName = false;
+	tasks.forEach(({
+		progress: {info},
+		state // WAITING | RUNNING | FINISHED | FAILED
+	}) => {
+		try {
+			const {name} = JSON.parse(info);
+			if (name) {
+				collectionsTaskState[name] = state;
+			} else {
+				anyTaskWithoutCollectionName = true;
+			}
+		} catch (e) {
+			anyTaskWithoutCollectionName = true;
+		}
+	});
+
+
 	const collectorOptions = queryCollectorsGraph.hits
 		? queryCollectorsGraph.hits.map(({
 			_name: key,
@@ -310,9 +333,34 @@ export function Collections(props) {
 		fetchCollections()
 	}, [queryCollectionsGraph]); // Whenever queryCollectionsGraph changes
 	*/
-	/*useInterval(() => {
-    	fetchCollections();
-  	}, 1000); // Loading dimmer screen gives flicker every second :( */
+	useInterval(() => { // This will continue to run as long as the Collections "tab" is open
+		// NOTE Could possibly use active websocket instead of http request...
+		fetch(`${servicesBaseUrl}/graphQL`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+  			body: JSON.stringify({ query: `{ queryTasks {
+				application
+				description
+				id
+				name
+				progress {
+					current
+					info
+					total
+				}
+				startTime
+				state
+				user
+			}}` })
+		})
+			.then(res => res.json())
+  			.then(res => {
+				//console.log(res);
+				if (res && res.data && res.data.queryTasks) {
+					setTasks(res.data.queryTasks);
+				}
+			});
+  	}, 1000);
 
 	return <>
 		<Header as='h1'>Collections</Header>
@@ -336,7 +384,7 @@ export function Collections(props) {
 				<Table.Body>
 					{queryCollectionsGraph.hits && queryCollectionsGraph.hits.map(({
 						collector,
-						collecting,
+						//collecting,
 						documentCount,
 						cron,
 						doCollect,
@@ -397,27 +445,46 @@ export function Collections(props) {
 												//fetchCollections()
 											})
 										}}><Icon color='blue' name='copy'/></Button>}/>
-									{collecting
-										? <Popup
-											content={`Stop collecting to ${name}`}
-											inverted
-											trigger={<Button disabled={disabled} icon onClick={() => {
-												fetch(`${servicesBaseUrl}/collectorStop?collectionName=${name}`, {
-													method: 'POST'
-												}).then(response => {
-													//fetchCollections()
-												})
-											}}><Icon color='red' name='stop'/></Button>}/>
-										: <Popup
-											content={`Start collecting to ${name}`}
-											inverted
-											trigger={<Button disabled={disabled} icon onClick={() => {
-												fetch(`${servicesBaseUrl}/collectionCollect?name=${name}`, {
-													method: 'POST'
-												}).then(response => {
-													//fetchCollections()
-												})
-											}}><Icon color='green' name='cloud download'/></Button>}/>
+									{collectionsTaskState[name]
+										? {
+											WAITING: <Popup
+												content={`Collector is in waiting state`}
+												inverted
+												trigger={<Button disabled={disabled} icon><Icon color='yellow' name='pause'/></Button>}/>,
+											RUNNING: <Popup
+												content={`Stop collecting to ${name}`}
+												inverted
+												trigger={<Button disabled={disabled} icon onClick={() => {
+													fetch(`${servicesBaseUrl}/collectorStop?collectionName=${name}`, {
+														method: 'POST'
+													}).then(response => {
+														//fetchCollections()
+													})
+												}}><Icon color='red' name='stop'/></Button>}/>,
+											FINISHED: <Popup
+												content={`Finished collecting to ${name}`}
+												inverted
+												trigger={<Button disabled={disabled} icon><Icon color='green' name='checkmark'/></Button>}/>,
+											FAILED: <Popup
+												content={`Something went wrong while collecting to ${name}`}
+												inverted
+												trigger={<Button disabled={disabled} icon><Icon color='red' name='warning'/></Button>}/>
+										}[collectionsTaskState[name]]
+										: anyTaskWithoutCollectionName
+											? <Popup
+												content={`Some collector task is starting...`}
+												inverted
+												trigger={<Button disabled={disabled} icon loading><Icon color='yellow' name='question'/></Button>}/>
+											: <Popup
+												content={`Start collecting to ${name}`}
+												inverted
+												trigger={<Button disabled={disabled} icon onClick={() => {
+													fetch(`${servicesBaseUrl}/collectionCollect?name=${name}`, {
+														method: 'POST'
+													}).then(response => {
+														//fetchCollections()
+													})
+												}}><Icon color='green' name='cloud download'/></Button>}/>
 									}
 									<DeleteModal name={name} onClose={null/*() => fetchCollections()*/} servicesBaseUrl={servicesBaseUrl}/>
 								</Button.Group>

@@ -10,7 +10,7 @@ import {
 	nonNull
 } from '/lib/graphql';
 //import {toStr} from '/lib/util';
-import {list as listTasks} from '/lib/xp/task';
+//import {list as listTasks} from '/lib/xp/task';
 
 
 import {PRINCIPAL_EXPLORER_READ} from '/lib/explorer/model/2/constants';
@@ -41,7 +41,7 @@ const COLLECTION_OBJECT_TYPE = createObjectType({
 		_name: { type: nonNull(GraphQLString) },
 		displayName: { type: nonNull(GraphQLString) },
 		type: { type: nonNull(GraphQLString) },
-		collecting: { type: GraphQLBoolean },
+		//collecting: { type: GraphQLBoolean },
 		collector: { type: createObjectType({
 			name: 'CollectionCollector',
 			//description: 'Collector description',
@@ -87,7 +87,7 @@ export const queryCollectionsResolver = ({
 	});
 	//log.info(`collectionsRes:${toStr(collectionsRes)}`);
 
-	const activeCollections = {};
+	/*const activeCollections = {};
 	listTasks({
 		state: 'RUNNING'
 	}).forEach((runningTask) => {
@@ -103,7 +103,7 @@ export const queryCollectionsResolver = ({
 				//no-op
 			}
 		}
-	});
+	});*/
 	//log.info(`activeCollections:${toStr(activeCollections)}`);
 
 	collectionsRes.hits = collectionsRes.hits.map(({
@@ -119,7 +119,7 @@ export const queryCollectionsResolver = ({
 		_id,
 		_path,
 		_name,
-		collecting: !!activeCollections[_name],
+		//collecting: !!activeCollections[_name],
 		collector,
 		cron: Array.isArray(cron) ? cron : [cron],
 		displayName,
@@ -178,7 +178,7 @@ export const queryCollections = {
 			_id
 			_name
 			_path
-			collecting
+			#collecting
 			collector {
 				name
 				configJson

@@ -115,12 +115,30 @@ const SITES_GQL = `getSites {
 	}
 }`;
 
+
+const TASKS_GQL = `queryTasks {
+	application
+	description
+	id
+	name
+	progress {
+		current
+		info
+		total
+	}
+	startTime
+	state
+	user
+}`;
+
+
 const ALL_GQL = `{
 	${COLLECTIONS_GQL}
 	${COLLECTORS_GQL}
 	${CONTENT_TYPES_GQL}
 	${FIELDS_GQL}
 	${SITES_GQL}
+	${TASKS_GQL}
 }`;
 
 const NULL = null;
@@ -208,6 +226,16 @@ export function webSocketEvent(event) {
 //https://www.npmjs.com/package/bsdp
 //https://www.npmjs.com/package/bitowl
 
+let colletorsState = execute(SCHEMA, `{
+	${COLLECTORS_GQL}
+}`, NULL);
+
+// NOTE https://github.com/enonic/doc-xp/issues/153
+// For your use-case create two listeners: node.* and task.*
+// In case you are not interested in node.push, filter it out in listener itself
+// If you really want magic, subscribe to * and do a filtering in js code.
+// It may be even more optimal for overall system throughput.
+
 //log.info('Starting to listen for changes to collections');
 listener({
 	type: 'node.*',
@@ -218,9 +246,9 @@ listener({
 			data: {
 				nodes
 			},
-			distributed,
-			localOrigin,
-			timestamp,
+			//distributed,
+			//localOrigin,
+			//timestamp,
 			type
 		} = event;
 		if (['node.created','node.updated','node.deleted'].includes(type)) {
@@ -238,11 +266,12 @@ listener({
 								}`, NULL)
 							}));
 						} else if (path.startsWith('/collectors/')) {
+							colletorsState = execute(SCHEMA, `{
+								${COLLECTORS_GQL}
+							}`, NULL);
 							sendToGroup(WEBSOCKET_GROUP, JSON.stringify({
 								type: 'collectors',
-								data: execute(SCHEMA, `{
-									${COLLECTORS_GQL}
-								}`, NULL)
+								data: colletorsState
 							}));
 						} else if (path.startsWith('/fields/')) {
 							// fields...
@@ -285,8 +314,70 @@ listener({
 				}
 			});
 		}
-	}
-});
+	} // callback
+}); // listener
+
+
+// NOTE The problem is that a collector task, can be in any app and have any name and any description.
+// Thus I have to look at the info object to determine whether this is a collector task
+// Submitted has no info
+// Info also doesn't currently provide any thing saying this is a collector :(
+// Solution: Get list of collector tasks from registered collectors.
+// TODO What are the relevant task "states"
+// TODO Send full list of relevant task "states" on any change?
+// TODO This data can be useful on the status page too.
+// TODO But only send such data when visible on screen???
+/*listener({
+	type: 'task.*',
+	localOnly: false,
+	callback: (event) => {
+		//log.info(`event:${toStr(event)}`);
+		const {
+			data,
+			//distributed,
+			//localOrigin,
+			//timestamp,
+			type
+		} = event;
+		//log.info(`event:${toStr(event)}`);
+		//log.info(`data:${toStr(data)}`);
+		log.info(`type:${toStr(type)}`);
+		const {
+			//description, // 'Collect'
+			//id, // '07c2d09f-73e9-44ea-a732-6a54a0b4da3a'
+			name, // 'com.enonic.app.explorer:webcrawl'
+			state, // 'WAITING'
+			progress: {
+				info: infoMaybeJson//,
+				//current, // 0
+				//total // 0
+			}//,
+			//application, // 'com.enonic.app.explorer'
+			//user, // 'user:system:su'
+			//startTime // '2020-06-23T11:06:33.633010Z'
+		} = data;
+		log.info(`colletorsState:${toStr(colletorsState)}`);
+		const {
+			data: {
+				queryCollectors: {
+					hits
+				}
+			}
+		} = colletorsState;
+		hits.forEach(({appName, collectTaskName}) => {
+			if (name === `${appName}:${collectTaskName}`) {
+				// TODO Send what when???
+				sendToGroup(WEBSOCKET_GROUP, JSON.stringify({
+					type: 'collectorTask',
+					data: {
+
+					}
+				}));
+			}
+		});
+	} // callback
+}); // listener*/
+
 /*
 const EXAMPLE_CREATE_EVENT = {
 	type: 'node.created',
@@ -336,6 +427,90 @@ const EXAMPLE_DELETE_EVENT = {
 				repo: 'com.enonic.app.explorer'
 			}
 		]
+	}
+};
+
+const EXAMPLE_TASK_SUBMITTED_EVENT = {
+	"type": "task.submitted",
+	"timestamp": 1592910393633,
+	"localOrigin": true,
+	"distributed": true,
+	"data": {
+		"description": "Collect",
+		"id": "07c2d09f-73e9-44ea-a732-6a54a0b4da3a",
+		"name": "com.enonic.app.explorer:webcrawl",
+		"state": "WAITING",
+		"progress": {
+			"info": "",
+			"current": 0,
+			"total": 0
+		},
+		"application": "com.enonic.app.explorer",
+		"user": "user:system:su",
+		"startTime": "2020-06-23T11:06:33.633010Z"
+	}
+};
+
+const EXAMPLE_TASK_UPDATED_EVENT = {
+	"type": "task.updated",
+	"timestamp": 1592910395263,
+	"localOrigin": true,
+	"distributed": true,
+	"data": {
+		"description": "Collect",
+		"id": "07c2d09f-73e9-44ea-a732-6a54a0b4da3a",
+		"name": "com.enonic.app.explorer:webcrawl",
+		"state": "RUNNING",
+		"progress": {
+			"info": "{\"name\":\"example\",\"message\":\"Finished with 0 errors.\",\"startTime\":1592910393658,\"currentTime\":1592910395263,\"uri\":\"https://www.example.com/\"}",
+			"current": 1,
+			"total": 1
+		},
+		"application": "com.enonic.app.explorer",
+		"user": "user:system:su",
+		"startTime": "2020-06-23T11:06:33.633010Z"
+	}
+};
+
+const EXAMPLE_TASK_FINISHED_EVENT = {
+	"type": "task.finished",
+	"timestamp": 1592910395275,
+	"localOrigin": true,
+	"distributed": true,
+	"data": {
+		"description": "Collect",
+		"id": "07c2d09f-73e9-44ea-a732-6a54a0b4da3a",
+		"name": "com.enonic.app.explorer:webcrawl",
+		"state": "FINISHED",
+		"progress": {
+			"info": "{\"name\":\"example\",\"message\":\"Finished with 0 errors.\",\"startTime\":1592910393658,\"currentTime\":1592910395263,\"uri\":\"https://www.example.com/\"}",
+			"current": 1,
+			"total": 1
+		},
+		"application": "com.enonic.app.explorer",
+		"user": "user:system:su",
+		"startTime": "2020-06-23T11:06:33.633010Z"
+	}
+};
+
+const EXAMPLE_TASK_REMOVED_EVENT = {
+	"type": "task.removed",
+	"timestamp": 1592910477671,
+	"localOrigin": true,
+	"distributed": true,
+	"data": {
+		"description": "Collect",
+		"id": "07c2d09f-73e9-44ea-a732-6a54a0b4da3a",
+		"name": "com.enonic.app.explorer:webcrawl",
+		"state": "FINISHED",
+		"progress": {
+			"info": "{\"name\":\"example\",\"message\":\"Finished with 0 errors.\",\"startTime\":1592910393658,\"currentTime\":1592910395263,\"uri\":\"https://www.example.com/\"}",
+			"current": 1,
+			"total": 1
+		},
+		"application": "com.enonic.app.explorer",
+		"user": "user:system:su",
+		"startTime": "2020-06-23T11:06:33.633010Z"
 	}
 };
 */
