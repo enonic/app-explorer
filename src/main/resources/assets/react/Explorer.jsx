@@ -110,6 +110,8 @@ export function Explorer(props) {
 	const [page, setPage] = React.useState('home');
 	const [sideBarVisible, setSideBarVisible] = React.useState(true);
 	const [pusherWidth, setPusherWidth] = React.useState('calc(100% - 260px)');
+
+	const [websocket, setWebsocket] = React.useState(null);
 	const [queryCollectionsGraph, setQueryCollectionsGraph] = React.useState({});
 	const [queryCollectorsGraph, setQueryCollectorsGraph] = React.useState({});
 	const [fields, setFields] = React.useState({});
@@ -129,6 +131,7 @@ export function Explorer(props) {
 			setWsColor('#000000');
 			setWsStatus('WebSocket Connecting...');
 			const ws = new WebSocket(wsUrl); //open
+			setWebsocket(ws);
 			ws.onopen = (event) => {
 				setWsColor('#00FF00');
 				setWsStatus('WebSocket Connection Open');
@@ -173,12 +176,16 @@ export function Explorer(props) {
 				if (type === 'pong') {
 					// Do nothing
 				} else if (type === 'initialize') {
-					const {data:{
-						queryCollections,
-						queryCollectors,
-						queryFields,
-						queryTasks
-					}} = data;
+					//console.debug('data', data);
+					const {
+						data:{
+							queryCollections,
+							queryCollectors,
+							queryFields,
+							queryTasks
+						}// = {},
+						//errors // [{errorType, message, locations, validationErrorType}]
+					} = data;
 					//console.debug('queryCollections', queryCollections);
 					//console.debug('queryCollectors', queryCollectors);
 					//console.debug('queryFields', queryFields);
@@ -210,6 +217,11 @@ export function Explorer(props) {
 					//console.debug('data', data);
 					setLicensedTo(data.licensedTo);
 					setLicenseValid(data.licenseValid);
+				} else if (type === 'tasks') {
+					const {data:{
+						queryTasks
+					}} = data;
+					setTasks(queryTasks);
 				}
 				/*setTimeout(() => { // Keep-alive
 					console.debug('Sending ping');
@@ -386,9 +398,12 @@ export function Explorer(props) {
 					setLicenseValid={setLicenseValid}
 					tasks={tasks}
 					setTasks={setTasks}
+					websocket={websocket}
 				/>}
 				{page === 'status' && <Status
-					servicesBaseUrl={servicesBaseUrl}
+					tasks={tasks}
+					setTasks={setTasks}
+					websocket={websocket}
 				/>}
 				{page === 'journal' && <Journals
 					servicesBaseUrl={servicesBaseUrl}

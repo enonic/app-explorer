@@ -26,7 +26,6 @@ const COLLECTIONS_GQL = `queryCollections {
 		_id
 		_name
 		_path
-		collecting
 		collector {
 			name
 			configJson
@@ -207,6 +206,14 @@ export function webSocketEvent(event) {
 		case 'unsubscribe':
 			removeToGroup(WEBSOCKET_GROUP, sessionId);
 			//send(sessionId, 'unsubscribed');
+			break;
+		case 'tasks':
+			send(sessionId, JSON.stringify({
+				type: 'tasks',
+				data: execute(SCHEMA, `{
+					${TASKS_GQL}
+				}`, NULL)
+			}));
 			break;
 		default:
 			log.error(`unhandeled websocket message:${message}`);

@@ -161,7 +161,8 @@ export function Collections(props) {
 		servicesBaseUrl,
 		setLicenseValid,
 		tasks, // []
-		setTasks
+		setTasks,
+		websocket
 	} = props;
 	//console.debug('queryCollectorsGraph', queryCollectorsGraph);
 	//console.debug('tasks', tasks);
@@ -334,8 +335,9 @@ export function Collections(props) {
 	}, [queryCollectionsGraph]); // Whenever queryCollectionsGraph changes
 	*/
 	useInterval(() => { // This will continue to run as long as the Collections "tab" is open
+		websocket && websocket.readyState === 1 && websocket.send('tasks');
 		// NOTE Could possibly use active websocket instead of http request...
-		fetch(`${servicesBaseUrl}/graphQL`, {
+		/*fetch(`${servicesBaseUrl}/graphQL`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
   			body: JSON.stringify({ query: `{ queryTasks {
@@ -359,7 +361,7 @@ export function Collections(props) {
 				if (res && res.data && res.data.queryTasks) {
 					setTasks(res.data.queryTasks);
 				}
-			});
+			});*/
   	}, 1000);
 
 	return <>

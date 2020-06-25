@@ -24,7 +24,11 @@ function taskStateToProgressClassName(state) {
 
 
 export function Status (props) {
-	const {servicesBaseUrl} = props;
+	const {
+		setTasks,
+		tasks,
+		websocket
+	} = props;
 
 	const [delay, setDelay] = React.useState(5000);
 	const [state, setState] = React.useState({
@@ -46,86 +50,86 @@ export function Status (props) {
 		return sorted;
 	} // sortCollectors
 
-	function getStatus() {
+	React.useEffect(() => { // Only on first render, not updates
+		websocket && websocket.readyState === 1 && websocket.send('tasks');
+	}, []); // Only on first render, not updates
+
+	React.useEffect(() => { // Everytime the tasks array is changed
 		setState(prev => {
 			const deref = JSON.parse(JSON.stringify(prev));
-			deref.isLoading = true;
+			deref.isLoading = false;
+			deref.collectors = sortCollectors({
+				column: prev.column,
+				direction: prev.direction,
+				collectors: tasks.map((task) => {
+					//console.debug('task', task);
+					const {
+						progress: {
+							current,
+							info,
+							total
+						},
+						//startTime,
+						state
+					} = task;
+					try {
+						const {
+							name: collection,
+							currentTime,
+							startTime = currentTime,
+							message
+						} = JSON.parse(info);
+						/*console.debug({
+							collection,
+							current,
+							currentTime,
+							message,
+							startTime,
+							state,
+							total
+						});*/
+						const remainingCount = total - current;
+						//console.debug({remainingCount});
+
+						const percent = Math.floor(current / total * 10000)/100; // Keeping two decimals
+						//console.debug({percent});
+
+						const durationMs = currentTime - startTime;
+						//console.debug({durationMs});
+
+						const averageMs = current ? durationMs / current : durationMs;
+						//console.debug({averageMs});
+
+						const remainingMs = (remainingCount * averageMs);
+						//console.debug({remainingMs});
+
+						const etaMs = currentTime + remainingMs;
+						//console.debug({etaMs});
+
+						return {
+							averageMs,
+							collection,
+							current,
+							currentTime,
+							durationMs,
+							etaMs,
+							message,
+							percent,
+							remainingCount,
+							remainingMs,
+							startTime,
+							state,
+							total
+						};
+					} catch (e) {
+						// no-op
+					} // try...catch
+					return null
+				}).filter(x => x) // map tasks
+			}) // sortCollectors
 			return deref;
-		});
-		fetch(`${servicesBaseUrl}/listCollectors`)
-			.then(response => {
-				//console.debug(response);
-				return response.json()
-			})
-			.then(data => {
-				//console.debug(data);
-				return setState(prev => {
-					const deref = JSON.parse(JSON.stringify(prev));
-					deref.isLoading = false;
-					deref.collectors = sortCollectors({
-						column: prev.column,
-						direction: prev.direction,
-						collectors: data.map(({
-							progress: {
-								current,
-								info: {
-									name: collection,
-									currentTime,
-									startTime = currentTime,
-									message
-								},
-								total
-							},
-							//startTime,
-							state
-						}) => {
-							/*console.debug({
-								current,
-								currentTime,
-								startTime,
-								total
-							});*/
-							const remainingCount = total - current;
-							//console.debug({remainingCount});
-
-							const percent = Math.floor(current / total * 10000)/100; // Keeping two decimals
-							//console.debug({percent});
-
-							const durationMs = currentTime - startTime;
-							//console.debug({durationMs});
-
-							const averageMs = current ? durationMs / current : durationMs;
-							//console.debug({averageMs});
-
-							const remainingMs = (remainingCount * averageMs);
-							//console.debug({remainingMs});
-
-							const etaMs = currentTime + remainingMs;
-							//console.debug({etaMs});
-
-							return {
-								averageMs,
-								collection,
-								current,
-								currentTime,
-								durationMs,
-								etaMs,
-								message,
-								percent,
-								remainingCount,
-								remainingMs,
-								startTime,
-								state,
-								total
-							};
-						}) // collectors
-					}) // sortCollectors
-					return deref;
-				}); // setState
-			}); // fetch
-	} // getStatus
-
-	React.useEffect(() => getStatus(), []);
+		}); // setState
+	}, [tasks]); // Everytime the tasks array is changed
 
 	const {
 		collectors,
@@ -135,7 +139,7 @@ export function Status (props) {
 	} = state;
 
 	useInterval(() => {
-    	getStatus();
+		websocket && websocket.readyState === 1 && websocket.send('tasks');
   	}, delay);
 
 	const sortGen = (c) => () => {
