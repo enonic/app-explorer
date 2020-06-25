@@ -9,7 +9,7 @@ import {
 	list,
 	nonNull
 } from '/lib/graphql';
-import {toStr} from '/lib/util';
+//import {toStr} from '/lib/util';
 
 
 import {PRINCIPAL_EXPLORER_READ} from '/lib/explorer/model/2/constants';
@@ -94,7 +94,7 @@ export const queryJournals = {
 			successes,
 			type
 		}));
-		log.info(`journalsRes:${toStr(journalsRes)}`);
+		//log.info(`journalsRes:${toStr(journalsRes)}`);
 		return journalsRes;
 	},
 	type: createObjectType({
