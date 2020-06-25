@@ -19,6 +19,7 @@ import {queryCollections} from './collection';
 import {queryCollectors} from './collector';
 import {queryFields} from './field';
 import {queryInterfaces} from './interface';
+import {queryJournals} from './journal';
 import {queryStopWords} from './stopWord';
 import {querySynonyms, queryThesauri} from './thesaurus';
 import {queryTasks} from './task';
@@ -47,6 +48,7 @@ export const SCHEMA = createSchema({
 			queryCollectors,
 			queryFields,
 			queryInterfaces,
+			queryJournals,
 			queryStopWords,
 			querySynonyms,
 			queryThesauri,
