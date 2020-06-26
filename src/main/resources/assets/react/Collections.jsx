@@ -42,10 +42,13 @@ function NewOrEditModal(props) {
 		initialValues,
 		licenseValid,
 		name,
+		onClose = () => {},
+		onOpen = () => {},
 		servicesBaseUrl,
 		setLicenseValid,
-		siteOptions//,
-		//totalNumberOfCollections
+		siteOptions,
+		totalNumberOfCollections,
+		websocket
 	} = props;
 	//console.debug('NewOrEditModal totalNumberOfCollections', totalNumberOfCollections);
 	const [state, setState] = React.useState({
@@ -53,14 +56,13 @@ function NewOrEditModal(props) {
 	});
 	//console.debug('NewOrEditModal', {props, state});
 
-	const onClose = () => {
-		setState({open: false});
-	}
-	const onOpen = () => setState({open: true});
-
 	return <Modal
 		closeIcon
-		onClose={onClose}
+		onClose={() => {
+			setState({open: false});
+			onClose();
+		}}
+		onOpen={onOpen}
 		open={state.open}
 		size='large'
 		trigger={name ? <Popup
@@ -69,14 +71,14 @@ function NewOrEditModal(props) {
 			trigger={<Button
 				icon
 				disabled={disabled}
-				onClick={onOpen}
+				onClick={() => setState({open: true})}
 			><Icon color='blue' name='edit'/></Button>}/>
 			: <Button
 				circular
 				color='green'
 				disabled={disabled}
 				icon
-				onClick={onOpen}
+				onClick={() => setState({open: true})}
 				size='massive'
 				style={{
 					bottom: 13.5,
@@ -85,7 +87,7 @@ function NewOrEditModal(props) {
 				}}><Icon
 					name='plus'
 				/></Button>}
-	>{licenseValid /*|| totalNumberOfCollections <= 3*/
+	>{licenseValid || totalNumberOfCollections <= 3
 			? <>
 				<Modal.Header>{name ? `Edit collection ${name}`: 'New collection'}</Modal.Header>
 				<Modal.Content>
@@ -96,9 +98,13 @@ function NewOrEditModal(props) {
 						fields={fields}
 						initialValues={initialValues}
 						mode={name ? 'modify' : 'create'}
-						onClose={onClose}
+						onClose={() => {
+							setState({open: false})
+							onClose();
+						}}
 						servicesBaseUrl={servicesBaseUrl}
 						siteOptions={siteOptions}
+						websocket={websocket}
 					/>
 				</Modal.Content>
 			</>
@@ -114,6 +120,7 @@ function DeleteModal(props) {
 	const {
 		name,
 		onClose,
+		onOpen = () => {},
 		servicesBaseUrl
 	} = props;
 	const [state, setState] = React.useState({
@@ -124,6 +131,7 @@ function DeleteModal(props) {
 	return <Modal
 		closeIcon
 		onClose={() => setState({open: false})}
+		onOpen={onOpen}
 		open={state.open}
 		trigger={<Popup
 			content={`Delete collection ${name}`}
@@ -162,13 +170,15 @@ export function Collections(props) {
 		setLicenseValid,
 		tasks, // []
 		setTasks,
+		setUpdateTasks,
+		updateTasks,
 		websocket
 	} = props;
 	//console.debug('queryCollectorsGraph', queryCollectorsGraph);
 	//console.debug('tasks', tasks);
 
 	const collectionsTaskState = {};
-	const anyTaskWithoutCollectionName = false;
+	let anyTaskWithoutCollectionName = false;
 	tasks.forEach(({
 		progress: {info},
 		state // WAITING | RUNNING | FINISHED | FAILED
@@ -334,8 +344,13 @@ export function Collections(props) {
 		fetchCollections()
 	}, [queryCollectionsGraph]); // Whenever queryCollectionsGraph changes
 	*/
-	useInterval(() => { // This will continue to run as long as the Collections "tab" is open
-		websocket && websocket.readyState === 1 && websocket.send('tasks');
+	useInterval(() => {
+		// This will continue to run as long as the Collections "tab" is open
+		// TODO Pause while modal windows are open?
+		// WARNING websocket messages from serverside events will still change state
+		if (updateTasks) {
+			websocket && websocket.readyState === 1 && websocket.send('tasks');
+		}
 		// NOTE Could possibly use active websocket instead of http request...
 		/*fetch(`${servicesBaseUrl}/graphQL`, {
 			method: 'POST',
@@ -414,10 +429,17 @@ export function Collections(props) {
 								fields={fields}
 								licenseValid={licenseValid}
 								name={name}
+								onClose={() => {
+									setUpdateTasks(true);
+								}}
+								onOpen={() => {
+									setUpdateTasks(false);
+								}}
 								servicesBaseUrl={servicesBaseUrl}
 								setLicenseValid={setLicenseValid}
 								siteOptions={siteOptions}
-								totalNumberOfCollections={0/*totalNumberOfCollections*/}
+								totalNumberOfCollections={queryCollectionsGraph.total}
+								websocket={websocket}
 							/></Table.Cell>
 							<Table.Cell collapsing>{displayName}</Table.Cell>
 							<Table.Cell collapsing>{documentCount}</Table.Cell>
@@ -444,7 +466,7 @@ export function Collections(props) {
 											fetch(`${servicesBaseUrl}/collectionDuplicate?name=${name}`, {
 												method: 'POST'
 											}).then(response => {
-												//fetchCollections()
+												websocket && websocket.readyState === 1 && websocket.send('collections');
 											})
 										}}><Icon color='blue' name='copy'/></Button>}/>
 									{collectionsTaskState[name]
@@ -460,7 +482,7 @@ export function Collections(props) {
 													fetch(`${servicesBaseUrl}/collectorStop?collectionName=${name}`, {
 														method: 'POST'
 													}).then(response => {
-														//fetchCollections()
+														websocket && websocket.readyState === 1 && websocket.send('tasks');
 													})
 												}}><Icon color='red' name='stop'/></Button>}/>,
 											FINISHED: <Popup
@@ -484,11 +506,21 @@ export function Collections(props) {
 													fetch(`${servicesBaseUrl}/collectionCollect?name=${name}`, {
 														method: 'POST'
 													}).then(response => {
-														//fetchCollections()
+														websocket && websocket.readyState === 1 && websocket.send('tasks');
 													})
 												}}><Icon color='green' name='cloud download'/></Button>}/>
 									}
-									<DeleteModal name={name} onClose={null/*() => fetchCollections()*/} servicesBaseUrl={servicesBaseUrl}/>
+									<DeleteModal
+										name={name}
+										onClose={() => {
+											websocket && websocket.readyState === 1 && websocket.send('collections');
+											setUpdateTasks(true);
+										}}
+										onOpen={() => {
+											setUpdateTasks(false);
+										}}
+										servicesBaseUrl={servicesBaseUrl}
+									/>
 								</Button.Group>
 							</Table.Cell>
 						</Table.Row>;
@@ -547,10 +579,17 @@ export function Collections(props) {
 				disabled={collectorOptions.length === 0}
 				fields={fields}
 				licenseValid={licenseValid}
+				onClose={() => {
+					setUpdateTasks(true);
+				}}
+				onOpen={() => {
+					setUpdateTasks(false);
+				}}
 				servicesBaseUrl={servicesBaseUrl}
 				setLicenseValid={setLicenseValid}
 				siteOptions={siteOptions}
-				totalNumberOfCollections={0/*totalNumberOfCollections*/}
+				totalNumberOfCollections={queryCollectionsGraph.total}
+				websocket={websocket}
 			/>
 		</Dimmer.Dimmable>
 	</>;

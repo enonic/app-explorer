@@ -207,6 +207,14 @@ export function webSocketEvent(event) {
 			removeToGroup(WEBSOCKET_GROUP, sessionId);
 			//send(sessionId, 'unsubscribed');
 			break;
+		case 'collections':
+			send(sessionId, JSON.stringify({
+				type: 'collections',
+				data: execute(SCHEMA, `{
+					${COLLECTIONS_GQL}
+				}`, NULL)
+			}));
+			break;
 		case 'tasks':
 			send(sessionId, JSON.stringify({
 				type: 'tasks',

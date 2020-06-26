@@ -116,6 +116,7 @@ export function Explorer(props) {
 	const [queryCollectorsGraph, setQueryCollectorsGraph] = React.useState({});
 	const [fields, setFields] = React.useState({});
 	const [tasks, setTasks] = React.useState([]);
+	const [updateTasks, setUpdateTasks] = React.useState(true);
 	//console.debug('queryCollectionsGraph', queryCollectionsGraph);
 	//console.debug('Explorer tasks', tasks);
 
@@ -218,10 +219,12 @@ export function Explorer(props) {
 					setLicensedTo(data.licensedTo);
 					setLicenseValid(data.licenseValid);
 				} else if (type === 'tasks') {
-					const {data:{
-						queryTasks
-					}} = data;
-					setTasks(queryTasks);
+					if (updateTasks) {
+						const {data:{
+							queryTasks
+						}} = data;
+						setTasks(queryTasks);
+					}
 				}
 				/*setTimeout(() => { // Keep-alive
 					console.debug('Sending ping');
@@ -398,6 +401,8 @@ export function Explorer(props) {
 					setLicenseValid={setLicenseValid}
 					tasks={tasks}
 					setTasks={setTasks}
+					setUpdateTasks={setUpdateTasks}
+					updateTasks={updateTasks}
 					websocket={websocket}
 				/>}
 				{page === 'status' && <Status
