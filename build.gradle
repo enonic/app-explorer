@@ -16,6 +16,7 @@ repositories {
 
 app {
 	name = project.appName
+	group = 'com.enonic.app'
 	displayName = 'Explorer'
 	vendorName = 'Enonic AS'
 	vendorUrl = 'http://enonic.com'
