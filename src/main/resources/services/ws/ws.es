@@ -342,7 +342,7 @@ listener({
 // TODO Send full list of relevant task "states" on any change?
 // TODO This data can be useful on the status page too.
 // TODO But only send such data when visible on screen???
-/*listener({
+listener({
 	type: 'task.*',
 	localOnly: false,
 	callback: (event) => {
@@ -361,12 +361,12 @@ listener({
 			//description, // 'Collect'
 			//id, // '07c2d09f-73e9-44ea-a732-6a54a0b4da3a'
 			name, // 'com.enonic.app.explorer:webcrawl'
-			state, // 'WAITING'
-			progress: {
-				info: infoMaybeJson//,
-				//current, // 0
-				//total // 0
-			}//,
+			state//, // 'WAITING'
+			//progress: {
+			//info: infoMaybeJson//,
+			//current, // 0
+			//total // 0
+			//}//,
 			//application, // 'com.enonic.app.explorer'
 			//user, // 'user:system:su'
 			//startTime // '2020-06-23T11:06:33.633010Z'
@@ -381,17 +381,26 @@ listener({
 		} = colletorsState;
 		hits.forEach(({appName, collectTaskName}) => {
 			if (name === `${appName}:${collectTaskName}`) {
-				// TODO Send what when???
+				// Update the status page and collection buttons on the collections page
 				sendToGroup(WEBSOCKET_GROUP, JSON.stringify({
-					type: 'collectorTask',
-					data: {
-
-					}
+					type: 'tasks',
+					data: execute(SCHEMA, `{
+						${TASKS_GQL}
+					}`, NULL)
 				}));
-			}
+				if (['FAILED','FINISHED'].includes(state)) {
+					// Update the collections page (specifically the documentCount)
+					sendToGroup(WEBSOCKET_GROUP, JSON.stringify({
+						type: 'collections',
+						data: execute(SCHEMA, `{
+							${COLLECTIONS_GQL}
+						}`, NULL)
+					}));
+				}
+			} // if collectorTask
 		});
 	} // callback
-}); // listener*/
+}); // listener
 
 /*
 const EXAMPLE_CREATE_EVENT = {
