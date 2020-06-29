@@ -101,7 +101,10 @@ const CLIENT_JS_CONFIG = {
 			{ from: 'jquery/dist', to: 'jquery'},
 			{ from: 'react/umd/react.*.js', to: 'react/[name].[ext]' },
 			{ from: 'react-dom/umd/react-dom.*.js', to: 'react-dom/[name].[ext]' },
-			{ from: 'semantic-ui/dist', to: 'semantic-ui'},
+
+			//{ from: 'semantic-ui/dist', to: 'semantic-ui'},
+			{ from: 'semantic-ui-css/semantic*', to: 'semantic-ui/[name].[ext]'},
+			{ from: 'semantic-ui-css/themes', to: 'semantic-ui/themes'},
 		], {
 			context: path.resolve(__dirname, 'node_modules')
 		}),
