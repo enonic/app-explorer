@@ -24,7 +24,7 @@ export function post(req) {
 		contentType: 'application/json',
 		body: {
 			licenseValid: !!isValid,
-			licenseText: isValid ? 'Licensed to ' + licenseDetails.issuedTo : null
+			licenseText: isValid ? 'Licensed to ' + licenseDetails.issuedTo : 'Unlicensed'
 		}
 	};
 }

@@ -73,6 +73,7 @@ const UploadLicenseModal = (props) => {
 	const {
 		licensedTo,
 		servicesBaseUrl,
+		setLicensedTo,
 		setLicenseValid
 	} = props;
 	const [open, setOpen] = React.useState(false);
@@ -85,6 +86,7 @@ const UploadLicenseModal = (props) => {
 	>
 		<UploadLicense
 			servicesBaseUrl={servicesBaseUrl}
+			setLicensedTo={setLicensedTo}
 			setLicenseValid={setLicenseValid}
 			whenValid={() => {setOpen(false);}}
 		/>
@@ -111,20 +113,17 @@ export function Explorer(props) {
 	const [sideBarVisible, setSideBarVisible] = React.useState(true);
 	const [pusherWidth, setPusherWidth] = React.useState('calc(100% - 260px)');
 
-	const [websocket, setWebsocket] = React.useState(null);
-	const [queryCollectionsGraph, setQueryCollectionsGraph] = React.useState({});
-	const [queryCollectorsGraph, setQueryCollectorsGraph] = React.useState({});
-	const [fields, setFields] = React.useState({});
-	const [tasks, setTasks] = React.useState([]);
-	const [updateTasks, setUpdateTasks] = React.useState(true);
-	//console.debug('queryCollectionsGraph', queryCollectionsGraph);
+	//const [websocket, setWebsocket] = React.useState(null);
+	//const [queryCollectorsGraph, setQueryCollectorsGraph] = React.useState({});
+	//const [fields, setFields] = React.useState({});
+	//const [tasks, setTasks] = React.useState([]);
 	//console.debug('Explorer tasks', tasks);
 
 	React.useEffect(() => {
 		const hashPage = window.location.hash.substring(1);
 		if (hashPage) { setPage(hashPage); }
 
-		const wsUrl = wsBaseUrl + '/ws';
+		/*const wsUrl = wsBaseUrl + '/ws';
 		//console.debug('wsUrl', wsUrl);
 
 		let intervalId = null;
@@ -142,12 +141,10 @@ export function Explorer(props) {
 				intervalId = setInterval(() => { // Keep-alive
 					//console.debug('Sending ping', Date.now());
 					//console.debug('ws.readyState', ws.readyState);
-					/*
-						0	CONNECTING	Socket has been created. The connection is not yet open.
-						1	OPEN	The connection is open and ready to communicate.
-						2	CLOSING	The connection is in the process of closing.
-						3	CLOSED	The connection is closed or couldn't be opened.
-					*/
+					//0	CONNECTING	Socket has been created. The connection is not yet open.
+					//1	OPEN	The connection is open and ready to communicate.
+					//2	CLOSING	The connection is in the process of closing.
+					//3	CLOSED	The connection is closed or couldn't be opened.
 					if (ws.readyState === 1) {
 						setWsColor('#FFFF00');
 						ws.send('ping');
@@ -164,7 +161,7 @@ export function Explorer(props) {
 				/*setTimeout(() => { // Keep-alive
 					console.debug('Sending initial ping');
 					ws.send('ping'); // Date.now()
-				}, 30000); // In 30 seconds*/
+				}, 30000); // In 30 seconds
 			}; // onopen
 
 			ws.onmessage = (event) => {
@@ -180,10 +177,10 @@ export function Explorer(props) {
 					//console.debug('data', data);
 					const {
 						data:{
-							queryCollections,
-							queryCollectors,
-							queryFields,
-							queryTasks
+							//queryCollections,
+							//queryCollectors//,
+							//queryFields//,
+							//queryTasks
 						}// = {},
 						//errors // [{errorType, message, locations, validationErrorType}]
 					} = data;
@@ -191,23 +188,16 @@ export function Explorer(props) {
 					//console.debug('queryCollectors', queryCollectors);
 					//console.debug('queryFields', queryFields);
 					//console.debug('queryTasks', queryTasks);
-					setQueryCollectionsGraph(queryCollections);
-					setQueryCollectorsGraph(queryCollectors);
-					setFields(queryFields);
-					setTasks(queryTasks);
-				} else if (type === 'collections') {
-					const {data:{
-						queryCollections
-					}} = data;
-					//console.debug('queryCollections', queryCollections);
-					setQueryCollectionsGraph(queryCollections);
-				} else if (type === 'collectors') {
+					//setQueryCollectorsGraph(queryCollectors);
+					//setFields(queryFields);
+					//setTasks(queryTasks);
+				} /*else if (type === 'collectors') {
 					const {data:{
 						queryCollectors
 					}} = data;
 					//console.debug('queryCollectors', queryCollectors);
 					setQueryCollectorsGraph(queryCollectors);
-				} else if (type === 'fields') {
+				} /*else if (type === 'fields') {
 					const {data:{
 						queryFields
 					}} = data;
@@ -218,18 +208,11 @@ export function Explorer(props) {
 					//console.debug('data', data);
 					setLicensedTo(data.licensedTo);
 					setLicenseValid(data.licenseValid);
-				} else if (type === 'tasks') {
-					if (updateTasks) {
-						const {data:{
-							queryTasks
-						}} = data;
-						setTasks(queryTasks);
-					}
 				}
 				/*setTimeout(() => { // Keep-alive
 					console.debug('Sending ping');
 					ws.send('ping'); // Date.now()
-				}, 30000);*/ // In 30 seconds
+				}, 30000); // In 30 seconds
 			}; // onmessage
 
 			ws.onerror = (event) => {
@@ -246,7 +229,7 @@ export function Explorer(props) {
 				setWsStatus('WebSocket Connection Closed!')
 			};
 		} // reconnectingWs
-		reconnectingWs();
+		reconnectingWs();*/
 	}, []); // useEffect
 
 	return <>
@@ -258,6 +241,7 @@ export function Explorer(props) {
 			<UploadLicenseModal
 				licensedTo={licensedTo}
 				servicesBaseUrl={servicesBaseUrl}
+				setLicensedTo={setLicensedTo}
 				setLicenseValid={setLicenseValid}
 			/>
 		</Menu>
@@ -364,7 +348,7 @@ export function Explorer(props) {
 					width: pusherWidth
 				}}
 			>
-				<Popup
+				{/*<Popup
 					content={wsStatus}
 					trigger={<svg
 						height="16"
@@ -382,7 +366,7 @@ export function Explorer(props) {
 							d="M192 145h32V68l-36-35-22 22 26 27v63zm32 16H113l-26-27 11-11 22 22h45l-44-45 11-11 44 44V88l-21-22 11-11-55-55H0l32 32h65l24 23-34 34-24-23V48H32v31l55 55-23 22 36 36h156l-32-31z"
 						/>
 					</svg>}
-				/>
+				/>*/}
 
 				{page === 'home' && <>
 					<Header as='h1' content='Explorer'/>
@@ -395,20 +379,12 @@ export function Explorer(props) {
 				{page === 'collections' && <Collections
 					collectorComponents={collectorComponents}
 					licenseValid={licenseValid}
-					queryCollectionsGraph={queryCollectionsGraph}
-					queryCollectorsGraph={queryCollectorsGraph}
 					servicesBaseUrl={servicesBaseUrl}
+					setLicensedTo={setLicensedTo}
 					setLicenseValid={setLicenseValid}
-					tasks={tasks}
-					setTasks={setTasks}
-					setUpdateTasks={setUpdateTasks}
-					updateTasks={updateTasks}
-					websocket={websocket}
 				/>}
 				{page === 'status' && <Status
-					tasks={tasks}
-					setTasks={setTasks}
-					websocket={websocket}
+					servicesBaseUrl={servicesBaseUrl}
 				/>}
 				{page === 'journal' && <Journals
 					servicesBaseUrl={servicesBaseUrl}
@@ -428,11 +404,13 @@ export function Explorer(props) {
 				{page === 'thesauri' && <Thesauri
 					licenseValid={licenseValid}
 					servicesBaseUrl={servicesBaseUrl}
+					setLicensedTo={setLicensedTo}
 					setLicenseValid={setLicenseValid}
 				/>}
 				{page === 'interfaces' && <Interfaces
 					licenseValid={licenseValid}
 					servicesBaseUrl={servicesBaseUrl}
+					setLicensedTo={setLicensedTo}
 					setLicenseValid={setLicenseValid}
 				/>}
 				{page === 'about' && <>

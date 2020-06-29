@@ -55,8 +55,7 @@ export function Collection(props) {
 				hour: '*'
 			}],
 			doCollect: false
-		},
-		websocket
+		}
 	} = props;
 	//console.debug('Collection initialValues', initialValues);
 
@@ -87,7 +86,6 @@ export function Collection(props) {
 				body: JSON.stringify(values)
 			}).then(response => {
 				onClose();
-				websocket && websocket.readyState === 1 && websocket.send('collections');
 			})
 		}}
 		schema={SCHEMA}

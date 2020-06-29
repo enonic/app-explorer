@@ -15,7 +15,7 @@ import {SCHEMA} from '../graphQL/graphQL';
 
 const WEBSOCKET_GROUP = 'subscribers';
 
-const COLLECTIONS_GQL = `queryCollections {
+/*const COLLECTIONS_GQL = `queryCollections {
 	total
 	count
 	page
@@ -44,7 +44,7 @@ const COLLECTIONS_GQL = `queryCollections {
 		name
 		type
 	}
-}`;
+}`;*/
 
 const COLLECTORS_GQL = `queryCollectors {
 	total
@@ -116,7 +116,7 @@ const SITES_GQL = `getSites {
 }`;
 
 
-const TASKS_GQL = `queryTasks {
+/*const TASKS_GQL = `queryTasks {
 	application
 	description
 	id
@@ -129,16 +129,16 @@ const TASKS_GQL = `queryTasks {
 	startTime
 	state
 	user
-}`;
+}`;*/
 
 
+//${COLLECTIONS_GQL}
+//${TASKS_GQL}
 const ALL_GQL = `{
-	${COLLECTIONS_GQL}
 	${COLLECTORS_GQL}
 	${CONTENT_TYPES_GQL}
 	${FIELDS_GQL}
 	${SITES_GQL}
-	${TASKS_GQL}
 }`;
 
 const NULL = null;
@@ -194,6 +194,7 @@ export function webSocketEvent(event) {
 				type: 'pong'
 			}));
 			break;
+			/*
 		case 'subscribe':
 			addToGroup(WEBSOCKET_GROUP, sessionId);
 			//log.info(`ALL_GQL:${ALL_GQL}`);
@@ -207,8 +208,8 @@ export function webSocketEvent(event) {
 		case 'unsubscribe':
 			removeToGroup(WEBSOCKET_GROUP, sessionId);
 			//send(sessionId, 'unsubscribed');
-			break;
-		case 'collections':
+			break;*/
+		/*case 'collections':
 			send(sessionId, JSON.stringify({
 				type: 'collections',
 				data: execute(SCHEMA, `{
@@ -223,13 +224,13 @@ export function webSocketEvent(event) {
 					${TASKS_GQL}
 				}`, NULL)
 			}));
-			break;
+			break;*/
 		default:
 			log.error(`unhandeled websocket message:${message}`);
 		}
 		break;
 	case 'close':
-		removeFromGroup(WEBSOCKET_GROUP, sessionId);
+		//removeFromGroup(WEBSOCKET_GROUP, sessionId);
 		//send(sessionId, 'websocket closed'); // Not received on client
 		break;
 	default:
@@ -242,6 +243,7 @@ export function webSocketEvent(event) {
 //https://www.npmjs.com/package/bsdp
 //https://www.npmjs.com/package/bitowl
 
+/*
 let colletorsState = execute(SCHEMA, `{
 	${COLLECTORS_GQL}
 }`, NULL);
@@ -273,7 +275,7 @@ listener({
 				const {id, path, branch, repo} = node;
 				if (branch === 'master') {
 					if (repo === 'com.enonic.app.explorer') {
-						if (path.startsWith('/collections/')) {
+						/*if (path.startsWith('/collections/')) {
 							// NOTE https://github.com/enonic/xp/issues/8163 lib-websocket.getGroupCount('groupName')
 							sendToGroup(WEBSOCKET_GROUP, JSON.stringify({
 								type: 'collections',
@@ -324,7 +326,7 @@ listener({
 					}
 					 /*else if (repo.startsWith('com.enonic.app.explorer.')) {
 						// document counts?
-					}*/
+					}
 					// contenttypes?
 					// sites?
 				}
@@ -343,7 +345,7 @@ listener({
 // TODO Send full list of relevant task "states" on any change?
 // TODO This data can be useful on the status page too.
 // TODO But only send such data when visible on screen???
-listener({
+/*listener({
 	type: 'task.*',
 	localOnly: false,
 	callback: (event) => {
@@ -402,6 +404,7 @@ listener({
 		});
 	} // callback
 }); // listener
+*/
 
 /*
 const EXAMPLE_CREATE_EVENT = {

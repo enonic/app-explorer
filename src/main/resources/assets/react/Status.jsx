@@ -25,9 +25,10 @@ function taskStateToProgressClassName(state) {
 
 export function Status (props) {
 	const {
-		setTasks,
-		tasks,
-		websocket
+		//setTasks, // Application wide state has side-effects :(
+		//tasks, // Application wide state has side-effects :(
+		servicesBaseUrl
+		//websocket
 	} = props;
 
 	const [delay, setDelay] = React.useState(5000);
@@ -37,6 +38,35 @@ export function Status (props) {
 		direction: 'ascending',
 		isLoading: false
 	});
+	const [tasks, setTasks] = React.useState([]);
+
+	function updateTasks() {
+		fetch(`${servicesBaseUrl}/graphQL`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+  			body: JSON.stringify({ query: `{ queryTasks {
+				application
+				description
+				id
+				name
+				progress {
+					current
+					info
+					total
+				}
+				startTime
+				state
+				user
+			}}` })
+		})
+			.then(res => res.json())
+  			.then(res => {
+				//console.log(res);
+				if (res && res.data && res.data.queryTasks) {
+					setTasks(res.data.queryTasks);
+				}
+			});
+	} // updateTasks
 
 	function sortCollectors({
 		collectors,
@@ -51,7 +81,8 @@ export function Status (props) {
 	} // sortCollectors
 
 	React.useEffect(() => { // Only on first render, not updates
-		websocket && websocket.readyState === 1 && websocket.send('tasks');
+		//websocket && websocket.readyState === 1 && websocket.send('tasks');
+		updateTasks();
 	}, []); // Only on first render, not updates
 
 	React.useEffect(() => { // Everytime the tasks array is changed
@@ -139,7 +170,8 @@ export function Status (props) {
 	} = state;
 
 	useInterval(() => {
-		websocket && websocket.readyState === 1 && websocket.send('tasks');
+		//websocket && websocket.readyState === 1 && websocket.send('tasks');
+		updateTasks();
   	}, delay);
 
 	const sortGen = (c) => () => {

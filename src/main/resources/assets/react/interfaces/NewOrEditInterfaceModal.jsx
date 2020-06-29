@@ -16,6 +16,7 @@ export function NewOrEditInterfaceModal(props) {
 		//initialValues = {},
 		licenseValid,
 		servicesBaseUrl,
+		setLicensedTo,
 		setLicenseValid,
 		stopWordOptions,
 		thesauriOptions,
@@ -76,6 +77,7 @@ export function NewOrEditInterfaceModal(props) {
 			</>
 			: <UploadLicense
 				servicesBaseUrl={servicesBaseUrl}
+				setLicensedTo={setLicensedTo}
 				setLicenseValid={setLicenseValid}
 			/>}
 	</Modal>;

@@ -54,6 +54,7 @@ export class Interfaces extends React.Component {
 		const {
 			licenseValid,
 			servicesBaseUrl,
+			setLicensedTo,
 			setLicenseValid
 		} = this.props;
 
@@ -95,6 +96,7 @@ export class Interfaces extends React.Component {
 										afterClose={() => this.updateInterfaces()}
 										licenseValid={licenseValid}
 										servicesBaseUrl={servicesBaseUrl}
+										setLicensedTo={setLicensedTo}
 										setLicenseValid={setLicenseValid}
 										stopWordOptions={stopWordOptions}
 										thesauriOptions={thesauriOptions}
@@ -126,6 +128,7 @@ export class Interfaces extends React.Component {
 				afterClose={() => this.updateInterfaces()}
 				licenseValid={licenseValid}
 				servicesBaseUrl={servicesBaseUrl}
+				setLicensedTo={setLicensedTo}
 				setLicenseValid={setLicenseValid}
 				stopWordOptions={stopWordOptions}
 				thesauriOptions={thesauriOptions}

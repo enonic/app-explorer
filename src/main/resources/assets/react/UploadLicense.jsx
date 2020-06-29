@@ -6,6 +6,7 @@ import {
 export const UploadLicense = (props) => {
 	const {
 		servicesBaseUrl,
+		setLicensedTo,
 		setLicenseValid,
 		whenValid = () => {}
 	} = props;
@@ -26,11 +27,12 @@ export const UploadLicense = (props) => {
 				}).then(response => response.json())
 					.then(data => {
 						//console.debug(data);
-						const {licenseValid} = data;
+						const {licenseText, licenseValid} = data;
 						//console.debug(licenseValid);
 						if (licenseValid) {
 							setUploadedLicenseValid(true);
 							setLicenseValid(true);
+							setLicensedTo(licenseText);
 							whenValid();
 						} else {
 							setUploadedLicenseValid(false);

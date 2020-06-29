@@ -23,6 +23,7 @@ export function NewOrEditThesaurus(props) {
 		name = '',
 		onClose,
 		servicesBaseUrl,
+		setLicensedTo,
 		setLicenseValid
 	} = props;
 	//console.debug('NewOrEditThesaurus licenseValid', licenseValid);
@@ -120,6 +121,7 @@ export function NewOrEditThesaurus(props) {
 			</>
 			: <UploadLicense
 				servicesBaseUrl={servicesBaseUrl}
+				setLicensedTo={setLicensedTo}
 				setLicenseValid={setLicenseValid}
 			/>
 		}</Modal>;

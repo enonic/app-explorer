@@ -12,6 +12,79 @@ import {UploadLicense} from './UploadLicense';
 import {useInterval} from './utils/useInterval';
 
 
+const COLLECTIONS_GQL = `queryCollections {
+	total
+	count
+	page
+	pageStart
+	pageEnd
+	pagesTotal
+	hits {
+		_id
+		_name
+		_path
+		collector {
+			name
+			configJson
+		}
+		cron {
+			month
+			dayOfMonth
+			dayOfWeek
+			hour
+			minute
+		}
+		displayName
+		doCollect
+		documentCount
+		interfaces
+		name
+		type
+	}
+}`;
+
+const COLLECTORS_GQL = `queryCollectors {
+	total
+	count
+	hits {
+		_id
+		_path
+		_name
+		appName
+		collectTaskName
+		configAssetPath
+		displayName
+		type
+	}
+}`;
+
+
+const TASKS_GQL = `queryTasks {
+	application
+	description
+	id
+	name
+	progress {
+		current
+		info
+		total
+	}
+	startTime
+	state
+	user
+}`;
+
+/*
+${CONTENT_TYPES_GQL}
+${FIELDS_GQL}
+${SITES_GQL}
+*/
+const ALL_GQL = `{
+	${COLLECTIONS_GQL}
+	${COLLECTORS_GQL}
+	${TASKS_GQL}
+}`;
+
 function rpad(s, w = 2, z = ' ') {
 	s = s + '';
 	return s.length >= w
@@ -45,10 +118,10 @@ function NewOrEditModal(props) {
 		onClose = () => {},
 		onOpen = () => {},
 		servicesBaseUrl,
+		setLicensedTo,
 		setLicenseValid,
 		siteOptions,
-		totalNumberOfCollections,
-		websocket
+		totalNumberOfCollections
 	} = props;
 	const [state, setState] = React.useState({
 		open: false
@@ -103,12 +176,12 @@ function NewOrEditModal(props) {
 						}}
 						servicesBaseUrl={servicesBaseUrl}
 						siteOptions={siteOptions}
-						websocket={websocket}
 					/>
 				</Modal.Content>
 			</>
 			: <UploadLicense
 				servicesBaseUrl={servicesBaseUrl}
+				setLicensedTo={setLicensedTo}
 				setLicenseValid={setLicenseValid}
 			/>}
 	</Modal>;
@@ -161,19 +234,17 @@ function DeleteModal(props) {
 
 export function Collections(props) {
 	const {
-		queryCollectionsGraph = {},
 		collectorComponents,
 		licenseValid,
-		queryCollectorsGraph = {},
 		servicesBaseUrl,
-		setLicenseValid,
-		tasks, // []
-		setTasks,
-		setUpdateTasks,
-		updateTasks,
-		websocket
+		setLicensedTo,
+		setLicenseValid
 	} = props;
-	//console.debug('queryCollectorsGraph', queryCollectorsGraph);
+
+	const [queryCollectionsGraph, setQueryCollectionsGraph] = React.useState({});
+	const [queryCollectorsGraph, setQueryCollectorsGraph] = React.useState({});
+	const [tasks, setTasks] = React.useState([]);
+	const [boolPoll, setBoolPoll] = React.useState(true);
 	//console.debug('tasks', tasks);
 
 	const collectionsTaskState = {};
@@ -253,26 +324,42 @@ export function Collections(props) {
 	} = collections;*/
 	//console.debug('Collections totalNumberOfCollections', totalNumberOfCollections);
 
-	/*
+	function fetchAll() {
+		fetch(`${servicesBaseUrl}/graphQL`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+  			body: JSON.stringify({ query: ALL_GQL })
+		})
+			.then(res => res.json())
+  			.then(res => {
+				//console.log(res);
+				if (res && res.data) {
+					setQueryCollectionsGraph(res.data.queryCollections);
+					setQueryCollectorsGraph(res.data.queryCollectors);
+					setTasks(res.data.queryTasks);
+				}
+			});
+	}
+
 	function fetchCollections({
 		activePage = page,
 		activePerPage = perPage,
 		clickedColumn = column,
 		newDirection = direction
 	} = {}) {
-		setState(prev => ({
+		/*setState(prev => ({
 			...prev,
 			isLoading: true
 		}));
-		const newSort = `${clickedColumn} ${newDirection === 'ascending' ? 'ASC' : 'DESC'}`;
+		const newSort = `${clickedColumn} ${newDirection === 'ascending' ? 'ASC' : 'DESC'}`;*/
 		/*console.debug('fetchCollections', {
 			activePage,
 			activePerPage,
 			clickedColumn,
 			newDirection,
 			newSort
-		});
-		fetch(`${servicesBaseUrl}/collectionList?page=${activePage}&perPage=${activePerPage}&sort=${newSort}`)
+		});*/
+		/*fetch(`${servicesBaseUrl}/collectionList?page=${activePage}&perPage=${activePerPage}&sort=${newSort}`)
 			.then(response => response.json())
 			.then(data => setState(prev => ({
 				...prev,
@@ -283,9 +370,52 @@ export function Collections(props) {
 				page: activePage,
 				perPage: activePerPage,
 				sort: newSort
-			})));
+			})));*/
+		fetch(`${servicesBaseUrl}/graphQL`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+  			body: JSON.stringify({ query: `{${COLLECTIONS_GQL}}` })
+		})
+			.then(res => res.json())
+  			.then(res => {
+				//console.log(res);
+				if (res && res.data && res.data.queryCollections) {
+					setQueryCollectionsGraph(res.data.queryCollections);
+				}
+			});
 	} // fetchCollections
 
+	function fetchCollectors() {
+		fetch(`${servicesBaseUrl}/graphQL`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ query: `{${COLLECTORS_GQL}}` })
+		})
+			.then(res => res.json())
+			.then(res => {
+				//console.log(res);
+				if (res && res.data && res.data.queryCollectors) {
+					setQueryCollectorsGraph(res.data.queryCollectors);
+				}
+			});
+	} // fetchCollectors
+
+	function fetchTasks() {
+		fetch(`${servicesBaseUrl}/graphQL`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+  			body: JSON.stringify({ query: `{${TASKS_GQL}}` })
+		})
+			.then(res => res.json())
+  			.then(res => {
+				//console.log(res);
+				if (res && res.data && res.data.queryTasks) {
+					setTasks(res.data.queryTasks);
+				}
+			});
+	} // fetchTasks
+
+	/*
 	function handlePaginationChange(e, {activePage}) {
 		//console.debug({function: 'handlePaginationChange', activePage});
 		fetchCollections({activePage})
@@ -336,47 +466,14 @@ export function Collections(props) {
 	} // handleSortGenerator
 	*/
 
-	//React.useEffect(() => fetchCollections(), []); // Only once
+	React.useEffect(() => fetchAll(), []); // Only once
 
-	/*React.useEffect(() => {
-		//console.debug('queryCollectionsGraph changed');
-		fetchCollections()
-	}, [queryCollectionsGraph]); // Whenever queryCollectionsGraph changes
-	*/
 	useInterval(() => {
 		// This will continue to run as long as the Collections "tab" is open
-		// TODO Pause while modal windows are open?
-		// WARNING websocket messages from serverside events will still change state
-		if (updateTasks) {
-			websocket && websocket.readyState === 1 && websocket.send('tasks');
+		if (boolPoll) {
+			fetchAll();
 		}
-		// NOTE Could possibly use active websocket instead of http request...
-		/*fetch(`${servicesBaseUrl}/graphQL`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-  			body: JSON.stringify({ query: `{ queryTasks {
-				application
-				description
-				id
-				name
-				progress {
-					current
-					info
-					total
-				}
-				startTime
-				state
-				user
-			}}` })
-		})
-			.then(res => res.json())
-  			.then(res => {
-				//console.log(res);
-				if (res && res.data && res.data.queryTasks) {
-					setTasks(res.data.queryTasks);
-				}
-			});*/
-  	}, 1000);
+  	}, 2500);
 
 	return <>
 		<Header as='h1'>Collections</Header>
@@ -435,16 +532,17 @@ export function Collections(props) {
 								licenseValid={licenseValid}
 								name={name}
 								onClose={() => {
-									setUpdateTasks(true);
+									fetchAll();
+									setBoolPoll(true);
 								}}
 								onOpen={() => {
-									setUpdateTasks(false);
+									setBoolPoll(false);
 								}}
 								servicesBaseUrl={servicesBaseUrl}
+								setLicensedTo={setLicensedTo}
 								setLicenseValid={setLicenseValid}
 								siteOptions={siteOptions}
 								totalNumberOfCollections={queryCollectionsGraph.total}
-								websocket={websocket}
 							/></Table.Cell>
 							<Table.Cell collapsing>{displayName}</Table.Cell>
 							<Table.Cell collapsing>{documentCount}</Table.Cell>
@@ -471,7 +569,7 @@ export function Collections(props) {
 											fetch(`${servicesBaseUrl}/collectionDuplicate?name=${name}`, {
 												method: 'POST'
 											}).then(response => {
-												websocket && websocket.readyState === 1 && websocket.send('collections');
+												fetchCollections();
 											})
 										}}><Icon color='blue' name='copy'/></Button>}/>
 									{collectionsTaskState[name]
@@ -487,7 +585,7 @@ export function Collections(props) {
 													fetch(`${servicesBaseUrl}/collectorStop?collectionName=${name}`, {
 														method: 'POST'
 													}).then(response => {
-														websocket && websocket.readyState === 1 && websocket.send('tasks');
+														fetchTasks();
 													})
 												}}><Icon color='red' name='stop'/></Button>}/>,
 											FINISHED: <Popup
@@ -511,18 +609,18 @@ export function Collections(props) {
 													fetch(`${servicesBaseUrl}/collectionCollect?name=${name}`, {
 														method: 'POST'
 													}).then(response => {
-														websocket && websocket.readyState === 1 && websocket.send('tasks');
+														fetchTasks();
 													})
 												}}><Icon color='green' name='cloud download'/></Button>}/>
 									}
 									<DeleteModal
 										name={name}
 										onClose={() => {
-											websocket && websocket.readyState === 1 && websocket.send('collections');
-											setUpdateTasks(true);
+											fetchCollections();
+											setBoolPoll(true);
 										}}
 										onOpen={() => {
-											setUpdateTasks(false);
+											setBoolPoll(false);
 										}}
 										servicesBaseUrl={servicesBaseUrl}
 									/>
@@ -585,16 +683,17 @@ export function Collections(props) {
 				fields={fields}
 				licenseValid={licenseValid}
 				onClose={() => {
-					setUpdateTasks(true);
+					fetchAll();
+					setBoolPoll(true);
 				}}
 				onOpen={() => {
-					setUpdateTasks(false);
+					setBoolPoll(false);
 				}}
 				servicesBaseUrl={servicesBaseUrl}
+				setLicensedTo={setLicensedTo}
 				setLicenseValid={setLicenseValid}
 				siteOptions={siteOptions}
 				totalNumberOfCollections={queryCollectionsGraph.total}
-				websocket={websocket}
 			/>
 		</Dimmer.Dimmable>
 	</>;
