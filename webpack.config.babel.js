@@ -297,7 +297,7 @@ const WEBPACK_CONFIG = [webpackServerSideJs({
 	],
 	mode: MODE,
 	optimization: {
-    	minimizer: [
+    	minimizer: MODE === 'development' ? [] : [
 			new TerserPlugin(/*{
 				terserOptions: {
 					compress: {}
