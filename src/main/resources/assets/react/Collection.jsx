@@ -60,6 +60,10 @@ export function Collection(props) {
 	} = props;
 	//console.debug('Collection initialValues', initialValues);
 
+	if (initialValues.collector.configJson) {
+		initialValues.collector.config = JSON.parse(initialValues.collector.configJson);
+	}
+
 	const cronPath = 'cron';
 
 	return <EnonicForm

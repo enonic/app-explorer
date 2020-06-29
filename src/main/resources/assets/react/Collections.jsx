@@ -50,7 +50,6 @@ function NewOrEditModal(props) {
 		totalNumberOfCollections,
 		websocket
 	} = props;
-	//console.debug('NewOrEditModal totalNumberOfCollections', totalNumberOfCollections);
 	const [state, setState] = React.useState({
 		open: false
 	});
