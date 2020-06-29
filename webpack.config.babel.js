@@ -178,6 +178,7 @@ const SS_FILES = [
 	'src/main/resources/services/interfaceGet/interfaceGet',
 	'src/main/resources/services/interfaceList/interfaceList',
 	'src/main/resources/services/interfaceModify/interfaceModify',
+	'src/main/resources/services/longPolling/longPolling',
 	'src/main/resources/services/notifications/notifications',
 	'src/main/resources/services/stopWordsCreateOrUpdate/stopWordsCreateOrUpdate',
 	'src/main/resources/services/stopWordsDelete/stopWordsDelete',
