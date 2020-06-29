@@ -399,6 +399,9 @@ export function Collections(props) {
 				</Table.Header>
 				<Table.Body>
 					{queryCollectionsGraph.hits && queryCollectionsGraph.hits.map(({
+						_id,
+						_name,
+						_path,
 						collector,
 						//collecting,
 						documentCount,
@@ -407,7 +410,7 @@ export function Collections(props) {
 						displayName,
 						//id,
 						interfaces,
-						_name: name
+						name
 					}, index) => {
 						const key = `collection[${index}]`;
 
@@ -420,6 +423,9 @@ export function Collections(props) {
 								contentTypeOptions={contentTypeOptions}
 								disabled={disabled}
 								initialValues={{
+									_id,
+									_name,
+									_path,
 									name,
 									collector,
 									cron,

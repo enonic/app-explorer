@@ -41,6 +41,7 @@ const COLLECTIONS_GQL = `queryCollections {
 		doCollect
 		documentCount
 		interfaces
+		name
 		type
 	}
 }`;

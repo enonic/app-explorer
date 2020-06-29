@@ -16,17 +16,33 @@ export function post({
 	//log.info(`json:${json}`);
 
 	const obj = JSON.parse(json);
-	obj._name = obj.name;
+
+	const writeConnection = connect({
+		principals: [PRINCIPAL_EXPLORER_WRITE]
+	});
+
+	// WARNING If the uses changes name, this will trigger a failing rename!
+	//obj._name = obj.name;
+	if (obj.name !== obj._name) {
+		const moveParams = {
+			source: obj._path,
+			target: obj.name
+		};
+		//log.info(`moveParams:${toStr({moveParams})}`);
+		const boolMoved = writeConnection.move(moveParams);
+		if (boolMoved) {
+			obj._name = obj.name;
+		}
+	}
+
 	obj.collector.configJson = JSON.stringify(obj.collector.config); // ForceArray workaround:
 	//log.info(`obj:${toStr({obj})}`);
 
-	const params = collection(obj);
+	const params = collection(obj); // Strips _id, _path
 	//log.info(`params:${toStr({params})}`);
 
 	const node = modify({
-		__connection: connect({
-			principals: [PRINCIPAL_EXPLORER_WRITE]
-		}),
+		__connection: writeConnection,
 		...params
 	});
 

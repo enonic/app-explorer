@@ -1,4 +1,7 @@
+//import generateUuidv4 from 'uuid/v4';
+
 //import {toStr} from '/lib/util';
+//import {sanitize} from '/lib/xp/common';
 
 import {
 	NT_COLLECTION,
@@ -8,6 +11,7 @@ import {
 import {collection} from '/lib/explorer/model/2/nodeTypes/collection'
 import {connect} from '/lib/explorer/repo/connect';
 import {create} from '/lib/explorer/node/create';
+//import {createRandomNamed} from '/lib/explorer/node/createRandomNamed';
 
 
 export function post({
@@ -16,7 +20,12 @@ export function post({
 	//log.info(`json:${json}`);
 
 	const obj = JSON.parse(json);
+
+	// WARNING This sets the node _name to whatever the user typed, may conflict!!!
+	// But thats ok, we like collection repos to have recognizeable names.
 	obj._name = obj.name;
+	//obj._name = sanitize(generateUuidv4()); // This could conflict too, but highly improbable.
+
 	obj.collector.configJson = JSON.stringify(obj.collector.config); // ForceArray workaround:
 	//log.info(`obj:${toStr({obj})}`);
 
@@ -33,7 +42,8 @@ export function post({
 	const body = {};
 	let status = 200;
 	if (node) {
-		body.name = node._name;
+		//body.name = node._name; // Have no idea why I did this :)
+		body.name = node.name; // So lets do this instead :)
 		body.displayName = node.displayName;
 	} else {
 		body.error = `Something went wrong when trying to create collection ${name}`;
