@@ -25,7 +25,7 @@ export function post({
 	let status = 400;
 	if (node) {
 		let number = 1;
-		while(exists({
+		while(exists({ // WARNING This could theoretically go on for a while...
 			connection,
 			name: `${name}${number}`
 		})) {
@@ -35,6 +35,7 @@ export function post({
 
 		node._id = undefined;
 		node._name = `${name}${number}`;
+		node.name = node._name; // Make sure the duplicate can be renamed...
 		node.displayName = `${node.displayName} (duplicate ${number})`;
 		const createdNode = create({
 			__connection: connection,

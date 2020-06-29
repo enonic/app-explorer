@@ -114,7 +114,7 @@ function NewOrEditModal(props) {
 		fields,
 		initialValues,
 		licenseValid,
-		name,
+		_name,
 		onClose = () => {},
 		onOpen = () => {},
 		servicesBaseUrl,
@@ -137,8 +137,8 @@ function NewOrEditModal(props) {
 		onOpen={onOpen}
 		open={state.open}
 		size='large'
-		trigger={name ? <Popup
-			content={`Edit collection ${name}`}
+		trigger={_name ? <Popup
+			content={`Edit collection ${_name}`}
 			inverted
 			trigger={<Button
 				icon
@@ -161,7 +161,7 @@ function NewOrEditModal(props) {
 				/></Button>}
 	>{licenseValid || totalNumberOfCollections <= 3
 			? <>
-				<Modal.Header>{name ? `Edit collection ${name}`: 'New collection'}</Modal.Header>
+				<Modal.Header>{_name ? `Edit collection ${_name}`: 'New collection'}</Modal.Header>
 				<Modal.Content>
 					<Collection
 						collectorComponents={collectorComponents}
@@ -169,7 +169,7 @@ function NewOrEditModal(props) {
 						contentTypeOptions={contentTypeOptions}
 						fields={fields}
 						initialValues={initialValues}
-						mode={name ? 'modify' : 'create'}
+						mode={_name ? 'modify' : 'create'}
 						onClose={() => {
 							setState({open: false})
 							onClose();
@@ -190,7 +190,7 @@ function NewOrEditModal(props) {
 
 function DeleteModal(props) {
 	const {
-		name,
+		_name,
 		onClose,
 		onOpen = () => {},
 		servicesBaseUrl
@@ -206,19 +206,19 @@ function DeleteModal(props) {
 		onOpen={onOpen}
 		open={state.open}
 		trigger={<Popup
-			content={`Delete collection ${name}`}
+			content={`Delete collection ${_name}`}
 			inverted
 			trigger={<Button
 				icon
 				onClick={() => setState({open: true})}><Icon color='red' name='trash alternate outline'/></Button>}/>}
 	>
-		<Modal.Header>Delete collection {name}</Modal.Header>
+		<Modal.Header>Delete collection {_name}</Modal.Header>
 		<Modal.Content>
-			<Header as='h2'>Do you really want to delete {name}?</Header>
+			<Header as='h2'>Do you really want to delete {_name}?</Header>
 			<Button
 				compact
 				onClick={() => {
-					fetch(`${servicesBaseUrl}/collectionDelete?name=${name}`, {
+					fetch(`${servicesBaseUrl}/collectionDelete?name=${_name}`, {
 						method: 'DELETE'
 					}).then(response => {
 						//if (response.status === 200) {}
@@ -530,7 +530,7 @@ export function Collections(props) {
 								}}
 								fields={fields}
 								licenseValid={licenseValid}
-								name={name}
+								_name={_name}
 								onClose={() => {
 									fetchAll();
 									setBoolPoll(true);
@@ -563,50 +563,50 @@ export function Collections(props) {
 							<Table.Cell collapsing>
 								<Button.Group>
 									<Popup
-										content={`Duplicate collection ${name}`}
+										content={`Duplicate collection ${_name}`}
 										inverted
 										trigger={<Button icon onClick={() => {
-											fetch(`${servicesBaseUrl}/collectionDuplicate?name=${name}`, {
+											fetch(`${servicesBaseUrl}/collectionDuplicate?name=${_name}`, {
 												method: 'POST'
 											}).then(response => {
 												fetchCollections();
 											})
 										}}><Icon color='blue' name='copy'/></Button>}/>
-									{collectionsTaskState[name]
+									{collectionsTaskState[_name]
 										? {
 											WAITING: <Popup
 												content={`Collector is in waiting state`}
 												inverted
 												trigger={<Button disabled={disabled} icon><Icon color='yellow' name='pause'/></Button>}/>,
 											RUNNING: <Popup
-												content={`Stop collecting to ${name}`}
+												content={`Stop collecting to ${_name}`}
 												inverted
 												trigger={<Button disabled={disabled} icon onClick={() => {
-													fetch(`${servicesBaseUrl}/collectorStop?collectionName=${name}`, {
+													fetch(`${servicesBaseUrl}/collectorStop?collectionName=${_name}`, {
 														method: 'POST'
 													}).then(response => {
 														fetchTasks();
 													})
 												}}><Icon color='red' name='stop'/></Button>}/>,
 											FINISHED: <Popup
-												content={`Finished collecting to ${name}`}
+												content={`Finished collecting to ${_name}`}
 												inverted
 												trigger={<Button disabled={disabled} icon><Icon color='green' name='checkmark'/></Button>}/>,
 											FAILED: <Popup
-												content={`Something went wrong while collecting to ${name}`}
+												content={`Something went wrong while collecting to ${_name}`}
 												inverted
 												trigger={<Button disabled={disabled} icon><Icon color='red' name='warning'/></Button>}/>
-										}[collectionsTaskState[name]]
+										}[collectionsTaskState[_name]]
 										: anyTaskWithoutCollectionName
 											? <Popup
 												content={`Some collector task is starting...`}
 												inverted
 												trigger={<Button disabled={disabled} icon loading><Icon color='yellow' name='question'/></Button>}/>
 											: <Popup
-												content={`Start collecting to ${name}`}
+												content={`Start collecting to ${_name}`}
 												inverted
 												trigger={<Button disabled={disabled} icon onClick={() => {
-													fetch(`${servicesBaseUrl}/collectionCollect?name=${name}`, {
+													fetch(`${servicesBaseUrl}/collectionCollect?name=${_name}`, {
 														method: 'POST'
 													}).then(response => {
 														fetchTasks();
@@ -614,7 +614,7 @@ export function Collections(props) {
 												}}><Icon color='green' name='cloud download'/></Button>}/>
 									}
 									<DeleteModal
-										name={name}
+										_name={_name}
 										onClose={() => {
 											fetchCollections();
 											setBoolPoll(true);
