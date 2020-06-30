@@ -51,11 +51,11 @@ export const get = () => ({
 			// If a task fails in a uncontrolled way task.progress.info is just a string, not json.
 			task.progress.info = JSON.parse(task.progress.info);
 			if (!task.progress.info.currentTime) {
-				log.info('Setting new currentTime');
+				//log.info('Setting new currentTime');
 				task.progress.info.currentTime = currentTimeMillis();
 			}
 			if (!task.progress.info.startTime) {
-				log.info('Setting new startTime');
+				//log.info('Setting new startTime');
 				task.progress.info.startTime = task.progress.info.currentTime;
 			}
 			return task;

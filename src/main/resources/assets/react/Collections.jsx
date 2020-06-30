@@ -266,7 +266,7 @@ export function Collections(props) {
 	});
 
 
-	const collectorOptions = queryCollectorsGraph.hits
+	let collectorOptions = queryCollectorsGraph.hits
 		? queryCollectorsGraph.hits.map(({
 			_name: key,
 			displayName: text

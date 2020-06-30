@@ -16,7 +16,7 @@ exports.delete = ({
 	const body = {};
 	let status = 200;
 	try {
-		log.info(`synonymDelete id:${id}`);
+		//log.info(`synonymDelete id:${id}`);
 		if(!id) throw new Error(`Missing required param id!`);
 		const deleteRes = remove({
 			connection: connect({

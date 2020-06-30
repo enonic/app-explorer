@@ -30,7 +30,7 @@ export function post({
 			name: `${name}${number}`
 		})) {
 			number++;
-			log.info(`number:${number}`);
+			//log.info(`number:${number}`);
 		}
 
 		node._id = undefined;
