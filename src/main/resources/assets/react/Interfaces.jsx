@@ -6,6 +6,47 @@ import {DeleteModal} from './interfaces/DeleteModal';
 import {SearchModal} from './interfaces/SearchModal';
 
 
+const INTERFACES_GQL = `queryInterfaces {
+	total
+	count
+	hits {
+		_id
+		_name
+		_path
+		displayName
+		filters {
+			must {
+				filter
+				params {
+					field
+					values
+				}
+			}
+			mustNot {
+				filter
+				params {
+					field
+					values
+				}
+			}
+		}
+		queryJson
+		resultMappings {
+			field
+			highlight
+			lengthLimit
+			to
+			type
+		}
+		type
+	}
+}`;
+
+const ALL_GQL = `{
+	${INTERFACES_GQL}
+}`;
+
+
 export class Interfaces extends React.Component {
 	constructor(props) {
 		//console.debug('Interfaces constructor');
