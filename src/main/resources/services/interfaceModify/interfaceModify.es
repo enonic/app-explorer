@@ -1,3 +1,5 @@
+import {sanitize} from '/lib/xp/common';
+
 import {
 	PRINCIPAL_EXPLORER_WRITE,
 	RT_JSON
@@ -21,16 +23,38 @@ export function post({
 		return jsonError('Missing required parameter json!');
 	}
 	const obj = JSON.parse(json);
-	obj.__connection = connect({principals: [PRINCIPAL_EXPLORER_WRITE]}); // eslint-disable-line no-underscore-dangle
-	//obj._name = name; // This would cause a rename, which is not a modify, so it fails!
-	obj.displayName = obj.name;
+
+	const writeConnection = connect({
+		principals: [PRINCIPAL_EXPLORER_WRITE]
+	});
+
+	const origNode = writeConnection.get(id);
+	if (!origNode) {
+		throw new Error(`Could not get original interface node to modify! id:${id}`);
+	}
+
+	obj._name = sanitize(obj.displayName);
+
+	if (obj._name !== origNode._name) { // _name changed
+		const moveParams = {
+			source: origNode._path,
+			target: obj._name
+		};
+		//log.info(`moveParams:${toStr({moveParams})}`);
+		const boolMoved = writeConnection.move(moveParams);
+		if (!boolMoved) {
+			throw new Error(`Unable to rename interface from ${origNode._name} to ${obj._name}!`);
+		}
+	}
+
+	obj.__connection = writeConnection; // eslint-disable-line no-underscore-dangle
 	const node = modify(interfaceModel(obj));
 	const body = {};
 	let status = 200;
 	if (node) {
-		body.message = `Interface ${obj.name} updated.`
+		body.message = `Interface ${obj._name} updated.`
 	} else {
-		body.error = `Something went wrong when trying to update interface ${obj.name}!`
+		body.error = `Something went wrong when trying to update interface ${obj._name}!`
 	}
 	return {
 		body,

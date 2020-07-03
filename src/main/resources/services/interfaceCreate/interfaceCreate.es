@@ -18,15 +18,14 @@ export function post({
 	}
 	const obj = JSON.parse(json);
 	obj.__connection = connect({principals: [PRINCIPAL_EXPLORER_WRITE]}); // eslint-disable-line no-underscore-dangle
-	obj._name = obj.name;
-	obj.displayName = obj.name;
-	const node = create(interfaceModel(obj));
+	obj._name = obj.displayName;
+	const node = create(interfaceModel(obj)); // This will sanitize _name
 	const body = {};
 	let status = 200;
 	if (node) {
-		body.message = `Interface ${obj.name} created.`
+		body.message = `Interface ${obj._name} created.`
 	} else {
-		body.error = `Something went wrong when trying to create interface ${obj.name}!`
+		body.error = `Something went wrong when trying to create interface ${obj._name}!`
 	}
 	return {
 		body,

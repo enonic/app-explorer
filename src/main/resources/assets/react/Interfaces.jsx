@@ -82,8 +82,8 @@ export class Interfaces extends React.Component {
 				</Table.Header>
 				<Table.Body>
 					{hits.map((initialValues, index) => {
-						const {displayName, id, name} = initialValues;
-						//console.debug({displayName, name, index});
+						const {displayName, _id, _name} = initialValues;
+						//console.debug({displayName, _name, index});
 						return <Table.Row key={index}>
 							<Table.Cell collapsing>{displayName}</Table.Cell>
 							<Table.Cell collapsing>
@@ -92,7 +92,7 @@ export class Interfaces extends React.Component {
 										collectionOptions={collectionOptions}
 										displayName={displayName}
 										fieldsObj={fieldsObj}
-										id={id}
+										id={_id}
 										afterClose={() => this.updateInterfaces()}
 										licenseValid={licenseValid}
 										servicesBaseUrl={servicesBaseUrl}
@@ -103,16 +103,16 @@ export class Interfaces extends React.Component {
 										total={total}
 									/>
 									<SearchModal
-										interfaceName={name}
+										interfaceName={_name}
 										servicesBaseUrl={servicesBaseUrl}
 									/>
 									<CopyModal
-										name={name}
+										name={_name}
 										updateInterfaces={() => this.updateInterfaces()}
 										servicesBaseUrl={servicesBaseUrl}
 									/>
 									<DeleteModal
-										name={name}
+										name={_name}
 										onClose={() => this.updateInterfaces()}
 										servicesBaseUrl={servicesBaseUrl}
 									/>

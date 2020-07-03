@@ -73,13 +73,15 @@ export function get() {
 
 	const interfaces = query({connection});
 	interfaces.hits = interfaces.hits.map(({
-		_id: id,
-		_name: name,
+		_id,
+		_name,
 		displayName
 	}) => ({
+		_id,
+		_name,
 		displayName,
-		id,
-		name
+		id: _id,
+		name: _name
 	}));
 
 	const stopWordOptions = getStopWords({connection}).hits.map(({displayName, name}) => ({

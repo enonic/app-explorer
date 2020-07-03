@@ -34,7 +34,7 @@ export function NewOrEditInterface(props) {
 			displayName: '',
 			facets: [],
 			filters: {},
-			name: '',
+			_name: '',
 			//query,
 			resultMappings: [{
 				field: '',
@@ -91,7 +91,7 @@ export function NewOrEditInterface(props) {
 				<Input
 					fluid
 					label={{basic: true, content: 'Name'}}
-					path='name'
+					path='displayName'
 					placeholder='Please input name'
 				/>
 			</Form.Field>
