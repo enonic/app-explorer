@@ -12,7 +12,9 @@ import {UploadLicense} from './UploadLicense';
 import {useInterval} from './utils/useInterval';
 
 
-const COLLECTIONS_GQL = `queryCollections {
+const COLLECTIONS_GQL = `queryCollections(
+	count: -1
+) {
 	total
 	count
 	page
@@ -38,7 +40,6 @@ const COLLECTIONS_GQL = `queryCollections {
 		doCollect
 		documentCount
 		interfaces
-		name
 		type
 	}
 }`;
@@ -526,6 +527,7 @@ export function Collections(props) {
 									name,
 									collector,
 									cron,
+									displayName,
 									doCollect
 								}}
 								fields={fields}

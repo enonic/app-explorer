@@ -63,8 +63,7 @@ const COLLECTION_OBJECT_TYPE = createObjectType({
 		}))},
 		doCollect: { type: GraphQLBoolean },
 		documentCount: { type: nonNull(GraphQLInt) },
-		interfaces: { type: list(GraphQLString)},
-		name: { type: nonNull(GraphQLString) }
+		interfaces: { type: list(GraphQLString)}
 	}
 }); // COLLECTION_OBJECT_TYPE
 
@@ -115,7 +114,6 @@ export const queryCollectionsResolver = ({
 		cron,
 		displayName,
 		doCollect,
-		name,
 		type
 	}) => ({
 		_id,
@@ -128,7 +126,6 @@ export const queryCollectionsResolver = ({
 		doCollect,
 		documentCount: getDocumentCount(_name),
 		interfaces: usedInInterfaces({connection, name: _name}),
-		name,
 		type
 	}));
 	//log.info(`mapped collectionsRes:${toStr(collectionsRes)}`);
@@ -197,7 +194,6 @@ export const queryCollections = {
 			doCollect
 			documentCount
 			interfaces
-			name
 			type
 		}
 	}

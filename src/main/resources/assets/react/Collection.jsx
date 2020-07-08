@@ -41,7 +41,7 @@ export function Collection(props) {
 		servicesBaseUrl,
 		siteOptions,
 		initialValues = {
-			name: '',
+			displayName: '',
 			collector: {
 				name: ''//,
 				//taskName: 'collect'//, // TODO
@@ -94,8 +94,8 @@ export function Collection(props) {
 			<Header as='h1' dividing content='Collection' id='collection'/>
 			<Input
 				fluid
-				label='Name'
-				path='name'
+				label='Display name'
+				path='displayName'
 			/>
 			<Header as='h2' dividing content='Collector'/>
 			<CollectorSelector

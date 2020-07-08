@@ -95,7 +95,7 @@ export function run({
 }) {
 	DEBUG && log.info(toStr({name, collectorId, configJson}));
 
-	const collector = new Collector({name, collectorId, configJson})
+	const collector = new Collector({name, collectorId, configJson});
 	if (!collector.config.baseUri) { throw new Error('Config is missing required parameter baseUri!'); }
 	collector.start();
 

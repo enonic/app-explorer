@@ -1,4 +1,5 @@
 //import {toStr} from '/lib/util';
+import {sanitize} from '/lib/xp/common';
 
 import {
 	NT_COLLECTION,
@@ -21,17 +22,16 @@ export function post({
 		principals: [PRINCIPAL_EXPLORER_WRITE]
 	});
 
-	// WARNING If the uses changes name, this will trigger a failing rename!
-	//obj._name = obj.name;
-	if (obj.name !== obj._name) {
+	const sanitizedName = sanitize(obj.displayName);
+	if (sanitizedName !== obj._name) {
 		const moveParams = {
 			source: obj._path,
-			target: obj.name
+			target: sanitizedName
 		};
 		//log.info(`moveParams:${toStr({moveParams})}`);
 		const boolMoved = writeConnection.move(moveParams);
 		if (boolMoved) {
-			obj._name = obj.name;
+			obj._name = sanitizedName;
 		}
 	}
 
