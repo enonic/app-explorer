@@ -266,7 +266,11 @@ export function Collections(props) {
 		}
 	});
 
+	//console.debug('collectorComponents', collectorComponents);
+	const intInitializedCollectorComponents = Object.keys(collectorComponents).length;
+	//console.debug('intInitializedCollectorComponents', intInitializedCollectorComponents);
 
+	//console.debug('queryCollectorsGraph', queryCollectorsGraph);
 	let collectorOptions = queryCollectorsGraph.hits
 		? queryCollectorsGraph.hits.map(({
 			_name: key,
@@ -507,19 +511,23 @@ export function Collections(props) {
 						doCollect,
 						displayName,
 						//id,
-						interfaces,
-						name
+						interfaces
 					}, index) => {
 						const key = `collection[${index}]`;
 
-						const disabled = !(collector.name && collectorOptions.filter(({key}) => collector.name).length);
+						const boolCollectorSelected = !!(collector && collector.name);
+						//console.debug('boolCollectorSelected', boolCollectorSelected);
+						const boolCollectorSelectedAndInitialized = boolCollectorSelected && collectorComponents[collector.name];
+						//console.debug('boolCollectorSelectedAndInitialized', boolCollectorSelectedAndInitialized);
+
+						const editEnabled = intInitializedCollectorComponents && (boolCollectorSelectedAndInitialized || !boolCollectorSelected);
 
 						return <Table.Row key={key}>
 							<Table.Cell collapsing><NewOrEditModal
 								collectorOptions={collectorOptions}
 								collectorComponents={collectorComponents}
 								contentTypeOptions={contentTypeOptions}
-								disabled={disabled}
+								disabled={!editEnabled}
 								initialValues={{
 									_id,
 									_name,
@@ -579,11 +587,11 @@ export function Collections(props) {
 											WAITING: <Popup
 												content={`Collector is in waiting state`}
 												inverted
-												trigger={<Button disabled={disabled} icon><Icon color='yellow' name='pause'/></Button>}/>,
+												trigger={<Button disabled={!boolCollectorSelectedAndInitialized} icon><Icon color='yellow' name='pause'/></Button>}/>,
 											RUNNING: <Popup
 												content={`Stop collecting to ${_name}`}
 												inverted
-												trigger={<Button disabled={disabled} icon onClick={() => {
+												trigger={<Button disabled={!boolCollectorSelectedAndInitialized} icon onClick={() => {
 													fetch(`${servicesBaseUrl}/collectorStop?collectionName=${_name}`, {
 														method: 'POST'
 													}).then(response => {
@@ -593,21 +601,21 @@ export function Collections(props) {
 											FINISHED: <Popup
 												content={`Finished collecting to ${_name}`}
 												inverted
-												trigger={<Button disabled={disabled} icon><Icon color='green' name='checkmark'/></Button>}/>,
+												trigger={<Button disabled={!boolCollectorSelectedAndInitialized} icon><Icon color='green' name='checkmark'/></Button>}/>,
 											FAILED: <Popup
 												content={`Something went wrong while collecting to ${_name}`}
 												inverted
-												trigger={<Button disabled={disabled} icon><Icon color='red' name='warning'/></Button>}/>
+												trigger={<Button disabled={!boolCollectorSelectedAndInitialized} icon><Icon color='red' name='warning'/></Button>}/>
 										}[collectionsTaskState[_name]]
 										: anyTaskWithoutCollectionName
 											? <Popup
 												content={`Some collector task is starting...`}
 												inverted
-												trigger={<Button disabled={disabled} icon loading><Icon color='yellow' name='question'/></Button>}/>
+												trigger={<Button disabled={!boolCollectorSelectedAndInitialized} icon loading><Icon color='yellow' name='question'/></Button>}/>
 											: <Popup
 												content={`Start collecting to ${_name}`}
 												inverted
-												trigger={<Button disabled={disabled} icon onClick={() => {
+												trigger={<Button disabled={!boolCollectorSelectedAndInitialized} icon onClick={() => {
 													fetch(`${servicesBaseUrl}/collectionCollect?name=${_name}`, {
 														method: 'POST'
 													}).then(response => {
@@ -681,7 +689,7 @@ export function Collections(props) {
 				collectorOptions={collectorOptions}
 				collectorComponents={collectorComponents}
 				contentTypeOptions={contentTypeOptions}
-				disabled={collectorOptions.length === 0}
+				disabled={!intInitializedCollectorComponents}
 				fields={fields}
 				licenseValid={licenseValid}
 				onClose={() => {
