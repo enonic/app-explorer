@@ -124,6 +124,7 @@ function NewOrEditModal(props) {
 		siteOptions,
 		totalNumberOfCollections
 	} = props;
+	//console.debug('totalNumberOfCollections',totalNumberOfCollections);
 	const [state, setState] = React.useState({
 		open: false
 	});
@@ -160,7 +161,7 @@ function NewOrEditModal(props) {
 				}}><Icon
 					name='plus'
 				/></Button>}
-	>{licenseValid || totalNumberOfCollections <= 3
+	>{licenseValid || totalNumberOfCollections <= 2 // This means it will be allowed to create collection 3, but not number 4
 			? <>
 				<Modal.Header>{_name ? `Edit collection ${_name}`: 'New collection'}</Modal.Header>
 				<Modal.Content>
