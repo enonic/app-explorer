@@ -12,7 +12,7 @@
   },
   "devDependencies": {
     "@enonic/semantic-ui-react-form": "0.0.4",
-    "@enonic/webpack-esm-assets": "^0.1.0",
+    "@enonic/webpack-esm-assets": "^0.4.0",
     "@enonic/webpack-server-side-js": "^0.1.4",
     "@enonic/webpack-style-assets": "^0.0.5",
     "array.prototype.find": "^2.1.0",
