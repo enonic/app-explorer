@@ -46,10 +46,10 @@ const NODE_MODULES = [{
 },{
 	header: 'React and React-dom',
 	href: 'https://github.com/facebook/react/blob/master/LICENSE'
-},{
+},/*{
 	header: 'react-scrollspy',
 	href: 'https://github.com/makotot/react-scrollspy/blob/master/LICENSE'
-},{
+},*/{
 	header: 'Semantic UI',
 	href: 'https://github.com/Semantic-Org/Semantic-UI/blob/master/LICENSE.md'
 },{

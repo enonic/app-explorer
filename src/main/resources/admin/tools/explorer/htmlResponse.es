@@ -119,6 +119,11 @@ services: {}, // Workaround for i18nUrl BUG
 		});
 	});
 </script>
+<script src="https://cdn.jsdelivr.net/gh/cferdinandi/smooth-scroll/dist/smooth-scroll.polyfills.min.js"></script>
+
+<script type="text/javascript">
+	var scroll = new SmoothScroll('a[href*="#"]');
+</script>
 */
 
 	return {
@@ -138,13 +143,6 @@ services: {}, // Workaround for i18nUrl BUG
 			jQuery = $; // Needed by semantic-ui
 		</script>
 		<script type="text/javascript" src="${assetUrl({path: 'semantic-ui/semantic.js'})}"></script>
-
-		<script src="https://cdn.jsdelivr.net/gh/cferdinandi/smooth-scroll/dist/smooth-scroll.polyfills.min.js"></script>
-
-		<script type="text/javascript">
-    		var scroll = new SmoothScroll('a[href*="#"]');
-		</script>
-
 		<script type='module' defer>
 			import {Explorer} from '${assetUrl({path: 'react/Explorer.esm.js'})}';
 			const propsObj = eval(${serialize(propsObj)});
