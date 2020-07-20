@@ -34,7 +34,7 @@
     "less": "^3.11.3",
     "moment": "^2.25.3",
     "pretty-ms": "^7.0.0",
-    "react": "16.8.4",
+    "react": "16.13.1",
     "react-dom": "16.8.4",
     "react-scrollspy": "^3.4.2",
     "semantic-ui-react": "0.87.3",
