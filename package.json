@@ -35,7 +35,7 @@
     "moment": "^2.27.0",
     "pretty-ms": "^7.0.0",
     "react": "16.8.4",
-    "react-dom": "16.8.4",
+    "react-dom": "16.13.0",
     "react-scrollspy": "^3.4.2",
     "semantic-ui-react": "0.87.3",
     "serialize-javascript": "^3.0.0",
