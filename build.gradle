@@ -140,6 +140,7 @@ processResources {
 	exclude '**/*.css'
 	exclude '**/*.es'
 	exclude '**/*.js'
+	exclude '**/*.jsx'
 	exclude '**/*.less'
 	exclude '**/*.sass'
 	exclude '**/*.scss'
