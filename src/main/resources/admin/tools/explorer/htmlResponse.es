@@ -77,6 +77,48 @@ services: {}, // Workaround for i18nUrl BUG
 };
 </script>
 <script type="text/javascript" src="${getLauncherPath()}" async></script>
+
+<script type="text/javascript" src="${assetUrl({path: 'js/tablesort.js'})}"></script>
+<script type="text/javascript">
+	/*$(document).ready(function() {
+		$('select.dropdown').dropdown();
+		$('table').tablesort();
+
+		const headerHeight = parseInt($('header').css('height'));
+		$('#mySidebar').css('padding-top', headerHeight);
+		//$('#myPusher').css('margin-top', headerHeight);
+		$('#myPusher').css('padding', 14);
+		$('#myPusher').css('padding-top', 14 + headerHeight);
+
+		if ($('#mySidebar').sidebar('is mobile')) {
+			$('#mySidebar').sidebar({
+				closable: true,
+				dimPage: true,
+				mobileTransition: 'overlay',
+				onHide: () => $('#myIcon').removeClass('close').addClass('sidebar'),
+				onVisible: () => $('#myIcon').removeClass('sidebar').addClass('close')
+			});
+			$('#myPusher').css('width', 'auto');
+			$('#mySidebar').sidebar('hide');
+		} else {
+			$('#mySidebar').sidebar({
+				closable: false,
+				dimPage: false,
+				onHide: () => $('#myIcon').removeClass('close').addClass('sidebar'),
+				onVisible: () => $('#myIcon').removeClass('sidebar').addClass('close'),
+				transition: 'push'
+			});
+		}
+
+		jQuery(window).resize(function() {
+			if (Math.max(document.documentElement.clientWidth, window.innerWidth || 0) < 768) {
+				$('#mySidebar').sidebar('hide');
+			} else {
+				$('#mySidebar').sidebar('show');
+			}
+		});
+	});
+</script>
 */
 
 	return {
@@ -93,51 +135,9 @@ services: {}, // Workaround for i18nUrl BUG
 		<script type="text/javascript" src="${assetUrl({path: 'explorer.js'})}"></script>
 		<script type="text/javascript" src="${assetUrl({path: 'jquery/jquery.js'})}"></script>
 		<script type="text/javascript">
-			jQuery = $;
+			jQuery = $; // Needed by semantic-ui
 		</script>
 		<script type="text/javascript" src="${assetUrl({path: 'semantic-ui/semantic.js'})}"></script>
-		<script type="text/javascript" src="${assetUrl({path: 'js/tablesort.js'})}"></script>
-		<script type="text/javascript">
-			/*$(document).ready(function() {
-				$('select.dropdown').dropdown();
-				$('table').tablesort();
-
-				const headerHeight = parseInt($('header').css('height'));
-				$('#mySidebar').css('padding-top', headerHeight);
-				//$('#myPusher').css('margin-top', headerHeight);
-				$('#myPusher').css('padding', 14);
-				$('#myPusher').css('padding-top', 14 + headerHeight);
-
-				if ($('#mySidebar').sidebar('is mobile')) {
-					$('#mySidebar').sidebar({
-						closable: true,
-						dimPage: true,
-						mobileTransition: 'overlay',
-						onHide: () => $('#myIcon').removeClass('close').addClass('sidebar'),
-						onVisible: () => $('#myIcon').removeClass('sidebar').addClass('close')
-					});
-					$('#myPusher').css('width', 'auto');
-					$('#mySidebar').sidebar('hide');
-				} else {
-					$('#mySidebar').sidebar({
-						closable: false,
-						dimPage: false,
-						onHide: () => $('#myIcon').removeClass('close').addClass('sidebar'),
-						onVisible: () => $('#myIcon').removeClass('sidebar').addClass('close'),
-						transition: 'push'
-					});
-				}
-
-				jQuery(window).resize(function() {
-					if (Math.max(document.documentElement.clientWidth, window.innerWidth || 0) < 768) {
-						$('#mySidebar').sidebar('hide');
-					} else {
-						$('#mySidebar').sidebar('show');
-					}
-				});
-			});*/
-		</script>
-
 
 		<script src="https://cdn.jsdelivr.net/gh/cferdinandi/smooth-scroll/dist/smooth-scroll.polyfills.min.js"></script>
 
