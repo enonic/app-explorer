@@ -12,7 +12,7 @@
     "yup": "^0.29.1"
   },
   "devDependencies": {
-    "@babel/preset-react": "7.0.0",
+    "@babel/preset-react": "7.10.4",
     "@enonic/semantic-ui-react-form": "0.0.4",
     "@enonic/webpack-esm-assets": "^0.4.0",
     "@enonic/webpack-server-side-js": "^0.1.4",
