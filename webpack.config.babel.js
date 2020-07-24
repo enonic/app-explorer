@@ -43,6 +43,9 @@ if(MODE === 'production') {
 	}));
 }
 
+const NODE_MODULES_CONTEXT = path.resolve(__dirname, 'node_modules');
+const ASSETS_CONTEXT = path.resolve(__dirname, SRC_DIR, 'assets');
+
 const CLIENT_JS_CONFIG = {
 	context: SRC_ASSETS_DIR_ABS,
 	entry: './react/index.jsx',
@@ -96,22 +99,22 @@ const CLIENT_JS_CONFIG = {
 		hints: false
 	},
 	plugins: [
-		new CopyWebpackPlugin([
-			//{ from: 'frappe-gantt/dist/*', to: 'frappe-gantt/[name].[ext]' },
-			{ from: 'jquery/dist', to: 'jquery'},
-			{ from: 'react/umd/react.*.js', to: 'react/[name].[ext]' },
-			{ from: 'react-dom/umd/react-dom.*.js', to: 'react-dom/[name].[ext]' },
+		new CopyWebpackPlugin({
+			patterns: [
+				//{ context: NODE_MODULES_CONTEXT, from: 'frappe-gantt/dist/*', to: 'frappe-gantt/[name].[ext]' },
+				{ context: NODE_MODULES_CONTEXT, from: 'jquery/dist', to: 'jquery'},
+				{ context: NODE_MODULES_CONTEXT, from: 'react/umd/react.*.js', to: 'react/[name].[ext]' },
+				{ context: NODE_MODULES_CONTEXT, from: 'react-dom/umd/react-dom.*.js', to: 'react-dom/[name].[ext]' },
 
-			//{ from: 'semantic-ui/dist', to: 'semantic-ui'},
-			{ from: 'semantic-ui-css/semantic*', to: 'semantic-ui/[name].[ext]'},
-			{ from: 'semantic-ui-css/themes', to: 'semantic-ui/themes'},
-		], {
-			context: path.resolve(__dirname, 'node_modules')
+				//{ context: NODE_MODULES_CONTEXT, from: 'semantic-ui/dist', to: 'semantic-ui'},
+				{ context: NODE_MODULES_CONTEXT, from: 'semantic-ui-css/semantic*', to: 'semantic-ui/[name].[ext]'},
+				{ context: NODE_MODULES_CONTEXT, from: 'semantic-ui-css/themes', to: 'semantic-ui/themes'},
+			]
 		}),
-		new CopyWebpackPlugin([
-			{ from: 'js', to: 'js'}
-		], {
-			context: path.resolve(__dirname, SRC_DIR, 'assets')
+		new CopyWebpackPlugin({
+			patterns: [
+				{ context: ASSETS_CONTEXT, from: 'js', to: 'js'}
+			]
 		})
 	],
 	resolve: {
