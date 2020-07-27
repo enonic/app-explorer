@@ -124,6 +124,19 @@ services: {}, // Workaround for i18nUrl BUG
 <script type="text/javascript">
 	var scroll = new SmoothScroll('a[href*="#"]');
 </script>
+<script type="text/javascript" src="${assetUrl({path: 'jquery/jquery.js'})}"></script>
+<script type="text/javascript">
+	jQuery = $; // Needed by semantic-ui
+</script>
+<script type="text/javascript" src="${assetUrl({path: 'semantic-ui/semantic.js'})}"></script>
+<!--script type="text/javascript" src="${assetUrl({path: 'semantic-ui-react/umd/semantic-ui-react.min.js'})}"></script-->
+<!--script type="text/javascript" src="${assetUrl({path: 'semantic-ui-react/commonjs/index.js'})}"></script-->
+<!--script type="text/javascript" src="${assetUrl({path: 'semantic-ui-react/commonjs/umd.js'})}"></script-->
+//import * from '${assetUrl({path: 'semantic-ui-react/umd/semantic-ui-react.min.js'})}';
+//import {Header} from '${assetUrl({path: 'semantic-ui-react/commonjs/index.js'})}';
+//import {Header, Icon, List, Menu, Modal, Popup, Sidebar} from '${assetUrl({path: 'semantic-ui-react/commonjs/umd.js'})}';
+//import {Header, Icon, List, Menu, Modal, Popup, Sidebar} from '${assetUrl({path: 'semantic-ui-react/es/index.js'})}';
+//const semantic = {Header, Icon, List, Menu, Modal, Popup, Sidebar};
 */
 
 	return {
@@ -132,17 +145,12 @@ services: {}, // Workaround for i18nUrl BUG
 		<script type="text/javascript" src="${assetUrl({path: 'react/react.development.js'})}"></script>
 		<script type="text/javascript" src="${assetUrl({path: 'react-dom/react-dom.development.js'})}"></script>
 		<link rel="shortcut icon" href="${assetUrl({path: 'favicon.ico'})}">
-		<link rel="stylesheet" type="text/css" href="${assetUrl({path: 'semantic-ui/semantic.css'})}">
+		<link rel="stylesheet" type="text/css" href="${assetUrl({path: 'semantic-ui-css/semantic.css'})}">
 		<title>${preTitle}Explorer</title>
 	</head>
 	<body style="background-color: white !important;">
 		<div id="${ID_REACT_EXPLORER_CONTAINER}"/>
 		<script type="text/javascript" src="${assetUrl({path: 'explorer.js'})}"></script>
-		<script type="text/javascript" src="${assetUrl({path: 'jquery/jquery.js'})}"></script>
-		<script type="text/javascript">
-			jQuery = $; // Needed by semantic-ui
-		</script>
-		<script type="text/javascript" src="${assetUrl({path: 'semantic-ui/semantic.js'})}"></script>
 		<script type='module' defer>
 			import {Explorer} from '${assetUrl({path: 'react/Explorer.esm.js'})}';
 			const propsObj = eval(${serialize(propsObj)});
