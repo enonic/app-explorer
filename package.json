@@ -14,7 +14,7 @@
   },
   "devDependencies": {
     "@babel/preset-react": "7.10.4",
-    "@enonic/semantic-ui-react-form": "0.0.4",
+    "@enonic/semantic-ui-react-form": "1.0.0",
     "@enonic/webpack-esm-assets": "^0.4.0",
     "@enonic/webpack-server-side-js": "^0.1.4",
     "@enonic/webpack-style-assets": "^0.0.5",
