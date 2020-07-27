@@ -20,7 +20,7 @@
     "@enonic/webpack-style-assets": "^0.0.5",
     "array.prototype.find": "^2.1.0",
     "babel-eslint": "^10.1.0",
-    "browser-sync": "^2.26.10",
+    "browser-sync": "^2.26.12",
     "browser-sync-webpack-plugin": "^2.2.2",
     "caniuse-lite": "^1.0.30001105",
     "classnames": "^2.2.6",
