@@ -22,7 +22,7 @@
     "babel-eslint": "^10.1.0",
     "browser-sync": "^2.26.12",
     "browser-sync-webpack-plugin": "^2.2.2",
-    "caniuse-lite": "^1.0.30001107",
+    "caniuse-lite": "^1.0.30001109",
     "classnames": "^2.2.6",
     "copy-webpack-plugin": "^6.0.3",
     "doctoc": "^1.4.0",
