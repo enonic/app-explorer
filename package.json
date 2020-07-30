@@ -43,7 +43,7 @@
     "traverse": "^0.6.6",
     "tslib": "^2.0.0",
     "uuid": "^3.4.0",
-    "webpack": "^4.44.0"
+    "webpack": "^4.44.1"
   },
   "name": "TODO",
   "private": true,
