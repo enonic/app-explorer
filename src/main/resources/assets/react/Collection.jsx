@@ -24,7 +24,7 @@ function required(value) {
 
 
 const SCHEMA = {
-	name: (v) => required(v)
+	displayName: (v) => required(v)
 };
 
 
