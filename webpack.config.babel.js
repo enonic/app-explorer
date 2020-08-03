@@ -36,6 +36,7 @@ const STATS = {
 const CS_MINIMIZER = [];
 if(MODE === 'production') {
 	CS_MINIMIZER.push(new TerserPlugin({
+		extractComments: false,
 		terserOptions: {
 			compress: {},
 			mangle: true // Note `mangle.properties` is `false` by default.
@@ -270,12 +271,13 @@ const WEBPACK_CONFIG = [webpackServerSideJs({
 	serverSideFiles: SS_FILES,
 	optimization: {
     	minimizer: [
-			new TerserPlugin(/*{
-				terserOptions: {
+			new TerserPlugin({
+				extractComments: false
+				/*terserOptions: {
 					compress: {}
 					//mangle: true // This will DESTROY exports!
-				}
-			}*/)
+				}*/
+			})
 		]
 	},
 	plugins: SS_PLUGINS,
@@ -302,12 +304,13 @@ const WEBPACK_CONFIG = [webpackServerSideJs({
 	mode: MODE,
 	optimization: {
     	minimizer: MODE === 'development' ? [] : [
-			new TerserPlugin(/*{
-				terserOptions: {
+			new TerserPlugin({
+				extractComments: false
+				/*terserOptions: {
 					compress: {}
 					//mangle: true // This will DESTROY exports!
-				}
-			}*/)
+				}*/
+			})
 		]
 	},
 	plugins: MODE === 'development' ? [
