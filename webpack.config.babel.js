@@ -50,9 +50,10 @@ const ASSETS_CONTEXT = path.resolve(__dirname, SRC_DIR, 'assets');
 const CLIENT_JS_CONFIG = {
 	context: SRC_ASSETS_DIR_ABS,
 	entry: './react/index.jsx',
-	externals: [
-		//'react' // semantic-ui-react fails if this is commented in
-	],
+	externals: {
+		react: 'React',
+		'react-dom': 'ReactDOM'
+	},
 	devtool: false, // Don't waste time generating sourceMaps
 	//devtool: 'source-map',
 	mode: MODE,
@@ -292,15 +293,18 @@ const WEBPACK_CONFIG = [webpackServerSideJs({
 		'src/main/resources/assets/react/Explorer.jsx',
 		'src/main/resources/assets/react/WebCrawler.jsx'
 	],
-	externals: [
-		// Unable to load these via script or module:
+	externals: {
+		react: 'React',
+		'react-dom': 'ReactDOM'
+	},
+	/*
+		// Unable to load these via script or module?
 		//'formik',
 		//'semantic-ui-react',
-		//'react',
 		//'react-scrollspy',
 		//'uuid/v4',
 		//'traverse'
-	],
+	*/
 	mode: MODE,
 	optimization: {
     	minimizer: MODE === 'development' ? [] : [
