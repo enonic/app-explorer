@@ -58,8 +58,7 @@ export function Fulltext(props) {
 					</Table.Header>
 					<Table.Body>{fieldsArray.map(({
 						boost,
-						field//,
-						//uuid4
+						field
 					}, index) => {
 						//console.debug('Fulltext boost', boost, 'field', field, 'index', index);
 						const key = `${fieldsPath}.${index}`;
@@ -81,8 +80,7 @@ export function Fulltext(props) {
 										index={index}
 										value={{
 											field: '_allText',
-											boost: ''//,
-											//uuid4: generateUuidv4()
+											boost: ''
 										}}
 									/>
 									<MoveDownButton

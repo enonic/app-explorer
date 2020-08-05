@@ -55,8 +55,7 @@ export function QueryBuilder(props) {
 					params = {
 						fields: [{
 							field: '_allText',
-							boost: ''//,
-							//uuid4: generateUuidv4()
+							boost: ''
 						}],
 						operator: newType === 'synonyms' ? 'or' : 'and'
 					};

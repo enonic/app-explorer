@@ -1,5 +1,3 @@
-//import generateUuidv4 from 'uuid/v4';
-
 //import {toStr} from '/lib/util';
 import {sanitize} from '/lib/xp/common';
 

@@ -32,8 +32,7 @@ export function Logic(props) {
 				path={expressionsPath}
 				value={{
 					params: {},
-					type: ''//,
-					//uuid4: generateUuidv4()
+					type: ''
 				}}
 			>
 				<Icon color='green' name='add'/>Add expression
@@ -71,8 +70,7 @@ export function Logic(props) {
 									path={expressionsPath}
 									value={{
 										params: {},
-										type: ''//,
-										//uuid4: generateUuidv4()
+										type: ''
 									}}
 								><Icon color='green' name='add'/>{'Add expression'}</InsertButton>
 								<MoveDownButton
@@ -98,8 +96,7 @@ export function Logic(props) {
 			path={expressionsPath}
 			value={{
 				params: {},
-				type: ''//,
-				//uuid4: generateUuidv4()
+				type: ''
 			}}
 		><Icon color='green' name='add'/>Add expression</InsertButton>}
 	</>;

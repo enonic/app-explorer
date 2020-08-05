@@ -62,9 +62,6 @@ const NODE_MODULES = [{
 	header: 'traverse',
 	description: 'MIT/X11',
 	href: 'https://github.com/substack/js-traverse/blob/master/LICENSE'
-},{
-	header: 'uuid',
-	href: 'https://github.com/kelektiv/node-uuid/blob/master/LICENSE.md'
 }];
 
 

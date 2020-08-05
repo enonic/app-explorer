@@ -1,5 +1,4 @@
 import {Form, Header, Loader} from 'semantic-ui-react';
-//import generateUuidv4 from 'uuid/v4';
 
 import {Form as EnonicForm} from 'semantic-ui-react-form/Form';
 import {Dropdown} from 'semantic-ui-react-form/inputs/Dropdown';
@@ -44,7 +43,6 @@ export function NewOrEditInterface(props) {
 				separator: ' ',
 				to: '',
 				type: 'string'
-				//uuid4: generateUuidv4()
 			}],
 			stopWords: [],
 			thesauri: []

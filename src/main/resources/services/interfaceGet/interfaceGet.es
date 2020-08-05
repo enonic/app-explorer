@@ -1,8 +1,5 @@
 import traverse from 'traverse';
 
-import generateUuidv4 from 'uuid/v4';
-//import { v4 as generateUuidv4 } from 'uuid'; // As of uuid 7.0.0
-
 //import {toStr} from '/lib/util';
 import {forceArray} from '/lib/util/data';
 import {isString} from '/lib/util/value';
@@ -28,14 +25,7 @@ function convert({object, fields, recurse = true}) {
 					convert({object: value, fields, recurse}); // Recurse
 				}
 				this.update(value);
-			} else if (Array.isArray(value)) {
-				this.update(value.map(entry => {
-					if (!isString(entry) && !entry.uuid4) {
-						entry.uuid4 = generateUuidv4();
-					}
-					return entry;
-				}));
-			} // if isArray
+			}
 		}
 	}); // traverse
 	return object;

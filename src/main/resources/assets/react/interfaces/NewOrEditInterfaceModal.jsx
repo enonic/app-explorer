@@ -1,5 +1,4 @@
 import {Button, Header, Icon, Modal, Popup} from 'semantic-ui-react';
-//import generateUuidv4 from 'uuid/v4';
 
 import {NewOrEditInterface} from './NewOrEditInterface';
 import {UploadLicense} from '../UploadLicense';
