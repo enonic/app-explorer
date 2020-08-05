@@ -81,4 +81,4 @@ export function StopWords(props) {
 			servicesBaseUrl={servicesBaseUrl}
 		/>
 	</>;
-} // class StopWords
+} // function StopWords

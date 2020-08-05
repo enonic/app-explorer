@@ -47,134 +47,119 @@ const ALL_GQL = `{
 }`;
 
 
-export class Interfaces extends React.Component {
-	constructor(props) {
-		//console.debug('Interfaces constructor');
-    	super(props);
+export function Interfaces({
+	licenseValid,
+	servicesBaseUrl,
+	setLicensedTo,
+	setLicenseValid
+}) {
+	const [state, setState] = React.useState({
+		interfaceExists: false,
+		interfaceTo: '',
+		interfaces: {
+			count: 0,
+			hits: [],
+			total: 0
+		},
+		isLoading: false
+	});
 
-    	this.state = {
-			interfaceExists: false,
-			interfaceTo: '',
-      		//interfaces: this.props.interfaces || {},
-			interfaces: {
-				count: 0,
-				hits: [],
-				total: 0
-			},
-			isLoading: false
-    	};
-  	} // constructor
-
-
-	updateInterfaces() {
-		this.setState({ isLoading: true });
-		fetch(`${this.props.servicesBaseUrl}/interfaceList`)
+	const memoizedUpdateInterfacesCallback = React.useCallback(() => {
+		setState((oldState) => {
+			const deref = JSON.parse(JSON.stringify(oldState));
+			deref.isLoading = true;
+			return deref;
+		});
+		fetch(`${servicesBaseUrl}/interfaceList`)
 			.then(response => response.json())
-			.then(data => this.setState({
-				collectionOptions: data.collectionOptions,
-				fieldsObj: data.fieldsObj,
-				interfaces: data.interfaces,
-				isLoading: false,
-				stopWordOptions: data.stopWordOptions,
-				thesauriOptions: data.thesauriOptions
+			.then(data => setState((oldState) => {
+				const deref = JSON.parse(JSON.stringify(oldState));
+				deref.collectionOptions = data.collectionOptions;
+				deref.fieldsObj = data.fieldsObj;
+				deref.interfaces = data.interfaces;
+				deref.isLoading = false;
+				deref.stopWordOptions = data.stopWordOptions;
+				deref.thesauriOptions = data.thesauriOptions;
+				return deref;
 			}));
-	} // updateInterfaces
+	}, [servicesBaseUrl]);
 
+	React.useEffect(() => {
+		memoizedUpdateInterfacesCallback();
+	}, [memoizedUpdateInterfacesCallback]);
 
-	componentDidMount() {
-		//console.debug('Interfaces componentDidMount');
-		this.updateInterfaces();
-	} // componentDidMount
-
-
-	render() {
-		//console.debug('Interfaces render');
-		//console.debug(this.props);
-		//console.debug(this.state.interfaces);
-
-		const {
-			licenseValid,
-			servicesBaseUrl,
-			setLicensedTo,
-			setLicenseValid
-		} = this.props;
-
-		const {
-			collectionOptions,
-			fieldsObj,
-			interfaces: {
-				hits,
-				total
-			},
-			stopWordOptions,
-			thesauriOptions
-		} = this.state;
-		//console.debug('fieldsObj', fieldsObj);
-		//console.debug(hits);
-
-		return <>
-			<Header as='h1' content='Interfaces'/>
-			<Table celled collapsing compact selectable singleLine striped>
-				<Table.Header>
-					<Table.Row>
-						<Table.HeaderCell>Name</Table.HeaderCell>
-						<Table.HeaderCell>Actions</Table.HeaderCell>
-					</Table.Row>
-				</Table.Header>
-				<Table.Body>
-					{hits.map((initialValues, index) => {
-						const {displayName, _id, _name} = initialValues;
-						//console.debug({displayName, _name, index});
-						return <Table.Row key={index}>
-							<Table.Cell collapsing>{displayName}</Table.Cell>
-							<Table.Cell collapsing>
-								<Button.Group>
-									<NewOrEditInterfaceModal
-										collectionOptions={collectionOptions}
-										displayName={displayName}
-										fieldsObj={fieldsObj}
-										id={_id}
-										afterClose={() => this.updateInterfaces()}
-										licenseValid={licenseValid}
-										servicesBaseUrl={servicesBaseUrl}
-										setLicensedTo={setLicensedTo}
-										setLicenseValid={setLicenseValid}
-										stopWordOptions={stopWordOptions}
-										thesauriOptions={thesauriOptions}
-										total={total}
-									/>
-									<SearchModal
-										interfaceName={_name}
-										servicesBaseUrl={servicesBaseUrl}
-									/>
-									<CopyModal
-										name={_name}
-										updateInterfaces={() => this.updateInterfaces()}
-										servicesBaseUrl={servicesBaseUrl}
-									/>
-									<DeleteModal
-										name={_name}
-										onClose={() => this.updateInterfaces()}
-										servicesBaseUrl={servicesBaseUrl}
-									/>
-								</Button.Group>
-							</Table.Cell>
-						</Table.Row>;
-					})}
-				</Table.Body>
-			</Table>
-			<NewOrEditInterfaceModal
-				collectionOptions={collectionOptions}
-				fieldsObj={fieldsObj}
-				afterClose={() => this.updateInterfaces()}
-				licenseValid={licenseValid}
-				servicesBaseUrl={servicesBaseUrl}
-				setLicensedTo={setLicensedTo}
-				setLicenseValid={setLicenseValid}
-				stopWordOptions={stopWordOptions}
-				thesauriOptions={thesauriOptions}
-				total={total}
-			/>
-		</>;
-	} // render
-} // class Interfaces
+	const {
+		collectionOptions,
+		fieldsObj,
+		interfaces: {
+			hits,
+			total
+		},
+		stopWordOptions,
+		thesauriOptions
+	} = state;
+	return <>
+		<Header as='h1' content='Interfaces'/>
+		<Table celled collapsing compact selectable singleLine striped>
+			<Table.Header>
+				<Table.Row>
+					<Table.HeaderCell>Name</Table.HeaderCell>
+					<Table.HeaderCell>Actions</Table.HeaderCell>
+				</Table.Row>
+			</Table.Header>
+			<Table.Body>
+				{hits.map((initialValues, index) => {
+					const {displayName, _id, _name} = initialValues;
+					//console.debug({displayName, _name, index});
+					return <Table.Row key={index}>
+						<Table.Cell collapsing>{displayName}</Table.Cell>
+						<Table.Cell collapsing>
+							<Button.Group>
+								<NewOrEditInterfaceModal
+									collectionOptions={collectionOptions}
+									displayName={displayName}
+									fieldsObj={fieldsObj}
+									id={_id}
+									afterClose={() => memoizedUpdateInterfacesCallback()}
+									licenseValid={licenseValid}
+									servicesBaseUrl={servicesBaseUrl}
+									setLicensedTo={setLicensedTo}
+									setLicenseValid={setLicenseValid}
+									stopWordOptions={stopWordOptions}
+									thesauriOptions={thesauriOptions}
+									total={total}
+								/>
+								<SearchModal
+									interfaceName={_name}
+									servicesBaseUrl={servicesBaseUrl}
+								/>
+								<CopyModal
+									name={_name}
+									updateInterfaces={() => memoizedUpdateInterfacesCallback()}
+									servicesBaseUrl={servicesBaseUrl}
+								/>
+								<DeleteModal
+									name={_name}
+									onClose={() => memoizedUpdateInterfacesCallback()}
+									servicesBaseUrl={servicesBaseUrl}
+								/>
+							</Button.Group>
+						</Table.Cell>
+					</Table.Row>;
+				})}
+			</Table.Body>
+		</Table>
+		<NewOrEditInterfaceModal
+			collectionOptions={collectionOptions}
+			fieldsObj={fieldsObj}
+			afterClose={() => memoizedUpdateInterfacesCallback()}
+			licenseValid={licenseValid}
+			servicesBaseUrl={servicesBaseUrl}
+			setLicensedTo={setLicensedTo}
+			setLicenseValid={setLicenseValid}
+			stopWordOptions={stopWordOptions}
+			thesauriOptions={thesauriOptions}
+			total={total}
+		/>
+	</>;
+} // function Interfaces
