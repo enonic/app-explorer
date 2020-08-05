@@ -4,6 +4,7 @@ module.exports = {
     extends: [
 		'plugin:jsx-a11y/recommended',
 		//'airbnb-base',
+		'plugin:react-hooks/recommended'
 	],
 
     globals: {
