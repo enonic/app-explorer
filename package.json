@@ -29,7 +29,7 @@
     "classnames": "2.2.6",
     "copy-webpack-plugin": "6.0.3",
     "doctoc": "1.4.0",
-    "eslint": "7.6.0",
+    "eslint": "7.8.0",
     "eslint-config-airbnb-base": "14.2.0",
     "eslint-plugin-import": "2.22.0",
     "eslint-plugin-jsx-a11y": "6.3.1",
