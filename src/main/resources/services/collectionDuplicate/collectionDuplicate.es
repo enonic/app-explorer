@@ -4,11 +4,9 @@ import {
 } from '/lib/explorer/model/2/constants';
 import {exists} from '/lib/explorer/collection/exists';
 import {get} from '/lib/explorer/collection/get';
-import {getCollectors} from '/lib/explorer/collection/reschedule';
 import {connect} from '/lib/explorer/repo/connect';
 import {create} from '/lib/explorer/node/create';
-import {toStr} from '/lib/util';
-import {send as sendEvent} from '/lib/xp/event';
+//import {toStr} from '/lib/util';
 
 export function post({
 	params: {
@@ -38,6 +36,7 @@ export function post({
 		node._name = `${name}${number}`;
 		node.name = node._name; // Make sure the duplicate can be renamed...
 		node.displayName = `${node.displayName} (duplicate ${number})`;
+		node.doCollect = false; // Duplicates should not be scheduled by default.
 		const createdNode = create({
 			__connection: writeConnection,
 			_parentPath: '/collections',
@@ -48,19 +47,6 @@ export function post({
 				message: `Duplicated collection ${name}.`
 			};
 			status = 200;
-			const event = {
-				type: `${app.name}.reschedule`,
-				distributed: true, // Change may happen on admin node, while crawl node needs the reschedule
-				data: {
-					collectors: getCollectors({
-						connection: writeConnection
-					}),
-					node: createdNode
-				}
-			};
-			log.info(`event:${toStr({event})}`);
-			const sendEventRes = sendEvent(event);
-			log.info(`sendEventRes:${toStr({sendEventRes})}`);
 		}
 	}
 	return {
