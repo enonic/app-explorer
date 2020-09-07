@@ -1,10 +1,7 @@
-import {RT_JSON} from '/lib/explorer/model/2/constants';
 import {list} from '/lib/cron';
+import {RT_JSON} from '/lib/explorer/model/2/constants';
 
-
-export function get() {
-	return {
-		body: list(),
-		contentType: RT_JSON
-	};
-}
+export const get = () => ({
+	body: list(),
+	contentType: RT_JSON
+});
