@@ -10,6 +10,8 @@ module.exports = {
 	],
 
 	globals: {
+		// CommonJS (CJS) format
+		exports: false,
 		module: false,
 
 		// Nashorn
