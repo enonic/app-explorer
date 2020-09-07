@@ -118,7 +118,7 @@
 	};
 
 	$.fn.tablesort = function(settings) {
-		var table, sortable, previous;
+		var table/*, sortable*/, previous;
 		return this.each(function() {
 			table = $(this);
 			previous = table.data('tablesort');
