@@ -67,8 +67,7 @@ export function post({
 			}
 		};
 		log.info(`event:${toStr({event})}`);
-		const sendEventRes = sendEvent(event);
-		log.info(`sendEventRes:${toStr({sendEventRes})}`);
+		sendEvent(event);
 	} else {
 		body.error = `Something went wrong when trying to modify collection ${node._name}`;
 		status = 500;

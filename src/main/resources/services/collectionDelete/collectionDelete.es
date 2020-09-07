@@ -46,8 +46,7 @@ exports.delete = ({
 			}
 		};
 		log.info(`event:${toStr({event})}`);
-		const sendEventRes = sendEvent(event);
-		log.info(`sendEventRes:${toStr({sendEventRes})}`);
+		sendEvent(event);
 	} else {
 		body = {
 			error: `Failed to delete collection ${name}!`
