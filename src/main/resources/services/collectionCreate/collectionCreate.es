@@ -1,4 +1,4 @@
-import {toStr} from '/lib/util';
+//import {toStr} from '/lib/util';
 import {sanitize} from '/lib/xp/common';
 import {send as sendEvent} from '/lib/xp/event';
 
@@ -16,7 +16,7 @@ import {create} from '/lib/explorer/node/create';
 export function post({
 	body: json
 }) {
-	//log.info(`json:${json}`);
+	//log.debug(`json:${json}`);
 
 	const obj = JSON.parse(json);
 
@@ -25,10 +25,10 @@ export function post({
 	obj._name = sanitize(obj.displayName);
 
 	obj.collector.configJson = JSON.stringify(obj.collector.config); // ForceArray workaround:
-	//log.info(`obj:${toStr({obj})}`);
+	//log.debug(`obj:${toStr({obj})}`);
 
 	const params = collection(obj);
-	//log.info(`params:${toStr({params})}`);
+	//log.debug(`params:${toStr({params})}`);
 
 	const writeConnection = connect({
 		principals: [PRINCIPAL_EXPLORER_WRITE]
@@ -55,7 +55,7 @@ export function post({
 				node
 			}
 		};
-		log.info(`event:${toStr({event})}`);
+		//log.debug(`event:${toStr({event})}`);
 		sendEvent(event);
 	} else {
 		body.error = `Something went wrong when trying to create collection ${obj._name}`;

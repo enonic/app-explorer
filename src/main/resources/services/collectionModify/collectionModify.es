@@ -1,4 +1,4 @@
-import {toStr} from '/lib/util';
+//import {toStr} from '/lib/util';
 import {sanitize} from '/lib/xp/common';
 import {send as sendEvent} from '/lib/xp/event';
 
@@ -14,7 +14,7 @@ import {modify} from '/lib/explorer/node/modify';
 export function post({
 	body: json
 }) {
-	//log.info(`json:${json}`);
+	//log.debug(`json:${json}`);
 
 	const obj = JSON.parse(json);
 
@@ -22,9 +22,9 @@ export function post({
 		principals: [PRINCIPAL_EXPLORER_WRITE]
 	});
 
-	log.info(`obj._path:${toStr(obj._path)}`);
+	//log.debug(`obj._path:${toStr(obj._path)}`);
 	const oldNode = writeConnection.get(obj._path);
-	log.info(`oldNode:${toStr({oldNode})}`);
+	//log.debug(`oldNode:${toStr({oldNode})}`);
 
 	const sanitizedName = sanitize(obj.displayName);
 	if (sanitizedName !== obj._name) {
@@ -32,7 +32,7 @@ export function post({
 			source: obj._path,
 			target: sanitizedName
 		};
-		//log.info(`moveParams:${toStr({moveParams})}`);
+		//log.debug(`moveParams:${toStr({moveParams})}`);
 		const boolMoved = writeConnection.move(moveParams);
 		if (boolMoved) {
 			obj._name = sanitizedName;
@@ -40,10 +40,10 @@ export function post({
 	}
 
 	obj.collector.configJson = JSON.stringify(obj.collector.config); // ForceArray workaround:
-	//log.info(`obj:${toStr({obj})}`);
+	//log.debug(`obj:${toStr({obj})}`);
 
 	const params = collection(obj); // Strips _id, _path
-	//log.info(`params:${toStr({params})}`);
+	//log.debug(`params:${toStr({params})}`);
 
 	const node = modify({
 		__connection: writeConnection,
@@ -66,7 +66,7 @@ export function post({
 				oldNode
 			}
 		};
-		log.info(`event:${toStr({event})}`);
+		//log.debug(`event:${toStr({event})}`);
 		sendEvent(event);
 	} else {
 		body.error = `Something went wrong when trying to modify collection ${node._name}`;

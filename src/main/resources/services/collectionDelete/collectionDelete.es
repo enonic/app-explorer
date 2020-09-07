@@ -5,7 +5,7 @@ import {
 } from '/lib/explorer/model/2/constants';
 import {connect} from '/lib/explorer/repo/connect';
 import {remove} from '/lib/explorer/node/remove';
-import {toStr} from '/lib/util';
+//import {toStr} from '/lib/util';
 import {send as sendEvent} from '/lib/xp/event';
 
 const PATH_COLLECTIONS = '/collections';
@@ -15,21 +15,21 @@ exports.delete = ({
 		name
 	}
 }) => {
-	log.info(`name:${toStr({name})}`);
+	//log.debug(`name:${toStr({name})}`);
 	const writeConnection = connect({principals: [PRINCIPAL_EXPLORER_WRITE]});
 
 	const nodePath = `${PATH_COLLECTIONS}/${name}`;
-	log.info(`nodePath:${toStr({nodePath})}`);
+	//log.debug(`nodePath:${toStr({nodePath})}`);
 
 	const oldNode = writeConnection.get(nodePath);
-	log.info(`oldNode:${toStr({oldNode})}`);
+	//log.debug(`oldNode:${toStr({oldNode})}`);
 
 	const removeRes = remove({
 		connection: writeConnection,
 		_parentPath: PATH_COLLECTIONS,
 		_name: name
 	});
-	log.info(`removeRes:${toStr({removeRes})}`);
+	//log.debug(`removeRes:${toStr({removeRes})}`);
 	let body = {
 		message: `Deleted collection ${name}`
 	};
