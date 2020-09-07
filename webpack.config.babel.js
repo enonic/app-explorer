@@ -323,14 +323,14 @@ const WEBPACK_CONFIG = [webpackServerSideJs({
 			proxy: 'http://localhost:8080/'
 		})
 	] : [],
-	resolveAlias: {
+	resolveAlias: MODE === 'development' ? {
+		'semantic-ui-react-form': path.resolve(__dirname, '../semantic-ui-react-form/src')
+	} : {
 		//'semantic-ui-react': path.resolve(__dirname, './node_modules/semantic-ui-react/dist/commonjs'),
 		//'semantic-ui-react': path.resolve(__dirname, './node_modules/semantic-ui-react/dist/es'),
 		//'semantic-ui-react': path.resolve(__dirname, './node_modules/semantic-ui-react/dist/umd/semantic-ui-react.min.js'),
 		//'semantic-ui-react': path.resolve(__dirname, './node_modules/semantic-ui-react/src'),
 		//'semantic-ui-react': path.resolve(__dirname, './node_modules/semantic-ui-react'),
-
-		//'semantic-ui-react-form': path.resolve(__dirname, '../semantic-ui-react-form/src')
 		'semantic-ui-react-form': path.resolve(__dirname, './node_modules/@enonic/semantic-ui-react-form/src')
 	}
 })];
