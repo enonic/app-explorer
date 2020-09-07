@@ -1,10 +1,13 @@
 //──────────────────────────────────────────────────────────────────────────────
 // Enonic XP libs (included in jar via gradle dependencies)
 //──────────────────────────────────────────────────────────────────────────────
+/*import {
+	//get as getJob,
+	list as listJobs
+} from '/lib/cron';*/
+import {toStr} from '/lib/util';
 import {isMaster} from '/lib/xp/cluster';
 import {listener} from '/lib/xp/event';
-import {toStr} from '/lib/util';
-
 import {
 	BRANCH_ID_EXPLORER,
 	EVENT_COLLECTOR_UNREGISTER,
@@ -83,11 +86,11 @@ if (cron) {
 			collectors,
 			node
 		}));
-		/*const jobs = listJobs();
-		log.info(toStr({jobs}));
-		jobs.jobs.forEach(({name}) => {
+		/*const cronList = listJobs();
+		log.debug(`cronList:${toStr({cronList})}`);
+		cronList.jobs.forEach(({name}) => {
 			const job = getJob({name});
-			log.info(toStr({job}));
+			log.debug(`job:${toStr({job})}`);
 		});*/
 	}); // runAsSu
 	log.info('This cluster node has cron=true in app.config, listening for reschedule events :)');
@@ -95,7 +98,7 @@ if (cron) {
 		type: `custom.${app.name}.reschedule`,
 		localOnly: false,
 		callback: (event) => {
-			// log.info(JSON.stringify(event, null, 4));
+			//log.debug(JSON.stringify(event, null, 4));
 			const {collectors,node,oldNode} = event.data;
 			reschedule({
 				collectors,
