@@ -1,7 +1,7 @@
 //import _ from 'lodash';
 import {
-	Button, Dimmer, Divider, Dropdown, Form, Header, Icon, Loader, Modal,
-	Pagination,	Popup, Table
+	Button, Dimmer, /*Divider, Dropdown, Form,*/ Header, Icon, Loader, Modal,
+	/*Pagination,*/ Popup, Table
 } from 'semantic-ui-react';
 import {
 	Collection,
@@ -173,7 +173,7 @@ function NewOrEditModal(props) {
 						initialValues={initialValues}
 						mode={_name ? 'modify' : 'create'}
 						onClose={() => {
-							setState({open: false})
+							setState({open: false});
 							onClose();
 						}}
 						servicesBaseUrl={servicesBaseUrl}
@@ -222,11 +222,11 @@ function DeleteModal(props) {
 				onClick={() => {
 					fetch(`${servicesBaseUrl}/collectionDelete?name=${_name}`, {
 						method: 'DELETE'
-					}).then(response => {
+					}).then((/*response*/) => {
 						//if (response.status === 200) {}
 						setState({open: false});
 						onClose();
-					})
+					});
 				}}
 			><Icon color='red' name='trash alternate outline'/>Confirm Delete</Button>
 		</Modal.Content>
@@ -316,7 +316,7 @@ export function Collections(props) {
 		isLoading,
 		page,
 		perPage,
-		sort,
+		//sort,
 		siteOptions/*,
 		totalCount No longer provided by the collectionList service*/
 	} = state;
@@ -334,10 +334,10 @@ export function Collections(props) {
 		fetch(`${servicesBaseUrl}/graphQL`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-  			body: JSON.stringify({ query: ALL_GQL })
+			body: JSON.stringify({ query: ALL_GQL })
 		})
 			.then(res => res.json())
-  			.then(res => {
+			.then(res => {
 				//console.log(res);
 				if (res && res.data) {
 					setQueryCollectionsGraph(res.data.queryCollections);
@@ -380,10 +380,10 @@ export function Collections(props) {
 		fetch(`${servicesBaseUrl}/graphQL`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-  			body: JSON.stringify({ query: `{${COLLECTIONS_GQL}}` })
+			body: JSON.stringify({ query: `{${COLLECTIONS_GQL}}` })
 		})
 			.then(res => res.json())
-  			.then(res => {
+			.then(res => {
 				//console.log(res);
 				if (res && res.data && res.data.queryCollections) {
 					setQueryCollectionsGraph(res.data.queryCollections);
@@ -391,7 +391,7 @@ export function Collections(props) {
 			});
 	} // fetchCollections
 
-	function fetchCollectors() {
+	/*function fetchCollectors() {
 		fetch(`${servicesBaseUrl}/graphQL`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
@@ -404,16 +404,16 @@ export function Collections(props) {
 					setQueryCollectorsGraph(res.data.queryCollectors);
 				}
 			});
-	} // fetchCollectors
+	} // fetchCollectors*/
 
 	function fetchTasks() {
 		fetch(`${servicesBaseUrl}/graphQL`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-  			body: JSON.stringify({ query: `{${TASKS_GQL}}` })
+			body: JSON.stringify({ query: `{${TASKS_GQL}}` })
 		})
 			.then(res => res.json())
-  			.then(res => {
+			.then(res => {
 				//console.log(res);
 				if (res && res.data && res.data.queryTasks) {
 					setTasks(res.data.queryTasks);
@@ -479,7 +479,7 @@ export function Collections(props) {
 		if (boolPoll) {
 			fetchAll();
 		}
-  	}, 2500);
+	}, 2500);
 
 	return <>
 		<Header as='h1'>Collections</Header>
@@ -533,7 +533,6 @@ export function Collections(props) {
 									_id,
 									_name,
 									_path,
-									name,
 									collector,
 									cron,
 									displayName,
@@ -579,9 +578,9 @@ export function Collections(props) {
 										trigger={<Button icon onClick={() => {
 											fetch(`${servicesBaseUrl}/collectionDuplicate?name=${_name}`, {
 												method: 'POST'
-											}).then(response => {
+											}).then(() => {
 												fetchCollections();
-											})
+											});
 										}}><Icon color='blue' name='copy'/></Button>}/>
 									{collectionsTaskState[_name]
 										? {
@@ -595,9 +594,9 @@ export function Collections(props) {
 												trigger={<Button disabled={!boolCollectorSelectedAndInitialized} icon onClick={() => {
 													fetch(`${servicesBaseUrl}/collectorStop?collectionName=${_name}`, {
 														method: 'POST'
-													}).then(response => {
+													}).then(() => {
 														fetchTasks();
-													})
+													});
 												}}><Icon color='red' name='stop'/></Button>}/>,
 											FINISHED: <Popup
 												content={`Finished collecting to ${_name}`}
@@ -619,9 +618,9 @@ export function Collections(props) {
 												trigger={<Button disabled={!boolCollectorSelectedAndInitialized} icon onClick={() => {
 													fetch(`${servicesBaseUrl}/collectionCollect?name=${_name}`, {
 														method: 'POST'
-													}).then(response => {
+													}).then(() => {
 														fetchTasks();
-													})
+													});
 												}}><Icon color='green' name='cloud download'/></Button>}/>
 									}
 									<DeleteModal
