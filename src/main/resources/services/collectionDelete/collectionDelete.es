@@ -1,4 +1,3 @@
-import {getCollectors} from '/lib/explorer/collection/reschedule';
 import {
 	PRINCIPAL_EXPLORER_WRITE,
 	RT_JSON
@@ -35,18 +34,17 @@ exports.delete = ({
 	};
 	let status = 200;
 	if (removeRes) {
-		const event = {
-			type: `${app.name}.reschedule`,
-			distributed: true, // Change may happen on admin node, while crawl node needs the reschedule
-			data: {
-				collectors: getCollectors({
-					connection: writeConnection
-				}),
-				oldNode
-			}
-		};
-		log.info(`event:${toStr({event})}`);
-		sendEvent(event);
+		if (oldNode.doCollect && oldNode.cron) { // No need to reschedule if deleted node was unscheduled
+			const event = {
+				type: `${app.name}.reschedule`,
+				distributed: true, // Change may happen on admin node, while crawl node needs the reschedule
+				data: {
+					oldNode
+				}
+			};
+			//log.debug(`event:${toStr({event})}`);
+			sendEvent(event);
+		}
 	} else {
 		body = {
 			error: `Failed to delete collection ${name}!`
