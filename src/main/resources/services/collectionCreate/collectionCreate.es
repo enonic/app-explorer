@@ -1,12 +1,14 @@
-//import {toStr} from '/lib/util';
+import {toStr} from '/lib/util';
 import {sanitize} from '/lib/xp/common';
+import {send as sendEvent} from '/lib/xp/event';
 
+import {getCollectors} from '/lib/explorer/collection/reschedule';
 import {
-	NT_COLLECTION,
+	//NT_COLLECTION,
 	PRINCIPAL_EXPLORER_WRITE,
 	RT_JSON
 } from '/lib/explorer/model/2/constants';
-import {collection} from '/lib/explorer/model/2/nodeTypes/collection'
+import {collection} from '/lib/explorer/model/2/nodeTypes/collection';
 import {connect} from '/lib/explorer/repo/connect';
 import {create} from '/lib/explorer/node/create';
 
@@ -28,10 +30,12 @@ export function post({
 	const params = collection(obj);
 	//log.info(`params:${toStr({params})}`);
 
+	const writeConnection = connect({
+		principals: [PRINCIPAL_EXPLORER_WRITE]
+	});
+
 	const node = create({
-		__connection: connect({
-			principals: [PRINCIPAL_EXPLORER_WRITE]
-		}),
+		__connection: writeConnection,
 		...params
 	});
 
@@ -41,8 +45,21 @@ export function post({
 		//body.name = node._name; // Have no idea why I did this :)
 		body.name = node.name; // So lets do this instead :)
 		body.displayName = node.displayName;
+		const event = {
+			type: `${app.name}.reschedule`,
+			distributed: true, // Change may happen on admin node, while crawl node needs the reschedule
+			data: {
+				collectors: getCollectors({
+					connection: writeConnection
+				}),
+				node
+			}
+		};
+		log.info(`event:${toStr({event})}`);
+		const sendEventRes = sendEvent(event);
+		log.info(`sendEventRes:${toStr({sendEventRes})}`);
 	} else {
-		body.error = `Something went wrong when trying to create collection ${name}`;
+		body.error = `Something went wrong when trying to create collection ${obj._name}`;
 		status = 500;
 	}
 	return {

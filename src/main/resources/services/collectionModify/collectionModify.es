@@ -1,15 +1,15 @@
-//import {toStr} from '/lib/util';
+import {toStr} from '/lib/util';
 import {sanitize} from '/lib/xp/common';
+import {send as sendEvent} from '/lib/xp/event';
 
+import {getCollectors} from '/lib/explorer/collection/reschedule';
 import {
-	NT_COLLECTION,
 	PRINCIPAL_EXPLORER_WRITE,
 	RT_JSON
 } from '/lib/explorer/model/2/constants';
-import {collection} from '/lib/explorer/model/2/nodeTypes/collection'
+import {collection} from '/lib/explorer/model/2/nodeTypes/collection';
 import {connect} from '/lib/explorer/repo/connect';
 import {modify} from '/lib/explorer/node/modify';
-
 
 export function post({
 	body: json
@@ -21,6 +21,10 @@ export function post({
 	const writeConnection = connect({
 		principals: [PRINCIPAL_EXPLORER_WRITE]
 	});
+
+	log.info(`obj._path:${toStr(obj._path)}`);
+	const oldNode = writeConnection.get(obj._path);
+	log.info(`oldNode:${toStr({oldNode})}`);
 
 	const sanitizedName = sanitize(obj.displayName);
 	if (sanitizedName !== obj._name) {
@@ -51,8 +55,22 @@ export function post({
 	if (node) {
 		body.name = node._name;
 		body.displayName = node.displayName;
+		const event = {
+			type: `${app.name}.reschedule`,
+			distributed: true, // Change may happen on admin node, while crawl node needs the reschedule
+			data: {
+				collectors: getCollectors({
+					connection: writeConnection
+				}),
+				node,
+				oldNode
+			}
+		};
+		log.info(`event:${toStr({event})}`);
+		const sendEventRes = sendEvent(event);
+		log.info(`sendEventRes:${toStr({sendEventRes})}`);
 	} else {
-		body.error = `Something went wrong when trying to modify collection ${name}`;
+		body.error = `Something went wrong when trying to modify collection ${node._name}`;
 		status = 500;
 	}
 	return {
