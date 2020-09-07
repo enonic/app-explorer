@@ -89,8 +89,8 @@ if (cron) {
 			const job = getJob({name});
 			log.info(toStr({job}));
 		});*/
-		log.info('This cluster node has cron=true in app.config, listening for reschedule events :)');
 	}); // runAsSu
+	log.info('This cluster node has cron=true in app.config, listening for reschedule events :)');
 	listener({
 		type: `custom.${app.name}.reschedule`,
 		localOnly: false,
@@ -105,7 +105,7 @@ if (cron) {
 		}
 	});
 } else {
-	log.info('This cluster node does NOT have cron=true in app.config, NOT listening for reschedule events :)');
+	log.debug('This cluster node does NOT have cron=true in app.config, NOT listening for reschedule events :)');
 }
 
 __.disposer(() => {
