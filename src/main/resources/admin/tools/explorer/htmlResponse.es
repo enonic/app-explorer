@@ -155,8 +155,7 @@ services: {}, // Workaround for i18nUrl BUG
 			import {Explorer} from '${assetUrl({path: 'react/Explorer.esm.js'})}';
 			const propsObj = eval(${serialize(propsObj)});
 			const collectorComponents = {};
-			${Object.entries(collectorsAppToUri)
-		.map(([a, u], i) => `import {Collector as Collector${i}} from '${u}';
+			${Object.keys(collectorsAppToUri).map((a, i) => `import {Collector as Collector${i}} from '${collectorsAppToUri[a]}';
 collectorComponents['${a}'] = Collector${i};`)
 		.join('\n')}
 			propsObj.collectorComponents = collectorComponents;

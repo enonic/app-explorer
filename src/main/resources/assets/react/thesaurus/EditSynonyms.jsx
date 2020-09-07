@@ -41,7 +41,8 @@ export function EditSynonyms(props) {
 		//console.debug('querySynonyms params', params, 'state', state);
 
 		// Get fallback params from prev state
-		Object.entries(state.params).forEach(([k, v]) => {
+		Object.keys(state.params).forEach((k) => {
+			const v = state.params[k];
 			//console.debug('querySynonyms k', k, 'v', v, `params[${k}]`, params[k], `typeof params[${k}]`, typeof params[k]);
 			if (typeof params[k] === 'undefined') {
 				params[k] = v;
@@ -53,7 +54,8 @@ export function EditSynonyms(props) {
 		setState(prev => {
 			const deref = JSON.parse(JSON.stringify(prev));
 			deref.isLoading = true;
-			Object.entries(params).forEach(([k, v]) => {
+			Object.keys(params).forEach((k) => {
+				const v = params[k];
 				deref.params[k] = v;
 			});
 			const [column, direction] = params.sort.split(' '); // 'from ASC'
@@ -64,7 +66,8 @@ export function EditSynonyms(props) {
 		});
 
 		const uri = new Uri(`${servicesBaseUrl}/thesauri`);
-		Object.entries(params).forEach(([k, v]) => {
+		Object.keys(params).forEach((k) => {
+			const v = params[k];
 			//console.debug({k, v});
 			uri.replaceQueryParam(k, v);
 		});
@@ -80,7 +83,7 @@ export function EditSynonyms(props) {
 					deref.result = data.queryResult;
 					return deref;
 				});
-			})
+			});
 	} // querySynonyms
 
 	React.useEffect(() => querySynonyms(), []);

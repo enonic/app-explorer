@@ -1,6 +1,7 @@
 export function fieldObjToFieldArr(obj) {
 	const arr = [];
-	Object.entries(obj).forEach(([k, v]) => {
+	Object.keys(obj).forEach((k) => {
+		const v = obj[k];
 		arr.push({
 			key: k,
 			text: v.text,

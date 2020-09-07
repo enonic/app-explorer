@@ -53,7 +53,8 @@ export function Journals({
 	function search() {
 		setLoading(true); // Make sure this happens before setResult below?
 		const uri = new Uri(`${servicesBaseUrl}/journals`);
-		Object.entries(params).forEach(([k, v]) => {
+		Object.keys(params).forEach((k) => {
+			const v = params[k];
 			//console.debug({k, v});
 			uri.replaceQueryParam(k, v);
 		});
