@@ -3,10 +3,9 @@ import path from 'path';
 import BrowserSyncPlugin from 'browser-sync-webpack-plugin';
 import CopyWebpackPlugin from 'copy-webpack-plugin';
 import TerserPlugin from 'terser-webpack-plugin';
-import UglifyJsPlugin from 'uglifyjs-webpack-plugin'; // Supports ECMAScript2015
-import {webpackEsmAssets} from '@enonic/webpack-esm-assets'
-import {webpackServerSideJs} from '@enonic/webpack-server-side-js'
-import {webpackStyleAssets} from '@enonic/webpack-style-assets'
+import {webpackEsmAssets} from '@enonic/webpack-esm-assets';
+import {webpackServerSideJs} from '@enonic/webpack-server-side-js';
+import {webpackStyleAssets} from '@enonic/webpack-style-assets';
 import webpack from 'webpack';
 
 //console.debug(process.env.NODE_ENV);
@@ -75,8 +74,8 @@ const CLIENT_JS_CONFIG = {
 						'@babel/plugin-syntax-throw-expressions',
 						'@babel/plugin-transform-object-assign',
 						['@babel/plugin-transform-runtime', {
-				      		regenerator: true
-				    	}],
+							regenerator: true
+						}],
 						'array-includes'
 					],
 					presets: [
@@ -271,7 +270,7 @@ const WEBPACK_CONFIG = [webpackServerSideJs({
 	externals: SS_EXTERNALS,
 	serverSideFiles: SS_FILES,
 	optimization: {
-    	minimizer: [
+		minimizer: [
 			new TerserPlugin({
 				extractComments: false
 				/*terserOptions: {
@@ -307,7 +306,7 @@ const WEBPACK_CONFIG = [webpackServerSideJs({
 	*/
 	mode: MODE,
 	optimization: {
-    	minimizer: MODE === 'development' ? [] : [
+		minimizer: MODE === 'development' ? [] : [
 			new TerserPlugin({
 				extractComments: false
 				/*terserOptions: {
