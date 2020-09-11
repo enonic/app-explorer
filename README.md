@@ -146,3 +146,58 @@ When running watch in development mode browser-sync will proxy http://localhost:
 
 On a development laptop the Explorer admin to is usually available here:
 - http://localhost:8080/admin/tool/com.enonic.app.explorer/explorer
+
+## Dependencies
+
+This list is abridged.
+
+```
+app-explorer
+  ├ gradle 5.6.4
+  │   ├ lib-cron 1.1.1
+  │   │   └ com.cronutils:cron-utils 8.1.1
+  │   ├ lib-explorer 3.0.6
+  │   │   ├ jar
+  │   │   │   ├ lib-http-client 2.0.0
+  │   │   │   └ lib-license 3.0.0
+  │   │   └ npm
+  │   │       └ highlight-search-result 1.0.4
+  │   └ lib-galimatias 1.0.0-B1
+  │       └ io.mola.galimatias:galimatias 0.2.0
+  └ node 14.10.1
+      ├ @enonic/semantic-ui-react-form 1.1.1
+	  ├ @enonic/webpack-esm-assets 0.7.0
+	  ├ @enonic/webpack-server-side-js 0.2.0
+	  ├ @enonic/webpack-style-assets 0.10.0
+	  ├ fast-deep-equal 3.1.3
+	  ├ get-value 3.0.1
+      ├ moment 2.27.0
+      ├ pretty-ms 7.0.0
+      ├ react 6.12
+	  ├ react-dom 6.12
+	  ├ semantic-ui-css 2.4.1
+	  ├ semantic-ui-react 1.2.1
+	  ├ serialize-javascript 5.0.1
+	  ├ set-value 3.0.2
+	  └ traverse 0.6.6
+```
+
+## Compatibility
+
+| App version | XP version |
+| ----------- | ---------- |
+| 1.0.1 | 7.3.1 |
+| 1.0.0 | 7.3.0 |
+
+## Changelog
+
+### 1.0.1
+
+* Require Enonic XP 7.3.1
+* Upgrade to lib-explorer-3.0.6
+* Upgrade to react 6.12
+* Upgrade to semantic-ui-react 1.2.1
+
+### 1.0.0
+
+* Initial release
