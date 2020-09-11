@@ -556,10 +556,10 @@ export function Collections(props) {
 							/></Table.Cell>
 							<Table.Cell collapsing>{displayName}</Table.Cell>
 							<Table.Cell collapsing>{documentCount}</Table.Cell>
-							<Table.Cell collapsing>{interfaces.map((iface, i) => <>
+							<Table.Cell collapsing>{interfaces.map((iface, i) => <p key={i}>
 								{i === 0 ? null : <br/>}
 								<span style={{whitespace: 'nowrap'}}>{iface}</span>
-							</>)}</Table.Cell>
+							</p>)}</Table.Cell>
 							<Table.Cell>{doCollect
 								? cron.map(({
 									month,
