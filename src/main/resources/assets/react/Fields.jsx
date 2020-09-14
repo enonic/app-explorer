@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import {
-	Button, Header, Icon, Loader, Table
+	Button, Header, /*Icon,*/ Loader, Table
 } from 'semantic-ui-react';
 
 import {NewOrEditModal} from './fields/NewOrEditModal';
@@ -75,7 +75,7 @@ export function Fields(props) {
 			fieldsRes,
 			direction: direction === 'ascending' ? 'descending' : 'ascending'
 		}));
-	} // handleSortGenerator
+	}; // handleSortGenerator
 
 	React.useEffect(() => fetchFields(), []);
 

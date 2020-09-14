@@ -71,7 +71,7 @@ export const queryFields = {
 			type,
 			value
 		}) => {
-			if (!fieldValuesObjArr[field]) {fieldValuesObjArr[field] = []}
+			if (!fieldValuesObjArr[field]) {fieldValuesObjArr[field] = [];}
 			fieldValuesObjArr[field].push({
 				_id,
 				_name,
@@ -81,8 +81,8 @@ export const queryFields = {
 				fieldReference,
 				type,
 				value
-			})
-		});
+			});
+		}); // forEach fieldValue
 		//log.info(`fieldValuesObjArr:${toStr(fieldValuesObjArr)}`);
 
 		const fieldsRes = getFields({connection});

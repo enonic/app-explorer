@@ -1,5 +1,5 @@
 import getIn from 'get-value';
-import setIn from 'set-value';
+//import setIn from 'set-value';
 import {Button, Form, Header, Icon, Table} from 'semantic-ui-react';
 import {
 	setError,
@@ -35,7 +35,7 @@ export const Collector = (props) => {
 	const {
 		context,
 		dispatch,
-		explorer,
+		//explorer,
 		isFirstRun,
 		path
 	} = props;

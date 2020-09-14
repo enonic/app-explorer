@@ -2,18 +2,15 @@ import serialize from 'serialize-javascript';
 
 import {validateLicense} from '/lib/license';
 //import {toStr} from '/lib/util';
-import {forceArray} from '/lib/util/data';
+/*import {forceArray} from '/lib/util/data';
 import {
 	getBaseUri,
 	getLauncherPath,
 	getLauncherUrl
-} from '/lib/xp/admin';
+} from '/lib/xp/admin';*/
 import {assetUrl, serviceUrl} from '/lib/xp/portal';
 
-import {
-	PRINCIPAL_EXPLORER_READ,
-	TOOL_PATH
-} from '/lib/explorer/model/2/constants';
+import {PRINCIPAL_EXPLORER_READ} from '/lib/explorer/model/2/constants';
 import {connect} from '/lib/explorer/repo/connect';
 import {query as queryCollectors} from '/lib/explorer/collector/query';
 
@@ -22,7 +19,6 @@ const ID_REACT_EXPLORER_CONTAINER = 'reactExplorerContainer';
 
 
 export function htmlResponse({
-	path = TOOL_PATH,
 	title = '',
 	status = 200
 } = {}) {

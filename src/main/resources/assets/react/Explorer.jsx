@@ -1,5 +1,5 @@
 import {
-	Header, Icon, List, Menu, Modal, Popup, Sidebar
+	Header, Icon, List, Menu, Modal, /*Popup,*/ Sidebar
 } from 'semantic-ui-react';
 
 import {Collections} from './Collections';
@@ -88,7 +88,7 @@ const UploadLicenseModal = (props) => {
 			whenValid={() => {setOpen(false);}}
 		/>
 	</Modal>;
-} // UploadLicenseModal
+}; // UploadLicenseModal
 
 
 export function Explorer(props) {
@@ -97,13 +97,13 @@ export function Explorer(props) {
 		collectorComponents,
 		licensedTo: initialLicensedTo,
 		licenseValid: initialLicenseValid,
-		servicesBaseUrl,
-		wsBaseUrl
+		servicesBaseUrl//,
+		//wsBaseUrl
 	} = props;
 	//console.debug('Explorer initialLicenseValid', initialLicenseValid);
 
-	const [wsColor, setWsColor] = React.useState('#888888');
-	const [wsStatus, setWsStatus] = React.useState('');
+	//const [wsColor, setWsColor] = React.useState('#888888');
+	//const [wsStatus, setWsStatus] = React.useState('');
 	const [licenseValid, setLicenseValid] = React.useState(initialLicenseValid);
 	const [licensedTo, setLicensedTo] = React.useState(initialLicensedTo);
 	const [page, setPage] = React.useState('home');
