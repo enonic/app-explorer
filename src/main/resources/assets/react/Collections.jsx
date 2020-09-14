@@ -1,16 +1,14 @@
 //import _ from 'lodash';
 import {
-	Button, Dimmer, /*Divider, Dropdown, Form,*/ Header, Icon, Loader, Modal,
-	/*Pagination,*/ Popup, Table
+	Button, Dimmer, Header, Icon, Loader, Popup, Table
 } from 'semantic-ui-react';
 import {
-	Collection,
 	MONTH_TO_HUMAN,
 	DAY_OF_WEEK_TO_HUMAN
 } from './Collection';
-import {UploadLicense} from './UploadLicense';
+import {DeleteCollectionModal} from './Collection/DeleteCollectionModal';
+import {NewOrEditCollectionModal} from './Collection/NewOrEditCollectionModal';
 import {useInterval} from './utils/useInterval';
-
 
 const COLLECTIONS_GQL = `queryCollections(
 	count: -1
@@ -59,6 +57,33 @@ const COLLECTORS_GQL = `queryCollectors {
 	}
 }`;
 
+const FIELDS_GQL = `queryFields {
+	total
+	count
+	hits {
+		#_id
+		_name
+		#_path
+		#denyDelete
+		#denyValues
+		displayName
+		#indexConfig
+		#inResults
+		#fieldType
+		key
+		#type
+		values {
+			#_id
+			_name
+			#_path
+			displayName
+			#field
+			#fieldReference
+			#type
+			value
+		}
+	}
+}`;
 
 const TASKS_GQL = `queryTasks {
 	application
@@ -77,12 +102,12 @@ const TASKS_GQL = `queryTasks {
 
 /*
 ${CONTENT_TYPES_GQL}
-${FIELDS_GQL}
 ${SITES_GQL}
 */
 const ALL_GQL = `{
 	${COLLECTIONS_GQL}
 	${COLLECTORS_GQL}
+	${FIELDS_GQL}
 	${TASKS_GQL}
 }`;
 
@@ -105,135 +130,6 @@ function zeroPad(s, w=2) {
 }
 
 
-function NewOrEditModal(props) {
-	const {
-		//collectors,
-		collectorComponents,
-		collectorOptions,
-		contentTypeOptions,
-		disabled,
-		fields,
-		initialValues,
-		licenseValid,
-		_name,
-		onClose = () => {},
-		onOpen = () => {},
-		servicesBaseUrl,
-		setLicensedTo,
-		setLicenseValid,
-		siteOptions,
-		totalNumberOfCollections
-	} = props;
-	//console.debug('totalNumberOfCollections',totalNumberOfCollections);
-	const [state, setState] = React.useState({
-		open: false
-	});
-	//console.debug('NewOrEditModal', {props, state});
-
-	return <Modal
-		closeIcon
-		onClose={() => {
-			setState({open: false});
-			onClose();
-		}}
-		onOpen={onOpen}
-		open={state.open}
-		size='large'
-		trigger={_name ? <Popup
-			content={`Edit collection ${_name}`}
-			inverted
-			trigger={<Button
-				icon
-				disabled={disabled}
-				onClick={() => setState({open: true})}
-			><Icon color='blue' name='edit'/></Button>}/>
-			: <Button
-				circular
-				color='green'
-				disabled={disabled}
-				icon
-				onClick={() => setState({open: true})}
-				size='massive'
-				style={{
-					bottom: 13.5,
-					position: 'fixed',
-					right: 13.5
-				}}><Icon
-					name='plus'
-				/></Button>}
-	>{licenseValid || totalNumberOfCollections <= 2 // This means it will be allowed to create collection 3, but not number 4
-			? <>
-				<Modal.Header>{_name ? `Edit collection ${_name}`: 'New collection'}</Modal.Header>
-				<Modal.Content>
-					<Collection
-						collectorComponents={collectorComponents}
-						collectorOptions={collectorOptions}
-						contentTypeOptions={contentTypeOptions}
-						fields={fields}
-						initialValues={initialValues}
-						mode={_name ? 'modify' : 'create'}
-						onClose={() => {
-							setState({open: false});
-							onClose();
-						}}
-						servicesBaseUrl={servicesBaseUrl}
-						siteOptions={siteOptions}
-					/>
-				</Modal.Content>
-			</>
-			: <UploadLicense
-				servicesBaseUrl={servicesBaseUrl}
-				setLicensedTo={setLicensedTo}
-				setLicenseValid={setLicenseValid}
-			/>}
-	</Modal>;
-} // NewOrEditModal
-
-
-function DeleteModal(props) {
-	const {
-		_name,
-		onClose,
-		onOpen = () => {},
-		servicesBaseUrl
-	} = props;
-	const [state, setState] = React.useState({
-		open: false
-	});
-	//console.debug('DeleteModal', {props, state});
-
-	return <Modal
-		closeIcon
-		onClose={() => setState({open: false})}
-		onOpen={onOpen}
-		open={state.open}
-		trigger={<Popup
-			content={`Delete collection ${_name}`}
-			inverted
-			trigger={<Button
-				icon
-				onClick={() => setState({open: true})}><Icon color='red' name='trash alternate outline'/></Button>}/>}
-	>
-		<Modal.Header>Delete collection {_name}</Modal.Header>
-		<Modal.Content>
-			<Header as='h2'>Do you really want to delete {_name}?</Header>
-			<Button
-				compact
-				onClick={() => {
-					fetch(`${servicesBaseUrl}/collectionDelete?name=${_name}`, {
-						method: 'DELETE'
-					}).then((/*response*/) => {
-						//if (response.status === 200) {}
-						setState({open: false});
-						onClose();
-					});
-				}}
-			><Icon color='red' name='trash alternate outline'/>Confirm Delete</Button>
-		</Modal.Content>
-	</Modal>;
-} // DeleteModal
-
-
 export function Collections(props) {
 	const {
 		collectorComponents,
@@ -247,6 +143,44 @@ export function Collections(props) {
 	const [queryCollectorsGraph, setQueryCollectorsGraph] = React.useState({});
 	const [tasks, setTasks] = React.useState([]);
 	const [boolPoll, setBoolPoll] = React.useState(true);
+
+	const [queryFieldsGraph, setQueryFieldsGraph] = React.useState({});
+	//console.debug('queryFieldsGraph', queryFieldsGraph); // count, hits
+	const fieldsObj = {};
+	//const fieldsArray =
+	queryFieldsGraph.hits ? queryFieldsGraph.hits.forEach(({
+		displayName: fieldLabel,
+		key,
+		values
+	}) => {
+		const valuesObj = {};
+		//const mappedValues =
+		values ? values.forEach(({_name, displayName: valueLabel, value}) => {
+			//console.debug('_name', _name);
+			//console.debug('value', value);
+			const valueKey = value || _name;
+			//console.debug('valueKey', valueKey);
+			valuesObj[valueKey] = {
+				label: valueLabel
+			};
+			/*return {
+				key: value,
+				label: displayName
+			};*/
+		}) : [];
+		fieldsObj[key] = {
+			label: fieldLabel,
+			values: valuesObj
+		};
+		/*return {
+			key,
+			label: displayName,
+			values: mappedValues
+		};*/
+	}) : [];
+	//console.debug('fieldsArray', fieldsArray);
+	//console.debug('fieldsObj', fieldsObj);
+
 	//console.debug('tasks', tasks);
 
 	const collectionsTaskState = {};
@@ -297,7 +231,6 @@ export function Collections(props) {
 		column: 'displayName',
 		contentTypeOptions: [],
 		direction: 'ascending',
-		fields: {},
 		isLoading: false,//true,
 		page: 1,
 		perPage: 10,
@@ -312,7 +245,6 @@ export function Collections(props) {
 		contentTypeOptions,
 		column,
 		direction,
-		fields,
 		isLoading,
 		page,
 		perPage,
@@ -342,6 +274,7 @@ export function Collections(props) {
 				if (res && res.data) {
 					setQueryCollectionsGraph(res.data.queryCollections);
 					setQueryCollectorsGraph(res.data.queryCollectors);
+					setQueryFieldsGraph(res.data.queryFields);
 					setTasks(res.data.queryTasks);
 				}
 			});
@@ -524,7 +457,7 @@ export function Collections(props) {
 						const editEnabled = intInitializedCollectorComponents && (boolCollectorSelectedAndInitialized || !boolCollectorSelected);
 
 						return <Table.Row key={key}>
-							<Table.Cell collapsing><NewOrEditModal
+							<Table.Cell collapsing><NewOrEditCollectionModal
 								collectorOptions={collectorOptions}
 								collectorComponents={collectorComponents}
 								contentTypeOptions={contentTypeOptions}
@@ -538,7 +471,7 @@ export function Collections(props) {
 									displayName,
 									doCollect
 								}}
-								fields={fields}
+								fields={fieldsObj}
 								licenseValid={licenseValid}
 								_name={_name}
 								onClose={() => {
@@ -623,7 +556,7 @@ export function Collections(props) {
 													});
 												}}><Icon color='green' name='cloud download'/></Button>}/>
 									}
-									<DeleteModal
+									<DeleteCollectionModal
 										_name={_name}
 										onClose={() => {
 											fetchCollections();
@@ -685,12 +618,12 @@ export function Collections(props) {
 					selection
 				/>
 			</Form.Field>*/}
-			<NewOrEditModal
+			<NewOrEditCollectionModal
 				collectorOptions={collectorOptions}
 				collectorComponents={collectorComponents}
 				contentTypeOptions={contentTypeOptions}
 				disabled={!intInitializedCollectorComponents}
-				fields={fields}
+				fields={fieldsObj}
 				licenseValid={licenseValid}
 				onClose={() => {
 					fetchAll();

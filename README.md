@@ -197,6 +197,8 @@ app-explorer
 * Upgrade to lib-explorer-3.0.6
 * Upgrade to react 6.12
 * Upgrade to semantic-ui-react 1.2.1
+* Expose fields to Collector React Component
+* BUGFIX Too strict GraphQL Schema lead to missing field values
 
 ### 1.0.0
 
