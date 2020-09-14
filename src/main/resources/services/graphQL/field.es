@@ -27,7 +27,7 @@ const FIELD_VALUE_OBJECT_TYPE = createObjectType({
 		field: { type: nonNull(GraphQLString) },
 		fieldReference: { type: nonNull(GraphQLString) },
 		type: { type: nonNull(GraphQLString) },
-		value: { type: nonNull(GraphQLString) }
+		value: { type: GraphQLString } // Found to be null in prod :(
 	}
 });
 
