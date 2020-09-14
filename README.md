@@ -186,12 +186,12 @@ app-explorer
 
 | App version | XP version |
 | ----------- | ---------- |
-| 1.0.1 | 7.3.1 |
+| 1.1.0 | 7.3.1 |
 | 1.0.0 | 7.3.0 |
 
 ## Changelog
 
-### 1.0.1
+### 1.1.0
 
 * Require Enonic XP 7.3.1
 * Upgrade to lib-explorer-3.0.6
