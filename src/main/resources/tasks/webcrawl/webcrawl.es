@@ -251,7 +251,7 @@ export function run({
 				//const dom = parseDOM(res.body, options);
 				const rootNode = cheerio.load(res.body, {
 					xmlMode: false
-		    }).root(); //log.info(safeStringify({rootNode})); // Huuuuuuuge!!!
+				}).root(); //log.info(safeStringify({rootNode})); // Huuuuuuuge!!!
 				//log.info(safeStringify({html: rootNode.html()}));
 
 				const headEl = querySelector(rootNode, 'head');
