@@ -199,6 +199,7 @@ app-explorer
 * Upgrade to semantic-ui-react 1.2.1
 * Expose fields to Collector React Component
 * BUGFIX Too strict GraphQL Schema lead to missing field values
+* Webcrawler collector: Add https:// if no :// in url
 
 ### 1.0.0
 
