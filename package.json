@@ -9,6 +9,7 @@
     "react": "16.12.0",
     "react-dom": "16.12.0",
     "react-html-parser": "2.0.2",
+    "regenerator-runtime": "^0.13.7",
     "robots-txt-guard": "0.2.1",
     "semantic-ui-css": "2.4.1",
     "set-value": "3.0.2",

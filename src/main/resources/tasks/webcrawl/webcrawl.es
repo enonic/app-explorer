@@ -99,8 +99,10 @@ export function run({
 	if (!collector.config.baseUri) { throw new Error('Config is missing required parameter baseUri!'); }
 	collector.start();
 
+	let {
+		baseUri
+	} = collector.config;
 	const {
-		baseUri,
 		resume = false,
 		excludes = [],
 		userAgent = DEFAULT_UA
@@ -110,6 +112,7 @@ export function run({
 	const excludeRegExps = excludes.map(str => new RegExp(str));
 
 	// Galimatias
+	if (!baseUri.includes('://')) { baseUri = `https://${baseUri}`;}
 	const entryPointUrlObj = new URL(baseUri);
 
 	const normalizedentryPointUrl = entryPointUrlObj.normalize();

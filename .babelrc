@@ -8,7 +8,11 @@
     [
         "@babel/preset-env",
         {
-            "useBuiltIns": false
+			"forceAllTransforms": false,
+			"targets": {
+				"esmodules": true
+			},
+            "useBuiltIns": "usage"
         }
     ]
   ]

@@ -73,13 +73,25 @@ const CLIENT_JS_CONFIG = {
 						'@babel/plugin-syntax-dynamic-import',
 						'@babel/plugin-syntax-throw-expressions',
 						'@babel/plugin-transform-object-assign',
-						['@babel/plugin-transform-runtime', {
-							regenerator: true
-						}],
 						'array-includes'
 					],
 					presets: [
-						'@babel/preset-env',
+						[
+							'@babel/preset-env',
+							{
+								corejs: 3,
+
+								// Enables all transformation plugins and as a result,
+								// your code is fully compiled to ES5
+								forceAllTransforms: true,
+
+								targets: {
+									esmodules: false // Enonic XP doesn't support ECMAScript Modules
+								},
+
+								useBuiltIns: 'usage' // false means polyfill not required runtime
+							}
+						],
 						'@babel/preset-react'
 					]
 				} // options
