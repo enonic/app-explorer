@@ -200,6 +200,7 @@ app-explorer
 * Expose fields to Collector React Component
 * BUGFIX Too strict GraphQL Schema lead to missing field values
 * Webcrawler collector: Add https:// if no :// in url
+* Make initialization a task and show progress in admin app rather than an error
 
 ### 1.0.0
 

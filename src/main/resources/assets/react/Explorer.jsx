@@ -1,5 +1,5 @@
 import {
-	Header, Icon, List, Menu, Modal, /*Popup,*/ Sidebar
+	Header, Icon, List, Menu, Modal, Sidebar
 } from 'semantic-ui-react';
 
 import {Collections} from './Collections';

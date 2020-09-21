@@ -10,20 +10,86 @@ import {
 } from '/lib/xp/admin';*/
 import {assetUrl, serviceUrl} from '/lib/xp/portal';
 
-import {PRINCIPAL_EXPLORER_READ} from '/lib/explorer/model/2/constants';
+import {
+	PRINCIPAL_EXPLORER_READ//,
+	//REPO_ID_EXPLORER
+} from '/lib/explorer/model/2/constants';
 import {connect} from '/lib/explorer/repo/connect';
 import {query as queryCollectors} from '/lib/explorer/collector/query';
-
+//import {get as getRepo} from '/lib/xp/repo';
+import {list as listTasks} from '/lib/xp/task';
 
 const ID_REACT_EXPLORER_CONTAINER = 'reactExplorerContainer';
 
+//const {currentTimeMillis} = Java.type('java.lang.System');
 
 export function htmlResponse({
-	title = '',
 	status = 200
 } = {}) {
+	const filteredTaskList = listTasks({
+		name: 'com.enonic.app.explorer:init'
+	});
+	//const currentTime = currentTimeMillis();
+	//if (!getRepo(REPO_ID_EXPLORER)) {
+	if (filteredTaskList.length) {
+		const {
+			progress: {
+				current,
+				info,
+				total
+			},
+			//startTime,
+			state
+		} = filteredTaskList[0];
+		//const remainingCount = total - current;
+		if(['RUNNING','WAITING'].includes(state)) {
+			return {
+				body: `<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=Edge">
+		<meta name="viewport" content="width=device-width, user-scalable=no">
+		<meta name="theme-color" content="#ffffff">
+		<meta http-equiv="refresh" content="1"/>
+		<title>Explorer</title>
+		<style>
+			td, th {
+				border: 1px solid gray;
+				padding: 2px;
+			}
+			th {
+				font-weight: bold;
+			}
+		</style>
+	</head>
+	<body>
+		<main>
+			<h1>Initialization task progress</h1>
+			<table style="width:100%">
+				<thead>
+					<tr>
+						<th>Info</th>
+						<th>Progress</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td style="width: 1%;white-space: nowrap;">${info}</td>
+						<td><div style="background-color:lightgray;text-align: center;width:${current/total*100}%">[${current}/${total}]</div></td>
+					</tr>
+				</tbody>
+			</table>
+			<p>Refreshing page in 1 second.</p>
+		</main>
+	</body>
+</html>`,
+				contentType: 'text/html; charset=utf-8'
+			};
+		}
+	}
+
 	//log.info(toStr({path}));
-	const preTitle = title ? `${title} - ` : '';
 
 	const licenseDetails = validateLicense({appKey: app.name});
 	//log.info(`licenseDetails:${toStr(licenseDetails)}`);
@@ -142,7 +208,7 @@ services: {}, // Workaround for i18nUrl BUG
 		<script type="text/javascript" src="${assetUrl({path: 'react-dom/react-dom.development.js'})}"></script>
 		<link rel="shortcut icon" href="${assetUrl({path: 'favicon.ico'})}">
 		<link rel="stylesheet" type="text/css" href="${assetUrl({path: 'semantic-ui-css/semantic.css'})}">
-		<title>${preTitle}Explorer</title>
+		<title>Explorer</title>
 	</head>
 	<body style="background-color: white !important;">
 		<div id="${ID_REACT_EXPLORER_CONTAINER}"/>
