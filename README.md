@@ -201,6 +201,7 @@ app-explorer
 * BUGFIX Too strict GraphQL Schema lead to missing field values
 * Webcrawler collector: Add https:// if no :// in url
 * Make initialization a task and show progress in admin app rather than an error
+* BUGFIX A collector application can't check the license of app-explorer
 
 ### 1.0.0
 
