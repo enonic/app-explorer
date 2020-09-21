@@ -1,15 +1,18 @@
 import {
-	progress as reportProgress
+	progress as reportProgress//,
+	//sleep
 } from '/lib/xp/task';
 
 export class Progress {
 	constructor({
 		current = 0,
 		info = 'Initializing',
+		//sleepMsAfterItem = 0,
 		total = 1
 	} = {}) {
 		this.current = current;
 		this.info = info;
+		//this.sleepMsAfterItem = sleepMsAfterItem;
 		this.total = total;
 	}
 
@@ -43,6 +46,9 @@ export class Progress {
 		if (info) {
 			this.info = info;
 		}
+		/*if (this.sleepMsAfterItem) {
+			sleep(this.sleepMsAfterItem);
+		}*/
 		return this; // chainable
 	}
 } // class Progress

@@ -32,6 +32,7 @@ export const EVENT_INIT_COMPLETE = `${APP_EXPLORER}.init.complete`;
 export function run() {
 	const progress = new Progress({
 		info: 'Task started',
+		//sleepMsAfterItem: 1000, // DEBUG
 		total: ROLES.length + USERS.length + REPOSITORIES.length + DEFAULT_FIELDS.length + 3
 		// Field type document
 		// Default interface

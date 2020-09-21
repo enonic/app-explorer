@@ -167,6 +167,7 @@ const SS_EXTERNALS = [
 	'/lib/xp/event',
 	'/lib/xp/io',
 	'/lib/xp/portal',
+	'/lib/xp/repo',
 	'/lib/xp/task',
 	'/lib/xp/value',
 	'/lib/xp/websocket'

@@ -11,12 +11,12 @@ import {
 import {assetUrl, serviceUrl} from '/lib/xp/portal';
 
 import {
-	PRINCIPAL_EXPLORER_READ//,
-	//REPO_ID_EXPLORER
+	PRINCIPAL_EXPLORER_READ,
+	REPO_ID_EXPLORER
 } from '/lib/explorer/model/2/constants';
 import {connect} from '/lib/explorer/repo/connect';
 import {query as queryCollectors} from '/lib/explorer/collector/query';
-//import {get as getRepo} from '/lib/xp/repo';
+import {get as getRepo} from '/lib/xp/repo';
 import {list as listTasks} from '/lib/xp/task';
 
 const ID_REACT_EXPLORER_CONTAINER = 'reactExplorerContainer';
@@ -26,12 +26,28 @@ const ID_REACT_EXPLORER_CONTAINER = 'reactExplorerContainer';
 export function htmlResponse({
 	status = 200
 } = {}) {
+	// On first startup repos are not yet created.
+	// There is a init task, but it takes a little while to start it.
+
+	let initTask;
+	if (!getRepo(REPO_ID_EXPLORER)) {
+		initTask = {
+			progress: {
+				current: 0,
+				info: 'Starting task...',
+				total: '15'
+			},
+			state: 'STARTING'
+		};
+	}
 	const filteredTaskList = listTasks({
 		name: 'com.enonic.app.explorer:init'
 	});
-	//const currentTime = currentTimeMillis();
-	//if (!getRepo(REPO_ID_EXPLORER)) {
 	if (filteredTaskList.length) {
+		initTask = filteredTaskList[0];
+	}
+	if (initTask) {
+		//const currentTime = currentTimeMillis();
 		const {
 			progress: {
 				current,
@@ -40,9 +56,9 @@ export function htmlResponse({
 			},
 			//startTime,
 			state
-		} = filteredTaskList[0];
+		} = initTask;
 		//const remainingCount = total - current;
-		if(['RUNNING','WAITING'].includes(state)) {
+		if(['STARTING', 'RUNNING','WAITING'].includes(state)) {
 			return {
 				body: `<!DOCTYPE html>
 <html>
