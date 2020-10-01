@@ -13,6 +13,9 @@ import webpack from 'webpack';
 //const MODE = 'development';
 const MODE = 'production';
 
+const BOOL_LIB_EXPLORER_EXTERNAL = true;
+//const BOOL_LIB_EXPLORER_EXTERNAL = false;
+
 const SRC_DIR = 'src/main/resources';
 const SRC_DIR_ABS = path.resolve(__dirname, SRC_DIR);
 const SRC_ASSETS_DIR_ABS = path.resolve(SRC_DIR_ABS, 'assets');
@@ -164,14 +167,24 @@ const SS_EXTERNALS = [
 	'/lib/xp/cluster',
 	'/lib/xp/common',
 	'/lib/xp/content',
+	'/lib/xp/context', // Needed by lib-explorer
 	'/lib/xp/event',
+	'/lib/xp/i18n', // Needed by lib-explorer
 	'/lib/xp/io',
+	'/lib/xp/mail', // Needed by lib-explorer
+	'/lib/xp/node', // Needed by lib-explorer
 	'/lib/xp/portal',
 	'/lib/xp/repo',
 	'/lib/xp/task',
 	'/lib/xp/value',
 	'/lib/xp/websocket'
 ];
+
+if (BOOL_LIB_EXPLORER_EXTERNAL) {
+	SS_EXTERNALS.push(/^\/lib\/explorer\//);
+} else {
+	SS_ALIAS['/lib/explorer'] = path.resolve(__dirname, '../lib-explorer/src/main/resources/lib/explorer/');
+}
 
 const SS_FILES = [
 	'src/main/resources/admin/tools/explorer/explorer',
@@ -258,7 +271,6 @@ const SS_PLUGINS = [
 
 if (MODE === 'production') {
 	SS_EXTERNALS.push('/lib/cron');
-	SS_EXTERNALS.push(/^\/lib\/explorer\//);
 	SS_EXTERNALS.push('/lib/util');
 	SS_EXTERNALS.push(/^\/lib\/util\//);
 } else {
@@ -270,7 +282,7 @@ if (MODE === 'production') {
 	SS_EXTERNALS.push('/lib/xp/repo');
 
 	SS_ALIAS['/lib/cron'] = path.resolve(__dirname, '../lib-cron/src/main/resources/lib/cron/');
-	SS_ALIAS['/lib/explorer'] = path.resolve(__dirname, '../lib-explorer/src/main/resources/lib/explorer/');
+
 	SS_ALIAS['/lib/util'] = path.resolve(__dirname, '../lib-util/src/main/resources/lib/util');
 	SS_PLUGINS.push(new BrowserSyncPlugin({
 		host: 'localhost',

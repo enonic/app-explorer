@@ -186,15 +186,22 @@ app-explorer
 
 | App version | XP version |
 | ----------- | ---------- |
+| 1.2.0 | 7.3.2 |
 | 1.1.0 | 7.3.1 |
 | 1.0.0 | 7.3.0 |
 
 ## Changelog
 
+### 1.2.0
+
+* Upgrade to lib-explorer-3.1.0
+* Use highlighter provided by Enonic API
+* Require Enonic XP 7.3.2
+
 ### 1.1.0
 
 * Require Enonic XP 7.3.1
-* Upgrade to lib-explorer-3.0.6
+* Upgrade to lib-explorer-3.0.7
 * Upgrade to react 6.12
 * Upgrade to semantic-ui-react 1.2.1
 * Expose fields to Collector React Component
