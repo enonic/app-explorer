@@ -34,6 +34,11 @@ const INTERFACES_GQL = `queryInterfaces {
 		resultMappings {
 			field
 			highlight
+			highlightFragmenter
+			highlightNumberOfFragments
+			highlightOrder
+			highlightPostTag
+			highlightPreTag
 			lengthLimit
 			to
 			type

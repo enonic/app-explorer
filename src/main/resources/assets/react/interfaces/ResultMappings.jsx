@@ -1,5 +1,5 @@
 //import getIn from 'get-value';
-import {Button, Form, Header, Table} from 'semantic-ui-react';
+import {Button, Form, Header, Label, Table} from 'semantic-ui-react';
 
 //import {getEnonicContext} from 'semantic-ui-react-form/Context';
 import {Checkbox} from 'semantic-ui-react-form/inputs/Checkbox';
@@ -42,12 +42,12 @@ export function ResultMappings(props) {
 						</Table.Row>
 					</Table.Header>
 					<Table.Body>{resultMappingsArray.map(({
-						field,
+						//field,
 						highlight,
 						join,
 						lengthLimit,
 						separator,
-						to,
+						//to,
 						type
 					}, index) => {
 						//console.debug('ResultMappings field', field, 'to', to, 'type', type, 'join', join, 'separator', separator, 'highlight', highlight, 'lengthLimit', lengthLimit);
@@ -92,6 +92,52 @@ export function ResultMappings(props) {
 										label="Highlight?"
 										path={`${pathWithIndex}.highlight`}
 									/></Form.Field>
+									{highlight
+										? <>
+											<Form.Field><Label content='Highlight fragmenter:'/><Dropdown
+												options={[{
+													key: 'span',
+													text: 'span',
+													value: 'span'
+												},{
+													key: 'simple',
+													text: 'simple',
+													value: 'simple'
+												}]}
+												path={`${pathWithIndex}.highlightFragmenter`}
+												placeholder='Select highlight fragmenter'
+												search
+												selection
+											/></Form.Field>
+											<Form.Field><Label content='Highlight number of fragments:'/><Input
+												path={`${pathWithIndex}.highlightNumberOfFragments`}
+												type='number'
+											/></Form.Field>
+											<Form.Field><Label content='Highlight Order:'/><Dropdown
+												options={[{
+													key: 'none',
+													text: 'none',
+													value: 'none'
+												},{
+													key: 'score',
+													text: 'score',
+													value: 'score'
+												}]}
+												path={`${pathWithIndex}.highlightOrder`}
+												placeholder='Select highlight order'
+												search
+												selection
+											/></Form.Field>
+											<Form.Field><Label content='Highlight pre tag:'/><Input
+												path={`${pathWithIndex}.highlightPreTag`}
+											/></Form.Field>
+											<Form.Field><Label content='Highlight post tag:'/><Input
+												path={`${pathWithIndex}.highlightPostTag`}
+											/></Form.Field>
+										</>
+										: null
+									}
+
 									<Form.Field><Input
 										label="Limit length to"
 										path={`${pathWithIndex}.lengthLimit`}
@@ -133,7 +179,7 @@ export function ResultMappings(props) {
 							</Table.Cell>
 						</Table.Row>;
 					})}</Table.Body>
-				</Table>
+				</Table>;
 			}}
 		/>
 	</>;

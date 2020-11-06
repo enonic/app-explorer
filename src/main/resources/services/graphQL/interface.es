@@ -69,6 +69,11 @@ const RESULT_MAPPING_OBJECT_TYPE = createObjectType({
 	fields: {
 		field: { type: nonNull(GraphQLString) },
 		highlight: { type: nonNull(GraphQLBoolean) },
+		highlightFragmenter: { type: GraphQLString }, // TODO nonNull?
+		highlightNumberOfFragments: { type: GraphQLBoolean}, // TODO nonNull?
+		highlightOrder: { type: GraphQLString }, // TODO nonNull?
+		highlightPostTag: { type: GraphQLString }, // TODO nonNull?
+		highlightPreTag: { type: GraphQLString }, // TODO nonNull?
 		lengthLimit: { type: GraphQLInt },
 		to: { type: nonNull(GraphQLString) },
 		type: { type: nonNull(GraphQLString) }
@@ -101,7 +106,7 @@ const INTERFACE_OBJECT_TYPE = createObjectType({
 
 
 export const queryInterfaces = {
-	resolve: (env) => {
+	resolve: (/*env*/) => {
 		//log.info(`env:${toStr(env)}`);
 		const connection = connect({ principals: [PRINCIPAL_EXPLORER_READ] });
 		const interfacesRes = query({
@@ -150,12 +155,22 @@ export const queryInterfaces = {
 			resultMappings: forceArray(resultMappings).map(({
 				field,
 				highlight,
+				highlightFragmenter = 'span',
+				highlightNumberOfFragments = 1,
+				highlightOrder = 'none',
+				highlightPostTag = '</em>',
+				highlightPreTag = '<em>',
 				lengthLimit,
 				to,
 				type
 			}) => ({
 				field,
 				highlight,
+				highlightFragmenter,
+				highlightNumberOfFragments,
+				highlightOrder,
+				highlightPostTag,
+				highlightPreTag,
 				lengthLimit: isInt(lengthLimit) ? lengthLimit : null,
 				to,
 				type
