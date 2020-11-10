@@ -186,11 +186,20 @@ app-explorer
 
 | App version | XP version |
 | ----------- | ---------- |
-| 1.2.0 | 7.3.2 |
+| 1.[23].0 | 7.3.2 |
 | 1.1.0 | 7.3.1 |
 | 1.0.0 | 7.3.0 |
 
 ## Changelog
+
+### 1.3.0
+
+* Make sure fragmentSize and numberOfFragments are integers
+* Make it possible to select highlight fragmenter, numberOfFragments, order, postTag and preTag
+* Upgrade to lib-explorer-3.5.0
+  * Work around nashorn issue with trunc and toInt
+  * Improve debugging with explain and logQueryResults parameters
+  * Use highlight fragmenter, numberOfFragments, order, postTag and preTag when searching
 
 ### 1.2.0
 
