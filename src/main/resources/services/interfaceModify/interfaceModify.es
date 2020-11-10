@@ -1,3 +1,4 @@
+//import {toStr} from '/lib/util';
 import {sanitize} from '/lib/xp/common';
 
 import {
@@ -8,6 +9,7 @@ import {modify} from '/lib/explorer/node/modify';
 import {connect} from '/lib/explorer/repo/connect';
 import {interfaceModel} from '/lib/explorer/model/2/nodeTypes/interface';
 import {jsonError} from '/lib/explorer/jsonError';
+import {mapResultMappings} from '../graphQL/interface';
 
 
 export function post({
@@ -23,6 +25,7 @@ export function post({
 		return jsonError('Missing required parameter json!');
 	}
 	const obj = JSON.parse(json);
+	//log.info(`obj:${toStr(obj)}`);
 
 	const writeConnection = connect({
 		principals: [PRINCIPAL_EXPLORER_WRITE]
@@ -47,14 +50,16 @@ export function post({
 		}
 	}
 
+	obj.resultMappings = mapResultMappings(obj.resultMappings);
+
 	obj.__connection = writeConnection; // eslint-disable-line no-underscore-dangle
 	const node = modify(interfaceModel(obj));
 	const body = {};
 	let status = 200;
 	if (node) {
-		body.message = `Interface ${obj._name} updated.`
+		body.message = `Interface ${obj._name} updated.`;
 	} else {
-		body.error = `Something went wrong when trying to update interface ${obj._name}!`
+		body.error = `Something went wrong when trying to update interface ${obj._name}!`;
 	}
 	return {
 		body,

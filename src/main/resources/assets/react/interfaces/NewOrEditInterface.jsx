@@ -60,7 +60,7 @@ export function NewOrEditInterface(props) {
 					deref.isLoading = false;
 					deref.initialValues = data;
 					return deref;
-				})
+				});
 			});
 	}, []);
 
@@ -81,7 +81,7 @@ export function NewOrEditInterface(props) {
 				method: 'POST'
 			}).then(response => {
 				if (response.status === 200) { onClose(); }
-			})
+			});
 		}}
 	>
 		<Form as='div'>

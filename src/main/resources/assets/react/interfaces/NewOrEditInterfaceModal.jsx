@@ -1,4 +1,4 @@
-import {Button, Header, Icon, Modal, Popup} from 'semantic-ui-react';
+import {Button, Icon, Modal, Popup} from 'semantic-ui-react';
 
 import {NewOrEditInterface} from './NewOrEditInterface';
 import {UploadLicense} from '../UploadLicense';
@@ -30,7 +30,7 @@ export function NewOrEditInterfaceModal(props) {
 	const onClose = () => {
 		setOpen(false);
 		afterClose();
-	}
+	};
 
 	return <Modal
 		closeIcon

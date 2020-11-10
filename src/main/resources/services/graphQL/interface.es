@@ -69,12 +69,12 @@ const RESULT_MAPPING_OBJECT_TYPE = createObjectType({
 	fields: {
 		field: { type: nonNull(GraphQLString) },
 		highlight: { type: nonNull(GraphQLBoolean) },
-		highlightFragmenter: { type: GraphQLString }, // TODO nonNull?
-		highlightNumberOfFragments: { type: GraphQLBoolean}, // TODO nonNull?
-		highlightOrder: { type: GraphQLString }, // TODO nonNull?
-		highlightPostTag: { type: GraphQLString }, // TODO nonNull?
-		highlightPreTag: { type: GraphQLString }, // TODO nonNull?
-		lengthLimit: { type: GraphQLInt },
+		highlightFragmenter: { type: GraphQLString }, // NOTE undefined allowed
+		highlightNumberOfFragments: { type: GraphQLInt }, // NOTE undefined allowed
+		highlightOrder: { type: GraphQLString }, // NOTE undefined allowed
+		highlightPostTag: { type: GraphQLString }, // NOTE undefined allowed
+		highlightPreTag: { type: GraphQLString }, // NOTE undefined allowed
+		lengthLimit: { type: GraphQLInt }, // NOTE undefined allowed
 		to: { type: nonNull(GraphQLString) },
 		type: { type: nonNull(GraphQLString) }
 	}
@@ -103,6 +103,42 @@ const INTERFACE_OBJECT_TYPE = createObjectType({
 		type: { type: nonNull(GraphQLString) }
 	}
 }); // INTERFACE_OBJECT_TYPE
+
+export const mapResultMappings = (resultMappings) => forceArray(resultMappings).map(({
+	field,
+	highlight = false,
+	highlightFragmenter = highlight ? 'span' : undefined,
+	highlightNumberOfFragments = highlight ? 1 : undefined,
+	highlightOrder = highlight ? 'none' : undefined,
+	highlightPostTag = highlight ? '</em>' : undefined,
+	highlightPreTag = highlight ? '<em>' : undefined,
+	lengthLimit = highlight ? 100 : undefined,
+	to,
+	type
+}) => {
+	let intOrUndefinedNumberOfFragments = parseInt(highlightNumberOfFragments, 10);
+	if (!isInt(intOrUndefinedNumberOfFragments)) {
+		intOrUndefinedNumberOfFragments = undefined;
+	}
+
+	let intOrUndefinedLengthLimit = parseInt(lengthLimit, 10);
+	if (!isInt(intOrUndefinedLengthLimit)) {
+		intOrUndefinedLengthLimit = undefined;
+	}
+
+	return {
+		field,
+		highlight,
+		highlightFragmenter: highlight ? highlightFragmenter : undefined,
+		highlightNumberOfFragments: highlight ? intOrUndefinedNumberOfFragments : undefined,
+		highlightOrder: highlight ? highlightOrder : undefined,
+		highlightPostTag: highlight ? highlightPostTag : undefined,
+		highlightPreTag: highlight ? highlightPreTag : undefined,
+		lengthLimit: intOrUndefinedLengthLimit,
+		to,
+		type
+	};
+});
 
 
 export const queryInterfaces = {
@@ -152,29 +188,7 @@ export const queryInterfaces = {
 				})) : null
 			},
 			queryJson: query ? JSON.stringify(query) : null,
-			resultMappings: forceArray(resultMappings).map(({
-				field,
-				highlight,
-				highlightFragmenter = 'span',
-				highlightNumberOfFragments = 1,
-				highlightOrder = 'none',
-				highlightPostTag = '</em>',
-				highlightPreTag = '<em>',
-				lengthLimit,
-				to,
-				type
-			}) => ({
-				field,
-				highlight,
-				highlightFragmenter,
-				highlightNumberOfFragments,
-				highlightOrder,
-				highlightPostTag,
-				highlightPreTag,
-				lengthLimit: isInt(lengthLimit) ? lengthLimit : null,
-				to,
-				type
-			})),
+			resultMappings: mapResultMappings(resultMappings),
 			type
 		}));
 		return interfacesRes;
