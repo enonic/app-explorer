@@ -196,6 +196,8 @@ app-explorer
 
 * Make sure fragmentSize and numberOfFragments are integers
 * Make it possible to select highlight fragmenter, numberOfFragments, order, postTag and preTag
+* Upgrade to lib-explorer-3.5.1
+  * Log stacktraces when catching
 * Upgrade to lib-explorer-3.5.0
   * Work around nashorn issue with trunc and toInt
   * Improve debugging with explain and logQueryResults parameters
