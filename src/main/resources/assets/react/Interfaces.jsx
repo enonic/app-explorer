@@ -47,9 +47,9 @@ const INTERFACES_GQL = `queryInterfaces {
 	}
 }`;
 
-const ALL_GQL = `{
+/*const ALL_GQL = `{
 	${INTERFACES_GQL}
-}`;
+}`;*/
 
 
 export function Interfaces({
