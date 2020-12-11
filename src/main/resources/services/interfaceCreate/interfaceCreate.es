@@ -11,12 +11,10 @@ import {mapResultMappings} from '../graphQL/interface';
 
 
 export function post({
-	params: {
-		json
-	}
+	body: json
 }) {
 	if (!json) {
-		return jsonError('Missing required parameter json!');
+		return jsonError('Empty body!');
 	}
 	const obj = JSON.parse(json);
 	//log.info(`obj:${toStr(obj)}`);

@@ -73,12 +73,16 @@ export function NewOrEditInterface(props) {
 			//console.debug('submit values', values);
 			let url = `${servicesBaseUrl}/interface`;
 			if (id) {
-				url = `${url}Modify?id=${id}&json=${JSON.stringify(values)}`;
+				url = `${url}Modify?id=${id}`;
 			} else {
-				url = `${url}Create?json=${JSON.stringify(values)}`;
+				url = `${url}Create`;
 			}
 			fetch(url, {
-				method: 'POST'
+				method: 'POST',
+				headers: {
+					'Content-Type':	'application/json'
+				},
+				body: JSON.stringify(values)
 			}).then(response => {
 				if (response.status === 200) { onClose(); }
 			});

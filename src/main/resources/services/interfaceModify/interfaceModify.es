@@ -13,16 +13,16 @@ import {mapResultMappings} from '../graphQL/interface';
 
 
 export function post({
+	body: json,
 	params: {
-		id,
-		json
+		id
 	}
 }) {
 	if (!id) {
 		return jsonError('Missing required parameter id!');
 	}
 	if (!json) {
-		return jsonError('Missing required parameter json!');
+		return jsonError('Empty body!');
 	}
 	const obj = JSON.parse(json);
 	//log.info(`obj:${toStr(obj)}`);

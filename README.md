@@ -194,6 +194,7 @@ app-explorer
 
 ### 1.3.0
 
+* Interface data in POST body rather than params.json
 * Make sure fragmentSize and numberOfFragments are integers
 * Make it possible to select highlight fragmenter, numberOfFragments, order, postTag and preTag
 * Upgrade to lib-explorer-3.5.1
