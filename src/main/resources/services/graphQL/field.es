@@ -53,11 +53,24 @@ const FIELD_OBJECT_TYPE = createObjectType({
 
 
 export const queryFields = {
+	args: {
+		fields: list(GraphQLString)
+	},
 	resolve: (env) => {
 		//log.info(`env:${toStr(env)}`);
+
+		const {args} = env;
+		//log.info(`args:${toStr(args)}`);
+
+		const {fields} = args;
+		//log.info(`fields:${toStr(fields)}`);
+
 		const connection = connect({ principals: [PRINCIPAL_EXPLORER_READ] });
 
-		const fieldValuesRes = getFieldValues({connection});
+		const fieldValuesRes = getFieldValues({
+			connection,
+			field: fields
+		});
 		//log.info(`fieldValuesRes:${toStr(fieldValuesRes)}`);
 
 		const fieldValuesObjArr = {};
@@ -85,7 +98,10 @@ export const queryFields = {
 		}); // forEach fieldValue
 		//log.info(`fieldValuesObjArr:${toStr(fieldValuesObjArr)}`);
 
-		const fieldsRes = getFields({connection});
+		const fieldsRes = getFields({
+			connection,
+			fields
+		});
 		//log.info(`fieldsRes:${toStr(fieldsRes)}`);
 
 		fieldsRes.hits = fieldsRes.hits.map(({

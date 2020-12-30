@@ -192,6 +192,15 @@ app-explorer
 
 ## Changelog
 
+### 1.4.0
+
+* Make it possible to link a thesaurus to none, any or specific language(s)
+* Upgrade to lib-explorer-3.7.0
+  * Added languages field to thesaurus
+  * getFields({fields}) make it possible to only get some fields
+  * getFieldValues({field}) field can now be an array of fields
+  * hasValue(field, values) now applies forceArray to its second parameter
+
 ### 1.3.0
 
 * Interface data in POST body rather than params.json

@@ -1,7 +1,9 @@
 import {
-	Button, Form, Header, Icon, Input, Modal, Popup
+	Button, Form, Header, Icon, Modal, Popup
 } from 'semantic-ui-react';
 
+//import {Dropdown} from 'semantic-ui-react-form';
+import {Dropdown} from 'semantic-ui-react-form/inputs/Dropdown';
 import {Form as EnonicForm} from 'semantic-ui-react-form/Form';
 import {Input as EnonicInput} from 'semantic-ui-react-form/inputs/Input';
 import {ResetButton} from 'semantic-ui-react-form/buttons/ResetButton';
@@ -19,6 +21,8 @@ export function NewOrEditThesaurus(props) {
 	const {
 		id,
 		displayName = '',
+		languages = [],
+		languagesOptions,
 		licenseValid,
 		name = '',
 		onClose,
@@ -26,7 +30,11 @@ export function NewOrEditThesaurus(props) {
 		setLicensedTo,
 		setLicenseValid
 	} = props;
+	//console.debug('NewOrEditThesaurus id', id);
+	//console.debug('NewOrEditThesaurus displayName', displayName);
+	//console.debug('NewOrEditThesaurus languages', languages);
 	//console.debug('NewOrEditThesaurus licenseValid', licenseValid);
+	//console.debug('NewOrEditThesaurus name', name);
 
 	const [open, setOpen] = React.useState(false);
 
@@ -68,21 +76,26 @@ export function NewOrEditThesaurus(props) {
 				<Modal.Content>
 					<EnonicForm
 						initialValues={{
-							name,
-							displayName
+							displayName,
+							languages,
+							name
 						}}
-						onSubmit={({
-							name,
-							displayName
-						}) => {
-							fetch(`${servicesBaseUrl}/thesaurus${id ? 'Update' : 'Create'}?displayName=${displayName}${id ? `&id=${id}` : ''}&name=${name}`, {
-								method: 'POST'
-							}).then(response => {
-								doClose();
-							})
+						onSubmit={(values) => {
+							//console.debug('onSubmit values', values);
+							fetch(`${servicesBaseUrl}/thesaurus${id ? 'Update' : 'Create'}`, {
+								method: 'POST',
+								headers: {
+									'Content-Type':	'application/json'
+								},
+								body: JSON.stringify(values)
+							}).then((response) => {
+								if (response.status === 200) {doClose();}
+								//doClose();
+							});
 						}}
 						schema={{
 							displayName: (value) => required(value),
+							//languages: (value) => required(value),
 							name: (value) => required(value)
 						}}
 					>
@@ -103,6 +116,17 @@ export function NewOrEditThesaurus(props) {
 									placeholder='Please input display name'
 								/>
 							</Form.Field>
+							<Form.Field>
+								<Dropdown
+									multiple={true}
+									options={languagesOptions}
+									path='languages'
+									placeholder='Select when to apply thesaurus'
+									search
+									selection
+								/>
+							</Form.Field>
+							{/*value={languages}*/}
 							<Form.Field>
 								<SubmitButton/>
 								<ResetButton/>

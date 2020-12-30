@@ -1,3 +1,4 @@
+import {jsonError} from '/lib/explorer/jsonError';
 import {
 	PRINCIPAL_EXPLORER_WRITE,
 	RT_JSON
@@ -5,20 +6,36 @@ import {
 import {connect} from '/lib/explorer/repo/connect';
 import {create} from '/lib/explorer/node/create';
 import {thesaurus} from '/lib/explorer/model/2/nodeTypes/thesaurus';
+//import {toStr} from '/lib/util';
 
 
 export function post({
-	params: {
-		displayName,
-		name
-	}
+	body: json
 }) {
+	if (!json) {
+		return jsonError('Empty body!');
+	}
+	const obj = JSON.parse(json);
+	//log.info(`obj:${toStr(obj)}`);
+
+	const {
+		displayName,
+		//id,
+		languages,
+		name
+	} = obj;
+	//log.info(`displayName:${toStr(displayName)}`);
+	//log.info(`id:${toStr(id)}`);
+	//log.info(`languages:${toStr(languages)}`);
+	//log.info(`name:${toStr(name)}`);
+
 	const createRes = create(thesaurus({
 		__connection: connect({
 			principals: [PRINCIPAL_EXPLORER_WRITE]
 		}),
 		_name: name,
-		displayName
+		displayName,
+		languages
 	}));
 	const body = {};
 	let status = 200;
