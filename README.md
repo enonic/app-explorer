@@ -186,6 +186,7 @@ app-explorer
 
 | App version | XP version |
 | ----------- | ---------- |
+| 1.4.0 | 7.4.1 |
 | 1.[23].0 | 7.3.2 |
 | 1.1.0 | 7.3.1 |
 | 1.0.0 | 7.3.0 |
@@ -203,6 +204,9 @@ app-explorer
   * getFields({fields}) make it possible to only get some fields
   * getFieldValues({field}) field can now be an array of fields
   * hasValue(field, values) now applies forceArray to its second parameter
+* Upgrade to lib-explorer-3.6.0
+  * Generate href for hit tags
+  * Require Enonic XP 7.4.1
 
 ### 1.3.0
 
