@@ -195,6 +195,9 @@ app-explorer
 ### 1.4.0
 
 * Make it possible to link a thesaurus to none, any or specific language(s)
+* Upgrade to lib-explorer-3.8.0
+  * getSynonyms will now filter on languages
+  * thesaurus/query({thesauri}) make it possible to filter on thesaurus name(s)
 * Upgrade to lib-explorer-3.7.0
   * Added languages field to thesaurus
   * getFields({fields}) make it possible to only get some fields
