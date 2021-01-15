@@ -3,7 +3,7 @@ package com.enonic.explorer;
 import java.util.Arrays;
 import java.util.Locale;
 
-import static com.google.common.base.Strings.isNullOrEmpty;
+//import static com.google.common.base.Strings.isNullOrEmpty;
 
 import com.enonic.xp.script.bean.BeanContext;
 import com.enonic.xp.script.bean.ScriptBean;
@@ -14,14 +14,22 @@ import com.enonic.xp.script.bean.ScriptBean;
 //public abstract class Locales implements ScriptBean
 public final class Locales implements ScriptBean
 {
-	public LocaleListJson getLocales()
+
+	//public List<String> getLocales()
+	public Locale[] getLocales()
+	{
+		return Locale.getAvailableLocales();
+	}
+
+	/*public LocaleListJson getLocales()
 	{
 		Locale[] locales = Locale.getAvailableLocales();
 		locales = Arrays.stream( locales ).
 		filter( ( locale ) -> !isNullOrEmpty( locale.toLanguageTag() ) && !isNullOrEmpty( locale.getDisplayName() ) ).
 		toArray( Locale[]::new );
 		return new LocaleListJson( locales );
-	}
+	}*/
+
 	/*public LocaleListJson getLocales( @QueryParam("query") final String query )
     {
         Locale[] locales = Locale.getAvailableLocales();
