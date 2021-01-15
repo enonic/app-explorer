@@ -1,6 +1,8 @@
 //const Locale = Java.type('java.util.Locale');
 //const {Locale} = Java.type('java.util');
-export const {getAvailableLocales: getLocales} = Java.type('java.util.Locale');
+//export const {getAvailableLocales: getLocales} = Java.type('java.util.Locale');
+
+export const getLocales = () => __.toNativeObject(Java.type('java.util.Locale').getAvailableLocales());
 
 /*export const getLocales = () => {
 	//const BEAN = __.newBean('com.enonic.explorer.Locales');
