@@ -5,10 +5,14 @@ import java.util.Locale;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 
+import com.enonic.xp.script.bean.BeanContext;
+import com.enonic.xp.script.bean.ScriptBean;
 //import com.enonic.explorer.LocaleListJson;
 
 
-public class Locales
+//public class Locales implements ScriptBean
+//public abstract class Locales implements ScriptBean
+public final class Locales implements ScriptBean
 {
 	public LocaleListJson getLocales()
 	{
@@ -45,4 +49,9 @@ public class Locales
         }
         return new LocaleListJson( locales );
     }*/
+	@Override
+    public void initialize( final BeanContext context )
+    {
+        //no-op
+    }
 }
