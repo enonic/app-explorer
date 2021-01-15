@@ -188,6 +188,7 @@ if (BOOL_LIB_EXPLORER_EXTERNAL) {
 
 const SS_FILES = [
 	'src/main/resources/admin/tools/explorer/explorer',
+	'src/main/resources/lib/locales',
 	'src/main/resources/main',
 	'src/main/resources/services/collectionCollect/collectionCollect',
 	'src/main/resources/services/collectionCreate/collectionCreate',

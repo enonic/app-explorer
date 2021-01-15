@@ -27,6 +27,10 @@ import {getCollectors, reschedule} from '/lib/explorer/collection/reschedule';
 
 import {EVENT_INIT_COMPLETE} from './tasks/init/init';
 
+import {getLocales} from './lib/locales';
+const locales = getLocales();
+log.info(`locales:${toStr(locales)}`);
+
 const COLLECT_TASK_NAME_WEBCRAWL = 'webcrawl';
 
 //──────────────────────────────────────────────────────────────────────────────

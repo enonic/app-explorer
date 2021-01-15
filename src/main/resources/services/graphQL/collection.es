@@ -9,7 +9,7 @@ import {
 	list,
 	nonNull
 } from '/lib/graphql';
-//import {toStr} from '/lib/util';
+import {toStr} from '/lib/util';
 //import {list as listTasks} from '/lib/xp/task';
 
 
@@ -19,6 +19,8 @@ import {getDocumentCount} from '/lib/explorer/collection/getDocumentCount';
 import {query} from '/lib/explorer/collection/query';
 import {usedInInterfaces} from '/lib/explorer/collection/usedInInterfaces';
 
+//import {getLocales} from '/lib/locales';
+import {getLocales} from '../../lib/locales';
 
 /*const COLLECTIONS_INPUT_TYPE = createInputObjectType({
 	name: 'CollectionsArguments',
@@ -74,6 +76,8 @@ export const queryCollectionsResolver = ({
 	perPage,
 	sort
 } = {}) => {
+	const locales = getLocales();
+	log.info(`locales:${toStr(locales)}`);
 	//log.info(`count:${toStr(count)}`);
 	//log.info(`page:${toStr(page)}`);
 	//log.info(`perPage:${toStr(perPage)}`);
@@ -158,7 +162,7 @@ export const queryCollections = {
 			hits: { type: list(COLLECTION_OBJECT_TYPE) }
 		} // fields
 	})
-} // queryCollections
+}; // queryCollections
 
 /* Example query
 {
