@@ -85,6 +85,17 @@ const FIELDS_GQL = `queryFields {
 	}
 }`;
 
+const LOCALES_GQL = `getLocales {
+	#country
+	#displayCountry
+	#displayLanguage
+	displayName
+	#displayVariant
+	#language
+	tag
+	#variant
+}`;
+
 const TASKS_GQL = `queryTasks {
 	application
 	description
@@ -108,6 +119,7 @@ const ALL_GQL = `{
 	${COLLECTIONS_GQL}
 	${COLLECTORS_GQL}
 	${FIELDS_GQL}
+	${LOCALES_GQL}
 	${TASKS_GQL}
 }`;
 

@@ -7,7 +7,7 @@ import {
 	createSchema,
 	execute
 } from '/lib/graphql';
-import {toStr} from '/lib/util';
+//import {toStr} from '/lib/util';
 
 
 import {RT_JSON} from '/lib/explorer/model/2/constants';
@@ -16,6 +16,7 @@ import {RT_JSON} from '/lib/explorer/model/2/constants';
 import {getContentTypes} from './contentType';
 import {getLicense} from './license';
 import {getSites} from './site';
+import {getLocales} from './i18n';
 import {queryCollections} from './collection';
 import {queryCollectors} from './collector';
 import {queryFields} from './field';
@@ -45,6 +46,7 @@ export const SCHEMA = createSchema({
 		fields: {
 			getContentTypes,
 			getLicense,
+			getLocales,
 			getSites,
 			queryCollections,
 			queryCollectors,
