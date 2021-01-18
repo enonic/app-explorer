@@ -13,6 +13,7 @@ export function NewOrEditCollectionModal(props) {
 		fields,
 		initialValues,
 		licenseValid,
+		locales, // []
 		_name,
 		onClose = () => {},
 		onOpen = () => {},
@@ -69,6 +70,7 @@ export function NewOrEditCollectionModal(props) {
 						contentTypeOptions={contentTypeOptions}
 						fields={fields}
 						initialValues={initialValues}
+						locales={locales}
 						mode={_name ? 'modify' : 'create'}
 						onClose={() => {
 							setState({open: false});

@@ -1,4 +1,4 @@
-import {Button, Form, Header, Segment, Table} from 'semantic-ui-react';
+import {Button, Form, Header, Label, Segment, Table} from 'semantic-ui-react';
 
 import {
 	Checkbox,
@@ -36,8 +36,9 @@ export function Collection(props) {
 		collectorOptions,
 		contentTypeOptions,
 		fields = {},
-		onClose,
+		locales, // []
 		mode,
+		onClose,
 		servicesBaseUrl,
 		siteOptions,
 		initialValues = {
@@ -54,7 +55,8 @@ export function Collection(props) {
 				minute: '*',
 				hour: '*'
 			}],
-			doCollect: false
+			doCollect: false,
+			language: ''
 		}
 	} = props;
 	//console.debug('Collection initialValues', initialValues);
@@ -97,6 +99,30 @@ export function Collection(props) {
 				label='Display name'
 				path='displayName'
 			/>
+			<Form.Field>
+				<Label content='Language'/>
+				<Dropdown
+					options={locales.map(({
+						//country,
+						//displayCountry,
+						//displayLanguage,
+						displayName,
+						//displayVariant,
+						//language,
+						tag//,
+						//variant
+					}) => ({
+						key: tag,
+						//text: `country:${country} displayCountry:${displayCountry} displayLanguage:${displayLanguage} displayName:${displayName} displayVariant:${displayVariant} language:${language} tag:${tag} variant:${variant}`,
+						text: displayName,
+						value: tag
+					}))}
+					path='language'
+					placeholder='Select language'
+					search
+					selection
+				/>
+			</Form.Field>
 			<Header as='h2' dividing content='Collector'/>
 			<CollectorSelector
 				options={collectorOptions}

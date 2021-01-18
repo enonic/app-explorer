@@ -86,14 +86,14 @@ const FIELDS_GQL = `queryFields {
 }`;
 
 const LOCALES_GQL = `getLocales {
-	#country
+	country
 	#displayCountry
 	#displayLanguage
 	displayName
 	#displayVariant
-	#language
+	language
 	tag
-	#variant
+	variant
 }`;
 
 const TASKS_GQL = `queryTasks {
@@ -151,6 +151,7 @@ export function Collections(props) {
 		setLicenseValid
 	} = props;
 
+	const [locales, setLocales] = React.useState([]);
 	const [queryCollectionsGraph, setQueryCollectionsGraph] = React.useState({});
 	const [queryCollectorsGraph, setQueryCollectorsGraph] = React.useState({});
 	const [tasks, setTasks] = React.useState([]);
@@ -284,6 +285,7 @@ export function Collections(props) {
 			.then(res => {
 				//console.log(res);
 				if (res && res.data) {
+					setLocales(res.data.getLocales);
 					setQueryCollectionsGraph(res.data.queryCollections);
 					setQueryCollectorsGraph(res.data.queryCollectors);
 					setQueryFieldsGraph(res.data.queryFields);
@@ -457,7 +459,8 @@ export function Collections(props) {
 						doCollect,
 						displayName,
 						//id,
-						interfaces
+						interfaces,
+						language = ''
 					}, index) => {
 						const key = `collection[${index}]`;
 
@@ -481,9 +484,11 @@ export function Collections(props) {
 									collector,
 									cron,
 									displayName,
-									doCollect
+									doCollect,
+									language
 								}}
 								fields={fieldsObj}
+								locales={locales}
 								licenseValid={licenseValid}
 								_name={_name}
 								onClose={() => {
@@ -637,6 +642,7 @@ export function Collections(props) {
 				disabled={!intInitializedCollectorComponents}
 				fields={fieldsObj}
 				licenseValid={licenseValid}
+				locales={locales}
 				onClose={() => {
 					fetchAll();
 					setBoolPoll(true);
