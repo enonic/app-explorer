@@ -3,34 +3,21 @@ package com.enonic.explorer;
 import java.util.Arrays;
 import java.util.Locale;
 
-//import static com.google.common.base.Strings.isNullOrEmpty;
+import static com.google.common.base.Strings.isNullOrEmpty;
+import static com.google.common.base.Strings.nullToEmpty;
 
 import com.enonic.xp.script.bean.BeanContext;
 import com.enonic.xp.script.bean.ScriptBean;
-//import com.enonic.explorer.LocaleListJson;
 
 
-//public class Locales implements ScriptBean
-//public abstract class Locales implements ScriptBean
 public final class Locales implements ScriptBean
 {
+	private String getFormattedDisplayName( Locale locale )
+    {
+        return locale.getDisplayName( locale ) + " (" + locale.toLanguageTag() + ")";
+    }
 
-	//public List<String> getLocales()
-	public Locale[] getLocales()
-	{
-		return Locale.getAvailableLocales();
-	}
-
-	/*public LocaleListJson getLocales()
-	{
-		Locale[] locales = Locale.getAvailableLocales();
-		locales = Arrays.stream( locales ).
-		filter( ( locale ) -> !isNullOrEmpty( locale.toLanguageTag() ) && !isNullOrEmpty( locale.getDisplayName() ) ).
-		toArray( Locale[]::new );
-		return new LocaleListJson( locales );
-	}*/
-
-	/*public LocaleListJson getLocales( @QueryParam("query") final String query )
+	public Locale[] getLocales( final String query )
     {
         Locale[] locales = Locale.getAvailableLocales();
         if ( !nullToEmpty( query ).isBlank() )
@@ -55,8 +42,9 @@ public final class Locales implements ScriptBean
                 filter( ( locale ) -> !isNullOrEmpty( locale.toLanguageTag() ) && !isNullOrEmpty( locale.getDisplayName() ) ).
                 toArray( Locale[]::new );
         }
-        return new LocaleListJson( locales );
-    }*/
+		return locales;
+    }
+
 	@Override
     public void initialize( final BeanContext context )
     {

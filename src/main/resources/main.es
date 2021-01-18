@@ -27,12 +27,26 @@ import {getCollectors, reschedule} from '/lib/explorer/collection/reschedule';
 
 import {EVENT_INIT_COMPLETE} from './tasks/init/init';
 
-import {getLocales} from './lib/locales';
+/*import {getLocales} from './lib/locales';
 runAsSu(() => {
 	const locales = getLocales();
-	log.info(`locales:${toStr(locales)}`);
-	log.info('locales', locales);
-});
+	//log.info(`locales:${toStr(locales)}`);
+	log.info(`locales.length:${locales.length}`);
+
+	const localesInEn = getLocales({
+		locale: 'en-US',
+		query: 'norsk'
+	});
+	log.info(`localesInEn:${toStr(localesInEn)}`);
+	log.info(`localesInEn.length:${localesInEn.length}`);
+
+	const localesInNbNo = getLocales({
+		locale: 'nb',
+		query: 'norsk'
+	});
+	log.info(`localesInNbNo:${toStr(localesInNbNo)}`);
+	log.info(`localesInNbNo.length:${localesInNbNo.length}`);
+});*/
 
 const COLLECT_TASK_NAME_WEBCRAWL = 'webcrawl';
 
