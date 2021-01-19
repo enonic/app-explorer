@@ -16,6 +16,7 @@ import {
 
 import {CollectorOptions} from './collection/CollectorOptions';
 import {CollectorSelector} from './collection/CollectorSelector';
+import {LanguageDropdown} from './collection/LanguageDropdown';
 
 
 function required(value) {
@@ -68,14 +69,14 @@ export function Collection(props) {
 	const cronPath = 'cron';
 
 	return <EnonicForm
-		afterValidate={(dereffed) => {
+		afterValidate={(/*dereffed*/) => {
 			//console.debug('Collection afterValidate dereffed', dereffed);
 		}}
-		afterVisit={(dereffed) => {
+		afterVisit={(/*dereffed*/) => {
 			//console.debug('Collection afterVisit dereffed', dereffed);
 		}}
 		initialValues={initialValues}
-		onChange={(values) => {
+		onChange={(/*values*/) => {
 			//console.debug('Collection onChange values', values);
 		}}
 		onSubmit={(values) => {
@@ -86,9 +87,9 @@ export function Collection(props) {
 					'Content-Type':	'application/json'
 				},
 				body: JSON.stringify(values)
-			}).then(response => {
+			}).then((/*response*/) => {
 				onClose();
-			})
+			});
 		}}
 		schema={SCHEMA}
 	>
@@ -100,28 +101,8 @@ export function Collection(props) {
 				path='displayName'
 			/>
 			<Form.Field>
-				<Label content='Language'/>
-				<Dropdown
-					options={locales.map(({
-						//country,
-						//displayCountry,
-						//displayLanguage,
-						displayName,
-						//displayVariant,
-						//language,
-						tag//,
-						//variant
-					}) => ({
-						key: tag,
-						//text: `country:${country} displayCountry:${displayCountry} displayLanguage:${displayLanguage} displayName:${displayName} displayVariant:${displayVariant} language:${language} tag:${tag} variant:${variant}`,
-						text: displayName,
-						value: tag
-					}))}
-					path='language'
-					placeholder='Select language'
-					search
-					selection
-				/>
+				<Label content='Language' size='large'/>
+				<LanguageDropdown locales={locales}/>
 			</Form.Field>
 			<Header as='h2' dividing content='Collector'/>
 			<CollectorSelector

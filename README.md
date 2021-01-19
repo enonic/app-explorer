@@ -196,6 +196,7 @@ app-explorer
 ### 1.5.0
 
 * webpapp/api/1/documents
+* Make it possible to select language per collection
 
 ### 1.4.0
 

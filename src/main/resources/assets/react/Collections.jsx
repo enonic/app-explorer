@@ -38,6 +38,7 @@ const COLLECTIONS_GQL = `queryCollections(
 		doCollect
 		documentCount
 		interfaces
+		language
 		type
 	}
 }`;
@@ -91,9 +92,9 @@ const LOCALES_GQL = `getLocales {
 	#displayLanguage
 	displayName
 	#displayVariant
-	language
+	#language
 	tag
-	variant
+	#variant
 }`;
 
 const TASKS_GQL = `queryTasks {
@@ -115,11 +116,19 @@ const TASKS_GQL = `queryTasks {
 ${CONTENT_TYPES_GQL}
 ${SITES_GQL}
 */
-const ALL_GQL = `{
+
+const MOUNT_GQL = `{
 	${COLLECTIONS_GQL}
 	${COLLECTORS_GQL}
 	${FIELDS_GQL}
 	${LOCALES_GQL}
+	${TASKS_GQL}
+}`;
+
+const UPDATE_GQL = `{
+	${COLLECTIONS_GQL}
+	${COLLECTORS_GQL}
+	${FIELDS_GQL}
 	${TASKS_GQL}
 }`;
 
@@ -275,17 +284,35 @@ export function Collections(props) {
 	} = collections;*/
 	//console.debug('Collections totalNumberOfCollections', totalNumberOfCollections);
 
-	function fetchAll() {
+	function fetchOnMount() {
 		fetch(`${servicesBaseUrl}/graphQL`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ query: ALL_GQL })
+			body: JSON.stringify({ query: MOUNT_GQL })
 		})
 			.then(res => res.json())
 			.then(res => {
 				//console.log(res);
 				if (res && res.data) {
 					setLocales(res.data.getLocales);
+					setQueryCollectionsGraph(res.data.queryCollections);
+					setQueryCollectorsGraph(res.data.queryCollectors);
+					setQueryFieldsGraph(res.data.queryFields);
+					setTasks(res.data.queryTasks);
+				}
+			});
+	}
+
+	function fetchOnUpdate() {
+		fetch(`${servicesBaseUrl}/graphQL`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ query: UPDATE_GQL })
+		})
+			.then(res => res.json())
+			.then(res => {
+				//console.log(res);
+				if (res && res.data) {
 					setQueryCollectionsGraph(res.data.queryCollections);
 					setQueryCollectorsGraph(res.data.queryCollectors);
 					setQueryFieldsGraph(res.data.queryFields);
@@ -419,12 +446,12 @@ export function Collections(props) {
 	} // handleSortGenerator
 	*/
 
-	React.useEffect(() => fetchAll(), []); // Only once
+	React.useEffect(() => fetchOnMount(), []); // Only once
 
 	useInterval(() => {
 		// This will continue to run as long as the Collections "tab" is open
 		if (boolPoll) {
-			fetchAll();
+			fetchOnUpdate();
 		}
 	}, 2500);
 
@@ -442,6 +469,7 @@ export function Collections(props) {
 							sorted={column === 'displayName' ? direction : null}
 						>Name</Table.HeaderCell>
 						<Table.HeaderCell>Documents</Table.HeaderCell>
+						<Table.HeaderCell>Language</Table.HeaderCell>
 						<Table.HeaderCell>Interfaces</Table.HeaderCell>
 						<Table.HeaderCell>Schedule</Table.HeaderCell>
 						<Table.HeaderCell>Actions</Table.HeaderCell>
@@ -492,7 +520,7 @@ export function Collections(props) {
 								licenseValid={licenseValid}
 								_name={_name}
 								onClose={() => {
-									fetchAll();
+									fetchOnUpdate();
 									setBoolPoll(true);
 								}}
 								onOpen={() => {
@@ -506,6 +534,7 @@ export function Collections(props) {
 							/></Table.Cell>
 							<Table.Cell collapsing>{displayName}</Table.Cell>
 							<Table.Cell collapsing>{documentCount}</Table.Cell>
+							<Table.Cell collapsing>{language}</Table.Cell>
 							<Table.Cell collapsing>{interfaces.map((iface, i) => <p key={i}>
 								{i === 0 ? null : <br/>}
 								<span style={{whitespace: 'nowrap'}}>{iface}</span>
@@ -644,7 +673,7 @@ export function Collections(props) {
 				licenseValid={licenseValid}
 				locales={locales}
 				onClose={() => {
-					fetchAll();
+					fetchOnUpdate();
 					setBoolPoll(true);
 				}}
 				onOpen={() => {

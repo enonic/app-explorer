@@ -9,7 +9,7 @@ import {
 	list,
 	nonNull
 } from '/lib/graphql';
-import {toStr} from '/lib/util';
+//import {toStr} from '/lib/util';
 //import {list as listTasks} from '/lib/xp/task';
 
 
@@ -47,7 +47,7 @@ const COLLECTION_OBJECT_TYPE = createObjectType({
 			//description: 'Collector description',
 			fields: {
 				name: { type: nonNull(GraphQLString) },
-				configJson: { type: nonNull(GraphQLString) }
+				configJson: { type: GraphQLString } // Can be null when no config yet...
 			}
 		})},
 		cron: { type: list(createObjectType({
@@ -63,7 +63,8 @@ const COLLECTION_OBJECT_TYPE = createObjectType({
 		}))},
 		doCollect: { type: GraphQLBoolean },
 		documentCount: { type: nonNull(GraphQLInt) },
-		interfaces: { type: list(GraphQLString)}
+		interfaces: { type: list(GraphQLString)},
+		language: { type: GraphQLString }
 	}
 }); // COLLECTION_OBJECT_TYPE
 
@@ -114,6 +115,7 @@ export const queryCollectionsResolver = ({
 		cron,
 		displayName,
 		doCollect,
+		language = '',
 		type
 	}) => ({
 		_id,
@@ -126,6 +128,7 @@ export const queryCollectionsResolver = ({
 		doCollect,
 		documentCount: getDocumentCount(_name),
 		interfaces: usedInInterfaces({connection, name: _name}),
+		language,
 		type
 	}));
 	//log.info(`mapped collectionsRes:${toStr(collectionsRes)}`);
@@ -194,6 +197,7 @@ export const queryCollections = {
 			doCollect
 			documentCount
 			interfaces
+			language
 			type
 		}
 	}
