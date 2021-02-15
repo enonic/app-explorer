@@ -186,7 +186,8 @@ app-explorer
 
 | App version | XP version |
 | ----------- | ---------- |
-| 1.[45].0 | 7.4.1 |
+| 1.5.0 | 7.5.0 |
+| 1.4.0 | 7.4.1 |
 | 1.[23].0 | 7.3.2 |
 | 1.1.0 | 7.3.1 |
 | 1.0.0 | 7.3.0 |
@@ -195,6 +196,7 @@ app-explorer
 
 ### 1.5.0
 
+* Require Enonic XP 7.5.0
 * webpapp/api/1/documents
 * Scheduling should not be visible before one has selected collector
 * Make it possible to select language per collection
