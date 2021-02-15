@@ -1,47 +1,452 @@
 /* eslint-disable no-console */
 import path from 'path';
-import BrowserSyncPlugin from 'browser-sync-webpack-plugin';
+//import BrowserSyncPlugin from 'browser-sync-webpack-plugin';
+import { CleanWebpackPlugin } from 'clean-webpack-plugin';
 import CopyWebpackPlugin from 'copy-webpack-plugin';
+import {
+	ESBuildMinifyPlugin,
+	ESBuildPlugin
+} from 'esbuild-loader';
+import MiniCssExtractPlugin from 'mini-css-extract-plugin';
+import postcssPresetEnv from 'postcss-preset-env';
+//import {print} from 'q-i';
 import TerserPlugin from 'terser-webpack-plugin';
-import {webpackEsmAssets} from '@enonic/webpack-esm-assets';
-import {webpackServerSideJs} from '@enonic/webpack-server-side-js';
-import {webpackStyleAssets} from '@enonic/webpack-style-assets';
+
 import webpack from 'webpack';
 
 //console.debug(process.env.NODE_ENV);
 
+
+//──────────────────────────────────────────────────────────────────────────────
+// Common constants
+//──────────────────────────────────────────────────────────────────────────────
 //const MODE = 'development';
 const MODE = 'production';
+//print({MODE});
 
-const BOOL_LIB_EXPLORER_EXTERNAL = true;
-//const BOOL_LIB_EXPLORER_EXTERNAL = false;
+//const BOOL_LIB_EXPLORER_EXTERNAL = MODE === 'production';
+const BOOL_LIB_EXPLORER_EXTERNAL = false;
+
+//const minimize = MODE === 'production';
+const minimize = true;
+//const minimize = false;
 
 const SRC_DIR = 'src/main/resources';
-const SRC_DIR_ABS = path.resolve(__dirname, SRC_DIR);
-const SRC_ASSETS_DIR_ABS = path.resolve(SRC_DIR_ABS, 'assets');
-
 const DST_DIR = 'build/resources/main';
-const DST_DIR_ABS = path.join(__dirname, DST_DIR);
-const DST_ASSETS_DIR_ABS = path.join(DST_DIR_ABS, 'assets');
-
 
 const STATS = {
 	colors: true,
 	hash: false,
-	maxModules: 0,
 	modules: false,
 	moduleTrace: false,
 	timings: false,
 	version: false
 };
 
+const WEBPACK_CONFIG = [];
+
+const dict = arr => Object.assign(...arr.map(([k, v]) => ({ [k]: v })));
+
+//──────────────────────────────────────────────────────────────────────────────
+// Enonic XP serverside javascript (Explorer admin tool and services)
+//──────────────────────────────────────────────────────────────────────────────
+//const SS_ESBUILD_TARGET = 'es2015';
+
+const SRC_DIR_ABS = path.resolve(__dirname, SRC_DIR);
+const DST_DIR_ABS = path.join(__dirname, DST_DIR);
+
+const SS_ALIAS = {
+	// Fixes: TypeError: Cannot read property "TYPED_ARRAY_SUPPORT" from undefined
+	myGlobal: path.resolve(__dirname, 'src/main/resources/tasks/webcrawl/global.es')
+};
+
+// Avoid bundling and transpile library files seperately.
+// To do that you would have to list all files in SS_FILES!
+//SS_EXTERNALS.push(/^\/admin\/tools\/explorer/);
+// So instead lets: Resolve dependencies within library and bundle them:
+SS_ALIAS['/admin/tools/explorer'] = path.resolve(__dirname, 'src/main/resources/admin/tools/explorer/');
+
+const SS_EXTERNALS = [
+	/\/lib\/cache/,
+	'/lib/galimatias',
+	'/lib/graphql',
+	'/lib/guillotine',
+	/\/lib\/http-client/,
+	/\/lib\/license/,
+	/\/lib\/router/,
+
+	///^\/lib\/xp\/.+/
+	'/lib/xp/admin',
+	'/lib/xp/auth',
+	'/lib/xp/cluster',
+	'/lib/xp/common',
+	'/lib/xp/content',
+	'/lib/xp/context', // Needed by lib-explorer
+	'/lib/xp/event',
+	'/lib/xp/i18n', // Needed by lib-explorer
+	'/lib/xp/io',
+	'/lib/xp/mail', // Needed by lib-explorer
+	'/lib/xp/node', // Needed by lib-explorer
+	'/lib/xp/portal',
+	'/lib/xp/repo',
+	'/lib/xp/task',
+	'/lib/xp/value',
+	'/lib/xp/websocket'
+];
+
+if (BOOL_LIB_EXPLORER_EXTERNAL) {
+	SS_EXTERNALS.push(/^\/lib\/explorer\//);
+} else {
+	SS_ALIAS['/lib/explorer'] = path.resolve(__dirname, '../lib-explorer/src/main/resources/lib/explorer/');
+}
+
+const SS_FILES = [
+	'admin/tools/explorer/explorer',
+	//'lib/fnv', // Not in use
+	'lib/locales',
+	'main',
+	'services/collectionCollect/collectionCollect',
+	'services/collectionCreate/collectionCreate',
+	'services/collectionDelete/collectionDelete',
+	'services/collectionDuplicate/collectionDuplicate',
+	'services/collectionList/collectionList',
+	'services/collectionModify/collectionModify',
+	'services/collectorStop/collectorStop',
+	'services/cronJobList/cronJobList',
+	'services/fieldCreate/fieldCreate',
+	'services/fieldDelete/fieldDelete',
+	'services/fieldList/fieldList',
+	'services/fieldModify/fieldModify',
+	'services/fieldValueCreateOrUpdate/fieldValueCreateOrUpdate',
+	'services/fieldValueDelete/fieldValueDelete',
+	'services/fieldValueList/fieldValueList',
+	'services/graphQL/graphQL',
+	'services/interfaceCopy/interfaceCopy',
+	'services/interfaceCreate/interfaceCreate',
+	'services/interfaceDelete/interfaceDelete',
+	'services/interfaceExists/interfaceExists',
+	'services/interfaceGet/interfaceGet',
+	'services/interfaceList/interfaceList',
+	'services/interfaceModify/interfaceModify',
+	'services/longPolling/longPolling',
+	'services/notifications/notifications',
+	'services/stopWordsCreateOrUpdate/stopWordsCreateOrUpdate',
+	'services/stopWordsDelete/stopWordsDelete',
+	'services/stopWordsList/stopWordsList',
+	'services/journals/journals',
+	'services/listCollectors/listCollectors',
+	'services/search/search',
+	'services/synonymCreate/synonymCreate',
+	'services/synonymDelete/synonymDelete',
+	'services/synonymModify/synonymModify',
+	'services/thesauri/thesauri',
+	'services/thesaurusCreate/thesaurusCreate',
+	'services/thesaurusDelete/thesaurusDelete',
+	'services/thesaurusExport/thesaurusExport',
+	'services/thesaurusImport/thesaurusImport',
+	'services/thesaurusList/thesaurusList',
+	'services/thesaurusUpdate/thesaurusUpdate',
+	'services/uninstallLicense/uninstallLicense',
+	'services/uploadLicense/uploadLicense',
+	'services/ws/ws',
+	'tasks/init/init',
+	'tasks/webcrawl/webcrawl',
+	'webapp/webapp'
+];
+
+const SS_PLUGINS = [
+	//new ESBuildPlugin(),
+	new webpack.ProvidePlugin({
+		/* ERROR: For some reason this breaks the webcrawl task!
+		console: { // Attempt at avoiding ReferenceError: "console" is not defined
+			assert: (params) => {log.debug(params)},
+			clear: () => {log.warning('console.clear called')},
+			count: () => {log.warning('console.count called')},
+			countReset: () => {log.warning('console.countReset called')},
+			debug: (params) => {log.debug(params)},
+			dir: (params) => {log.debug(params)},
+			dirxml: (params) => {log.debug(params)},
+			error: (params) => {log.error(params)},
+			exception: (params) => {log.error(params)},
+			group: () => {log.warning('console.group called')},
+			groupCollapsed: () => {log.warning('console.groupCollapsed called')},
+			groupEnd: () => {log.warning('console.groupEnd called')},
+			info: (params) => {log.info(params)},
+			log: (params) => {log.info(params)},
+			profile: (params) => {log.debug(params)},
+			profileEnd: () => {log.warning('console.profileEnd called')},
+			table: (params) => {log.info(params)},
+			time: () => {log.warning('console.time called')},
+			timeEnd: () => {log.warning('console.timeEnd called')},
+			timeLog: () => {log.warning('console.timeLog called')},
+			timeStamp: () => {log.warning('console.timeStamp called')},
+			trace: (params) => {log.debug(params)},
+			warn: (params) => {log.warning(params)}
+		},*/
+		Buffer: ['buffer', 'Buffer'],
+		global: 'myGlobal' // Without it will get: Cannot read property "ES6" from undefined
+	})
+];
+
+if (MODE === 'production') {
+	SS_EXTERNALS.push('/lib/cron');
+	SS_EXTERNALS.push('/lib/util');
+	SS_EXTERNALS.push(/^\/lib\/util\//);
+} else {
+	// Needed by lib-explorer
+	SS_EXTERNALS.push('/lib/xp/context');
+	SS_EXTERNALS.push('/lib/xp/i18n');
+	SS_EXTERNALS.push('/lib/xp/mail');
+	SS_EXTERNALS.push('/lib/xp/node');
+	SS_EXTERNALS.push('/lib/xp/repo');
+
+	SS_ALIAS['/lib/cron'] = path.resolve(__dirname, '../lib-cron/src/main/resources/lib/cron/');
+
+	SS_ALIAS['/lib/util'] = path.resolve(__dirname, '../lib-util/src/main/resources/lib/util');
+	/*SS_PLUGINS.push(new BrowserSyncPlugin({
+		host: 'localhost',
+		port: 3000,
+		proxy: 'http://localhost:8080/'
+	}));*/
+}
+
+const SS_JS_CONFIG = {
+	context: path.resolve(__dirname, SRC_DIR),
+	devtool: false, // Don't waste time generating sourceMaps
+	entry: dict(
+		SS_FILES.map(k => [
+			k, // name
+			`./${k}.es` // source relative to context
+		])
+	),
+	externals: SS_EXTERNALS,
+	mode: MODE,
+	module: {
+		rules: [{
+			//test: /\.es$/,
+
+			// TypeError: isObject is not a function
+			test: /\.(es6?|tsx?|js)$/, // Will need js for node module depenencies
+
+			/*exclude: [ // NOTE: Does this error belong here? TypeError: Cannot read property "prototype" from undefined
+				/\bcore-js\b/,
+				/\bwebpack\b/,
+				/\bregenerator-runtime\b/,
+			],*/
+			use: [{
+				loader: 'babel-loader',
+				options: {
+					babelrc: false, // The .babelrc file should only be used to transpile config files.
+					comments: false,
+					compact: false,
+					minified: false,
+					plugins: [
+						'@babel/plugin-transform-arrow-functions',
+						'@babel/plugin-proposal-class-properties',
+						'@babel/plugin-proposal-export-default-from', // export v from 'mod'; // I think it adds a default export
+						'@babel/plugin-proposal-export-namespace-from', // export * as ns from 'mod';
+						'@babel/plugin-proposal-object-rest-spread',
+						'@babel/plugin-syntax-dynamic-import', // Allow parsing of import()
+						'@babel/plugin-syntax-throw-expressions',
+						'@babel/plugin-transform-block-scoped-functions',
+						'@babel/plugin-transform-block-scoping',
+						'@babel/plugin-transform-classes', // tasks/syncSite/Progress.es
+						'@babel/plugin-transform-computed-properties',
+						'@babel/plugin-transform-destructuring',
+						'@babel/plugin-transform-duplicate-keys',
+						'@babel/plugin-transform-for-of',
+						'@babel/plugin-transform-function-name',
+						'@babel/plugin-transform-instanceof',
+						'@babel/plugin-transform-literals',
+						'@babel/plugin-transform-new-target',
+						'@babel/plugin-transform-member-expression-literals',
+						'@babel/plugin-transform-modules-commonjs', // transforms ECMAScript modules to CommonJS
+						'@babel/plugin-transform-object-assign', // Not used locally, perhaps in node_modules?
+						'@babel/plugin-transform-object-super',
+						'@babel/plugin-transform-parameters',
+						'@babel/plugin-transform-property-literals',
+						'@babel/plugin-transform-property-mutators',
+						'@babel/plugin-transform-reserved-words',
+						'@babel/plugin-transform-shorthand-properties',
+						'@babel/plugin-transform-spread',
+						'@babel/plugin-transform-sticky-regex',
+						'@babel/plugin-transform-template-literals',
+						'@babel/plugin-transform-typeof-symbol',
+						'@babel/plugin-transform-unicode-escapes', // This plugin is included in @babel/preset-env
+						'@babel/plugin-transform-unicode-regex',
+						'array-includes'
+					],
+					presets: [
+						//'@babel/preset-typescript', // Why did I ever add this???
+						[
+							'@babel/preset-env',
+							{
+								corejs: 3, // Needed when useBuiltIns: usage
+
+								// Enables all transformation plugins and as a result,
+								// your code is fully compiled to ES5
+								forceAllTransforms: true,
+
+								targets: {
+									esmodules: false, // Enonic XP doesn't support ECMAScript Modules
+
+									// https://node.green/
+									node: '0.10.48'
+									//node: '5.12.0'
+
+								},
+
+								//useBuiltIns: false // no polyfills are added automatically
+								useBuiltIns: 'entry' // replaces direct imports of core-js to imports of only the specific modules required for a target environment
+								//useBuiltIns: 'usage' // polyfills will be added automatically when the usage of some feature is unsupported in target environment
+							}
+						]
+					]
+				} // options
+			}/*, { // RUNTIME ERROR: ES6 destructuring is not yet implemented
+				loader: 'esbuild-loader',
+				options: {
+					format: 'cjs', // Does this option exist? At least it doesn't complain
+					loader: 'js', // js, jsx, ts, tsx, json, text, base64, file, dataurl, binary
+					//platform: 'browser', // error: Invalid option in transform() call: "platform"
+					target: SS_ESBUILD_TARGET
+				}
+			}*/]
+		}]
+	},
+	optimization: {
+		minimize,
+		minimizer: MODE === 'production' ? [
+			/*new ESBuildMinifyPlugin({ // ES6 destructuring is not yet implemented
+				target: SS_ESBUILD_TARGET
+			})*/
+		] : []
+	},
+	output: {
+		filename: '[name].js',
+		libraryTarget: 'commonjs',
+		path: path.join(__dirname, DST_DIR)
+	},
+	performance: {
+		hints: false
+	},
+	plugins: SS_PLUGINS,
+	resolve: {
+		alias: SS_ALIAS,
+		extensions: [
+			//'mjs',
+			//'jsx',
+			//'esm',
+			'es', // Needed to resolve "local" imports starting with / which are .es files
+			//'es6',
+			'js'//, // Needed to resolve node_modules
+			//'json'
+		].map(ext => `.${ext}`)
+	},
+	stats: STATS
+};
+//print({SS_JS_CONFIG}, { maxItems: Infinity });
+//process.exit();
+WEBPACK_CONFIG.push(SS_JS_CONFIG);
+
+//──────────────────────────────────────────────────────────────────────────────
+// Assets (sass)
+//──────────────────────────────────────────────────────────────────────────────
+const SRC_ASSETS_DIR = `${SRC_DIR}/assets`;
+const SRC_ASSETS_DIR_ABS = path.resolve(SRC_DIR_ABS, 'assets');
+
+const DST_ASSETS_DIR = `${DST_DIR}/assets`;
+const DST_ASSETS_DIR_ABS = path.join(DST_DIR_ABS, 'assets');
+
+
+const SRC_STYLE_DIR = `${SRC_ASSETS_DIR}/style`;
+const DST_STYLE_DIR = `${DST_ASSETS_DIR}/style`;
+
+const STYLE_OUTPUT_PATH = path.join(__dirname, '.build');
+const STYLE_OUTPUT_FILENAME = 'bundle';
+
+const STYLE_USE = [
+	MiniCssExtractPlugin.loader,
+	{
+		loader: 'css-loader', // translates CSS into CommonJS
+		options: { importLoaders: 1 }
+	},
+	{
+		loader: 'postcss-loader',
+		options: {
+			//ident: 'postcss',
+			postcssOptions: {
+				plugins: () => [postcssPresetEnv()]
+			}
+		}
+	}
+];
+
+const STYLE_CONFIG = {
+	context: path.resolve(__dirname, SRC_STYLE_DIR),
+	devtool: false, // Don't waste time generating sourceMaps
+	entry: {
+		'main': './main.sass'
+	},
+	mode: MODE,
+	module: {
+		rules: [
+			{
+				test: /\.(c|le|sa|sc)ss$/,
+				use: [
+					...STYLE_USE,
+					'less-loader', // compiles Less to CSS
+					'sass-loader' // compiles Sass to CSS
+				]
+			},
+			{
+				test: /\.styl$/,
+				use: [
+					...STYLE_USE,
+					'stylus-loader' // compiles Stylus to CSS
+				]
+			},
+			{
+				test: /\.svg/,
+				use: {
+					loader: 'svg-url-loader',
+					options: {}
+				}
+			}
+		]
+	},
+	output: {
+		filename: 'temporaryStyleBundle.js',
+		path: STYLE_OUTPUT_PATH
+	},
+	plugins: [
+		new CleanWebpackPlugin({
+			cleanOnceBeforeBuildPatterns: [STYLE_OUTPUT_PATH],
+			verbose: true
+		}),
+		new MiniCssExtractPlugin({
+			filename: `../${DST_STYLE_DIR}/${STYLE_OUTPUT_FILENAME}.css`
+		})
+	],
+	resolve: {
+		extensions: ['sass', 'scss', 'less', 'styl', 'css'].map(ext => `.${ext}`)
+	},
+	stats: STATS
+};
+//print({STYLE_CONFIG}, { maxItems: Infinity });
+//process.exit();
+WEBPACK_CONFIG.push(STYLE_CONFIG);
+
+//──────────────────────────────────────────────────────────────────────────────
+// Clientside javascript
+//──────────────────────────────────────────────────────────────────────────────
 const CS_MINIMIZER = [];
 if(MODE === 'production') {
 	CS_MINIMIZER.push(new TerserPlugin({
 		extractComments: false,
 		terserOptions: {
-			compress: {},
-			mangle: true // Note `mangle.properties` is `false` by default.
+			compress: {}//,
+			//mangle: true // This will DESTROY exports!
 		}
 	}));
 }
@@ -102,6 +507,7 @@ const CLIENT_JS_CONFIG = {
 		}]
 	},
 	optimization: {
+		minimize,
 		minimizer: CS_MINIMIZER
 	},
 	output: {
@@ -139,230 +545,88 @@ const CLIENT_JS_CONFIG = {
 	},
 	stats: STATS
 };
-//console.log(`CLIENT_JS_CONFIG:${toStr(CLIENT_JS_CONFIG)}`); process.exit();
+//print({CLIENT_JS_CONFIG}, { maxItems: Infinity });
+//process.exit();
+WEBPACK_CONFIG.push(CLIENT_JS_CONFIG);
 
-const SS_ALIAS = {
-	// Fixes: TypeError: Cannot read property "TYPED_ARRAY_SUPPORT" from undefined
-	myGlobal: path.resolve(__dirname, 'src/main/resources/tasks/webcrawl/global')
-};
 
-// Avoid bundling and transpile library files seperately.
-// To do that you would have to list all files in SS_FILES!
-//SS_EXTERNALS.push(/^\/admin\/tools\/explorer/);
-// So instead lets: Resolve dependencies within library and bundle them:
-SS_ALIAS['/admin/tools/explorer'] = path.resolve(__dirname, 'src/main/resources/admin/tools/explorer/');
-
-const SS_EXTERNALS = [
-	/\/lib\/cache/,
-	'/lib/galimatias',
-	'/lib/graphql',
-	'/lib/guillotine',
-	/\/lib\/http-client/,
-	/\/lib\/license/,
-	/\/lib\/router/,
-
-	///^\/lib\/xp\/.+/
-	'/lib/xp/admin',
-	'/lib/xp/auth',
-	'/lib/xp/cluster',
-	'/lib/xp/common',
-	'/lib/xp/content',
-	'/lib/xp/context', // Needed by lib-explorer
-	'/lib/xp/event',
-	'/lib/xp/i18n', // Needed by lib-explorer
-	'/lib/xp/io',
-	'/lib/xp/mail', // Needed by lib-explorer
-	'/lib/xp/node', // Needed by lib-explorer
-	'/lib/xp/portal',
-	'/lib/xp/repo',
-	'/lib/xp/task',
-	'/lib/xp/value',
-	'/lib/xp/websocket'
-];
-
-if (BOOL_LIB_EXPLORER_EXTERNAL) {
-	SS_EXTERNALS.push(/^\/lib\/explorer\//);
-} else {
-	SS_ALIAS['/lib/explorer'] = path.resolve(__dirname, '../lib-explorer/src/main/resources/lib/explorer/');
-}
-
-const SS_FILES = [
-	'src/main/resources/admin/tools/explorer/explorer',
-	'src/main/resources/lib/locales',
-	'src/main/resources/main',
-	'src/main/resources/services/collectionCollect/collectionCollect',
-	'src/main/resources/services/collectionCreate/collectionCreate',
-	'src/main/resources/services/collectionDelete/collectionDelete',
-	'src/main/resources/services/collectionDuplicate/collectionDuplicate',
-	'src/main/resources/services/collectionList/collectionList',
-	'src/main/resources/services/collectionModify/collectionModify',
-	'src/main/resources/services/collectorStop/collectorStop',
-	'src/main/resources/services/cronJobList/cronJobList',
-	'src/main/resources/services/fieldCreate/fieldCreate',
-	'src/main/resources/services/fieldDelete/fieldDelete',
-	'src/main/resources/services/fieldList/fieldList',
-	'src/main/resources/services/fieldModify/fieldModify',
-	'src/main/resources/services/fieldValueCreateOrUpdate/fieldValueCreateOrUpdate',
-	'src/main/resources/services/fieldValueDelete/fieldValueDelete',
-	'src/main/resources/services/fieldValueList/fieldValueList',
-	'src/main/resources/services/graphQL/graphQL',
-	'src/main/resources/services/interfaceCopy/interfaceCopy',
-	'src/main/resources/services/interfaceCreate/interfaceCreate',
-	'src/main/resources/services/interfaceDelete/interfaceDelete',
-	'src/main/resources/services/interfaceExists/interfaceExists',
-	'src/main/resources/services/interfaceGet/interfaceGet',
-	'src/main/resources/services/interfaceList/interfaceList',
-	'src/main/resources/services/interfaceModify/interfaceModify',
-	'src/main/resources/services/longPolling/longPolling',
-	'src/main/resources/services/notifications/notifications',
-	'src/main/resources/services/stopWordsCreateOrUpdate/stopWordsCreateOrUpdate',
-	'src/main/resources/services/stopWordsDelete/stopWordsDelete',
-	'src/main/resources/services/stopWordsList/stopWordsList',
-	'src/main/resources/services/journals/journals',
-	'src/main/resources/services/listCollectors/listCollectors',
-	'src/main/resources/services/search/search',
-	'src/main/resources/services/synonymCreate/synonymCreate',
-	'src/main/resources/services/synonymDelete/synonymDelete',
-	'src/main/resources/services/synonymModify/synonymModify',
-	'src/main/resources/services/thesauri/thesauri',
-	'src/main/resources/services/thesaurusCreate/thesaurusCreate',
-	'src/main/resources/services/thesaurusDelete/thesaurusDelete',
-	'src/main/resources/services/thesaurusExport/thesaurusExport',
-	'src/main/resources/services/thesaurusImport/thesaurusImport',
-	'src/main/resources/services/thesaurusList/thesaurusList',
-	'src/main/resources/services/thesaurusUpdate/thesaurusUpdate',
-	'src/main/resources/services/uninstallLicense/uninstallLicense',
-	'src/main/resources/services/uploadLicense/uploadLicense',
-	'src/main/resources/tasks/init/init',
-	'src/main/resources/tasks/webcrawl/webcrawl',
-	'src/main/resources/services/ws/ws'
-];
-
-const SS_PLUGINS = [
-	new webpack.ProvidePlugin({
-		/* ERROR: For some reason this breaks the webcrawl task!
-		console: { // Attempt at avoiding ReferenceError: "console" is not defined
-			assert: (params) => {log.debug(params)},
-			clear: () => {log.warning('console.clear called')},
-			count: () => {log.warning('console.count called')},
-			countReset: () => {log.warning('console.countReset called')},
-			debug: (params) => {log.debug(params)},
-			dir: (params) => {log.debug(params)},
-			dirxml: (params) => {log.debug(params)},
-			error: (params) => {log.error(params)},
-			exception: (params) => {log.error(params)},
-			group: () => {log.warning('console.group called')},
-			groupCollapsed: () => {log.warning('console.groupCollapsed called')},
-			groupEnd: () => {log.warning('console.groupEnd called')},
-			info: (params) => {log.info(params)},
-			log: (params) => {log.info(params)},
-			profile: (params) => {log.debug(params)},
-			profileEnd: () => {log.warning('console.profileEnd called')},
-			table: (params) => {log.info(params)},
-			time: () => {log.warning('console.time called')},
-			timeEnd: () => {log.warning('console.timeEnd called')},
-			timeLog: () => {log.warning('console.timeLog called')},
-			timeStamp: () => {log.warning('console.timeStamp called')},
-			trace: (params) => {log.debug(params)},
-			warn: (params) => {log.warning(params)}
-		},*/
-		global: 'myGlobal' // Without it will get: Cannot read property "ES6" from undefined
-	})
-];
-
-if (MODE === 'production') {
-	SS_EXTERNALS.push('/lib/cron');
-	SS_EXTERNALS.push('/lib/util');
-	SS_EXTERNALS.push(/^\/lib\/util\//);
-} else {
-	// Needed by lib-explorer
-	SS_EXTERNALS.push('/lib/xp/context');
-	SS_EXTERNALS.push('/lib/xp/i18n');
-	SS_EXTERNALS.push('/lib/xp/mail');
-	SS_EXTERNALS.push('/lib/xp/node');
-	SS_EXTERNALS.push('/lib/xp/repo');
-
-	SS_ALIAS['/lib/cron'] = path.resolve(__dirname, '../lib-cron/src/main/resources/lib/cron/');
-
-	SS_ALIAS['/lib/util'] = path.resolve(__dirname, '../lib-util/src/main/resources/lib/util');
-	SS_PLUGINS.push(new BrowserSyncPlugin({
-		host: 'localhost',
-		port: 3000,
-		proxy: 'http://localhost:8080/'
-	}));
-}
-
-const WEBPACK_CONFIG = [webpackServerSideJs({
-	__dirname,
-	externals: SS_EXTERNALS,
-	serverSideFiles: SS_FILES,
-	optimization: {
-		minimizer: [
-			new TerserPlugin({
-				extractComments: false
-				/*terserOptions: {
-					compress: {}
-					//mangle: true // This will DESTROY exports!
-				}*/
-			})
-		]
+//──────────────────────────────────────────────────────────────────────────────
+// Clientside Ecmascript modules
+//──────────────────────────────────────────────────────────────────────────────
+const ESBUILD_TARGET = 'es2015';
+const CLIENT_ES_CONFIG = {
+	context: path.join(__dirname, SRC_ASSETS_DIR, 'react'),
+	devtool: false, // Don't waste time generating sourceMaps
+	entry: {
+		'Explorer': './Explorer.jsx',
+		'WebCrawler': './WebCrawler.jsx'
 	},
-	plugins: SS_PLUGINS,
-	mode: MODE,
-	resolveAlias: SS_ALIAS
-}), webpackStyleAssets({
-	__dirname,
-	mode: MODE
-}), CLIENT_JS_CONFIG, webpackEsmAssets({
-	__dirname,
-	assetFiles: [
-		'src/main/resources/assets/react/Explorer.jsx',
-		'src/main/resources/assets/react/WebCrawler.jsx'
-	],
 	externals: {
 		react: 'React',
 		'react-dom': 'ReactDOM'
 	},
-	/*
-		// Unable to load these via script or module?
-		//'formik',
-		//'semantic-ui-react',
-		//'react-scrollspy',
-		//'uuid/v4',
-		//'traverse'
-	*/
 	mode: MODE,
-	optimization: {
-		minimizer: MODE === 'development' ? [] : [
-			new TerserPlugin({
-				extractComments: false
-				/*terserOptions: {
-					compress: {}
-					//mangle: true // This will DESTROY exports!
-				}*/
-			})
-		]
+	module: {
+		rules: [{
+			test: /\.jsx$/,
+			loader: 'esbuild-loader',
+			options: {
+				loader: 'jsx',
+				target: ESBUILD_TARGET
+			}
+		}]
 	},
-	plugins: MODE === 'development' ? [
-		new BrowserSyncPlugin({
-			host: 'localhost',
-			port: 3002,
-			proxy: 'http://localhost:8080/'
-		})
-	] : [],
-	resolveAlias: MODE === 'development' ? {
-		'semantic-ui-react-form': path.resolve(__dirname, '../semantic-ui-react-form/src')
-	} : {
-		//'semantic-ui-react': path.resolve(__dirname, './node_modules/semantic-ui-react/dist/commonjs'),
-		//'semantic-ui-react': path.resolve(__dirname, './node_modules/semantic-ui-react/dist/es'),
-		//'semantic-ui-react': path.resolve(__dirname, './node_modules/semantic-ui-react/dist/umd/semantic-ui-react.min.js'),
-		//'semantic-ui-react': path.resolve(__dirname, './node_modules/semantic-ui-react/src'),
-		//'semantic-ui-react': path.resolve(__dirname, './node_modules/semantic-ui-react'),
-		'semantic-ui-react-form': path.resolve(__dirname, './node_modules/@enonic/semantic-ui-react-form/src')
-	}
-})];
+	optimization: {
+		minimize,
+		minimizer: MODE === 'production' ? [
+			new ESBuildMinifyPlugin({
+				target: ESBUILD_TARGET
+			})
+		] : []
+	},
+	output: {
+		filename: '[name].esm.js',
+		//library: 'LIB', // If you try to load to files with the same library name the latter will overwrite the first!!!
 
-//console.log(`WEBPACK_CONFIG:${JSON.stringify(WEBPACK_CONFIG, null, 4)}`);
+		library: 'Lib[name]',
+		// Library name base (Libreact/Explorer) must be a valid identifier when using a var declaring library type.
+		// Either use a valid identifier (e. g. Libreact_Explorer) or use a different library type
+		// (e. g. 'type: "global"', which assign a property on the global scope instead of declaring a variable).
+		// Common configuration options that specific library names are
+		// 'output.library[.name]', 'entry.xyz.library[.name]', 'ModuleFederationPlugin.name' and 'ModuleFederationPlugin.library[.name]'.
+
+		libraryTarget: 'var',
+		//libraryTarget: 'global',
+		//libraryTarget: 'window',
+		path: path.join(__dirname, DST_ASSETS_DIR, 'react')
+	},
+	performance: {
+		hints: false
+	},
+	plugins: [
+		new webpack.ProvidePlugin({
+			Buffer: ['buffer', 'Buffer']
+		}),
+		//new EsmWebpackPlugin(), // Webpack 5: Error: Cannot find module 'webpack/lib/MultiModule'
+		new ESBuildPlugin()
+	],
+	resolve: {
+		alias: {
+			'semantic-ui-react-form': MODE === 'production'
+				? path.resolve(__dirname, './node_modules/@enonic/semantic-ui-react-form/src')
+				: path.resolve(__dirname, '../semantic-ui-react-form/src')
+		},
+		extensions: [
+			'mjs', 'jsx', 'esm', 'es', 'es6', 'js', 'json'
+		].map(ext => `.${ext}`)
+	},
+	stats: STATS
+};
+//print({CLIENT_ES_CONFIG}, { maxItems: Infinity });
+//process.exit();
+WEBPACK_CONFIG.push(CLIENT_ES_CONFIG);
+
+//print({WEBPACK_CONFIG}, { maxItems: Infinity });
 //process.exit();
 
 export { WEBPACK_CONFIG as default };

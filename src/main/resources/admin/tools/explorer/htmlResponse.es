@@ -104,7 +104,6 @@ export function htmlResponse({
 			};
 		}
 	}
-
 	//log.info(toStr({path}));
 
 	const licenseDetails = validateLicense({appKey: app.name});
@@ -118,19 +117,30 @@ export function htmlResponse({
 		servicesBaseUrl: serviceUrl({service: ''}),
 		wsBaseUrl: serviceUrl({service: '', type: 'absolute'}).replace('http', 'ws')
 	};
+	//const propsJson = JSON.stringify(propsObj);
+	//log.info(`propsJson:${propsJson}`);
 
 	const collectorsAppToUri = {};
+	const collectorsObj = {};
 	queryCollectors({
 		connection: connect({principals: PRINCIPAL_EXPLORER_READ})
 	}).hits.forEach(({
 		_name: collectorId,
 		appName,
+		componentPath,
 		configAssetPath
 	}) => {
 		collectorsAppToUri[collectorId] = assetUrl({
 			application: appName,
 			path: configAssetPath
 		});
+		collectorsObj[collectorId] = {
+			componentPath,
+			url: assetUrl({
+				application: appName,
+				path: configAssetPath
+			})
+		};
 	});
 	//log.info(toStr({collectorsAppToUri}));
 
@@ -229,16 +239,17 @@ services: {}, // Workaround for i18nUrl BUG
 	<body style="background-color: white !important;">
 		<div id="${ID_REACT_EXPLORER_CONTAINER}"/>
 		<script type="text/javascript" src="${assetUrl({path: 'explorer.js'})}"></script>
-		<script type='module' defer>
-			import {Explorer} from '${assetUrl({path: 'react/Explorer.esm.js'})}';
-			const propsObj = eval(${serialize(propsObj)});
-			const collectorComponents = {};
-			${Object.keys(collectorsAppToUri).map((a, i) => `import {Collector as Collector${i}} from '${collectorsAppToUri[a]}';
-collectorComponents['${a}'] = Collector${i};`)
+		<script type="text/javascript" src="${assetUrl({path: 'react/Explorer.esm.js'})}"></script>
+		${Object.keys(collectorsAppToUri).map((a) => `<script type="text/javascript" src="${collectorsAppToUri[a]}"></script>`)
 		.join('\n')}
+		<script type='module' defer>
+			const propsObj = eval(${serialize(propsObj)});
+			//console.debug('propsObj', propsObj);
+			const collectorComponents = {};
+			${Object.keys(collectorsObj).map((collectorId) => `collectorComponents['${collectorId}'] = ${collectorsObj[collectorId].componentPath}`)}
 			propsObj.collectorComponents = collectorComponents;
 			ReactDOM.render(
-				React.createElement(Explorer, propsObj),
+				React.createElement(window.LibExplorer.Explorer, propsObj),
 				document.getElementById('${ID_REACT_EXPLORER_CONTAINER}')
 			);
 		</script>
@@ -248,7 +259,7 @@ collectorComponents['${a}'] = Collector${i};`)
 		status
 	};
 }
-
+//const propsObj = JSON.parse('${propsJson}');
 
 /*
 $('.ui.checkbox').checkbox();

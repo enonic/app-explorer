@@ -42,6 +42,7 @@ listener({
 			register({
 				appName: app.name,
 				collectTaskName: COLLECT_TASK_NAME_WEBCRAWL,
+				componentPath: 'window.LibWebCrawler.Collector',
 				configAssetPath: 'react/WebCrawler.esm.js',
 				displayName: 'Web crawler'
 			});
