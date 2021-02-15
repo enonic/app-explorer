@@ -65,7 +65,7 @@ dependencies {
 
 	include 'com.enonic.lib:lib-explorer:3.10.0'
 
-	include 'com.enonic.lib:lib-util:2.2.1'
+	include 'com.enonic.lib:lib-util:3.0.0'
 
 	include 'com.enonic.lib:lib-galimatias:1.0.0-B1'
 

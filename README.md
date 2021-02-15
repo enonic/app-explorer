@@ -197,6 +197,7 @@ app-explorer
 ### 1.5.0
 
 * Require Enonic XP 7.5.0
+* lib-util-3.0.0
 * Upgrade to lib-explorer-3.10.0
   * Add componentPath to register function
 * webpapp/api/1/documents
