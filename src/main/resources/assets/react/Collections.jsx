@@ -5,9 +5,9 @@ import {
 import {
 	MONTH_TO_HUMAN,
 	DAY_OF_WEEK_TO_HUMAN
-} from './Collection';
-import {DeleteCollectionModal} from './Collection/DeleteCollectionModal';
-import {NewOrEditCollectionModal} from './Collection/NewOrEditCollectionModal';
+} from './collection/SchedulingSegment';
+import {DeleteCollectionModal} from './collection/DeleteCollectionModal';
+import {NewOrEditCollectionModal} from './collection/NewOrEditCollectionModal';
 import {useInterval} from './utils/useInterval';
 
 const COLLECTIONS_GQL = `queryCollections(
