@@ -198,7 +198,7 @@ app-explorer
 
 * Require Enonic XP 7.5.0
 * lib-util-3.0.0
-* Upgrade to lib-explorer-3.10.0
+* Upgrade to lib-explorer-3.10.1
   * Add componentPath to register function
 * webpapp/api/1/documents
 * Scheduling should not be visible before one has selected collector

@@ -24,8 +24,8 @@ import webpack from 'webpack';
 const MODE = 'production';
 //print({MODE});
 
-//const BOOL_LIB_EXPLORER_EXTERNAL = MODE === 'production';
-const BOOL_LIB_EXPLORER_EXTERNAL = false;
+const BOOL_LIB_EXPLORER_EXTERNAL = MODE === 'production';
+//const BOOL_LIB_EXPLORER_EXTERNAL = false;
 
 //const minimize = MODE === 'production';
 const minimize = true;
@@ -228,11 +228,11 @@ const SS_JS_CONFIG = {
 			// TypeError: isObject is not a function
 			test: /\.(es6?|tsx?|js)$/, // Will need js for node module depenencies
 
-			/*exclude: [ // NOTE: Does this error belong here? TypeError: Cannot read property "prototype" from undefined
-				/\bcore-js\b/,
-				/\bwebpack\b/,
-				/\bregenerator-runtime\b/,
-			],*/
+			exclude: [ // It takes time to transpile, if you know they don't need transpilation to run in Enonic you may list them here:
+				/node_modules[\\/]core-js/, // will cause errors if they are transpiled by Babel
+				/node_modules[\\/]webpack[\\/]buildin/ // will cause errors if they are transpiled by Babel
+			],
+
 			use: [{
 				loader: 'babel-loader',
 				options: {
@@ -467,7 +467,11 @@ const CLIENT_JS_CONFIG = {
 	module: {
 		rules: [{
 			test: /\.jsx$/,
-			exclude: /node_modules/,
+			//exclude: /node_modules/, // Perhaps too much?
+			exclude: [ // It takes time to transpile, if you know they don't need transpilation to run in Enonic you may list them here:
+				/node_modules[\\/]core-js/, // will cause errors if they are transpiled by Babel
+				/node_modules[\\/]webpack[\\/]buildin/ // will cause errors if they are transpiled by Babel
+			],
 			use: [{
 				loader: 'babel-loader',
 				options: {
@@ -568,6 +572,10 @@ const CLIENT_ES_CONFIG = {
 	mode: MODE,
 	module: {
 		rules: [{
+			exclude: [ // It takes time to transpile, if you know they don't need transpilation to run in Enonic you may list them here:
+				/node_modules[\\/]core-js/, // will cause errors if they are transpiled by Babel
+				/node_modules[\\/]webpack[\\/]buildin/ // will cause errors if they are transpiled by Babel
+			],
 			test: /\.jsx$/,
 			loader: 'esbuild-loader',
 			options: {
