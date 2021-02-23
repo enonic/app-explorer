@@ -1,4 +1,5 @@
 //import {toStr} from '/lib/util';
+import {forceArray} from '/lib/util/data';
 import {sanitize} from '/lib/xp/common';
 import {send as sendEvent} from '/lib/xp/event';
 
@@ -9,6 +10,7 @@ import {
 } from '/lib/explorer/model/2/constants';
 import {collection} from '/lib/explorer/model/2/nodeTypes/collection';
 import {connect} from '/lib/explorer/repo/connect';
+import {hash} from '/lib/explorer/string/hash';
 import {modify} from '/lib/explorer/node/modify';
 
 export function post({
@@ -37,6 +39,20 @@ export function post({
 		if (boolMoved) {
 			obj._name = sanitizedName;
 		}
+	}
+
+	if (obj.collector && obj.collector.name && obj.collector.name === 'com.enonic.app.explorer:api' ) {
+		obj.collector.config.apiKeys = forceArray(obj.collector.config.apiKeys).map(({
+			comment,
+			dateTime,
+			key,
+			hashed = false
+		}) => ({
+			comment,
+			dateTime,
+			key: hashed ? key : hash(key),
+			hashed: true
+		}));
 	}
 
 	obj.collector.configJson = JSON.stringify(obj.collector.config); // ForceArray workaround:

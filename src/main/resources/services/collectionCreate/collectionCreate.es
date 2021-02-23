@@ -1,4 +1,5 @@
 //import {toStr} from '/lib/util';
+import {forceArray} from '/lib/util/data';
 import {sanitize} from '/lib/xp/common';
 import {send as sendEvent} from '/lib/xp/event';
 
@@ -10,6 +11,7 @@ import {
 } from '/lib/explorer/model/2/constants';
 import {collection} from '/lib/explorer/model/2/nodeTypes/collection';
 import {connect} from '/lib/explorer/repo/connect';
+import {hash} from '/lib/explorer/string/hash';
 import {create} from '/lib/explorer/node/create';
 
 
@@ -23,6 +25,20 @@ export function post({
 	// WARNING This sets the node _name to whatever the user typed, may conflict!!!
 	// But thats ok, we like collection repos to have recognizeable names.
 	obj._name = sanitize(obj.displayName);
+
+	if (obj.collector && obj.collector.name && obj.collector.name === 'com.enonic.app.explorer:api' ) {
+		obj.collector.config.apiKeys = forceArray(obj.collector.config.apiKeys).map(({
+			comment,
+			dateTime,
+			key,
+			hashed = false
+		}) => ({
+			comment,
+			dateTime,
+			key: hashed ? key : hash(key),
+			hashed: true
+		}));
+	}
 
 	obj.collector.configJson = JSON.stringify(obj.collector.config); // ForceArray workaround:
 	//log.debug(`obj:${toStr({obj})}`);
