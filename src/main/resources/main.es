@@ -29,6 +29,7 @@ import {EVENT_INIT_COMPLETE} from './tasks/init/init';
 
 
 const COLLECT_TASK_NAME_WEBCRAWL = 'webcrawl';
+const COLLECT_TASK_NAME_API = 'api';
 
 //──────────────────────────────────────────────────────────────────────────────
 // Main
@@ -39,6 +40,13 @@ listener({
 	callback: (/*event*/) => {
 		//log.info(`Received event ${toStr(event)}`);
 		if (isMaster()) {
+			register({
+				appName: app.name,
+				collectTaskName: COLLECT_TASK_NAME_API,
+				componentPath: 'window.LibApiCollector.ApiCollector',
+				configAssetPath: 'react/ApiCollector.esm.js',
+				displayName: 'API Collector (external)'
+			});
 			register({
 				appName: app.name,
 				collectTaskName: COLLECT_TASK_NAME_WEBCRAWL,
@@ -125,6 +133,10 @@ if (isMaster()) {
 } // if isMaster
 
 __.disposer(() => {
+	unregister({
+		appName: app.name,
+		collectTaskName: COLLECT_TASK_NAME_API
+	});
 	unregister({
 		appName: app.name,
 		collectTaskName: COLLECT_TASK_NAME_WEBCRAWL

@@ -468,6 +468,7 @@ export function Collections(props) {
 							onClick={null/*handleSortGenerator('displayName')*/}
 							sorted={column === 'displayName' ? direction : null}
 						>Name</Table.HeaderCell>
+						<Table.HeaderCell>Collector</Table.HeaderCell>
 						<Table.HeaderCell>Documents</Table.HeaderCell>
 						<Table.HeaderCell>Language</Table.HeaderCell>
 						<Table.HeaderCell>Interfaces</Table.HeaderCell>
@@ -533,6 +534,7 @@ export function Collections(props) {
 								totalNumberOfCollections={queryCollectionsGraph.total}
 							/></Table.Cell>
 							<Table.Cell collapsing>{displayName}</Table.Cell>
+							<Table.Cell collapsing>{collector && collector.name || ''}</Table.Cell>
 							<Table.Cell collapsing>{documentCount}</Table.Cell>
 							<Table.Cell collapsing>{language}</Table.Cell>
 							<Table.Cell collapsing>{interfaces.map((iface, i) => <p key={i}>
@@ -561,46 +563,48 @@ export function Collections(props) {
 												fetchCollections();
 											});
 										}}><Icon color='blue' name='copy'/></Button>}/>
-									{collectionsTaskState[_name]
-										? {
-											WAITING: <Popup
-												content={`Collector is in waiting state`}
-												inverted
-												trigger={<Button disabled={!boolCollectorSelectedAndInitialized} icon><Icon color='yellow' name='pause'/></Button>}/>,
-											RUNNING: <Popup
-												content={`Stop collecting to ${_name}`}
-												inverted
-												trigger={<Button disabled={!boolCollectorSelectedAndInitialized} icon onClick={() => {
-													fetch(`${servicesBaseUrl}/collectorStop?collectionName=${_name}`, {
-														method: 'POST'
-													}).then(() => {
-														fetchTasks();
-													});
-												}}><Icon color='red' name='stop'/></Button>}/>,
-											FINISHED: <Popup
-												content={`Finished collecting to ${_name}`}
-												inverted
-												trigger={<Button disabled={!boolCollectorSelectedAndInitialized} icon><Icon color='green' name='checkmark'/></Button>}/>,
-											FAILED: <Popup
-												content={`Something went wrong while collecting to ${_name}`}
-												inverted
-												trigger={<Button disabled={!boolCollectorSelectedAndInitialized} icon><Icon color='red' name='warning'/></Button>}/>
-										}[collectionsTaskState[_name]]
-										: anyTaskWithoutCollectionName
-											? <Popup
-												content={`Some collector task is starting...`}
-												inverted
-												trigger={<Button disabled={!boolCollectorSelectedAndInitialized} icon loading><Icon color='yellow' name='question'/></Button>}/>
-											: <Popup
-												content={`Start collecting to ${_name}`}
-												inverted
-												trigger={<Button disabled={!boolCollectorSelectedAndInitialized} icon onClick={() => {
-													fetch(`${servicesBaseUrl}/collectionCollect?name=${_name}`, {
-														method: 'POST'
-													}).then(() => {
-														fetchTasks();
-													});
-												}}><Icon color='green' name='cloud download'/></Button>}/>
+									{collector && collector.name && collector.name !== 'com.enonic.app.explorer:api'
+										? collectionsTaskState[_name]
+											? {
+												WAITING: <Popup
+													content={`Collector is in waiting state`}
+													inverted
+													trigger={<Button disabled={!boolCollectorSelectedAndInitialized} icon><Icon color='yellow' name='pause'/></Button>}/>,
+												RUNNING: <Popup
+													content={`Stop collecting to ${_name}`}
+													inverted
+													trigger={<Button disabled={!boolCollectorSelectedAndInitialized} icon onClick={() => {
+														fetch(`${servicesBaseUrl}/collectorStop?collectionName=${_name}`, {
+															method: 'POST'
+														}).then(() => {
+															fetchTasks();
+														});
+													}}><Icon color='red' name='stop'/></Button>}/>,
+												FINISHED: <Popup
+													content={`Finished collecting to ${_name}`}
+													inverted
+													trigger={<Button disabled={!boolCollectorSelectedAndInitialized} icon><Icon color='green' name='checkmark'/></Button>}/>,
+												FAILED: <Popup
+													content={`Something went wrong while collecting to ${_name}`}
+													inverted
+													trigger={<Button disabled={!boolCollectorSelectedAndInitialized} icon><Icon color='red' name='warning'/></Button>}/>
+											}[collectionsTaskState[_name]]
+											: anyTaskWithoutCollectionName
+												? <Popup
+													content={`Some collector task is starting...`}
+													inverted
+													trigger={<Button disabled={!boolCollectorSelectedAndInitialized} icon loading><Icon color='yellow' name='question'/></Button>}/>
+												: <Popup
+													content={`Start collecting to ${_name}`}
+													inverted
+													trigger={<Button disabled={!boolCollectorSelectedAndInitialized} icon onClick={() => {
+														fetch(`${servicesBaseUrl}/collectionCollect?name=${_name}`, {
+															method: 'POST'
+														}).then(() => {
+															fetchTasks();
+														});
+													}}><Icon color={boolCollectorSelectedAndInitialized ? 'green' : 'grey'} name='cloud download'/></Button>}/>
+										: <Button disabled={true} icon><Icon color='grey' name='cloud download'/></Button>
 									}
 									<DeleteCollectionModal
 										_name={_name}

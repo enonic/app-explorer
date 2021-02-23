@@ -62,7 +62,7 @@
     "babel-loader": "8.2.2",
     "browser-sync": "2.26.14",
     "browser-sync-webpack-plugin": "2.3.0",
-    "buffer": "^6.0.3",
+    "buffer": "6.0.3",
     "caniuse-lite": "1.0.30001187",
     "classnames": "2.2.6",
     "clean-webpack-plugin": "3.0.0",
