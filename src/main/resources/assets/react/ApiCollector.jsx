@@ -4,13 +4,15 @@ import {
 	Form,
 	Header,
 	//Icon,
+	Input,
+	Radio,
 	Table
 } from 'semantic-ui-react';
 import {
 	setValue,
 	DeleteItemButton,
 	Form as EnonicForm,
-	Input,
+	Input as EnonicInput,
 	InsertButton,
 	List,
 	MoveDownButton,
@@ -20,6 +22,17 @@ import {
 
 const API_KEYS_PATH = 'apiKeys';
 
+function makeKey({
+	characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789',
+	length = 32
+} = {}) {
+	let result = '';
+	const charactersLength = characters.length;
+	for ( var i = 0; i < length; i++ ) {
+		result += characters.charAt(Math.floor(Math.random() * charactersLength));
+	}
+	return result;
+}
 
 export const ApiCollector = (props) => {
 	//console.debug('ApiCollector props', props);
@@ -43,8 +56,10 @@ export const ApiCollector = (props) => {
 		} else {
 			initialValues = {
 				[API_KEYS_PATH]: [{
-					key: '',
-					comment: ''
+					comment: '',
+					dateTime: new Date(Date.now()).toISOString(),
+					hashed: false,
+					key: makeKey()
 				}]
 			};
 			dispatch(setValue({path, value: initialValues}));
@@ -71,57 +86,81 @@ export const ApiCollector = (props) => {
 							<Table celled compact selectable striped>
 								<Table.Header>
 									<Table.Row>
+										<Table.HeaderCell collapsing>Date</Table.HeaderCell>
 										<Table.HeaderCell collapsing>Key</Table.HeaderCell>
-										<Table.HeaderCell collapsing>Comment</Table.HeaderCell>
+										<Table.HeaderCell collapsing>Hashed</Table.HeaderCell>
+										<Table.HeaderCell collapsing></Table.HeaderCell>
 									</Table.Row>
 								</Table.Header>
 								<Table.Body>{
 									apiKeysArray.map(({
-										key // eslint-disable-line no-unused-vars
-										//comment
+										//comment = '',
+										dateTime = new Date(Date.now()).toISOString(),
+										hashed = false,
+										key = makeKey() // eslint-disable-line no-unused-vars
 									}, index) => {
 										const reactKey = `${API_KEYS_PATH}.${index}`;
 										//console.debug('ApiCollector reactKey', reactKey);
-										return <Table.Row key={reactKey}>
-											<Table.Cell>
-												<Input
-													fluid
-													path={`${reactKey}.key`}
-												/>
-											</Table.Cell>
-											<Table.Cell>
-												<Input
-													fluid
-													path={`${reactKey}.comment`}
-												/>
-											</Table.Cell>
-											<Table.Cell collapsing>
-												<Button.Group>
-													<InsertButton
-														index={index+1}
-														path={API_KEYS_PATH}
-														value={{
-															key: '',
-															comment: ''
-														}}
+										return <React.Fragment key={reactKey}>
+											<Table.Row>
+												<Table.Cell>
+													<Input
+														disabled={true}
+														value={dateTime}
 													/>
-													<MoveDownButton
-														disabled={index + 1 >= apiKeysArray.length}
-														index={index}
-														path={API_KEYS_PATH}
+												</Table.Cell>
+												<Table.Cell>
+													<Input
+														disabled={true}
+														value={key}
 													/>
-													<MoveUpButton
-														index={index}
-														path={API_KEYS_PATH}
+												</Table.Cell>
+												<Table.Cell>
+													<Radio
+														checked={hashed}
+														readOnly={true}
+														toggle
 													/>
-													<DeleteItemButton
-														disabled={apiKeysArray.length <= 1}
-														index={index}
-														path={API_KEYS_PATH}
+												</Table.Cell>
+												<Table.Cell collapsing rowSpan={2}>
+													<Button.Group>
+														<InsertButton
+															index={index+1}
+															path={API_KEYS_PATH}
+															value={{
+																comment: '',
+																dateTime: new Date(Date.now()).toISOString(),
+																hashed: false,
+																key: makeKey()
+															}}
+														/>
+														<MoveDownButton
+															disabled={index + 1 >= apiKeysArray.length}
+															index={index}
+															path={API_KEYS_PATH}
+														/>
+														<MoveUpButton
+															index={index}
+															path={API_KEYS_PATH}
+														/>
+														<DeleteItemButton
+															disabled={apiKeysArray.length <= 1}
+															index={index}
+															path={API_KEYS_PATH}
+														/>
+													</Button.Group>
+												</Table.Cell>
+											</Table.Row>
+											<Table.Row>
+												<Table.Cell colSpan={3}>
+													<EnonicInput
+														fluid
+														path={`${reactKey}.comment`}
+														placeholder='Comment'
 													/>
-												</Button.Group>
-											</Table.Cell>
-										</Table.Row>;
+												</Table.Cell>
+											</Table.Row>
+										</React.Fragment>;
 									})
 								}</Table.Body>
 							</Table>

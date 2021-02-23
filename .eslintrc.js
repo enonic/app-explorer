@@ -118,6 +118,7 @@ module.exports = {
 		}],
 		'no-unexpected-multiline': 'off',
 		'object-curly-spacing': ['off'],
+		"react/jsx-no-undef": ['error', { "allowGlobals": true }],
 		//'react/jsx-uses-react': 'error',
 		//'react/jsx-uses-vars': 'error',
 		'react/prop-types': 'off',
