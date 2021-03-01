@@ -93,7 +93,7 @@
     "terser-webpack-plugin": "5.1.1",
     "traverse": "0.6.6",
     "tslib": "2.1.0",
-    "webpack": "5.22.0",
+    "webpack": "5.24.2",
     "webpack-cli": "4.5.0"
   },
   "license": "Apache-2.0",
