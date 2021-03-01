@@ -203,7 +203,8 @@ app-explorer
 * webpapp/api/1/documents
 * Scheduling should not be visible before one has selected collector
 * Make it possible to select language per collection
-* Upgrade node modules (patch)
+* Build system upgrades
+  * Node 14.16.0
 
 ### 1.4.0
 
