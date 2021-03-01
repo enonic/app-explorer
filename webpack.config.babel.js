@@ -24,8 +24,8 @@ import webpack from 'webpack';
 const MODE = 'production';
 //print({MODE});
 
-const BOOL_LIB_EXPLORER_EXTERNAL = MODE === 'production';
-//const BOOL_LIB_EXPLORER_EXTERNAL = false;
+//const BOOL_LIB_EXPLORER_EXTERNAL = MODE === 'production';
+const BOOL_LIB_EXPLORER_EXTERNAL = false;
 
 //const minimize = MODE === 'production';
 const minimize = true;
