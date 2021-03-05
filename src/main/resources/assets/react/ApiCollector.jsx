@@ -110,6 +110,10 @@ export const ApiCollector = (props) => {
 													/>
 												</Table.Cell>
 												<Table.Cell>
+													{hashed
+														? 'This is NOT a useable API key. Just the one-way hashed control value.'
+														: 'This is your API key. Copy it now, because after you click [Submit] it is one-way hashed, and never available again. If you loose the API key, simply make a new one.'
+													}
 													<Input
 														disabled={true}
 														value={key}
