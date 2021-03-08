@@ -196,6 +196,7 @@ app-explorer
 
 ### 1.5.0-SNAPSHOT
 
+* Make some folders on startup
 * Add Import API (webpapp/api/1/documents)
 * Require Enonic XP 7.5.0
 * lib-util-3.0.0

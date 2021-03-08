@@ -10,11 +10,13 @@ import {
 } from '/lib/explorer/model/2/constants';
 import {
 	DEFAULT_INTERFACE,
+	FOLDERS,
 	ROLES,
 	REPOSITORIES,
 	USERS,
 	field,
 	fieldValue,
+	folder,
 	interfaceModel
 } from '/lib/explorer/model/2/index';
 import {node as Node} from '/lib/explorer/model/2/nodeTypes/node';
@@ -83,6 +85,15 @@ export function run() {
 				node.initialized = false;
 			}
 		});*/
+
+		FOLDERS.forEach((_name) => {
+			ignoreErrors(() => {
+				create(folder({
+					__connection: connection,
+					_name
+				}));
+			});
+		});
 
 		DEFAULT_FIELDS.forEach(({
 			_name,
