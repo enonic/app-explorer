@@ -146,3 +146,5 @@ processResources {
 	exclude '**/*.scss'
 	exclude '**/*.styl'
 }
+
+jar.dependsOn webpack
