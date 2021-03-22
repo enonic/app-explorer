@@ -2,6 +2,7 @@ import {
 	Header, Icon, List, Menu, Modal, Sidebar
 } from 'semantic-ui-react';
 
+import {Api} from './Api';
 import {Collections} from './Collections';
 import {Fields} from './Fields';
 import {Interfaces} from './Interfaces';
@@ -267,6 +268,12 @@ export function Explorer(props) {
 					onClick={() => setPage('home')}
 				><Icon name='search'/> Home</Menu.Item>
 
+				{licenseValid && <Menu.Item
+					as='a'
+					href='#api'
+					active={page === 'api'}
+					onClick={() => setPage('api')}
+				><Icon name='plug'/> API</Menu.Item>}
 				<Menu.Item
 					as='a'
 					href='#collections'
@@ -373,6 +380,9 @@ export function Explorer(props) {
 						servicesBaseUrl={servicesBaseUrl}
 					/>
 				</>}
+				{licenseValid && page === 'api' && <Api
+					servicesBaseUrl={servicesBaseUrl}
+				/>}
 				{page === 'collections' && <Collections
 					collectorComponents={collectorComponents}
 					licenseValid={licenseValid}

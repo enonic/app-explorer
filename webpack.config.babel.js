@@ -105,6 +105,9 @@ const SS_FILES = [
 	//'lib/fnv', // Not in use
 	'lib/locales',
 	'main',
+	'services/apiKeyCreate/apiKeyCreate',
+	'services/apiKeyDelete/apiKeyDelete',
+	'services/apiKeyModify/apiKeyModify',
 	'services/collectionCollect/collectionCollect',
 	'services/collectionCreate/collectionCreate',
 	'services/collectionDelete/collectionDelete',

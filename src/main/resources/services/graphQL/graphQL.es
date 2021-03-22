@@ -17,6 +17,7 @@ import {getContentTypes} from './contentType';
 import {getLicense} from './license';
 import {getSites} from './site';
 import {getLocales} from './i18n';
+import {queryApiKeys} from './apiKey';
 import {queryCollections} from './collection';
 import {queryCollectors} from './collector';
 import {queryFields} from './field';
@@ -48,6 +49,7 @@ export const SCHEMA = createSchema({
 			getLicense,
 			getLocales,
 			getSites,
+			queryApiKeys,
 			queryCollections,
 			queryCollectors,
 			queryFields,

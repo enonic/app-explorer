@@ -5,7 +5,7 @@ mapping.api.target = /webapp/com.enonic.app.explorer/api
 mapping.api.idProvider.system = default
 */
 
-export {all} from '/lib/explorer/api/v1';
+export {all} from '/lib/explorer/api';
 
 /*
 import Router from '/lib/router';
