@@ -17,18 +17,36 @@ import {
 	nonNull
 } from '/lib/graphql';
 //import {toStr} from '/lib/util';
+import {forceArray} from '/lib/util/data';
 
 export const queryApiKeys = {
-	resolve: (/*env*/) => {
+	args: {
+		count: GraphQLInt,
+		sort: GraphQLString,
+		start: GraphQLInt // start is ignored when count -1
+	},
+	resolve: (env) => {
 		//log.info(`env:${toStr(env)}`);
+		const {
+			args: {
+				count = -1,
+				sort = '_name ASC',
+				start = 0 // start is ignored when count -1
+			} = {}
+		} = env;
+		//log.info(`count:${count}`);
+		//log.info(`sort:${sort}`);
+		//log.info(`start:${start}`); // start is ignored when count -1
 
 		const filters = {};
 		const queryParams = {
-			count: -1,
+			count,
 			filters: addFilter({
 				filters,
 				filter: hasValue('type', [NT_API_KEY])
-			})
+			}),
+			sort,
+			start // start is ignored when count -1
 		};
 		//log.info(`queryParams:${toStr(queryParams)}`);
 
@@ -43,6 +61,7 @@ export const queryApiKeys = {
 				_id: node._id,
 				_path: node._path,
 				_name: node._name,
+				collections: forceArray(node.collections),
 				hashed: node.hashed,
 				key: node.key,
 				type: node.type
@@ -64,6 +83,7 @@ export const queryApiKeys = {
 					_id: { type: nonNull(GraphQLString) },
 					_path: { type: nonNull(GraphQLString) },
 					_name: { type: nonNull(GraphQLString) },
+					collections: { type: list(GraphQLString)},
 					hashed: { type: nonNull(GraphQLBoolean) },
 					key: { type: nonNull(GraphQLString) },
 					type: { type: nonNull(GraphQLString) }

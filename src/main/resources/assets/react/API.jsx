@@ -16,13 +16,23 @@ import {
 	SubmitButton
 } from 'semantic-ui-react-form';
 
+import {Dropdown} from 'semantic-ui-react-form/inputs/Dropdown';
+
 import {useInterval} from './utils/useInterval';
 
 
-const API_KEYS_GQL = `{
+const GQL = `{
 	queryApiKeys {
 		#total
 		#count
+		hits {
+			_name
+			collections
+		}
+	}
+	queryCollections(
+		count: -1
+	) {
 		hits {
 			_name
 		}
@@ -48,12 +58,21 @@ const NewOrEditApiKey = (props) => {
 	const {
 		_name,
 		initialValues = {
+			collections: [],
 			key: _name ? '' : makeKey()//,
 			//name: _name
 		},
 		onClose,
+		queryCollectionsGraph,
 		servicesBaseUrl
 	} = props;
+	//console.debug('initialValues', initialValues);
+
+	const collectionOptions = queryCollectionsGraph.hits ? queryCollectionsGraph.hits.map(({_name: key}) => ({
+		key,
+		text: key,
+		value: key
+	})) : [];
 
 	return <EnonicForm
 		initialValues={initialValues}
@@ -73,24 +92,40 @@ const NewOrEditApiKey = (props) => {
 			});
 		}}
 	>
-		{_name
-			? null
-			: <Input
-				fluid
-				label='Name'
-				path='name'
-			/>
-		}
-		<Input
-			fluid
-			label='Key'
-			path='key'
-			placeholder={_name ? 'If you type anything here, it will overwrite the previous key on save' : 'Key is one way hashed on save'}
-		/>
-		<Form.Field>
-			<SubmitButton/>
-			<ResetButton/>
-		</Form.Field>
+		<Form as='div'>
+			{_name
+				? null
+				: <Form.Field>
+					<Input
+						fluid
+						label='Name'
+						path='name'
+					/>
+				</Form.Field>
+			}
+			<Form.Field>
+				<Input
+					fluid
+					label='Key'
+					path='key'
+					placeholder={_name ? 'If you type anything here, it will overwrite the previous key on save' : 'Key is one way hashed on save'}
+				/>
+			</Form.Field>
+			<Header as='h2' content='Collection(s)' dividing id='collections'/>
+			<Form.Field>
+				<Dropdown
+					multiple={true}
+					options={collectionOptions}
+					path='collections'
+					placeholder='Please select one or more collections...'
+					selection
+				/>
+			</Form.Field>
+			<Form.Field>
+				<SubmitButton/>
+				<ResetButton/>
+			</Form.Field>
+		</Form>
 	</EnonicForm>;
 }; // NewOrEditApiKey
 
@@ -102,6 +137,7 @@ const NewOrEditApiKeyModal = (props) => {
 		initialValues,
 		onClose = () => {},
 		onOpen = () => {},
+		queryCollectionsGraph,
 		servicesBaseUrl
 	} = props;
 	const [state, setState] = React.useState({
@@ -146,6 +182,7 @@ const NewOrEditApiKeyModal = (props) => {
 					setState({open: false});
 					onClose();
 				}}
+				queryCollectionsGraph={queryCollectionsGraph}
 				servicesBaseUrl={servicesBaseUrl}
 			/>
 		</Modal.Content>
@@ -209,19 +246,21 @@ export const Api = (props) => {
 	} = props;
 
 	const [queryApiKeysGraph, setQueryApiKeysGraph] = React.useState({});
+	const [queryCollectionsGraph, setQueryCollectionsGraph] = React.useState({});
 	const [boolPoll, setBoolPoll] = React.useState(true);
 
 	const fetchApiKeys = () => {
 		fetch(`${servicesBaseUrl}/graphQL`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ query: API_KEYS_GQL })
+			body: JSON.stringify({ query: GQL })
 		})
 			.then(res => res.json())
 			.then(res => {
 				//console.log(res);
 				if (res && res.data) {
 					setQueryApiKeysGraph(res.data.queryApiKeys);
+					setQueryCollectionsGraph(res.data.queryCollections);
 				}
 			});
 	};
@@ -242,36 +281,48 @@ export const Api = (props) => {
 				<Table.Row>
 					<Table.HeaderCell>Edit</Table.HeaderCell>
 					<Table.HeaderCell>Name</Table.HeaderCell>
+					<Table.HeaderCell>Collections</Table.HeaderCell>
 					<Table.HeaderCell>Actions</Table.HeaderCell>
 				</Table.Row>
 			</Table.Header>
 			<Table.Body>
 				{queryApiKeysGraph.hits && queryApiKeysGraph.hits.map(({
-					_name
+					_name,
+					collections
 				}) => {
 					return <Table.Row key={_name}>
 						<Table.Cell collapsing>
 							<NewOrEditApiKeyModal
 								_name={_name}
+								initialValues={{
+									_name,
+									collections
+								}}
 								onClose={() => {
+									//console.debug('onClose');
 									fetchApiKeys();
 									setBoolPoll(true);
 								}}
 								onOpen={() => {
+									console.debug('onOpen'); // For some reason does not get called???
 									setBoolPoll(false);
 								}}
+								queryCollectionsGraph={queryCollectionsGraph}
 								servicesBaseUrl={servicesBaseUrl}
 							/>
 						</Table.Cell>
-						<Table.Cell>{_name}</Table.Cell>
+						<Table.Cell collapsing>{_name}</Table.Cell>
+						<Table.Cell>{collections.join(', ')}</Table.Cell>
 						<Table.Cell collapsing>
 							<DeleteApiKeyModal
 								_name={_name}
 								onClose={() => {
+									//console.debug('onClose');
 									fetchApiKeys();
 									setBoolPoll(true);
 								}}
 								onOpen={() => {
+									console.debug('onOpen'); // For some reason does not get called???
 									setBoolPoll(false);
 								}}
 								servicesBaseUrl={servicesBaseUrl}
@@ -283,12 +334,15 @@ export const Api = (props) => {
 		</Table>
 		<NewOrEditApiKeyModal
 			onClose={() => {
+				//console.debug('onClose');
 				fetchApiKeys();
 				setBoolPoll(true);
 			}}
 			onOpen={() => {
+				//console.debug('onOpen'); // Why this one gets called and not the other ones is beyond me???
 				setBoolPoll(false);
 			}}
+			queryCollectionsGraph={queryCollectionsGraph}
 			servicesBaseUrl={servicesBaseUrl}
 		/>
 	</>;

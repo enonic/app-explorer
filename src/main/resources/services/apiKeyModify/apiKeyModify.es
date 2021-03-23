@@ -28,9 +28,6 @@ export function post({
 	if (!name) {
 		body.error = 'Name cannot be empty!';
 		status = 400;
-	} else if (!key) {
-		body.error = 'Key cannot be empty!';
-		status = 400;
 	} else {
 		try {
 			const writeConnection = connect({
@@ -39,9 +36,28 @@ export function post({
 			const modifiedNode = writeConnection.modify({
 				key: `${PATH_API_KEYS}/${name}`,
 				editor: (node) => {
-					node.modifiedTime = new Date();
-					node.modifier = getUser().key;
-					node.key = hash(key);
+					Object.keys(obj).forEach((property) => {
+						//log.info(`property:${property}`);
+						if (!(
+							property.startsWith('_') ||
+							[
+								'creator',
+								'createdTime',
+								'key', // key is set below
+								'type'
+							].includes(property)
+						)) {
+							const value = obj[property];
+							node[property] = value;
+						} /*else {
+							log.info(`Ignoring property:${property} value:${toStr(obj[property])}`);
+						}*/
+						node.modifiedTime = new Date();
+						node.modifier = getUser().key;
+						if (key) {
+							node.key = hash(key);
+						}
+					});
 					return node;
 				}
 			});

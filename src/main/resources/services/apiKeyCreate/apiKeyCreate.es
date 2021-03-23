@@ -18,6 +18,7 @@ export function post({
 	//log.info(`obj:${toStr(obj)}`);
 
 	const {
+		collections,
 		name,
 		key
 	} = obj;
@@ -37,6 +38,7 @@ export function post({
 			_inheritsPermissions: true,
 			_parentPath: PATH_API_KEYS,
 			_name: name,
+			collections,
 			creator: getUser().key,
 			hashed: true,
 			key: hash(key),
