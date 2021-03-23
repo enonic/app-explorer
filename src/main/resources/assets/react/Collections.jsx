@@ -34,7 +34,6 @@ const COLLECTIONS_GQL = `queryCollections(
 			hour
 			minute
 		}
-		displayName
 		doCollect
 		documentCount
 		interfaces
@@ -250,14 +249,14 @@ export function Collections(props) {
 			pageTotal: 1,
 			total: 0
 		},*/
-		column: 'displayName',
+		column: '_name',
 		contentTypeOptions: [],
 		direction: 'ascending',
 		isLoading: false,//true,
 		page: 1,
 		perPage: 10,
 		siteOptions: [],
-		sort: 'displayName ASC'/*,
+		sort: '_name ASC'/*,
 		totalCount: 0*/
 	});
 	//console.debug('Collections', {props, state});
@@ -271,8 +270,7 @@ export function Collections(props) {
 		page,
 		perPage,
 		//sort,
-		siteOptions/*,
-		totalCount No longer provided by the collectionList service*/
+		siteOptions
 	} = state;
 	//console.debug({column, direction, sort});
 
@@ -327,30 +325,6 @@ export function Collections(props) {
 		clickedColumn = column,
 		newDirection = direction
 	} = {}) {
-		/*setState(prev => ({
-			...prev,
-			isLoading: true
-		}));
-		const newSort = `${clickedColumn} ${newDirection === 'ascending' ? 'ASC' : 'DESC'}`;*/
-		/*console.debug('fetchCollections', {
-			activePage,
-			activePerPage,
-			clickedColumn,
-			newDirection,
-			newSort
-		});*/
-		/*fetch(`${servicesBaseUrl}/collectionList?page=${activePage}&perPage=${activePerPage}&sort=${newSort}`)
-			.then(response => response.json())
-			.then(data => setState(prev => ({
-				...prev,
-				...data,
-				column: clickedColumn,
-				direction: newDirection,
-				isLoading: false,
-				page: activePage,
-				perPage: activePerPage,
-				sort: newSort
-			})));*/
 		fetch(`${servicesBaseUrl}/graphQL`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
@@ -364,21 +338,6 @@ export function Collections(props) {
 				}
 			});
 	} // fetchCollections
-
-	/*function fetchCollectors() {
-		fetch(`${servicesBaseUrl}/graphQL`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ query: `{${COLLECTORS_GQL}}` })
-		})
-			.then(res => res.json())
-			.then(res => {
-				//console.log(res);
-				if (res && res.data && res.data.queryCollectors) {
-					setQueryCollectorsGraph(res.data.queryCollectors);
-				}
-			});
-	} // fetchCollectors*/
 
 	function fetchTasks() {
 		fetch(`${servicesBaseUrl}/graphQL`, {
@@ -394,57 +353,6 @@ export function Collections(props) {
 				}
 			});
 	} // fetchTasks
-
-	/*
-	function handlePaginationChange(e, {activePage}) {
-		//console.debug({function: 'handlePaginationChange', activePage});
-		fetchCollections({activePage})
-	}
-
-	function handlePerPageChange(e, {name, value}) {
-		fetchCollections({activePerPage:value});
-	}
-
-	const handleSortGenerator = (clickedColumn) => () => {
-	    const {
-			//collections,
-			column,
-			direction
-		} = state;
-		/*console.debug('handleSort', {
-			clickedColumn,
-			//collections,
-			column,
-			direction
-		});
-
-	    if (column !== clickedColumn) {
-			fetchCollections({
-				clickedColumn,
-				newDirection: 'ascending'
-			});
-			/*collections.hits = _.sortBy(collections.hits, [clickedColumn]);
-	    	setState(prev => ({
-				...prev,
-				column: clickedColumn,
-		        collections,
-		        direction: 'ascending'
-			}));
-			return;
-	    }
-
-		fetchCollections({
-			clickedColumn,
-			newDirection: direction === 'ascending' ? 'descending' : 'ascending'
-		});
-		/*collections.hits = collections.hits.reverse();
-	    setState(prev => ({
-			...prev,
-			collections,
-			direction: direction === 'ascending' ? 'descending' : 'ascending'
-	  	}));
-	} // handleSortGenerator
-	*/
 
 	React.useEffect(() => fetchOnMount(), []); // Only once
 
@@ -466,7 +374,7 @@ export function Collections(props) {
 						<Table.HeaderCell>Edit</Table.HeaderCell>
 						<Table.HeaderCell
 							onClick={null/*handleSortGenerator('displayName')*/}
-							sorted={column === 'displayName' ? direction : null}
+							sorted={column === '_name' ? direction : null}
 						>Name</Table.HeaderCell>
 						<Table.HeaderCell>Collector</Table.HeaderCell>
 						<Table.HeaderCell>Documents</Table.HeaderCell>
@@ -486,7 +394,6 @@ export function Collections(props) {
 						documentCount,
 						cron,
 						doCollect,
-						displayName,
 						//id,
 						interfaces,
 						language = ''
@@ -512,7 +419,6 @@ export function Collections(props) {
 									_path,
 									collector,
 									cron,
-									displayName,
 									doCollect,
 									language
 								}}
@@ -533,7 +439,7 @@ export function Collections(props) {
 								siteOptions={siteOptions}
 								totalNumberOfCollections={queryCollectionsGraph.total}
 							/></Table.Cell>
-							<Table.Cell collapsing>{displayName}</Table.Cell>
+							<Table.Cell collapsing>{_name}</Table.Cell>
 							<Table.Cell collapsing>{collector && collector.name || ''}</Table.Cell>
 							<Table.Cell collapsing>{documentCount}</Table.Cell>
 							<Table.Cell collapsing>{language}</Table.Cell>

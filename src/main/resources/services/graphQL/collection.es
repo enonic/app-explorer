@@ -39,7 +39,6 @@ const COLLECTION_OBJECT_TYPE = createObjectType({
 		_id: { type: nonNull(GraphQLString) },
 		_path: { type: nonNull(GraphQLString) },
 		_name: { type: nonNull(GraphQLString) },
-		displayName: { type: nonNull(GraphQLString) },
 		type: { type: nonNull(GraphQLString) },
 		//collecting: { type: GraphQLBoolean },
 		collector: { type: createObjectType({
@@ -113,7 +112,6 @@ export const queryCollectionsResolver = ({
 		_name,
 		collector,
 		cron,
-		displayName,
 		doCollect,
 		language = '',
 		type
@@ -124,7 +122,6 @@ export const queryCollectionsResolver = ({
 		//collecting: !!activeCollections[_name],
 		collector,
 		cron: Array.isArray(cron) ? cron : [cron],
-		displayName,
 		doCollect,
 		documentCount: getDocumentCount(_name),
 		interfaces: usedInInterfaces({connection, name: _name}),
@@ -169,7 +166,7 @@ export const queryCollections = {
 		count: -1
 		page: 1
 		perPage: 1
-		sort: "displayName ASC"
+		sort: "_name ASC"
 	) {
 		total
 		count
@@ -193,7 +190,6 @@ export const queryCollections = {
 				hour
 				minute
 			}
-			displayName
 			doCollect
 			documentCount
 			interfaces

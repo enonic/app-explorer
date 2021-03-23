@@ -48,10 +48,11 @@ export function get({
 		//interfaceName
 	});
 	//log.info(`iFace:${toStr(iFace)}`);
+
 	const {
 		_id: id,
 		_name,
-		collections = [],
+		collections = [], // Just collection names, not collection nodes
 		displayName = '',
 		facets = [],
 		filters = {},
@@ -62,7 +63,7 @@ export function get({
 		thesauri = []
 	} = iFace;
 	const body = {
-		collections: forceArray(collections),
+		collections: forceArray(collections), // Just collection names, not collection nodes
 		displayName,
 		facets: forceArray(facets),
 		filters: convert({object: filters, fields: ['must', 'mustNot', 'values']}),
@@ -75,6 +76,7 @@ export function get({
 		thesauri: forceArray(thesauri)
 	};
 	//log.info(`body:${toStr(body)}`);
+
 	return {
 		body,
 		contentType: RT_JSON

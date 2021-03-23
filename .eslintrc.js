@@ -106,6 +106,7 @@ module.exports = {
 				'__connection', // My own stupidity
 				'_id', // content-type property
 				'_indexConfig', // node property
+				'_inheritsPermissions', // node property
 				'_name', // node property
 				'_parentPath', // node property
 				'_path', // content-type property

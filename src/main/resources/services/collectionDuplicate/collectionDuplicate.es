@@ -23,30 +23,34 @@ export function post({
 	};
 	let status = 400;
 	if (node) {
-		let number = 1;
-		while(exists({ // WARNING This could theoretically go on for a while...
-			connection: writeConnection,
-			name: `${name}${number}`
-		})) {
-			number++;
-			//log.info(`number:${number}`);
-		}
+		try {
+			let number = 1;
+			while(exists({ // WARNING This could theoretically go on for a while...
+				connection: writeConnection,
+				name: `${name}${number}`
+			})) {
+				number++;
+				//log.info(`number:${number}`);
+			}
 
-		node._id = undefined;
-		node._name = `${name}${number}`;
-		node.name = node._name; // Make sure the duplicate can be renamed...
-		node.displayName = `${node.displayName} (duplicate ${number})`;
-		node.doCollect = false; // Duplicates should not be scheduled by default.
-		const createdNode = create({
-			__connection: writeConnection,
-			_parentPath: '/collections',
-			...node
-		});
-		if(createdNode) {
-			body = {
-				message: `Duplicated collection ${name}.`
-			};
-			status = 200;
+			node._id = undefined;
+			node._name = `${name}${number}`;
+			node.doCollect = false; // Duplicates should not be scheduled by default.
+			const createdNode = create({
+				__connection: writeConnection,
+				_parentPath: '/collections',
+				...node
+			});
+			if(createdNode) {
+				body = {
+					message: `Duplicated collection ${name}.`
+				};
+				status = 200;
+			}
+		} catch (e) {
+			log.error('e', e);
+			body.error(`Something went wrong while trying to duplicate ${name}!`);
+			status = 500;
 		}
 	}
 	return {

@@ -1,5 +1,6 @@
 //import {toStr} from '/lib/util';
 import {forceArray} from '/lib/util/data';
+import {getUser} from '/lib/xp/auth';
 import {sanitize} from '/lib/xp/common';
 import {send as sendEvent} from '/lib/xp/event';
 
@@ -12,7 +13,6 @@ import {
 import {collection} from '/lib/explorer/model/2/nodeTypes/collection';
 import {connect} from '/lib/explorer/repo/connect';
 import {hash} from '/lib/explorer/string/hash';
-import {create} from '/lib/explorer/node/create';
 
 
 export function post({
@@ -21,62 +21,74 @@ export function post({
 	//log.debug(`json:${json}`);
 
 	const obj = JSON.parse(json);
-
-	// WARNING This sets the node _name to whatever the user typed, may conflict!!!
-	// But thats ok, we like collection repos to have recognizeable names.
-	obj._name = sanitize(obj.displayName);
-
-	if (obj.collector && obj.collector.name && obj.collector.name === 'com.enonic.app.explorer:api' ) {
-		obj.collector.config.apiKeys = forceArray(obj.collector.config.apiKeys).map(({
-			comment,
-			dateTime,
-			key,
-			hashed = false
-		}) => ({
-			comment,
-			dateTime,
-			key: hashed ? key : hash(key),
-			hashed: true
-		}));
-	}
-
-	obj.collector.configJson = JSON.stringify(obj.collector.config); // ForceArray workaround:
-	//log.debug(`obj:${toStr({obj})}`);
-
-	const params = collection(obj);
-	//log.debug(`params:${toStr({params})}`);
-
-	const writeConnection = connect({
-		principals: [PRINCIPAL_EXPLORER_WRITE]
-	});
-
-	const node = create({
-		__connection: writeConnection,
-		...params
-	});
+	//log.info(`obj:${toStr(obj)}`);
 
 	const body = {};
 	let status = 200;
-	if (node) {
-		//body.name = node._name; // Have no idea why I did this :)
-		body.name = node.name; // So lets do this instead :)
-		body.displayName = node.displayName;
-		const event = {
-			type: `${app.name}.reschedule`,
-			distributed: true, // Change may happen on admin node, while crawl node needs the reschedule
-			data: {
-				collectors: getCollectors({
-					connection: writeConnection
-				}),
-				node
-			}
-		};
-		//log.debug(`event:${toStr({event})}`);
-		sendEvent(event);
+
+	obj._name = sanitize(obj._name);
+
+	if (!obj._name) {
+		body.error = 'Name cannot be empty!';
+		status = 400;
 	} else {
-		body.error = `Something went wrong when trying to create collection ${obj._name}`;
-		status = 500;
+		try {
+			if (obj.collector && obj.collector.name && obj.collector.name === 'com.enonic.app.explorer:api' ) {
+				obj.collector.config.apiKeys = forceArray(obj.collector.config.apiKeys).map(({
+					comment,
+					dateTime,
+					key,
+					hashed = false
+				}) => ({
+					comment,
+					dateTime,
+					key: hashed ? key : hash(key),
+					hashed: true
+				}));
+			}
+
+			obj.collector.configJson = JSON.stringify(obj.collector.config); // ForceArray workaround:
+			//log.debug(`obj:${toStr({obj})}`);
+
+			const params = collection(obj);
+			//log.debug(`params:${toStr({params})}`);
+			params._inheritsPermissions = true;
+			params._permissions = [];
+			params.creator = getUser().key;
+			params.createdTime = new Date();
+			//log.info(`params:${toStr(params)}`);
+
+			const writeConnection = connect({
+				principals: [PRINCIPAL_EXPLORER_WRITE]
+			});
+			const node = writeConnection.create(params);
+			//log.info(`node:${toStr(node)}`);
+
+			if (node) {
+				writeConnection.refresh(); // So the data becomes immidiately searchable
+				body.name = node._name;
+				const event = {
+					type: `${app.name}.reschedule`,
+					distributed: true, // Change may happen on admin node, while crawl node needs the reschedule
+					data: {
+						collectors: getCollectors({
+							connection: writeConnection
+						}),
+						node
+					}
+				};
+				//log.debug(`event:${toStr({event})}`);
+				sendEvent(event);
+			} else {
+				throw new Error(`Something went wrong when trying to create collection ${obj._name}`);
+			}
+		} catch (e) {
+			log.error('e', e);
+			body.error = `Something went wrong when trying to create collection ${obj._name}`;
+			status = 500;
+		}
 	}
+
 	return {
 		body,
 		contentType: RT_JSON,

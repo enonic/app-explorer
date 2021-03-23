@@ -93,11 +93,10 @@ export function get() {
 	return {
 		body: {
 			collectionOptions: queryCollections({connection}).hits.map(({
-				displayName: text,
 				_name: key
 			}) => ({
 				key,
-				text,
+				text: key,
 				value: key
 			})),
 			fieldsObj,

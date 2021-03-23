@@ -112,7 +112,6 @@ const SS_FILES = [
 	'services/collectionCreate/collectionCreate',
 	'services/collectionDelete/collectionDelete',
 	'services/collectionDuplicate/collectionDuplicate',
-	'services/collectionList/collectionList',
 	'services/collectionModify/collectionModify',
 	'services/collectorStop/collectorStop',
 	'services/cronJobList/cronJobList',

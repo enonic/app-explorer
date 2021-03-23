@@ -13,13 +13,25 @@ import {LanguageDropdown} from './collection/LanguageDropdown';
 import {SchedulingSegment} from './collection/SchedulingSegment';
 
 
-function required(value) {
-	return value ? undefined : 'Required!';
+function isSane(value) {
+	if(!value) {
+		return 'Required!';
+	}
+	const matches = value.match(/[^-a-zA-Z0-9+]/g);
+	if (matches) {
+		return `Illegal characters: ${matches.join('')}`;
+	}
+	return undefined;
 }
 
 
+/*function required(value) {
+	return value ? undefined : 'Required!';
+}*/
+
+
 const SCHEMA = {
-	displayName: (v) => required(v)
+	_name: (v) => isSane(v)
 };
 
 
@@ -37,7 +49,7 @@ export function Collection(props) {
 		servicesBaseUrl,
 		siteOptions,
 		initialValues = {
-			displayName: '',
+			_name: '',
 			collector: {
 				name: ''//,
 				//taskName: 'collect'//, // TODO
@@ -89,8 +101,8 @@ export function Collection(props) {
 			<Header as='h1' dividing content='Collection' id='collection'/>
 			<Input
 				fluid
-				label='Display name'
-				path='displayName'
+				label='Name'
+				path='_name'
 			/>
 			<Form.Field>
 				<Label content='Language' size='large'/>
