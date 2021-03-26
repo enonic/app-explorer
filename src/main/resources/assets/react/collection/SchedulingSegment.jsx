@@ -18,7 +18,7 @@ export function SchedulingSegment(/*props*/) {
 	const [context/*, dispatch*/] = getEnonicContext();
 	const collectorName = getIn(context.values, 'collector.name');
 	const cronPath = 'cron';
-	return (collectorName && collectorName !== 'com.enonic.app.explorer:api') ? <Segment color='green'>
+	return collectorName ? <Segment color='green'>
 		<Header as='h2' dividing content='Scheduling' id='cron'/>
 		<Checkbox
 			path='doCollect'

@@ -564,7 +564,6 @@ const CLIENT_ES_CONFIG = {
 	context: path.join(__dirname, SRC_ASSETS_DIR, 'react'),
 	devtool: false, // Don't waste time generating sourceMaps
 	entry: {
-		'ApiCollector': './ApiCollector.jsx',
 		'Explorer': './Explorer.jsx',
 		'WebCrawler': './WebCrawler.jsx'
 	},

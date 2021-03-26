@@ -448,17 +448,15 @@ export function Collections(props) {
 								<span style={{whitespace: 'nowrap'}}>{iface}</span>
 							</p>)}</Table.Cell>
 							<Table.Cell>{
-								(collector && collector.name && collector.name === 'com.enonic.app.explorer:api')
-									? 'N/A'
-									: doCollect
-										? cron.map(({
-											month,
-											dayOfMonth,
-											dayOfWeek,
-											minute,
-											hour
-										}, i) => <pre key={`${_name}.cron.${i}`}>{`${hour === '*' ? '**' : zeroPad(hour)}:${minute === '*' ? '**' : zeroPad(minute)} ${rpad(DAY_OF_WEEK_TO_HUMAN[dayOfWeek], 9)} in ${rpad(MONTH_TO_HUMAN[month], 11)} (dayOfMonth:${lpad(dayOfMonth)})`}</pre>)
-										: 'Not scheduled'
+								doCollect
+									? cron.map(({
+										month,
+										dayOfMonth,
+										dayOfWeek,
+										minute,
+										hour
+									}, i) => <pre key={`${_name}.cron.${i}`}>{`${hour === '*' ? '**' : zeroPad(hour)}:${minute === '*' ? '**' : zeroPad(minute)} ${rpad(DAY_OF_WEEK_TO_HUMAN[dayOfWeek], 9)} in ${rpad(MONTH_TO_HUMAN[month], 11)} (dayOfMonth:${lpad(dayOfMonth)})`}</pre>)
+									: 'Not scheduled'
 							}</Table.Cell>
 							<Table.Cell collapsing>
 								<Button.Group>
@@ -472,7 +470,7 @@ export function Collections(props) {
 												fetchCollections();
 											});
 										}}><Icon color='blue' name='copy'/></Button>}/>
-									{collector && collector.name && collector.name !== 'com.enonic.app.explorer:api'
+									{collector && collector.name
 										? collectionsTaskState[_name]
 											? {
 												WAITING: <Popup

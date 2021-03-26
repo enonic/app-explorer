@@ -33,20 +33,6 @@ export function post({
 		status = 400;
 	} else {
 		try {
-			if (obj.collector && obj.collector.name && obj.collector.name === 'com.enonic.app.explorer:api' ) {
-				obj.collector.config.apiKeys = forceArray(obj.collector.config.apiKeys).map(({
-					comment,
-					dateTime,
-					key,
-					hashed = false
-				}) => ({
-					comment,
-					dateTime,
-					key: hashed ? key : hash(key),
-					hashed: true
-				}));
-			}
-
 			obj.collector.configJson = JSON.stringify(obj.collector.config); // ForceArray workaround:
 			//log.debug(`obj:${toStr({obj})}`);
 
