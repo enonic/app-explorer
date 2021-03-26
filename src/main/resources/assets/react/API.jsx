@@ -3,7 +3,8 @@ import {
 	Form,
 	Header,
 	Icon,
-	//Label,
+	//Input as SemanticUiReactInput,
+	Label,
 	Modal,
 	Popup,
 	Table
@@ -11,12 +12,14 @@ import {
 
 import {
 	Form as EnonicForm,
-	Input,
+	Input as EnonicInput,
 	ResetButton,
 	SubmitButton
 } from 'semantic-ui-react-form';
 
 import {Dropdown} from 'semantic-ui-react-form/inputs/Dropdown';
+
+import {GenerateKeyButton} from './api/generateKeyButton';
 
 import {useInterval} from './utils/useInterval';
 
@@ -96,7 +99,7 @@ const NewOrEditApiKey = (props) => {
 			{_name
 				? null
 				: <Form.Field>
-					<Input
+					<EnonicInput
 						fluid
 						label='Name'
 						path='name'
@@ -104,12 +107,15 @@ const NewOrEditApiKey = (props) => {
 				</Form.Field>
 			}
 			<Form.Field>
-				<Input
+				<EnonicInput
 					fluid
-					label='Key'
 					path='key'
 					placeholder={_name ? 'If you type anything here, it will overwrite the previous key on save' : 'Key is one way hashed on save'}
-				/>
+				>
+					<Label content='Key' size='big'/>
+					<input/>
+					<GenerateKeyButton/>
+				</EnonicInput>
 			</Form.Field>
 			<Header as='h2' content='Collection(s)' dividing id='collections'/>
 			<Form.Field>
