@@ -531,10 +531,10 @@ const CLIENT_JS_CONFIG = {
 			patterns: [
 				//{ context: NODE_MODULES_CONTEXT, from: 'frappe-gantt/dist/*', to: 'frappe-gantt/[name].[ext]' },
 				//{ context: NODE_MODULES_CONTEXT, from: 'jquery/dist', to: 'jquery'},
-				{ context: NODE_MODULES_CONTEXT, from: 'react/umd/react.*.js', to: 'react/[name].[ext]' },
-				{ context: NODE_MODULES_CONTEXT, from: 'react-dom/umd/react-dom.*.js', to: 'react-dom/[name].[ext]' },
+				{ context: NODE_MODULES_CONTEXT, from: 'react/umd/react.*.js', to: 'react/[name][ext]' },
+				{ context: NODE_MODULES_CONTEXT, from: 'react-dom/umd/react-dom.*.js', to: 'react-dom/[name][ext]' },
 
-				{ context: NODE_MODULES_CONTEXT, from: 'semantic-ui-css/semantic*', to: 'semantic-ui-css/[name].[ext]'},
+				{ context: NODE_MODULES_CONTEXT, from: 'semantic-ui-css/semantic*', to: 'semantic-ui-css/[name][ext]'},
 				{ context: NODE_MODULES_CONTEXT, from: 'semantic-ui-css/themes', to: 'semantic-ui-css/themes'}, // Fonts
 				//{ context: NODE_MODULES_CONTEXT, from: 'semantic-ui/dist', to: 'semantic-ui'},
 				{ context: NODE_MODULES_CONTEXT, from: 'semantic-ui-react/dist', to: 'semantic-ui-react'},
