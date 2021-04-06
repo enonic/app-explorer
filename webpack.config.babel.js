@@ -104,6 +104,7 @@ const SS_FILES = [
 	'admin/tools/explorer/explorer',
 	//'lib/fnv', // Not in use
 	'lib/locales',
+	'lib/licensing',
 	'main',
 	'services/apiKeyCreate/apiKeyCreate',
 	'services/apiKeyDelete/apiKeyDelete',
