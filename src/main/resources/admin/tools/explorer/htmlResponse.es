@@ -1,6 +1,6 @@
 import serialize from 'serialize-javascript';
 
-import {validateLicense} from '/lib/license';
+import {isLicenseValid, getIssuedTo} from '/lib/licensing';
 //import {toStr} from '/lib/util';
 /*import {forceArray} from '/lib/util/data';
 import {
@@ -106,14 +106,9 @@ export function htmlResponse({
 	}
 	//log.info(toStr({path}));
 
-	const licenseDetails = validateLicense({appKey: app.name});
-	//log.info(`licenseDetails:${toStr(licenseDetails)}`);
-	const licenseValid = !!(licenseDetails && !licenseDetails.expired);
-	//log.info(`licenseValid:${toStr(licenseValid)}`);
-
 	const propsObj = {
-		licensedTo: licenseDetails ? `Licensed to ${licenseDetails.issuedTo}` : 'Unlicensed',
-		licenseValid,
+		licensedTo: getIssuedTo(),
+		licenseValid: isLicenseValid(),
 		servicesBaseUrl: serviceUrl({service: ''}),
 		wsBaseUrl: serviceUrl({service: '', type: 'absolute'}).replace('http', 'ws')
 	};
