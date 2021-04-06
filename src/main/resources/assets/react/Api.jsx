@@ -19,7 +19,7 @@ import {
 
 import {Dropdown} from 'semantic-ui-react-form/inputs/Dropdown';
 
-import {GenerateKeyButton} from './api/generateKeyButton';
+import {GenerateKeyButton} from './api/GenerateKeyButton';
 
 import {useInterval} from './utils/useInterval';
 
