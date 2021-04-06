@@ -5,7 +5,7 @@ import {
 	SubmitButton
 } from 'semantic-ui-react-form';
 
-import {Emails} from './Notifications/Emails';
+import {Emails} from './notifications/Emails';
 
 
 export function Notifications(props) {
