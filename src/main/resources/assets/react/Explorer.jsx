@@ -69,6 +69,7 @@ const NODE_MODULES = [{
 const UploadLicenseModal = (props) => {
 	//console.debug('props', props);
 	const {
+		licenseValid,
 		licensedTo,
 		servicesBaseUrl,
 		setLicensedTo,
@@ -80,8 +81,11 @@ const UploadLicenseModal = (props) => {
 		onClose={() => {setOpen(false);}}
 		open={open}
 		size='large'
-		trigger={<Menu.Item onClick={() => {setOpen(true);}}>{licensedTo}</Menu.Item>}
-	>
+		trigger={<Menu.Item
+					style={{pointerEvents: licenseValid ? 'none' : null}}
+					onClick={() => {!licenseValid && setOpen(true);}}>{licensedTo}
+				</Menu.Item>}
+		>
 		<UploadLicense
 			servicesBaseUrl={servicesBaseUrl}
 			setLicensedTo={setLicensedTo}
@@ -237,6 +241,7 @@ export function Explorer(props) {
 			</Menu.Item>
 			<Menu.Item header>Explorer</Menu.Item>
 			<UploadLicenseModal
+				licenseValid={licenseValid}
 				licensedTo={licensedTo}
 				servicesBaseUrl={servicesBaseUrl}
 				setLicensedTo={setLicensedTo}
