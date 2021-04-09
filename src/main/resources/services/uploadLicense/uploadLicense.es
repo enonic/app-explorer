@@ -7,12 +7,6 @@ export function post(req) {
 	const license = readText(licenseStream);
 
 	const licenseInstalled = installLicense(license);
-	if (licenseInstalled) {
-		installLicense({
-			license,
-			appKey: app.name
-		});
-	}
 
 	return {
 		status: licenseInstalled ? 200 : 500,

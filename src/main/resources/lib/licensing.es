@@ -32,10 +32,8 @@ export const installLicense = (license) => {
         return false;
     }
 
-    install({
+    return install({
         license: license,
         appKey: subscriptionKey,
     });
-
-    return true;
 }
