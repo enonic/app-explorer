@@ -196,6 +196,8 @@ app-explorer
 
 ### 1.5.0-SNAPSHOT
 
+* Upgrade to lib-explorer-3.11.0
+  * Added document/create and document/update
 * Upgrade to lib-explorer-3.10.3
   * Removed displayName from Collections
 * Add Import API (webpapp/api/1/documents)

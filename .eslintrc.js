@@ -35,8 +35,11 @@ module.exports = {
 		console: false,
 		document: false,
 		fetch: false,
+		//global: false,
+		//navigator: false,
 		setTimeout: false,
 		window: false,
+		//XMLHttpRequest: false,
 
 		// Jquery
 		$: false,

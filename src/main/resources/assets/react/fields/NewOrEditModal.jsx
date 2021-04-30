@@ -128,23 +128,63 @@ export function NewOrEditModal(props) {
 							path='fieldType'
 							options={[{
 								key: 'text',
-								text: 'Text',
+								text: 'Text', // String?
 								value: 'text'
 							},{
+								key: 'boolean',
+								text: 'Boolean',
+								value: 'boolean'
+							},{
+								key: 'double', // float
+								text: 'Double (Double-precision 64-bit IEEE 754 floating point.)',
+								value: 'double'
+							},{
+								key: 'long', // int
+								text: 'Long (64-bit two’s complement integer.)',
+								value: 'long'
+							},{
+								key: 'geoPoint',
+								text: 'GeoPoint',
+								value: 'geoPoint'
+							},{
+								key: 'instant',
+								text: 'Instant - An ISO-8601-formatted instant (e.g \'2011-12-03T10:15:30Z\')',
+								value: 'instant'
+							},{
+								key: 'localDate',
+								text: 'LocalDate - A ISO local date-time string (e.g \'2011-12-03\')',
+								value: 'localDate'
+							},{
+								key: 'localDateTime',
+								text: 'LocalDateTime - A local date-time string (e.g \'2007-12-03T10:15:30\')',
+								value: 'localDateTime'
+							},{
+								key: 'localTime',
+								text: 'LocalTime - A ISO local date-time string (e.g \'10:15:30\')',
+								value: 'localTime'
+							},/*{
+								key: 'reference',
+								text: 'Reference',
+								value: 'reference'
+							},*/{
 								key: 'tag',
-								text: 'Tag',
+								text: 'Tag', // deprecate?
 								value: 'tag'
 							},{
 								key: 'uri',
-								text: 'Uri',
+								text: 'Uri', // deprecate?
 								value: 'uri'
 							},{
 								key: 'html',
-								text: 'Html',
+								text: 'HTML', // deprecate?
 								value: 'html'
-							},{
+							},/*{
+								key: 'xml',
+								text: 'XML',
+								value: 'xml'
+							},*/{
 								key: 'base64',
-								text: 'Base64 encoded data',
+								text: 'Base64 encoded data', // deprecate?
 								value: 'base64'
 							}]}
 							search
