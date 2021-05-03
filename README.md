@@ -210,7 +210,7 @@ app-explorer
 * Scheduling should not be visible before one has selected collector
 * Make it possible to select language per collection
 * Build system upgrades
-  * Node 14.16.0
+  * Node 14.16.1
   * Babel modules 7.13.14
   * Core-js 3.10.0
   * Webpack 5.30.0
