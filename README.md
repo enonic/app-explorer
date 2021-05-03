@@ -211,9 +211,9 @@ app-explorer
 * Make it possible to select language per collection
 * Build system upgrades
   * Node 14.16.1
-  * Babel modules 7.13.14
-  * Core-js 3.10.0
-  * Webpack 5.30.0
+  * Babel modules 7.14.0
+  * Core-js 3.11.1
+  * Webpack 5.36.2
   * All node modules up to date (except react)
 
 ### 1.4.0
