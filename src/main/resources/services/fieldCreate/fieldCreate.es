@@ -1,5 +1,5 @@
 //import {toStr} from '/lib/util';
-import {sanitize} from '/lib/xp/common';
+//import {sanitize} from '/lib/xp/common';
 
 import {
 	PRINCIPAL_EXPLORER_WRITE,
@@ -8,7 +8,7 @@ import {
 import {field} from '/lib/explorer/model/2/nodeTypes/field';
 import {create} from '/lib/explorer/node/create';
 import {connect} from '/lib/explorer/repo/connect';
-import {ucFirst} from '/lib/explorer/ucFirst';
+//import {ucFirst} from '/lib/explorer/ucFirst';
 
 
 export function post({params: {
@@ -18,10 +18,10 @@ export function post({params: {
 	const obj = JSON.parse(json);
 	//log.info(`obj:${toStr(obj)}`);
 	let {
-		key,
-		displayName
+		key
 	} = obj;
 	const {
+		allowArray = false,
 		description = '',
 		//iconUrl = '',
 		instruction = 'type',
@@ -34,26 +34,21 @@ export function post({params: {
 		fieldType = 'text'
 	} = obj;
 	if (!key) {
-		if (!displayName) {
-			return {
-				body: {
-					error: 'You must provide either key or Display name!'
-				},
-				status: 400,
-				contentType: RT_JSON
-			};
-		}
-		key = sanitize(displayName);
-	} else if (!displayName) {
-		displayName = ucFirst(key);
+		return {
+			body: {
+				error: 'You must provide key!'
+			},
+			status: 400,
+			contentType: RT_JSON
+		};
 	}
 
 	const lcKey = key.toLowerCase();
 	const nodeParams = field({
 		__connection: connect({principals: PRINCIPAL_EXPLORER_WRITE}),
 		_name: lcKey,
+		allowArray,
 		description,
-		displayName,
 		fieldType,
 		key: lcKey,
 		//iconUrl,
@@ -75,7 +70,7 @@ export function post({params: {
 	if (!node) {
 		body = {
 			error: `Something went wrong when trying to create field with key:${lcKey}.`
-		}
+		};
 		status = 500;
 	}
 

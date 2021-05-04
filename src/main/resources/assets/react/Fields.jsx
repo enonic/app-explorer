@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import {
-	Button, Header, /*Icon,*/ Loader, Table
+	Button, Header, Icon, Loader, Table
 } from 'semantic-ui-react';
 
 import {NewOrEditModal} from './fields/NewOrEditModal';
@@ -92,13 +92,13 @@ export function Fields(props) {
 								sorted={column === 'key' ? direction : null}
 							>Name</Table.HeaderCell>
 							<Table.HeaderCell
-								onClick={handleSortGenerator('displayName')}
-								sorted={column === 'displayName' ? direction : null}
-							>Display name</Table.HeaderCell>
-							<Table.HeaderCell
 								onClick={handleSortGenerator('fieldType')}
 								sorted={column === 'fieldType' ? direction : null}
 							>Type</Table.HeaderCell>
+							<Table.HeaderCell
+								onClick={handleSortGenerator('allowArray')}
+								sorted={column === 'allowArray' ? direction : null}
+							>Allow array</Table.HeaderCell>
 							<Table.HeaderCell
 								onClick={handleSortGenerator('values')}
 								sorted={column === 'values' ? direction : null}
@@ -108,9 +108,9 @@ export function Fields(props) {
 					</Table.Header>
 					<Table.Body>
 						{fieldsRes.hits.map(({
+							allowArray = false,
 							denyDelete = false,
 							denyValues = false,
-							displayName = '',
 							fieldType = 'text',
 							key,
 							name,
@@ -125,8 +125,8 @@ export function Fields(props) {
 						}, index) => {
 							return <Table.Row key={`field[${index}]`}>
 								<Table.Cell>{key}</Table.Cell>
-								<Table.Cell>{displayName}</Table.Cell>
 								<Table.Cell>{fieldType}</Table.Cell>
+								<Table.Cell>{allowArray ? <Icon color='green' name='checkmark'/> : <Icon color='red' name='x'/>}</Table.Cell>
 								<Table.Cell>{valuesRes.hits.map(({displayName})=>displayName).join(', ')}</Table.Cell>
 								<Table.Cell>
 									<Button.Group>
@@ -134,7 +134,7 @@ export function Fields(props) {
 											disabled={denyValues}
 											field={name}
 											initialValues={{
-												displayName,
+												allowArray,
 												fieldType,
 												key,
 												instruction,

@@ -1,9 +1,10 @@
-import getIn from 'get-value';
+//import getIn from 'get-value';
 import {
 	Button, Form, Header, Icon, Modal, Popup
 } from 'semantic-ui-react';
 
 import {Form as EnonicForm} from 'semantic-ui-react-form/Form';
+import {Checkbox} from 'semantic-ui-react-form/inputs/Checkbox';
 import {Dropdown} from 'semantic-ui-react-form/inputs/Dropdown';
 import {Input} from 'semantic-ui-react-form/inputs/Input';
 
@@ -26,7 +27,6 @@ function required(value) {
 
 
 const SCHEMA = {
-	displayName: (value) => required(value),
 	fieldType: (value) => required(value),
 	instruction: (value) => required(value),
 	key: (value) => required(value) || notStartWithUnderscore(value)
@@ -38,8 +38,8 @@ export function NewOrEditModal(props) {
 		disabled = false,
 		field,
 		initialValues = {
+			allowArray: false,
 			description: '',
-			displayName: '',
 			fieldType: 'text',
 			key: '',
 			instruction: 'type',
@@ -53,21 +53,21 @@ export function NewOrEditModal(props) {
 		onClose,
 		servicesBaseUrl
 	} = props;
-	const editMode = !!initialValues.displayName;
+	const editMode = !!initialValues.key;
 
 	const [open, setOpen] = React.useState(false);
 
 	const doClose = () => {
 		setOpen(false); // This needs to be before unmount.
 		onClose(); // This could trigger render in parent, and unmount this Component.
-	}
+	};
 
 	return <Modal
 		closeIcon
 		onClose={doClose}
 		open={open}
 		trigger={editMode ? <Popup
-			content={`Edit field ${initialValues.displayName}`}
+			content={`Edit field ${initialValues.key}`}
 			inverted
 			trigger={<Button
 				icon
@@ -89,7 +89,7 @@ export function NewOrEditModal(props) {
 					name='plus'
 				/></Button>}
 	>
-		<Modal.Header>{editMode ? `Edit field ${initialValues.displayName}`: 'New field'}</Modal.Header>
+		<Modal.Header>{editMode ? `Edit field ${initialValues.key}`: 'New field'}</Modal.Header>
 		<Modal.Content>
 			<EnonicForm
 				initialValues={initialValues}
@@ -97,9 +97,9 @@ export function NewOrEditModal(props) {
 					//console.debug('NewOrEditModal onSubmit values', values);
 					fetch(`${servicesBaseUrl}/field${editMode ? 'Modify' : 'Create'}?json=${JSON.stringify(values)}`, {
 						method: 'POST'
-					}).then(response => {
+					}).then((/*response*/) => {
 						doClose();
-					})
+					});
 				}}
 				schema={SCHEMA}
 			>
@@ -112,12 +112,6 @@ export function NewOrEditModal(props) {
 					</Form.Field>}
 					<Form.Field>
 						<Input
-							label={{basic: true, content: 'Display name'}}
-							path='displayName'
-						/>
-					</Form.Field>
-					<Form.Field>
-						<Input
 							label={{basic: true, content: 'Description'}}
 							path='description'
 						/>
@@ -127,8 +121,12 @@ export function NewOrEditModal(props) {
 							fluid
 							path='fieldType'
 							options={[{
+								key: 'string',
+								text: 'String',
+								value: 'string'
+							},{
 								key: 'text',
-								text: 'Text', // String?
+								text: 'Text',
 								value: 'text'
 							},{
 								key: 'boolean',
@@ -189,6 +187,12 @@ export function NewOrEditModal(props) {
 							}]}
 							search
 							selection
+						/>
+					</Form.Field>
+					<Form.Field>
+						<Checkbox
+							label='Allow array?'
+							path='allowArray'
 						/>
 					</Form.Field>
 					<Form.Field>

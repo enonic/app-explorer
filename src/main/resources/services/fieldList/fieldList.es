@@ -15,9 +15,9 @@ export function get() {
 	const fieldsRes = getFields({connection});
 	fieldsRes.hits = fieldsRes.hits.map(({
 		_name: name,
+		allowArray = false,
 		denyDelete = false,
 		denyValues = false,
-		displayName,
 		fieldType,
 		indexConfig, // String or object
 		key
@@ -35,11 +35,11 @@ export function get() {
 		}) => ({
 			displayName,
 			value
-		}))
+		}));
 		return {
+			allowArray,
 			denyDelete,
 			denyValues,
-			displayName,
 			fieldType,
 			key,
 			name,

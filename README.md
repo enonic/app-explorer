@@ -196,6 +196,9 @@ app-explorer
 
 ### 1.5.0-SNAPSHOT
 
+* Remove field displayName
+* Add field allow array boolean
+* Add more field value types
 * Upgrade to lib-explorer-3.11.0
   * Added document/create and document/update
 * Upgrade to lib-explorer-3.10.3
