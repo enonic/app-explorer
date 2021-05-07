@@ -1,6 +1,10 @@
 import _ from 'lodash';
 import {
-	Button, Header, Icon, Loader, Table
+	Button,
+	Header,
+	//Icon,
+	Loader,
+	Table
 } from 'semantic-ui-react';
 
 import {NewOrEditModal} from './fields/NewOrEditModal';
@@ -80,7 +84,7 @@ export function Fields(props) {
 	React.useEffect(() => fetchFields(), []);
 
 	return <>
-		<Header as='h1'>Fields</Header>
+		<Header as='h1'>Schema</Header>
 		{isLoading
 			? <Loader active inverted>Loading</Loader>
 			: <>
@@ -95,10 +99,18 @@ export function Fields(props) {
 								onClick={handleSortGenerator('fieldType')}
 								sorted={column === 'fieldType' ? direction : null}
 							>Type</Table.HeaderCell>
-							<Table.HeaderCell
+							{/*<Table.HeaderCell
 								onClick={handleSortGenerator('allowArray')}
 								sorted={column === 'allowArray' ? direction : null}
-							>Allow array</Table.HeaderCell>
+							>Allow array</Table.HeaderCell>*/}
+							<Table.HeaderCell
+								onClick={handleSortGenerator('min')}
+								sorted={column === 'min' ? direction : null}
+							>Min</Table.HeaderCell>
+							<Table.HeaderCell
+								onClick={handleSortGenerator('max')}
+								sorted={column === 'max' ? direction : null}
+							>Max</Table.HeaderCell>
 							<Table.HeaderCell
 								onClick={handleSortGenerator('values')}
 								sorted={column === 'values' ? direction : null}
@@ -113,6 +125,8 @@ export function Fields(props) {
 							denyValues = false,
 							fieldType = 'text',
 							key,
+							min = 0,
+							max = 0,
 							name,
 							instruction,
 							decideByType,
@@ -126,7 +140,9 @@ export function Fields(props) {
 							return <Table.Row key={`field[${index}]`}>
 								<Table.Cell>{key}</Table.Cell>
 								<Table.Cell>{fieldType}</Table.Cell>
-								<Table.Cell>{allowArray ? <Icon color='green' name='checkmark'/> : <Icon color='red' name='x'/>}</Table.Cell>
+								{/*<Table.Cell>{allowArray ? <Icon color='green' name='checkmark'/> : <Icon color='red' name='x'/>}</Table.Cell>*/}
+								<Table.Cell>{min === 0 ? '*' : min}</Table.Cell>
+								<Table.Cell>{max === 0 ? '∞' : max}</Table.Cell>
 								<Table.Cell>{valuesRes.hits.map(({displayName})=>displayName).join(', ')}</Table.Cell>
 								<Table.Cell>
 									<Button.Group>
@@ -137,6 +153,8 @@ export function Fields(props) {
 												allowArray,
 												fieldType,
 												key,
+												min,
+												max,
 												instruction,
 												decideByType,
 												enabled,

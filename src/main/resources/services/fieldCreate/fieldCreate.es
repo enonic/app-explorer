@@ -23,6 +23,8 @@ export function post({params: {
 	const {
 		allowArray = false,
 		description = '',
+		min = 0,
+		max = 0,
 		//iconUrl = '',
 		instruction = 'type',
 		decideByType = true,
@@ -51,6 +53,8 @@ export function post({params: {
 		description,
 		fieldType,
 		key: lcKey,
+		min,
+		max,
 		//iconUrl,
 		instruction,
 		decideByType,

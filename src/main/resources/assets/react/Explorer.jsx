@@ -320,10 +320,10 @@ export function Explorer(props) {
 
 				<Menu.Item
 					as='a'
-					href='#fields'
-					active={page === 'fields'}
-					onClick={() => setPage('fields')}
-				><Icon name='sitemap'/> Fields</Menu.Item>
+					href='#schema'
+					active={page === 'schema'}
+					onClick={() => setPage('schema')}
+				><Icon name='sitemap'/> Schema</Menu.Item>
 				<Menu.Item
 					as='a'
 					href='#stopWords'
@@ -407,7 +407,7 @@ export function Explorer(props) {
 				{/*page === 'scheduling' && <Scheduling
 					servicesBaseUrl={servicesBaseUrl}
 				/>*/}
-				{page === 'fields' && <Fields
+				{page === 'schema' && <Fields
 					servicesBaseUrl={servicesBaseUrl}
 				/>}
 				{page === 'stopWords' && <StopWords

@@ -20,7 +20,9 @@ export function get() {
 		denyValues = false,
 		fieldType,
 		indexConfig, // String or object
-		key
+		key,
+		min = 0,
+		max = 0
 	}) => {
 		const valuesRes = getFieldValues({
 			connection,
@@ -42,6 +44,8 @@ export function get() {
 			denyValues,
 			fieldType,
 			key,
+			min,
+			max,
 			name,
 
 			instruction: isString(indexConfig) ? indexConfig : 'custom',

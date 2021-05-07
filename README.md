@@ -196,8 +196,9 @@ app-explorer
 
 ### 1.5.0-SNAPSHOT
 
+* Rename Fields -> Schema
 * Remove field displayName
-* Add field allow array boolean
+* Add field min and max occurrences
 * Add more field value types
 * Upgrade to lib-explorer-3.11.0
   * Added document/create and document/update
