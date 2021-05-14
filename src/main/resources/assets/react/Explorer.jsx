@@ -82,10 +82,10 @@ const UploadLicenseModal = (props) => {
 		open={open}
 		size='large'
 		trigger={<Menu.Item
-					style={{pointerEvents: licenseValid ? 'none' : null}}
-					onClick={() => {!licenseValid && setOpen(true);}}>{licensedTo}
-				</Menu.Item>}
-		>
+			style={{pointerEvents: licenseValid ? 'none' : null}}
+			onClick={() => {!licenseValid && setOpen(true);}}>{licensedTo}
+		</Menu.Item>}
+	>
 		<UploadLicense
 			servicesBaseUrl={servicesBaseUrl}
 			setLicensedTo={setLicensedTo}

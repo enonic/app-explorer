@@ -37,9 +37,10 @@ const COLLECTION_OBJECT_TYPE = createObjectType({
 	//description:
 	fields: {
 		_id: { type: nonNull(GraphQLString) },
-		_path: { type: nonNull(GraphQLString) },
 		_name: { type: nonNull(GraphQLString) },
-		type: { type: nonNull(GraphQLString) },
+		_nodeType: { type: GraphQLString }, // TODO nonNull?
+		_path: { type: nonNull(GraphQLString) },
+		//type: { type: nonNull(GraphQLString) },
 		//collecting: { type: GraphQLBoolean },
 		collector: { type: createObjectType({
 			name: 'CollectionCollector',
@@ -108,25 +109,27 @@ export const queryCollectionsResolver = ({
 
 	collectionsRes.hits = collectionsRes.hits.map(({
 		_id,
-		_path,
 		_name,
+		_nodeType,
+		_path,
 		collector,
 		cron,
 		doCollect,
-		language = '',
-		type
+		language = ''//,
+		//type
 	}) => ({
 		_id,
-		_path,
 		_name,
+		_nodeType,
+		_path,
 		//collecting: !!activeCollections[_name],
 		collector,
 		cron: Array.isArray(cron) ? cron : [cron],
 		doCollect,
 		documentCount: getDocumentCount(_name),
 		interfaces: usedInInterfaces({connection, name: _name}),
-		language,
-		type
+		language//,
+		//type
 	}));
 	//log.info(`mapped collectionsRes:${toStr(collectionsRes)}`);
 	return collectionsRes;
@@ -177,6 +180,7 @@ export const queryCollections = {
 		hits {
 			_id
 			_name
+			_nodeType
 			_path
 			#collecting
 			collector {
@@ -194,7 +198,7 @@ export const queryCollections = {
 			documentCount
 			interfaces
 			language
-			type
+			#type
 		}
 	}
 }

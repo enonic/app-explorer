@@ -8,7 +8,7 @@ import {
 	list,
 	nonNull
 } from '/lib/graphql';
-import {forceArray} from '/lib/util/data';
+//import {forceArray} from '/lib/util/data';
 //import {toStr} from '/lib/util';
 
 
@@ -23,16 +23,17 @@ const STOPWORDS_OBJECT_TYPE = createObjectType({
 	fields: {
 		_id: { type: nonNull(GraphQLString) },
 		_name: { type: nonNull(GraphQLString) },
+		_nodeType: { type: GraphQLString }, // TODO nonNull?
 		_path: { type: nonNull(GraphQLString) },
 		displayName: { type: nonNull(GraphQLString) },
-		words: { type: list(GraphQLString) },
-		type: { type: nonNull(GraphQLString) }
+		words: { type: list(GraphQLString) }//,
+		//type: { type: nonNull(GraphQLString) }
 	}
 }); // STOPWORDS_OBJECT_TYPE
 
 
 export const queryStopWords = {
-	resolve: (env) => {
+	resolve: (/*env*/) => {
 		//log.info(`env:${toStr(env)}`);
 		const connection = connect({ principals: [PRINCIPAL_EXPLORER_READ] });
 		const stopWordsRes = query({
@@ -42,18 +43,20 @@ export const queryStopWords = {
 		stopWordsRes.hits = stopWordsRes.hits.map(({
 			id,
 			name,
+			_nodeType,
 			_path,
 			displayName,
-			words,
-			type
+			words//,
+			//type
 		}) => ({
 			_id: id,
 			_name: name,
+			_nodeType,
 			_path,
 			displayName,
 			//words: words ? forceArray(words) : null,
-			words, // Always array
-			type
+			words//, // Always array
+			//type
 		}));
 		return stopWordsRes;
 	},

@@ -61,10 +61,11 @@ export const queryApiKeys = {
 				_id: node._id,
 				_path: node._path,
 				_name: node._name,
+				_nodeType: node._nodeType,
 				collections: forceArray(node.collections),
 				hashed: node.hashed,
-				key: node.key,
-				type: node.type
+				key: node.key//,
+				//type: node.type
 			};
 		});
 		//log.info(`apiKeysRes:${toStr(apiKeysRes)}`);
@@ -81,12 +82,13 @@ export const queryApiKeys = {
 				name: 'ApiKey',
 				fields: {
 					_id: { type: nonNull(GraphQLString) },
-					_path: { type: nonNull(GraphQLString) },
 					_name: { type: nonNull(GraphQLString) },
+					_nodeType: { type: GraphQLString }, // TODO nonNull?
+					_path: { type: nonNull(GraphQLString) },
 					collections: { type: list(GraphQLString)},
 					hashed: { type: nonNull(GraphQLBoolean) },
-					key: { type: nonNull(GraphQLString) },
-					type: { type: nonNull(GraphQLString) }
+					key: { type: nonNull(GraphQLString) }//,
+					//type: { type: nonNull(GraphQLString) }
 				}
 			})) }
 		} // fields

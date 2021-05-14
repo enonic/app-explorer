@@ -21,13 +21,14 @@ const COLLECTOR_OBJECT_TYPE = createObjectType({
 	//description:
 	fields: {
 		_id: { type: nonNull(GraphQLString) },
-		_path: { type: nonNull(GraphQLString) },
 		_name: { type: nonNull(GraphQLString) },
+		_nodeType: { type: GraphQLString }, // TODO nonNull?
+		_path: { type: nonNull(GraphQLString) },
 		appName: { type: nonNull(GraphQLString) },
 		collectTaskName: { type: nonNull(GraphQLString) },
 		configAssetPath: { type: nonNull(GraphQLString) },
-		displayName: { type: nonNull(GraphQLString) },
-		type: { type: nonNull(GraphQLString) }
+		displayName: { type: nonNull(GraphQLString) }//,
+		//type: { type: nonNull(GraphQLString) }
 	}
 }); // COLLECTOR_OBJECT_TYPE
 
@@ -39,22 +40,24 @@ export const queryCollectorsResolver = () => {
 	//log.info(`collectorsReq:${toStr(collectorsReq)}`);
 	collectorsReq.hits = collectorsReq.hits.map(({
 		_id,
-		_path,
 		_name,
+		_nodeType,
+		_path,
 		appName,
 		collectTaskName,
 		configAssetPath,
-		displayName,
-		type
+		displayName//,
+		//type
 	}) => ({
 		_id,
-		_path,
 		_name,
+		_nodeType,
+		_path,
 		appName,
 		collectTaskName,
 		configAssetPath,
-		displayName,
-		type
+		displayName//,
+		//type
 	}));
 	//log.info(`mapped collectorsReq:${toStr(collectorsReq)}`);
 	return collectorsReq;
@@ -88,13 +91,14 @@ export const queryCollectors = {
 		count
 		hits {
 			_id
-			_path
 			_name
+			_nodeType
+			_path
 			appName
 			collectTaskName
 			configAssetPath
 			displayName
-			type
+			#type
 		}
 	}
 }

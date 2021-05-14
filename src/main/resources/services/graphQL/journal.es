@@ -22,8 +22,9 @@ const JOURNAL_OBJECT_TYPE = createObjectType({
 	//description:
 	fields: {
 		_id: { type: nonNull(GraphQLString) },
-		_path: { type: nonNull(GraphQLString) },
 		_name: { type: nonNull(GraphQLString) },
+		_nodeType: { type: GraphQLString }, // TODO nonNull?
+		_path: { type: nonNull(GraphQLString) },
 		displayName: { type: nonNull(GraphQLString) },
 		endTime: { type: nonNull(GraphQLString) },
 		errorCount: { type: nonNull(GraphQLInt) },
@@ -46,8 +47,8 @@ const JOURNAL_OBJECT_TYPE = createObjectType({
 				message: { type: GraphQLString },
 				uri: { type: GraphQLString }
 			}
-		}))},
-		type: { type: nonNull(GraphQLString) }
+		}))}//,
+		//type: { type: nonNull(GraphQLString) }
 	}
 }); // JOURNAL_OBJECT_TYPE
 
@@ -69,8 +70,9 @@ export const queryJournals = {
 		//log.info(`journalsRes:${toStr(journalsRes)}`);
 		journalsRes.hits = journalsRes.hits.map(({
 			_id,
-			_path,
 			_name,
+			_nodeType,
+			_path,
 			displayName,
 			endTime,
 			errorCount,
@@ -78,12 +80,13 @@ export const queryJournals = {
 			name,
 			startTime,
 			successCount,
-			successes,
-			type
+			successes//,
+			//type
 		}) => ({
 			_id,
 			_path,
 			_name,
+			_nodeType,
 			displayName,
 			endTime,
 			errorCount,
@@ -91,8 +94,8 @@ export const queryJournals = {
 			name,
 			startTime,
 			successCount,
-			successes,
-			type
+			successes//,
+			//type
 		}));
 		//log.info(`journalsRes:${toStr(journalsRes)}`);
 		return journalsRes;
@@ -134,6 +137,7 @@ export const queryJournals = {
 		hits {
 			_id
 			_name
+			_nodeType
 			_path
 			displayName
 			endTime
@@ -150,7 +154,7 @@ export const queryJournals = {
 				message
 				uri
 			}
-			type
+			#type
 		}
 	}
 }

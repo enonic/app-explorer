@@ -76,7 +76,7 @@ const RESULT_MAPPING_OBJECT_TYPE = createObjectType({
 		highlightPreTag: { type: GraphQLString }, // NOTE undefined allowed
 		lengthLimit: { type: GraphQLInt }, // NOTE undefined allowed
 		to: { type: nonNull(GraphQLString) },
-		type: { type: nonNull(GraphQLString) }
+		type: { type: nonNull(GraphQLString) } // string, tags
 	}
 });
 
@@ -87,6 +87,7 @@ const INTERFACE_OBJECT_TYPE = createObjectType({
 	fields: {
 		_id: { type: nonNull(GraphQLString) },
 		_name: { type: nonNull(GraphQLString) },
+		_nodeType: { type: GraphQLString }, // TODO nonNull?
 		_path: { type: nonNull(GraphQLString) },
 		displayName: { type: nonNull(GraphQLString) },
 		filters: { type: createObjectType({
@@ -99,8 +100,8 @@ const INTERFACE_OBJECT_TYPE = createObjectType({
 		}) },
 		//name: { type: nonNull(GraphQLString) }, // Same as displayName
 		queryJson: { type: GraphQLString },
-		resultMappings: { type: list(RESULT_MAPPING_OBJECT_TYPE)},
-		type: { type: nonNull(GraphQLString) }
+		resultMappings: { type: list(RESULT_MAPPING_OBJECT_TYPE)}//,
+		//type: { type: nonNull(GraphQLString) }
 	}
 }); // INTERFACE_OBJECT_TYPE
 
@@ -151,6 +152,7 @@ export const queryInterfaces = {
 		interfacesRes.hits = interfacesRes.hits.map(({
 			_id,
 			_name,
+			_nodeType,
 			_path,
 			displayName,
 			filters: {
@@ -158,11 +160,12 @@ export const queryInterfaces = {
 				mustNot
 			},
 			query,
-			resultMappings,
-			type
+			resultMappings//,
+			//type
 		}) => ({
 			_id,
 			_name,
+			_nodeType,
 			_path,
 			displayName,
 			filters: {
@@ -188,8 +191,8 @@ export const queryInterfaces = {
 				})) : null
 			},
 			queryJson: query ? JSON.stringify(query) : null,
-			resultMappings: mapResultMappings(resultMappings),
-			type
+			resultMappings: mapResultMappings(resultMappings)//,
+			//type
 		}));
 		return interfacesRes;
 	},

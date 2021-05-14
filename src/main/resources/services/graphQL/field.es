@@ -22,11 +22,12 @@ const FIELD_VALUE_OBJECT_TYPE = createObjectType({
 	fields: {
 		_id: { type: nonNull(GraphQLString) },
 		_name: { type: nonNull(GraphQLString) },
+		_nodeType: { type: GraphQLString }, // TODO nonNull?
 		_path: { type: nonNull(GraphQLString) },
 		displayName: { type: nonNull(GraphQLString) },
 		field: { type: nonNull(GraphQLString) },
 		fieldReference: { type: nonNull(GraphQLString) },
-		type: { type: nonNull(GraphQLString) },
+		//type: { type: nonNull(GraphQLString) },
 		value: { type: GraphQLString } // Found to be null in prod :(
 	}
 });
@@ -38,6 +39,7 @@ const FIELD_OBJECT_TYPE = createObjectType({
 	fields: {
 		_id: { type: nonNull(GraphQLString) },
 		_name: { type: nonNull(GraphQLString) },
+		_nodeType: { type: GraphQLString }, // TODO nonNull?
 		_path: { type: nonNull(GraphQLString) },
 		denyDelete: { type: GraphQLBoolean },
 		denyValues: { type: GraphQLBoolean },
@@ -46,7 +48,7 @@ const FIELD_OBJECT_TYPE = createObjectType({
 		inResults: { type: GraphQLBoolean },
 		fieldType: { type: nonNull(GraphQLString) },
 		key: { type: nonNull(GraphQLString) },
-		type: { type: nonNull(GraphQLString) },
+		//type: { type: nonNull(GraphQLString) },
 		values: { type: list(FIELD_VALUE_OBJECT_TYPE)}
 	}
 });
@@ -77,22 +79,24 @@ export const queryFields = {
 		fieldValuesRes.hits.forEach(({
 			_id,
 			_name,
+			_nodeType,
 			_path,
 			displayName,
 			field,
 			fieldReference,
-			type,
+			//type,
 			value
 		}) => {
 			if (!fieldValuesObjArr[field]) {fieldValuesObjArr[field] = [];}
 			fieldValuesObjArr[field].push({
 				_id,
 				_name,
+				_nodeType,
 				_path,
 				displayName,
 				field,
 				fieldReference,
-				type,
+				//type,
 				value
 			});
 		}); // forEach fieldValue
@@ -107,6 +111,7 @@ export const queryFields = {
 		fieldsRes.hits = fieldsRes.hits.map(({
 			_id,
 			_name,
+			_nodeType,
 			_path,
 			denyDelete,
 			denyValues,
@@ -114,11 +119,12 @@ export const queryFields = {
 			indexConfig,
 			inResults,
 			fieldType,
-			key,
-			type
+			key//,
+			//type
 		}) => ({
 			_id,
 			_name,
+			_nodeType,
 			_path,
 			denyDelete,
 			denyValues,
@@ -127,7 +133,7 @@ export const queryFields = {
 			inResults,
 			fieldType,
 			key,
-			type,
+			//type,
 			values: fieldValuesObjArr[_name]
 		}));
 		//log.info(`mapped fieldsRes:${toStr(fieldsRes)}`);
@@ -158,6 +164,7 @@ export const queryFields = {
 		hits {
 			_id
 			_name
+			_nodeType
 			_path
 			denyDelete
 			denyValues
@@ -166,7 +173,7 @@ export const queryFields = {
 			inResults
 			fieldType
 			key
-			type
+			#type
 			values {
 				_id
 				_name

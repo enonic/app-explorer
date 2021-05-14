@@ -6,12 +6,13 @@ import {DeleteModal} from './interfaces/DeleteModal';
 import {SearchModal} from './interfaces/SearchModal';
 
 
-const INTERFACES_GQL = `queryInterfaces {
+/*const INTERFACES_GQL = `queryInterfaces {
 	total
 	count
 	hits {
 		_id
 		_name
+		#_nodeType
 		_path
 		displayName
 		filters {
@@ -43,9 +44,9 @@ const INTERFACES_GQL = `queryInterfaces {
 			to
 			type
 		}
-		type
+		#type
 	}
-}`;
+}`;*/
 
 /*const ALL_GQL = `{
 	${INTERFACES_GQL}

@@ -22,6 +22,7 @@ const COLLECTIONS_GQL = `queryCollections(
 	hits {
 		_id
 		_name
+		#_nodeType
 		_path
 		collector {
 			name
@@ -38,7 +39,7 @@ const COLLECTIONS_GQL = `queryCollections(
 		documentCount
 		interfaces
 		language
-		type
+		#type
 	}
 }`;
 
@@ -47,13 +48,14 @@ const COLLECTORS_GQL = `queryCollectors {
 	count
 	hits {
 		_id
-		_path
 		_name
+		#_nodeType
+		_path
 		appName
 		collectTaskName
 		configAssetPath
 		displayName
-		type
+		#type
 	}
 }`;
 
@@ -63,6 +65,7 @@ const FIELDS_GQL = `queryFields {
 	hits {
 		#_id
 		_name
+		#_nodeType
 		#_path
 		#denyDelete
 		#denyValues
@@ -75,6 +78,7 @@ const FIELDS_GQL = `queryFields {
 		values {
 			#_id
 			_name
+			#_nodeType
 			#_path
 			displayName
 			#field

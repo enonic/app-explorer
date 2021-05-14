@@ -27,13 +27,14 @@ const SYNONYM_OBJECT_TYPE = createObjectType({
 	fields: {
 		_id: { type: nonNull(GraphQLString) },
 		_name: { type: nonNull(GraphQLString) },
+		_nodeType: { type: GraphQLString }, // TODO nonNull?
 		_path: { type: nonNull(GraphQLString) },
 		from: { type: nonNull(list(nonNull(GraphQLString))) },
 		displayName: { type: nonNull(GraphQLString) },
 		thesaurus: { type: nonNull(GraphQLString) },
 		thesaurusReference: { type: nonNull(GraphQLString) },
-		to: { type: nonNull(list(nonNull(GraphQLString))) },
-		type: { type: nonNull(GraphQLString) }
+		to: { type: nonNull(list(nonNull(GraphQLString))) }//,
+		//type: { type: nonNull(GraphQLString) }
 	}
 }); // SYNONYM_OBJECT_TYPE
 
@@ -55,12 +56,13 @@ const THESAURUS_OBJECT_TYPE = createObjectType({
 	fields: {
 		_id: { type: nonNull(GraphQLString) },
 		_name: { type: nonNull(GraphQLString) },
+		_nodeType: { type: GraphQLString }, // TODO nonNull?
 		_path: { type: nonNull(GraphQLString) },
 		description: { type: nonNull(GraphQLString) },
 		displayName: { type: nonNull(GraphQLString) },
 		synonyms: { type: QUERY_SYNONYMS_OBJECT_TYPE },
-		synonymsCount: { type: nonNull(GraphQLInt) },
-		type: { type: nonNull(GraphQLString) }
+		synonymsCount: { type: nonNull(GraphQLInt) }//,
+		//type: { type: nonNull(GraphQLString) }
 	}
 }); // THESAURUS_OBJECT_TYPE
 
@@ -85,24 +87,26 @@ const querySynonymsResolver = ({
 	//log.info(`synonymsRes:${toStr(synonymsRes)}`);
 	synonymsRes.hits = synonymsRes.hits.map(({
 		_path,
+		_nodeType,
 		id: _id,
 		name: _name,
 		displayName,
 		from,
 		thesaurus,
 		thesaurusReference,
-		to,
-		type
+		to//,
+		//type
 	}) => ({
 		_id,
 		_name,
+		_nodeType,
 		_path,
 		displayName,
 		from,
 		thesaurus,
 		thesaurusReference,
-		to,
-		type
+		to//,
+		//type
 	}));
 	return synonymsRes;
 }; // querySynonymsResolver
@@ -125,23 +129,25 @@ export const querySynonyms = {
 
 
 export const queryThesauri = {
-	resolve: (env) => {
+	resolve: (/*env*/) => {
 		//log.info(`env:${toStr(env)}`);
 		const connection = connect({ principals: [PRINCIPAL_EXPLORER_READ] });
 		const thesauriRes = query({
 			connection
 		});
 		thesauriRes.hits = thesauriRes.hits.map(({
+			_nodeType,
 			_path,
 			description,
 			id: _id,
 			name: _name,
 			displayName,
-			synonymsCount,
-			type
+			synonymsCount//,
+			//type
 		}) => ({
 			_id,
 			_name,
+			_nodeType,
 			_path,
 			description,
 			displayName,
@@ -157,8 +163,8 @@ export const queryThesauri = {
 					}
 				}
 			}),
-			synonymsCount,
-			type
+			synonymsCount//,
+			//type
 		}));
 		return thesauriRes;
 	},
@@ -199,13 +205,14 @@ export const queryThesauri = {
 		hits {
 			_id
 			_name
+			_nodeType
 			_path
 			displayName
 			from
 			thesaurus
 			thesaurusReference
 			to
-			type
+			#type
 		}
 	}
 	queryThesauri {
@@ -214,6 +221,7 @@ export const queryThesauri = {
 		hits {
 			_id
 			_name
+			_nodeType
 			_path
 			description
 			displayName
@@ -223,17 +231,18 @@ export const queryThesauri = {
 				hits {
 					_id
 					_name
+					_nodeType
 					_path
 					displayName
 					from
 					thesaurus
 					thesaurusReference
 					to
-					type
+					#type
 				}
 			}
 			synonymsCount
-			type
+			#type
 		}
 	}
 }

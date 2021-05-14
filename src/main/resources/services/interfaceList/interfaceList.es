@@ -27,7 +27,7 @@ export function get() {
 			value: _name,
 			path: _path
 		});*/
-		if (!fieldValuesObj[field]) {fieldValuesObj[field] = {}}
+		if (!fieldValuesObj[field]) {fieldValuesObj[field] = {};}
 		fieldValuesObj[field][key] = {
 			key,
 			text: displayName,
@@ -37,14 +37,14 @@ export function get() {
 	});
 
 	const fieldsArray = getFields({connection}).hits.map(({
-		displayName,
+		//displayName,
 		key,
 		inResults = true,
 		_path
 	}) => ({
 		key,
 		inResults,
-		text: displayName,
+		//text: displayName,
 		path: _path,
 		value: key,
 		values: fieldValuesObj[key]
@@ -55,7 +55,7 @@ export function get() {
 		//label,
 		inResults,
 		path,
-		text,
+		//text,
 		//value,
 		values
 	}) => {
@@ -65,7 +65,7 @@ export function get() {
 				//label,
 				//inResults,
 				path,
-				text,
+				text: key,
 				values
 			};
 		}
