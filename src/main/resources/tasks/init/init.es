@@ -23,8 +23,12 @@ import {node as Node} from '/lib/explorer/model/2/nodeTypes/node';
 import {create} from '/lib/explorer/node/create';
 import {connect} from '/lib/explorer/repo/connect';
 import {init as initRepo} from '/lib/explorer/repo/init';
+import {getFields} from '/lib/explorer/field/getFields';
+import {addFilter} from '/lib/explorer/query/addFilter';
+import {hasValue} from '/lib/explorer/query/hasValue';
 import {runAsSu} from '/lib/explorer/runAsSu';
-//import {toStr} from '/lib/util';
+
+import {toStr} from '/lib/util';
 import {addMembers, createRole, createUser} from '/lib/xp/auth';
 import {send} from '/lib/xp/event';
 import {Progress} from './Progress';
@@ -35,11 +39,115 @@ export function run() {
 	const progress = new Progress({
 		info: 'Task started',
 		//sleepMsAfterItem: 1000, // DEBUG
-		total: ROLES.length + USERS.length + REPOSITORIES.length + DEFAULT_FIELDS.length + 3
+		total: ROLES.length + USERS.length + REPOSITORIES.length + DEFAULT_FIELDS.length + 5
 		// Field type document
 		// Default interface
 		// notificationsData
 	}).report();
+
+	const connection = connect({principals:[PRINCIPAL_EXPLORER_WRITE]});
+
+	//──────────────────────────────────────────────────────────────────────────
+	// Move type -> _nodeType
+	//──────────────────────────────────────────────────────────────────────────
+	progress.setInfo(`Finding nodes where _nodeType = default and node.type exists`).report();
+	// WARNING Does not find nodes there _indexConfig is none!
+	const nodesWithTypeQueryParams = {
+		count: -1,
+		filters: addFilter({
+			filter: { exists: { field: 'type'}},
+			filters: addFilter({
+				filter: hasValue('_nodeType', ['default'])
+			})
+		})
+	};
+
+	const nodesWithTypeRes = connection.query(nodesWithTypeQueryParams);
+	nodesWithTypeRes.hits = nodesWithTypeRes.hits
+		.map(hit => connection.get(hit.id))
+		.map(({_id, _nodeType, _path, type}) => ({_id, _nodeType, _path, type}));
+	//log.info(`nodesWithTypeRes:${toStr(nodesWithTypeRes)}`);
+	//log.info(`nodesWithTypeQueryParams:${toStr(nodesWithTypeQueryParams)}`);
+	progress.finishItem();
+
+	progress.addItems(nodesWithTypeRes.total);
+	nodesWithTypeRes.hits.forEach(({_id, _nodeType, _path, type}) => {
+		progress.setInfo(`Trying to change _nodeType from ${_nodeType} to ${type} on _path:${_path} _id:${_id}`).report();
+		ignoreErrors(() => {
+			connection.modify({
+				key: _id,
+				editor: (node) => {
+					node._nodeType = node.type;
+					delete node.type;
+					return node;
+				}
+			});
+		}); // ignoreErrors
+		progress.finishItem();
+	});
+	connection.refresh();
+
+	//──────────────────────────────────────────────────────────────────────────
+	// Nodes where _indexConfig.default = none
+	//──────────────────────────────────────────────────────────────────────────
+	progress.setInfo(`Finding nodes where _nodeType still is default and _indexConfig.default = none`).report();
+	const nodesWithIndexDefaultNoneQueryParams = {
+		count: -1,
+		filters: addFilter({
+			filter: hasValue('_nodeType', ['default'])
+		})
+		/*filters: addFilter({
+			filter: hasValue('_indexConfig.default.enabled', [false]) // Doesn't work
+		}),*/
+		//query: "_indexConfig.default.enabled = 'false'" // Doesn't work
+	};
+	const nodesWithIndexDefaultNoneRes = connection.query(nodesWithIndexDefaultNoneQueryParams);
+	nodesWithIndexDefaultNoneRes.hits = nodesWithIndexDefaultNoneRes.hits
+		.map(hit => connection.get(hit.id))
+		.map(({
+			_id, _indexConfig, _nodeType, _path, type
+		}) => ({
+			_id, _indexConfig, _nodeType, _path, type
+		}))
+		.filter(({_indexConfig: {
+			default: {
+				decideByType,
+				enabled,
+				nGram,
+				fulltext,
+				includeInAllText,
+				path
+			} = {}
+		}}) => enabled === false
+			&& decideByType === false
+			&& nGram === false
+			&& fulltext === false
+			&& includeInAllText === false
+			&& path === false
+		);
+	//log.debug(`nodesWithIndexDefaultNoneRes:${toStr(nodesWithIndexDefaultNoneRes)}`);
+	//log.debug(`nodesWithIndexDefaultNoneQueryParams:${toStr(nodesWithIndexDefaultNoneQueryParams)}`);
+	progress.finishItem();
+
+	progress.addItems(nodesWithIndexDefaultNoneRes.hits.length);
+	nodesWithIndexDefaultNoneRes.hits.forEach(({_id, _nodeType, _path, type}) => {
+		progress.setInfo(`Trying to change _nodeType from ${_nodeType} to ${type} on _path:${_path} _id:${_id}`).report();
+		ignoreErrors(() => {
+			connection.modify({
+				key: _id,
+				editor: (node) => {
+					node._indexConfig.default.enabled = true;
+					node._nodeType = node.type;
+					delete node.type;
+					return node;
+				}
+			});
+		}); // ignoreErrors
+		progress.finishItem();
+	});
+	connection.refresh();
+	//──────────────────────────────────────────────────────────────────────────
+
 	runAsSu(() => {
 		ROLES.forEach(({name, displayName, description}) => {
 			progress.setInfo(`Creating role ${displayName}`).report();
@@ -77,8 +185,6 @@ export function run() {
 			progress.finishItem();
 		});
 
-		const connection = connect({principals:[PRINCIPAL_EXPLORER_WRITE]});
-
 		/*connection.modify({
 			key: '/',
 			editor: (node) => {
@@ -99,11 +205,11 @@ export function run() {
 			_name,
 			denyDelete,
 			denyValues,
-			displayName,
+			//displayName,
 			key,
 			inResults = true
 		}) => {
-			progress.setInfo(`Creating default field ${displayName}`).report();
+			progress.setInfo(`Creating default field ${key}`).report();
 			const params = field({
 				_name,
 				_inheritsPermissions: false,
@@ -113,7 +219,7 @@ export function run() {
 				],
 				denyDelete,
 				denyValues,
-				displayName,
+				//displayName,
 				key,
 				inResults
 			});
@@ -124,6 +230,41 @@ export function run() {
 			});
 			progress.finishItem();
 		}); // DEFAULT_FIELDS.forEach
+
+		//──────────────────────────────────────────────────────────────────────────
+		// Removing displayName from all fields
+		//──────────────────────────────────────────────────────────────────────────
+		progress.setInfo(`Finding fields with displayName`).report();
+		const fieldsWithDisplayNameRes = getFields({
+			connection,
+			filters: addFilter({
+				filter: {exists:{field: 'displayName'}}
+			})
+		});
+		fieldsWithDisplayNameRes.hits = fieldsWithDisplayNameRes.hits.map(({
+			_id, _path, displayName
+		})=>({
+			_id, _path, displayName
+		}));
+		//log.debug(`fieldsWithDisplayNameRes:${toStr(fieldsWithDisplayNameRes)}`);
+		progress.finishItem();
+
+		progress.addItems(fieldsWithDisplayNameRes.hits.length);
+		fieldsWithDisplayNameRes.hits.forEach(({_id, _path, displayName}) => {
+			progress.setInfo(`Removing displayName:${displayName} from _path:${_path} _id:${_id}`).report();
+			ignoreErrors(() => {
+				connection.modify({
+					key: _id,
+					editor: (node) => {
+						delete node.displayName;
+						return node;
+					}
+				});
+			}); // ignoreErrors
+			progress.finishItem();
+		});
+		connection.refresh();
+		//──────────────────────────────────────────────────────────────────────────
 
 		progress.setInfo('Creating fieldValue Document for field type').report();
 		const node = getField({

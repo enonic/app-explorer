@@ -41,7 +41,7 @@ const FIELD_OBJECT_TYPE = createObjectType({
 		_path: { type: nonNull(GraphQLString) },
 		denyDelete: { type: GraphQLBoolean },
 		denyValues: { type: GraphQLBoolean },
-		displayName: { type: nonNull(GraphQLString) },
+		//displayName: { type: nonNull(GraphQLString) },
 		indexConfig: { type: nonNull(GraphQLString) },
 		inResults: { type: GraphQLBoolean },
 		fieldType: { type: nonNull(GraphQLString) },
@@ -110,7 +110,7 @@ export const queryFields = {
 			_path,
 			denyDelete,
 			denyValues,
-			displayName,
+			//displayName,
 			indexConfig,
 			inResults,
 			fieldType,
@@ -122,7 +122,7 @@ export const queryFields = {
 			_path,
 			denyDelete,
 			denyValues,
-			displayName,
+			//displayName,
 			indexConfig,
 			inResults,
 			fieldType,
@@ -161,7 +161,7 @@ export const queryFields = {
 			_path
 			denyDelete
 			denyValues
-			displayName
+			#displayName
 			indexConfig
 			inResults
 			fieldType

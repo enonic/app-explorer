@@ -66,7 +66,7 @@ const FIELDS_GQL = `queryFields {
 		#_path
 		#denyDelete
 		#denyValues
-		displayName
+		#displayName
 		#indexConfig
 		#inResults
 		#fieldType
@@ -170,7 +170,7 @@ export function Collections(props) {
 	const fieldsObj = {};
 	//const fieldsArray =
 	queryFieldsGraph.hits ? queryFieldsGraph.hits.forEach(({
-		displayName: fieldLabel,
+		//displayName: fieldLabel,
 		key,
 		values
 	}) => {
@@ -190,7 +190,7 @@ export function Collections(props) {
 			};*/
 		}) : [];
 		fieldsObj[key] = {
-			label: fieldLabel,
+			label: key, //fieldLabel,
 			values: valuesObj
 		};
 		/*return {

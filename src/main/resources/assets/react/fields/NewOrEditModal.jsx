@@ -40,7 +40,7 @@ export function NewOrEditModal(props) {
 		initialValues = {
 			allowArray: false,
 			description: '',
-			fieldType: 'text',
+			fieldType: 'any',
 			key: '',
 			min: 0,
 			max: 0,
@@ -130,6 +130,10 @@ export function NewOrEditModal(props) {
 									fluid
 									path='fieldType'
 									options={[{
+										key: 'any',
+										text: 'Any', // Don't validate type
+										value: 'any'
+									},{
 										key: 'string',
 										text: 'String',
 										value: 'string'

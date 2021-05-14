@@ -91,6 +91,7 @@ const SS_EXTERNALS = [
 	'/lib/xp/repo',
 	'/lib/xp/task',
 	'/lib/xp/value',
+	'/lib/xp/value.js',
 	'/lib/xp/websocket'
 ];
 

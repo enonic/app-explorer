@@ -139,7 +139,7 @@ export function Fields(props) {
 						}, index) => {
 							return <Table.Row key={`field[${index}]`}>
 								<Table.Cell>{key}</Table.Cell>
-								<Table.Cell>{fieldType}</Table.Cell>
+								<Table.Cell>{fieldType === 'any' ? '*' : fieldType}</Table.Cell>
 								{/*<Table.Cell>{allowArray ? <Icon color='green' name='checkmark'/> : <Icon color='red' name='x'/>}</Table.Cell>*/}
 								<Table.Cell>{min === 0 ? '*' : min}</Table.Cell>
 								<Table.Cell>{max === 0 ? '∞' : max}</Table.Cell>

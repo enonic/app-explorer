@@ -196,6 +196,7 @@ app-explorer
 
 ### 1.5.0-SNAPSHOT
 
+* node.type -> node._nodeType
 * Rename Fields -> Schema
 * Remove field displayName
 * Add field min and max occurrences
