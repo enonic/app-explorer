@@ -17,6 +17,7 @@ import {fieldObjToFieldArr} from './query/fieldObjToFieldArr';
 export function Facets(props) {
 	const [context, dispatch] = getEnonicContext();
 	const {
+		disabled = false,
 		fieldsObj,
 		id,
 		legend = null,
@@ -39,6 +40,7 @@ export function Facets(props) {
 	if (!(Array.isArray(value) && value.length)) {
 		return <Form.Field id={id}>
 			<SetValueButton
+				disabled={disabled}
 				path={path}
 				value={[{
 					tag: '',
@@ -69,6 +71,7 @@ export function Facets(props) {
 						const key=`${path}.${index}`;
 						return <Table.Row key={key}>
 							<Table.Cell><Dropdown
+								disabled={disabled}
 								onChange={(ignoredEvent,{value: newTag}) => {
 									//console.debug('Dropdown newValue', newValue);
 									const newValue = {
@@ -89,6 +92,7 @@ export function Facets(props) {
 								value={tag}
 							/></Table.Cell>
 							<Table.Cell>{allowChildren && tag && fieldsObj[tag] && fieldsObj[tag].values && <Facets
+								disabled={disabled}
 								fieldsObj={fieldsObj[tag].values}
 								legend=''
 								level={level}
@@ -97,6 +101,7 @@ export function Facets(props) {
 							/>}</Table.Cell>
 							<Table.Cell><Button.Group>
 								<InsertButton
+									disabled={disabled}
 									path={path}
 									index={index+1}
 									value={{
@@ -104,16 +109,17 @@ export function Facets(props) {
 									}}
 								/>
 								<MoveDownButton
-									disabled={index + 1 >= facetsArray.length}
+									disabled={disabled || index + 1 >= facetsArray.length}
 									path={path}
 									index={index}
 								/>
 								<MoveUpButton
+									disabled={disabled}
 									path={path}
 									index={index}
 								/>
 								<DeleteItemButton
-									disabled={facetsArray.length < 2}
+									disabled={disabled || facetsArray.length < 2}
 									path={path}
 									index={index}
 								/>

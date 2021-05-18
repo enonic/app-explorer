@@ -2,6 +2,7 @@ import {Button, Icon, Input, Message, Modal} from 'semantic-ui-react';
 
 
 export function DeleteModal({
+	disabled = false,
 	name,
 	onClose = () => {},
 	servicesBaseUrl
@@ -18,6 +19,7 @@ export function DeleteModal({
 		open={open}
 		trigger={<Button
 			compact
+			disabled={disabled}
 			onClick={() => setOpen(true)}
 			size='tiny'
 			type='button'
@@ -46,7 +48,7 @@ export function DeleteModal({
 								setOpen(false);
 								onClose();
 							}
-						})
+						});
 				}}
 				type='button'
 			><Icon color='red' name='trash alternate outline'/>Delete</Button> : <Message

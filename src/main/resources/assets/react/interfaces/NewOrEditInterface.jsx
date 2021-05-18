@@ -64,7 +64,14 @@ export function NewOrEditInterface(props) {
 			});
 	}, []);
 
-	const {initialValues, isLoading} = state;
+	const {
+		initialValues,
+		initialValues: {
+			_name
+		},
+		isLoading
+	} = state;
+	//console.debug('_name', _name);
 
 	return isLoading ? <Loader active inverted>Loading</Loader> : <EnonicForm
 		initialValues={initialValues}
@@ -91,6 +98,7 @@ export function NewOrEditInterface(props) {
 		<Form as='div'>
 			<Form.Field>
 				<Input
+					disabled={_name === 'default'}
 					fluid
 					label={{basic: true, content: 'Name'}}
 					path='displayName'
@@ -100,6 +108,7 @@ export function NewOrEditInterface(props) {
 			<Header as='h2' content='Collection(s)' dividing id='collections'/>
 			<Form.Field>
 				<Dropdown
+					disabled={_name === 'default'}
 					multiple={true}
 					options={collectionOptions}
 					path='collections'
@@ -108,9 +117,11 @@ export function NewOrEditInterface(props) {
 				/>
 			</Form.Field>
 			<QueryFiltersBuilder
+				disabled={_name === 'default'}
 				fieldsObj={fieldsObj}
 			/>
 			<QueryBuilder
+				disabled={_name === 'default'}
 				fieldsObj={fieldsObj}
 				id='query'
 				legend='Query'
@@ -118,6 +129,7 @@ export function NewOrEditInterface(props) {
 			/>
 			<Header as='h3' content='Stop words' dividing id='stopwords'/>
 			<Dropdown
+				disabled={_name === 'default'}
 				fluid
 				multiple={true}
 				options={stopWordOptions}
@@ -126,18 +138,20 @@ export function NewOrEditInterface(props) {
 				selection
 			/>
 			<ResultMappings
+				disabled={_name === 'default'}
 				fieldsObj={fieldsObj}
 				id='resultmappings'
 				legend='Result mapping(s)'
 			/>
 			<Facets
+				disabled={_name === 'default'}
 				fieldsObj={fieldsObj}
 				id='facets'
 				legend='Facet(s)'
 			/>
 			<Form.Field>
-				<SubmitButton/>
-				<ResetButton/>
+				<SubmitButton disabled={_name === 'default'}/>
+				<ResetButton disabled={_name === 'default'}/>
 			</Form.Field>
 		</Form>
 	</EnonicForm>;

@@ -16,17 +16,18 @@ import {OperatorSelector} from './OperatorSelector';
 
 
 export function Fulltext(props) {
-	const [context, dispatch] = getEnonicContext();
+	const [context/*, dispatch*/] = getEnonicContext();
 
 	const {
+		disabled = false,
 		fieldsObj,
 		name = 'fulltext',
-		legend = null,
+		//legend = null,
 		parentPath,
 		path = parentPath ? `${parentPath}.${name}` : name,
 		thesauriOptions,
-		type = 'fulltext', // ngram synonyms
-		value = getIn(context.values, path)
+		type = 'fulltext'//, // ngram synonyms
+		//value = getIn(context.values, path)
 	} = props;
 	//console.debug('Fulltext path', path, 'type', type, 'value', value);
 	const fieldsPath = `${path}.fields`;
@@ -36,6 +37,7 @@ export function Fulltext(props) {
 	const thesauriValue = getIn(context.values, thesauriPath, []);
 	return <>
 		{type === 'synonyms' && <Form.Field><Dropdown
+			disabled={disabled}
 			fluid
 			multiple={true}
 			options={thesauriOptions}
@@ -64,11 +66,13 @@ export function Fulltext(props) {
 						const key = `${fieldsPath}.${index}`;
 						return <Table.Row key={key}>
 							<Table.Cell><Dropdown
+								disabled={disabled}
 								options={fieldOptions}
 								path={`${key}.field`}
 								value={field}
 							/></Table.Cell>
 							<Table.Cell><Input
+								disabled={disabled}
 								path={`${key}.boost`}
 								type='number'
 								value={boost}
@@ -76,6 +80,7 @@ export function Fulltext(props) {
 							<Table.Cell>
 								<Button.Group>
 									<InsertButton
+										disabled={disabled}
 										path={fieldsPath}
 										index={index}
 										value={{
@@ -84,27 +89,31 @@ export function Fulltext(props) {
 										}}
 									/>
 									<MoveDownButton
-										disabled={index + 1 >= fieldsArray.length}
+										disabled={disabled || index + 1 >= fieldsArray.length}
 										path={fieldsPath}
 										index={index}
 									/>
 									<MoveUpButton
+										disabled={disabled}
 										path={fieldsPath}
 										index={index}
 									/>
 									<DeleteItemButton
-										disabled={fieldsArray.length < 2}
+										disabled={disabled || fieldsArray.length < 2}
 										path={fieldsPath}
 										index={index}
 									/>
 								</Button.Group>
 							</Table.Cell>
-						</Table.Row>
+						</Table.Row>;
 					})}</Table.Body>
 				</Table>;
 			}}
 		/>
-		{type === 'synonyms' ? null : <OperatorSelector parentPath={path}/>}
+		{type === 'synonyms' ? null : <OperatorSelector
+			disabled={disabled}
+			parentPath={path}
+		/>}
 	</>;
 
 } // function Fulltext

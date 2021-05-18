@@ -9,6 +9,7 @@ import {fieldObjToFieldArr} from './fieldObjToFieldArr';
 
 export function Range(props) {
 	const {
+		disabled = false,
 		fieldsObj,
 		name = 'range',
 		parentPath,
@@ -18,6 +19,7 @@ export function Range(props) {
 	return <>
 		<Form.Field>
 			<Dropdown
+				disabled={disabled}
 				fluid
 				options={fieldOptions}
 				path={`${path}.field`}
@@ -28,6 +30,7 @@ export function Range(props) {
 		</Form.Field>
 		<Form.Field>
 			<Input
+				disabled={disabled}
 				fluid
 				path={`${path}.from`}
 				placeholder='From'
@@ -35,6 +38,7 @@ export function Range(props) {
 		</Form.Field>
 		<Form.Field>
 			<Input
+				disabled={disabled}
 				fluid
 				path={`${path}.to`}
 				placeholder='To'
@@ -42,12 +46,14 @@ export function Range(props) {
 		</Form.Field>
 		<Form.Field>
 			<Checkbox
+				disabled={disabled}
 				label='Include from?'
 				path={`${path}.includeFrom`}
 			/>
 		</Form.Field>
 		<Form.Field>
 			<Checkbox
+				disabled={disabled}
 				label='Include to?'
 				path={`${path}.includeTo`}
 			/>

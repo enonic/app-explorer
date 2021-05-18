@@ -12,8 +12,9 @@ import {QueryBuilder} from './QueryBuilder';
 
 
 export function Logic(props) {
-	const [context, dispatch] = getEnonicContext();
+	const [context/*, dispatch*/] = getEnonicContext();
 	const {
+		disabled = false,
 		fieldsObj,
 		name = 'group',
 		parentPath,
@@ -27,6 +28,7 @@ export function Logic(props) {
 	if (!value || !value.expressions || !Array.isArray(value.expressions) || !value.expressions.length) {
 		return <Form.Field>
 			<InsertButton
+				disabled={disabled}
 				icon={false}
 				index={0}
 				path={expressionsPath}
@@ -42,6 +44,7 @@ export function Logic(props) {
 
 	return <>
 		<OperatorSelector
+			disabled={disabled}
 			path={`${path}.operator`}
 		/>
 		<List
@@ -58,6 +61,7 @@ export function Logic(props) {
 						{index ? <Divider hidden/> : null}
 						<Segment raised>
 							<QueryBuilder
+								disabled={disabled}
 								fieldsObj={fieldsObj}
 								name={index}
 								parentPath={expressionsPath}
@@ -66,6 +70,7 @@ export function Logic(props) {
 							/>
 							<Button.Group floated='right'>
 								<InsertButton
+									disabled={disabled}
 									index={index+1}
 									path={expressionsPath}
 									value={{
@@ -74,12 +79,13 @@ export function Logic(props) {
 									}}
 								><Icon color='green' name='add'/>{'Add expression'}</InsertButton>
 								<MoveDownButton
-									disabled={index === value.expressions.length - 1}
+									disabled={disabled || index === value.expressions.length - 1}
 									index={index}
 									path={expressionsPath}
 									visible={value.expressions.length > 1}
 								/>
 								<MoveUpButton
+									disabled={disabled}
 									index={index}
 									path={expressionsPath}
 									visible={value.expressions.length > 1}
@@ -92,6 +98,7 @@ export function Logic(props) {
 			}}
 		/>
 		{value.expressions.length ? null : <InsertButton
+			disabled={disabled}
 			index={value.expressions.length - 1}
 			path={expressionsPath}
 			value={{

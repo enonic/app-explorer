@@ -21,6 +21,7 @@ export function QueryBuilder(props) {
 	const [context, dispatch] = getEnonicContext();
 
 	const {
+		disabled = false,
 		fieldsObj,
 		id,
 		name = 'query',
@@ -36,6 +37,7 @@ export function QueryBuilder(props) {
 	const paramsPath = `${path}.params`;
 	const fragment = <>
 		{parentPath && <DeleteItemButton
+			disabled={disabled}
 			basic compact icon floated='right'
 			style={{
 				boxShadow: 'none'
@@ -44,6 +46,7 @@ export function QueryBuilder(props) {
 			path={parentPath}
 		><Icon color='black' name='close'/></DeleteItemButton>}
 		<SemanticUiReactDropdown
+			disabled={disabled}
 			onChange={(ignoredEvent,{value: newType}) => {
 				let params;
 				if(newType === 'group') {
@@ -125,25 +128,30 @@ export function QueryBuilder(props) {
 			value={type}
 		/>
 		{['fulltext', 'ngram', 'synonyms'].includes(type) && <Fulltext
+			disabled={disabled}
 			fieldsObj={fieldsObj}
 			path={paramsPath}
 			type={type}
 			thesauriOptions={thesauriOptions}
 		/>}
 		{type === 'group' && <Logic
+			disabled={disabled}
 			fieldsObj={fieldsObj}
 			path={paramsPath}
 			thesauriOptions={thesauriOptions}
 		/>}
 		{type === 'compareExpr' && <CompareExpression
+			disabled={disabled}
 			fieldsObj={fieldsObj}
 			path={paramsPath}
 		/>}
 		{type === 'range' && <Range
+			disabled={disabled}
 			fieldsObj={fieldsObj}
 			path={paramsPath}
 		/>}
 		{type === 'pathMatch' && <PathMatch
+			disabled={disabled}
 			fieldsObj={fieldsObj}
 			path={paramsPath}
 		/>}

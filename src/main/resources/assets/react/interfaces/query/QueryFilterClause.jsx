@@ -20,10 +20,11 @@ import {QueryFieldSelector} from './QueryFieldSelector';
 
 
 export function QueryFilterClause(props) {
-	const [context, dispatch] = getEnonicContext();
+	const [context/*, dispatch*/] = getEnonicContext();
 	//console.debug('QueryFilterClause context', context);
 
 	const {
+		disabled = false,
 		fieldsObj = {},
 		id,
 		parentPath,
@@ -37,6 +38,7 @@ export function QueryFilterClause(props) {
 	if(!(value && Array.isArray(value) && value.length)) {
 		return <Form.Field id={id}>
 			<SetValueButton
+				disabled={disabled}
 				icon={false}
 				path={path}
 				value={[{
@@ -82,6 +84,7 @@ export function QueryFilterClause(props) {
 						return <Table.Row key={key}>
 							<Table.Cell>
 								<QueryFilterSelector
+									disabled={disabled}
 									parentPath={key}
 									value={filter}
 								/>
@@ -89,6 +92,7 @@ export function QueryFilterClause(props) {
 							<Table.Cell>
 								{['exists', 'hasValue', 'notExists'].includes(filter)
 									&& <QueryFieldSelector
+										disabled={disabled}
 										fieldOptions={fieldOptions}
 										parentPath={`${key}.params`}
 									/>
@@ -96,6 +100,7 @@ export function QueryFilterClause(props) {
 							</Table.Cell>
 							<Table.Cell>
 								{filter === 'hasValue' && field && fieldsObj[field] && fieldsObj[field].values && <Dropdown
+									disabled={disabled}
 									multiple={true}
 									path={valuesPath}
 									options={fieldObjToFieldArr(fieldsObj[field].values) || []}
@@ -118,6 +123,7 @@ export function QueryFilterClause(props) {
 												return <Table.Row key={idKey}>
 													<Table.Cell>
 														<Input
+															disabled={disabled}
 															fluid
 															path={idKey}
 															value={idValue}
@@ -126,21 +132,23 @@ export function QueryFilterClause(props) {
 													<Table.Cell>
 														<Button.Group>
 															<InsertButton
+																disabled={disabled}
 																path={valuesPath}
 																index={idIndex}
 																value={''}
 															/>
 															<MoveDownButton
-																disabled={idIndex + 1 >= ids.length}
+																disabled={disabled || idIndex + 1 >= ids.length}
 																path={valuesPath}
 																index={idIndex}
 															/>
 															<MoveUpButton
+																disabled={disabled}
 																path={valuesPath}
 																index={idIndex}
 															/>
 															<DeleteItemButton
-																disabled={ids.length < 2}
+																disabled={disabled || ids.length < 2}
 																path={valuesPath}
 																index={idIndex}
 															/>
@@ -149,7 +157,7 @@ export function QueryFilterClause(props) {
 												</Table.Row>;
 											})}
 											</Table.Body>
-										</Table>
+										</Table>;
 									}}
 								/>}
 							</Table.Cell>
@@ -159,6 +167,7 @@ export function QueryFilterClause(props) {
 										content='Insert'
 										inverted
 										trigger={<InsertButton
+											disabled={disabled}
 											path={path}
 											index={index+1}
 											value={{
@@ -172,7 +181,7 @@ export function QueryFilterClause(props) {
 										content='Move down'
 										inverted
 										trigger={<MoveDownButton
-											disabled={index + 1 >= filtersArray.length}
+											disabled={disabled || index + 1 >= filtersArray.length}
 											path={path}
 											index={index}
 										/>}/>
@@ -180,6 +189,7 @@ export function QueryFilterClause(props) {
 										content='Move up'
 										inverted
 										trigger={<MoveUpButton
+											disabled={disabled}
 											path={path}
 											index={index}
 										/>}/>
@@ -187,6 +197,7 @@ export function QueryFilterClause(props) {
 										content='Delete'
 										inverted
 										trigger={<DeleteItemButton
+											disabled={disabled}
 											path={path}
 											index={index}
 										/>}/>
@@ -196,19 +207,21 @@ export function QueryFilterClause(props) {
 					})}
 					</Table.Body>
 				</Table>
-			{/*<Popup
-				content='Add'
-				inverted
-				trigger={<InsertButton
-					path={path}
-					index={filtersArray.length}
-					value={{
-						filter: 'exists',
-						params: {
-							field: ''
-						}
-					}}
-				/>}/>*/}
+				{/*<Popup
+					content='Add'
+					inverted
+					trigger={<InsertButton
+						disabled={disabled}
+						path={path}
+						index={filtersArray.length}
+						value={{
+							filter: 'exists',
+							params: {
+								field: ''
+							}
+						}}
+					/>}
+				/>*/}
 			</>;
 		}}
 	/>;

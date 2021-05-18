@@ -50,6 +50,7 @@ const OPERATOR_OPTIONS = [{
 
 export function CompareExpression(props) {
 	const {
+		disabled = false,
 		fieldsObj,
 		name = 'compareExpr',
 		parentPath,
@@ -59,6 +60,7 @@ export function CompareExpression(props) {
 	return <>
 		<Form.Field>
 			<Dropdown
+				disabled={disabled}
 				fluid
 				options={fieldOptions}
 				path={`${path}.field`}
@@ -69,6 +71,7 @@ export function CompareExpression(props) {
 		</Form.Field>
 		<Form.Field>
 			<Dropdown
+				disabled={disabled}
 				fluid
 				options={OPERATOR_OPTIONS}
 				path={`${path}.operator`}
@@ -77,6 +80,7 @@ export function CompareExpression(props) {
 		</Form.Field>
 		<Form.Field>
 			<Input
+				disabled={disabled}
 				fluid
 				path={`${path}.valueExpr`}
 			/>

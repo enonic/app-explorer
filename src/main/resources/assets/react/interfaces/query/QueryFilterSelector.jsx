@@ -32,6 +32,7 @@ export function QueryFilterSelector(props) {
 	//console.debug('QueryFilterSelector context', context);
 
 	const {
+		disabled = false,
 		parentPath,
 		name = 'filter',
 		path = parentPath ? `${parentPath}.${name}` : name,
@@ -40,6 +41,7 @@ export function QueryFilterSelector(props) {
 
 	//console.debug('QueryFilterSelector path', path);
 	return <SemanticUiReactDropdown
+		disabled={disabled}
 		onChange={(ignoredEvent,{value: filter}) => {
 			const newValue = {
 				filter,
@@ -56,5 +58,5 @@ export function QueryFilterSelector(props) {
 		}}
 		options={OPTIONS}
 		value={value}
-	/>
+	/>;
 } // function QueryFilterSelector

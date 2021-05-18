@@ -27,6 +27,9 @@ const MODE = 'production';
 const BOOL_LIB_EXPLORER_EXTERNAL = MODE === 'production';
 //const BOOL_LIB_EXPLORER_EXTERNAL = false;
 
+//const BOOL_LOCAL_SEMANTIC_UI_REACT_FORM = MODE !== 'production';
+const BOOL_LOCAL_SEMANTIC_UI_REACT_FORM = true;
+
 //const minimize = MODE === 'production';
 const minimize = true;
 //const minimize = false;
@@ -624,9 +627,9 @@ const CLIENT_ES_CONFIG = {
 	],
 	resolve: {
 		alias: {
-			'semantic-ui-react-form': MODE === 'production'
-				? path.resolve(__dirname, './node_modules/@enonic/semantic-ui-react-form/src')
-				: path.resolve(__dirname, '../semantic-ui-react-form/src')
+			'semantic-ui-react-form': BOOL_LOCAL_SEMANTIC_UI_REACT_FORM
+				? path.resolve(__dirname, '../semantic-ui-react-form/src')
+				: path.resolve(__dirname, './node_modules/@enonic/semantic-ui-react-form/src')
 		},
 		extensions: [
 			'mjs', 'jsx', 'esm', 'es', 'es6', 'js', 'json'

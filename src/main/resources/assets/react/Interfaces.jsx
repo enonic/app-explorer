@@ -146,6 +146,7 @@ export function Interfaces({
 								/>
 								<DeleteModal
 									name={_name}
+									disabled={_name === 'default'}
 									onClose={() => memoizedUpdateInterfacesCallback()}
 									servicesBaseUrl={servicesBaseUrl}
 								/>

@@ -18,6 +18,7 @@ import {fieldObjToFieldArr} from './query/fieldObjToFieldArr';
 export function ResultMappings(props) {
 	//const [context, dispatch] = getEnonicContext();
 	const {
+		disabled = false,
 		fieldsObj,
 		id,
 		legend = null,
@@ -55,13 +56,16 @@ export function ResultMappings(props) {
 						const typePath = `${pathWithIndex}.type`;
 						return <Table.Row key={pathWithIndex}>
 							<Table.Cell><Dropdown
+								disabled={disabled}
 								options={fieldOptions}
 								path={`${pathWithIndex}.field`}
 							/></Table.Cell>
 							<Table.Cell><Input
+								disabled={disabled}
 								path={`${pathWithIndex}.to`}
 							/></Table.Cell>
 							<Table.Cell><Dropdown
+								disabled={disabled}
 								options={[{
 									key: 'string',
 									text: 'String',
@@ -78,23 +82,27 @@ export function ResultMappings(props) {
 								{type === 'string' && <>
 									<Form.Field>
 										<Checkbox
+											disabled={disabled}
 											label="Join if array?"
 											path={`${pathWithIndex}.join`}
 										/>
 									</Form.Field>
 									{join && <Form.Field><Input
+										disabled={disabled}
 										label='Separator'
 										path={`${pathWithIndex}.separator`}
 										placeholder='separator'
 										value={separator}
 									/></Form.Field>}
 									<Form.Field><Checkbox
+										disabled={disabled}
 										label="Highlight?"
 										path={`${pathWithIndex}.highlight`}
 									/></Form.Field>
 									{highlight
 										? <>
 											<Form.Field><Label content='Highlight fragmenter:'/><Dropdown
+												disabled={disabled}
 												options={[{
 													key: 'span',
 													text: 'span',
@@ -110,10 +118,12 @@ export function ResultMappings(props) {
 												selection
 											/></Form.Field>
 											<Form.Field><Label content='Highlight number of fragments:'/><Input
+												disabled={disabled}
 												path={`${pathWithIndex}.highlightNumberOfFragments`}
 												type='number'
 											/></Form.Field>
 											<Form.Field><Label content='Highlight Order:'/><Dropdown
+												disabled={disabled}
 												options={[{
 													key: 'none',
 													text: 'none',
@@ -129,9 +139,11 @@ export function ResultMappings(props) {
 												selection
 											/></Form.Field>
 											<Form.Field><Label content='Highlight pre tag:'/><Input
+												disabled={disabled}
 												path={`${pathWithIndex}.highlightPreTag`}
 											/></Form.Field>
 											<Form.Field><Label content='Highlight post tag:'/><Input
+												disabled={disabled}
 												path={`${pathWithIndex}.highlightPostTag`}
 											/></Form.Field>
 										</>
@@ -139,6 +151,7 @@ export function ResultMappings(props) {
 									}
 
 									<Form.Field><Input
+										disabled={disabled}
 										label="Limit length to"
 										path={`${pathWithIndex}.lengthLimit`}
 										value={lengthLimit}
@@ -149,6 +162,7 @@ export function ResultMappings(props) {
 							<Table.Cell>
 								<Button.Group>
 									<InsertButton
+										disabled={disabled}
 										path={path}
 										index={index+1}
 										value={{
@@ -162,16 +176,17 @@ export function ResultMappings(props) {
 										}}
 									/>
 									<MoveDownButton
-										disabled={index + 1 >= resultMappingsArray.length}
+										disabled={disabled || index + 1 >= resultMappingsArray.length}
 										path={path}
 										index={index}
 									/>
 									<MoveUpButton
+										disabled={disabled}
 										path={path}
 										index={index}
 									/>
 									<DeleteItemButton
-										disabled={resultMappingsArray.length < 2}
+										disabled={disabled || resultMappingsArray.length < 2}
 										path={path}
 										index={index}
 									/>

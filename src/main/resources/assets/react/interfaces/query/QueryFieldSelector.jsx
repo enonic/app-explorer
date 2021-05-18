@@ -13,16 +13,18 @@ export function QueryFieldSelector(props) {
 	//console.debug('QueryFieldSelector context', context);
 
 	const {
+		disabled = false,
 		fieldOptions,
 		parentPath,
 		name = 'field',
 		path = parentPath ? `${parentPath}.${name}` : name,
-		placeholder='Please select a field',
+		placeholder = 'Please select a field',
 		value = getIn(context.values, path)
 	} = props;
 	//console.debug('QueryFieldSelector path', path, 'value', value);
 
 	return <SemanticUiReactDropdown
+		disabled={disabled}
 		onChange={(ignoredEvent,{value: field}) => {
 			const newValue = {
 				field,
@@ -35,6 +37,7 @@ export function QueryFieldSelector(props) {
 			}));
 		}}
 		options={fieldOptions}
+		placeholder={placeholder}
 		value={value}
-	/>
+	/>;
 } // function QueryFieldSelector

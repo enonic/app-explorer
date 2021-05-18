@@ -9,6 +9,7 @@ export function OperatorSelector(props) {
 	const [context, dispatch] = getEnonicContext();
 	const {
 		defaultValue = 'or',
+		disabled = false,
 		parentPath,
 		path = parentPath ? `${parentPath}.operator` : 'operator',
 		value = getIn(context.values, path, defaultValue)
@@ -17,6 +18,7 @@ export function OperatorSelector(props) {
 		<Form.Field>
 			<Radio
 				checked={value !== 'and'}
+				disabled={disabled}
 				label="OR"
 				name={path}
 				onChange={() => dispatch(setValue({path, value: 'or'}))}
@@ -25,6 +27,7 @@ export function OperatorSelector(props) {
 		<Form.Field>
 			<Radio
 				checked={value === 'and'}
+				disabled={disabled}
 				label="AND"
 				name={path}
 				onChange={() => dispatch(setValue({path, value: 'and'}))}

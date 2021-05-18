@@ -196,12 +196,25 @@ app-explorer
 
 ### 1.5.0-SNAPSHOT
 
+* Disable all inputs and buttons when "editing" default interface
+* Disable delete on default interface
 * Build system upgrades
   * Node 14.17.0
   * Babel modules 7.14.3
   * Core-js 3.12.1
   * Webpack 5.37.0
   * All node modules up to date (except react)
+* Upgrade to @enonic/semantic-ui-react-form 2.2.0
+  * Make it possible to manually disable:
+    * DeleteButton
+    * InsertButton
+    * MoveUpButton
+    * ResetButton
+    * SortButton
+    * ValidateFormButton
+    * VisitAllButton
+* Upgrade to @enonic/semantic-ui-react-form 2.1.0
+  * Make it possible to manually disable the Submit button
 * node.type -> node._nodeType
 * Rename Fields -> Schema
 * Remove field displayName

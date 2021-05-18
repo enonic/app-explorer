@@ -8,6 +8,7 @@ import {fieldObjToFieldArr} from './fieldObjToFieldArr';
 
 export function PathMatch(props) {
 	const {
+		disabled = false,
 		fieldsObj,
 		name = 'pathMatch',
 		parentPath,
@@ -17,6 +18,7 @@ export function PathMatch(props) {
 	return <>
 		<Form.Field>
 			<Dropdown
+				disabled={disabled}
 				fluid
 				options={fieldOptions}
 				path={`${path}.field`}
@@ -27,6 +29,7 @@ export function PathMatch(props) {
 		</Form.Field>
 		<Form.Field>
 			<Input
+				disabled={disabled}
 				fluid
 				path={`${path}.path`}
 				placeholder='Path'
@@ -34,6 +37,7 @@ export function PathMatch(props) {
 		</Form.Field>
 		<Form.Field>
 			<Input
+				disabled={disabled}
 				fluid
 				path={`${path}.minMatch`}
 				type='number'
