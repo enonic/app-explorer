@@ -196,6 +196,12 @@ app-explorer
 
 ### 1.5.0-SNAPSHOT
 
+* Build system upgrades
+  * Node 14.17.0
+  * Babel modules 7.14.3
+  * Core-js 3.12.1
+  * Webpack 5.37.0
+  * All node modules up to date (except react)
 * node.type -> node._nodeType
 * Rename Fields -> Schema
 * Remove field displayName
@@ -214,12 +220,6 @@ app-explorer
   * Add componentPath to register function
 * Scheduling should not be visible before one has selected collector
 * Make it possible to select language per collection
-* Build system upgrades
-  * Node 14.16.1
-  * Babel modules 7.14.0
-  * Core-js 3.11.1
-  * Webpack 5.36.2
-  * All node modules up to date (except react)
 
 ### 1.4.0
 
