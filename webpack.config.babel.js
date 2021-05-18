@@ -27,8 +27,8 @@ const MODE = 'production';
 const BOOL_LIB_EXPLORER_EXTERNAL = MODE === 'production';
 //const BOOL_LIB_EXPLORER_EXTERNAL = false;
 
-//const BOOL_LOCAL_SEMANTIC_UI_REACT_FORM = MODE !== 'production';
-const BOOL_LOCAL_SEMANTIC_UI_REACT_FORM = true;
+const BOOL_LOCAL_SEMANTIC_UI_REACT_FORM = MODE !== 'production';
+//const BOOL_LOCAL_SEMANTIC_UI_REACT_FORM = true;
 
 //const minimize = MODE === 'production';
 const minimize = true;

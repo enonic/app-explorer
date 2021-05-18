@@ -220,6 +220,10 @@ app-explorer
 * Remove field displayName
 * Add field min and max occurrences
 * Add more field value types
+* Upgrade to lib-explorer-3.12.1
+  * Sort fields by key
+  * DEFAULT_INTERFACE_NAME
+  * INTERFACES_FOLDER
 * Upgrade to lib-explorer-3.12.0
   * Support should filters in interfaces
   * Schema change: type -> _nodeType

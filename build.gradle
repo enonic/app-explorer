@@ -63,7 +63,7 @@ dependencies {
 
 	include 'com.enonic.lib:lib-cron:1.1.1'
 
-	include 'com.enonic.lib:lib-explorer:3.12.0'
+	include 'com.enonic.lib:lib-explorer:3.12.1'
 
 	include 'com.enonic.lib:lib-util:3.0.0'
 
