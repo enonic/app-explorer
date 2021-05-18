@@ -30,6 +30,13 @@ import {SearchModal} from './interfaces/SearchModal';
 					values
 				}
 			}
+			should {
+				filter
+				params {
+					field
+					values
+				}
+			}
 		}
 		queryJson
 		resultMappings {

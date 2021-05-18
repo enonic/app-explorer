@@ -66,7 +66,7 @@ export function get({
 		collections: forceArray(collections), // Just collection names, not collection nodes
 		displayName,
 		facets: forceArray(facets),
-		filters: convert({object: filters, fields: ['must', 'mustNot', 'values']}),
+		filters: convert({object: filters, fields: ['must', 'mustNot', 'should', 'values']}),
 		id,
 		_name,
 		name,

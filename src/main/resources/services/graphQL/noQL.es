@@ -50,7 +50,8 @@ export const QUERY_FILTERS_INPUT_OBJECT_TYPE = createInputObjectType({
 			//description:,
 			fields: {
 				must: { type: FILTERS_OBJECT_TYPE },
-				mustNot: { type: FILTERS_OBJECT_TYPE }
+				mustNot: { type: FILTERS_OBJECT_TYPE },
+				should: { type: FILTERS_OBJECT_TYPE }
 			}
 		}) }
 	}

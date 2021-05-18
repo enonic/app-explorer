@@ -220,6 +220,12 @@ app-explorer
 * Remove field displayName
 * Add field min and max occurrences
 * Add more field value types
+* Upgrade to lib-explorer-3.12.0
+  * Support should filters in interfaces
+  * Schema change: type -> _nodeType
+  * Nested validation
+  * Min/max occurrences validation
+  * Type validation
 * Upgrade to lib-explorer-3.11.0
   * Added document/create and document/update
 * Upgrade to lib-explorer-3.10.3

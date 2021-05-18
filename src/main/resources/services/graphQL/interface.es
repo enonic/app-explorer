@@ -95,7 +95,8 @@ const INTERFACE_OBJECT_TYPE = createObjectType({
 			//description:
 			fields: {
 				must: { type: list(INTERFACE_FILTER_OBJECT_TYPE) },
-				mustNot: { type: list(INTERFACE_FILTER_OBJECT_TYPE) }
+				mustNot: { type: list(INTERFACE_FILTER_OBJECT_TYPE) },
+				should: { type: list(INTERFACE_FILTER_OBJECT_TYPE) }
 			}
 		}) },
 		//name: { type: nonNull(GraphQLString) }, // Same as displayName
@@ -157,7 +158,8 @@ export const queryInterfaces = {
 			displayName,
 			filters: {
 				must,
-				mustNot
+				mustNot,
+				should
 			},
 			query,
 			resultMappings//,
@@ -180,6 +182,16 @@ export const queryInterfaces = {
 					}
 				})) : null,
 				mustNot: mustNot ? forceArray(mustNot).map(({
+					filter,
+					params: {field, values}
+				}) => ({
+					filter,
+					params: {
+						field,
+						values: values ? forceArray(values) : null
+					}
+				})) : null,
+				should: should ? forceArray(should).map(({
 					filter,
 					params: {field, values}
 				}) => ({
@@ -227,6 +239,13 @@ export const queryInterfaces = {
       				}
         		}
         		mustNot {
+          			filter
+          			params {
+            			field
+            			values
+          			}
+        		}
+				should {
           			filter
           			params {
             			field
