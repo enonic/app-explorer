@@ -196,6 +196,7 @@ app-explorer
 
 ### 1.5.0-SNAPSHOT
 
+* Search by default on enter, with the option of "On change?"
 * Disable all inputs and buttons when "editing" default interface
 * Disable delete on default interface
 * Build system upgrades

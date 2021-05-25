@@ -1,8 +1,7 @@
 import getIn from 'get-value';
 import setIn from 'set-value';
 
-import {Form as EnonicForm} from 'semantic-ui-react-form/Form';
-import {Input as EnonicInput} from 'semantic-ui-react-form/inputs/Input';
+import {Form} from 'semantic-ui-react';
 
 import {Hits} from './search/Hits';
 
@@ -12,80 +11,89 @@ import {Hits} from './search/Hits';
 
 export function Search(props) {
 	const {
-		collectionOptions = [],
-		thesaurusOptions = [],
+		//collectionOptions = [],
+		interfaceName = 'default',
+		//thesaurusOptions = [],
 		servicesBaseUrl
 	} = props;
+	//console.debug('Search interfaceName', interfaceName);
 
-	const [state, setState] = React.useState({
-		cache: {},
-		searchString: props.searchString || '',
-		interfaceName: props.interfaceName || 'default'
+	const [boolOnChange, setBoolOnChange] = React.useState(false);
+	//console.debug('Search boolOnChange', boolOnChange);
+
+	const [loading, setLoading] = React.useState(false);
+	//console.debug('Search loading', loading);
+
+	const [searchString, setSearchString] = React.useState(props.searchString || '');
+	//console.debug('Search searchString', searchString);
+
+	const [cache, setCache] = React.useState({});
+	//console.debug('Search cache', cache);
+
+	const [result, setResult] = React.useState({
+		count: 0,
+		hits: [],
+		total: 0
 	});
+	//console.debug('Search result', result);
 
-	const {
-		cache,
-		interfaceName,
-		searchString
-	} = state;
-	//console.debug('Search interfaceName', interfaceName, 'searchString', searchString, 'cache', cache);
-
-	function search({
-		searchString
-	} = {}) {
-		if(!interfaceName || !searchString) {
-			setState(prev => {
-				const deref = JSON.parse(JSON.stringify(prev));
-				deref.searchString = searchString;
-				return deref;
-			})
+	function search(ss) {
+		const cachedResult = getIn(cache, `${interfaceName}.${ss}`);
+		if (cachedResult) {
+			setResult(cachedResult);
 			return;
 		}
-		const uri = `${servicesBaseUrl}/search?interface=${interfaceName}&name=searchString&searchString=${searchString}`;
+		setLoading(true);
+		const uri = `${servicesBaseUrl}/search?interface=${interfaceName}&name=searchString&searchString=${ss}`;
 		//console.debug(uri);
 		fetch(uri)
 			.then(response => response.json())
-			.then(data => setState(prev => {
-				const deref = JSON.parse(JSON.stringify(prev));
-				setIn(deref, `cache.${interfaceName}.${searchString}`, data);
-				deref.searchString = searchString;
-				return deref;
-			}));
+			.then(aResult => {
+				setCache(prev => {
+					const deref = JSON.parse(JSON.stringify(prev));
+					setIn(deref, `${interfaceName}.${ss}`, aResult);
+					return deref;
+				});
+				setResult(aResult);
+				setLoading(false);
+			});
 	}
 
-	React.useEffect(() => search({searchString}), []);
+	React.useEffect(() => search(searchString), []);
 
-	//const data = searchString && cache[interfaceName] && cache[interfaceName][searchString];
-	const data = getIn(cache, `${interfaceName}.${searchString}`);
-	const hits = data ? data.hits : [];
-	//const synonyms = data && data.synonymsObj;
-	const loading = searchString && !data;
-	/*console.debug('Search', {
-		//collections,
-		hits,
-		loading//,
-		//thesauri
-	});*/
+	// NOTE: If you hold a key down, onKeyDown and onKeyPress happens multiple times!
 
 	return <>
-		<EnonicForm
-			initialValues={{
-				searchString
-			}}
-			onChange={({searchString}) => {
-				//console.debug('onChange searchString', searchString);
-				search({searchString});
-			}}
-		>
-			<EnonicInput
-				fluid
-				icon='search'
-				loading={false}
-				path='searchString'
-			/>
-		</EnonicForm>
+		<Form>
+			<Form.Group widths='equal'>
+				<Form.Input
+					fluid
+					icon='search'
+					loading={false}
+					onKeyUp={(event) => {
+						//console.debug('onKeyUp event.which',event.which);
+						if(event.which == 10 || event.which == 13) {
+							//console.debug('onKeyUp searchString',searchString);
+							search(searchString);
+						}
+					}}
+					onChange={(ignored,{value}) => {
+						//console.debug('onChange value',value);
+						setSearchString(value);
+						if (boolOnChange) {
+							search(value);
+						}
+					}}
+				/>
+				<Form.Checkbox
+					checked={boolOnChange}
+					label='On change?'
+					onChange={(ignored,{checked})=>setBoolOnChange(checked)}
+				/>
+			</Form.Group>
+		</Form>
 		<Hits
-			hits={hits}
+			hits={result.hits}
 			loading={loading}
 		/>
 	</>;

@@ -5,9 +5,9 @@ import {Header, List} from 'semantic-ui-react';
 //import {toStr} from '../utils/toStr';
 
 
-const forceMap = (str, fn) => {
+/*const forceMap = (str, fn) => {
 	return (Array.isArray(str) ? str : [str]).map(fn);
-}
+}*/
 
 
 export const Hits = ({
@@ -32,10 +32,10 @@ export const Hits = ({
 			hits.map(({
 				text,
 				title,
-				href: uri,
-				source,
-				informationType,
-				language
+				href: uri//,
+				//source,
+				//informationType,
+				//language
 			}, index) => <List.Item key={index}>
 				<a href={uri}>
 					<Header>{ReactHtmlParser(title)}</Header>
@@ -53,4 +53,4 @@ export const Hits = ({
 			</List.Item>)
 		}
 	</List>;
-} // Hits
+}; // Hits
