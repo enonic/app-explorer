@@ -218,8 +218,12 @@ export function run() {
 			denyDelete,
 			denyValues,
 			//displayName,
+			fieldType = 'string',
+			indexConfig = 'type',
+			inResults = true,
 			key,
-			inResults = true
+			max = 0,
+			min = 0
 		}) => {
 			progress.setInfo(`Creating default field ${key}`).report();
 			const params = field({
@@ -232,8 +236,12 @@ export function run() {
 				denyDelete,
 				denyValues,
 				//displayName,
+				fieldType,
+				indexConfig,
+				inResults,
 				key,
-				inResults
+				max,
+				min
 			});
 			params.__connection = writeConnection; // eslint-disable-line no-underscore-dangle
 			//log.info(toStr({params}));

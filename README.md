@@ -222,6 +222,9 @@ app-explorer
 * Remove field displayName
 * Add field min and max occurrences
 * Add more field value types
+* Upgrade to lib-explorer-3.14.3
+  * Use document/createOrUpdate in Collector.persist
+  * Add object/isObject function
 * Upgrade to lib-explorer-3.14.2
   * Fix import paths
 * Upgrade to lib-explorer-3.14.1
