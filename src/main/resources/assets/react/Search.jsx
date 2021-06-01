@@ -38,6 +38,14 @@ export function Search(props) {
 	//console.debug('Search result', result);
 
 	function search(ss) {
+		if(!ss) {
+			setResult({
+				count: 0,
+				hits: [],
+				total: 0
+			});
+			return;
+		}
 		const cachedResult = getIn(cache, `${interfaceName}.${ss}`);
 		if (cachedResult) {
 			setResult(cachedResult);
