@@ -38,10 +38,14 @@ export const queryApiKeys = {
 		//log.info(`sort:${sort}`);
 		//log.info(`start:${start}`); // start is ignored when count -1
 
-		const filters = {};
+		const filters = addFilter({
+			clause: 'should',
+			filter: hasValue('_nodeType', [NT_API_KEY])
+		});
 		const queryParams = {
 			count,
 			filters: addFilter({
+				clause: 'should',
 				filters,
 				filter: hasValue('type', [NT_API_KEY])
 			}),
