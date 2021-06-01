@@ -120,11 +120,13 @@ export function htmlResponse({
 	queryCollectors({
 		connection: connect({principals: PRINCIPAL_EXPLORER_READ})
 	}).hits.forEach(({
-		_name: collectorId,
+		//_name: collectorId,
 		appName,
+		collectTaskName,
 		componentPath,
 		configAssetPath
 	}) => {
+		const collectorId = `${appName}:${collectTaskName}`;
 		collectorsAppToUri[collectorId] = assetUrl({
 			application: appName,
 			path: configAssetPath

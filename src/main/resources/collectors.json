@@ -1,0 +1,6 @@
+[{
+	"componentPath": "window.LibWebCrawler.Collector",
+	"configAssetPath": "react/WebCrawler.esm.js",
+	"displayName": "Web crawler",
+	"taskName": "webcrawl"
+}]

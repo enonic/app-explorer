@@ -20,12 +20,17 @@ const COLLECTOR_OBJECT_TYPE = createObjectType({
 	name: 'Collector',
 	//description:
 	fields: {
-		_id: { type: nonNull(GraphQLString) },
-		_name: { type: nonNull(GraphQLString) },
-		_nodeType: { type: GraphQLString }, // TODO nonNull?
-		_path: { type: nonNull(GraphQLString) },
+
+		// TODO: These can be null until removed
+		// We're not registering collectors as nodes anymore.
+		//_id: { type: (GraphQLString) },
+		//_name: { type: (GraphQLString) },
+		//_nodeType: { type: GraphQLString },
+		//_path: { type: (GraphQLString) },
+
 		appName: { type: nonNull(GraphQLString) },
 		collectTaskName: { type: nonNull(GraphQLString) },
+		componentPath: { type: nonNull(GraphQLString) },
 		configAssetPath: { type: nonNull(GraphQLString) },
 		displayName: { type: nonNull(GraphQLString) }//,
 		//type: { type: nonNull(GraphQLString) }
@@ -37,29 +42,7 @@ export const queryCollectorsResolver = () => {
 	const collectorsReq = query({
 		connection: connect({ principals: [PRINCIPAL_EXPLORER_READ] })
 	});
-	//log.info(`collectorsReq:${toStr(collectorsReq)}`);
-	collectorsReq.hits = collectorsReq.hits.map(({
-		_id,
-		_name,
-		_nodeType,
-		_path,
-		appName,
-		collectTaskName,
-		configAssetPath,
-		displayName//,
-		//type
-	}) => ({
-		_id,
-		_name,
-		_nodeType,
-		_path,
-		appName,
-		collectTaskName,
-		configAssetPath,
-		displayName//,
-		//type
-	}));
-	//log.info(`mapped collectorsReq:${toStr(collectorsReq)}`);
+	//log.debug(`collectorsReq:${toStr({collectorsReq})}`);
 	return collectorsReq;
 }; // queryCollectorsResolver
 
@@ -90,10 +73,10 @@ export const queryCollectors = {
 		total
 		count
 		hits {
-			_id
-			_name
-			_nodeType
-			_path
+			#_id
+			#_name
+			#_nodeType
+			#_path
 			appName
 			collectTaskName
 			configAssetPath

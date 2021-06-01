@@ -47,10 +47,10 @@ const COLLECTORS_GQL = `queryCollectors {
 	total
 	count
 	hits {
-		_id
-		_name
+		#_id
+		#_name
 		#_nodeType
-		_path
+		#_path
 		appName
 		collectTaskName
 		configAssetPath
@@ -233,12 +233,14 @@ export function Collections(props) {
 	//console.debug('queryCollectorsGraph', queryCollectorsGraph);
 	let collectorOptions = queryCollectorsGraph.hits
 		? queryCollectorsGraph.hits.map(({
-			_name: key,
+			appName,
+			collectTaskName,
+			//_name: key,
 			displayName: text
 		}) => ({
-			key,
+			key: `${appName}:${collectTaskName}`,
 			text,
-			value: key
+			value: `${appName}:${collectTaskName}`
 		}))
 		: [];
 	//console.debug('collectorOptions', collectorOptions);

@@ -1,5 +1,5 @@
 //import {toStr} from '/lib/util';
-import {forceArray} from '/lib/util/data';
+//import {forceArray} from '/lib/util/data';
 import {getUser} from '/lib/xp/auth';
 import {sanitize} from '/lib/xp/common';
 import {send as sendEvent} from '/lib/xp/event';
@@ -11,7 +11,7 @@ import {
 } from '/lib/explorer/model/2/constants';
 import {collection} from '/lib/explorer/model/2/nodeTypes/collection';
 import {connect} from '/lib/explorer/repo/connect';
-import {hash} from '/lib/explorer/string/hash';
+//import {hash} from '/lib/explorer/string/hash';
 
 
 export function post({
@@ -87,13 +87,15 @@ export function post({
 
 			if (modifiedNode) {
 				body.name = modifiedNode._name;
+				const collectors = getCollectors({
+					connection: writeConnection
+				});
+				//log.debug(`collectors:${toStr({collectors})}`);
 				const event = {
 					type: `${app.name}.reschedule`,
 					distributed: true, // Change may happen on admin node, while crawl node needs the reschedule
 					data: {
-						collectors: getCollectors({
-							connection: writeConnection
-						}),
+						collectors,
 						modifiedNode,
 						oldNode
 					}

@@ -16,7 +16,10 @@ import {
 	PRINCIPAL_EXPLORER_WRITE,
 	REPO_ID_EXPLORER
 } from '/lib/explorer/model/2/constants';
-import {register, unregister} from '/lib/explorer/collector';
+import {
+	unregister
+} from '/lib/explorer/collector';
+
 import {runAsSu} from '/lib/explorer/runAsSu';
 import {connect} from '/lib/explorer/repo/connect';
 import {remove} from '/lib/explorer/node/remove';
@@ -39,31 +42,34 @@ listener({
 	callback: (/*event*/) => {
 		//log.info(`Received event ${toStr(event)}`);
 		if (isMaster()) {
-			register({
-				appName: app.name,
-				collectTaskName: COLLECT_TASK_NAME_WEBCRAWL,
-				componentPath: 'window.LibWebCrawler.Collector',
-				configAssetPath: 'react/WebCrawler.esm.js',
-				displayName: 'Web crawler'
-			});
 			listener({
 				type: `custom.${EVENT_COLLECTOR_UNREGISTER}`,
 				localOnly: true, // Only listen to local event? Yes
 				callback: (event) => {
-					log.info(`Received event ${toStr(event)}`);
+					log.debug(`Received event ${toStr(event)}`);
 					const {collectorId} = event.data;
 					if (collectorId) {
-						log.info(`Trying to remove collectorId ${collectorId}`);
-						return remove({
-							connection: connect({
-								principals: [PRINCIPAL_EXPLORER_WRITE]
-							}),
-							_parentPath: '/collectors',
-							_name: collectorId
+						const writeConnection = connect({
+							principals: [PRINCIPAL_EXPLORER_WRITE]
 						});
+						if (writeConnection.exists(`/collectors/${collectorId}`)) {
+							log.debug(`Trying to remove old type collector registration collectorId ${collectorId}`);
+							return remove({
+								connection: writeConnection,
+								_parentPath: '/collectors',
+								_name: collectorId
+							});
+						}
 					}
 				} // callback
 			}); // listener
+			unregister({
+				appName: app.name,
+				collectTaskName: COLLECT_TASK_NAME_WEBCRAWL//,
+				//componentPath: 'window.LibWebCrawler.Collector',
+				//configAssetPath: 'react/WebCrawler.esm.js',
+				//displayName: 'Web crawler'
+			});
 		} // isMaster
 
 		const cron = app.config.cron === 'true';
@@ -75,10 +81,11 @@ listener({
 					repoId: REPO_ID_EXPLORER,
 					principals:[PRINCIPAL_EXPLORER_READ]
 				});
+
 				const collectors = getCollectors({
 					connection: explorerRepoReadConnection
 				});
-				//log.info(toStr({collectors}));
+				//log.debug(`collectors:${toStr({collectors})}`);
 
 				const collectionsRes = query({
 					connection: explorerRepoReadConnection,
@@ -87,10 +94,12 @@ listener({
 					})
 				});
 				//log.info(toStr({collectionsRes})); // huge
+
 				collectionsRes.hits.forEach(node => reschedule({
 					collectors,
 					node
 				}));
+
 				/*const cronList = listJobs();
 				log.debug(`cronList:${toStr({cronList})}`);
 				cronList.jobs.forEach(({name}) => {
@@ -123,10 +132,3 @@ if (isMaster()) {
 		name: 'init'
 	});
 } // if isMaster
-
-__.disposer(() => {
-	unregister({
-		appName: app.name,
-		collectTaskName: COLLECT_TASK_NAME_WEBCRAWL
-	});
-});
