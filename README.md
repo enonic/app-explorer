@@ -222,6 +222,8 @@ app-explorer
 * Remove field displayName
 * Add field min and max occurrences
 * Add more field value types
+* Upgrade to lib-explorer-3.14.2
+  * Fix import paths
 * Upgrade to lib-explorer-3.14.1
   * Temporary support for both old and new collectors
   * Deprecate collector/register in favour of src/main/resources/collectors.json
