@@ -221,6 +221,15 @@ app-explorer
 * Remove field displayName
 * Add field min and max occurrences
 * Add more field value types
+* Upgrade to lib-explorer-3.14.1
+  * Temporary support for both old and new collectors
+  * Deprecate collector/register in favour of src/main/resources/collectors.json
+* Upgrade to lib-explorer-3.14.0
+  * Add collector/list function
+* Upgrade to lib-explorer-3.13.1
+  * Return application/list key as string
+* Upgrade to lib-explorer-3.13.0
+  * Add application/list function
 * Upgrade to lib-explorer-3.12.1
   * Sort fields by key
   * DEFAULT_INTERFACE_NAME
