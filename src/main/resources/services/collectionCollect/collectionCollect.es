@@ -52,7 +52,7 @@ export function post({
 				configJson: incomingConfigJson
 			}
 		} = collectionNode;
-		DEBUG && log.info(`currentCollectorId:${currentCollectorId} incomingConfigJson:${toStr(incomingConfigJson)}`);
+		//log.debug(`currentCollectorId:${currentCollectorId} incomingConfigJson:${toStr(incomingConfigJson)}`);
 
 		const config = incomingConfigJson
 			? JSON.parse(incomingConfigJson)
@@ -62,7 +62,6 @@ export function post({
 		const collector = queryCollectors({
 			connection: readConnection
 		}).hits.map(({
-			_name: collectorId,
 			appName,
 			displayName,
 			collectTaskName: taskName,
@@ -70,7 +69,7 @@ export function post({
 		}) => {
 			return {
 				application: appName,
-				collectorId,
+				collectorId: `${appName}:${taskName}`,
 				displayName,
 				taskName,
 				uri: assetUrl({
@@ -79,7 +78,7 @@ export function post({
 				})
 			};
 		}).filter(({collectorId}) => collectorId === currentCollectorId)[0];
-		DEBUG && log.info(`collector:${toStr({collector})}`);
+		//log.debug(`collector:${toStr({collector})}`);
 
 		if (resume === 'true') { // Surgeon specific
 			config.resume = true;
