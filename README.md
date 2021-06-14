@@ -196,6 +196,8 @@ app-explorer
 
 ### 1.5.0-SNAPSHOT
 
+* Remove filters on SYSTEM_FIELDS from interface nodes
+* Remove SYSTEM_FIELDS from explorer repo
 * Polyfill Array.flat
 * Include collectors.json instead of registering collectors
 * Search by default on enter, with the option of "On change?"
