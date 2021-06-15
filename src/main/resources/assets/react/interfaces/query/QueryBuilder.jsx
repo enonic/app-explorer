@@ -32,8 +32,17 @@ export function QueryBuilder(props) {
 		value = getIn(context.values, path)
 	} = props;
 	//console.debug('QueryBuilder path', path, 'value', value);
+
+	//console.debug('QueryBuilder fieldsObj', fieldsObj);
+	const expandedFieldsObj = JSON.parse(JSON.stringify(fieldsObj));
+	expandedFieldsObj['_allText'] = {
+		text: '_allText'
+	};
+	//console.debug('QueryBuilder expandedFieldsObj', expandedFieldsObj);
+
 	const type = getIn(value, 'type');
 	//console.debug('QueryBuilder type', type);
+
 	const paramsPath = `${path}.params`;
 	const fragment = <>
 		{parentPath && <DeleteItemButton
@@ -129,14 +138,14 @@ export function QueryBuilder(props) {
 		/>
 		{['fulltext', 'ngram', 'synonyms'].includes(type) && <Fulltext
 			disabled={disabled}
-			fieldsObj={fieldsObj}
+			fieldsObj={expandedFieldsObj}
 			path={paramsPath}
 			type={type}
 			thesauriOptions={thesauriOptions}
 		/>}
 		{type === 'group' && <Logic
 			disabled={disabled}
-			fieldsObj={fieldsObj}
+			fieldsObj={expandedFieldsObj}
 			path={paramsPath}
 			thesauriOptions={thesauriOptions}
 		/>}

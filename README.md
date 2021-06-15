@@ -196,6 +196,7 @@ app-explorer
 
 ### 1.5.0-SNAPSHOT
 
+* _allText can now be selected under fulltext, ngram and synonyms in queryBuilder
 * Disable should filters in interfaces until version 2.0.0
 * Deny creation of field starting with document_metadata
 * Remove SYSTEM_FIELDS from explorer repo
