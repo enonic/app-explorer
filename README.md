@@ -194,6 +194,10 @@ app-explorer
 
 ## Changelog
 
+### 2.0.0-SNAPSHOT
+
+* TODO: Enable should filters in interfaces again
+
 ### 1.5.0-SNAPSHOT
 
 * Add values (true and false) for the system field document_metadata.valid
