@@ -181,30 +181,9 @@ export function run() {
 		} // if model < 0
 
 		//──────────────────────────────────────────────────────────────────────
-		// Model 1: Remove "system" fields
+		// Model 1: Move type -> _nodeType
 		//──────────────────────────────────────────────────────────────────────
 		if (getModel() < 1) {
-			progress.addItems(1);
-			progress.setInfo(`Removing "system" fields from explorer repo`).report();
-			const fieldsPathsToDelete = SYSTEM_FIELDS.map(({_name}) => `${PATH_FIELDS}/${_name}`);
-			//log.debug(`fieldsPathsToDelete:${toStr(fieldsPathsToDelete)}`);
-
-			//const deleteRes =
-			writeConnection.delete(...fieldsPathsToDelete);
-			//log.debug(`deleteRes:${toStr(deleteRes)}`);
-
-			writeConnection.refresh();
-			setModel({
-				connection: writeConnection,
-				version: 1
-			});
-			progress.finishItem();
-		} // if model < 1
-
-		//──────────────────────────────────────────────────────────────────────
-		// Model 2: Move type -> _nodeType
-		//──────────────────────────────────────────────────────────────────────
-		if (getModel() < 2) {
 			progress.setInfo(`Finding nodes where _nodeType = default and node.type exists`).report();
 			// WARNING Does not find nodes there _indexConfig is none!
 			const nodesWithTypeQueryParams = {
@@ -243,14 +222,14 @@ export function run() {
 			writeConnection.refresh();
 			setModel({
 				connection: writeConnection,
-				version: 2
+				version: 1
 			});
-		} // if model < 2
+		} // if model < 1
 
 		//──────────────────────────────────────────────────────────────────────
-		// Model 3: Nodes where _indexConfig.default = none
+		// Model 2: Nodes where _indexConfig.default = none
 		//──────────────────────────────────────────────────────────────────────
-		if (getModel() < 3) {
+		if (getModel() < 2) {
 			progress.setInfo(`Finding nodes where _nodeType still is default and _indexConfig.default = none`).report();
 			const nodesWithIndexDefaultNoneQueryParams = {
 				count: -1,
@@ -309,14 +288,14 @@ export function run() {
 			writeConnection.refresh();
 			setModel({
 				connection: writeConnection,
-				version: 3
+				version: 2
 			});
-		} // if model < 3
+		} // if model < 2
 
 		//──────────────────────────────────────────────────────────────────────
-		// Model 4: Removing displayName from all fields
+		// Model 3: Removing displayName from all fields
 		//──────────────────────────────────────────────────────────────────────
-		if (getModel() < 4) {
+		if (getModel() < 3) {
 			progress.setInfo(`Finding fields with displayName`).report();
 			const fieldsWithDisplayNameQueryParams = {
 				count: -1,
@@ -367,9 +346,9 @@ export function run() {
 			writeConnection.refresh();
 			setModel({
 				connection: writeConnection,
-				version: 4
+				version: 3
 			});
-		} // if model < 4
+		} // if model < 3
 		//──────────────────────────────────────────────────────────────────────
 
 		/*progress.setInfo('Creating fieldValue Document for field _nodeType').report();
@@ -403,9 +382,9 @@ export function run() {
 		progress.finishItem();*/
 
 		//──────────────────────────────────────────────────────────────────────
-		// Model 5: Creating/updating default interface
+		// Model 4: Creating/updating default interface
 		//──────────────────────────────────────────────────────────────────────
-		if (getModel() < 5) {
+		if (getModel() < 4) {
 			progress.setInfo('Creating/updating default interface').report();
 
 			const existingInterfaceNode = getInterface({
@@ -451,14 +430,14 @@ export function run() {
 			progress.finishItem();
 			setModel({
 				connection: writeConnection,
-				version: 5
+				version: 4
 			});
-		} // if model < 5
+		} // if model < 4
 
 		//──────────────────────────────────────────────────────────────────────
-		// Model 6: Remove filters on SYSTEM_FIELDS from interface nodes
+		// Model 5: Remove filters on SYSTEM_FIELDS from interface nodes
 		//──────────────────────────────────────────────────────────────────────
-		if (getModel() < 6) {
+		if (getModel() < 5) {
 			progress.addItems(1);
 			progress.setInfo('Remove filters on SYSTEM_FIELDS from interface nodes').report();
 			const allInterfaceNodesQueryParams = {
@@ -550,6 +529,27 @@ export function run() {
 				} // if filters
 			}); // allInterfaceNodes.forEach
 
+			setModel({
+				connection: writeConnection,
+				version: 5
+			});
+			progress.finishItem();
+		} // if model < 5
+
+		//──────────────────────────────────────────────────────────────────────
+		// Model 6: Remove "system" fields
+		//──────────────────────────────────────────────────────────────────────
+		if (getModel() < 6) {
+			progress.addItems(1);
+			progress.setInfo(`Removing "system" fields from explorer repo`).report();
+			const fieldsPathsToDelete = SYSTEM_FIELDS.map(({_name}) => `${PATH_FIELDS}/${_name}`);
+			//log.debug(`fieldsPathsToDelete:${toStr(fieldsPathsToDelete)}`);
+
+			//const deleteRes =
+			writeConnection.delete(...fieldsPathsToDelete);
+			//log.debug(`deleteRes:${toStr(deleteRes)}`);
+
+			writeConnection.refresh();
 			setModel({
 				connection: writeConnection,
 				version: 6
