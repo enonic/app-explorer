@@ -33,7 +33,6 @@ export function QueryFilterClause(props) {
 		path = parentPath ? `${parentPath}.${name}` : name,
 		value = getIn(context, `values.${path}`)
 	} = props;
-	//console.debug('QueryFilterClause fieldsObj', fieldsObj);
 	//console.debug('QueryFilterClause id', id, 'name', name, 'path', path, 'value', value);
 	if(!(value && Array.isArray(value) && value.length)) {
 		return <Form.Field id={id}>
@@ -50,8 +49,29 @@ export function QueryFilterClause(props) {
 			><Icon color='green' name='plus'/> Add {name} filter(s)</SetValueButton>
 		</Form.Field>;
 	}
-	const fieldOptions = fieldObjToFieldArr(fieldsObj);
+
+	//console.debug('QueryFilterClause fieldsObj', fieldsObj);
+	const expandedFieldsObj = JSON.parse(JSON.stringify(fieldsObj));
+	expandedFieldsObj['document_metadata.valid'] = {
+		text: 'document_metadata.valid',
+		values: {
+			true: { // Can't use boolean as Object key.
+				key: 'true',
+				text: 'true',
+				value: true
+			},
+			false: { // Can't use boolean as Object key.
+				key: 'false',
+				text: 'false',
+				value: false
+			}
+		}
+	};
+	//console.debug('QueryFilterClause expandedFieldsObj', expandedFieldsObj);
+
+	const fieldOptions = fieldObjToFieldArr(expandedFieldsObj);
 	//console.debug('QueryFilterClause fieldOptions', fieldOptions);
+
 	return <List
 		path={path}
 		render={(filtersArray) => {
@@ -99,11 +119,11 @@ export function QueryFilterClause(props) {
 								}
 							</Table.Cell>
 							<Table.Cell>
-								{filter === 'hasValue' && field && fieldsObj[field] && fieldsObj[field].values && <Dropdown
+								{filter === 'hasValue' && field && expandedFieldsObj[field] && expandedFieldsObj[field].values && <Dropdown
 									disabled={disabled}
 									multiple={true}
 									path={valuesPath}
-									options={fieldObjToFieldArr(fieldsObj[field].values) || []}
+									options={fieldObjToFieldArr(expandedFieldsObj[field].values) || []}
 									value={fieldValues}
 								/>}
 								{filter === 'ids' && <List
