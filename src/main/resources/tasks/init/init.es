@@ -26,7 +26,7 @@ import {
 	folder,
 	interfaceModel
 } from '/lib/explorer/model/2/index';
-import {getModel} from '/lib/explorer/model/getModel';
+import {isModelLessThan} from '/lib/explorer/model/isModelLessThan';
 import {setModel} from '/lib/explorer/model/setModel';
 import {node as Node} from '/lib/explorer/model/2/nodeTypes/node';
 import {create} from '/lib/explorer/node/create';
@@ -104,7 +104,10 @@ export function run() {
 		//──────────────────────────────────────────────────────────────────────
 		// Model 0: Initial data
 		//──────────────────────────────────────────────────────────────────────
-		if (getModel() < 0) {
+		if (isModelLessThan({
+			connection: writeConnection,
+			version: 0
+		})) {
 			progress.addItems(FOLDERS.length);
 			FOLDERS.forEach((_name) => {
 				progress.setInfo(`Creating folder ${_name}`).report();
@@ -202,7 +205,10 @@ export function run() {
 		//──────────────────────────────────────────────────────────────────────
 		// Model 1: Move type -> _nodeType
 		//──────────────────────────────────────────────────────────────────────
-		if (getModel() < 1) {
+		if (isModelLessThan({
+			connection: writeConnection,
+			version: 1
+		})) {
 			progress.addItems(1);
 			progress.setInfo(`Finding nodes where _nodeType = default and node.type exists`).report();
 			// WARNING Does not find nodes there _indexConfig is none!
@@ -249,7 +255,10 @@ export function run() {
 		//──────────────────────────────────────────────────────────────────────
 		// Model 2: Nodes where _indexConfig.default = none
 		//──────────────────────────────────────────────────────────────────────
-		if (getModel() < 2) {
+		if (isModelLessThan({
+			connection: writeConnection,
+			version: 2
+		})) {
 			progress.addItems(1);
 			progress.setInfo(`Finding nodes where _nodeType still is default and _indexConfig.default = none`).report();
 			const nodesWithIndexDefaultNoneQueryParams = {
@@ -316,7 +325,10 @@ export function run() {
 		//──────────────────────────────────────────────────────────────────────
 		// Model 3: Removing displayName from all fields
 		//──────────────────────────────────────────────────────────────────────
-		if (getModel() < 3) {
+		if (isModelLessThan({
+			connection: writeConnection,
+			version: 3
+		})) {
 			progress.addItems(1);
 			progress.setInfo(`Finding fields with displayName`).report();
 			const fieldsWithDisplayNameQueryParams = {
@@ -375,7 +387,10 @@ export function run() {
 		//──────────────────────────────────────────────────────────────────────
 		// Model 4: Creating/updating default interface
 		//──────────────────────────────────────────────────────────────────────
-		if (getModel() < 4) {
+		if (isModelLessThan({
+			connection: writeConnection,
+			version: 4
+		})) {
 			progress.addItems(1);
 			progress.setInfo('Creating/updating default interface').report();
 
@@ -429,7 +444,10 @@ export function run() {
 		//──────────────────────────────────────────────────────────────────────
 		// Model 5: Remove filters on SYSTEM_FIELDS from interface nodes
 		//──────────────────────────────────────────────────────────────────────
-		if (getModel() < 5) {
+		if (isModelLessThan({
+			connection: writeConnection,
+			version: 5
+		})) {
 			progress.addItems(1);
 			progress.setInfo('Remove filters on SYSTEM_FIELDS from interface nodes').report();
 			const allInterfaceNodesQueryParams = {
@@ -531,7 +549,10 @@ export function run() {
 		//──────────────────────────────────────────────────────────────────────
 		// Model 6: Remove "system" fields
 		//──────────────────────────────────────────────────────────────────────
-		if (getModel() < 6) {
+		if (isModelLessThan({
+			connection: writeConnection,
+			version: 6
+		})) {
 			progress.addItems(1);
 			progress.setInfo(`Removing "system" fields from explorer repo`).report();
 			const fieldsPathsToDelete = SYSTEM_FIELDS.map(({_name}) => `${PATH_FIELDS}/${_name}`);
