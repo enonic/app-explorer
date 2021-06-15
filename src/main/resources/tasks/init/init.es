@@ -55,10 +55,10 @@ export function run() {
 		const progress = new Progress({
 			info: 'Task started',
 			//sleepMsAfterItem: 1000, // DEBUG
-			total: ROLES.length + USERS.length + REPOSITORIES.length + READWRITE_FIELDS.length + 4
-			// Field type document
-			// Default interface
-			// notificationsData
+			total: ROLES.length
+				+ USERS.length
+				+ REPOSITORIES.length
+				+ READWRITE_FIELDS.length
 		}).report();
 
 		ROLES.forEach(({name, displayName, description}) => {
@@ -105,13 +105,16 @@ export function run() {
 		// Model 0: Initial data
 		//──────────────────────────────────────────────────────────────────────
 		if (getModel() < 0) {
+			progress.addItems(FOLDERS.length);
 			FOLDERS.forEach((_name) => {
+				progress.setInfo(`Creating folder ${_name}`).report();
 				ignoreErrors(() => {
 					create(folder({
 						__connection: writeConnection,
 						_name
 					}));
 				});
+				progress.finishItem();
 			});
 			// Ok, lets think worst case scenarios about fields:
 			//
@@ -174,6 +177,22 @@ export function run() {
 				progress.finishItem();
 			}); // DEFAULT_FIELDS.forEach
 			writeConnection.refresh();
+
+			progress.addItems(1);
+			progress.setInfo('Creating notificationsData').report();
+			const notificationsData = Node({
+				__connection: writeConnection,
+				_name: 'notifications',
+				emails:[]
+			});
+			//log.info(toStr({notificationsData}));
+			ignoreErrors(() => {
+				//const notificationsNode =
+				create(notificationsData);
+				//log.info(toStr({notificationsNode}));
+			});
+			progress.finishItem();
+
 			setModel({
 				connection: writeConnection,
 				version: 0
@@ -184,6 +203,7 @@ export function run() {
 		// Model 1: Move type -> _nodeType
 		//──────────────────────────────────────────────────────────────────────
 		if (getModel() < 1) {
+			progress.addItems(1);
 			progress.setInfo(`Finding nodes where _nodeType = default and node.type exists`).report();
 			// WARNING Does not find nodes there _indexConfig is none!
 			const nodesWithTypeQueryParams = {
@@ -230,6 +250,7 @@ export function run() {
 		// Model 2: Nodes where _indexConfig.default = none
 		//──────────────────────────────────────────────────────────────────────
 		if (getModel() < 2) {
+			progress.addItems(1);
 			progress.setInfo(`Finding nodes where _nodeType still is default and _indexConfig.default = none`).report();
 			const nodesWithIndexDefaultNoneQueryParams = {
 				count: -1,
@@ -296,6 +317,7 @@ export function run() {
 		// Model 3: Removing displayName from all fields
 		//──────────────────────────────────────────────────────────────────────
 		if (getModel() < 3) {
+			progress.addItems(1);
 			progress.setInfo(`Finding fields with displayName`).report();
 			const fieldsWithDisplayNameQueryParams = {
 				count: -1,
@@ -349,42 +371,12 @@ export function run() {
 				version: 3
 			});
 		} // if model < 3
-		//──────────────────────────────────────────────────────────────────────
-
-		/*progress.setInfo('Creating fieldValue Document for field _nodeType').report();
-		const existingNodeTypeFieldNode = getField({
-			connection: writeConnection,
-			_name: 'underscore-nodetype'
-		});
-		//log.debug(`existingNodeTypeFieldNode:${toStr({existingNodeTypeFieldNode})}`);
-
-		if (existingNodeTypeFieldNode) {
-			const paramsV = fieldValue({
-				displayName: 'Document',
-				field: 'underscore-nodetype', // _name not key
-				fieldReference: existingNodeTypeFieldNode._id,
-				value: NT_DOCUMENT
-			});
-			//log.debug(`paramsV:${toStr({paramsV})}`);
-			paramsV.__connection = writeConnection; // eslint-disable-line no-underscore-dangle
-			try {
-				//const user = getUser();
-				//log.debug(`user:${toStr({user})}`);
-				create(paramsV);
-			} catch (e) {
-				if (e.class.name !== 'com.enonic.xp.node.NodeAlreadyExistAtPathException') {
-					log.error(`${e.class.name} ${e.message}`, e);
-				}
-			}
-		} else {
-			log.error(`Field type not found! Cannot create field value ${NT_DOCUMENT}`);
-		}
-		progress.finishItem();*/
 
 		//──────────────────────────────────────────────────────────────────────
 		// Model 4: Creating/updating default interface
 		//──────────────────────────────────────────────────────────────────────
 		if (getModel() < 4) {
+			progress.addItems(1);
 			progress.setInfo('Creating/updating default interface').report();
 
 			const existingInterfaceNode = getInterface({
@@ -558,26 +550,6 @@ export function run() {
 		} // if model < 6
 
 		//──────────────────────────────────────────────────────────────────────
-		progress.setInfo('Creating notificationsData').report();
-		const notificationsData = Node({
-			__connection: writeConnection,
-			_name: 'notifications',
-			emails:[]
-		});
-		//log.info(toStr({notificationsData}));
-		ignoreErrors(() => {
-			//const notificationsNode =
-			create(notificationsData);
-			//log.info(toStr({notificationsNode}));
-		});
-		progress.finishItem();
-
-		/*writeConnection.modify({
-			key: '/',
-			editor: (node) => {
-				node.initialized = true;
-			}
-		});*/
 
 		progress.setInfo('Initialization complete :)').report();
 		const event = {
