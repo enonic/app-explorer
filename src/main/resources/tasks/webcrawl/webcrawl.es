@@ -83,9 +83,9 @@ const getAttributeValue = (node, name) => {
 	return undefined;
 };
 
-const textContent = node => node.text();
+//const textContent = node => node.text();
 const outerHTML = node => node.clone().wrap('<div>').parent().html();
-const innerHTML = node => node.html();
+//const innerHTML = node => node.html();
 
 
 export function run({
