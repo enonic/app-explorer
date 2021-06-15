@@ -201,6 +201,7 @@ app-explorer
 * Remove SYSTEM_FIELDS from explorer repo
 * Remove filters on SYSTEM_FIELDS from interface nodes
 * Polyfill Array.flat
+* Polyfill Number.isInteger
 * Include collectors.json instead of registering collectors
 * Search by default on enter, with the option of "On change?"
 * Disable all inputs and buttons when "editing" default interface
