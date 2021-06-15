@@ -17,6 +17,15 @@ import {CustomInstructionOptions} from './CustomInstructionOptions';
 import {EditValues} from './EditValues';
 
 
+function notDocumentMetaData(value) {
+	if (value === 'document_metadata') {
+		return "Can't be document_metadata";
+	} else if (value.startsWith('document_metadata.')) {
+		return "Can't start with document_metadata.";
+	}
+	return undefined;
+}
+
 function notStartWithUnderscore(value) {
 	return value.startsWith('_') ? "Can't start with underscore!" : undefined;
 }
@@ -29,7 +38,9 @@ function required(value) {
 const SCHEMA = {
 	fieldType: (value) => required(value),
 	instruction: (value) => required(value),
-	key: (value) => required(value) || notStartWithUnderscore(value)
+	key: (value) => required(value)
+		|| notStartWithUnderscore(value)
+		|| notDocumentMetaData(value)
 };
 
 

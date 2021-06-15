@@ -196,6 +196,7 @@ app-explorer
 
 ### 1.5.0-SNAPSHOT
 
+* Deny creation of field starting with document_metadata
 * Remove SYSTEM_FIELDS from explorer repo
 * Remove filters on SYSTEM_FIELDS from interface nodes
 * Polyfill Array.flat
