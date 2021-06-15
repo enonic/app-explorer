@@ -206,7 +206,7 @@ export function run({
 						_name: nodeName
 					});
 					const {uris} = node;
-					uris.Each(normalized => handleNormalizedUri(normalized));
+					uris.forEach(normalized => handleNormalizedUri(normalized));
 				} // exists
 			} else { // !resume
 				collector.taskProgressObj.info.message = `Processing ${uri}`;
