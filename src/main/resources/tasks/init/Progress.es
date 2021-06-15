@@ -21,13 +21,22 @@ export class Progress {
 		return this; // chainable
 	}*/
 
+	debug() {
+		log.debug(`[${this.current}/${this.total}] ${this.info}`);
+		return this; // chainable
+	}
+
+	info() {
+		log.info(`[${this.current}/${this.total}] ${this.info}`);
+		return this; // chainable
+	}
+
 	setInfo(info) {
 		this.info = info;
 		return this; // chainable
 	}
 
 	report() {
-		log.debug(`[${this.current}/${this.total}] ${this.info}`);
 		reportProgress({
 			current: this.current,
 			info: this.info,

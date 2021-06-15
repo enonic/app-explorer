@@ -42,35 +42,59 @@ import {forceArray} from '/lib/util/data';
 import {
 	addMembers,
 	createRole,
-	createUser/*,
+	createUser,
+	getPrincipal/*,
+	findPrincipals,
 	getUser*/
 } from '/lib/xp/auth';
+//import {sanitize} from '/lib/xp/common';
 import {send} from '/lib/xp/event';
 import {Progress} from './Progress';
 
+
 export const EVENT_INIT_COMPLETE = `${APP_EXPLORER}.init.complete`;
+
+// We what less noise on startup.
+// Let's report with info when something is actually done.
+// And report with debug when only investigating if there is something to do.
 
 export function run() {
 	runAsSu(() => {
 		const progress = new Progress({
 			info: 'Task started',
 			//sleepMsAfterItem: 1000, // DEBUG
-			total: ROLES.length
-				+ USERS.length
+			total: USERS.length
 				+ REPOSITORIES.length
 				+ READWRITE_FIELDS.length
 		}).report();
 
+		/*const principalsRes = findPrincipals({
+			//count: -1,
+			//idProvider: 'system', // nada
+			//name: sanitize(`${APP_EXPLORER}.admin`),
+			//searchText: sanitize(`${APP_EXPLORER}.`),
+			type: 'role'
+		});
+		log.debug(`principalsRes:${toStr(principalsRes)}`);*/
+
 		ROLES.forEach(({name, displayName, description}) => {
-			progress.setInfo(`Creating role ${displayName}`).report();
-			ignoreErrors(() => {
-				createRole({
-					name,
-					displayName,
-					description
-				});
-			});
+			progress.addItems(1);
+			progress.setInfo(`Checking for role ${displayName}`).report().debug();
+			const principal = getPrincipal(`role:${name}`);
+			//log.debug(`principal:${toStr(principal)}`);
 			progress.finishItem();
+			if(!principal) {
+				progress.addItems(1);
+				progress.setInfo(`Creating role ${displayName}`).report().info();
+				ignoreErrors(() => {
+					createRole({
+						name,
+						displayName,
+						description
+					});
+				});
+				progress.finishItem();
+			}
 		});
 
 		USERS.forEach(({name, displayName, idProvider, roles = []}) => {
