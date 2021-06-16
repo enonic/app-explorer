@@ -200,7 +200,6 @@ app-explorer
 
 ### 1.5.0-SNAPSHOT
 
-* TODO: BUG Collector status page is not working!
 * Less noise on startup
 * Add values (true and false) for the system field document_metadata.valid
 * _allText can now be selected under fulltext, ngram and synonyms in queryBuilder
