@@ -17,6 +17,7 @@ import {
 	REPO_ID_EXPLORER
 } from '/lib/explorer/model/2/constants';
 import {
+	register,
 	unregister
 } from '/lib/explorer/collector';
 
@@ -32,6 +33,14 @@ import {EVENT_INIT_COMPLETE} from './tasks/init/init';
 
 
 const COLLECT_TASK_NAME_WEBCRAWL = 'webcrawl';
+
+/*
+ On startup some data needs to be initialized.
+ Writing data only happens on the master node,
+ but when initialization is complete an event is sent to all the cluster nodes,
+  so the node with cron=true can do it's thing, and
+  so that a listener for unregister can be setup on the master.
+*/
 
 //──────────────────────────────────────────────────────────────────────────────
 // Main
@@ -63,12 +72,12 @@ listener({
 					}
 				} // callback
 			}); // listener
-			unregister({
+			register({
 				appName: app.name,
-				collectTaskName: COLLECT_TASK_NAME_WEBCRAWL//,
-				//componentPath: 'window.LibWebCrawler.Collector',
-				//configAssetPath: 'react/WebCrawler.esm.js',
-				//displayName: 'Web crawler'
+				collectTaskName: COLLECT_TASK_NAME_WEBCRAWL,
+				componentPath: 'window.LibWebCrawler.Collector',
+				configAssetPath: 'react/WebCrawler.esm.js',
+				displayName: 'Web crawler'
 			});
 		} // isMaster
 
@@ -132,3 +141,10 @@ if (isMaster()) {
 		name: 'init'
 	});
 } // if isMaster
+
+__.disposer(() => {
+	unregister({
+		appName: app.name,
+		collectTaskName: COLLECT_TASK_NAME_WEBCRAWL
+	});
+});
