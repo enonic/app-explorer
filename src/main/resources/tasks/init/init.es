@@ -610,7 +610,11 @@ export function run() {
 		progress.setInfo('Initialization complete :)').report().logInfo();
 		const event = {
 			type: EVENT_INIT_COMPLETE,
+
+			// We want to setup listeners for unregister on all nodes and
+			// this master node may not the be node with cron=true.
 			distributed: true,
+
 			data: {}
 		};
 		//log.info(`Sending event ${toStr(event)}`);
