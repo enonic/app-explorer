@@ -69,7 +69,6 @@ export function run() {
 			total: ROLES.length
 				+ USERS.length
 				+ REPOSITORIES.length
-				+ READWRITE_FIELDS.length
 		}).report();
 
 		/*const principalsRes = findPrincipals({
@@ -88,8 +87,7 @@ export function run() {
 			//log.debug(`principal:${toStr(principal)}`);
 			progress.finishItem();
 			if(!principal) {
-				progress.addItems(1);
-				progress.setInfo(`Creating role ${displayName}...`).report().logInfo();
+				progress.addItems(1).setInfo(`Creating role ${displayName}...`).report().logInfo();
 				ignoreErrors(() => {
 					createRole({
 						name,
@@ -108,8 +106,7 @@ export function run() {
 			//log.debug(`principal:${toStr(principal)}`);
 			progress.finishItem();
 			if(!principal) {
-				progress.addItems(1);
-				progress.setInfo(`Creating user ${displayName}...`).report().logInfo();
+				progress.addItems(1).setInfo(`Creating user ${displayName}...`).report().logInfo();
 				ignoreErrors(() => {
 					createUser({
 						idProvider,
@@ -129,7 +126,7 @@ export function run() {
 			//log.debug(`repo:${toStr(repo)}`);
 			progress.finishItem();
 			if (!repo) {
-				progress.setInfo(`Creating repository ${id}...`).report().logInfo();
+				progress.addItems(1).setInfo(`Creating repository ${id}...`).report().logInfo();
 				ignoreErrors(() => {
 					initRepo({
 						repoId: id,
@@ -185,6 +182,7 @@ export function run() {
 			// But are using an old version of app-explorer with Model 1.
 			// As long as the lib-explorer code is backwards compatible, this should not be an issue.
 
+			progress.addItems(READWRITE_FIELDS.length);
 			READWRITE_FIELDS.forEach(({
 				_name,
 				denyDelete, // TODO remove in 2.0?
@@ -252,8 +250,7 @@ export function run() {
 			connection: writeConnection,
 			version: 1
 		})) {
-			progress.addItems(1);
-			progress.setInfo(`Finding nodes where _nodeType = default and node.type exists...`).report().debug();
+			progress.addItems(1).setInfo(`Finding nodes where _nodeType = default and node.type exists...`).report().debug();
 			// WARNING Does not find nodes there _indexConfig is none!
 			const nodesWithTypeQueryParams = {
 				count: -1,
@@ -302,8 +299,7 @@ export function run() {
 			connection: writeConnection,
 			version: 2
 		})) {
-			progress.addItems(1);
-			progress.setInfo(`Finding nodes where _nodeType still is default and _indexConfig.default = none...`).report().debug();
+			progress.addItems(1).setInfo(`Finding nodes where _nodeType still is default and _indexConfig.default = none...`).report().debug();
 			const nodesWithIndexDefaultNoneQueryParams = {
 				count: -1,
 				filters: addFilter({
@@ -372,8 +368,7 @@ export function run() {
 			connection: writeConnection,
 			version: 3
 		})) {
-			progress.addItems(1);
-			progress.setInfo(`Finding fields with displayName...`).report().debug();
+			progress.addItems(1).setInfo(`Finding fields with displayName...`).report().debug();
 			const fieldsWithDisplayNameQueryParams = {
 				count: -1,
 				filters: {
@@ -434,8 +429,7 @@ export function run() {
 			connection: writeConnection,
 			version: 4
 		})) {
-			progress.addItems(1);
-			progress.setInfo('Creating/updating default interface...').report().logInfo();
+			progress.addItems(1).setInfo('Creating/updating default interface...').report().logInfo();
 
 			const existingInterfaceNode = getInterface({
 				connection: writeConnection,
@@ -491,8 +485,7 @@ export function run() {
 			connection: writeConnection,
 			version: 5
 		})) {
-			progress.addItems(1);
-			progress.setInfo('Remove filters on SYSTEM_FIELDS from interface nodes...').report().logInfo();
+			progress.addItems(1).setInfo('Remove filters on SYSTEM_FIELDS from interface nodes...').report().logInfo();
 			const allInterfaceNodesQueryParams = {
 				count: -1,
 				filters: {
@@ -596,8 +589,7 @@ export function run() {
 			connection: writeConnection,
 			version: 6
 		})) {
-			progress.addItems(1);
-			progress.setInfo(`Removing "system" fields from explorer repo...`).report().logInfo();
+			progress.addItems(1).setInfo(`Removing "system" fields from explorer repo...`).report().logInfo();
 			const fieldsPathsToDelete = SYSTEM_FIELDS.map(({_name}) => `${PATH_FIELDS}/${_name}`);
 			//log.debug(`fieldsPathsToDelete:${toStr(fieldsPathsToDelete)}`);
 
