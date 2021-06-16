@@ -48,7 +48,7 @@ export const queryCollectorsResolver = () => {
 
 
 export const queryCollectors = {
-	resolve: (env) => {
+	resolve: (/*env*/) => {
 		//log.info(`env:${toStr(env)}`);
 		return queryCollectorsResolver();
 	},

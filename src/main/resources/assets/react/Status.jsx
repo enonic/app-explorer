@@ -44,7 +44,7 @@ export function Status (props) {
 		fetch(`${servicesBaseUrl}/graphQL`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-  			body: JSON.stringify({ query: `{ queryTasks {
+			body: JSON.stringify({ query: `{ queryTasks {
 				application
 				description
 				id
@@ -60,7 +60,7 @@ export function Status (props) {
 			}}` })
 		})
 			.then(res => res.json())
-  			.then(res => {
+			.then(res => {
 				//console.log(res);
 				if (res && res.data && res.data.queryTasks) {
 					setTasks(res.data.queryTasks);
@@ -155,9 +155,9 @@ export function Status (props) {
 					} catch (e) {
 						// no-op
 					} // try...catch
-					return null
+					return null;
 				}).filter(x => x) // map tasks
-			}) // sortCollectors
+			}); // sortCollectors
 			return deref;
 		}); // setState
 	}, [tasks]); // Everytime the tasks array is changed
@@ -165,14 +165,14 @@ export function Status (props) {
 	const {
 		collectors,
 		column,
-		direction,
-		isLoading
+		direction//,
+		//isLoading
 	} = state;
 
 	useInterval(() => {
 		//websocket && websocket.readyState === 1 && websocket.send('tasks');
 		updateTasks();
-  	}, delay);
+	}, delay);
 
 	const sortGen = (c) => () => {
 		setState(prev => {
@@ -186,9 +186,9 @@ export function Status (props) {
 				collectors: prev.collectors,
 				column: deref.column,
 				direction: deref.direction
-			})
+			});
 			return deref;
-		})
+		});
 	}; // sortGen
 
 	return <>
@@ -331,9 +331,9 @@ export function Status (props) {
 			<Form.Field>
 				<Dropdown
 					fluid
-    				selection
+					selection
 					onChange={(ignored,{value}) => setDelay(value)}
-    				options={[{
+					options={[{
 						key: 1000,
 						text: 'second',
 						value: 1000
