@@ -58,16 +58,36 @@ export const queryTasks = {
 			name,
 			state
 		});
+		//log.info(`taskList:${toStr(taskList)}`);
+
+		/*{
+		    "description": "Collect",
+		    "id": "c4e62533-4853-4da2-998a-096cc3c783fb",
+		    "name": "com.enonic.app.explorer:webcrawl",
+		    "state": "RUNNING",
+		    "application": "com.enonic.app.explorer",
+		    "user": "user:system:su",
+		    "startTime": "2021-06-16T12:09:41.477186Z",
+		    "progress": {
+		        "info": "{\"name\":\"a-enonic-com\",\"message\":\"Processing https://www.enonic.com/\",\"startTime\":1623845381500,\"currentTime\":1623845382453,\"uri\":\"https://www.enonic.com/\"}",
+		        "current": 0,
+		        "total": 1
+		    }
+		}*/
 
 		if (onlyRegisteredCollectorTasks) {
 			const collectorsRes = queryCollectorsResolver();
 			//log.info(`collectorsRes:${toStr(collectorsRes)}`);
 			const registeredCollectors = {};
-			collectorsRes.hits.forEach(({_name}) => {
-				registeredCollectors[_name] = true;
+			collectorsRes.hits.forEach(({
+				appName,
+				collectTaskName
+			}) => {
+				registeredCollectors[`${appName}:${collectTaskName}`] = true;
 			});
 			//log.info(`registeredCollectors:${toStr(registeredCollectors)}`);
 			taskList = taskList.filter(({name}) => registeredCollectors[name]);
+			//log.info(`filtered taskList:${toStr(taskList)}`);
 		} // if onlyRegisteredCollectorTasks
 
 		return taskList;
