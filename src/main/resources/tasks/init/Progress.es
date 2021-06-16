@@ -26,7 +26,7 @@ export class Progress {
 		return this; // chainable
 	}
 
-	info() {
+	logInfo() {
 		log.info(`[${this.current}/${this.total}] ${this.info}`);
 		return this; // chainable
 	}

@@ -30,6 +30,7 @@ import {isModelLessThan} from '/lib/explorer/model/isModelLessThan';
 import {setModel} from '/lib/explorer/model/setModel';
 import {node as Node} from '/lib/explorer/model/2/nodeTypes/node';
 import {create} from '/lib/explorer/node/create';
+//import {exists} from '/lib/explorer/node/exists';
 import {connect} from '/lib/explorer/repo/connect';
 import {init as initRepo} from '/lib/explorer/repo/init';
 import {get as getInterface} from '/lib/explorer/interface/get';
@@ -49,6 +50,8 @@ import {
 } from '/lib/xp/auth';
 //import {sanitize} from '/lib/xp/common';
 import {send} from '/lib/xp/event';
+import {get as getRepo} from '/lib/xp/repo';
+
 import {Progress} from './Progress';
 
 
@@ -63,7 +66,8 @@ export function run() {
 		const progress = new Progress({
 			info: 'Task started',
 			//sleepMsAfterItem: 1000, // DEBUG
-			total: USERS.length
+			total: ROLES.length
+				+ USERS.length
 				+ REPOSITORIES.length
 				+ READWRITE_FIELDS.length
 		}).report();
@@ -78,14 +82,14 @@ export function run() {
 		log.debug(`principalsRes:${toStr(principalsRes)}`);*/
 
 		ROLES.forEach(({name, displayName, description}) => {
-			progress.addItems(1);
-			progress.setInfo(`Checking for role ${displayName}`).report().debug();
+			//progress.addItems(1); Already in total
+			progress.setInfo(`Checking for role ${displayName}...`).report().debug();
 			const principal = getPrincipal(`role:${name}`);
 			//log.debug(`principal:${toStr(principal)}`);
 			progress.finishItem();
 			if(!principal) {
 				progress.addItems(1);
-				progress.setInfo(`Creating role ${displayName}`).report().info();
+				progress.setInfo(`Creating role ${displayName}...`).report().logInfo();
 				ignoreErrors(() => {
 					createRole({
 						name,
@@ -98,27 +102,42 @@ export function run() {
 		});
 
 		USERS.forEach(({name, displayName, idProvider, roles = []}) => {
-			progress.setInfo(`Creating user ${displayName}`).report();
-			ignoreErrors(() => {
-				createUser({
-					idProvider,
-					name,
-					displayName
-				});
-				roles.forEach(role => addMembers(`role:${role}`, [`user:${idProvider}:${name}`]));
-			});
+			//progress.addItems(1); Already in total
+			progress.setInfo(`Checking for role ${displayName}...`).report().debug();
+			const principal = getPrincipal(`user:${idProvider}:${name}`);
+			//log.debug(`principal:${toStr(principal)}`);
 			progress.finishItem();
+			if(!principal) {
+				progress.addItems(1);
+				progress.setInfo(`Creating user ${displayName}...`).report().logInfo();
+				ignoreErrors(() => {
+					createUser({
+						idProvider,
+						name,
+						displayName
+					});
+					roles.forEach(role => addMembers(`role:${role}`, [`user:${idProvider}:${name}`]));
+				});
+				progress.finishItem();
+			}
 		});
 
 		REPOSITORIES.forEach(({id, rootPermissions}) => {
-			progress.setInfo(`Creating repository ${id}`).report();
-			ignoreErrors(() => {
-				initRepo({
-					repoId: id,
-					rootPermissions
-				});
-			});
+			//progress.addItems(1); Already in total
+			progress.setInfo(`Checking for repository ${id}...`).report().debug();
+			const repo = getRepo(id);
+			//log.debug(`repo:${toStr(repo)}`);
 			progress.finishItem();
+			if (!repo) {
+				progress.setInfo(`Creating repository ${id}...`).report().logInfo();
+				ignoreErrors(() => {
+					initRepo({
+						repoId: id,
+						rootPermissions
+					});
+				});
+				progress.finishItem();
+			}
 		});
 
 		const writeConnection = connect({
@@ -134,7 +153,7 @@ export function run() {
 		})) {
 			progress.addItems(FOLDERS.length);
 			FOLDERS.forEach((_name) => {
-				progress.setInfo(`Creating folder ${_name}`).report();
+				progress.setInfo(`Creating folder ${_name}...`).report().logInfo();
 				ignoreErrors(() => {
 					create(folder({
 						__connection: writeConnection,
@@ -178,7 +197,7 @@ export function run() {
 				max = 0,
 				min = 0
 			}) => {
-				progress.setInfo(`Creating default field ${key}`).report();
+				progress.setInfo(`Creating default field ${key}...`).report().logInfo();
 				const params = field({
 					_name,
 					_inheritsPermissions: false,
@@ -206,7 +225,7 @@ export function run() {
 			writeConnection.refresh();
 
 			progress.addItems(1);
-			progress.setInfo('Creating notificationsData').report();
+			progress.setInfo('Creating notificationsData...').report().logInfo();
 			const notificationsData = Node({
 				__connection: writeConnection,
 				_name: 'notifications',
@@ -234,7 +253,7 @@ export function run() {
 			version: 1
 		})) {
 			progress.addItems(1);
-			progress.setInfo(`Finding nodes where _nodeType = default and node.type exists`).report();
+			progress.setInfo(`Finding nodes where _nodeType = default and node.type exists...`).report().debug();
 			// WARNING Does not find nodes there _indexConfig is none!
 			const nodesWithTypeQueryParams = {
 				count: -1,
@@ -256,7 +275,7 @@ export function run() {
 
 			progress.addItems(nodesWithTypeRes.total);
 			nodesWithTypeRes.hits.forEach(({_id, _nodeType, _path, type}) => {
-				progress.setInfo(`Trying to change _nodeType from ${_nodeType} to ${type} on _path:${_path} _id:${_id}`).report();
+				progress.setInfo(`Trying to change _nodeType from ${_nodeType} to ${type} on _path:${_path} _id:${_id}...`).report().logInfo();
 				ignoreErrors(() => {
 					writeConnection.modify({
 						key: _id,
@@ -284,7 +303,7 @@ export function run() {
 			version: 2
 		})) {
 			progress.addItems(1);
-			progress.setInfo(`Finding nodes where _nodeType still is default and _indexConfig.default = none`).report();
+			progress.setInfo(`Finding nodes where _nodeType still is default and _indexConfig.default = none...`).report().debug();
 			const nodesWithIndexDefaultNoneQueryParams = {
 				count: -1,
 				filters: addFilter({
@@ -325,7 +344,7 @@ export function run() {
 
 			progress.addItems(nodesWithIndexDefaultNoneRes.hits.length);
 			nodesWithIndexDefaultNoneRes.hits.forEach(({_id, _nodeType, _path, type}) => {
-				progress.setInfo(`Trying to change _nodeType from ${_nodeType} to ${type} on _path:${_path} _id:${_id}`).report();
+				progress.setInfo(`Trying to change _nodeType from ${_nodeType} to ${type} on _path:${_path} _id:${_id}...`).report().logInfo();
 				ignoreErrors(() => {
 					writeConnection.modify({
 						key: _id,
@@ -354,7 +373,7 @@ export function run() {
 			version: 3
 		})) {
 			progress.addItems(1);
-			progress.setInfo(`Finding fields with displayName`).report();
+			progress.setInfo(`Finding fields with displayName...`).report().debug();
 			const fieldsWithDisplayNameQueryParams = {
 				count: -1,
 				filters: {
@@ -374,7 +393,7 @@ export function run() {
 				},
 				query: ''
 			};
-			log.debug(`fieldsWithDisplayNameQueryParams:${toStr(fieldsWithDisplayNameQueryParams)}`);
+			//log.debug(`fieldsWithDisplayNameQueryParams:${toStr(fieldsWithDisplayNameQueryParams)}`);
 
 			const fieldsWithDisplayNameRes = writeConnection.query(fieldsWithDisplayNameQueryParams);
 			fieldsWithDisplayNameRes.hits = fieldsWithDisplayNameRes.hits
@@ -384,12 +403,12 @@ export function run() {
 				})=>({
 					_id, _path, displayName
 				}));
-			log.debug(`fieldsWithDisplayNameRes:${toStr(fieldsWithDisplayNameRes)}`);
+			//log.debug(`fieldsWithDisplayNameRes:${toStr(fieldsWithDisplayNameRes)}`);
 			progress.finishItem();
 
 			progress.addItems(fieldsWithDisplayNameRes.hits.length);
 			fieldsWithDisplayNameRes.hits.forEach(({_id, _path, displayName}) => {
-				progress.setInfo(`Removing displayName:${displayName} from _path:${_path} _id:${_id}`).report();
+				progress.setInfo(`Removing displayName:${displayName} from _path:${_path} _id:${_id}...`).report().logInfo();
 				ignoreErrors(() => {
 					writeConnection.modify({
 						key: _id,
@@ -416,7 +435,7 @@ export function run() {
 			version: 4
 		})) {
 			progress.addItems(1);
-			progress.setInfo('Creating/updating default interface').report();
+			progress.setInfo('Creating/updating default interface...').report().logInfo();
 
 			const existingInterfaceNode = getInterface({
 				connection: writeConnection,
@@ -473,7 +492,7 @@ export function run() {
 			version: 5
 		})) {
 			progress.addItems(1);
-			progress.setInfo('Remove filters on SYSTEM_FIELDS from interface nodes').report();
+			progress.setInfo('Remove filters on SYSTEM_FIELDS from interface nodes...').report().logInfo();
 			const allInterfaceNodesQueryParams = {
 				count: -1,
 				filters: {
@@ -578,7 +597,7 @@ export function run() {
 			version: 6
 		})) {
 			progress.addItems(1);
-			progress.setInfo(`Removing "system" fields from explorer repo`).report();
+			progress.setInfo(`Removing "system" fields from explorer repo...`).report().logInfo();
 			const fieldsPathsToDelete = SYSTEM_FIELDS.map(({_name}) => `${PATH_FIELDS}/${_name}`);
 			//log.debug(`fieldsPathsToDelete:${toStr(fieldsPathsToDelete)}`);
 
@@ -596,7 +615,7 @@ export function run() {
 
 		//──────────────────────────────────────────────────────────────────────
 
-		progress.setInfo('Initialization complete :)').report();
+		progress.setInfo('Initialization complete :)').report().logInfo();
 		const event = {
 			type: EVENT_INIT_COMPLETE,
 			distributed: true,
