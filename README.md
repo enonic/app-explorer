@@ -213,12 +213,6 @@ app-explorer
 * Search by default on enter, with the option of "On change?"
 * Disable all inputs and buttons when "editing" default interface
 * Disable delete on default interface
-* Build system upgrades
-  * Node 14.17.0
-  * Babel modules 7.14.3
-  * Core-js 3.12.1
-  * Webpack 5.37.0
-  * All node modules up to date (except react)
 * Upgrade to @enonic/semantic-ui-react-form 2.2.0
   * Make it possible to manually disable:
     * DeleteButton
@@ -272,6 +266,12 @@ app-explorer
   * Add componentPath to register function
 * Scheduling should not be visible before one has selected collector
 * Make it possible to select language per collection
+* Build system upgrades
+  * Node 14.17.1
+  * Babel modules 7.14.6
+  * Core-js 3.14.0
+  * Webpack 5.39.1
+  * All node modules up to date (except clean-webpack-plugin and react)
 
 ### 1.4.0
 
