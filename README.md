@@ -229,6 +229,19 @@ app-explorer
 * Remove field displayName
 * Add field min and max occurrences
 * Add more field value types
+* Upgrade to lib-explorer-3.15.0
+  * Move function parameters that start with __ to second argument without __
+  * Make collector/register handle different versions of installed app-explorer
+  * Only run collector/register on master
+  * Document API: Skip empty arrays which cause problems during diff
+  * Build indexConfig for document_metadata.modifiedTime on document/update()
+  * Add isModelLessThan
+  * should filter _nodeType/type = document in interface code (not GUI)
+  * Polyfill Number.isInteger
+  * Remove filters on SYSTEM_FIELDS from default interface node
+  * Make system fields ready for removal from explorer repo
+  * Add getModel and setModel
+  * lib-http-client:2.3.0 (okhttp/4.9.1)
 * Upgrade to lib-explorer-3.14.3
   * Use document/createOrUpdate in Collector.persist
   * Add object/isObject function
