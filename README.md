@@ -196,6 +196,7 @@ app-explorer
 
 ### 2.0.0-SNAPSHOT
 
+* TODO: Require XP-7.6 and use distributable tasks
 * TODO: Enable should filters in interfaces again
 
 ### 1.5.0-SNAPSHOT
@@ -229,6 +230,8 @@ app-explorer
 * Remove field displayName
 * Add field min and max occurrences
 * Add more field value types
+* Upgrade to lib-explorer-3.15.1
+  * Colletors/Document API write both _nodeType and type (for backwards compatibility)
 * Upgrade to lib-explorer-3.15.0
   * Move function parameters that start with __ to second argument without __
   * Make collector/register handle different versions of installed app-explorer
