@@ -59,8 +59,7 @@ const SRC_DIR_ABS = path.resolve(__dirname, SRC_DIR);
 const DST_DIR_ABS = path.join(__dirname, DST_DIR);
 
 const SS_ALIAS = {
-	// Fixes: TypeError: Cannot read property "TYPED_ARRAY_SUPPORT" from undefined
-	myGlobal: path.resolve(__dirname, 'src/main/resources/tasks/webcrawl/global.es')
+	'@enonic/nashorn-polyfills': path.resolve(__dirname, 'src/main/resources/lib/nashorn/index.es')
 };
 
 // Avoid bundling and transpile library files seperately.
@@ -191,7 +190,8 @@ const SS_PLUGINS = [
 			warn: (params) => {log.warning(params)}
 		},*/
 		Buffer: ['buffer', 'Buffer'],
-		global: 'myGlobal' // Without it will get: Cannot read property "ES6" from undefined
+
+		global: '@enonic/nashorn-polyfills' // Not always polyfilled only when identifier global found
 	})
 ];
 

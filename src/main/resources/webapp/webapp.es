@@ -5,6 +5,8 @@ mapping.api.target = /webapp/com.enonic.app.explorer/api
 mapping.api.idProvider.system = default
 */
 
+import '@enonic/nashorn-polyfills';
+
 export {all} from '/lib/explorer/api';
 
 /*
