@@ -186,7 +186,7 @@ app-explorer
 
 | App version | XP version |
 | ----------- | ---------- |
-| 1.5.0-SNAPSHOT | 7.5.0 |
+| 1.5.0 | 7.6.0 |
 | 1.4.0 | 7.4.1 |
 | 1.[23].0 | 7.3.2 |
 | 1.1.0 | 7.3.1 |
@@ -201,6 +201,7 @@ app-explorer
 
 ### 1.5.0-SNAPSHOT
 
+* Require Enonic XP 7.6 and use distributed tasks
 * Less noise on startup
 * Add values (true and false) for the system field document_metadata.valid
 * _allText can now be selected under fulltext, ngram and synonyms in queryBuilder
@@ -230,6 +231,10 @@ app-explorer
 * Remove field displayName
 * Add field min and max occurrences
 * Add more field value types
+* Upgrade to lib-explorer-3.16.0
+  * Require Enonic XP 7.6 and use distributed tasks
+* Upgrade to lib-explorer-3.15.2
+  * lib-util-3.0.0
 * Upgrade to lib-explorer-3.15.1
   * Colletors/Document API write both _nodeType and type (for backwards compatibility)
 * Upgrade to lib-explorer-3.15.0

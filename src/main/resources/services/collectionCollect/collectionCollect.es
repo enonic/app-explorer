@@ -1,6 +1,6 @@
 import {toStr} from '/lib/util';
 import {assetUrl} from '/lib/xp/portal';
-import {submitNamed} from '/lib/xp/task';
+import {submitTask} from '/lib/xp/task';
 
 import {
 	PRINCIPAL_EXPLORER_READ,
@@ -87,17 +87,17 @@ export function post({
 		const configJson = JSON.stringify(config);
 		DEBUG && log.info(`configJson:${toStr({configJson})}`);
 
-		const submitNamedParams = {
-			name: collector.collectorId, // <appname>:<taskname>
+		const submitTaskParams = {
+			descriptor: collector.collectorId, // <appname>:<taskname>
 			config: {
 				name, // Collection name
 				collectorId: collector.collectorId, // <appname>:<taskname>
 				configJson
 			}
 		};
-		DEBUG && log.info(`submitNamedParams:${toStr({submitNamedParams})}`);
+		DEBUG && log.info(`submitTaskParams:${toStr({submitTaskParams})}`);
 
-		const taskId = submitNamed(submitNamedParams);
+		const taskId = submitTask(submitTaskParams);
 		DEBUG && log.info(`taskId:${toStr({taskId})}`);
 
 		body.messages = `Started collecting ${name} with taskId ${taskId}`;

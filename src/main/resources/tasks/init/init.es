@@ -61,6 +61,9 @@ export const EVENT_INIT_COMPLETE = `${APP_EXPLORER}.init.complete`;
 // Let's report with info when something is actually done.
 // And report with debug when only investigating if there is something to do.
 
+// We have no control over which cluster node runs this task.
+// However we have ensured it only runs once by surrounding it's submitTask with isMaster.
+
 export function run() {
 	runAsSu(() => {
 		const progress = new Progress({
@@ -611,8 +614,11 @@ export function run() {
 		const event = {
 			type: EVENT_INIT_COMPLETE,
 
-			// We want to setup listeners for unregister on all nodes and
-			// this master node may not the be node with cron=true.
+			// Since we have no control over where this distributable task is
+			// run we have to send this event to all cluster nodes.
+			// After init some code need to be executed only once (isMaster),
+			// while other code need to run on all cluster nodes.
+			// So this distributed event is listened for on all cluster nodes.
 			distributed: true,
 
 			data: {}

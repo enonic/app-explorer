@@ -1,3 +1,4 @@
+import '@enonic/nashorn-polyfills';
 //──────────────────────────────────────────────────────────────────────────────
 // Enonic XP libs (included in jar via gradle dependencies)
 //──────────────────────────────────────────────────────────────────────────────
@@ -8,7 +9,7 @@
 import {toStr} from '/lib/util';
 import {isMaster} from '/lib/xp/cluster';
 import {listener} from '/lib/xp/event';
-import {submitNamed} from '/lib/xp/task';
+import {submitTask} from '/lib/xp/task';
 import {
 	BRANCH_ID_EXPLORER,
 	EVENT_COLLECTOR_UNREGISTER,
@@ -42,14 +43,29 @@ const COLLECT_TASK_NAME_WEBCRAWL = 'webcrawl';
   so that a listener for unregister can be setup on the master.
 */
 
+log.info(`Starting ${app.name} ${app.version} isMaster:${isMaster()} config:${toStr(app.config)}`);
+
 //──────────────────────────────────────────────────────────────────────────────
 // Main
 //──────────────────────────────────────────────────────────────────────────────
+
+// Since some of the code within this listener callback has to be run on all
+// cluster nodes. We have to listen for the event on all cluster nodes.
+// Some of the code within the listener callback has to run only once, so we
+// have protected that code only with isMaster.
 listener({
 	type: `custom.${EVENT_INIT_COMPLETE}`,
+
+	// This event is sent from within a distributed task, so we have no control
+	// over where the event is sent from. So it's sent as a distributed event,
+	// thus that's what we have to listen for.
 	localOnly: false,
+
 	callback: (/*event*/) => {
 		//log.info(`Received event ${toStr(event)}`);
+
+		// The unregister event is sent as a local event on all cluster nodes.
+		// But it should only be listened for, and acted upon on the master node.
 		if (isMaster()) {
 			listener({
 				type: `custom.${EVENT_COLLECTOR_UNREGISTER}`,
@@ -72,14 +88,21 @@ listener({
 					}
 				} // callback
 			}); // listener
-			register({
-				appName: app.name,
-				collectTaskName: COLLECT_TASK_NAME_WEBCRAWL,
-				componentPath: 'window.LibWebCrawler.Collector',
-				configAssetPath: 'react/WebCrawler.esm.js',
-				displayName: 'Web crawler'
-			});
 		} // isMaster
+
+		register({ // Has isMaster interally
+			appName: app.name,
+			collectTaskName: COLLECT_TASK_NAME_WEBCRAWL,
+			componentPath: 'window.LibWebCrawler.Collector',
+			configAssetPath: 'react/WebCrawler.esm.js',
+			displayName: 'Web crawler'
+		});
+
+
+		// The master node is typically not the cluster node which executes cron jobs.
+		// So we cannot protect this code with isMaster.
+		// But we have protected it with an app.config on a single cluster node instead.
+		// TODO: In Enonic XP 7.7 we will use internal scheduling instead.
 
 		const cron = app.config.cron === 'true';
 		if (cron) {
@@ -136,13 +159,17 @@ listener({
 	} // callback EVENT_INIT_COMPLETE
 }); // listener EVENT_INIT_COMPLETE
 
+// Even though distributed task is used, it should only be run once.
+// This it must still be protected with isMaster
 if (isMaster()) {
-	submitNamed({
-		name: 'init'
+	// We have no control where this is run, only that it run only once.
+	submitTask({
+		descriptor: 'init'
 	});
 } // if isMaster
 
 __.disposer(() => {
+	log.info(`Stopping ${app.name} ${app.version} isMaster:${isMaster()} config:${toStr(app.config)}`);
 	unregister({
 		appName: app.name,
 		collectTaskName: COLLECT_TASK_NAME_WEBCRAWL
