@@ -2,10 +2,12 @@ import '@enonic/nashorn-polyfills';
 //──────────────────────────────────────────────────────────────────────────────
 // Enonic XP libs (included in jar via gradle dependencies)
 //──────────────────────────────────────────────────────────────────────────────
-/*import {
-	//get as getJob,
-	list as listJobs
-} from '/lib/cron';*/
+import {
+	list as listCronJobs,
+	schedule as scheduleCronJob,
+	unschedule as unscheduleCronJob
+} from '/lib/cron';
+
 import {toStr} from '/lib/util';
 import {isMaster} from '/lib/xp/cluster';
 import {listener} from '/lib/xp/event';
@@ -44,6 +46,35 @@ const COLLECT_TASK_NAME_WEBCRAWL = 'webcrawl';
 */
 
 log.info(`Starting ${app.name} ${app.version} isMaster:${isMaster()} config:${toStr(app.config)}`);
+
+//──────────────────────────────────────────────────────────────────────────────
+// Unschedule all cronJobs with applicationKey: com.enonic.app.explorer
+// libCron works locally so this must be done on all cluster nodes.
+// In principle such cronJobs should only exist on the node which has cron=true
+// in it's app.config, but lets just make sure and do all cluster nodes.
+//──────────────────────────────────────────────────────────────────────────────
+/*const scheduledTestCronJob = scheduleCronJob({
+	name: 'hopefullyUniqueTestName',
+	cron: '1 2 3 4 5',
+	callback: () => {
+		log.info('This is a test');
+	}
+});
+log.info(`scheduledTestCronJob:${toStr(scheduledTestCronJob)}`);*/
+
+const locallyScheduledExplorerCronJobs = listCronJobs().jobs
+	.filter(({applicationKey}) => applicationKey === 'com.enonic.app.explorer');
+//log.info(`locallyScheduledExplorerCronJobs:${toStr(locallyScheduledExplorerCronJobs)}`);
+
+locallyScheduledExplorerCronJobs.forEach(({name}) => {
+	unscheduleCronJob({name});
+});
+
+const localExplorerCronJobsStillScheduled = listCronJobs().jobs
+	.filter(({applicationKey}) => applicationKey === 'com.enonic.app.explorer'); // Should be empty
+if(localExplorerCronJobsStillScheduled) {
+	log.error(`localExplorerCronJobsStillScheduled:${toStr(localExplorerCronJobsStillScheduled)}`);
+}
 
 //──────────────────────────────────────────────────────────────────────────────
 // Main
@@ -131,13 +162,6 @@ listener({
 					collectors,
 					node
 				}));
-
-				/*const cronList = listJobs();
-				log.debug(`cronList:${toStr({cronList})}`);
-				cronList.jobs.forEach(({name}) => {
-					const job = getJob({name});
-					log.debug(`job:${toStr({job})}`);
-				});*/
 			}); // runAsSu
 			log.info('This cluster node has cron=true in app.config, listening for reschedule events :)');
 			listener({

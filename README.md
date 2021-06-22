@@ -196,11 +196,12 @@ app-explorer
 
 ### 2.0.0-SNAPSHOT
 
-* TODO: Require XP-7.6 and use distributable tasks
+* TODO: Remove any reference to lib-cron
 * TODO: Enable should filters in interfaces again
 
 ### 1.5.0-SNAPSHOT
 
+* Make sure all previous cronJobs are unscheduled on startup
 * Require Enonic XP 7.6 and use distributed tasks
 * Less noise on startup
 * Add values (true and false) for the system field document_metadata.valid
