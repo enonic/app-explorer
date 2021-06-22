@@ -90,6 +90,7 @@ const SS_EXTERNALS = [
 	'/lib/xp/mail', // Needed by lib-explorer
 	'/lib/xp/node', // Needed by lib-explorer
 	'/lib/xp/portal',
+	'/lib/xp/scheduler', // Needed by lib-explorer
 	'/lib/xp/repo',
 	'/lib/xp/task',
 	'/lib/xp/value',
@@ -118,7 +119,7 @@ const SS_FILES = [
 	'services/collectionDuplicate/collectionDuplicate',
 	'services/collectionModify/collectionModify',
 	'services/collectorStop/collectorStop',
-	'services/cronJobList/cronJobList',
+	'services/cronJobList/cronJobList', // TODO: remove in explorer-2.0.0
 	'services/fieldCreate/fieldCreate',
 	'services/fieldDelete/fieldDelete',
 	'services/fieldList/fieldList',
@@ -197,18 +198,11 @@ const SS_PLUGINS = [
 ];
 
 if (MODE === 'production') {
-	SS_EXTERNALS.push('/lib/cron');
+	SS_EXTERNALS.push('/lib/cron'); // TODO: remove in explorer-2.0.0
 	SS_EXTERNALS.push('/lib/util');
 	SS_EXTERNALS.push(/^\/lib\/util\//);
 } else {
-	// Needed by lib-explorer
-	SS_EXTERNALS.push('/lib/xp/context');
-	SS_EXTERNALS.push('/lib/xp/i18n');
-	SS_EXTERNALS.push('/lib/xp/mail');
-	SS_EXTERNALS.push('/lib/xp/node');
-	SS_EXTERNALS.push('/lib/xp/repo');
-
-	SS_ALIAS['/lib/cron'] = path.resolve(__dirname, '../lib-cron/src/main/resources/lib/cron/');
+	SS_ALIAS['/lib/cron'] = path.resolve(__dirname, '../lib-cron/src/main/resources/lib/cron/'); // TODO: remove in explorer-2.0.0
 
 	SS_ALIAS['/lib/util'] = path.resolve(__dirname, '../lib-util/src/main/resources/lib/util');
 	/*SS_PLUGINS.push(new BrowserSyncPlugin({

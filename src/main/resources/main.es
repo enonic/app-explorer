@@ -4,7 +4,7 @@ import '@enonic/nashorn-polyfills';
 //──────────────────────────────────────────────────────────────────────────────
 import {
 	list as listCronJobs,
-	schedule as scheduleCronJob,
+	//schedule as scheduleCronJob,
 	unschedule as unscheduleCronJob
 } from '/lib/cron';
 
@@ -27,9 +27,7 @@ import {
 import {runAsSu} from '/lib/explorer/runAsSu';
 import {connect} from '/lib/explorer/repo/connect';
 import {remove} from '/lib/explorer/node/remove';
-import {addFilter} from '/lib/explorer/query/addFilter';
-import {hasValue} from '/lib/explorer/query/hasValue';
-import {query} from '/lib/explorer/collection/query';
+import {query as queryCollections} from '/lib/explorer/collection/query';
 import {getCollectors, reschedule} from '/lib/explorer/collection/reschedule';
 
 import {EVENT_INIT_COMPLETE} from './tasks/init/init';
@@ -150,11 +148,8 @@ listener({
 				});
 				//log.debug(`collectors:${toStr({collectors})}`);
 
-				const collectionsRes = query({
-					connection: explorerRepoReadConnection,
-					filters: addFilter({
-						filter: hasValue('doCollect', true)
-					})
+				const collectionsRes = queryCollections({
+					connection: explorerRepoReadConnection
 				});
 				//log.info(toStr({collectionsRes})); // huge
 

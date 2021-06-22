@@ -202,6 +202,7 @@ app-explorer
 ### 1.5.0-SNAPSHOT
 
 * Make sure all previous cronJobs are unscheduled on startup
+* Require to Enonic XP 7.7 and use internal scheduling instead of lib-cron
 * Require Enonic XP 7.6 and use distributed tasks
 * Less noise on startup
 * Add values (true and false) for the system field document_metadata.valid

@@ -44,6 +44,7 @@ dependencies {
 	include "com.enonic.xp:lib-node:${xpVersion}" // Needed by lib-explorer
 	include "com.enonic.xp:lib-portal:${xpVersion}"
 	include "com.enonic.xp:lib-repo:${xpVersion}"
+	include "com.enonic.xp:lib-scheduler:${xpVersion}"
 	include "com.enonic.xp:lib-task:${xpVersion}"
 	//include "com.enonic.xp:lib-thymeleaf:${xpVersion}"
 	include "com.enonic.xp:lib-websocket:${xpVersion}"
@@ -58,13 +59,12 @@ dependencies {
 	include 'com.enonic.lib:lib-graphql:1.1.1'
 	include 'com.enonic.lib:lib-guillotine:4.2.0'
 
-	//include 'com.enonic.lib:lib-http-client:2.0.0' // User-Agent: okhttp/3.14.0
 	include 'com.enonic.lib:lib-http-client:2.3.0' // User-Agent: okhttp/4.9.1
 
 	include 'com.enonic.lib:lib-license:3.0.0'
 	include 'com.enonic.lib:lib-router:2.1.0'
 
-	include 'com.enonic.lib:lib-cron:1.1.1'
+	include 'com.enonic.lib:lib-cron:1.1.1' // TODO: remove in explorer-2.0.0
 
 	include 'com.enonic.lib:lib-explorer:3.16.0'
 
