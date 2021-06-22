@@ -4,8 +4,11 @@ import {
 } from '/lib/explorer/model/2/constants';
 import {connect} from '/lib/explorer/repo/connect';
 import {remove} from '/lib/explorer/node/remove';
-//import {toStr} from '/lib/util';
-import {send as sendEvent} from '/lib/xp/event';
+import {listExplorerJobsThatStartWithName} from '/lib/explorer/scheduler/listExplorerJobsThatStartWithName';
+
+import {toStr} from '/lib/util';
+import {delete as deleteJob} from '/lib/xp/scheduler';
+import {executeFunction} from '/lib/xp/task';
 
 const PATH_COLLECTIONS = '/collections';
 
@@ -23,6 +26,30 @@ exports.delete = ({
 	const oldNode = writeConnection.get(nodePath);
 	//log.debug(`oldNode:${toStr({oldNode})}`);
 
+	if (!oldNode) {
+		const message = `Can't delete collection node with path:${nodePath}, unable to find it!`;
+		log.error(message);
+		return {
+			body: {
+				message
+			},
+			contentType: RT_JSON,
+			status: 404
+		};
+	}
+
+	executeFunction({
+		description: `Delete any scheduled job relating to collection with path:${oldNode._path}`,
+		func: () => {
+			const explorerJobsThatStartWithName = listExplorerJobsThatStartWithName({name: oldNode._id});
+			log.info(`collection path:${oldNode._path} explorerJobsThatStartWithName:${toStr(explorerJobsThatStartWithName)}`);
+			explorerJobsThatStartWithName.forEach(({name}) => {
+				log.info(`Deleting job name:${name}, while deleting collection with path:${oldNode._path}`);
+				deleteJob({name});
+			});
+		}
+	});
+
 	const removeRes = remove({
 		connection: writeConnection,
 		_parentPath: PATH_COLLECTIONS,
@@ -33,23 +60,11 @@ exports.delete = ({
 		message: `Deleted collection ${name}`
 	};
 	let status = 200;
-	if (removeRes) {
-		if (oldNode.doCollect && oldNode.cron) { // No need to reschedule if deleted node was unscheduled
-			const event = {
-				type: `${app.name}.reschedule`,
-				distributed: true, // Change may happen on admin node, while crawl node needs the reschedule
-				data: {
-					oldNode
-				}
-			};
-			//log.debug(`event:${toStr({event})}`);
-			sendEvent(event);
-		}
-	} else {
+	if (!removeRes) {
 		body = {
 			error: `Failed to delete collection ${name}!`
 		};
-		status = 400;
+		status = 500;
 	}
 	return {
 		body,

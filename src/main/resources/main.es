@@ -11,6 +11,7 @@ import {
 import {toStr} from '/lib/util';
 import {isMaster} from '/lib/xp/cluster';
 import {listener} from '/lib/xp/event';
+import {delete as deleteJob} from '/lib/xp/scheduler';
 import {submitTask} from '/lib/xp/task';
 import {
 	BRANCH_ID_EXPLORER,
@@ -28,7 +29,9 @@ import {runAsSu} from '/lib/explorer/runAsSu';
 import {connect} from '/lib/explorer/repo/connect';
 import {remove} from '/lib/explorer/node/remove';
 import {query as queryCollections} from '/lib/explorer/collection/query';
-import {getCollectors, reschedule} from '/lib/explorer/collection/reschedule';
+import {getCollectors, createOrModifyJobsFromCollectionNode} from '/lib/explorer/scheduler/createOrModifyJobsFromCollectionNode';
+import {listExplorerJobs} from '/lib/explorer/scheduler/listExplorerJobs';
+
 
 import {EVENT_INIT_COMPLETE} from './tasks/init/init';
 
@@ -127,16 +130,16 @@ listener({
 			displayName: 'Web crawler'
 		});
 
-
-		// The master node is typically not the cluster node which executes cron jobs.
-		// So we cannot protect this code with isMaster.
-		// But we have protected it with an app.config on a single cluster node instead.
-		// TODO: In Enonic XP 7.7 we will use internal scheduling instead.
-
-		const cron = app.config.cron === 'true';
-		if (cron) {
-			log.info('This cluster node has cron=true in app.config, rescheduling all cron jobs :)');
+		if (isMaster()) {
 			runAsSu(() => {
+				const allExplorerJobs = listExplorerJobs();
+				log.info(`allExplorerJobs:${toStr({allExplorerJobs})}`);
+				log.info(`Deleting all scheduled jobs, before creating new ones.`);
+				allExplorerJobs.forEach(({name}) => {
+					log.debug(`Deleting job name:${name}, before creating new ones.`);
+					deleteJob({name});
+				});
+
 				const explorerRepoReadConnection = connect({
 					branch: BRANCH_ID_EXPLORER,
 					repoId: REPO_ID_EXPLORER,
@@ -153,27 +156,14 @@ listener({
 				});
 				//log.info(toStr({collectionsRes})); // huge
 
-				collectionsRes.hits.forEach(node => reschedule({
+				collectionsRes.hits.forEach(collectionNode => createOrModifyJobsFromCollectionNode({
+					//connection: explorerRepoReadConnection,
+					collectionNode,
 					collectors,
-					node
+					timeZone: 'GMT+02:00' // CEST (Summer Time)
+					//timeZone: 'GMT+01:00' // CET
 				}));
 			}); // runAsSu
-			log.info('This cluster node has cron=true in app.config, listening for reschedule events :)');
-			listener({
-				type: `custom.${app.name}.reschedule`,
-				localOnly: false,
-				callback: (event) => {
-					//log.debug(JSON.stringify(event, null, 4));
-					const {collectors,node,oldNode} = event.data;
-					reschedule({
-						collectors,
-						node,
-						oldNode
-					});
-				}
-			});
-		} else {
-			log.debug('This cluster node does NOT have cron=true in app.config, NOT listening for reschedule events :)');
 		}
 	} // callback EVENT_INIT_COMPLETE
 }); // listener EVENT_INIT_COMPLETE

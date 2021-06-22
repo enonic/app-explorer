@@ -2,16 +2,14 @@
 //import {forceArray} from '/lib/util/data';
 import {getUser} from '/lib/xp/auth';
 import {sanitize} from '/lib/xp/common';
-import {send as sendEvent} from '/lib/xp/event';
 
-import {getCollectors} from '/lib/explorer/collection/reschedule';
 import {
 	PRINCIPAL_EXPLORER_WRITE,
 	RT_JSON
 } from '/lib/explorer/model/2/constants';
 import {collection} from '/lib/explorer/model/2/nodeTypes/collection';
 import {connect} from '/lib/explorer/repo/connect';
-//import {hash} from '/lib/explorer/string/hash';
+import {createOrModifyJobsFromCollectionNode} from '/lib/explorer/scheduler/createOrModifyJobsFromCollectionNode';
 
 
 export function post({
@@ -87,21 +85,12 @@ export function post({
 
 			if (modifiedNode) {
 				body.name = modifiedNode._name;
-				const collectors = getCollectors({
-					connection: writeConnection
+				createOrModifyJobsFromCollectionNode({
+					connection: writeConnection,
+					collectionNode: modifiedNode,
+					timeZone: 'GMT+02:00' // CEST (Summer Time)
+					//timeZone: 'GMT+01:00' // CET
 				});
-				//log.debug(`collectors:${toStr({collectors})}`);
-				const event = {
-					type: `${app.name}.reschedule`,
-					distributed: true, // Change may happen on admin node, while crawl node needs the reschedule
-					data: {
-						collectors,
-						modifiedNode,
-						oldNode
-					}
-				};
-				//log.debug(`event:${toStr({event})}`);
-				sendEvent(event);
 			} else {
 				throw new Error(`Something went wrong when trying to modify collection ${modifiedNode._name}`);
 			}
