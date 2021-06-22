@@ -201,6 +201,7 @@ app-explorer
 
 ### 1.5.0-SNAPSHOT
 
+* TODO: BUG explorer doesn't initialize on fresh sandbox (Enonic XP 7.5.0, 7.6.1 and 7.7.0)
 * Make sure all previous cronJobs are unscheduled on startup
 * Require to Enonic XP 7.7 and use internal scheduling instead of lib-cron
 * Require Enonic XP 7.6 and use distributed tasks
