@@ -530,6 +530,7 @@ const CLIENT_JS_CONFIG = {
 		new CopyWebpackPlugin({
 			patterns: [
 				//{ context: NODE_MODULES_CONTEXT, from: 'frappe-gantt/dist/*', to: 'frappe-gantt/[name].[ext]' },
+				{ context: NODE_MODULES_CONTEXT, from: 'nice-react-gantt/lib/css/style.css', to: 'nice-react-gantt/style.css' },
 				//{ context: NODE_MODULES_CONTEXT, from: 'jquery/dist', to: 'jquery'},
 				{ context: NODE_MODULES_CONTEXT, from: 'react/umd/react.*.js', to: 'react/[name][ext]' },
 				{ context: NODE_MODULES_CONTEXT, from: 'react-dom/umd/react-dom.*.js', to: 'react-dom/[name][ext]' },

@@ -23,6 +23,7 @@ import {queryCollectors} from './collector';
 import {queryFields} from './field';
 import {queryInterfaces} from './interface';
 import {queryJournals} from './journal';
+import {listScheduledJobs} from './scheduler';
 import {queryStopWords} from './stopWord';
 import {querySynonyms, queryThesauri} from './thesaurus';
 import {queryTasks} from './task';
@@ -49,6 +50,7 @@ export const SCHEMA = createSchema({
 			getLicense,
 			getLocales,
 			getSites,
+			listScheduledJobs,
 			queryApiKeys,
 			queryCollections,
 			queryCollectors,

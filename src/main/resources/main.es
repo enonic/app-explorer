@@ -133,7 +133,7 @@ listener({
 		if (isMaster()) {
 			runAsSu(() => {
 				const allExplorerJobs = listExplorerJobs();
-				log.info(`allExplorerJobs:${toStr({allExplorerJobs})}`);
+				//log.info(`allExplorerJobs:${toStr({allExplorerJobs})}`);
 				log.info(`Deleting all scheduled jobs, before creating new ones.`);
 				allExplorerJobs.forEach(({name}) => {
 					log.debug(`Deleting job name:${name}, before creating new ones.`);

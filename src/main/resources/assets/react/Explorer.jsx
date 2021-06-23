@@ -8,7 +8,7 @@ import {Fields} from './Fields';
 import {Interfaces} from './Interfaces';
 import {Journals} from './Journals';
 import {Notifications} from './Notifications';
-//import {Scheduling} from './Scheduling';
+import {Scheduling} from './Scheduling';
 import {Search} from './Search';
 import {Status} from './Status';
 import {StopWords} from './StopWords';
@@ -289,7 +289,8 @@ export function Explorer(props) {
 					'collections',
 					'status',
 					'journal',
-					'notifications'//, 'scheduling'
+					'notifications',
+					'scheduling'
 				].includes(page) &&
 				<Menu.Menu>
 					<Menu.Item
@@ -310,12 +311,12 @@ export function Explorer(props) {
 						active={page === 'notifications'}
 						onClick={() => setPage('notifications')}
 					><Icon name='warning'/> Notifications</Menu.Item>
-					{/*<Menu.Item
+					<Menu.Item
 						as='a'
 						href='#scheduling'
 						active={page === 'scheduling'}
 						onClick={() => setPage('scheduling')}
-					><Icon name='calendar'/> Scheduling</Menu.Item>*/}
+					><Icon name='calendar'/> Scheduling</Menu.Item>
 				</Menu.Menu>}
 
 				<Menu.Item
@@ -404,9 +405,9 @@ export function Explorer(props) {
 				{page === 'notifications' && <Notifications
 					servicesBaseUrl={servicesBaseUrl}
 				/>}
-				{/*page === 'scheduling' && <Scheduling
+				{page === 'scheduling' && <Scheduling
 					servicesBaseUrl={servicesBaseUrl}
-				/>*/}
+				/>}
 				{page === 'schema' && <Fields
 					servicesBaseUrl={servicesBaseUrl}
 				/>}

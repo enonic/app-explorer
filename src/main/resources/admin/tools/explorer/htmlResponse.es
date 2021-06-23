@@ -230,6 +230,7 @@ services: {}, // Workaround for i18nUrl BUG
 		<script type="text/javascript" src="${assetUrl({path: 'react/react.development.js'})}"></script>
 		<script type="text/javascript" src="${assetUrl({path: 'react-dom/react-dom.development.js'})}"></script>
 		<link rel="shortcut icon" href="${assetUrl({path: 'favicon.ico'})}">
+		<link rel="stylesheet" type="text/css" href="${assetUrl({path: 'nice-react-gantt/style.css'})}">
 		<link rel="stylesheet" type="text/css" href="${assetUrl({path: 'semantic-ui-css/semantic.css'})}">
 		<title>Explorer</title>
 	</head>
