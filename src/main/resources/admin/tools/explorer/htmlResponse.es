@@ -232,6 +232,7 @@ services: {}, // Workaround for i18nUrl BUG
 		<link rel="shortcut icon" href="${assetUrl({path: 'favicon.ico'})}">
 		<link rel="stylesheet" type="text/css" href="${assetUrl({path: 'nice-react-gantt/style.css'})}">
 		<link rel="stylesheet" type="text/css" href="${assetUrl({path: 'semantic-ui-css/semantic.css'})}">
+		<link rel="stylesheet" type="text/css" href="${assetUrl({path: 'react-semantic-ui-datepickers/react-semantic-ui-datepickers.css'})}">
 		<title>Explorer</title>
 	</head>
 	<body style="background-color: white !important;">
