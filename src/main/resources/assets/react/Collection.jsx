@@ -55,12 +55,12 @@ export function Collection(props) {
 				//taskName: 'collect'//, // TODO
 				//config: null // CollectorSelector onChange will set this.
 			},
-			cron: [{
+			cron: [{ // Default once a week
 				month: '*',
 				dayOfMonth: '*',
-				dayOfWeek: '*',
-				minute: '*',
-				hour: '*'
+				dayOfWeek: '0',
+				minute: '0',
+				hour: '0'
 			}],
 			doCollect: false,
 			language: ''

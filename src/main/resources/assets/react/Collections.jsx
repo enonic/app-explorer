@@ -1,14 +1,14 @@
-//import _ from 'lodash';
+import {parseExpression as parseCronExpression} from 'cron-parser';
 import {
 	Button, Dimmer, Header, Icon, Loader, Popup, Table
 } from 'semantic-ui-react';
 import {
-	MONTH_TO_HUMAN,
-	DAY_OF_WEEK_TO_HUMAN
+	MONTH_TO_HUMAN
 } from './collection/SchedulingSegment';
 import {DeleteCollectionModal} from './collection/DeleteCollectionModal';
 import {NewOrEditCollectionModal} from './collection/NewOrEditCollectionModal';
 import {useInterval} from './utils/useInterval';
+import {Cron} from './utils/Cron';
 
 const COLLECTIONS_GQL = `queryCollections(
 	count: -1
@@ -28,14 +28,6 @@ const COLLECTIONS_GQL = `queryCollections(
 			name
 			configJson
 		}
-		cron {
-			month
-			dayOfMonth
-			dayOfWeek
-			hour
-			minute
-		}
-		doCollect
 		documentCount
 		interfaces
 		language
@@ -89,6 +81,17 @@ const FIELDS_GQL = `queryFields {
 	}
 }`;
 
+const JOBS_GQL = `listScheduledJobs {
+	collectionName
+	enabled
+	descriptor
+	schedule {
+  		timeZone
+  		type
+  		value
+	}
+}`;
+
 const LOCALES_GQL = `getLocales {
 	country
 	#displayCountry
@@ -124,6 +127,7 @@ const MOUNT_GQL = `{
 	${COLLECTIONS_GQL}
 	${COLLECTORS_GQL}
 	${FIELDS_GQL}
+	${JOBS_GQL}
 	${LOCALES_GQL}
 	${TASKS_GQL}
 }`;
@@ -132,6 +136,7 @@ const UPDATE_GQL = `{
 	${COLLECTIONS_GQL}
 	${COLLECTORS_GQL}
 	${FIELDS_GQL}
+	${JOBS_GQL}
 	${TASKS_GQL}
 }`;
 
@@ -149,11 +154,6 @@ function lpad(s, w = 2, z = ' ') {
 }
 
 
-function zeroPad(s, w=2) {
-	return lpad(s,w,'0');
-}
-
-
 export function Collections(props) {
 	const {
 		collectorComponents,
@@ -166,13 +166,12 @@ export function Collections(props) {
 	const [locales, setLocales] = React.useState([]);
 	const [queryCollectionsGraph, setQueryCollectionsGraph] = React.useState({});
 	const [queryCollectorsGraph, setQueryCollectorsGraph] = React.useState({});
+	const [jobsObj, setJobsObj] = React.useState({});
 	const [tasks, setTasks] = React.useState([]);
 	const [boolPoll, setBoolPoll] = React.useState(true);
 
 	const [queryFieldsGraph, setQueryFieldsGraph] = React.useState({});
-	//console.debug('queryFieldsGraph', queryFieldsGraph); // count, hits
 	const fieldsObj = {};
-	//const fieldsArray =
 	queryFieldsGraph.hits ? queryFieldsGraph.hits.forEach(({
 		//displayName: fieldLabel,
 		key,
@@ -181,10 +180,7 @@ export function Collections(props) {
 		const valuesObj = {};
 		//const mappedValues =
 		values ? values.forEach(({_name, displayName: valueLabel, value}) => {
-			//console.debug('_name', _name);
-			//console.debug('value', value);
 			const valueKey = value || _name;
-			//console.debug('valueKey', valueKey);
 			valuesObj[valueKey] = {
 				label: valueLabel
 			};
@@ -203,10 +199,6 @@ export function Collections(props) {
 			values: mappedValues
 		};*/
 	}) : [];
-	//console.debug('fieldsArray', fieldsArray);
-	//console.debug('fieldsObj', fieldsObj);
-
-	//console.debug('tasks', tasks);
 
 	const collectionsTaskState = {};
 	let anyTaskWithoutCollectionName = false;
@@ -226,11 +218,8 @@ export function Collections(props) {
 		}
 	});
 
-	//console.debug('collectorComponents', collectorComponents);
 	const intInitializedCollectorComponents = Object.keys(collectorComponents).length;
-	//console.debug('intInitializedCollectorComponents', intInitializedCollectorComponents);
 
-	//console.debug('queryCollectorsGraph', queryCollectorsGraph);
 	let collectorOptions = queryCollectorsGraph.hits
 		? queryCollectorsGraph.hits.map(({
 			appName,
@@ -243,18 +232,8 @@ export function Collections(props) {
 			value: `${appName}:${collectTaskName}`
 		}))
 		: [];
-	//console.debug('collectorOptions', collectorOptions);
 
-	const [state, setState] = React.useState({
-		/*collections: {
-			//count: 0, // Unused?
-			hits: [],
-			page: 1,
-			pageStart: 0,
-			pageEnd: 0,
-			pageTotal: 1,
-			total: 0
-		},*/
+	const [state/*, setState*/] = React.useState({
 		column: '_name',
 		contentTypeOptions: [],
 		direction: 'ascending',
@@ -262,31 +241,38 @@ export function Collections(props) {
 		page: 1,
 		perPage: 10,
 		siteOptions: [],
-		sort: '_name ASC'/*,
-		totalCount: 0*/
+		sort: '_name ASC'
 	});
-	//console.debug('Collections', {props, state});
 
 	const {
-		//collections,
 		contentTypeOptions,
 		column,
 		direction,
 		isLoading,
-		page,
-		perPage,
-		//sort,
 		siteOptions
 	} = state;
-	//console.debug({column, direction, sort});
 
-	/*const {
-		pageStart,
-		pageEnd,
-		pagesTotal = 1,
-		total: totalNumberOfCollections
-	} = collections;*/
-	//console.debug('Collections totalNumberOfCollections', totalNumberOfCollections);
+	function setJobsObjFromArr(arr) {
+		const obj={};
+		arr.forEach(({
+			collectionName,
+			enabled,
+			schedule: {
+				type,
+				//timeZone,
+				value
+			}
+		}) => {
+			if (type === 'CRON') {
+				if(obj[collectionName]) {
+					obj[collectionName].push({enabled, value});
+				} else {
+					obj[collectionName] = [{enabled, value}];
+				}
+			}
+		});
+		setJobsObj(obj);
+	} // jobsObjFromArr
 
 	function fetchOnMount() {
 		fetch(`${servicesBaseUrl}/graphQL`, {
@@ -296,16 +282,16 @@ export function Collections(props) {
 		})
 			.then(res => res.json())
 			.then(res => {
-				//console.log(res);
 				if (res && res.data) {
 					setLocales(res.data.getLocales);
 					setQueryCollectionsGraph(res.data.queryCollections);
 					setQueryCollectorsGraph(res.data.queryCollectors);
 					setQueryFieldsGraph(res.data.queryFields);
+					setJobsObjFromArr(res.data.listScheduledJobs);
 					setTasks(res.data.queryTasks);
-				}
-			});
-	}
+				} // if
+			}); // then
+	} // fetchOnMount
 
 	function fetchOnUpdate() {
 		fetch(`${servicesBaseUrl}/graphQL`, {
@@ -315,22 +301,17 @@ export function Collections(props) {
 		})
 			.then(res => res.json())
 			.then(res => {
-				//console.log(res);
 				if (res && res.data) {
 					setQueryCollectionsGraph(res.data.queryCollections);
 					setQueryCollectorsGraph(res.data.queryCollectors);
 					setQueryFieldsGraph(res.data.queryFields);
+					setJobsObjFromArr(res.data.listScheduledJobs);
 					setTasks(res.data.queryTasks);
 				}
 			});
 	}
 
-	function fetchCollections({
-		activePage = page,
-		activePerPage = perPage,
-		clickedColumn = column,
-		newDirection = direction
-	} = {}) {
+	function fetchCollections() {
 		fetch(`${servicesBaseUrl}/graphQL`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
@@ -338,7 +319,6 @@ export function Collections(props) {
 		})
 			.then(res => res.json())
 			.then(res => {
-				//console.log(res);
 				if (res && res.data && res.data.queryCollections) {
 					setQueryCollectionsGraph(res.data.queryCollections);
 				}
@@ -353,7 +333,6 @@ export function Collections(props) {
 		})
 			.then(res => res.json())
 			.then(res => {
-				//console.log(res);
 				if (res && res.data && res.data.queryTasks) {
 					setTasks(res.data.queryTasks);
 				}
@@ -396,23 +375,20 @@ export function Collections(props) {
 						_name,
 						_path,
 						collector,
-						//collecting,
 						documentCount,
-						cron,
-						doCollect,
-						//id,
 						interfaces,
 						language = ''
 					}, index) => {
 						const key = `collection[${index}]`;
-
 						const boolCollectorSelected = !!(collector && collector.name);
-						//console.debug('boolCollectorSelected', boolCollectorSelected);
 						const boolCollectorSelectedAndInitialized = boolCollectorSelected && collectorComponents[collector.name];
-						//console.debug('boolCollectorSelectedAndInitialized', boolCollectorSelectedAndInitialized);
-
 						const editEnabled = intInitializedCollectorComponents && (boolCollectorSelectedAndInitialized || !boolCollectorSelected);
-
+						const cron = jobsObj[_name]
+							? jobsObj[_name].map(({value}) => {
+								return new Cron(value).toObj();
+							})
+							: [new Cron('0 0 * * 0').toObj()]; // Default once a week
+						const doCollect = jobsObj[_name] ? jobsObj[_name][0].enabled : false;
 						return <Table.Row key={key}>
 							<Table.Cell collapsing><NewOrEditCollectionModal
 								collectorOptions={collectorOptions}
@@ -454,14 +430,18 @@ export function Collections(props) {
 								<span style={{whitespace: 'nowrap'}}>{iface}</span>
 							</p>)}</Table.Cell>
 							<Table.Cell>{
-								doCollect
-									? cron.map(({
-										month,
-										dayOfMonth,
-										dayOfWeek,
-										minute,
-										hour
-									}, i) => <pre key={`${_name}.cron.${i}`}>{`${hour === '*' ? '**' : zeroPad(hour)}:${minute === '*' ? '**' : zeroPad(minute)} ${rpad(DAY_OF_WEEK_TO_HUMAN[dayOfWeek], 9)} in ${rpad(MONTH_TO_HUMAN[month], 11)} (dayOfMonth:${lpad(dayOfMonth)})`}</pre>)
+								jobsObj[_name]
+									? jobsObj[_name].map(({enabled, value}, i) => {
+										const interval = parseCronExpression(value);
+										const fields = JSON.parse(JSON.stringify(interval.fields)); // Fields is immutable
+										return <pre key={`${_name}.cron.${i}`} style={{color:enabled ? 'auto' : 'gray'}}>
+											{`${Cron.hourToHuman(fields.hour)}:${
+												Cron.minuteToHuman(fields.minute)} ${
+												Cron.dayOfWeekToHuman(fields.dayOfWeek)} in ${
+												rpad(MONTH_TO_HUMAN[fields.month.length === 12 ? '*' : fields.month[0]], 11)} (dayOfMonth:${
+												lpad(fields.dayOfMonth.length === 31 ? '*' : fields.dayOfMonth)})`}
+										</pre>;
+									})
 									: 'Not scheduled'
 							}</Table.Cell>
 							<Table.Cell collapsing>
@@ -535,52 +515,7 @@ export function Collections(props) {
 						</Table.Row>;
 					})}
 				</Table.Body>
-				{/*totalCount
-					? <Table.Footer>
-						<Table.Row>
-							<Table.HeaderCell></Table.HeaderCell>
-							<Table.HeaderCell></Table.HeaderCell>
-							<Table.HeaderCell>{totalCount}</Table.HeaderCell>
-							<Table.HeaderCell></Table.HeaderCell>
-							<Table.HeaderCell></Table.HeaderCell>
-							<Table.HeaderCell></Table.HeaderCell>
-						</Table.Row>
-					</Table.Footer>
-					: null
-				*/}
 			</Table>
-			{/*<Pagination
-				attached='bottom'
-				fluid
-				size='mini'
-
-				boundaryRange={1}
-				siblingRange={1}
-
-				ellipsisItem={null}
-				firstItem={{content: <Icon name='angle double left' />, icon: true}}
-				prevItem={{content: <Icon name='angle left' />, icon: true}}
-				nextItem={{content: <Icon name='angle right' />, icon: true}}
-				lastItem={{content: <Icon name='angle double right' />, icon: true}}
-
-				activePage={page}
-				totalPages={pagesTotal}
-
-				onPageChange={handlePaginationChange}
-			/>
-			<p>Displaying {pageStart}-{pageEnd} of {totalNumberOfCollections}</p>
-			<Divider hidden/>
-			<Form.Field>
-				<Header as='h4'><Icon name='resize vertical'/> Per page</Header>
-				<Dropdown
-					defaultValue={perPage}
-					fluid
-					name='perPage'
-					onChange={handlePerPageChange}
-					options={[5,10,25,50,100].map(key => ({key, text: `${key}`, value: key}))}
-					selection
-				/>
-			</Form.Field>*/}
 			<NewOrEditCollectionModal
 				collectorOptions={collectorOptions}
 				collectorComponents={collectorComponents}

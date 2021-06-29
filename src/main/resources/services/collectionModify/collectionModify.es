@@ -58,6 +58,11 @@ export function post({
 			const params = collection(obj); // Strips _id, _path
 			//log.info(`params:${toStr({params})}`);
 
+			const cron = JSON.parse(JSON.stringify(params.cron));
+			delete params.cron;
+			const doCollect = JSON.parse(JSON.stringify(params.doCollect));
+			delete params.doCollect;
+
 			const modifiedNode = writeConnection.modify({
 				key: obj._path,
 				editor: (n) => {
@@ -85,6 +90,8 @@ export function post({
 
 			if (modifiedNode) {
 				body.name = modifiedNode._name;
+				modifiedNode.cron = cron;
+				modifiedNode.doCollect = doCollect;
 				createOrModifyJobsFromCollectionNode({
 					connection: writeConnection,
 					collectionNode: modifiedNode,

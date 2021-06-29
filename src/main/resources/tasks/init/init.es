@@ -1,6 +1,7 @@
 import {detailedDiff} from 'deep-object-diff';
 import deepEqual from 'fast-deep-equal';
 
+import {query as queryCollections} from '/lib/explorer/collection/query';
 //import {getField} from '/lib/explorer/field/getField';
 import {ignoreErrors} from '/lib/explorer/ignoreErrors';
 import {
@@ -37,6 +38,7 @@ import {get as getInterface} from '/lib/explorer/interface/get';
 import {addFilter} from '/lib/explorer/query/addFilter';
 import {hasValue} from '/lib/explorer/query/hasValue';
 import {runAsSu} from '/lib/explorer/runAsSu';
+import {getCollectors, createOrModifyJobsFromCollectionNode} from '/lib/explorer/scheduler/createOrModifyJobsFromCollectionNode';
 
 import {toStr} from '/lib/util';
 import {forceArray} from '/lib/util/data';
@@ -607,6 +609,59 @@ export function run() {
 			});
 			progress.finishItem();
 		} // if model < 6
+
+		//──────────────────────────────────────────────────────────────────────
+		// Model 7: Migrate from collection.cron to system.scheduler
+		//──────────────────────────────────────────────────────────────────────
+		if (isModelLessThan({
+			connection: writeConnection,
+			version: 7
+		})) {
+			progress.addItems(1).setInfo(`Migrate from collection.cron to system.scheduler...`).report().logInfo();
+
+			const collectors = getCollectors({
+				connection: writeConnection
+			});
+			//log.debug(`collectors:${toStr({collectors})}`);
+
+			const collectionsWithCron = queryCollections({
+				connection: writeConnection,
+				filters: addFilter({
+					filter: {
+						exists: {
+							field: 'cron'
+						}
+					}
+				})
+			}).hits;
+			//log.debug(`collectionsWithCron:${toStr(collectionsWithCron)}`); // huge?
+
+			collectionsWithCron.forEach(collectionNode => {
+				//log.debug(`collectionNode:${toStr(collectionNode)}`);
+				createOrModifyJobsFromCollectionNode({
+					connection: writeConnection,
+					collectionNode,
+					collectors,
+					timeZone: 'GMT+02:00' // CEST (Summer Time)
+					//timeZone: 'GMT+01:00' // CET
+				});
+				writeConnection.modify({
+					key: collectionNode._id,
+					editor: (cNode) => {
+						delete cNode.cron;
+						delete cNode.doCollect;
+						return cNode;
+					}
+				});
+				writeConnection.refresh();
+			}); // collectionsWithCron.forEach
+
+			setModel({
+				connection: writeConnection,
+				version: 7
+			});
+			progress.finishItem();
+		} // if model < 7
 
 		//──────────────────────────────────────────────────────────────────────
 

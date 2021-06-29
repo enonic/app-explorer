@@ -40,6 +40,11 @@ export function post({
 			params.createdTime = new Date();
 			//log.info(`params:${toStr(params)}`);
 
+			const cron = JSON.parse(JSON.stringify(params.cron));
+			delete params.cron;
+			const doCollect = JSON.parse(JSON.stringify(params.doCollect));
+			delete params.doCollect;
+
 			const writeConnection = connect({
 				principals: [PRINCIPAL_EXPLORER_WRITE]
 			});
@@ -49,6 +54,8 @@ export function post({
 			if (collectionNode) {
 				writeConnection.refresh(); // So the data becomes immidiately searchable
 				body.name = collectionNode._name;
+				collectionNode.cron = cron;
+				collectionNode.doCollect = doCollect;
 				createOrModifyJobsFromCollectionNode({
 					connection: writeConnection,
 					collectionNode,

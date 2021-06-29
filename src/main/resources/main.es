@@ -4,34 +4,24 @@ import '@enonic/nashorn-polyfills';
 //──────────────────────────────────────────────────────────────────────────────
 import {
 	list as listCronJobs,
-	//schedule as scheduleCronJob,
 	unschedule as unscheduleCronJob
 } from '/lib/cron';
 
 import {toStr} from '/lib/util';
 import {isMaster} from '/lib/xp/cluster';
 import {listener} from '/lib/xp/event';
-import {delete as deleteJob} from '/lib/xp/scheduler';
 import {submitTask} from '/lib/xp/task';
 import {
-	BRANCH_ID_EXPLORER,
 	EVENT_COLLECTOR_UNREGISTER,
-	PRINCIPAL_EXPLORER_READ,
-	PRINCIPAL_EXPLORER_WRITE,
-	REPO_ID_EXPLORER
+	PRINCIPAL_EXPLORER_WRITE
 } from '/lib/explorer/model/2/constants';
 import {
 	register,
 	unregister
 } from '/lib/explorer/collector';
 
-import {runAsSu} from '/lib/explorer/runAsSu';
 import {connect} from '/lib/explorer/repo/connect';
 import {remove} from '/lib/explorer/node/remove';
-import {query as queryCollections} from '/lib/explorer/collection/query';
-import {getCollectors, createOrModifyJobsFromCollectionNode} from '/lib/explorer/scheduler/createOrModifyJobsFromCollectionNode';
-import {listExplorerJobs} from '/lib/explorer/scheduler/listExplorerJobs';
-
 
 import {EVENT_INIT_COMPLETE} from './tasks/init/init';
 
@@ -54,15 +44,6 @@ log.info(`Starting ${app.name} ${app.version} isMaster:${isMaster()} config:${to
 // In principle such cronJobs should only exist on the node which has cron=true
 // in it's app.config, but lets just make sure and do all cluster nodes.
 //──────────────────────────────────────────────────────────────────────────────
-/*const scheduledTestCronJob = scheduleCronJob({
-	name: 'hopefullyUniqueTestName',
-	cron: '1 2 3 4 5',
-	callback: () => {
-		log.info('This is a test');
-	}
-});
-log.info(`scheduledTestCronJob:${toStr(scheduledTestCronJob)}`);*/
-
 const locallyScheduledExplorerCronJobs = listCronJobs().jobs
 	.filter(({applicationKey}) => applicationKey === 'com.enonic.app.explorer');
 //log.info(`locallyScheduledExplorerCronJobs:${toStr(locallyScheduledExplorerCronJobs)}`);
@@ -73,7 +54,7 @@ locallyScheduledExplorerCronJobs.forEach(({name}) => {
 
 const localExplorerCronJobsStillScheduled = listCronJobs().jobs
 	.filter(({applicationKey}) => applicationKey === 'com.enonic.app.explorer'); // Should be empty
-if(localExplorerCronJobsStillScheduled) {
+if(localExplorerCronJobsStillScheduled.length) {
 	log.error(`localExplorerCronJobsStillScheduled:${toStr(localExplorerCronJobsStillScheduled)}`);
 }
 
@@ -129,42 +110,6 @@ listener({
 			configAssetPath: 'react/WebCrawler.esm.js',
 			displayName: 'Web crawler'
 		});
-
-		if (isMaster()) {
-			runAsSu(() => {
-				const allExplorerJobs = listExplorerJobs();
-				//log.info(`allExplorerJobs:${toStr({allExplorerJobs})}`);
-				log.info(`Deleting all scheduled jobs, before creating new ones.`);
-				allExplorerJobs.forEach(({name}) => {
-					log.debug(`Deleting job name:${name}, before creating new ones.`);
-					deleteJob({name});
-				});
-
-				const explorerRepoReadConnection = connect({
-					branch: BRANCH_ID_EXPLORER,
-					repoId: REPO_ID_EXPLORER,
-					principals:[PRINCIPAL_EXPLORER_READ]
-				});
-
-				const collectors = getCollectors({
-					connection: explorerRepoReadConnection
-				});
-				//log.debug(`collectors:${toStr({collectors})}`);
-
-				const collectionsRes = queryCollections({
-					connection: explorerRepoReadConnection
-				});
-				//log.info(toStr({collectionsRes})); // huge
-
-				collectionsRes.hits.forEach(collectionNode => createOrModifyJobsFromCollectionNode({
-					//connection: explorerRepoReadConnection,
-					collectionNode,
-					collectors,
-					timeZone: 'GMT+02:00' // CEST (Summer Time)
-					//timeZone: 'GMT+01:00' // CET
-				}));
-			}); // runAsSu
-		}
 	} // callback EVENT_INIT_COMPLETE
 }); // listener EVENT_INIT_COMPLETE
 

@@ -202,8 +202,9 @@ app-explorer
 ### 1.5.0-SNAPSHOT
 
 * TODO: BUG explorer doesn't initialize on fresh sandbox (Enonic XP 7.5.0, 7.6.1 and 7.7.0)
+* collectionDuplicate no longer includes schedule
+* Migrate from collection.cron to system.scheduler
 * Scheduling page
-* collectionDuplicate must also reschedule
 * Reschedule without sending and listening for events
 * Make sure all previous cronJobs are unscheduled on startup
 * Require to Enonic XP 7.7 and use internal scheduling instead of lib-cron
