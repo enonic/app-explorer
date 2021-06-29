@@ -23,8 +23,8 @@ export function post({
 		displayName,
 		words
 	}));*/
+	const connection = connect({principals: [PRINCIPAL_EXPLORER_WRITE]});
 	const params = {
-		__connection: connect({principals: [PRINCIPAL_EXPLORER_WRITE]}),
 		_indexConfig: {default: 'byType'},
 		_parentPath: '/stopwords',
 		_name: name,
@@ -32,7 +32,7 @@ export function post({
 		words,
 		type: NT_STOP_WORDS
 	};
-	const node = mode === 'update' ? modify(params) : create(params);
+	const node = mode === 'update' ? modify(params, {connection}) : create(params, {connection});
 	//log.info(`node:${toStr(node)}`);
 	const body = {};
 	let status = 200;

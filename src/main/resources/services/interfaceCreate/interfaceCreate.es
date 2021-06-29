@@ -19,10 +19,11 @@ export function post({
 	const obj = JSON.parse(json);
 	//log.info(`obj:${toStr(obj)}`);
 
-	obj.__connection = connect({principals: [PRINCIPAL_EXPLORER_WRITE]}); // eslint-disable-line no-underscore-dangle
 	obj._name = obj.displayName;
 	obj.resultMappings = mapResultMappings(obj.resultMappings);
-	const node = create(interfaceModel(obj)); // This will sanitize _name
+	const node = create(interfaceModel(obj), {
+		connection: connect({principals: [PRINCIPAL_EXPLORER_WRITE]})
+	}); // This will sanitize _name
 	const body = {};
 	let status = 200;
 	if (node) {

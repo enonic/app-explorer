@@ -38,13 +38,14 @@ export function post({
 			const fromArr = from.trim().split(',').map(str => str.trim());
 			const toArr = to.trim().split(',').map(str => str.trim());
 			const params = synonym({
-				__connection: connection,
 				_parentPath: `/thesauri/${name}`,
 				from: fromArr.length > 1 ? fromArr : fromArr.join(),
 				to: toArr.length > 1 ? toArr : toArr.join()
 			});
 			//log.info(toStr({params}));
-			const createOrModifyRes = createOrModify(params);
+			const createOrModifyRes = createOrModify(params, {
+				connection
+			});
 			if (createOrModifyRes) {
 				successes += 1;
 			} else {

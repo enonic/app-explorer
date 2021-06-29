@@ -38,9 +38,6 @@ export function post({
 			throw new Error(`Unable to find thesaurus with id:${thesaurusId}!`);
 		}
 		const createRes = createRandomNamed({
-			__connection: connect({
-				principals: [PRINCIPAL_EXPLORER_WRITE]
-			}),
 			_indexConfig: {default: 'byType'},
 			_parentPath: thesaurusNode._path,
 			displayName: `${Array.isArray(from) ? from.join(', ') : from} => ${Array.isArray(to) ? to.join(', ') : to}`,
@@ -48,6 +45,10 @@ export function post({
 			thesaurusReference: reference(thesaurusNode._id),
 			to,
 			type: NT_SYNONYM
+		}, {
+			connection: connect({
+				principals: [PRINCIPAL_EXPLORER_WRITE]
+			})
 		});
 		if (!createRes) {
 			throw new Error(`Something went wrong when trying to create synonym from:${fromJson} to:${toJson} in thesaurus with id:${thesaurusId}!`);

@@ -30,13 +30,14 @@ export function post({
 	//log.info(`name:${toStr(name)}`);
 
 	const modifyRes = modify(thesaurus({
-		__connection: connect({
-			principals: [PRINCIPAL_EXPLORER_WRITE]
-		}),
 		_name: name,
 		displayName,
 		languages
-	}));
+	}), {
+		connection: connect({
+			principals: [PRINCIPAL_EXPLORER_WRITE]
+		})
+	});
 	const body = {};
 	let status = 200;
 	if (modifyRes) {

@@ -1,4 +1,4 @@
-import {toStr} from '/lib/util';
+//import {toStr} from '/lib/util';
 import {forceArray} from '/lib/util/data';
 
 import {
@@ -12,11 +12,10 @@ import {get as getNode} from '/lib/explorer/node/get';
 
 
 export function get() {
-	const connection = connect({
-		principals: [PRINCIPAL_EXPLORER_READ]
-	});
 	const node = getNode({
-		connection,
+		connection: connect({
+			principals: [PRINCIPAL_EXPLORER_READ]
+		}),
 		path: '/notifications'
 	}) || {};
 	//log.info(toStr({node}));
@@ -48,14 +47,13 @@ export function post({
 		const {emails = []} = obj;
 		//log.info(`emails:${toStr(emails)}`);
 
-		const connection = connect({
-			principals: [PRINCIPAL_EXPLORER_WRITE]
-		});
-
 		createOrModify({
-			__connection: connection,
 			emails,
 			_name: 'notifications'
+		}, {
+			connection: connect({
+				principals: [PRINCIPAL_EXPLORER_WRITE]
+			})
 		});
 
 		return {

@@ -1,5 +1,4 @@
 //import {toStr} from '/lib/util';
-import {sanitize} from '/lib/xp/common';
 
 import {
 	PRINCIPAL_EXPLORER_WRITE,
@@ -19,7 +18,6 @@ export function post({params: {
 }}) {
 	const connection = connect({principals: PRINCIPAL_EXPLORER_WRITE});
 	const nodeParams = fieldValue({
-		__connection: connection,
 		displayName,
 		field,
 		fieldReference: getReference({
@@ -28,7 +26,9 @@ export function post({params: {
 		}),
 		value
 	});
-	const node = createOrModify(nodeParams);
+	const node = createOrModify(nodeParams, {
+		connection
+	});
 
 	let body = {
 		message: `Value ${value} for field ${field} created.`
@@ -38,7 +38,7 @@ export function post({params: {
 	if (!node) {
 		body = {
 			error: `Something went wrong when trying to create value ${value} for field ${field}.`
-		}
+		};
 		status = 500;
 	}
 

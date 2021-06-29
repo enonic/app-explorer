@@ -47,7 +47,6 @@ export function post({params: {
 
 	const lcKey = key.toLowerCase();
 	const nodeParams = field({
-		__connection: connect({principals: PRINCIPAL_EXPLORER_WRITE}),
 		_name: lcKey,
 		allowArray,
 		description,
@@ -64,7 +63,9 @@ export function post({params: {
 		includeInAllText,
 		path
 	});
-	const node = modify(nodeParams);
+	const node = modify(nodeParams, {
+		connection: connect({principals: PRINCIPAL_EXPLORER_WRITE})
+	});
 
 	let body = {
 		message: `Field with key:${lcKey} modified.`

@@ -49,9 +49,6 @@ export function post({
 		}
 
 		const modifyRes = modify({
-			__connection: connect({
-				principals: [PRINCIPAL_EXPLORER_WRITE]
-			}),
 			//_id: id, // Gets stripped!!!
 			//_parentPath: thesaurusNode._path,
 			_parentPath: dirname(synonymNode._path),
@@ -59,6 +56,10 @@ export function post({
 			displayName: `${Array.isArray(from) ? from.join(', ') : from} => ${Array.isArray(to) ? to.join(', ') : to}`,
 			from,
 			to
+		}, {
+			connection: connect({
+				principals: [PRINCIPAL_EXPLORER_WRITE]
+			})
 		});
 		if (!modifyRes) {
 			throw new Error(`Something went wrong when trying to modify synonym id:${id} from:${fromJson} to:${toJson} in thesaurus with id:${thesaurusId}!`);

@@ -52,8 +52,9 @@ export function post({
 
 	obj.resultMappings = mapResultMappings(obj.resultMappings);
 
-	obj.__connection = writeConnection; // eslint-disable-line no-underscore-dangle
-	const node = modify(interfaceModel(obj));
+	const node = modify(interfaceModel(obj), {
+		connection: writeConnection
+	});
 	const body = {};
 	let status = 200;
 	if (node) {
