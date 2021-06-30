@@ -590,6 +590,9 @@ export function run() {
 		//──────────────────────────────────────────────────────────────────────
 		// Model 6: Remove "system" fields
 		//──────────────────────────────────────────────────────────────────────
+		// NOTE: This will delete the type field, but it can be recreated and
+		// used as a normal field after that.
+		//──────────────────────────────────────────────────────────────────────
 		if (isModelLessThan({
 			connection: writeConnection,
 			version: 6

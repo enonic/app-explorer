@@ -198,6 +198,7 @@ app-explorer
 
 * TODO: Remove any reference to lib-cron
 * TODO: Enable should filters in interfaces again
+* TODO: Support stemmed queries
 
 ### 1.5.0-SNAPSHOT
 
@@ -238,6 +239,11 @@ app-explorer
 * Remove field displayName
 * Add field min and max occurrences
 * Add more field value types
+* Upgrade to lib-explorer-3.18.0
+  * Adding language when building _indexConfig to support stemmed queries
+* Upgrade to lib-explorer-3.17.0
+  * Add getLocales()
+  * Require to Enonic XP 7.7 and use internal scheduling instead of lib-cron
 * Upgrade to lib-explorer-3.16.0
   * Require Enonic XP 7.6 and use distributed tasks
 * Upgrade to lib-explorer-3.15.2

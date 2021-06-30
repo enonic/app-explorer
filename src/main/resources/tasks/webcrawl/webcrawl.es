@@ -91,11 +91,15 @@ const outerHTML = node => node.clone().wrap('<div>').parent().html();
 export function run({
 	name, // Collection name
 	collectorId,
-	configJson
+	configJson,
+	language
 }) {
-	DEBUG && log.info(toStr({name, collectorId, configJson}));
+	//log.info(`name:${toStr(name)}`);
+	//log.info(`collectorId:${toStr(collectorId)}`);
+	//log.info(`configJson:${toStr(configJson)}`);
+	//log.info(`language:${toStr(language)}`);
 
-	const collector = new Collector({name, collectorId, configJson});
+	const collector = new Collector({name, collectorId, configJson, language});
 	if (!collector.config.baseUri) { throw new Error('Config is missing required parameter baseUri!'); }
 	collector.start();
 
