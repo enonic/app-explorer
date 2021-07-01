@@ -198,11 +198,11 @@ app-explorer
 
 * TODO: Remove any reference to lib-cron
 * TODO: Enable should filters in interfaces again
-* TODO: Support stemmed queries
 
 ### 1.5.0-SNAPSHOT
 
 * TODO: BUG explorer doesn't initialize on fresh sandbox (Enonic XP 7.5.0, 7.6.1 and 7.7.0)
+* Support stemmed queries
 * collectionDuplicate no longer includes schedule
 * Migrate from collection.cron to system.scheduler
 * Scheduling page

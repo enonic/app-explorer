@@ -24,8 +24,11 @@ import webpack from 'webpack';
 const MODE = 'production';
 //print({MODE});
 
-const BOOL_LIB_EXPLORER_EXTERNAL = MODE === 'production';
-//const BOOL_LIB_EXPLORER_EXTERNAL = false;
+//const BOOL_LIB_EXPLORER_EXTERNAL = MODE === 'production';
+const BOOL_LIB_EXPLORER_EXTERNAL = false;
+
+//const BOOL_LOCAL_SDK = MODE !== 'production';
+const BOOL_LOCAL_SDK = true;
 
 const BOOL_LOCAL_SEMANTIC_UI_REACT_FORM = MODE !== 'production';
 //const BOOL_LOCAL_SEMANTIC_UI_REACT_FORM = true;
@@ -59,7 +62,14 @@ const SRC_DIR_ABS = path.resolve(__dirname, SRC_DIR);
 const DST_DIR_ABS = path.join(__dirname, DST_DIR);
 
 const SS_ALIAS = {
-	'@enonic/nashorn-polyfills': path.resolve(__dirname, 'src/main/resources/lib/nashorn/index.es')
+	'@enonic/nashorn-polyfills': path.resolve(__dirname, 'src/main/resources/lib/nashorn/index.es'),
+	'@enonic/sdk': BOOL_LIB_EXPLORER_EXTERNAL
+		? BOOL_LOCAL_SDK
+			? path.resolve(__dirname, '../../comlock/sdk-npm/src/index')
+			: path.resolve(__dirname, './node_modules/@enonic/sdk/src/index')
+		: BOOL_LOCAL_SDK
+			? path.resolve(__dirname, '../../comlock/sdk-npm/dist/cjs/index')
+			: path.resolve(__dirname, './node_modules/@enonic/sdk/dist/cjs/index')
 };
 
 // Avoid bundling and transpile library files seperately.
@@ -548,6 +558,9 @@ const CLIENT_JS_CONFIG = {
 		})
 	],
 	resolve: {
+		/*alias: { // NOTE: If the local lib-explorer is not the newest there could be trouble...
+			'/lib/explorer': path.resolve(SRC_DIR_ABS, '../lib-explorer/src/main/resources/lib/explorer/')
+		},*/
 		extensions: ['.es', '.js', '.jsx']
 	},
 	stats: STATS
@@ -583,6 +596,17 @@ const CLIENT_ES_CONFIG = {
 			loader: 'esbuild-loader',
 			options: {
 				loader: 'jsx',
+				target: ESBUILD_TARGET
+			}
+		}, {
+			exclude: [ // It takes time to transpile, if you know they don't need transpilation to run in Enonic you may list them here:
+				/node_modules[\\/]core-js/, // will cause errors if they are transpiled by Babel
+				/node_modules[\\/]webpack[\\/]buildin/ // will cause errors if they are transpiled by Babel
+			],
+			test: /\.tsx?$/,
+			loader: 'esbuild-loader',
+			options: {
+				loader: 'tsx',
 				target: ESBUILD_TARGET
 			}
 		}]
@@ -623,12 +647,15 @@ const CLIENT_ES_CONFIG = {
 	],
 	resolve: {
 		alias: {
+			'@enonic/sdk': BOOL_LOCAL_SDK
+				? path.resolve(__dirname, '../../comlock/sdk-npm/src/index')
+				: path.resolve(__dirname, './node_modules/@enonic/sdk/src/index'),
 			'semantic-ui-react-form': BOOL_LOCAL_SEMANTIC_UI_REACT_FORM
 				? path.resolve(__dirname, '../semantic-ui-react-form/src')
 				: path.resolve(__dirname, './node_modules/@enonic/semantic-ui-react-form/src')
 		},
 		extensions: [
-			'mjs', 'jsx', 'esm', 'es', 'es6', 'js', 'json'
+			'mjs', 'jsx', 'esm', 'es', 'es6', 'js', 'json', 'ts'
 		].map(ext => `.${ext}`)
 	},
 	stats: STATS

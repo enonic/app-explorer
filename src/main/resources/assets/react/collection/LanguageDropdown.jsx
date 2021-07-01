@@ -8,11 +8,15 @@ import {capitalize} from '../utils/capitalize';
 
 export function LanguageDropdown(props) {
 	const {
-		locales
+		disabled = false,
+		locales,
+		name = 'language',
+		parentPath,
+		path = parentPath ? `${parentPath}.${name}` : name
 	} = props;
 	const [context/*, dispatch*/] = getEnonicContext();
 
-	const language = getIn(context.values, 'language');
+	const language = getIn(context.values, path);
 	/*
 	className='icon'
 	button
@@ -23,6 +27,7 @@ export function LanguageDropdown(props) {
 	*/
 	//return <Flag name={}/>
 	return <Dropdown
+		disabled={disabled}
 		fluid
 		options={locales.map(({
 			country,
@@ -43,7 +48,7 @@ export function LanguageDropdown(props) {
 			text: `${capitalize(displayName)} [${tag}]`,
 			value: tag
 		}))}
-		path='language'
+		path={path}
 		placeholder='Select language'
 		search
 		selection

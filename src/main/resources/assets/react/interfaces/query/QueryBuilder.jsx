@@ -1,3 +1,11 @@
+import {
+	QUERY_FUNCTION_FULLTEXT,
+	QUERY_FUNCTION_NGRAM,
+	QUERY_FUNCTION_RANGE,
+	QUERY_FUNCTION_PATH_MATCH,
+	QUERY_FUNCTION_STEMMED
+} from '@enonic/sdk';
+
 import getIn from 'get-value';
 import {
 	Dropdown as SemanticUiReactDropdown,
@@ -15,6 +23,7 @@ import {Fulltext} from './Fulltext';
 import {Logic} from './Logic';
 import {PathMatch} from './PathMatch';
 import {Range} from './Range';
+import {Stemmed} from './Stemmed';
 
 
 export function QueryBuilder(props) {
@@ -63,7 +72,20 @@ export function QueryBuilder(props) {
 						expressions: [],
 						operator: 'or'
 					};
-				} else if (['fulltext', 'ngram', 'synonyms'].includes(newType)) {
+				} else if (newType === QUERY_FUNCTION_STEMMED) {
+					params = {
+						fields: [{
+							field: '', // The _allText field doesn't suport stemming yet.
+							boost: ''
+						}],
+						operator: 'and',
+						language: ''
+					};
+				} else if ([
+					QUERY_FUNCTION_FULLTEXT,
+					QUERY_FUNCTION_NGRAM,
+					'synonyms'
+				].includes(newType)) {
 					params = {
 						fields: [{
 							field: '_allText',
@@ -80,7 +102,7 @@ export function QueryBuilder(props) {
 						operator: '=',
 						valueExpr: ''
 					};
-				} else if (newType === 'range') {
+				} else if (newType === QUERY_FUNCTION_RANGE) {
 					params = {
 						field: '',
 						from : '',
@@ -88,7 +110,7 @@ export function QueryBuilder(props) {
 						includeFrom: false,
 						includeTo: false
 					};
-				} else if (newType === 'pathMatch') {
+				} else if (newType === QUERY_FUNCTION_PATH_MATCH) {
 					params = {
 						field: '',
 						path: '',
@@ -108,13 +130,17 @@ export function QueryBuilder(props) {
 				text: 'Logic',
 				value: 'group'
 			}, {
-				key: 'fulltext',
-				text: 'Fulltext',
-				value: 'fulltext'
+				key: QUERY_FUNCTION_STEMMED,
+				text: 'Stemmed',
+				value: QUERY_FUNCTION_STEMMED
 			}, {
-				key: 'ngram',
+				key: QUERY_FUNCTION_FULLTEXT,
+				text: 'Fulltext',
+				value: QUERY_FUNCTION_FULLTEXT
+			}, {
+				key: QUERY_FUNCTION_NGRAM,
 				text: 'Ngram',
-				value: 'ngram'
+				value: QUERY_FUNCTION_NGRAM
 			}, {
 				key: 'synonyms',
 				text: 'Synonyms', // Fulltext Or
@@ -124,19 +150,28 @@ export function QueryBuilder(props) {
 				text: 'Compare expression',
 				value: 'compareExpr'
 			}, {
-				key: 'range',
+				key: QUERY_FUNCTION_RANGE,
 				text: 'Range',
-				value: 'range'
+				value: QUERY_FUNCTION_RANGE
 			}, {
-				key: 'pathMatch',
+				key: QUERY_FUNCTION_PATH_MATCH,
 				text: 'Path match',
-				value: 'pathMatch'
+				value: QUERY_FUNCTION_PATH_MATCH
 			}]}
 			path={`${path}.type`}
 			placeholder='Please select expression type'
 			value={type}
 		/>
-		{['fulltext', 'ngram', 'synonyms'].includes(type) && <Fulltext
+		{type === QUERY_FUNCTION_STEMMED && <Stemmed
+			disabled={disabled}
+			fieldsObj={expandedFieldsObj}
+			path={paramsPath}
+		/>}
+		{[
+			QUERY_FUNCTION_FULLTEXT,
+			QUERY_FUNCTION_NGRAM,
+			'synonyms'
+		].includes(type) && <Fulltext
 			disabled={disabled}
 			fieldsObj={expandedFieldsObj}
 			path={paramsPath}
@@ -154,12 +189,12 @@ export function QueryBuilder(props) {
 			fieldsObj={fieldsObj}
 			path={paramsPath}
 		/>}
-		{type === 'range' && <Range
+		{type === QUERY_FUNCTION_RANGE && <Range
 			disabled={disabled}
 			fieldsObj={fieldsObj}
 			path={paramsPath}
 		/>}
-		{type === 'pathMatch' && <PathMatch
+		{type === QUERY_FUNCTION_PATH_MATCH && <PathMatch
 			disabled={disabled}
 			fieldsObj={fieldsObj}
 			path={paramsPath}
