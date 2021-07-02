@@ -6,7 +6,7 @@ import {
 	QUERY_FUNCTION_STEMMED,
 	QUERY_OPERATOR_AND,
 	QUERY_OPERATOR_OR
-} from '@enonic/sdk';
+} from '@enonic/js-utils';
 
 import getIn from 'get-value';
 import {

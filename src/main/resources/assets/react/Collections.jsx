@@ -1,3 +1,8 @@
+import {
+	lpad,
+	rpad
+} from '@enonic/js-utils';
+
 import {parseExpression as parseCronExpression} from 'cron-parser';
 import {
 	Button, Dimmer, Header, Icon, Loader, Popup, Table
@@ -139,19 +144,6 @@ const UPDATE_GQL = `{
 	${JOBS_GQL}
 	${TASKS_GQL}
 }`;
-
-function rpad(s, w = 2, z = ' ') {
-	s = s + '';
-	return s.length >= w
-		? s
-		: s + new Array(w - s.length + 1).join(z);
-}
-
-
-function lpad(s, w = 2, z = ' ') {
-	s = s + '';
-	return s.length >= w ? s : new Array(w - s.length + 1).join(z) + s;
-}
 
 
 export function Collections(props) {

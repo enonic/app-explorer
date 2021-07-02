@@ -1,7 +1,7 @@
 import {
 	QUERY_OPERATOR_AND,
 	QUERY_OPERATOR_OR
-} from '@enonic/sdk';
+} from '@enonic/js-utils';
 
 import getIn from 'get-value';
 import {Button, Form, Table} from 'semantic-ui-react';

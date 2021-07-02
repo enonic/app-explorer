@@ -4,7 +4,7 @@ import {Form, Radio} from 'semantic-ui-react';
 import {getEnonicContext} from 'semantic-ui-react-form/Context';
 import {setValue} from 'semantic-ui-react-form/actions';
 
-import {QUERY_OPERATOR_AND, QUERY_OPERATOR_OR} from '@enonic/sdk';
+import {QUERY_OPERATOR_AND, QUERY_OPERATOR_OR} from '@enonic/js-utils';
 
 export function OperatorSelector(props) {
 	const [context, dispatch] = getEnonicContext();
