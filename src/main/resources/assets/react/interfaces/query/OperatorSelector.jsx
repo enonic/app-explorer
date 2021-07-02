@@ -4,34 +4,37 @@ import {Form, Radio} from 'semantic-ui-react';
 import {getEnonicContext} from 'semantic-ui-react-form/Context';
 import {setValue} from 'semantic-ui-react-form/actions';
 
+import {QUERY_OPERATOR_AND, QUERY_OPERATOR_OR} from '@enonic/sdk';
 
 export function OperatorSelector(props) {
 	const [context, dispatch] = getEnonicContext();
 	const {
-		defaultValue = 'or',
+		defaultValue = QUERY_OPERATOR_OR,
 		disabled = false,
+		options = [{
+			label: 'OR',
+			value: QUERY_OPERATOR_OR
+		},{
+			value: 'AND',
+			key: QUERY_OPERATOR_AND
+		}],
 		parentPath,
 		path = parentPath ? `${parentPath}.operator` : 'operator',
 		value = getIn(context.values, path, defaultValue)
 	} = props;
+	//console.debug('path', path, 'value', value);
 	return <>
-		<Form.Field>
+		{options.map(({
+			label,
+			value: optionValue
+		}, index) => <Form.Field key={`${path}.${index}`}>
 			<Radio
-				checked={value !== 'and'}
+				checked={value === optionValue}
 				disabled={disabled}
-				label="OR"
+				label={label}
 				name={path}
-				onChange={() => dispatch(setValue({path, value: 'or'}))}
+				onChange={() => dispatch(setValue({path, value: optionValue}))}
 			/>
-		</Form.Field>
-		<Form.Field>
-			<Radio
-				checked={value === 'and'}
-				disabled={disabled}
-				label="AND"
-				name={path}
-				onChange={() => dispatch(setValue({path, value: 'and'}))}
-			/>
-		</Form.Field>
+		</Form.Field>)}
 	</>;
 } //function OperatorSelector

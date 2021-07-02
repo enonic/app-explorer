@@ -1,3 +1,8 @@
+import {
+	QUERY_OPERATOR_AND,
+	QUERY_OPERATOR_OR
+} from '@enonic/sdk';
+
 import getIn from 'get-value';
 import {Button, Form, Table} from 'semantic-ui-react';
 
@@ -113,6 +118,13 @@ export function Fulltext(props) {
 		{type === 'synonyms' ? null : <OperatorSelector
 			disabled={disabled}
 			parentPath={path}
+			options={[{
+				value: QUERY_OPERATOR_OR,
+				label: 'OR - Any of the words in the search-string matches.'
+			},{
+				value: QUERY_OPERATOR_AND,
+				label: 'AND - All words in search-string matches.'
+			}]}
 		/>}
 	</>;
 

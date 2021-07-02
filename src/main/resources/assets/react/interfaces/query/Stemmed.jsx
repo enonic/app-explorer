@@ -1,6 +1,8 @@
 import {
 	LANGUAGES,
-	QUERY_FUNCTION_STEMMED
+	QUERY_FUNCTION_STEMMED,
+	QUERY_OPERATOR_AND,
+	QUERY_OPERATOR_OR
 } from '@enonic/sdk';
 
 import {Button, Table} from 'semantic-ui-react';
@@ -147,6 +149,13 @@ export function Stemmed(props) {
 		/>
 		<OperatorSelector
 			disabled={disabled}
+			options={[{
+				value: QUERY_OPERATOR_OR,
+				label: 'OR - Any of the words in the search-string matches.'
+			},{
+				value: QUERY_OPERATOR_AND,
+				label: 'AND - All words in search-string matches.'
+			}]}
 			parentPath={path}
 		/>
 	</>;

@@ -3,7 +3,9 @@ import {
 	QUERY_FUNCTION_NGRAM,
 	QUERY_FUNCTION_RANGE,
 	QUERY_FUNCTION_PATH_MATCH,
-	QUERY_FUNCTION_STEMMED
+	QUERY_FUNCTION_STEMMED,
+	QUERY_OPERATOR_AND,
+	QUERY_OPERATOR_OR
 } from '@enonic/sdk';
 
 import getIn from 'get-value';
@@ -70,7 +72,7 @@ export function QueryBuilder(props) {
 				if(newType === 'group') {
 					params = {
 						expressions: [],
-						operator: 'or'
+						operator: QUERY_OPERATOR_OR
 					};
 				} else if (newType === QUERY_FUNCTION_STEMMED) {
 					params = {
@@ -78,7 +80,7 @@ export function QueryBuilder(props) {
 							field: '', // The _allText field doesn't suport stemming yet.
 							boost: ''
 						}],
-						operator: 'and',
+						operator: QUERY_OPERATOR_AND,
 						language: ''
 					};
 				} else if ([
@@ -91,7 +93,7 @@ export function QueryBuilder(props) {
 							field: '_allText',
 							boost: ''
 						}],
-						operator: newType === 'synonyms' ? 'or' : 'and'
+						operator: newType === 'synonyms' ? QUERY_OPERATOR_OR : QUERY_OPERATOR_AND
 					};
 					if (newType === 'synonyms') {
 						params.thesauri = [];

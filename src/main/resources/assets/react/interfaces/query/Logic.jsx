@@ -1,3 +1,8 @@
+import {
+	QUERY_OPERATOR_AND,
+	QUERY_OPERATOR_OR
+} from '@enonic/sdk';
+
 import getIn from 'get-value';
 import {Button, Divider, Form, Icon, Segment} from 'semantic-ui-react';
 
@@ -46,6 +51,13 @@ export function Logic(props) {
 		<OperatorSelector
 			disabled={disabled}
 			path={`${path}.operator`}
+			options={[{
+				value: QUERY_OPERATOR_OR,
+				label: 'OR - Any of the expressions matches.'
+			},{
+				value: QUERY_OPERATOR_AND,
+				label: 'AND - All expressions matches.'
+			}]}
 		/>
 		<List
 			path={expressionsPath}
