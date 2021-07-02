@@ -19,19 +19,49 @@ import {fieldObjToFieldArr} from './fieldObjToFieldArr';
 import {OperatorSelector} from './OperatorSelector';
 
 
+const LANG_CODE_TO_COUNTRY_CODE = {
+	ar: 'ae', // sa
+	bg: 'bg',
+	bn: 'bd',
+	ca: 'es', // Spain
+	cz: 'cz',
+	da: 'dk',
+	de: 'de',
+	el: 'gr',
+	eu: 'es', // Spain
+	es: 'es',
+	fa: 'ir',
+	fi: 'fi',
+	fr: 'fr',
+	ga: 'ie',
+	gl: 'es', // Spain
+	hi: 'in',
+	hu: 'hu',
+	hy: 'am',
+	id: 'id',
+	it: 'it',
+	ja: 'jp',
+	ko: 'kr', // South
+	ku: 'iq', // Iraq
+	lt: 'lt',
+	lv: 'lv',
+	nl: 'nl',
+	no: 'no',
+	pt: 'pt',
+	'pt-br': 'br',
+	ro: 'ro',
+	ru: 'ru',
+	sv: 'se',
+	tr: 'tr',
+	th: 'th',
+	zh: 'cn'
+};
+
 const LOCALES = LANGUAGES.map(({
 	code: tag,
 	language: displayName
 }) => ({
-	country: tag === 'da' && 'dk'
-	|| tag === 'el' && 'gr'
-	|| tag === 'hi' && 'in'
-	|| tag === 'hy' && 'am'
-	|| tag === 'ja' && 'jp'
-	|| tag === 'ko' && 'kr'
-	|| tag === 'pt-br' && 'br'
-	|| tag === 'zh' && 'cn'
-	|| tag,
+	country: LANG_CODE_TO_COUNTRY_CODE[tag] || '',
 	displayName,
 	tag
 }));
@@ -48,6 +78,11 @@ export function Stemmed(props) {
 	const fieldsPath = `${path}.fields`;
 	const fieldOptions = fieldObjToFieldArr(fieldsObj);
 	return <>
+		<LanguageDropdown
+			disabled={disabled}
+			locales={LOCALES}
+			parentPath={path}
+		/>
 		<List
 			path={fieldsPath}
 			render={(fieldsArray) => {
@@ -112,11 +147,6 @@ export function Stemmed(props) {
 		/>
 		<OperatorSelector
 			disabled={disabled}
-			parentPath={path}
-		/>
-		<LanguageDropdown
-			disabled={disabled}
-			locales={LOCALES}
 			parentPath={path}
 		/>
 	</>;
