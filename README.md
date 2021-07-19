@@ -186,7 +186,8 @@ app-explorer
 
 | App version | XP version |
 | ----------- | ---------- |
-| 1.5.0 | 7.6.0 |
+| 2.0.0 | 7.7.0 |
+| 1.5.0 | 7.7.0 |
 | 1.4.0 | 7.4.1 |
 | 1.[23].0 | 7.3.2 |
 | 1.1.0 | 7.3.1 |
@@ -198,10 +199,30 @@ app-explorer
 
 * TODO: Remove any reference to lib-cron
 * TODO: Enable should filters in interfaces again
+* Require lib-explorer-4.0.0
+  * Moved from constants to @enonic/js-utils
+    * COLON_SIGN
+    * DOT_SIGN
+    * ELLIPSIS
+    * RT_JSON -> RESPONSE_TYPE_JSON
+    * RT_HTML -> RESPONSE_TYPE_HTML
+  * Remove TOOL_PATH from constants
+  * Deprecate collection/unregister
+  * Change lib-explorer-3 deprecation warnings into thrown errors:
+    * collection/register
+    * collection/reschedule
+  * Move _nodeType = document from should to must in interface code
+  * Move should _nodeType filter to must in all queries
+  * Remove should type filter from all queries
+* Build system upgrades:
+  * Gradle 6.4
+  * Node 14.17.3
+  * Core-js 3.15.2
+  * Webpack 5.45.1
 
 ### 1.5.0-SNAPSHOT
 
-* TODO: BUG explorer doesn't initialize on fresh sandbox (Enonic XP 7.5.0, 7.6.1 and 7.7.0)
+* TODO: BUG explorer doesn't initialize on fresh sandbox (Enonic XP 7.7.0)
 * Support stemmed queries
 * collectionDuplicate no longer includes schedule
 * Migrate from collection.cron to system.scheduler
