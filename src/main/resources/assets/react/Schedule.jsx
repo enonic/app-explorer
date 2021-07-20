@@ -22,7 +22,7 @@ const JOBS_GQL = `{
 }`;
 
 
-export const Scheduling = (props) => {
+export const Schedule = (props) => {
 	const {
 		servicesBaseUrl,
 		now: propNow = new Date(Date.now()),
@@ -117,7 +117,7 @@ export const Scheduling = (props) => {
 	React.useEffect(memoizedFetchJobs, [memoizedFetchJobs]);
 
 	useInterval(() => {
-		// This will continue to run as long as the Scheduling "tab" is open
+		// This will continue to run as long as the Schedule "tab" is open
 		//if (boolPoll) {
 		memoizedFetchJobs();
 	}, 5000);
@@ -251,12 +251,12 @@ const TASKS = [{
 //const VIEW_MODE = 'Week';
 
 
-export const Scheduling = (props) => {
+export const Schedule = (props) => {
 	const {
 		servicesBaseUrl
 	} = props;
 	return <>
-		<h1>Scheduling</h1>
+		<h1>Schedule</h1>
 		<FrappeGantt
 			tasks={TASKS}
 			viewMode={'Week'/*this.state.mode this is undefined}
