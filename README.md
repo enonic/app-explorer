@@ -228,7 +228,7 @@ app-explorer
 
 * TODO: BUG explorer doesn't initialize on fresh sandbox (Enonic XP 7.7.0)
 * TODO: Use collection name rather than collection when scheduling
-* TODO: Scheduling -> Schedules
+* Scheduling -> Schedules
 * Support stemmed queries
 * collectionDuplicate no longer includes schedule
 * Migrate from collection.cron to system.scheduler
