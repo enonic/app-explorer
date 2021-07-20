@@ -1,5 +1,5 @@
 import {
-	LANGUAGES,
+	STEMMING_LANGUAGES,
 	QUERY_FUNCTION_STEMMED,
 	QUERY_OPERATOR_AND,
 	QUERY_OPERATOR_OR
@@ -59,7 +59,7 @@ const LANG_CODE_TO_COUNTRY_CODE = {
 	zh: 'cn'
 };
 
-const LOCALES = LANGUAGES.map(({
+const LOCALES = STEMMING_LANGUAGES.map(({
 	code: tag,
 	language: displayName
 }) => ({
