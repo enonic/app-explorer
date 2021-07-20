@@ -673,6 +673,57 @@ export function run() {
 		} // if model < 7
 
 		//──────────────────────────────────────────────────────────────────────
+		// Model 8: Add stemmed query expressions to Default interface
+		//──────────────────────────────────────────────────────────────────────
+		if (isModelLessThan({
+			connection: writeConnection,
+			version: 8
+		})) {
+			progress.addItems(1).setInfo('Add stemmed query expressions to Default interface...').report().logInfo();
+
+			const existingInterfaceNode = getInterface({
+				connection: writeConnection,
+				interfaceName: DEFAULT_INTERFACE_NAME
+			});
+			//log.debug(`existingInterfaceNode:${toStr(existingInterfaceNode)}`);
+
+			const interfaceParams = interfaceModel(DEFAULT_INTERFACE);
+			//log.debug(`interfaceParams:${toStr(interfaceParams)}`);
+
+			if(existingInterfaceNode) {
+				const maybeChangedInterface = JSON.parse(JSON.stringify(existingInterfaceNode));
+				delete interfaceParams._parentPath;
+				Object.keys(interfaceParams).forEach((k) => {
+					maybeChangedInterface[k] = interfaceParams[k];
+				});
+				//log.debug(`maybeChangedInterface:${toStr(maybeChangedInterface)}`);
+
+				if (!deepEqual(existingInterfaceNode, maybeChangedInterface)) {
+					interfaceParams.modifiedTime = new Date();
+					maybeChangedInterface.modifiedTime = interfaceParams.modifiedTime;
+					ignoreErrors(() => {
+						log.info(`Changes detected, updating default interface. Diff:${toStr(detailedDiff(existingInterfaceNode, maybeChangedInterface))}`);
+						writeConnection.modify({
+							key: existingInterfaceNode._id,
+							editor: (node) => {
+								Object.keys(interfaceParams).forEach((k) => {
+									node[k] = interfaceParams[k];
+								});
+								return node;
+							}
+						});
+					});
+				}
+			}
+
+			progress.finishItem();
+			setModel({
+				connection: writeConnection,
+				version: 8
+			});
+		} // if model < 8
+
+		//──────────────────────────────────────────────────────────────────────
 
 		progress.setInfo('Initialization complete :)').report().logInfo();
 		const event = {
