@@ -1,7 +1,4 @@
-//──────────────────────────────────────────────────────────────────────────────
-// Enonic XP libs (externals not webpacked)
-//──────────────────────────────────────────────────────────────────────────────
-//import {toStr} from '/lib/util';
+//import {toStr} from '@enonic/js-utils';
 
 //──────────────────────────────────────────────────────────────────────────────
 // Local libs (Absolute path without extension so it doesn't get webpacked)

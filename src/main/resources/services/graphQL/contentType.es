@@ -1,3 +1,5 @@
+//import {toStr} from '@enonic/js-utils';
+
 import {
 	//createInputObjectType,
 	createObjectType,
@@ -8,7 +10,6 @@ import {
 	list,
 	nonNull
 } from '/lib/graphql';
-//import {toStr} from '/lib/util';
 import {getTypes} from '/lib/xp/content';
 
 

@@ -1,3 +1,5 @@
+//import {forceArray, toStr} from '@enonic/js-utils';
+
 import {
 	//createInputObjectType,
 	createObjectType,
@@ -8,8 +10,6 @@ import {
 	list,
 	nonNull
 } from '/lib/graphql';
-//import {forceArray} from '/lib/util/data';
-//import {toStr} from '/lib/util';
 
 
 import {PRINCIPAL_EXPLORER_READ} from '/lib/explorer/model/2/constants';

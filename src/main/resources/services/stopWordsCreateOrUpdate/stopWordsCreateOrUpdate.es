@@ -1,4 +1,5 @@
-//import {toStr} from '/lib/util';
+//import {toStr} from '@enonic/js-utils';
+
 import {
 	NT_STOP_WORDS,
 	PRINCIPAL_EXPLORER_WRITE,

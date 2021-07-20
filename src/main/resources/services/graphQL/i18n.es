@@ -1,3 +1,5 @@
+//import {toStr} from '@enonic/js-utils';
+
 import {
 	//createInputObjectType,
 	createObjectType,
@@ -8,9 +10,9 @@ import {
 	list//,
 	//nonNull
 } from '/lib/graphql';
-//import {toStr} from '/lib/util';
 //import {getLocales as importedGetLocales} from '/lib/locales';
 import {getLocales as importedGetLocales} from '../../lib/locales';
+
 
 export const getLocales = {
 	args: {

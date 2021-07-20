@@ -1,4 +1,4 @@
-//import {toStr} from '/lib/util';
+//import {toStr} from '@enonic/js-utils';
 
 import {
 	PRINCIPAL_EXPLORER_WRITE,
@@ -25,7 +25,7 @@ exports.delete = ({
 			path: id
 		});
 		if (!deleteRes) {
-			throw new Error(`Something went wrong when trying to delete synonym id:${id}!`)
+			throw new Error(`Something went wrong when trying to delete synonym id:${id}!`);
 		}
 		body.message=`Deleted synonym id:${id}`;
 	} catch (e) {

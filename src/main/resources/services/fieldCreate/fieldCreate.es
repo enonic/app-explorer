@@ -1,4 +1,5 @@
-//import {toStr} from '/lib/util';
+//import {toStr} from '@enonic/js-utils';
+
 //import {sanitize} from '/lib/xp/common';
 
 import {
@@ -8,7 +9,6 @@ import {
 import {field} from '/lib/explorer/model/2/nodeTypes/field';
 import {create} from '/lib/explorer/node/create';
 import {connect} from '/lib/explorer/repo/connect';
-//import {ucFirst} from '/lib/explorer/ucFirst';
 
 
 export function post({params: {

@@ -1,3 +1,5 @@
+//import {toStr} from '@enonic/js-utils';
+
 import {
 	PRINCIPAL_EXPLORER_WRITE,
 	RT_JSON
@@ -6,8 +8,6 @@ import {exists} from '/lib/explorer/collection/exists';
 import {get} from '/lib/explorer/collection/get';
 import {connect} from '/lib/explorer/repo/connect';
 import {create} from '/lib/explorer/node/create';
-
-//import {toStr} from '/lib/util';
 
 
 export function post({

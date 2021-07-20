@@ -1,4 +1,6 @@
 import '@enonic/nashorn-polyfills';
+import {toStr} from '@enonic/js-utils';
+
 //──────────────────────────────────────────────────────────────────────────────
 // Enonic XP libs (included in jar via gradle dependencies)
 //──────────────────────────────────────────────────────────────────────────────
@@ -7,7 +9,6 @@ import {
 	unschedule as unscheduleCronJob
 } from '/lib/cron';
 
-import {toStr} from '/lib/util';
 import {isMaster} from '/lib/xp/cluster';
 import {listener} from '/lib/xp/event';
 import {submitTask} from '/lib/xp/task';

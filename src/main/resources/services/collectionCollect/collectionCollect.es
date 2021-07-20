@@ -1,4 +1,5 @@
-import {toStr} from '/lib/util';
+import {toStr} from '@enonic/js-utils';
+
 import {assetUrl} from '/lib/xp/portal';
 import {submitTask} from '/lib/xp/task';
 

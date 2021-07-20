@@ -1,5 +1,5 @@
-//import {toStr} from '/lib/util';
-//import {forceArray} from '/lib/util/data';
+//import {toStr} from '@enonic/js-utils';
+
 import {RT_JSON} from '/lib/explorer/model/2/constants';
 import {query as queryJournals} from '/lib/explorer/journal/query';
 import {addFilter} from '/lib/explorer/query/addFilter';

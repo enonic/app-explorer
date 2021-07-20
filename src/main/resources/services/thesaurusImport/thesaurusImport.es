@@ -1,4 +1,5 @@
-import {isString} from '/lib/util/value';
+import {isString} from '@enonic/js-utils';
+
 import {getMultipartText} from '/lib/xp/portal';
 
 import {

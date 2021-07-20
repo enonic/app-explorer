@@ -1,5 +1,5 @@
-//import {toStr} from '/lib/util';
-//import {forceArray} from '/lib/util/data';
+//import {toStr} from '@enonic/js-utils';
+
 import {getUser} from '/lib/xp/auth';
 import {sanitize} from '/lib/xp/common';
 

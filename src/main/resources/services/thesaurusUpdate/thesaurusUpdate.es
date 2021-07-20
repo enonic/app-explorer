@@ -1,3 +1,5 @@
+//import {toStr} from '@enonic/js-utils';
+
 import {jsonError} from '/lib/explorer/jsonError';
 import {
 	PRINCIPAL_EXPLORER_WRITE,
@@ -6,7 +8,6 @@ import {
 import {connect} from '/lib/explorer/repo/connect';
 import {modify} from '/lib/explorer/node/modify';
 import {thesaurus} from '/lib/explorer/model/2/nodeTypes/thesaurus';
-//import {toStr} from '/lib/util';
 
 
 export function post({

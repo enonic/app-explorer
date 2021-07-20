@@ -1,19 +1,20 @@
-import {execute} from '/lib/graphql';
-import {validateLicense} from '/lib/license';
-import {toStr} from '/lib/util';
-import {listener} from '/lib/xp/event';
+import {toStr} from '@enonic/js-utils';
+
+//import {execute} from '/lib/graphql';
+//import {validateLicense} from '/lib/license';
+//import {listener} from '/lib/xp/event';
 import {
-	addToGroup,
-	removeFromGroup,
-	send,
-	sendToGroup
+	//addToGroup,
+	//removeFromGroup,
+	send//,
+	//sendToGroup
 } from '/lib/xp/websocket';
 
-import {SCHEMA} from '../graphQL/graphQL';
+//import {SCHEMA} from '../graphQL/graphQL';
 //import {queryCollectionsResolver} from '../graphQL/collection';
 
 
-const WEBSOCKET_GROUP = 'subscribers';
+//const WEBSOCKET_GROUP = 'subscribers';
 
 /*const COLLECTIONS_GQL = `queryCollections {
 	total
@@ -134,14 +135,14 @@ const SITES_GQL = `getSites {
 
 //${COLLECTIONS_GQL}
 //${TASKS_GQL}
-const ALL_GQL = `{
+/*const ALL_GQL = `{
 	${COLLECTORS_GQL}
 	${CONTENT_TYPES_GQL}
 	${FIELDS_GQL}
 	${SITES_GQL}
 }`;
 
-const NULL = null;
+const NULL = null;*/
 
 
 export function get(request) {

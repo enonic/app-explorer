@@ -1,5 +1,5 @@
+import {isString} from '@enonic/js-utils';
 import getIn from 'get-value';
-import {isString} from '/lib/util/value';
 
 import {
 	PRINCIPAL_EXPLORER_READ,
