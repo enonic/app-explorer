@@ -186,7 +186,7 @@ app-explorer
 
 | App version | XP version |
 | ----------- | ---------- |
-| 1.5.0 | 7.6.0 |
+| 1.5.0 | 7.7.1 |
 | 1.4.0 | 7.4.1 |
 | 1.[23].0 | 7.3.2 |
 | 1.1.0 | 7.3.1 |
@@ -204,13 +204,14 @@ app-explorer
 * TODO: BUG explorer doesn't initialize on fresh sandbox (Enonic XP 7.7.0)
 * TODO: Use collection name rather than collection when scheduling
 * Scheduling -> Schedules
+* Require Enonic XP 7.7.1 (because of BUGFIX for main.js exception is swallowed)
 * Support stemmed queries
 * collectionDuplicate no longer includes schedule
 * Migrate from collection.cron to system.scheduler
 * Scheduling page
 * Reschedule without sending and listening for events
 * Make sure all previous cronJobs are unscheduled on startup
-* Require to Enonic XP 7.7 and use internal scheduling instead of lib-cron
+* Require Enonic XP 7.7 and use internal scheduling instead of lib-cron
 * Require Enonic XP 7.6 and use distributed tasks
 * Less noise on startup
 * Add values (true and false) for the system field document_metadata.valid
