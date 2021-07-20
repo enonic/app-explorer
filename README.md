@@ -197,6 +197,8 @@ app-explorer
 
 ### 2.0.0-SNAPSHOT
 
+* MAYBE: Make sure no schedule exist for collections that are somehow deleted?
+
 * TODO: Remove any reference to lib-cron
 * TODO: Enable should filters in interfaces again
 
@@ -227,7 +229,7 @@ app-explorer
 ### 1.5.0-SNAPSHOT
 
 * TODO: BUG explorer doesn't initialize on fresh sandbox (Enonic XP 7.7.0)
-* TODO: Use collection name rather than collection when scheduling
+* TODO: Use collection name rather than collection id when scheduling
 * Scheduling -> Schedules
 * Require Enonic XP 7.7.1 (because of BUGFIX for main.js exception is swallowed)
 * Support stemmed queries

@@ -39,6 +39,7 @@ import {addFilter} from '/lib/explorer/query/addFilter';
 import {hasValue} from '/lib/explorer/query/hasValue';
 import {runAsSu} from '/lib/explorer/runAsSu';
 import {getCollectors, createOrModifyJobsFromCollectionNode} from '/lib/explorer/scheduler/createOrModifyJobsFromCollectionNode';
+//import {listExplorerJobs} from '/lib/explorer/scheduler/listExplorerJobs';
 
 import {toStr} from '/lib/util';
 import {forceArray} from '/lib/util/data';
@@ -53,6 +54,7 @@ import {
 //import {sanitize} from '/lib/xp/common';
 import {send} from '/lib/xp/event';
 import {get as getRepo} from '/lib/xp/repo';
+//import {delete as deleteJob} from '/lib/xp/scheduler';
 
 import {Progress} from './Progress';
 
@@ -665,6 +667,19 @@ export function run() {
 			});
 			progress.finishItem();
 		} // if model < 7
+
+
+		//──────────────────────────────────────────────────────────────────────
+		// Things done after all data is initialized:
+		// Make sure no schedule exist for collections that are somehow deleted?
+		// Make sure a schedule exist for an imported collection? No, collections no longer contain cron definitions.
+		//──────────────────────────────────────────────────────────────────────
+		/*progress.setInfo(`Make sure no schedule exist for collections that are somehow deleted...`).report().logDebug();
+		const explorerJobs = listExplorerJobs();
+		log.debug(`explorerJobs:${toStr(explorerJobs)}`);
+		//deleteJob({name:})
+		progress.finishItem();*/
+
 
 		//──────────────────────────────────────────────────────────────────────
 
