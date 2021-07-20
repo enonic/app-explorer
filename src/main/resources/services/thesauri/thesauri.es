@@ -1,5 +1,5 @@
 //import {toStr} from '/lib/util';
-import {forceArray} from '/lib/util/data';
+//import {forceArray} from '/lib/util/data';
 
 import {PRINCIPAL_EXPLORER_READ, RT_JSON} from '/lib/explorer/model/2/constants';
 import {connect} from '/lib/explorer/repo/connect';
@@ -44,7 +44,7 @@ export function get({
 				filters,
 				filter: hasValue('_parentPath', `/thesauri/${thesaurus}`)
 			});
-		})
+		});
 	}
 
 	const connection = connect({
