@@ -199,7 +199,7 @@ app-explorer
 
 * TODO: Remove any reference to lib-cron
 * TODO: Enable should filters in interfaces again
-* TODO: Remove listener for EVENT_COLLECTOR_UNREGISTER from main? yes
+* TODO: Remove listener for EVENT_COLLECTOR_UNREGISTER from main
 * TODO: Remove unregister from main
 * TODO: Remove register from main
 
