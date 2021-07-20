@@ -12,6 +12,7 @@ require('object.getownpropertydescriptors').shim();
 //import 'symbol-es6'; // This does not fix: TypeError: Cannot read property "Symbol" from undefined
 
 require('array.prototype.find').shim();
+import {toStr} from '@enonic/js-utils';
 import guard from 'robots-txt-guard';
 
 // Cheerio import causes:
@@ -40,7 +41,6 @@ import {URL} from '/lib/galimatias';
 
 
 import {request as httpClientRequest} from '/lib/http-client';
-import {toStr} from '/lib/util';
 
 import {
 	NT_DOCUMENT

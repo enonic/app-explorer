@@ -1,7 +1,12 @@
-import {toStr} from '/lib/util';
+import {toStr} from '@enonic/js-utils';
+
 import {connect} from '/lib/xp/node';
 
-import {BRANCH_ID_EXPLORER, PACKAGE, NT_THESAURUS, REPO_ID_EXPLORER} from '/lib/explorer/model/2/constants';
+import {
+	BRANCH_ID_EXPLORER,
+	NT_THESAURUS,
+	REPO_ID_EXPLORER
+} from '/lib/explorer/model/2/constants';
 
 
 const CONNECTION = connect({

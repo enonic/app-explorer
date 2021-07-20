@@ -1,7 +1,9 @@
-//import {toStr} from '/lib/util';
+//import {toStr} from '@enonic/js-utils';
+
 import {RT_JSON} from '/lib/explorer/model/2/constants';
 import {listCollectors} from '/lib/explorer/collector/listCollectors';
 import {currentTimeMillis} from '/lib/explorer/time/currentTimeMillis';
+
 
 /*const TEST_DATA = [{
 	description: "Collect",

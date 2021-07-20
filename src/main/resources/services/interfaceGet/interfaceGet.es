@@ -1,8 +1,8 @@
+import {
+	forceArray//,
+	//toStr
+} from '@enonic/js-utils';
 import traverse from 'traverse';
-
-//import {toStr} from '/lib/util';
-import {forceArray} from '/lib/util/data';
-//import {isString} from '/lib/util/value';
 
 import {
 	PRINCIPAL_EXPLORER_READ,
@@ -12,6 +12,7 @@ import {jsonError} from '/lib/explorer/jsonError';
 import {get as getInterface} from '/lib/explorer/interface/get';
 import {connect} from '/lib/explorer/repo/connect';
 import {mapResultMappings} from '../graphQL/interface';
+
 
 function convert({object, fields, recurse = true}) {
 	traverse(object).forEach(function(value) { // Fat arrow destroys this

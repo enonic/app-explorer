@@ -1,14 +1,15 @@
+//import {toStr} from '@enonic/js-utils';
+
 import {
 	//createInputObjectType,
 	createObjectType,
-	GraphQLBoolean,
+	//GraphQLBoolean,
 	//GraphQLFloat,
 	GraphQLInt,
 	GraphQLString,
 	list,
 	nonNull
 } from '/lib/graphql';
-//import {toStr} from '/lib/util';
 import {getSites as gS} from '/lib/util/content/getSites';
 
 
@@ -25,7 +26,7 @@ const SITE_OBJECT_TYPE = createObjectType({
 
 
 export const getSites = {
-	resolve: (env) => {
+	resolve: (/*env*/) => {
 		//log.info(`env:${toStr(env)}`);
 		const sites = gS({
 			branch: 'master'

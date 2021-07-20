@@ -1,5 +1,4 @@
-//import {toStr} from '/lib/util';
-//import {forceArray} from '/lib/util/data';
+//import {toStr} from '@enonic/js-utils';
 
 import {PRINCIPAL_EXPLORER_READ, RT_JSON} from '/lib/explorer/model/2/constants';
 import {connect} from '/lib/explorer/repo/connect';

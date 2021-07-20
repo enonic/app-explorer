@@ -1,4 +1,5 @@
-//import {toStr} from '/lib/util';
+//import {toStr} from '@enonic/js-utils';
+
 import {sanitize} from '/lib/xp/common';
 
 import {

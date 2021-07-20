@@ -1,3 +1,5 @@
+import {toStr} from '@enonic/js-utils';
+
 import {
 	PRINCIPAL_EXPLORER_WRITE,
 	RT_JSON
@@ -6,11 +8,12 @@ import {connect} from '/lib/explorer/repo/connect';
 import {remove} from '/lib/explorer/node/remove';
 import {listExplorerJobsThatStartWithName} from '/lib/explorer/scheduler/listExplorerJobsThatStartWithName';
 
-import {toStr} from '/lib/util';
 import {delete as deleteJob} from '/lib/xp/scheduler';
 import {executeFunction} from '/lib/xp/task';
 
+
 const PATH_COLLECTIONS = '/collections';
+
 
 exports.delete = ({
 	params: {

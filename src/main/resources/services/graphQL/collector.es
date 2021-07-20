@@ -1,3 +1,5 @@
+//import {toStr} from '@enonic/js-utils';
+
 import {
 	//createInputObjectType,
 	createObjectType,
@@ -8,8 +10,6 @@ import {
 	list,
 	nonNull
 } from '/lib/graphql';
-//import {toStr} from '/lib/util';
-
 
 import {PRINCIPAL_EXPLORER_READ} from '/lib/explorer/model/2/constants';
 import {connect} from '/lib/explorer/repo/connect';

@@ -1,4 +1,6 @@
+//import {toStr} from '@enonic/js-utils';
 //import getIn from 'get-value';
+
 import {
 	//createInputObjectType,
 	createObjectType,
@@ -9,9 +11,7 @@ import {
 	list,
 	nonNull
 } from '/lib/graphql';
-//import {toStr} from '/lib/util';
 import {list as listTasks} from '/lib/xp/task';
-
 
 import {queryCollectorsResolver} from './collector';
 

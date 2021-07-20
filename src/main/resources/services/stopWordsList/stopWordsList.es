@@ -1,4 +1,5 @@
-//import {toStr} from '/lib/util';
+//import {toStr} from '@enonic/js-utils';
+
 import {
 	PRINCIPAL_EXPLORER_READ,
 	RT_JSON

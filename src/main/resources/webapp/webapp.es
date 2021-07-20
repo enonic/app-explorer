@@ -10,8 +10,9 @@ import '@enonic/nashorn-polyfills';
 export {all} from '/lib/explorer/api';
 
 /*
+import {toStr} from '@enonic/js-utils';
+
 import Router from '/lib/router';
-import {toStr} from '/lib/util';
 
 const router = Router();
 

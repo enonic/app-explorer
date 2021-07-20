@@ -1,3 +1,5 @@
+//import {toStr} from '@enonic/js-utils';
+
 import {
 	//createInputObjectType,
 	createObjectType,
@@ -9,11 +11,10 @@ import {
 	nonNull
 } from '/lib/graphql';
 import {validateLicense} from '/lib/license';
-//import {toStr} from '/lib/util';
 
 
 export const getLicense = {
-	resolve: (env) => {
+	resolve: (/*env*/) => {
 		//log.info(`env:${toStr(env)}`);
 		const licenseDetails = validateLicense({appKey: app.name});
 		const licenseValid = !!(licenseDetails && !licenseDetails.expired);

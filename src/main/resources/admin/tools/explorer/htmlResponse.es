@@ -1,9 +1,8 @@
+//import {toStr} from '@enonic/js-utils';
 import serialize from 'serialize-javascript';
 
 import {isLicenseValid, getIssuedTo} from '/lib/licensing';
-//import {toStr} from '/lib/util';
-/*import {forceArray} from '/lib/util/data';
-import {
+/*import {
 	getBaseUri,
 	getLauncherPath,
 	getLauncherUrl

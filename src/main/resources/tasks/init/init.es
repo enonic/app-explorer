@@ -1,3 +1,7 @@
+import {
+	forceArray,
+	toStr
+} from '@enonic/js-utils';
 import {detailedDiff} from 'deep-object-diff';
 import deepEqual from 'fast-deep-equal';
 
@@ -41,8 +45,6 @@ import {runAsSu} from '/lib/explorer/runAsSu';
 import {getCollectors, createOrModifyJobsFromCollectionNode} from '/lib/explorer/scheduler/createOrModifyJobsFromCollectionNode';
 //import {listExplorerJobs} from '/lib/explorer/scheduler/listExplorerJobs';
 
-import {toStr} from '/lib/util';
-import {forceArray} from '/lib/util/data';
 import {
 	addMembers,
 	createRole,

@@ -1,4 +1,9 @@
 import {
+	forceArray//,
+	//toStr
+} from '@enonic/js-utils';
+
+import {
 	NT_API_KEY,
 	//PATH_API_KEYS,
 	PRINCIPAL_EXPLORER_READ
@@ -16,8 +21,7 @@ import {
 	list,
 	nonNull
 } from '/lib/graphql';
-//import {toStr} from '/lib/util';
-import {forceArray} from '/lib/util/data';
+
 
 export const queryApiKeys = {
 	args: {

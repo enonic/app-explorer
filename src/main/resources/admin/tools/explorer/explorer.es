@@ -1,7 +1,8 @@
+//import {toStr} from '@enonic/js-utils';
+
 //──────────────────────────────────────────────────────────────────────────────
 // Enonic XP libs (included in jar via gradle dependencies)
 //──────────────────────────────────────────────────────────────────────────────
-//import {toStr} from '/lib/util';
 import newRouter from '/lib/router';
 import {hasRole} from '/lib/xp/auth';
 

@@ -1,4 +1,10 @@
 import {
+	forceArray,
+	isInt//,
+	//toStr
+} from '@enonic/js-utils';
+
+import {
 	//createInputObjectType,
 	createObjectType,
 	GraphQLBoolean,
@@ -8,9 +14,6 @@ import {
 	list,
 	nonNull
 } from '/lib/graphql';
-import {forceArray} from '/lib/util/data';
-import {isInt} from '/lib/util/value';
-//import {toStr} from '/lib/util';
 
 
 import {PRINCIPAL_EXPLORER_READ} from '/lib/explorer/model/2/constants';
