@@ -157,10 +157,13 @@ export function run() {
 			FOLDERS.forEach((_name) => {
 				progress.setInfo(`Creating folder ${_name}...`).report().logInfo();
 				ignoreErrors(() => {
-					create(folder({
-						__connection: writeConnection,
-						_name
-					}));
+					create(
+						folder({
+							_name
+						}), {
+							connection: writeConnection
+						}
+					);
 				});
 				progress.finishItem();
 			});
@@ -218,10 +221,11 @@ export function run() {
 					max,
 					min
 				});
-				params.__connection = writeConnection; // eslint-disable-line no-underscore-dangle
 				//log.info(toStr({params}));
 				ignoreErrors(() => {
-					create(params); // ;( This currently uses sanitize so _ becomes -
+					create(params, {
+						connection: writeConnection
+					}); // ;( This currently uses sanitize so _ becomes -
 				});
 				progress.finishItem();
 			}); // DEFAULT_FIELDS.forEach
@@ -230,14 +234,15 @@ export function run() {
 			progress.addItems(1);
 			progress.setInfo('Creating notificationsData...').report().logInfo();
 			const notificationsData = Node({
-				__connection: writeConnection,
 				_name: 'notifications',
 				emails:[]
 			});
 			//log.info(toStr({notificationsData}));
 			ignoreErrors(() => {
 				//const notificationsNode =
-				create(notificationsData);
+				create(notificationsData, {
+					connection: writeConnection
+				});
 				//log.info(toStr({notificationsNode}));
 			});
 			progress.finishItem();
@@ -470,9 +475,10 @@ export function run() {
 					});
 				}
 			} else {
-				interfaceParams.__connection = writeConnection; // eslint-disable-line no-underscore-dangle
 				ignoreErrors(() => {
-					create(interfaceParams); // Should contain _parentPath
+					create(interfaceParams, {
+						connection: writeConnection
+					}); // Should contain _parentPath
 				});
 			}
 

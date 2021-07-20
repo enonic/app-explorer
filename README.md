@@ -201,8 +201,8 @@ app-explorer
 
 ### 1.5.0-SNAPSHOT
 
-* TODO: BUG explorer doesn't initialize on fresh sandbox (Enonic XP 7.7.0)
 * TODO: Upgrade to lib-explorer-3.19.0
+* Update calls to node/create to avoid deprecation warnings
 * Scheduling -> Schedules
 * Require Enonic XP 7.7.1 (because of BUGFIX for main.js exception is swallowed)
 * Support stemmed queries
