@@ -194,11 +194,6 @@ app-explorer
 
 ## Changelog
 
-### 2.0.0-SNAPSHOT
-
-* TODO: Remove any reference to lib-cron
-* TODO: Enable should filters in interfaces again
-
 ### 1.5.0-SNAPSHOT
 
 * TODO: Upgrade to lib-explorer-3.19.0
