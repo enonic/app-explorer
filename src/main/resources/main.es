@@ -81,7 +81,7 @@ listener({
 		// But it should only be listened for, and acted upon on the master node.
 		if (isMaster()) {
 			listener({
-				type: `custom.${EVENT_COLLECTOR_UNREGISTER}`,
+				type: `custom.${EVENT_COLLECTOR_UNREGISTER}`, // TODO Remove in lib-explorer-4.0.0/app-explorer-2.0.0 ?
 				localOnly: true, // Only listen to local event? Yes
 				callback: (event) => {
 					log.debug(`Received event ${toStr(event)}`);

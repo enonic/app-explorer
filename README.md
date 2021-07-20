@@ -199,6 +199,10 @@ app-explorer
 
 * TODO: Remove any reference to lib-cron
 * TODO: Enable should filters in interfaces again
+* TODO: Remove listener for EVENT_COLLECTOR_UNREGISTER from main? yes
+* TODO: Remove unregister from main
+* TODO: Remove register from main
+
 * Require lib-explorer-4.0.0
   * Moved from constants to @enonic/js-utils
     * COLON_SIGN
