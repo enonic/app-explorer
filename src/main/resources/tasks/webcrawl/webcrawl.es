@@ -346,11 +346,11 @@ export function run({
 
 				if (boolIndex && (!robots || robots.isIndexable('', uri))) {
 					collector.persistDocument({
-						displayName: title,
+						displayName: title, // This has no field definition by default
 						title,
 						text: bodyEl.text(),
 						uri,
-						uris
+						uris // This has no field definition by default
 					});
 				} // indexable
 			} // resume ... else
