@@ -15,19 +15,6 @@ import {SearchModal} from './interfaces/SearchModal';
 		#_nodeType
 		_path
 		displayName
-		resultMappings {
-			field
-			highlight
-			highlightFragmenter
-			highlightNumberOfFragments
-			highlightOrder
-			highlightPostTag
-			highlightPreTag
-			lengthLimit
-			to
-			type
-		}
-		#type
 	}
 }`;*/
 

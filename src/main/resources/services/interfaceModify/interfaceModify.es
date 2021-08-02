@@ -10,7 +10,6 @@ import {modify} from '/lib/explorer/node/modify';
 import {connect} from '/lib/explorer/repo/connect';
 import {interfaceModel} from '/lib/explorer/model/2/nodeTypes/interface';
 import {jsonError} from '/lib/explorer/jsonError';
-import {mapResultMappings} from '../graphQL/interface';
 
 
 export function post({
@@ -51,7 +50,6 @@ export function post({
 		}
 	}
 
-	obj.resultMappings = mapResultMappings(obj.resultMappings);
 
 	const node = modify(interfaceModel(obj), {
 		connection: writeConnection

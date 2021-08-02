@@ -8,7 +8,6 @@ import {create} from '/lib/explorer/node/create';
 import {connect} from '/lib/explorer/repo/connect';
 import {interfaceModel} from '/lib/explorer/model/2/nodeTypes/interface';
 import {jsonError} from '/lib/explorer/jsonError';
-import {mapResultMappings} from '../graphQL/interface';
 
 
 export function post({
@@ -21,7 +20,6 @@ export function post({
 	//log.info(`obj:${toStr(obj)}`);
 
 	obj._name = obj.displayName;
-	obj.resultMappings = mapResultMappings(obj.resultMappings);
 	const node = create(interfaceModel(obj), {
 		connection: connect({principals: [PRINCIPAL_EXPLORER_WRITE]})
 	}); // This will sanitize _name

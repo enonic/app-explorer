@@ -2,7 +2,6 @@ import {
 	forceArray//,
 	//toStr
 } from '@enonic/js-utils';
-import traverse from 'traverse';
 
 import {
 	PRINCIPAL_EXPLORER_READ,
@@ -11,26 +10,6 @@ import {
 import {jsonError} from '/lib/explorer/jsonError';
 import {get as getInterface} from '/lib/explorer/interface/get';
 import {connect} from '/lib/explorer/repo/connect';
-import {mapResultMappings} from '../graphQL/interface';
-
-
-function convert({object, fields, recurse = true}) {
-	traverse(object).forEach(function(value) { // Fat arrow destroys this
-		const key = this.key;
-		if (fields.includes(key)) { // Fields that should become array
-			if (!value) {
-				this.update([]);
-			} else if (!Array.isArray(value)) { // Convert single value to array
-				value = [value];
-				if (recurse) {
-					convert({object: value, fields, recurse}); // Recurse
-				}
-				this.update(value);
-			}
-		}
-	}); // traverse
-	return object;
-} // function convert
 
 
 export function get({
@@ -57,7 +36,6 @@ export function get({
 		displayName = '',
 		facets = [],
 		name = '',
-		resultMappings = [],
 		stopWords = [],
 		thesauri = []
 	} = iFace;
@@ -68,7 +46,6 @@ export function get({
 		id,
 		_name,
 		name,
-		resultMappings: mapResultMappings(resultMappings),
 		stopWords: forceArray(stopWords),
 		thesauri: forceArray(thesauri)
 	};

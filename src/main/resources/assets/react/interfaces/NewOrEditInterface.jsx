@@ -8,7 +8,6 @@ import {ResetButton} from 'semantic-ui-react-form/buttons/ResetButton';
 import {SubmitButton} from 'semantic-ui-react-form/buttons/SubmitButton';
 
 import {Facets} from './Facets';
-import {ResultMappings} from './ResultMappings';
 
 
 export function NewOrEditInterface(props) {
@@ -31,15 +30,6 @@ export function NewOrEditInterface(props) {
 			displayName: '',
 			facets: [],
 			_name: '',
-			resultMappings: [{
-				field: '',
-				highlight: false,
-				join: true,
-				lengthLimit: '',
-				separator: ' ',
-				to: '',
-				type: 'string'
-			}],
 			stopWords: [],
 			thesauri: []
 		},
@@ -121,12 +111,6 @@ export function NewOrEditInterface(props) {
 				path='stopWords'
 				search
 				selection
-			/>
-			<ResultMappings
-				disabled={_name === 'default'}
-				fieldsObj={fieldsObj}
-				id='resultmappings'
-				legend='Result mapping(s)'
 			/>
 			<Facets
 				disabled={_name === 'default'}

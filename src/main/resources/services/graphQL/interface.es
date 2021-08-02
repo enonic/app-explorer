@@ -1,12 +1,7 @@
-import {
-	forceArray,
-	isInt//,
-	//toStr
-} from '@enonic/js-utils';
+//import {toStr} from '@enonic/js-utils';
 
 import {
 	createObjectType,
-	GraphQLBoolean,
 	GraphQLInt,
 	GraphQLString,
 	list,
@@ -19,23 +14,6 @@ import {connect} from '/lib/explorer/repo/connect';
 import {query} from '/lib/explorer/interface/query';
 
 
-const RESULT_MAPPING_OBJECT_TYPE = createObjectType({
-	name: 'ResultMapping',
-	fields: {
-		field: { type: nonNull(GraphQLString) },
-		highlight: { type: nonNull(GraphQLBoolean) },
-		highlightFragmenter: { type: GraphQLString }, // NOTE undefined allowed
-		highlightNumberOfFragments: { type: GraphQLInt }, // NOTE undefined allowed
-		highlightOrder: { type: GraphQLString }, // NOTE undefined allowed
-		highlightPostTag: { type: GraphQLString }, // NOTE undefined allowed
-		highlightPreTag: { type: GraphQLString }, // NOTE undefined allowed
-		lengthLimit: { type: GraphQLInt }, // NOTE undefined allowed
-		to: { type: nonNull(GraphQLString) },
-		type: { type: nonNull(GraphQLString) } // string, tags
-	}
-});
-
-
 const INTERFACE_OBJECT_TYPE = createObjectType({
 	name: 'Interface',
 	fields: {
@@ -43,47 +21,10 @@ const INTERFACE_OBJECT_TYPE = createObjectType({
 		_name: { type: nonNull(GraphQLString) },
 		_nodeType: { type: GraphQLString }, // TODO nonNull?
 		_path: { type: nonNull(GraphQLString) },
-		displayName: { type: nonNull(GraphQLString) },
-		//name: { type: nonNull(GraphQLString) }, // Same as displayName
-		resultMappings: { type: list(RESULT_MAPPING_OBJECT_TYPE)}
+		displayName: { type: nonNull(GraphQLString) }//,
+		//name: { type: nonNull(GraphQLString) } // Same as displayName
 	}
 }); // INTERFACE_OBJECT_TYPE
-
-export const mapResultMappings = (resultMappings) => forceArray(resultMappings).map(({
-	field,
-	highlight = false,
-	highlightFragmenter = highlight ? 'span' : undefined,
-	highlightNumberOfFragments = highlight ? 1 : undefined,
-	highlightOrder = highlight ? 'none' : undefined,
-	highlightPostTag = highlight ? '</em>' : undefined,
-	highlightPreTag = highlight ? '<em>' : undefined,
-	lengthLimit = highlight ? 100 : undefined,
-	to,
-	type
-}) => {
-	let intOrUndefinedNumberOfFragments = parseInt(highlightNumberOfFragments, 10);
-	if (!isInt(intOrUndefinedNumberOfFragments)) {
-		intOrUndefinedNumberOfFragments = undefined;
-	}
-
-	let intOrUndefinedLengthLimit = parseInt(lengthLimit, 10);
-	if (!isInt(intOrUndefinedLengthLimit)) {
-		intOrUndefinedLengthLimit = undefined;
-	}
-
-	return {
-		field,
-		highlight,
-		highlightFragmenter: highlight ? highlightFragmenter : undefined,
-		highlightNumberOfFragments: highlight ? intOrUndefinedNumberOfFragments : undefined,
-		highlightOrder: highlight ? highlightOrder : undefined,
-		highlightPostTag: highlight ? highlightPostTag : undefined,
-		highlightPreTag: highlight ? highlightPreTag : undefined,
-		lengthLimit: intOrUndefinedLengthLimit,
-		to,
-		type
-	};
-});
 
 
 export const queryInterfaces = {
@@ -98,15 +39,13 @@ export const queryInterfaces = {
 			_name,
 			_nodeType,
 			_path,
-			displayName,
-			resultMappings
+			displayName
 		}) => ({
 			_id,
 			_name,
 			_nodeType,
 			_path,
-			displayName,
-			resultMappings: mapResultMappings(resultMappings)
+			displayName
 		}));
 		return interfacesRes;
 	},
@@ -131,13 +70,6 @@ export const queryInterfaces = {
 			_name
 			_path
 			displayName
-			resultMappings {
-				field
-				highlight
-				lengthLimit
-				to
-				type
-			}
 		}
 	}
 }

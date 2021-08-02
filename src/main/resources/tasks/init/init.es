@@ -803,6 +803,70 @@ export function run() {
 				});
 			}
 
+			progress.addItems(1).setInfo('Finding interfaces which has resultMappings, so they can be removed...').report().logInfo();
+			const interfacesWithResultMappings = writeConnection.query({
+				filters: addFilter({
+					filter: { exists: { field: 'resultMappings'}},
+					filters: addFilter({
+						filter: hasValue('_nodeType', [NT_INTERFACE])
+					})
+				})
+			}).hits.map(({id}) => writeConnection.get(id));
+			//log.debug(`interfacesWithResultMappings:${toStr(interfacesWithResultMappings)}`);
+			progress.finishItem();
+
+			if (interfacesWithResultMappings) {
+				progress.addItems(interfacesWithResultMappings.length);
+				interfacesWithResultMappings.forEach(({_path}) => {
+					progress.setInfo(`Removing resultMappings from interface _path:${_path}`).report().logInfo();
+					writeConnection.modify({
+						key: _path,
+						editor: (interfaceNode) => {
+							delete interfaceNode.resultMappings;
+							log.debug(`interfaceNode with resultMappings removed:${toStr(interfaceNode)}`);
+							return interfaceNode;
+						}
+					});
+					progress.finishItem();
+				});
+			}
+
+			progress.addItems(1).setInfo('Finding all interfaces so resultMappings can be removed from indexConfig...').report().logInfo();
+			const allInterfaces = writeConnection.query({
+				filters: addFilter({
+					filter: hasValue('_nodeType', [NT_INTERFACE])
+				})
+			}).hits.map(({id}) => writeConnection.get(id));
+			//log.debug(`allInterfaces:${toStr(allInterfaces)}`);
+			progress.finishItem();
+
+			if (allInterfaces) {
+				progress.addItems(allInterfaces.length);
+				allInterfaces.forEach(({_indexConfig = {}, _path}) => {
+					if (_indexConfig.configs) {
+						const hasResultMappingsArray = forceArray(_indexConfig.configs).filter(({path: p}) => p === 'resultMappings*');
+						//log.debug(`hasResultMappingsArray:${toStr(hasResultMappingsArray)}`);
+						if (hasResultMappingsArray.length) {
+							progress.setInfo(`Removing resultMappings from indexConfig of interface _path:${_path}`).report().logInfo();
+							writeConnection.modify({
+								key: _path,
+								editor: (interfaceNode) => {
+									interfaceNode._indexConfig.configs.forEach(({path}, i) => {
+										if (path === 'resultMappings*') {
+											//log.debug(`The index of the indexConfig with path 'resultMapping*' is:${toStr(i)} in inteface with _path:${_path}`);
+											interfaceNode._indexConfig.configs.splice(i, 1);
+										}
+									});
+									//log.debug(`interfaceNode with resultMappings removed from indexConfig:${toStr(interfaceNode)}`);
+									return interfaceNode;
+								}
+							});
+							progress.finishItem();
+						}
+					}
+				});
+			}
+
 			/*setModel({
 				connection: writeConnection,
 				version: 9
