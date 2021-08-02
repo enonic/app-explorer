@@ -861,9 +861,65 @@ export function run() {
 									return interfaceNode;
 								}
 							});
-							progress.finishItem();
 						}
 					}
+					progress.finishItem();
+				});
+			}
+
+			progress.addItems(1).setInfo('Finding interfaces which has facets, so they can be removed...').report().logInfo();
+			const interfacesWithFacets = writeConnection.query({
+				filters: addFilter({
+					filter: { exists: { field: 'facets'}},
+					filters: addFilter({
+						filter: hasValue('_nodeType', [NT_INTERFACE])
+					})
+				})
+			}).hits.map(({id}) => writeConnection.get(id));
+			//log.debug(`interfacesWithFacets:${toStr(interfacesWithFacets)}`);
+			progress.finishItem();
+
+			if (interfacesWithFacets) {
+				progress.addItems(interfacesWithFacets.length);
+				interfacesWithFacets.forEach(({_path}) => {
+					progress.setInfo(`Removing facets from interface _path:${_path}`).report().logInfo();
+					writeConnection.modify({
+						key: _path,
+						editor: (interfaceNode) => {
+							delete interfaceNode.facets;
+							//log.debug(`interfaceNode with facets removed:${toStr(interfaceNode)}`);
+							return interfaceNode;
+						}
+					});
+					progress.finishItem();
+				});
+			}
+
+			progress.addItems(1).setInfo('Finding interfaces which has pagination, so they can be removed...').report().logInfo();
+			const interfacesWithPagination = writeConnection.query({
+				filters: addFilter({
+					filter: { exists: { field: 'pagination'}},
+					filters: addFilter({
+						filter: hasValue('_nodeType', [NT_INTERFACE])
+					})
+				})
+			}).hits.map(({id}) => writeConnection.get(id));
+			//log.debug(`interfacesWithPagination:${toStr(interfacesWithPagination)}`);
+			progress.finishItem();
+
+			if (interfacesWithPagination) {
+				progress.addItems(interfacesWithPagination.length);
+				interfacesWithPagination.forEach(({_path}) => {
+					progress.setInfo(`Removing pagination from interface _path:${_path}`).report().logInfo();
+					writeConnection.modify({
+						key: _path,
+						editor: (interfaceNode) => {
+							delete interfaceNode.pagination;
+							//log.debug(`interfaceNode with pagination removed:${toStr(interfaceNode)}`);
+							return interfaceNode;
+						}
+					});
+					progress.finishItem();
 				});
 			}
 

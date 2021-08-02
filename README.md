@@ -287,7 +287,7 @@ search(
 	NOPE: #pagination
 }
 
-* Remove filters, query, resultMappings and type from Interfaces in Admin GUI
+* Remove filters, query, resultMappings and facets from Interfaces in Admin GUI
 * Remove listener for EVENT_COLLECTOR_UNREGISTER from main
 * Remove unregister from main
 * Remove register from main

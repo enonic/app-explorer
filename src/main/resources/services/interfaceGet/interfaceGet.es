@@ -34,7 +34,6 @@ export function get({
 		_name,
 		collections = [], // Just collection names, not collection nodes
 		displayName = '',
-		facets = [],
 		name = '',
 		stopWords = [],
 		thesauri = []
@@ -42,7 +41,6 @@ export function get({
 	const body = {
 		collections: forceArray(collections), // Just collection names, not collection nodes
 		displayName,
-		facets: forceArray(facets),
 		id,
 		_name,
 		name,

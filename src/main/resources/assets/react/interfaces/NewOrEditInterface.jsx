@@ -7,13 +7,10 @@ import {Input} from 'semantic-ui-react-form/inputs/Input';
 import {ResetButton} from 'semantic-ui-react-form/buttons/ResetButton';
 import {SubmitButton} from 'semantic-ui-react-form/buttons/SubmitButton';
 
-import {Facets} from './Facets';
-
 
 export function NewOrEditInterface(props) {
 	const {
 		collectionOptions,
-		fieldsObj,
 		id, // nullable
 		onClose,
 		servicesBaseUrl,
@@ -28,7 +25,6 @@ export function NewOrEditInterface(props) {
 		initialValues: {
 			collections: [],
 			displayName: '',
-			facets: [],
 			_name: '',
 			stopWords: [],
 			thesauri: []
@@ -111,12 +107,6 @@ export function NewOrEditInterface(props) {
 				path='stopWords'
 				search
 				selection
-			/>
-			<Facets
-				disabled={_name === 'default'}
-				fieldsObj={fieldsObj}
-				id='facets'
-				legend='Facet(s)'
 			/>
 			<Form.Field>
 				<SubmitButton disabled={_name === 'default'}/>
