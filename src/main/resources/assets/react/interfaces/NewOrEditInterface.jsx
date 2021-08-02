@@ -9,7 +9,6 @@ import {SubmitButton} from 'semantic-ui-react-form/buttons/SubmitButton';
 
 import {Facets} from './Facets';
 import {QueryBuilder} from './query/QueryBuilder';
-import {QueryFiltersBuilder} from './query/QueryFiltersBuilder';
 import {ResultMappings} from './ResultMappings';
 
 
@@ -32,7 +31,6 @@ export function NewOrEditInterface(props) {
 			collections: [],
 			displayName: '',
 			facets: [],
-			filters: {},
 			_name: '',
 			//query,
 			resultMappings: [{
@@ -116,10 +114,6 @@ export function NewOrEditInterface(props) {
 					selection
 				/>
 			</Form.Field>
-			<QueryFiltersBuilder
-				disabled={_name === 'default'}
-				fieldsObj={fieldsObj}
-			/>
 			<QueryBuilder
 				disabled={_name === 'default'}
 				fieldsObj={fieldsObj}

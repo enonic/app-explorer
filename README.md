@@ -212,7 +212,6 @@ app-explorer
 * TODO: Make link to REST API from GUI?
 * TODO: REST API for /search/documents?collections=all accessible by api.key
 * TODO: Remove any reference to lib-cron
-* TODO: Enable should filters in interfaces again
 * TODO: Stemming in synonyms
 
 * TODO: dynamic fields (document_metadata.text title uri) _allText?
@@ -287,8 +286,8 @@ search(
 	#curations
 	NOPE: #pagination
 }
-* TODO: Remove Filters from Admin GUI
 
+* Remove Filters from Admin GUI
 * Remove listener for EVENT_COLLECTOR_UNREGISTER from main
 * Remove unregister from main
 * Remove register from main

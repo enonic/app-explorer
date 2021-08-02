@@ -21,23 +21,6 @@ import {connect} from '/lib/explorer/repo/connect';
 import {query} from '/lib/explorer/interface/query';
 
 
-const INTERFACE_FILTER_OBJECT_TYPE = createObjectType({
-	name: 'InterfaceFilter',
-	//description:
-	fields: {
-		filter: { type: nonNull(GraphQLString) },
-		params: { type: nonNull(createObjectType({
-			name: 'InterfaceFilterParams',
-			//description:
-			fields: {
-				field: { type: nonNull(GraphQLString) },
-				values: { type: list(GraphQLString) }
-			}
-		})) }
-	}
-});
-
-
 //const QUERY_PARAMS_OBJECT_TYPE = ;
 
 
@@ -93,15 +76,6 @@ const INTERFACE_OBJECT_TYPE = createObjectType({
 		_nodeType: { type: GraphQLString }, // TODO nonNull?
 		_path: { type: nonNull(GraphQLString) },
 		displayName: { type: nonNull(GraphQLString) },
-		filters: { type: createObjectType({
-			name: 'InterfaceFilters',
-			//description:
-			fields: {
-				must: { type: list(INTERFACE_FILTER_OBJECT_TYPE) },
-				mustNot: { type: list(INTERFACE_FILTER_OBJECT_TYPE) },
-				should: { type: list(INTERFACE_FILTER_OBJECT_TYPE) }
-			}
-		}) },
 		//name: { type: nonNull(GraphQLString) }, // Same as displayName
 		queryJson: { type: GraphQLString },
 		resultMappings: { type: list(RESULT_MAPPING_OBJECT_TYPE)}//,
@@ -159,11 +133,6 @@ export const queryInterfaces = {
 			_nodeType,
 			_path,
 			displayName,
-			filters: {
-				must,
-				mustNot,
-				should
-			},
 			query,
 			resultMappings//,
 			//type
@@ -173,38 +142,6 @@ export const queryInterfaces = {
 			_nodeType,
 			_path,
 			displayName,
-			filters: {
-				must: must ? forceArray(must).map(({
-					filter,
-					params: {field, values}
-				}) => ({
-					filter,
-					params: {
-						field,
-						values: values ? forceArray(values) : null
-					}
-				})) : null,
-				mustNot: mustNot ? forceArray(mustNot).map(({
-					filter,
-					params: {field, values}
-				}) => ({
-					filter,
-					params: {
-						field,
-						values: values ? forceArray(values) : null
-					}
-				})) : null,
-				should: should ? forceArray(should).map(({
-					filter,
-					params: {field, values}
-				}) => ({
-					filter,
-					params: {
-						field,
-						values: values ? forceArray(values) : null
-					}
-				})) : null
-			},
 			queryJson: query ? JSON.stringify(query) : null,
 			resultMappings: mapResultMappings(resultMappings)//,
 			//type
@@ -233,29 +170,6 @@ export const queryInterfaces = {
 			_name
 			_path
 			displayName
-			filters {
-        		must {
-          			filter
-          			params {
-            			field
-        				values
-      				}
-        		}
-        		mustNot {
-          			filter
-          			params {
-            			field
-            			values
-          			}
-        		}
-				should {
-          			filter
-          			params {
-            			field
-            			values
-          			}
-        		}
-      		}
 			queryJson
 			resultMappings {
 				field

@@ -741,6 +741,46 @@ export function run() {
 		} // if model < 8
 
 		//──────────────────────────────────────────────────────────────────────
+		// Model 9: Remove filters from interfaces
+		//──────────────────────────────────────────────────────────────────────
+		if (isModelLessThan({
+			connection: writeConnection,
+			version: 9
+		})) {
+			progress.addItems(1).setInfo('Finding interfaces which has filters, so they can be removed...').report().logInfo();
+			const interfacesWithFilters = writeConnection.query({
+				filters: addFilter({
+					filter: { exists: { field: 'filters'}},
+					filters: addFilter({
+						filter: hasValue('_nodeType', [NT_INTERFACE])
+					})
+				})
+			}).hits.map(({id}) => writeConnection.get(id));
+			//log.debug(`interfacesWithFilters:${toStr(interfacesWithFilters)}`);
+			progress.finishItem();
+
+			if (interfacesWithFilters) {
+				progress.addItems(interfacesWithFilters.length);
+				interfacesWithFilters.forEach(({_path}) => {
+					progress.setInfo(`Removing filters from interface _path:${_path}`).report().logInfo();
+					writeConnection.modify({
+						key: _path,
+						editor: (interfaceNode) => {
+							delete interfaceNode.filters;
+							//log.debug(`modified interfaceNode:${toStr(interfaceNode)}`);
+							return interfaceNode;
+						}
+					});
+					progress.finishItem();
+				});
+			}
+			/*setModel({
+				connection: writeConnection,
+				version: 9
+			});*/
+		} // if model < 9
+
+		//──────────────────────────────────────────────────────────────────────
 
 		progress.setInfo('Initialization complete :)').report().logInfo();
 		const event = {

@@ -56,7 +56,6 @@ export function get({
 		collections = [], // Just collection names, not collection nodes
 		displayName = '',
 		facets = [],
-		filters = {},
 		name = '',
 		query = {},
 		resultMappings = [],
@@ -67,7 +66,6 @@ export function get({
 		collections: forceArray(collections), // Just collection names, not collection nodes
 		displayName,
 		facets: forceArray(facets),
-		filters: convert({object: filters, fields: ['must', 'mustNot', 'should', 'values']}),
 		id,
 		_name,
 		name,

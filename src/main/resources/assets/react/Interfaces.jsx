@@ -15,29 +15,6 @@ import {SearchModal} from './interfaces/SearchModal';
 		#_nodeType
 		_path
 		displayName
-		filters {
-			must {
-				filter
-				params {
-					field
-					values
-				}
-			}
-			mustNot {
-				filter
-				params {
-					field
-					values
-				}
-			}
-			should {
-				filter
-				params {
-					field
-					values
-				}
-			}
-		}
 		queryJson
 		resultMappings {
 			field
