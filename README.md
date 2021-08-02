@@ -197,10 +197,97 @@ app-explorer
 
 ### 2.0.0-SNAPSHOT
 
-* MAYBE: Make sure no schedule exist for collections that are somehow deleted?
+* NOPE: Perhaps define default highlight (and lengthLimit?) in Schema?
 
+* ICEBOX: Schema REST API? NO. Schema part of Collector. Just push data, schema will autogenerate...
+* ICEBOX: Could provide default english synonyms
+* ICEBOX: Could provide default english stopwords (stopwords "destroys" stemmed and ngram...)
+
+* MAYBE: GraphQL API for all explorer domain objects (example:collections) list, get, post, delete?
+* MAYBE: GraphQL API for /search/documents?collections=all accessible by api.key
+* MAYBE: Make sure no schedule exist for collections that are somehow deleted?
+* MAYBE: No need for global schema anymore?
+
+* TODO: Store language (perhaps in document_metadata)
+* TODO: Make link to REST API from GUI?
+* TODO: REST API for /search/documents?collections=all accessible by api.key
 * TODO: Remove any reference to lib-cron
 * TODO: Enable should filters in interfaces again
+* TODO: Stemming in synonyms
+
+* TODO: dynamic fields (document_metadata.text title uri) _allText?
+* TODO: Allow to setup schema before REST API develper starts working...
+
+* TODO: Web-API for interface/search
+Editor:
+	!name
+	!collections (api-key tilganger og languages for stemming) overrideable?
+
+	?query = (fulltext^3 OR stemmed(languages)^2 OR ngram^1) overrideable?
+	NOPE: ?highlight = from schema overrideable?
+
+	?boost = {
+		title: 3
+		//text: 3,
+		uri: 2,
+		_allText: 1 (text, title, uri)
+	}
+
+	?filters overrideable?
+	?stopwords overrideable? nope
+	?synonyms overrideable? nope
+	NOPE: ?resultmappings (which fields are available) overrideable? prob not
+	NOPE: ?facets (which categories(fields) and values are available) overrideable?
+
+Developer:
+endpoint graphql?apiKey=123
+
+search(
+
+	count, // Use iterators instead
+	start,
+
+	interface = 'default',
+	searchString="a",
+	highlight={...},
+	//query=...,
+	filters: {...},
+	aggregations: [
+		field: merke: { // Look at guillotine
+			bucketSize: 15,
+			order: 'name ASC' // count
+		]
+	}
+	NOPE: stopwords: ['englishStopwords']
+	NOPE: synonyms: ['englishSynonyms']
+) {
+	#total
+	#count
+	hits {
+		text,
+		title,
+		uri
+	}
+	#aggregations {
+		NOPE: deactiveAllFacetsLink
+		{
+			category: 'merke'
+			count/total,
+			hits: {
+				name: 'audi'
+			}
+		}
+			NOPE: #activateAllFacetsInCategoryLink
+			NOPE: #deActivateAllFacetsInCategoryLink
+			NOPE: #activateLink
+			NOPE: #deActivateLink
+		}
+		...
+	}
+	#curations
+	NOPE: #pagination
+}
+* TODO: Remove Filters from Admin GUI
 
 * Remove listener for EVENT_COLLECTOR_UNREGISTER from main
 * Remove unregister from main
