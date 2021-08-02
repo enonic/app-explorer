@@ -8,7 +8,6 @@ import {ResetButton} from 'semantic-ui-react-form/buttons/ResetButton';
 import {SubmitButton} from 'semantic-ui-react-form/buttons/SubmitButton';
 
 import {Facets} from './Facets';
-import {QueryBuilder} from './query/QueryBuilder';
 import {ResultMappings} from './ResultMappings';
 
 
@@ -19,8 +18,8 @@ export function NewOrEditInterface(props) {
 		id, // nullable
 		onClose,
 		servicesBaseUrl,
-		stopWordOptions,
-		thesauriOptions
+		stopWordOptions//,
+		//thesauriOptions
 	} = props;
 	//console.debug('NewOrEditInterface stopWordOptions', stopWordOptions);
 	//console.debug('NewOrEditInterface thesauriOptions', thesauriOptions);
@@ -32,7 +31,6 @@ export function NewOrEditInterface(props) {
 			displayName: '',
 			facets: [],
 			_name: '',
-			//query,
 			resultMappings: [{
 				field: '',
 				highlight: false,
@@ -114,13 +112,6 @@ export function NewOrEditInterface(props) {
 					selection
 				/>
 			</Form.Field>
-			<QueryBuilder
-				disabled={_name === 'default'}
-				fieldsObj={fieldsObj}
-				id='query'
-				legend='Query'
-				thesauriOptions={thesauriOptions}
-			/>
 			<Header as='h3' content='Stop words' dividing id='stopwords'/>
 			<Dropdown
 				disabled={_name === 'default'}

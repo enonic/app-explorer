@@ -57,7 +57,6 @@ export function get({
 		displayName = '',
 		facets = [],
 		name = '',
-		query = {},
 		resultMappings = [],
 		stopWords = [],
 		thesauri = []
@@ -69,7 +68,6 @@ export function get({
 		id,
 		_name,
 		name,
-		query: convert({object: query, fields: ['expressions', 'fields']}),
 		resultMappings: mapResultMappings(resultMappings),
 		stopWords: forceArray(stopWords),
 		thesauri: forceArray(thesauri)

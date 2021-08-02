@@ -5,10 +5,8 @@ import {
 } from '@enonic/js-utils';
 
 import {
-	//createInputObjectType,
 	createObjectType,
 	GraphQLBoolean,
-	//GraphQLFloat,
 	GraphQLInt,
 	GraphQLString,
 	list,
@@ -21,37 +19,8 @@ import {connect} from '/lib/explorer/repo/connect';
 import {query} from '/lib/explorer/interface/query';
 
 
-//const QUERY_PARAMS_OBJECT_TYPE = ;
-
-
-/*const QUERY_OBJECT_TYPE = createObjectType({
-	name: 'Query',
-	//description:
-	fields: {
-		operator: { type: GraphQLString },
-		params: { type: createObjectType({
-			name: 'Query',
-			//description:
-			fields: {
-				expressions: { type: list(QUERY_OBJECT_TYPE)}, // Recursive type possible?
-				fields: { type: list(createObjectType({
-					name: 'QueryFields',
-					//description:
-					fields: {
-						boost: { type: nonNull(GraphQLInt)},
-						field: { type: nonNull(GraphQLString)}
-					}
-				})) }
-			}
-		})},
-		type: { type: nonNull(GraphQLString) }
-	}
-});*/
-
-
 const RESULT_MAPPING_OBJECT_TYPE = createObjectType({
 	name: 'ResultMapping',
-	//description:
 	fields: {
 		field: { type: nonNull(GraphQLString) },
 		highlight: { type: nonNull(GraphQLBoolean) },
@@ -69,7 +38,6 @@ const RESULT_MAPPING_OBJECT_TYPE = createObjectType({
 
 const INTERFACE_OBJECT_TYPE = createObjectType({
 	name: 'Interface',
-	//description:
 	fields: {
 		_id: { type: nonNull(GraphQLString) },
 		_name: { type: nonNull(GraphQLString) },
@@ -77,9 +45,7 @@ const INTERFACE_OBJECT_TYPE = createObjectType({
 		_path: { type: nonNull(GraphQLString) },
 		displayName: { type: nonNull(GraphQLString) },
 		//name: { type: nonNull(GraphQLString) }, // Same as displayName
-		queryJson: { type: GraphQLString },
-		resultMappings: { type: list(RESULT_MAPPING_OBJECT_TYPE)}//,
-		//type: { type: nonNull(GraphQLString) }
+		resultMappings: { type: list(RESULT_MAPPING_OBJECT_TYPE)}
 	}
 }); // INTERFACE_OBJECT_TYPE
 
@@ -133,24 +99,19 @@ export const queryInterfaces = {
 			_nodeType,
 			_path,
 			displayName,
-			query,
-			resultMappings//,
-			//type
+			resultMappings
 		}) => ({
 			_id,
 			_name,
 			_nodeType,
 			_path,
 			displayName,
-			queryJson: query ? JSON.stringify(query) : null,
-			resultMappings: mapResultMappings(resultMappings)//,
-			//type
+			resultMappings: mapResultMappings(resultMappings)
 		}));
 		return interfacesRes;
 	},
 	type: createObjectType({
 		name: 'QueryInterfaces',
-		//description:
 		fields: {
 			total: { type: nonNull(GraphQLInt) },
 			count: { type: nonNull(GraphQLInt) },
@@ -170,7 +131,6 @@ export const queryInterfaces = {
 			_name
 			_path
 			displayName
-			queryJson
 			resultMappings {
 				field
 				highlight
@@ -178,7 +138,6 @@ export const queryInterfaces = {
 				to
 				type
 			}
-			type
 		}
 	}
 }

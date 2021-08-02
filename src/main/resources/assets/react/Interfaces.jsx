@@ -15,7 +15,6 @@ import {SearchModal} from './interfaces/SearchModal';
 		#_nodeType
 		_path
 		displayName
-		queryJson
 		resultMappings {
 			field
 			highlight

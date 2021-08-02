@@ -741,7 +741,7 @@ export function run() {
 		} // if model < 8
 
 		//──────────────────────────────────────────────────────────────────────
-		// Model 9: Remove filters from interfaces
+		// Model 9: Remove filters and query from interfaces
 		//──────────────────────────────────────────────────────────────────────
 		if (isModelLessThan({
 			connection: writeConnection,
@@ -767,13 +767,42 @@ export function run() {
 						key: _path,
 						editor: (interfaceNode) => {
 							delete interfaceNode.filters;
-							//log.debug(`modified interfaceNode:${toStr(interfaceNode)}`);
+							//log.debug(`interfaceNode with filters removed:${toStr(interfaceNode)}`);
 							return interfaceNode;
 						}
 					});
 					progress.finishItem();
 				});
 			}
+
+			progress.addItems(1).setInfo('Finding interfaces which has a query, so it can be removed...').report().logInfo();
+			const interfacesWithQuery = writeConnection.query({
+				filters: addFilter({
+					filter: { exists: { field: 'query'}},
+					filters: addFilter({
+						filter: hasValue('_nodeType', [NT_INTERFACE])
+					})
+				})
+			}).hits.map(({id}) => writeConnection.get(id));
+			//log.debug(`interfacesWithQuery:${toStr(interfacesWithQuery)}`);
+			progress.finishItem();
+
+			if (interfacesWithQuery) {
+				progress.addItems(interfacesWithQuery.length);
+				interfacesWithQuery.forEach(({_path}) => {
+					progress.setInfo(`Removing query from interface _path:${_path}`).report().logInfo();
+					writeConnection.modify({
+						key: _path,
+						editor: (interfaceNode) => {
+							delete interfaceNode.query;
+							//log.debug(`interfaceNode with query removed:${toStr(interfaceNode)}`);
+							return interfaceNode;
+						}
+					});
+					progress.finishItem();
+				});
+			}
+
 			/*setModel({
 				connection: writeConnection,
 				version: 9

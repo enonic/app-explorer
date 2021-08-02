@@ -64,7 +64,7 @@ export function Facets(props) {
 						</Table.Row>
 					</Table.Header>}
 					<Table.Body>{facetsArray.map(({
-						facets,
+						//facets,
 						tag
 					},index) => {
 						//console.debug('Facets tag', tag, 'facets', facets);

@@ -287,7 +287,7 @@ search(
 	NOPE: #pagination
 }
 
-* Remove Filters from Admin GUI
+* Remove filters and query from Admin GUI
 * Remove listener for EVENT_COLLECTOR_UNREGISTER from main
 * Remove unregister from main
 * Remove register from main
