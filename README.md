@@ -197,8 +197,6 @@ app-explorer
 
 ### 2.0.0-SNAPSHOT
 
-* NOPE: Perhaps define default highlight (and lengthLimit?) in Schema?
-
 * ICEBOX: Schema REST API? NO. Schema part of Collector. Just push data, schema will autogenerate...
 * ICEBOX: Could provide default english synonyms
 * ICEBOX: Could provide default english stopwords (stopwords "destroys" stemmed and ngram...)
@@ -223,7 +221,6 @@ endpoint graphql?apiKey=123
 search(
 	count, // Use iterators instead
 	start, // Use iterators instead
-	highlight={...},
 	//query=..., Later?
 	filters: {...},
 	aggregations: [
@@ -255,10 +252,10 @@ search(
 * TODO: Make api/v1/documents available again
 * Temporarily removed api/v1/documents
 * Add api/v1/interface/{interfaceName} GraphQL endpoint with search function
-  * TODO: Support fields
-  * Support searchString parameter
-  * Wash searchString
-  * Wash stopWords
+  * Support highlight and searchString parameters
+  * TODO: Support hits field
+  * Support highlight and score field
+  * Wash searchString and remove stopWords
 * Add field boosting and synonyms to Interfaces in Admin GUI
 * Remove filters, query, resultMappings and facets from Interfaces in Admin GUI
 * Remove listener for EVENT_COLLECTOR_UNREGISTER from main
