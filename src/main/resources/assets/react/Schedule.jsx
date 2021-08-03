@@ -141,7 +141,6 @@ export const Schedule = (props) => {
 			marginTop: -14,
 			marginRight: -14
 		}}>
-			{/* TODO: Use Table instead of Grid, for better responsive stacking? */}
 			<Table basic compact inverted>
 			 	<Table.Header>
 					<Table.Row verticalAlign='bottom'>
