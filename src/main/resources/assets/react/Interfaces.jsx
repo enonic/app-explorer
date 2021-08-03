@@ -1,4 +1,11 @@
-import {Button, Header, Table} from 'semantic-ui-react';
+import {
+	Button,
+	Header,
+	Label,
+	Radio,
+	Segment,
+	Table
+} from 'semantic-ui-react';
 
 import {NewOrEditInterfaceModal} from './interfaces/NewOrEditInterfaceModal';
 import {CopyModal} from './interfaces/CopyModal';
@@ -40,6 +47,11 @@ export function Interfaces({
 		isLoading: false
 	});
 
+	const [showCollectionCount, setShowCollectionCount] = React.useState(true);
+	const [showCollections, setShowCollections] = React.useState(false);
+	const [showSynonyms, setShowSynonyms] = React.useState(true);
+	const [showDelete, setShowDelete] = React.useState(false);
+
 	const memoizedUpdateInterfacesCallback = React.useCallback(() => {
 		setState((oldState) => {
 			const deref = JSON.parse(JSON.stringify(oldState));
@@ -51,10 +63,12 @@ export function Interfaces({
 			.then(data => setState((oldState) => {
 				const deref = JSON.parse(JSON.stringify(oldState));
 				deref.collectionOptions = data.collectionOptions;
+				deref.collections = data.collections;
 				deref.fieldsObj = data.fieldsObj;
 				deref.interfaces = data.interfaces;
 				deref.isLoading = false;
 				deref.stopWordOptions = data.stopWordOptions;
+				deref.synonyms = data.synonyms;
 				deref.thesauriOptions = data.thesauriOptions;
 				return deref;
 			}));
@@ -75,20 +89,84 @@ export function Interfaces({
 		thesauriOptions
 	} = state;
 	return <>
+		<Segment basic inverted style={{
+			marginLeft: -14,
+			marginTop: -14,
+			marginRight: -14
+		}}>
+			<Table basic collapsing compact inverted>
+				<Table.Body>
+					<Table.Row verticalAlign='middle'>
+						<Table.Cell collapsing>
+							<Radio
+								checked={showCollectionCount}
+								onChange={(ignored,{checked}) => {
+									setShowCollectionCount(checked);
+								}}
+								toggle
+							/>
+							<Label color='black' size='large'>Show collection count</Label>
+						</Table.Cell>
+						<Table.Cell collapsing>
+							<Radio
+								checked={showCollections}
+								onChange={(ignored,{checked}) => {
+									setShowCollections(checked);
+								}}
+								toggle
+							/>
+							<Label color='black' size='large'>Show collections</Label>
+						</Table.Cell>
+						<Table.Cell collapsing>
+							<Radio
+								checked={showSynonyms}
+								onChange={(ignored,{checked}) => {
+									setShowSynonyms(checked);
+								}}
+								toggle
+							/>
+							<Label color='black' size='large'>Show synonyms</Label>
+						</Table.Cell>
+						<Table.Cell collapsing>
+							<Radio
+								checked={showDelete}
+								onChange={(ignored,{checked}) => {
+									setShowDelete(checked);
+								}}
+								toggle
+							/>
+							<Label color='black' size='large'>Show delete</Label>
+						</Table.Cell>
+					</Table.Row>
+				</Table.Body>
+			</Table>
+		</Segment>
 		<Header as='h1' content='Interfaces'/>
 		<Table celled collapsing compact selectable singleLine striped>
 			<Table.Header>
 				<Table.Row>
 					<Table.HeaderCell>Name</Table.HeaderCell>
+					{showCollectionCount ? <Table.HeaderCell>Collection count</Table.HeaderCell> : null}
+					{showCollections ? <Table.HeaderCell>Collection(s)</Table.HeaderCell> : null}
+					{showSynonyms ? <Table.HeaderCell>Synonyms</Table.HeaderCell> : null}
 					<Table.HeaderCell>Actions</Table.HeaderCell>
 				</Table.Row>
 			</Table.Header>
 			<Table.Body>
 				{hits.map((initialValues, index) => {
-					const {displayName, _id, _name} = initialValues;
+					const {
+						_id,
+						_name,
+						collections,
+						displayName,
+						synonyms
+					} = initialValues;
 					//console.debug({displayName, _name, index});
 					return <Table.Row key={index}>
 						<Table.Cell collapsing>{displayName}</Table.Cell>
+						{showCollectionCount ? <Table.Cell collapsing>{collections.length}</Table.Cell> : null}
+						{showCollections ? <Table.Cell collapsing>{collections.join(', ')}</Table.Cell> : null}
+						{showSynonyms ? <Table.Cell collapsing>{synonyms.join(', ')}</Table.Cell> : null}
 						<Table.Cell collapsing>
 							<Button.Group>
 								<NewOrEditInterfaceModal
@@ -114,12 +192,12 @@ export function Interfaces({
 									updateInterfaces={() => memoizedUpdateInterfacesCallback()}
 									servicesBaseUrl={servicesBaseUrl}
 								/>
-								<DeleteModal
+								{showDelete ? <DeleteModal
 									name={_name}
 									disabled={_name === 'default'}
 									onClose={() => memoizedUpdateInterfacesCallback()}
 									servicesBaseUrl={servicesBaseUrl}
-								/>
+								/> : null}
 							</Button.Group>
 						</Table.Cell>
 					</Table.Row>;

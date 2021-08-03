@@ -1,4 +1,7 @@
-//import {toStr} from '@enonic/js-utils';
+import {
+	forceArray//,
+	//toStr
+} from '@enonic/js-utils';
 
 import {
 	PRINCIPAL_EXPLORER_READ,
@@ -7,7 +10,7 @@ import {
 import {query as queryCollections} from '/lib/explorer/collection/query';
 import {getFields} from '/lib/explorer/field/getFields';
 import {getFieldValues} from '/lib/explorer/field/getFieldValues';
-import {query} from '/lib/explorer/interface/query';
+import {query as queryInterfaces} from '/lib/explorer/interface/query';
 import {addFilter} from '/lib/explorer/query/addFilter';
 import {hasValue} from '/lib/explorer/query/hasValue';
 import {connect} from '/lib/explorer/repo/connect';
@@ -126,17 +129,21 @@ export function get() {
 	});
 	//log.debug(`fieldsObj:${toStr({fieldsObj})}`);
 
-	const interfaces = query({connection});
+	const interfaces = queryInterfaces({connection});
 	interfaces.hits = interfaces.hits.map(({
 		_id,
 		_name,
-		displayName
+		collections,
+		displayName,
+		synonyms
 	}) => ({
 		_id,
 		_name,
+		collections: forceArray(collections),
 		displayName,
 		id: _id,
-		name: _name
+		name: _name,
+		synonyms: forceArray(synonyms)
 	}));
 
 	const stopWordOptions = getStopWords({connection}).hits.map(({displayName, name}) => ({

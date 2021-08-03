@@ -14,8 +14,8 @@ export function NewOrEditInterface(props) {
 		id, // nullable
 		onClose,
 		servicesBaseUrl,
-		stopWordOptions//,
-		//thesauriOptions
+		stopWordOptions,
+		thesauriOptions
 	} = props;
 	//console.debug('NewOrEditInterface stopWordOptions', stopWordOptions);
 	//console.debug('NewOrEditInterface thesauriOptions', thesauriOptions);
@@ -55,6 +55,8 @@ export function NewOrEditInterface(props) {
 	} = state;
 	//console.debug('_name', _name);
 
+	const disabled = _name === 'default';
+
 	return isLoading ? <Loader active inverted>Loading</Loader> : <EnonicForm
 		initialValues={initialValues}
 		onSubmit={(values) => {
@@ -80,17 +82,17 @@ export function NewOrEditInterface(props) {
 		<Form as='div'>
 			<Form.Field>
 				<Input
-					disabled={_name === 'default'}
+					disabled={disabled}
 					fluid
 					label={{basic: true, content: 'Name'}}
 					path='displayName'
 					placeholder='Please input name'
 				/>
 			</Form.Field>
-			<Header as='h2' content='Collection(s)' dividing id='collections'/>
+			<Header as='h2' content='Collection(s)' disabled={disabled} dividing id='collections'/>
 			<Form.Field>
 				<Dropdown
-					disabled={_name === 'default'}
+					disabled={disabled}
 					multiple={true}
 					options={collectionOptions}
 					path='collections'
@@ -98,9 +100,19 @@ export function NewOrEditInterface(props) {
 					selection
 				/>
 			</Form.Field>
-			<Header as='h3' content='Stop words' dividing id='stopwords'/>
+			<Header as='h3' content='Synonyms' disabled={disabled} dividing id='synonyms'/>
+			<Form.Field><Dropdown
+				disabled={disabled}
+				fluid
+				multiple={true}
+				options={thesauriOptions}
+				path='synonyms'
+				search
+				selection
+			/></Form.Field>
+			<Header as='h3' content='Stop words' disabled={disabled} dividing id='stopwords'/>
 			<Dropdown
-				disabled={_name === 'default'}
+				disabled={disabled}
 				fluid
 				multiple={true}
 				options={stopWordOptions}
@@ -109,8 +121,8 @@ export function NewOrEditInterface(props) {
 				selection
 			/>
 			<Form.Field>
-				<SubmitButton disabled={_name === 'default'}/>
-				<ResetButton disabled={_name === 'default'}/>
+				<SubmitButton disabled={disabled}/>
+				<ResetButton disabled={disabled}/>
 			</Form.Field>
 		</Form>
 	</EnonicForm>;

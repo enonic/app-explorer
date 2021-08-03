@@ -36,7 +36,7 @@ export function get({
 		displayName = '',
 		name = '',
 		stopWords = [],
-		thesauri = []
+		synonyms = []
 	} = iFace;
 	const body = {
 		collections: forceArray(collections), // Just collection names, not collection nodes
@@ -45,7 +45,7 @@ export function get({
 		_name,
 		name,
 		stopWords: forceArray(stopWords),
-		thesauri: forceArray(thesauri)
+		synonyms: forceArray(synonyms)
 	};
 	//log.info(`body:${toStr(body)}`);
 

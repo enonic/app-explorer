@@ -923,6 +923,34 @@ export function run() {
 				});
 			}
 
+			progress.addItems(1).setInfo('Finding interfaces which has thesauri, so they can be removed...').report().logInfo();
+			const interfacesWithThesauri = writeConnection.query({
+				filters: addFilter({
+					filter: { exists: { field: 'thesauri'}},
+					filters: addFilter({
+						filter: hasValue('_nodeType', [NT_INTERFACE])
+					})
+				})
+			}).hits.map(({id}) => writeConnection.get(id));
+			//log.debug(`interfacesWithThesauri:${toStr(interfacesWithThesauri)}`);
+			progress.finishItem();
+
+			if (interfacesWithThesauri) {
+				progress.addItems(interfacesWithThesauri.length);
+				interfacesWithThesauri.forEach(({_path}) => {
+					progress.setInfo(`Removing thesauri from interface _path:${_path}`).report().logInfo();
+					writeConnection.modify({
+						key: _path,
+						editor: (interfaceNode) => {
+							delete interfaceNode.thesauri;
+							//log.debug(`interfaceNode with thesauri removed:${toStr(interfaceNode)}`);
+							return interfaceNode;
+						}
+					});
+					progress.finishItem();
+				});
+			}
+
 			/*setModel({
 				connection: writeConnection,
 				version: 9

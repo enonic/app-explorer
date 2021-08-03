@@ -1,4 +1,7 @@
-//import {toStr} from '@enonic/js-utils';
+import {
+	forceArray//,
+	//toStr
+} from '@enonic/js-utils';
 
 import {
 	createObjectType,
@@ -21,8 +24,9 @@ const INTERFACE_OBJECT_TYPE = createObjectType({
 		_name: { type: nonNull(GraphQLString) },
 		_nodeType: { type: GraphQLString }, // TODO nonNull?
 		_path: { type: nonNull(GraphQLString) },
-		displayName: { type: nonNull(GraphQLString) }//,
+		displayName: { type: nonNull(GraphQLString) },
 		//name: { type: nonNull(GraphQLString) } // Same as displayName
+		synonyms: { type: list(GraphQLString) }//,
 	}
 }); // INTERFACE_OBJECT_TYPE
 
@@ -39,13 +43,15 @@ export const queryInterfaces = {
 			_name,
 			_nodeType,
 			_path,
-			displayName
+			displayName,
+			synonyms
 		}) => ({
 			_id,
 			_name,
 			_nodeType,
 			_path,
-			displayName
+			displayName,
+			synonyms: forceArray(synonyms)
 		}));
 		return interfacesRes;
 	},
@@ -70,6 +76,7 @@ export const queryInterfaces = {
 			_name
 			_path
 			displayName
+			synonyms
 		}
 	}
 }
