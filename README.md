@@ -217,39 +217,14 @@ app-explorer
 * TODO: dynamic fields (document_metadata.text title uri) _allText?
 * TODO: Allow to setup schema before REST API develper starts working...
 
-* TODO: Web-API for interface/search
-Editor:
-	!name
-	!collections (api-key tilganger og languages for stemming) overrideable?
-
-	?query = (fulltext^3 OR stemmed(languages)^2 OR ngram^1) overrideable?
-	NOPE: ?highlight = from schema overrideable?
-
-	?boost = {
-		title: 3
-		//text: 3,
-		uri: 2,
-		_allText: 1 (text, title, uri)
-	}
-
-	?filters overrideable?
-	?stopwords overrideable? nope
-	?synonyms overrideable? nope
-	NOPE: ?resultmappings (which fields are available) overrideable? prob not
-	NOPE: ?facets (which categories(fields) and values are available) overrideable?
-
 Developer:
 endpoint graphql?apiKey=123
 
 search(
-
 	count, // Use iterators instead
-	start,
-
-	interface = 'default',
-	searchString="a",
+	start, // Use iterators instead
 	highlight={...},
-	//query=...,
+	//query=..., Later?
 	filters: {...},
 	aggregations: [
 		field: merke: { // Look at guillotine
@@ -257,18 +232,13 @@ search(
 			order: 'name ASC' // count
 		]
 	}
-	NOPE: stopwords: ['englishStopwords']
-	NOPE: synonyms: ['englishSynonyms']
 ) {
-	#total
-	#count
 	hits {
 		text,
 		title,
 		uri
 	}
 	#aggregations {
-		NOPE: deactiveAllFacetsLink
 		{
 			category: 'merke'
 			count/total,
@@ -276,17 +246,19 @@ search(
 				name: 'audi'
 			}
 		}
-			NOPE: #activateAllFacetsInCategoryLink
-			NOPE: #deActivateAllFacetsInCategoryLink
-			NOPE: #activateLink
-			NOPE: #deActivateLink
 		}
 		...
 	}
 	#curations
-	NOPE: #pagination
 }
 
+* TODO: Make api/v1/documents available again
+* Temporarily removed api/v1/documents
+* Add api/v1/interface/{interfaceName} GraphQL endpoint with search function
+  * TODO: Support fields
+  * Support searchString parameter
+  * Wash searchString
+  * Wash stopWords
 * Add field boosting and synonyms to Interfaces in Admin GUI
 * Remove filters, query, resultMappings and facets from Interfaces in Admin GUI
 * Remove listener for EVENT_COLLECTOR_UNREGISTER from main

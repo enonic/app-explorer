@@ -7,34 +7,13 @@ mapping.api.idProvider.system = default
 
 import '@enonic/nashorn-polyfills';
 
-export {all} from '/lib/explorer/api';
-
-/*
-import {toStr} from '@enonic/js-utils';
+//export {all} from '/lib/explorer/api'; // TODO Make this available again!!!
 
 import Router from '/lib/router';
+import {post as interfacePost} from './interface';
 
 const router = Router();
 
-router.all('/api/1/documents', (request) => {
-	log.info(`request:${toStr(request)}`);
-	return {
-		body: {
-			path: 'documents'
-		},
-		contentType: 'text/json;charset=utf-8'
-	};
-});
-
-router.all('', (request) => {
-	log.info(`request:${toStr(request)}`);
-	return {
-		body: {
-			uke: 'bla'
-		},
-		contentType: 'text/json;charset=utf-8'
-	};
-});
+router.post('/api/v1/interface/{interfaceName}', (request) => interfacePost(request));
 
 export const all = (r) => router.dispatch(r);
-*/
