@@ -4,6 +4,7 @@ import {
 } from '@enonic/js-utils';
 
 import {
+	DEFAULT_INTERFACE_FIELDS,
 	PRINCIPAL_EXPLORER_READ,
 	RT_JSON
 } from '/lib/explorer/model/2/constants';
@@ -34,6 +35,7 @@ export function get({
 		_name,
 		collections = [], // Just collection names, not collection nodes
 		displayName = '',
+		fields = DEFAULT_INTERFACE_FIELDS,
 		name = '',
 		stopWords = [],
 		synonyms = []
@@ -43,6 +45,7 @@ export function get({
 		displayName,
 		id,
 		_name,
+		fields: forceArray(fields),
 		name,
 		stopWords: forceArray(stopWords),
 		synonyms: forceArray(synonyms)

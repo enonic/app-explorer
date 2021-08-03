@@ -49,7 +49,9 @@ export function Interfaces({
 
 	const [showCollectionCount, setShowCollectionCount] = React.useState(true);
 	const [showCollections, setShowCollections] = React.useState(false);
-	const [showSynonyms, setShowSynonyms] = React.useState(true);
+	const [showFields, setShowFields] = React.useState(false);
+	const [showSynonyms, setShowSynonyms] = React.useState(false);
+	const [showStopWords, setShowStopWords] = React.useState(false);
 	const [showDelete, setShowDelete] = React.useState(false);
 
 	const memoizedUpdateInterfacesCallback = React.useCallback(() => {
@@ -115,7 +117,17 @@ export function Interfaces({
 								}}
 								toggle
 							/>
-							<Label color='black' size='large'>Show collections</Label>
+							<Label color='black' size='large'>Show collection(s)</Label>
+						</Table.Cell>
+						<Table.Cell collapsing>
+							<Radio
+								checked={showFields}
+								onChange={(ignored,{checked}) => {
+									setShowFields(checked);
+								}}
+								toggle
+							/>
+							<Label color='black' size='large'>Show field(s)</Label>
 						</Table.Cell>
 						<Table.Cell collapsing>
 							<Radio
@@ -126,6 +138,16 @@ export function Interfaces({
 								toggle
 							/>
 							<Label color='black' size='large'>Show synonyms</Label>
+						</Table.Cell>
+						<Table.Cell collapsing>
+							<Radio
+								checked={showStopWords}
+								onChange={(ignored,{checked}) => {
+									setShowStopWords(checked);
+								}}
+								toggle
+							/>
+							<Label color='black' size='large'>Show stopwords</Label>
 						</Table.Cell>
 						<Table.Cell collapsing>
 							<Radio
@@ -145,10 +167,13 @@ export function Interfaces({
 		<Table celled collapsing compact selectable singleLine striped>
 			<Table.Header>
 				<Table.Row>
+					<Table.HeaderCell>Edit</Table.HeaderCell>
 					<Table.HeaderCell>Name</Table.HeaderCell>
 					{showCollectionCount ? <Table.HeaderCell>Collection count</Table.HeaderCell> : null}
 					{showCollections ? <Table.HeaderCell>Collection(s)</Table.HeaderCell> : null}
+					{showFields ? <Table.HeaderCell>Field(s)</Table.HeaderCell> : null}
 					{showSynonyms ? <Table.HeaderCell>Synonyms</Table.HeaderCell> : null}
+					{showStopWords ? <Table.HeaderCell>Stopwords</Table.HeaderCell> : null}
 					<Table.HeaderCell>Actions</Table.HeaderCell>
 				</Table.Row>
 			</Table.Header>
@@ -159,30 +184,36 @@ export function Interfaces({
 						_name,
 						collections,
 						displayName,
+						fields,
+						stopWords,
 						synonyms
 					} = initialValues;
 					//console.debug({displayName, _name, index});
 					return <Table.Row key={index}>
+						<Table.Cell collapsing>
+							<NewOrEditInterfaceModal
+								collectionOptions={collectionOptions}
+								displayName={displayName}
+								fieldsObj={fieldsObj}
+								id={_id}
+								afterClose={() => memoizedUpdateInterfacesCallback()}
+								licenseValid={licenseValid}
+								servicesBaseUrl={servicesBaseUrl}
+								setLicensedTo={setLicensedTo}
+								setLicenseValid={setLicenseValid}
+								stopWordOptions={stopWordOptions}
+								thesauriOptions={thesauriOptions}
+								total={total}
+							/>
+						</Table.Cell>
 						<Table.Cell collapsing>{displayName}</Table.Cell>
-						{showCollectionCount ? <Table.Cell collapsing>{collections.length}</Table.Cell> : null}
-						{showCollections ? <Table.Cell collapsing>{collections.join(', ')}</Table.Cell> : null}
+						{showCollectionCount ? <Table.Cell collapsing>{_name === 'default' ? '∞' : collections.length}</Table.Cell> : null}
+						{showCollections ? <Table.Cell collapsing>{_name === 'default' ? '∞' : collections.join(', ')}</Table.Cell> : null}
+						{showFields ? <Table.Cell collapsing>{fields.map(({name, boost}) => `${name}^${boost}`).join(', ')}</Table.Cell> : null}
 						{showSynonyms ? <Table.Cell collapsing>{synonyms.join(', ')}</Table.Cell> : null}
+						{showStopWords ? <Table.Cell collapsing>{stopWords.join(', ')}</Table.Cell> : null}
 						<Table.Cell collapsing>
 							<Button.Group>
-								<NewOrEditInterfaceModal
-									collectionOptions={collectionOptions}
-									displayName={displayName}
-									fieldsObj={fieldsObj}
-									id={_id}
-									afterClose={() => memoizedUpdateInterfacesCallback()}
-									licenseValid={licenseValid}
-									servicesBaseUrl={servicesBaseUrl}
-									setLicensedTo={setLicensedTo}
-									setLicenseValid={setLicenseValid}
-									stopWordOptions={stopWordOptions}
-									thesauriOptions={thesauriOptions}
-									total={total}
-								/>
 								<SearchModal
 									interfaceName={_name}
 									servicesBaseUrl={servicesBaseUrl}

@@ -17,6 +17,8 @@ import {connect} from '/lib/explorer/repo/connect';
 import {query as getStopWords} from '/lib/explorer/stopWords/query';
 import {query as getThesauri} from '/lib/explorer/thesaurus/query';
 
+import {DEFAULT_INTERFACE_FIELDS} from '../../constants';
+
 
 export function get() {
 	const connection = connect({principals: [PRINCIPAL_EXPLORER_READ]});
@@ -135,14 +137,18 @@ export function get() {
 		_name,
 		collections,
 		displayName,
+		fields = DEFAULT_INTERFACE_FIELDS,
+		stopWords,
 		synonyms
 	}) => ({
 		_id,
 		_name,
 		collections: forceArray(collections),
 		displayName,
+		fields: forceArray(fields),
 		id: _id,
 		name: _name,
+		stopWords: forceArray(stopWords),
 		synonyms: forceArray(synonyms)
 	}));
 

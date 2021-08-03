@@ -43,6 +43,7 @@ export function StopWords(props) {
 		<Table celled collapsing compact selectable singleLine sortable striped>
 			<Table.Header>
 				<Table.Row>
+					<Table.HeaderCell>Edit</Table.HeaderCell>
 					<Table.HeaderCell>Name</Table.HeaderCell>
 					<Table.HeaderCell>Count</Table.HeaderCell>
 					<Table.HeaderCell>Words</Table.HeaderCell>
@@ -53,18 +54,21 @@ export function StopWords(props) {
 				{stopWordsRes.hits.map(({displayName, name, words}, index) => {
 					const key = `list[${index}]`;
 					return <Table.Row key={key}>
+						<Table.Cell collapsing>
+							<NewOrEditModal
+								afterClose={() => updateStopwords()}
+								displayName={displayName}
+								name={name}
+								servicesBaseUrl={servicesBaseUrl}
+								words={words}
+							/>
+						</Table.Cell>
 						<Table.Cell collapsing>{displayName}</Table.Cell>
 						<Table.Cell collapsing>{words.length}</Table.Cell>
 						<Table.Cell collapsing>{words.join(', ')}</Table.Cell>
 						<Table.Cell collapsing>
 							<Button.Group>
-								<NewOrEditModal
-									afterClose={() => updateStopwords()}
-									displayName={displayName}
-									name={name}
-									servicesBaseUrl={servicesBaseUrl}
-									words={words}
-								/>
+								{/* MAYBE copy/duplicate? */}
 								<DeleteModal
 									afterClose={() => updateStopwords()}
 									name={name}

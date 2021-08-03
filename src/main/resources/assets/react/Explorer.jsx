@@ -333,10 +333,10 @@ export function Explorer(props) {
 				><Icon name='crop'/> StopWords</Menu.Item>
 				<Menu.Item
 					as='a'
-					href='#thesauri'
-					active={page === 'thesauri'}
-					onClick={() => setPage('thesauri')}
-				><Icon name='font'/> Thesauri</Menu.Item>
+					href='#synonyms'
+					active={page === 'synonyms'}
+					onClick={() => setPage('synonyms')}
+				><Icon name='font'/> Synonyms</Menu.Item>
 				<Menu.Item
 					as='a'
 					href='#interfaces'
@@ -414,7 +414,7 @@ export function Explorer(props) {
 				{page === 'stopWords' && <StopWords
 					servicesBaseUrl={servicesBaseUrl}
 				/>}
-				{page === 'thesauri' && <Thesauri
+				{page === 'synonyms' && <Thesauri
 					licenseValid={licenseValid}
 					servicesBaseUrl={servicesBaseUrl}
 					setLicensedTo={setLicensedTo}

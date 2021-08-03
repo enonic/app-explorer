@@ -7,10 +7,15 @@ import {Input} from 'semantic-ui-react-form/inputs/Input';
 import {ResetButton} from 'semantic-ui-react-form/buttons/ResetButton';
 import {SubmitButton} from 'semantic-ui-react-form/buttons/SubmitButton';
 
+import {FieldSelector} from './FieldSelector';
+
+import {DEFAULT_INTERFACE_FIELDS} from '../../../constants';
+
 
 export function NewOrEditInterface(props) {
 	const {
 		collectionOptions,
+		fieldsObj,
 		id, // nullable
 		onClose,
 		servicesBaseUrl,
@@ -23,11 +28,12 @@ export function NewOrEditInterface(props) {
 	//const [isLoading, setLoading] = React.useState(!!id);
 	const [state, setState] = React.useState({
 		initialValues: {
+			_name: '',
 			collections: [],
 			displayName: '',
-			_name: '',
+			fields: DEFAULT_INTERFACE_FIELDS,
 			stopWords: [],
-			thesauri: []
+			synonyms: []
 		},
 		isLoading: !!id
 	});
@@ -53,6 +59,7 @@ export function NewOrEditInterface(props) {
 		},
 		isLoading
 	} = state;
+	//console.debug('NewOrEditInterface initialValues', initialValues);
 	//console.debug('_name', _name);
 
 	const disabled = _name === 'default';
@@ -100,6 +107,13 @@ export function NewOrEditInterface(props) {
 					selection
 				/>
 			</Form.Field>
+
+			<Header as='h3' content='Fields' disabled={disabled} dividing id='fields'/>
+			<FieldSelector
+				disabled={disabled}
+				fieldsObj={fieldsObj}
+			/>
+
 			<Header as='h3' content='Synonyms' disabled={disabled} dividing id='synonyms'/>
 			<Form.Field><Dropdown
 				disabled={disabled}

@@ -559,7 +559,7 @@ const CLIENT_JS_CONFIG = {
 	],
 	resolve: {
 		/*alias: { // NOTE: If the local lib-explorer is not the newest there could be trouble...
-			'/lib/explorer': path.resolve(SRC_DIR_ABS, '../lib-explorer/src/main/resources/lib/explorer/')
+			'/lib/explorer': path.resolve(__dirname, '../lib-explorer/src/main/resources/lib/explorer/')
 		},*/
 		extensions: ['.es', '.js', '.jsx']
 	},
@@ -652,7 +652,9 @@ const CLIENT_ES_CONFIG = {
 				: path.resolve(__dirname, './node_modules/@enonic/js-utils/src/index'),
 			'semantic-ui-react-form': BOOL_LOCAL_SEMANTIC_UI_REACT_FORM
 				? path.resolve(__dirname, '../semantic-ui-react-form/src')
-				: path.resolve(__dirname, './node_modules/@enonic/semantic-ui-react-form/src')
+				: path.resolve(__dirname, './node_modules/@enonic/semantic-ui-react-form/src')//,
+			// NOTE: If the local lib-explorer is not the newest there could be trouble...
+			//'/lib/explorer': path.resolve(__dirname, '../lib-explorer/src/main/resources/lib/explorer/')
 		},
 		extensions: [
 			'mjs', 'jsx', 'esm', 'es', 'es6', 'js', 'json', 'ts'

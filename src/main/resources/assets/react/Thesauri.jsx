@@ -98,9 +98,10 @@ export function ThesauriList(props) {
 	return <>
 		{isLoading
 			? <Loader active inverted>Loading</Loader>
-			: <Table celled compact selectable sortable striped attached='top'>
+			: <Table celled collapsing compact selectable sortable striped attached='top'>
 				<Table.Header>
 					<Table.Row>
+						<Table.HeaderCell>Edit</Table.HeaderCell>
 						<Table.HeaderCell>Display name</Table.HeaderCell>
 						<Table.HeaderCell>Languages</Table.HeaderCell>
 						<Table.HeaderCell>Synonyms</Table.HeaderCell>
@@ -117,10 +118,22 @@ export function ThesauriList(props) {
 						synonymsCount
 					}, index) => {
 						return <Table.Row key={index}>
-							<Table.Cell>{displayName}</Table.Cell>
-							<Table.Cell>{languages.join(', ')}</Table.Cell>
-							<Table.Cell>{synonymsCount}</Table.Cell>
-							<Table.Cell>
+							<Table.Cell collapsing>
+								<NewOrEditThesaurus
+									displayName={displayName}
+									id={id}
+									languages={languages}
+									languagesOptions={languagesOptions}
+									licenseValid={licenseValid}
+									name={name}
+									onClose={fetchThesauri}
+									servicesBaseUrl={servicesBaseUrl}
+								/>
+							</Table.Cell>
+							<Table.Cell collapsing>{displayName}</Table.Cell>
+							<Table.Cell collapsing>{languages.join(', ')}</Table.Cell>
+							<Table.Cell collapsing>{synonymsCount}</Table.Cell>
+							<Table.Cell collapsing>
 								<Button.Group>
 									{/*<NewOrEditSynonym
 										onClose={fetchThesauri}
@@ -133,16 +146,6 @@ export function ThesauriList(props) {
 										thesaurusId={id}
 										thesaurusName={name}
 									/>*/}
-									<NewOrEditThesaurus
-										displayName={displayName}
-										id={id}
-										languages={languages}
-										languagesOptions={languagesOptions}
-										licenseValid={licenseValid}
-										name={name}
-										onClose={fetchThesauri}
-										servicesBaseUrl={servicesBaseUrl}
-									/>
 									<DeleteThesaurus
 										id={id}
 										name={name}
@@ -170,15 +173,14 @@ export function ThesauriList(props) {
 				</Table.Body>
 				<Table.Footer>
 					<Table.Row>
+						<Table.HeaderCell><EditSynonymsModal
+							onClose={fetchThesauri}
+							servicesBaseUrl={servicesBaseUrl}
+						/></Table.HeaderCell>
 						<Table.HeaderCell></Table.HeaderCell>
 						<Table.HeaderCell></Table.HeaderCell>
 						<Table.HeaderCell>{synonymsSum}</Table.HeaderCell>
-						<Table.HeaderCell>
-							<EditSynonymsModal
-								onClose={fetchThesauri}
-								servicesBaseUrl={servicesBaseUrl}
-							/>
-						</Table.HeaderCell>
+						<Table.HeaderCell></Table.HeaderCell>
 					</Table.Row>
 				</Table.Footer>
 			</Table>}
@@ -205,7 +207,7 @@ export function Thesauri(props) {
 	} = props;
 	//console.debug('Thesauri licenseValid', licenseValid);
 	return <>
-		<Header as='h1'>Thesauri</Header>
+		<Header as='h1'>Synonyms</Header>
 		<ThesauriList
 			licenseValid={licenseValid}
 			servicesBaseUrl={servicesBaseUrl}

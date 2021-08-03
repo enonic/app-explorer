@@ -91,6 +91,7 @@ export function Fields(props) {
 				<Table celled collapsing compact selectable sortable striped>
 					<Table.Header>
 						<Table.Row>
+							<Table.HeaderCell>Edit</Table.HeaderCell>
 							<Table.HeaderCell
 								onClick={handleSortGenerator('key')}
 								sorted={column === 'key' ? direction : null}
@@ -138,6 +139,28 @@ export function Fields(props) {
 							valuesRes
 						}, index) => {
 							return <Table.Row key={`field[${index}]`}>
+								<Table.Cell>
+									<NewOrEditModal
+										disabled={denyValues}
+										field={name}
+										initialValues={{
+											allowArray,
+											fieldType,
+											key,
+											min,
+											max,
+											instruction,
+											decideByType,
+											enabled,
+											fulltext,
+											includeInAllText,
+											nGram, // node._indexConfig.default.nGram uses uppercase G in nGram
+											path
+										}}
+										onClose={fetchFields}
+										servicesBaseUrl={servicesBaseUrl}
+									/>
+								</Table.Cell>
 								<Table.Cell>{key}</Table.Cell>
 								<Table.Cell>{fieldType === 'any' ? '*' : fieldType}</Table.Cell>
 								{/*<Table.Cell>{allowArray ? <Icon color='green' name='checkmark'/> : <Icon color='red' name='x'/>}</Table.Cell>*/}
@@ -146,26 +169,6 @@ export function Fields(props) {
 								<Table.Cell>{valuesRes.hits.map(({displayName})=>displayName).join(', ')}</Table.Cell>
 								<Table.Cell>
 									<Button.Group>
-										<NewOrEditModal
-											disabled={denyValues}
-											field={name}
-											initialValues={{
-												allowArray,
-												fieldType,
-												key,
-												min,
-												max,
-												instruction,
-												decideByType,
-												enabled,
-												fulltext,
-												includeInAllText,
-												nGram, // node._indexConfig.default.nGram uses uppercase G in nGram
-												path
-											}}
-											onClose={fetchFields}
-											servicesBaseUrl={servicesBaseUrl}
-										/>
 										<DeleteModal
 											disabled={denyDelete}
 											name={name}
