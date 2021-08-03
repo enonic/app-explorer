@@ -29,9 +29,9 @@ export function post({
 		_indexConfig: {default: 'byType'},
 		_parentPath: '/stopwords',
 		_name: name,
+		_nodeType: NT_STOP_WORDS,
 		displayName,
-		words,
-		type: NT_STOP_WORDS
+		words
 	};
 	const node = mode === 'update' ? modify(params, {connection}) : create(params, {connection});
 	//log.info(`node:${toStr(node)}`);
