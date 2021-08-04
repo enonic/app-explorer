@@ -252,9 +252,8 @@ search(
 * TODO: Make api/v1/documents available again
 * Temporarily removed api/v1/documents
 * Add api/v1/interface/{interfaceName} GraphQL endpoint with search function
-  * Support highlight and searchString parameters
-  * Support hits field
-  * Support highlight and score field
+  * Support filters, highlight and searchString parameters
+  * Support hits field including (_highlight, _json and _score)
   * Wash searchString and remove stopWords
 * Add field boosting and synonyms to Interfaces in Admin GUI
 * Remove filters, query, resultMappings and facets from Interfaces in Admin GUI

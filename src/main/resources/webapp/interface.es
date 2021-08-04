@@ -2,11 +2,11 @@ import {
 	RESPONSE_TYPE_JSON,
 	//VALUE_TYPE_ANY,
 	VALUE_TYPE_BOOLEAN,
-	VALUE_TYPE_GEO_POINT,
-	VALUE_TYPE_INSTANT,
-	VALUE_TYPE_LOCAL_DATE,
-	VALUE_TYPE_LOCAL_DATE_TIME,
-	VALUE_TYPE_LOCAL_TIME,
+	//VALUE_TYPE_GEO_POINT,
+	//VALUE_TYPE_INSTANT,
+	//VALUE_TYPE_LOCAL_DATE,
+	//VALUE_TYPE_LOCAL_DATE_TIME,
+	//VALUE_TYPE_LOCAL_TIME,
 	//VALUE_TYPE_SET,
 	VALUE_TYPE_STRING,
 	addQueryFilter,
@@ -43,6 +43,61 @@ import {multiConnect} from '/lib/explorer/repo/multiConnect';
 import {get as getStopWordsList} from '/lib/explorer/stopWords/get';
 
 //import {DEFAULT_INTERFACE_FIELDS} from '../constants';
+
+
+const GRAPHQL_INPUT_TYPE_FILTER_EXISTS = createInputObjectType({
+	name: 'InputTypeFilterExists',
+	fields: {
+		field: { type: GraphQLString }
+	}
+});
+
+const GRAPHQL_INPUT_TYPE_FILTER_HAS_VALUE = createInputObjectType({
+	name: 'InputTypeFilterHasValue',
+	fields: {
+		field: { type: GraphQLString },
+		values: { type: list(GraphQLString) }
+	}
+});
+
+const GRAPHQL_INPUT_TYPE_FILTER_IDS = createInputObjectType({
+	name: 'InputTypeFilterIds',
+	fields: {
+		values: { type: list(GraphQLString) }
+	}
+});
+
+const GRAPHQL_INPUT_TYPE_FILTER_NOT_EXISTS = createInputObjectType({
+	name: 'InputTypeFilterNotExists',
+	fields: {
+		field: { type: GraphQLString }
+	}
+});
+
+const GRAPHQL_INPUT_TYPE_FILTER_BOOLEAN_FIELDS_FIELDS = {
+	exists: { type: GRAPHQL_INPUT_TYPE_FILTER_EXISTS },
+	hasValue: { type: GRAPHQL_INPUT_TYPE_FILTER_HAS_VALUE },
+	ids: { type: GRAPHQL_INPUT_TYPE_FILTER_IDS },
+	notExists: { type: GRAPHQL_INPUT_TYPE_FILTER_NOT_EXISTS }
+};
+
+const GRAPHQL_INPUT_TYPE_FILTER_BOOLEAN = createInputObjectType({
+	name: 'InputTypeFilterBoolean',
+	fields: {
+		must: { type: list(createInputObjectType({
+			name: 'InputTypeFilterBooleanMust',
+			fields: GRAPHQL_INPUT_TYPE_FILTER_BOOLEAN_FIELDS_FIELDS
+		}))},
+		mustNot: { type: list(createInputObjectType({
+			name: 'InputTypeFilterBooleanMustNot',
+			fields: GRAPHQL_INPUT_TYPE_FILTER_BOOLEAN_FIELDS_FIELDS
+		}))},
+		should: { type: list(createInputObjectType({
+			name: 'InputTypeFilterBooleanShould',
+			fields: GRAPHQL_INPUT_TYPE_FILTER_BOOLEAN_FIELDS_FIELDS
+		}))}
+	}
+});
 
 
 function washDocumentNode(node) {
@@ -152,6 +207,16 @@ function generateSchemaForInterface(interfaceName) {
 			fields: {
 				search: {
 					args: {
+						filters: createInputObjectType({
+							name: 'FiltersParameter',
+							fields: {
+								boolean: { type: GRAPHQL_INPUT_TYPE_FILTER_BOOLEAN },
+								exists: { type: GRAPHQL_INPUT_TYPE_FILTER_EXISTS },
+								hasValue: { type: GRAPHQL_INPUT_TYPE_FILTER_HAS_VALUE },
+								ids: { type: GRAPHQL_INPUT_TYPE_FILTER_IDS },
+								notExists: { type: GRAPHQL_INPUT_TYPE_FILTER_NOT_EXISTS }
+							}
+						}),
 						highlight: createInputObjectType({
 							name: 'HighlightParameter',
 							fields: {
@@ -173,6 +238,7 @@ function generateSchemaForInterface(interfaceName) {
 					resolve: (env) => {
 						const {
 							args: {
+								filters = {},
 								highlight = {
 									//encoder: 'html' // html value will force escaping html, if you use html highlighting tags
 									//fragmenter: 'span', // simple
@@ -188,6 +254,7 @@ function generateSchemaForInterface(interfaceName) {
 								searchString = ''
 							}
 						} = env;
+						//log.debug(`filters:${toStr(filters)}`);
 						//log.debug(`highlight:${toStr(highlight)}`);
 
 						//log.debug(`searchString:${toStr(searchString)}`);
@@ -224,7 +291,8 @@ function generateSchemaForInterface(interfaceName) {
 						const queryParams = {
 							count: 1, // TODO DEBUG Use "GraphQL iterator instead..."
 							filters: addQueryFilter({
-								filter: hasValue('_nodeType', [NT_DOCUMENT])
+								filter: hasValue('_nodeType', [NT_DOCUMENT]),
+								filters
 							}),
 							highlight,
 							query: `fulltext('${fields.map(({name: field, boost = 1}) => `${field}${boost && boost > 1 ? `^${boost}` : ''}`)}', '${searchStringWithoutStopWords}', 'AND')`
@@ -315,6 +383,65 @@ export function post(request) {
 /*
 {
 	search(
+    filters: {
+      #boolean: {
+        #must: {
+          #exists: {
+          # 	field: "title"
+          #}
+          #hasValue: {
+          #  field: "title"
+          #  values: "Example Domain"
+          #}
+          #ids: {
+          #  values: "530e980b-89dc-4522-af0f-df4b420a1f81"
+          #}
+          #notExists: {
+          #  field: "title"
+          #}
+        #} #must
+        #mustNot: {
+          #exists: {
+          # 	field: "title"
+          #}
+          #hasValue: {
+          #  field: "title"
+          #  values: "Example Domain"
+          #}
+          #ids: {
+          #  values: "530e980b-89dc-4522-af0f-df4b420a1f81"
+          #}
+          #notExists: {
+          #  field: "nonExistant"
+          #}
+        #} # mustNot
+        #should: [{
+        #  exists: {
+        #   	field: "title"
+        #  }
+        #},{
+        #  exists: {
+        #   	field: "text"
+        #	}
+        #}] # should
+      #} # boolean
+      #exists: {
+      #    field: "title"
+      #    field: "nonExistant"
+      #}
+      #hasValue: {
+      #    field: "title"
+      #    values: "Example Domain"
+      #    values: "nonExistant"
+      #}
+      #ids: {
+          #values: "530e980b-89dc-4522-af0f-df4b420a1f81"
+      		#values: "nonExistant"
+      #}
+      #notExists: {
+      #  field: "title"
+      #}
+    }
     highlight: {
       #encoder: "html"
       fragmenter: "simple"
