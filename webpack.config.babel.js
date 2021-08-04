@@ -16,6 +16,9 @@ import webpack from 'webpack';
 
 //console.debug(process.env.NODE_ENV);
 
+// Check which node is used
+//console.log(process.execPath);
+//console.log(process.version);
 
 //──────────────────────────────────────────────────────────────────────────────
 // Common constants

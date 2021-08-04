@@ -27,8 +27,8 @@ import {
 	LocalDateTime as GraphQLLocalDateTime,
 	LocalTime as GraphQLLocalTime,
 	newSchemaGenerator,
-	nonNull/*,
-	reference*/
+	nonNull,
+	reference
 } from '/lib/graphql';
 
 import {getFields} from '/lib/explorer/field/getFields';
@@ -101,6 +101,36 @@ const GRAPHQL_INPUT_TYPE_FILTER_HAS_VALUE = createInputObjectType({
 		values: { type: nonNull(list(GraphQLString)) }
 	}
 });*/
+
+/*const GRAPHQL_INPUT_TYPE_AGGREGATION_STATS = createInputObjectType({
+	name: 'InputTypeAggregationStats',
+	fields: {
+		field: {
+			type: nonNull(GraphQLString)
+		}
+	}
+});*/
+
+const GRAPHQL_INPUT_TYPE_AGGREGATION_TERMS = createInputObjectType({
+	name: 'InputTypeAggregationTerms',
+	fields: {
+		field: {
+			type: nonNull(GraphQLString)
+		},
+		order: {
+			type: GraphQLString
+		},
+		size: {
+			type: GraphQLInt
+		},
+		minDocCount: {
+			type: GraphQLInt
+		}
+	}
+});
+
+// TODO: range, dateRange, dateHistogram, geoDistance, min, max and valueCount
+// https://github.com/enonic/lib-guillotine/blob/master/src/main/resources/lib/guillotine/generic/input-types.js
 
 const GRAPHQL_INPUT_TYPE_FILTER_IDS = createInputObjectType({
 	name: 'InputTypeFilterIds',
@@ -179,7 +209,7 @@ function generateSchemaForInterface(interfaceName) {
 		connection: explorerRepoReadConnection,
 		interfaceName
 	});
-	log.debug(`interfaceNode:${toStr(interfaceNode)}`);
+	//log.debug(`interfaceNode:${toStr(interfaceNode)}`);
 	const {
 		collections,
 		fields,// = DEFAULT_INTERFACE_FIELDS, TODO This wont work when fields = [] which filter does
@@ -240,7 +270,7 @@ function generateSchemaForInterface(interfaceName) {
 	// Name must be non-null, non-empty and match [_A-Za-z][_0-9A-Za-z]* - was 'GraphQLScalarType{name='String', description='Built-in String', coercing=graphql.Scalars$3@af372a4}'
 	//enumTypeFilterFieldsValues.push(GraphQLString);
 
-	log.debug(`enumTypeFilterFieldsValues:${toStr(enumTypeFilterFieldsValues)}`);
+	//log.debug(`enumTypeFilterFieldsValues:${toStr(enumTypeFilterFieldsValues)}`);
 	//log.debug(`highlightParameterPropertiesFields:${toStr(highlightParameterPropertiesFields)}`);
 
 	const enumTypeFilterFields = createEnumType({
@@ -343,6 +373,16 @@ function generateSchemaForInterface(interfaceName) {
 			fields: {
 				search: {
 					args: {
+						aggregations: list(createInputObjectType({
+							name: 'InputObjectAggregations',
+							fields: {
+								name: { type: nonNull(GraphQLString) },
+								terms: { type: GRAPHQL_INPUT_TYPE_AGGREGATION_TERMS }/*,
+								aggregations: { // TODO subAggregations
+									type: reference('InputObjectAggregations')
+								}*/
+							}
+						})),
 						filters: createInputObjectType({
 							name: 'FiltersParameter',
 							fields: {
@@ -386,6 +426,7 @@ function generateSchemaForInterface(interfaceName) {
 					resolve: (env) => {
 						const {
 							args: {
+								aggregations: aggregationsArg,
 								filters = {},
 								highlight = {
 									//encoder: 'html' // html value will force escaping html, if you use html highlighting tags
@@ -404,6 +445,16 @@ function generateSchemaForInterface(interfaceName) {
 						} = env;
 						//log.debug(`filters:${toStr(filters)}`);
 						//log.debug(`highlight:${toStr(highlight)}`);
+
+						//log.debug(`aggregationsArg:${toStr(aggregationsArg)}`);
+						const aggregations = {};
+						aggregationsArg.forEach(({name, ...rest}) => {
+							/*if (isSet(aggregations[name])) {
+								// TODO Throw GraphQLError
+							}*/
+							aggregations[name] = rest;
+						});
+						//log.debug(`aggregations:${toStr(aggregations)}`);
 
 						//log.debug(`searchString:${toStr(searchString)}`);
 						const washedSearchString = wash({string: searchString});
@@ -437,6 +488,7 @@ function generateSchemaForInterface(interfaceName) {
 						//log.debug(`removedStopWords:${toStr({removedStopWords})}`);
 
 						const queryParams = {
+							aggregations,
 							count: 1, // TODO DEBUG Use "GraphQL iterator instead..."
 							filters: addQueryFilter({
 								filter: hasValue('_nodeType', [NT_DOCUMENT]),
@@ -461,6 +513,11 @@ function generateSchemaForInterface(interfaceName) {
 
 						const queryRes = multiRepoReadConnection.query(queryParams);
 						//log.debug(`queryRes:${toStr({queryRes})}`);
+
+						queryRes.aggregations = Object.keys(queryRes.aggregations).map((name) => ({
+							name,
+							buckets: queryRes.aggregations[name].buckets
+						}));
 
 						queryRes.hits = queryRes.hits.map(({
 							branch,
@@ -489,12 +546,25 @@ function generateSchemaForInterface(interfaceName) {
 					type: createObjectType({
 						name: 'InterfaceSearch',
 						fields: {
-							total: { type: nonNull(GraphQLInt) },
+							aggregations: { type: list(createObjectType({
+								name: 'InterfaceSearchAggregations',
+								fields: {
+									name: { type: nonNull(GraphQLString) },
+									buckets: { type: list(createObjectType({
+										name: 'InterfaceSearchAggregationsBuckets',
+										fields: {
+											docCount: { type: nonNull(GraphQLInt) },
+											key: { type: nonNull(GraphQLString) }
+										}
+									}))}
+								}
+							}))},
 							count: { type: nonNull(GraphQLInt) },
 							hits: { type: list(createObjectType({
 								name: 'InterfaceSearchHits',
 								fields: interfaceSearchHitsFields
-							})) }
+							}))},
+							total: { type: nonNull(GraphQLInt) }
 						}
 					})
 				}
@@ -521,10 +591,10 @@ export function post(request) {
 	//log.debug(`interfaceName:${toStr(interfaceName)}`);
 	const body = JSON.parse(bodyJson);
 	const {query, variables} = body;
-	log.debug(`query:${toStr(query)}`);
-	log.debug(`variables:${toStr(variables)}`);
+	//log.debug(`query:${toStr(query)}`);
+	//log.debug(`variables:${toStr(variables)}`);
 	const context = {};
-	log.debug(`context:${toStr(context)}`);
+	//log.debug(`context:${toStr(context)}`);
 	return {
 		contentType: RESPONSE_TYPE_JSON,
 		body: execute(generateSchemaForInterface(interfaceName), query, variables, context)
@@ -534,7 +604,24 @@ export function post(request) {
 /*
 {
 	search(
-    filters: {
+    aggregations: [{
+      name: "myTitleAggregation",
+      terms: {
+        field: "title"
+        order: "_term ASC"
+        size: 10
+        minDocCount: 0
+      }
+    },{
+      name: "myUriAggregation",
+      terms: {
+        field: "uri"
+        order: "_term ASC"
+        size: 10
+        minDocCount: 0
+      }
+    }]
+    #filters: {
       #boolean: {
         #must: {
           #exists: {
@@ -593,7 +680,7 @@ export function post(request) {
       #notExists: {
       #  field: title
       #}
-    }
+    #} #filters
     highlight: {
       #encoder: html
       fragmenter: simple
@@ -634,8 +721,14 @@ export function post(request) {
     }
     searchString: "domain"
   ) {
+    aggregations {
+      name
+      buckets {
+        docCount
+        key
+      }
+    }
     count
-    total
     hits {
       _highlight {
         title
@@ -648,6 +741,7 @@ export function post(request) {
       text
       uri
     }
+    total
   }
 }
 */

@@ -222,37 +222,15 @@ search(
 	count, // Use iterators instead
 	start, // Use iterators instead
 	//query=..., Later?
-	filters: {...},
-	aggregations: [
-		field: merke: { // Look at guillotine
-			bucketSize: 15,
-			order: 'name ASC' // count
-		]
-	}
 ) {
-	hits {
-		text,
-		title,
-		uri
-	}
-	#aggregations {
-		{
-			category: 'merke'
-			count/total,
-			hits: {
-				name: 'audi'
-			}
-		}
-		}
-		...
-	}
 	#curations
 }
 
 * TODO: Make api/v1/documents available again
 * Temporarily removed api/v1/documents
 * Add api/v1/interface/{interfaceName} GraphQL endpoint with search function
-  * Support filters, highlight and searchString parameters
+  * Support aggregations, filters, highlight and searchString parameters
+  * Support aggregations, count and total fields
   * Support hits field including (_highlight, _json and _score)
   * Wash searchString and remove stopWords
 * Upgrade to lib-graphql:2.0.0
