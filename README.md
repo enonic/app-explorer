@@ -255,6 +255,7 @@ search(
   * Support filters, highlight and searchString parameters
   * Support hits field including (_highlight, _json and _score)
   * Wash searchString and remove stopWords
+* Upgrade to lib-graphql:2.0.0
 * Add field boosting and synonyms to Interfaces in Admin GUI
 * Remove filters, query, resultMappings and facets from Interfaces in Admin GUI
 * Remove listener for EVENT_COLLECTOR_UNREGISTER from main

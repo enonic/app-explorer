@@ -58,7 +58,7 @@ dependencies {
 	//include 'com.enonic.lib:lib-admin-ui:3.0.0' // Not needed for the XP Menu
 
 	include 'com.enonic.lib:lib-cache:2.1.1'
-	include 'com.enonic.lib:lib-graphql:1.1.1'
+	include 'com.enonic.lib:lib-graphql:2.0.0'
 	include 'com.enonic.lib:lib-guillotine:4.2.0'
 
 	include 'com.enonic.lib:lib-http-client:2.3.0' // User-Agent: okhttp/4.9.1
