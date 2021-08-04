@@ -1,5 +1,14 @@
 import {
 	RESPONSE_TYPE_JSON,
+	//VALUE_TYPE_ANY,
+	VALUE_TYPE_BOOLEAN,
+	VALUE_TYPE_GEO_POINT,
+	VALUE_TYPE_INSTANT,
+	VALUE_TYPE_LOCAL_DATE,
+	VALUE_TYPE_LOCAL_DATE_TIME,
+	VALUE_TYPE_LOCAL_TIME,
+	//VALUE_TYPE_SET,
+	VALUE_TYPE_STRING,
 	addQueryFilter,
 	camelize,
 	toStr,
@@ -46,6 +55,27 @@ function washDocumentNode(node) {
 }
 
 
+function valueTypeToGraphQLType(valueType) {
+	if(valueType === VALUE_TYPE_STRING) return GraphQLString; // Most values are strings
+	if(valueType === 'long') return GraphQLInt; // Some are integers
+	if(valueType === VALUE_TYPE_BOOLEAN) return GraphQLBoolean; // A few are boolean
+	if(valueType === 'double') return GraphQLFloat; // A few are floating point numbers
+	return GraphQLString; // The rest are string
+	/*if(valueType === VALUE_TYPE_GEO_POINT) return GraphQLString;
+	if(valueType === VALUE_TYPE_INSTANT) return GraphQLString;
+	if(valueType === VALUE_TYPE_LOCAL_DATE) return GraphQLString;
+	if(valueType === VALUE_TYPE_LOCAL_DATE_TIME) return GraphQLString;
+	if(valueType === VALUE_TYPE_LOCAL_TIME) return GraphQLString;
+	//if(valueType === VALUE_TYPE_ANY) return GraphQLString;
+	//if(valueType === VALUE_TYPE_SET) return GraphQLString;
+
+	// TODO Remove in lib-explorer-4.0.0/app-explorer-2.0.0 ?
+	if(valueType === 'uri') return GraphQLString;
+	if(valueType === 'tag') return GraphQLString;
+	if(valueType === 'html') return GraphQLString;*/
+}
+
+
 function generateSchemaForInterface(interfaceName) {
 	const explorerRepoReadConnection = connect({ principals: [PRINCIPAL_EXPLORER_READ] });
 	const interfaceNode = getInterface({
@@ -66,10 +96,18 @@ function generateSchemaForInterface(interfaceName) {
 
 	const fieldsRes = getFields({connection: explorerRepoReadConnection});
 	//log.debug(`fieldsRes:${toStr(fieldsRes)}`);
+	log.debug(`fieldsRes.hits[0]:${toStr(fieldsRes.hits[0])}`);
 
 	const highlightParameterPropertiesFields = {};
+	const interfaceSearchHitsFieldsFromSchema = {};
 	const interfaceSearchHitsHighlightsFields = {};
-	fieldsRes.hits.forEach(({key}) => {
+
+	fieldsRes.hits.forEach(({
+		fieldType: valueType = VALUE_TYPE_STRING,
+		key/*,
+		max, // TODO nonNull list
+		min*/
+	}) => {
 		const camelizedFieldKey = camelize(key, /-/g);
 		//log.debug(`key:${toStr(key)} camelized:${toStr(camelizedFieldKey)}`);
 		highlightParameterPropertiesFields[camelizedFieldKey] = { type: createInputObjectType({
@@ -85,9 +123,23 @@ function generateSchemaForInterface(interfaceName) {
 				requireFieldMatch: { type: GraphQLBoolean }
 			}
 		})};
-		interfaceSearchHitsHighlightsFields[camelizedFieldKey] = { type: list(GraphQLString) };
+		const type = valueTypeToGraphQLType(valueType);
+		interfaceSearchHitsFieldsFromSchema[camelizedFieldKey] = { type };
+		interfaceSearchHitsHighlightsFields[camelizedFieldKey] = { type: list(type) };
 	});
-	//log.debug(`fieldsObj:${toStr(fieldsObj)}`);
+	//log.debug(`highlightParameterPropertiesFields:${toStr(highlightParameterPropertiesFields)}`);
+
+	const interfaceSearchHitsFields = {
+		_highlight: { type: createObjectType({
+			name: 'InterfaceSearchHitsHighlights',
+			fields: interfaceSearchHitsHighlightsFields // This list can't be empty when createObjectType is called?
+		})},
+		_json: { type: GraphQLString },
+		_score: { type: GraphQLFloat }
+	};
+	Object.keys(interfaceSearchHitsFieldsFromSchema).forEach((k) => {
+		interfaceSearchHitsFields[k] = interfaceSearchHitsFieldsFromSchema[k];
+	});
 
 	const highlightProperties = createInputObjectType({
 		name: 'HighlightParameterProperties',
@@ -200,15 +252,20 @@ function generateSchemaForInterface(interfaceName) {
 							id,
 							repoId,
 							score
-						}) => ({
-							highlight,
-							json: JSON.stringify(washDocumentNode(connect({
+						}) => {
+							const washedNode = washDocumentNode(connect({
 								branch,
 								principals: [PRINCIPAL_EXPLORER_READ],
 								repoId
-							}).get(id))),
-							score
-						}));
+							}).get(id));
+							const json = JSON.stringify(washedNode);
+							/* eslint-disable no-underscore-dangle */
+							washedNode._highlight = highlight;
+							washedNode._json = json;
+							washedNode._score = score;
+							/* eslint-enable no-underscore-dangle */
+							return washedNode;
+						});
 						log.debug(`queryRes:${toStr({queryRes})}`);
 
 						return queryRes;
@@ -220,14 +277,7 @@ function generateSchemaForInterface(interfaceName) {
 							count: { type: nonNull(GraphQLInt) },
 							hits: { type: list(createObjectType({
 								name: 'InterfaceSearchHits',
-								fields: {
-									highlight: { type: createObjectType({
-										name: 'InterfaceSearchHitsHighlights',
-										fields: interfaceSearchHitsHighlightsFields
-									})},
-									json: { type: GraphQLString },
-									score: { type: GraphQLFloat }
-								}
+								fields: interfaceSearchHitsFields
 							})) }
 						}
 					})
@@ -308,13 +358,16 @@ export function post(request) {
     count
     total
     hits {
-      highlight {
+      _highlight {
         title
         text
         uri
       }
-      json
-      score
+      _json
+      _score
+      title
+      text
+      uri
     }
   }
 }
