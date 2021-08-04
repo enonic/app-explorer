@@ -587,6 +587,16 @@ export function post(request) {
 		} = {}
 	} = request;
 	log.debug(`authorization:${toStr(authorization)}`);
+	const prefix = 'Explorer-Api-Key ';
+	if(!authorization || !authorization.startsWith(prefix)) {
+		return { status: 401 }; // Unauthorized
+	}
+	const apiKey = authorization.substring(prefix.length);
+	log.debug(`apiKey:${toStr(apiKey)}`);
+	if (!apiKey) {
+		return { status: 401 }; // Unauthorized
+	}
+
 	// TODO get apiKey from authorization header...
 	//log.debug(`interfaceName:${toStr(interfaceName)}`);
 	const body = JSON.parse(bodyJson);
