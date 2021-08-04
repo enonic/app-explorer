@@ -1,13 +1,13 @@
 import {
 	RESPONSE_TYPE_JSON,
-	//VALUE_TYPE_ANY,
+	VALUE_TYPE_ANY,
 	VALUE_TYPE_BOOLEAN,
 	//VALUE_TYPE_GEO_POINT,
 	VALUE_TYPE_INSTANT,
 	VALUE_TYPE_LOCAL_DATE,
 	VALUE_TYPE_LOCAL_DATE_TIME,
 	VALUE_TYPE_LOCAL_TIME,
-	//VALUE_TYPE_SET,
+	VALUE_TYPE_SET,
 	VALUE_TYPE_STRING,
 	addQueryFilter,
 	camelize,
@@ -46,11 +46,17 @@ import {connect} from '/lib/explorer/repo/connect';
 import {multiConnect} from '/lib/explorer/repo/multiConnect';
 import {get as getStopWordsList} from '/lib/explorer/stopWords/get';
 
-const schemaGenerator = newSchemaGenerator();
+const {
+	createEnumType,
+	createInputObjectType,
+	createObjectType,
+	createSchema,
+	createUnionType
+} = newSchemaGenerator();
 //import {DEFAULT_INTERFACE_FIELDS} from '../constants';
 
 
-const GRAPHQL_ENUM_TYPE_HIGHLIGHT_OPTION_ENCODER = schemaGenerator.createEnumType({
+const GRAPHQL_ENUM_TYPE_HIGHLIGHT_OPTION_ENCODER = createEnumType({
 	name: 'EnumTypeHighlightOptionEncoder',
 	values: [
 		'default',
@@ -58,7 +64,7 @@ const GRAPHQL_ENUM_TYPE_HIGHLIGHT_OPTION_ENCODER = schemaGenerator.createEnumTyp
 	]
 });
 
-const GRAPHQL_ENUM_TYPE_HIGHLIGHT_OPTION_FRAGMENTER = schemaGenerator.createEnumType({
+const GRAPHQL_ENUM_TYPE_HIGHLIGHT_OPTION_FRAGMENTER = createEnumType({
 	name: 'EnumTypeHighlightOptionFragmenter',
 	values: [
 		'simple',
@@ -66,7 +72,7 @@ const GRAPHQL_ENUM_TYPE_HIGHLIGHT_OPTION_FRAGMENTER = schemaGenerator.createEnum
 	]
 });
 
-const GRAPHQL_ENUM_TYPE_HIGHLIGHT_OPTION_ORDER = schemaGenerator.createEnumType({
+const GRAPHQL_ENUM_TYPE_HIGHLIGHT_OPTION_ORDER = createEnumType({
 	name: 'EnumTypeHighlightOptionOrder',
 	values: [
 		'none',  // default
@@ -74,21 +80,21 @@ const GRAPHQL_ENUM_TYPE_HIGHLIGHT_OPTION_ORDER = schemaGenerator.createEnumType(
 	]
 });
 
-const GRAPHQL_ENUM_TYPE_HIGHLIGHT_OPTION_TAG_SCHEMA = schemaGenerator.createEnumType({
+const GRAPHQL_ENUM_TYPE_HIGHLIGHT_OPTION_TAG_SCHEMA = createEnumType({
 	name: 'EnumTypeHighlightOptionTagSchema',
 	values: [
 		'styled'  // default is undefined
 	]
 });
 
-const GRAPHQL_INPUT_TYPE_FILTER_EXISTS = schemaGenerator.createInputObjectType({
+const GRAPHQL_INPUT_TYPE_FILTER_EXISTS = createInputObjectType({
 	name: 'InputTypeFilterExists',
 	fields: {
 		field: { type: GraphQLString }
 	}
 });
 
-const GRAPHQL_INPUT_TYPE_FILTER_HAS_VALUE = schemaGenerator.createInputObjectType({
+const GRAPHQL_INPUT_TYPE_FILTER_HAS_VALUE = createInputObjectType({
 	name: 'InputTypeFilterHasValue',
 	fields: {
 		field: { type: GraphQLString },
@@ -96,14 +102,14 @@ const GRAPHQL_INPUT_TYPE_FILTER_HAS_VALUE = schemaGenerator.createInputObjectTyp
 	}
 });
 
-const GRAPHQL_INPUT_TYPE_FILTER_IDS = schemaGenerator.createInputObjectType({
+const GRAPHQL_INPUT_TYPE_FILTER_IDS = createInputObjectType({
 	name: 'InputTypeFilterIds',
 	fields: {
 		values: { type: list(GraphQLString) }
 	}
 });
 
-const GRAPHQL_INPUT_TYPE_FILTER_NOT_EXISTS = schemaGenerator.createInputObjectType({
+const GRAPHQL_INPUT_TYPE_FILTER_NOT_EXISTS = createInputObjectType({
 	name: 'InputTypeFilterNotExists',
 	fields: {
 		field: { type: GraphQLString }
@@ -117,18 +123,18 @@ const GRAPHQL_INPUT_TYPE_FILTER_BOOLEAN_FIELDS_FIELDS = {
 	notExists: { type: GRAPHQL_INPUT_TYPE_FILTER_NOT_EXISTS }
 };
 
-const GRAPHQL_INPUT_TYPE_FILTER_BOOLEAN = schemaGenerator.createInputObjectType({
+const GRAPHQL_INPUT_TYPE_FILTER_BOOLEAN = createInputObjectType({
 	name: 'InputTypeFilterBoolean',
 	fields: {
-		must: { type: list(schemaGenerator.createInputObjectType({
+		must: { type: list(createInputObjectType({
 			name: 'InputTypeFilterBooleanMust',
 			fields: GRAPHQL_INPUT_TYPE_FILTER_BOOLEAN_FIELDS_FIELDS
 		}))},
-		mustNot: { type: list(schemaGenerator.createInputObjectType({
+		mustNot: { type: list(createInputObjectType({
 			name: 'InputTypeFilterBooleanMustNot',
 			fields: GRAPHQL_INPUT_TYPE_FILTER_BOOLEAN_FIELDS_FIELDS
 		}))},
-		should: { type: list(schemaGenerator.createInputObjectType({
+		should: { type: list(createInputObjectType({
 			name: 'InputTypeFilterBooleanShould',
 			fields: GRAPHQL_INPUT_TYPE_FILTER_BOOLEAN_FIELDS_FIELDS
 		}))}
@@ -189,45 +195,84 @@ function generateSchemaForInterface(interfaceName) {
 		connection: explorerRepoReadConnection,
 		includeSystemFields: true
 	});
-	//log.debug(`fieldsRes:${toStr(fieldsRes)}`);
-	log.debug(`fieldsRes.hits[0]:${toStr(fieldsRes.hits[0])}`);
+	log.debug(`fieldsRes:${toStr(fieldsRes)}`);
+	//log.debug(`fieldsRes.hits[0]:${toStr(fieldsRes.hits[0])}`);
 
+	const enumTypeFilterFieldsValues = [];
 	const highlightParameterPropertiesFields = {};
 	const interfaceSearchHitsFieldsFromSchema = {};
 	const interfaceSearchHitsHighlightsFields = {};
 
 	fieldsRes.hits.forEach(({
-		fieldType: valueType = VALUE_TYPE_STRING,
+		fieldType: valueType,
 		isSystemField = false,
 		key/*,
 		max, // TODO nonNull list
 		min*/
 	}) => {
-		const camelizedFieldKey = camelize(key, /-/g);
-		//log.debug(`key:${toStr(key)} camelized:${toStr(camelizedFieldKey)}`);
-		if (!isSystemField) {
-			highlightParameterPropertiesFields[camelizedFieldKey] = { type: schemaGenerator.createInputObjectType({
-				name: `HighlightParameterProperties${ucFirst(camelizedFieldKey)}`,
-				fields: {
-					fragmenter: { type: GRAPHQL_ENUM_TYPE_HIGHLIGHT_OPTION_FRAGMENTER },
-					fragmentSize: { type: GraphQLInt },
-					noMatchSize: { type: GraphQLInt },
-					numberOfFragments: { type: GraphQLInt },
-					order: { type: GRAPHQL_ENUM_TYPE_HIGHLIGHT_OPTION_ORDER },
-					postTag: { type: GraphQLString },
-					preTag: { type: GraphQLString },
-					requireFieldMatch: { type: GraphQLBoolean }
-				}
-			})};
-			const type = valueTypeToGraphQLType(valueType);
-			interfaceSearchHitsFieldsFromSchema[camelizedFieldKey] = { type };
-			interfaceSearchHitsHighlightsFields[camelizedFieldKey] = { type: list(type) };
+		if (valueType) {
+			const camelizedFieldKey = camelize(key, /[.-]/g);
+			//log.debug(`key:${toStr(key)} camelized:${toStr(camelizedFieldKey)}`);
+			if (![VALUE_TYPE_ANY, VALUE_TYPE_SET].includes(valueType)) {
+				enumTypeFilterFieldsValues.push(camelizedFieldKey);
+			}
+			if (!isSystemField) {
+				highlightParameterPropertiesFields[camelizedFieldKey] = { type: createInputObjectType({
+					name: `HighlightParameterProperties${ucFirst(camelizedFieldKey)}`,
+					fields: {
+						fragmenter: { type: GRAPHQL_ENUM_TYPE_HIGHLIGHT_OPTION_FRAGMENTER },
+						fragmentSize: { type: GraphQLInt },
+						noMatchSize: { type: GraphQLInt },
+						numberOfFragments: { type: GraphQLInt },
+						order: { type: GRAPHQL_ENUM_TYPE_HIGHLIGHT_OPTION_ORDER },
+						postTag: { type: GraphQLString },
+						preTag: { type: GraphQLString },
+						requireFieldMatch: { type: GraphQLBoolean }
+					}
+				})};
+				const type = valueTypeToGraphQLType(valueType);
+				interfaceSearchHitsFieldsFromSchema[camelizedFieldKey] = { type };
+				interfaceSearchHitsHighlightsFields[camelizedFieldKey] = { type: list(type) };
+			}
 		}
 	});
+
+	// Name must be non-null, non-empty and match [_A-Za-z][_0-9A-Za-z]* - was 'GraphQLScalarType{name='String', description='Built-in String', coercing=graphql.Scalars$3@af372a4}'
+	//enumTypeFilterFieldsValues.push(GraphQLString);
+
+	log.debug(`enumTypeFilterFieldsValues:${toStr(enumTypeFilterFieldsValues)}`);
 	//log.debug(`highlightParameterPropertiesFields:${toStr(highlightParameterPropertiesFields)}`);
 
+	const enumTypeFilterFields = createEnumType({
+		name: 'EnumTypeFilterFields',
+		values: enumTypeFilterFieldsValues
+	});
+
+	const unionTypeFilterExistsWithDynamicFieldsField = createUnionType({
+		name: 'UnionTypeFilterExistsWithDynamicFieldsField',
+		types: [
+			enumTypeFilterFields,
+			GraphQLString
+		],
+		typeResolver: (a,b) => {
+			log.debug(`a:${toStr(a)}`);
+			log.debug(`b:${toStr(b)}`);
+			return GraphQLString;
+		}
+	});
+
+	const graphqlInputTypeFilterExistsWithDynamicFields = createInputObjectType({
+		name: 'InputTypeFilterExistsWithDynamicFields',
+		fields: {
+			field: {
+				//type: enumTypeFilterFields
+				type: unionTypeFilterExistsWithDynamicFieldsField
+			}
+		}
+	});
+
 	const interfaceSearchHitsFields = {
-		_highlight: { type: schemaGenerator.createObjectType({
+		_highlight: { type: createObjectType({
 			name: 'InterfaceSearchHitsHighlights',
 			fields: interfaceSearchHitsHighlightsFields // This list can't be empty when createObjectType is called?
 		})},
@@ -238,30 +283,31 @@ function generateSchemaForInterface(interfaceName) {
 		interfaceSearchHitsFields[k] = interfaceSearchHitsFieldsFromSchema[k];
 	});
 
-	const highlightProperties = schemaGenerator.createInputObjectType({
+	const highlightProperties = createInputObjectType({
 		name: 'HighlightParameterProperties',
 		fields: highlightParameterPropertiesFields
 	});
 
-	return schemaGenerator.createSchema({
+	return createSchema({
 		//dictionary:,
 		//mutation:,
-		query: schemaGenerator.createObjectType({
+		query: createObjectType({
 			name: 'Query',
 			fields: {
 				search: {
 					args: {
-						filters: schemaGenerator.createInputObjectType({
+						filters: createInputObjectType({
 							name: 'FiltersParameter',
 							fields: {
 								boolean: { type: GRAPHQL_INPUT_TYPE_FILTER_BOOLEAN },
-								exists: { type: GRAPHQL_INPUT_TYPE_FILTER_EXISTS },
+								exists: { type: graphqlInputTypeFilterExistsWithDynamicFields },
+								//exists: { type: GRAPHQL_INPUT_TYPE_FILTER_EXISTS },
 								hasValue: { type: GRAPHQL_INPUT_TYPE_FILTER_HAS_VALUE },
 								ids: { type: GRAPHQL_INPUT_TYPE_FILTER_IDS },
 								notExists: { type: GRAPHQL_INPUT_TYPE_FILTER_NOT_EXISTS }
 							}
 						}),
-						highlight: schemaGenerator.createInputObjectType({
+						highlight: createInputObjectType({
 							name: 'HighlightParameter',
 							fields: {
 								encoder: { type: GRAPHQL_ENUM_TYPE_HIGHLIGHT_OPTION_ENCODER }, // Global only
@@ -382,12 +428,12 @@ function generateSchemaForInterface(interfaceName) {
 
 						return queryRes;
 					},
-					type: schemaGenerator.createObjectType({
+					type: createObjectType({
 						name: 'InterfaceSearch',
 						fields: {
 							total: { type: nonNull(GraphQLInt) },
 							count: { type: nonNull(GraphQLInt) },
-							hits: { type: list(schemaGenerator.createObjectType({
+							hits: { type: list(createObjectType({
 								name: 'InterfaceSearchHits',
 								fields: interfaceSearchHitsFields
 							})) }
