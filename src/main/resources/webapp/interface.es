@@ -50,8 +50,8 @@ const {
 	createEnumType,
 	createInputObjectType,
 	createObjectType,
-	createSchema,
-	createUnionType
+	createSchema/*,
+	createUnionType*/
 } = newSchemaGenerator();
 //import {DEFAULT_INTERFACE_FIELDS} from '../constants';
 
@@ -87,32 +87,32 @@ const GRAPHQL_ENUM_TYPE_HIGHLIGHT_OPTION_TAG_SCHEMA = createEnumType({
 	]
 });
 
-const GRAPHQL_INPUT_TYPE_FILTER_EXISTS = createInputObjectType({
+/*const GRAPHQL_INPUT_TYPE_FILTER_EXISTS = createInputObjectType({
 	name: 'InputTypeFilterExists',
 	fields: {
-		field: { type: GraphQLString }
+		field: { type: nonNull(GraphQLString) }
 	}
 });
 
 const GRAPHQL_INPUT_TYPE_FILTER_HAS_VALUE = createInputObjectType({
 	name: 'InputTypeFilterHasValue',
 	fields: {
-		field: { type: GraphQLString },
-		values: { type: list(GraphQLString) }
+		field: { type: nonNull(GraphQLString) },
+		values: { type: nonNull(list(GraphQLString)) }
 	}
-});
+});*/
 
 const GRAPHQL_INPUT_TYPE_FILTER_IDS = createInputObjectType({
 	name: 'InputTypeFilterIds',
 	fields: {
-		values: { type: list(GraphQLString) }
+		values: { type: nonNull(list(GraphQLString)) }
 	}
 });
 
-const GRAPHQL_INPUT_TYPE_FILTER_NOT_EXISTS = createInputObjectType({
+/*const GRAPHQL_INPUT_TYPE_FILTER_NOT_EXISTS = createInputObjectType({
 	name: 'InputTypeFilterNotExists',
 	fields: {
-		field: { type: GraphQLString }
+		field: { type: nonNull(GraphQLString) }
 	}
 });
 
@@ -139,7 +139,7 @@ const GRAPHQL_INPUT_TYPE_FILTER_BOOLEAN = createInputObjectType({
 			fields: GRAPHQL_INPUT_TYPE_FILTER_BOOLEAN_FIELDS_FIELDS
 		}))}
 	}
-});
+});*/
 
 
 function washDocumentNode(node) {
@@ -195,7 +195,7 @@ function generateSchemaForInterface(interfaceName) {
 		connection: explorerRepoReadConnection,
 		includeSystemFields: true
 	});
-	log.debug(`fieldsRes:${toStr(fieldsRes)}`);
+	//log.debug(`fieldsRes:${toStr(fieldsRes)}`);
 	//log.debug(`fieldsRes.hits[0]:${toStr(fieldsRes.hits[0])}`);
 
 	const enumTypeFilterFieldsValues = [];
@@ -248,26 +248,73 @@ function generateSchemaForInterface(interfaceName) {
 		values: enumTypeFilterFieldsValues
 	});
 
+	/* Can't union enum and scalar, only object...
 	const unionTypeFilterExistsWithDynamicFieldsField = createUnionType({
 		name: 'UnionTypeFilterExistsWithDynamicFieldsField',
 		types: [
-			enumTypeFilterFields,
-			GraphQLString
+			nonNull(enumTypeFilterFields),
+			nonNull(GraphQLString)
 		],
 		typeResolver: (a,b) => {
 			log.debug(`a:${toStr(a)}`);
 			log.debug(`b:${toStr(b)}`);
 			return GraphQLString;
 		}
-	});
+	});*/
 
 	const graphqlInputTypeFilterExistsWithDynamicFields = createInputObjectType({
 		name: 'InputTypeFilterExistsWithDynamicFields',
 		fields: {
 			field: {
-				//type: enumTypeFilterFields
-				type: unionTypeFilterExistsWithDynamicFieldsField
+				type: nonNull(enumTypeFilterFields)/*,
+				//type: unionTypeFilterExistsWithDynamicFieldsField
+				resolver: (env) => {
+					log.debug(`env:${toStr(env)}`); // This is never reached, perhaps createInputObjectType doesn't have resolver...
+					return '';
+				}*/
 			}
+		}
+	});
+
+	const graphqlInputTypeFilterHasValueWithDynamicFields = createInputObjectType({
+		name: 'InputTypeFilterHasValueWithDynamicFields',
+		fields: {
+			field: { type: nonNull(enumTypeFilterFields) },
+			values: { type: nonNull(list(GraphQLString)) }
+		}
+	});
+
+	const graphqlInputTypeFilterNotExistsWithDynamicFields = createInputObjectType({
+		name: 'InputTypeFilterNotExistsWithDynamicFields',
+		fields: {
+			field: {
+				type: nonNull(enumTypeFilterFields)
+			}
+		}
+	});
+
+	const graphqlInputTypeFilterBooleanDynamicFields = {
+		exists: { type: graphqlInputTypeFilterExistsWithDynamicFields },
+		hasValue: { type: graphqlInputTypeFilterHasValueWithDynamicFields },
+		ids: { type: GRAPHQL_INPUT_TYPE_FILTER_IDS },
+		notExists: { type: graphqlInputTypeFilterNotExistsWithDynamicFields }
+	};
+
+	const graphqlInputTypeFilterBooleanWithDynamicFields = createInputObjectType({
+		name: 'InputTypeFilterBooleanWithDynamicFields',
+		fields: {
+			must: { type: list(createInputObjectType({
+				name: 'InputTypeFilterBooleanMust',
+				fields: graphqlInputTypeFilterBooleanDynamicFields
+			}))},
+			mustNot: { type: list(createInputObjectType({
+				name: 'InputTypeFilterBooleanMustNot',
+				fields: graphqlInputTypeFilterBooleanDynamicFields
+			}))},
+			should: { type: list(createInputObjectType({
+				name: 'InputTypeFilterBooleanShould',
+				fields: graphqlInputTypeFilterBooleanDynamicFields
+			}))}
 		}
 	});
 
@@ -299,12 +346,23 @@ function generateSchemaForInterface(interfaceName) {
 						filters: createInputObjectType({
 							name: 'FiltersParameter',
 							fields: {
-								boolean: { type: GRAPHQL_INPUT_TYPE_FILTER_BOOLEAN },
-								exists: { type: graphqlInputTypeFilterExistsWithDynamicFields },
-								//exists: { type: GRAPHQL_INPUT_TYPE_FILTER_EXISTS },
-								hasValue: { type: GRAPHQL_INPUT_TYPE_FILTER_HAS_VALUE },
+								boolean: {
+									//type: GRAPHQL_INPUT_TYPE_FILTER_BOOLEAN
+									type: graphqlInputTypeFilterBooleanWithDynamicFields
+								},
+								exists: {
+									//type: GRAPHQL_INPUT_TYPE_FILTER_EXISTS
+									type: graphqlInputTypeFilterExistsWithDynamicFields
+								},
+								hasValue: {
+									//type: GRAPHQL_INPUT_TYPE_FILTER_HAS_VALUE
+									type: graphqlInputTypeFilterHasValueWithDynamicFields
+								},
 								ids: { type: GRAPHQL_INPUT_TYPE_FILTER_IDS },
-								notExists: { type: GRAPHQL_INPUT_TYPE_FILTER_NOT_EXISTS }
+								notExists: {
+									//type: GRAPHQL_INPUT_TYPE_FILTER_NOT_EXISTS
+									type: graphqlInputTypeFilterNotExistsWithDynamicFields
+								}
 							}
 						}),
 						highlight: createInputObjectType({
@@ -480,22 +538,22 @@ export function post(request) {
       #boolean: {
         #must: {
           #exists: {
-          # 	field: "title"
+           	#field: title
           #}
           #hasValue: {
-          #  field: "title"
+          #  field: title
           #  values: "Example Domain"
           #}
           #ids: {
           #  values: "530e980b-89dc-4522-af0f-df4b420a1f81"
           #}
           #notExists: {
-          #  field: "title"
+          #  field: title
           #}
         #} #must
         #mustNot: {
           #exists: {
-          # 	field: "title"
+          # 	field: title
           #}
           #hasValue: {
           #  field: "title"
@@ -505,34 +563,35 @@ export function post(request) {
           #  values: "530e980b-89dc-4522-af0f-df4b420a1f81"
           #}
           #notExists: {
-          #  field: "nonExistant"
+          #  field: "nonExistant" # This is not possible, only enums
           #}
         #} # mustNot
         #should: [{
         #  exists: {
-        #   	field: "title"
+        #   	field: title
         #  }
         #},{
         #  exists: {
-        #   	field: "text"
+        #   	field: text
         #	}
         #}] # should
       #} # boolean
       #exists: {
-      #    field: "title"
-      #    field: "nonExistant"
+          #field: text
+          #field: "nonExistant" # This is not possible, only enums
       #}
       #hasValue: {
-      #    field: "title"
-      #    values: "Example Domain"
-      #    values: "nonExistant"
+          #field: title
+          #values: "Example Domain"
+        	#values: ["Example Domain"]
+      		#values: "nonExistant" # This is not possible, only enums
       #}
       #ids: {
           #values: "530e980b-89dc-4522-af0f-df4b420a1f81"
       		#values: "nonExistant"
       #}
       #notExists: {
-      #  field: "title"
+      #  field: title
       #}
     }
     highlight: {
