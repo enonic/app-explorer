@@ -226,6 +226,7 @@ search(
 * TODO: Make api/v1/documents available again
 * Temporarily removed api/v1/documents
 * Add api/v1/interface/{interfaceName} GraphQL endpoint with search function
+  * Support ApiKey via Authorization HTTP_HEADER
   * Support aggregations, filters, highlight and searchString parameters
   * Support aggregations, count and total fields
   * Support hits field including (_highlight, _json and _score)

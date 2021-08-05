@@ -32,11 +32,13 @@ import {
 } from '/lib/graphql';
 
 import {getFields} from '/lib/explorer/field/getFields';
+import {exists as interfaceExists} from '/lib/explorer/interface/exists';
 import {get as getInterface} from '/lib/explorer/interface/get';
 import {filter as filterInterface} from '/lib/explorer/interface/filter';
 import {hasValue} from '/lib/explorer/query/hasValue';
 import {
 	COLLECTION_REPO_PREFIX,
+	NT_API_KEY,
 	NT_DOCUMENT,
 	PRINCIPAL_EXPLORER_READ
 } from '/lib/explorer/model/2/constants';
@@ -45,6 +47,7 @@ import {wash} from '/lib/explorer/query/wash';
 import {connect} from '/lib/explorer/repo/connect';
 import {multiConnect} from '/lib/explorer/repo/multiConnect';
 import {get as getStopWordsList} from '/lib/explorer/stopWords/get';
+import {hash} from '/lib/explorer/string/hash';
 
 const {
 	createEnumType,
@@ -586,19 +589,88 @@ export function post(request) {
 			interfaceName// = 'default'
 		} = {}
 	} = request;
-	log.debug(`authorization:${toStr(authorization)}`);
+	//log.debug(`authorization:${toStr(authorization)}`);
 	const prefix = 'Explorer-Api-Key ';
-	if(!authorization || !authorization.startsWith(prefix)) {
+	if(!authorization) {
+		log.error(`Authorization header missing!`);
+		return { status: 401 }; // Unauthorized
+	}
+	if(!authorization.startsWith(prefix)) {
+		log.error(`Invalid Authorization header:${authorization}!`);
 		return { status: 401 }; // Unauthorized
 	}
 	const apiKey = authorization.substring(prefix.length);
-	log.debug(`apiKey:${toStr(apiKey)}`);
+	//log.debug(`apiKey:${toStr(apiKey)}`);
 	if (!apiKey) {
+		log.error(`ApiKey not found in Authorization header:${authorization}!`);
 		return { status: 401 }; // Unauthorized
 	}
+	if (!interfaceName) {
+		log.error(`interfaceName not provided!`);
+		return 404; // Not Found
+	}
+	const hashedApiKey = hash(apiKey);
+	//log.debug(`hashedApiKey:${toStr(hashedApiKey)}`);
 
-	// TODO get apiKey from authorization header...
+	const explorerRepoReadConnection = connect({ principals: [PRINCIPAL_EXPLORER_READ] });
+	const matchingApiKeys = explorerRepoReadConnection.query({
+		count: -1,
+		filters: {
+			boolean: {
+				must: [{
+					hasValue: {
+						field: 'key',
+						values: [hashedApiKey]
+					}
+				},{
+					hasValue: {
+						field: '_nodetype',
+						values: [NT_API_KEY]
+					}
+				}]
+			}
+		}
+	});
+	//log.debug(`matchingApiKeys:${toStr(matchingApiKeys)}`);
+	if(matchingApiKeys.total !== 1) {
+		log.error(`API key hashedApiKey:${hashedApiKey} not found!`);
+		return {
+			body: {
+				//message: 'Bad Request'
+				message: 'Unauthorized'
+			},
+			contentType: 'text/json;charset=utf-8',
+			//status: 400 // Bad Request
+			status: 401 // Unauthorized
+		};
+	}
+	const apiKeyNode = explorerRepoReadConnection.get(matchingApiKeys.hits[0].id);
+	//log.debug(`apiKeyNode:${toStr(apiKeyNode)}`);
+	let {interfaces = []} = apiKeyNode;
+	if (!Array.isArray(interfaces)) { interfaces = [interfaces]; }
+	//log.debug(`interfaces:${toStr(interfaces)}`);
+	if (!interfaces.includes(interfaceName)) {
+		log.error(`API key hashedApiKey:${hashedApiKey} doesn't have read access to interface:${interfaceName}!`);
+		return {
+			body: {
+				//message: 'Bad Request'
+				message: 'Unauthorized'
+			},
+			contentType: 'text/json;charset=utf-8',
+			//status: 400 // Bad Request
+			status: 401 // Unauthorized
+		};
+	}
+
 	//log.debug(`interfaceName:${toStr(interfaceName)}`);
+	if (!interfaceExists({
+		connection: explorerRepoReadConnection,
+		name: interfaceName
+	})) {
+		log.error(`interface:${interfaceName} doesn't exist!`);
+		return 404; // Not Found
+	}
+
 	const body = JSON.parse(bodyJson);
 	const {query, variables} = body;
 	//log.debug(`query:${toStr(query)}`);
