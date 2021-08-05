@@ -1,24 +1,23 @@
 //import {toStr} from '@enonic/js-utils';
 
 import {
-	//createInputObjectType,
-	createObjectType,
-	//GraphQLBoolean,
-	//GraphQLFloat,
 	GraphQLInt,
 	GraphQLString,
 	list,
+	newSchemaGenerator,
 	nonNull
 } from '/lib/graphql';
-
 
 import {PRINCIPAL_EXPLORER_READ} from '/lib/explorer/model/2/constants';
 import {connect} from '/lib/explorer/repo/connect';
 import {query as qS} from '/lib/explorer/synonym/query';
 import {query} from '/lib/explorer/thesaurus/query';
 
-
 import {QUERY_FILTERS_INPUT_OBJECT_TYPE} from './noQL';
+
+const {
+	createObjectType
+} = newSchemaGenerator();
 
 
 const SYNONYM_OBJECT_TYPE = createObjectType({

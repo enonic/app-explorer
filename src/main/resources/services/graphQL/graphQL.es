@@ -1,18 +1,11 @@
 //import {toStr} from '@enonic/js-utils';
 
-/*import {
-	createContext,
-	createHeadlessCmsType
-} from '/lib/guillotine';*/
 import {
-	createObjectType,
-	createSchema,
-	execute
+	execute,
+	newSchemaGenerator
 } from '/lib/graphql';
 
-
 import {RT_JSON} from '/lib/explorer/model/2/constants';
-
 
 import {getContentTypes} from './contentType';
 import {getLicense} from './license';
@@ -29,21 +22,13 @@ import {queryStopWords} from './stopWord';
 import {querySynonyms, queryThesauri} from './thesaurus';
 import {queryTasks} from './task';
 
+const {
+	createObjectType,
+	createSchema
+} = newSchemaGenerator();
 
-//const CONTEXT = createContext();
+
 export const SCHEMA = createSchema({
-	/*dictionary: CONTEXT.dictionary,
-	query: createObjectType({
-		name: 'Query',
-		fields: {
-			guillotine: {
-				type: createHeadlessCmsType(CONTEXT),
-				resolve: function () {
-					return {};
-				}
-			}
-		}
-	})*/
 	query: createObjectType({
 		name: 'Query',
 		fields: {

@@ -1,17 +1,16 @@
 //import {toStr} from '@enonic/js-utils';
 
 import {
-	//createInputObjectType,
-	createObjectType,
-	//GraphQLBoolean,
-	//GraphQLFloat,
-	//GraphQLInt,
 	GraphQLString,
-	list//,
-	//nonNull
+	list,
+	newSchemaGenerator
 } from '/lib/graphql';
 //import {getLocales as importedGetLocales} from '/lib/locales';
 import {getLocales as importedGetLocales} from '../../lib/locales';
+
+const {
+	createObjectType
+} = newSchemaGenerator();
 
 
 export const getLocales = {

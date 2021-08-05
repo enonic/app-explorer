@@ -1,15 +1,13 @@
 import {
-	createInputObjectType,
-	//createObjectType,
-	//GraphQLBoolean,
-	//GraphQLFloat,
-	//GraphQLID,
-	//GraphQLInt,
 	GraphQLString,
 	list,
-	nonNull//,
-	//reference
+	newSchemaGenerator,
+	nonNull
 } from '/lib/graphql';
+
+const {
+	createInputObjectType
+} = newSchemaGenerator();
 
 
 const HAS_VALUE_FILTER_OBJECT_TYPE = createInputObjectType({

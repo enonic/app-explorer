@@ -1,16 +1,16 @@
 //import {toStr} from '@enonic/js-utils';
 
 import {
-	//createInputObjectType,
-	createObjectType,
 	GraphQLBoolean,
-	//GraphQLFloat,
-	//GraphQLInt,
 	GraphQLString,
-	//list,
+	newSchemaGenerator,
 	nonNull
 } from '/lib/graphql';
 import {validateLicense} from '/lib/license';
+
+const {
+	createObjectType
+} = newSchemaGenerator();
 
 
 export const getLicense = {

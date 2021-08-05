@@ -2,18 +2,20 @@
 //import getIn from 'get-value';
 
 import {
-	//createInputObjectType,
-	createObjectType,
 	GraphQLBoolean,
-	//GraphQLFloat,
 	GraphQLInt,
 	GraphQLString,
 	list,
+	newSchemaGenerator,
 	nonNull
 } from '/lib/graphql';
 import {list as listTasks} from '/lib/xp/task';
 
 import {queryCollectorsResolver} from './collector';
+
+const {
+	createObjectType
+} = newSchemaGenerator();
 
 
 const TASK_OBJECT_TYPE = createObjectType({

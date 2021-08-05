@@ -4,10 +4,10 @@ import {
 } from '@enonic/js-utils';
 
 import {
-	createObjectType,
 	GraphQLInt,
 	GraphQLString,
 	list,
+	newSchemaGenerator,
 	nonNull
 } from '/lib/graphql';
 
@@ -15,6 +15,10 @@ import {
 import {PRINCIPAL_EXPLORER_READ} from '/lib/explorer/model/2/constants';
 import {connect} from '/lib/explorer/repo/connect';
 import {query} from '/lib/explorer/interface/query';
+
+const {
+	createObjectType
+} = newSchemaGenerator();
 
 
 const INTERFACE_OBJECT_TYPE = createObjectType({

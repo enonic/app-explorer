@@ -1,16 +1,17 @@
 //import {toStr} from '@enonic/js-utils';
 
 import {
-	//createInputObjectType,
-	createObjectType,
-	//GraphQLBoolean,
-	//GraphQLFloat,
 	GraphQLInt,
 	GraphQLString,
 	list,
+	newSchemaGenerator,
 	nonNull
 } from '/lib/graphql';
 import {getSites as gS} from '/lib/util/content/getSites';
+
+const {
+	createObjectType
+} = newSchemaGenerator();
 
 
 const SITE_OBJECT_TYPE = createObjectType({

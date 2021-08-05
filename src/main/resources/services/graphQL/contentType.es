@@ -1,16 +1,17 @@
 //import {toStr} from '@enonic/js-utils';
 
 import {
-	//createInputObjectType,
-	createObjectType,
 	GraphQLBoolean,
-	//GraphQLFloat,
-	//GraphQLInt,
 	GraphQLString,
 	list,
+	newSchemaGenerator,
 	nonNull
 } from '/lib/graphql';
 import {getTypes} from '/lib/xp/content';
+
+const {
+	createObjectType
+} = newSchemaGenerator();
 
 
 const CONTENT_TYPE_OBJECT_TYPE = createObjectType({
@@ -38,7 +39,7 @@ const CONTENT_TYPE_OBJECT_TYPE = createObjectType({
 
 
 export const getContentTypes = {
-	resolve: (env) => {
+	resolve: (/*env*/) => {
 		//log.info(`env:${toStr(env)}`);
 		const contentTypes = getTypes().map(({form, ...rest}) => ({
 			//form,

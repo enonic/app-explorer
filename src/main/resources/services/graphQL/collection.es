@@ -2,13 +2,11 @@
 //import getIn from 'get-value';
 
 import {
-	//createInputObjectType,
-	createObjectType,
 	GraphQLBoolean,
-	//GraphQLFloat,
 	GraphQLInt,
 	GraphQLString,
 	list,
+	newSchemaGenerator,
 	nonNull
 } from '/lib/graphql';
 //import {list as listTasks} from '/lib/xp/task';
@@ -19,6 +17,9 @@ import {getDocumentCount} from '/lib/explorer/collection/getDocumentCount';
 import {query} from '/lib/explorer/collection/query';
 import {usedInInterfaces} from '/lib/explorer/collection/usedInInterfaces';
 
+const {
+	createObjectType
+} = newSchemaGenerator();
 
 /*const COLLECTIONS_INPUT_TYPE = createInputObjectType({
 	name: 'CollectionsArguments',

@@ -2,13 +2,10 @@
 //import getIn from 'get-value';
 
 import {
-	//createInputObjectType,
-	createObjectType,
-	//GraphQLBoolean,
-	//GraphQLFloat,
 	GraphQLInt,
 	GraphQLString,
 	list,
+	newSchemaGenerator,
 	nonNull
 } from '/lib/graphql';
 
@@ -16,6 +13,10 @@ import {
 //import {PRINCIPAL_EXPLORER_READ} from '/lib/explorer/model/2/constants';
 //import {connect} from '/lib/explorer/repo/connect';
 import {query} from '/lib/explorer/journal/query';
+
+const {
+	createObjectType
+} = newSchemaGenerator();
 
 
 const JOURNAL_OBJECT_TYPE = createObjectType({

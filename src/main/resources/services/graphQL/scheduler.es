@@ -4,15 +4,16 @@
 import {list as listJobs} from '/lib/xp/scheduler';
 
 import {
-	//createInputObjectType,
-	createObjectType,
 	GraphQLBoolean,
-	//GraphQLFloat,
-	//GraphQLInt,
 	GraphQLString,
 	list,
+	newSchemaGenerator,
 	nonNull
 } from '/lib/graphql';
+
+const {
+	createObjectType
+} = newSchemaGenerator();
 
 
 export const listScheduledJobs = {
