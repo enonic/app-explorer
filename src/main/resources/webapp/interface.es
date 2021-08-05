@@ -30,6 +30,11 @@ import {
 	nonNull/*,
 	reference*/
 } from '/lib/graphql';
+import {
+	createConnectionType,
+	decodeCursor,
+	encodeCursor
+} from '/lib/graphql-connection';
 
 import {getFields} from '/lib/explorer/field/getFields';
 import {exists as interfaceExists} from '/lib/explorer/interface/exists';
@@ -49,13 +54,15 @@ import {multiConnect} from '/lib/explorer/repo/multiConnect';
 import {get as getStopWordsList} from '/lib/explorer/stopWords/get';
 import {hash} from '/lib/explorer/string/hash';
 
+const schemaGenerator = newSchemaGenerator();
+
 const {
 	createEnumType,
 	createInputObjectType,
 	createObjectType,
 	createSchema/*,
 	createUnionType*/
-} = newSchemaGenerator();
+} = schemaGenerator;
 //import {DEFAULT_INTERFACE_FIELDS} from '../constants';
 
 
@@ -368,208 +375,272 @@ function generateSchemaForInterface(interfaceName) {
 		fields: highlightParameterPropertiesFields
 	});
 
+	function searchResolver(env) {
+		const {
+			args: {
+				aggregations: aggregationsArg,
+				count = 10,
+				filters = {},
+				highlight = {
+					//encoder: 'html' // html value will force escaping html, if you use html highlighting tags
+					//fragmenter: 'span', // simple
+					//fragmentSize: 100,
+					//noMatchSize: 0,
+					//numberOfFragments: 5,
+					//order: 'none', // score
+					//postTag: '</em>',
+					//preTag: '<em>',
+					//requireFieldMatch: true,
+					//tagsSchema: 'styled'
+				},
+				searchString = '',
+				start = 0
+			}
+		} = env;
+		//log.debug(`filters:${toStr(filters)}`);
+		//log.debug(`highlight:${toStr(highlight)}`);
+
+		//log.debug(`aggregationsArg:${toStr(aggregationsArg)}`);
+		const aggregations = {};
+		aggregationsArg.forEach(({name, ...rest}) => {
+			/*if (isSet(aggregations[name])) {
+				// TODO Throw GraphQLError
+			}*/
+			aggregations[name] = rest;
+		});
+		//log.debug(`aggregations:${toStr(aggregations)}`);
+
+		//log.debug(`searchString:${toStr(searchString)}`);
+		const washedSearchString = wash({string: searchString});
+		//log.debug(`washedSearchString:${toStr({washedSearchString})}`);
+
+		// TODO stopWords could be cached:
+		const listOfStopWords = [];
+		if (stopWords && stopWords.length) {
+			stopWords.forEach((name) => {
+				const {words} = getStopWordsList({ // Not a query
+					connection: explorerRepoReadConnection,
+					name
+				});
+				//log.debug(toStr({words}));
+				words.forEach((word) => {
+					if (!listOfStopWords.includes(word)) {
+						listOfStopWords.push(word);
+					}
+				});
+			});
+		}
+		//log.debug(`listOfStopWords:${toStr({listOfStopWords})}`);
+
+		const removedStopWords = [];
+		const searchStringWithoutStopWords = removeStopWords({
+			removedStopWords,
+			stopWords: listOfStopWords,
+			string: washedSearchString
+		});
+		//log.debug(`searchStringWithoutStopWords:${toStr({searchStringWithoutStopWords})}`);
+		//log.debug(`removedStopWords:${toStr({removedStopWords})}`);
+
+		const queryParams = {
+			aggregations,
+			count,
+			filters: addQueryFilter({
+				filter: hasValue('_nodeType', [NT_DOCUMENT]),
+				filters
+			}),
+			highlight,
+			query: `fulltext('${fields.map(({name: field, boost = 1}) => `${field}${boost && boost > 1 ? `^${boost}` : ''}`)}', '${searchStringWithoutStopWords}', 'AND')`,
+			start
+		};
+		log.debug(`queryParams:${toStr({queryParams})}`);
+
+		const multiConnectParams = {
+			principals: [PRINCIPAL_EXPLORER_READ],
+			sources: collections.map(collection => ({
+				repoId: `${COLLECTION_REPO_PREFIX}${collection}`,
+				branch: 'master', // NOTE Hardcoded
+				principals: [PRINCIPAL_EXPLORER_READ]
+			}))
+		};
+		//log.debug(`multiConnectParams:${toStr({multiConnectParams})}`);
+
+		const multiRepoReadConnection = multiConnect(multiConnectParams);
+
+		const queryRes = multiRepoReadConnection.query(queryParams);
+		//log.debug(`queryRes:${toStr({queryRes})}`);
+
+		queryRes.aggregations = Object.keys(queryRes.aggregations).map((name) => ({
+			name,
+			buckets: queryRes.aggregations[name].buckets
+		}));
+
+		queryRes.hits = queryRes.hits.map(({
+			branch,
+			highlight,
+			id,
+			repoId,
+			score
+		}) => {
+			const washedNode = washDocumentNode(connect({
+				branch,
+				principals: [PRINCIPAL_EXPLORER_READ],
+				repoId
+			}).get(id));
+			const json = JSON.stringify(washedNode);
+			/* eslint-disable no-underscore-dangle */
+			washedNode._highlight = highlight;
+			washedNode._json = json;
+			washedNode._score = score;
+			/* eslint-enable no-underscore-dangle */
+			return washedNode;
+		});
+		log.debug(`queryRes:${toStr({queryRes})}`);
+
+		return queryRes;
+	}
+
+	const objectTypeInterfaceSearch = createObjectType({
+		name: 'InterfaceSearch',
+		fields: {
+			aggregations: { type: list(createObjectType({
+				name: 'InterfaceSearchAggregations',
+				fields: {
+					name: { type: nonNull(GraphQLString) },
+					buckets: { type: list(createObjectType({
+						name: 'InterfaceSearchAggregationsBuckets',
+						fields: {
+							docCount: { type: nonNull(GraphQLInt) },
+							key: { type: nonNull(GraphQLString) }
+						}
+					}))}
+				}
+			}))},
+			count: { type: nonNull(GraphQLInt) },
+			hits: { type: list(createObjectType({
+				name: 'InterfaceSearchHits',
+				fields: interfaceSearchHitsFields
+			}))},
+			total: { type: nonNull(GraphQLInt) }
+		}
+	});
+
+	const inputObjectTypeAggregations = createInputObjectType({
+		name: 'InputObjectAggregations',
+		fields: {
+			name: { type: nonNull(GraphQLString) },
+			terms: { type: GRAPHQL_INPUT_TYPE_AGGREGATION_TERMS }/*,
+			aggregations: { // TODO subAggregations
+				type: reference('InputObjectAggregations')
+			}*/
+		}
+	});
+
+	const inputObjectTypeFilters = createInputObjectType({
+		name: 'FiltersParameter',
+		fields: {
+			boolean: {
+				//type: GRAPHQL_INPUT_TYPE_FILTER_BOOLEAN
+				type: graphqlInputTypeFilterBooleanWithDynamicFields
+			},
+			exists: {
+				//type: GRAPHQL_INPUT_TYPE_FILTER_EXISTS
+				type: graphqlInputTypeFilterExistsWithDynamicFields
+			},
+			hasValue: {
+				//type: GRAPHQL_INPUT_TYPE_FILTER_HAS_VALUE
+				type: graphqlInputTypeFilterHasValueWithDynamicFields
+			},
+			ids: { type: GRAPHQL_INPUT_TYPE_FILTER_IDS },
+			notExists: {
+				//type: GRAPHQL_INPUT_TYPE_FILTER_NOT_EXISTS
+				type: graphqlInputTypeFilterNotExistsWithDynamicFields
+			}
+		}
+	});
+
+	const inputObjectTypeHighlight = createInputObjectType({
+		name: 'HighlightParameter',
+		fields: {
+			encoder: { type: GRAPHQL_ENUM_TYPE_HIGHLIGHT_OPTION_ENCODER }, // Global only
+			fragmenter: { type: GRAPHQL_ENUM_TYPE_HIGHLIGHT_OPTION_FRAGMENTER },
+			fragmentSize: { type: GraphQLInt },
+			noMatchSize: { type: GraphQLInt },
+			numberOfFragments: { type: GraphQLInt },
+			order: { type: GRAPHQL_ENUM_TYPE_HIGHLIGHT_OPTION_ORDER },
+			postTag: { type: GraphQLString },
+			preTag: { type: GraphQLString },
+			requireFieldMatch: { type: GraphQLBoolean },
+			tagsSchema: { type: GRAPHQL_ENUM_TYPE_HIGHLIGHT_OPTION_TAG_SCHEMA }, // Global only
+			properties: { type: highlightProperties }
+		}
+	});
+
 	return createSchema({
 		//dictionary:,
 		//mutation:,
 		query: createObjectType({
 			name: 'Query',
 			fields: {
-				search: {
+				getSearchConnection: {
 					args: {
-						aggregations: list(createInputObjectType({
-							name: 'InputObjectAggregations',
-							fields: {
-								name: { type: nonNull(GraphQLString) },
-								terms: { type: GRAPHQL_INPUT_TYPE_AGGREGATION_TERMS }/*,
-								aggregations: { // TODO subAggregations
-									type: reference('InputObjectAggregations')
-								}*/
-							}
-						})),
-						filters: createInputObjectType({
-							name: 'FiltersParameter',
-							fields: {
-								boolean: {
-									//type: GRAPHQL_INPUT_TYPE_FILTER_BOOLEAN
-									type: graphqlInputTypeFilterBooleanWithDynamicFields
-								},
-								exists: {
-									//type: GRAPHQL_INPUT_TYPE_FILTER_EXISTS
-									type: graphqlInputTypeFilterExistsWithDynamicFields
-								},
-								hasValue: {
-									//type: GRAPHQL_INPUT_TYPE_FILTER_HAS_VALUE
-									type: graphqlInputTypeFilterHasValueWithDynamicFields
-								},
-								ids: { type: GRAPHQL_INPUT_TYPE_FILTER_IDS },
-								notExists: {
-									//type: GRAPHQL_INPUT_TYPE_FILTER_NOT_EXISTS
-									type: graphqlInputTypeFilterNotExistsWithDynamicFields
-								}
-							}
-						}),
-						highlight: createInputObjectType({
-							name: 'HighlightParameter',
-							fields: {
-								encoder: { type: GRAPHQL_ENUM_TYPE_HIGHLIGHT_OPTION_ENCODER }, // Global only
-								fragmenter: { type: GRAPHQL_ENUM_TYPE_HIGHLIGHT_OPTION_FRAGMENTER },
-								fragmentSize: { type: GraphQLInt },
-								noMatchSize: { type: GraphQLInt },
-								numberOfFragments: { type: GraphQLInt },
-								order: { type: GRAPHQL_ENUM_TYPE_HIGHLIGHT_OPTION_ORDER },
-								postTag: { type: GraphQLString },
-								preTag: { type: GraphQLString },
-								requireFieldMatch: { type: GraphQLBoolean },
-								tagsSchema: { type: GRAPHQL_ENUM_TYPE_HIGHLIGHT_OPTION_TAG_SCHEMA }, // Global only
-								properties: { type: highlightProperties }
-							}
-						}),
+						after: GraphQLString,
+						//aggregations: list(inputObjectTypeAggregations),
+						//filters: inputObjectTypeFilters,
+						first: GraphQLInt,
+						//highlight: inputObjectTypeHighlight,
 						searchString: GraphQLString
 					},
 					resolve: (env) => {
+						log.debug(`env:${toStr({env})}`);
 						const {
-							args: {
-								aggregations: aggregationsArg,
-								filters = {},
-								highlight = {
-									//encoder: 'html' // html value will force escaping html, if you use html highlighting tags
-									//fragmenter: 'span', // simple
-									//fragmentSize: 100,
-									//noMatchSize: 0,
-									//numberOfFragments: 5,
-									//order: 'none', // score
-									//postTag: '</em>',
-									//preTag: '<em>',
-									//requireFieldMatch: true,
-									//tagsSchema: 'styled'
-								},
-								searchString = ''
+							after = encodeCursor('0'), // encoded representation of start
+							//aggregations,
+							//filters,
+							first, // count
+							//highlight,
+							searchString
+						} = env.args;
+						log.debug(`after:${toStr({after})}`);
+						log.debug(`first:${toStr({first})}`);
+						const start = (after && parseInt(decodeCursor(after))) || 0;
+						log.debug(`start:${toStr({start})}`);
+						const node = searchResolver({
+							//aggregations,
+							count: first,
+							//filters,
+							//highlight,
+							searchString,
+							start
+						});
+						const totalCount = node.total;
+						// TODO I have no idea if these are correct!
+						const endCursor = encodeCursor(totalCount - first);
+						const hasNext = totalCount > start + first;
+						return {
+							totalCount,
+							edges: {
+								node
+							},
+							pageInfo: {
+								startCursor: after,
+								endCursor,
+								hasNext
 							}
-						} = env;
-						//log.debug(`filters:${toStr(filters)}`);
-						//log.debug(`highlight:${toStr(highlight)}`);
-
-						//log.debug(`aggregationsArg:${toStr(aggregationsArg)}`);
-						const aggregations = {};
-						aggregationsArg.forEach(({name, ...rest}) => {
-							/*if (isSet(aggregations[name])) {
-								// TODO Throw GraphQLError
-							}*/
-							aggregations[name] = rest;
-						});
-						//log.debug(`aggregations:${toStr(aggregations)}`);
-
-						//log.debug(`searchString:${toStr(searchString)}`);
-						const washedSearchString = wash({string: searchString});
-						//log.debug(`washedSearchString:${toStr({washedSearchString})}`);
-
-						// TODO stopWords could be cached:
-						const listOfStopWords = [];
-						if (stopWords && stopWords.length) {
-							stopWords.forEach((name) => {
-								const {words} = getStopWordsList({ // Not a query
-									connection: explorerRepoReadConnection,
-									name
-								});
-								//log.debug(toStr({words}));
-								words.forEach((word) => {
-									if (!listOfStopWords.includes(word)) {
-										listOfStopWords.push(word);
-									}
-								});
-							});
-						}
-						//log.debug(`listOfStopWords:${toStr({listOfStopWords})}`);
-
-						const removedStopWords = [];
-						const searchStringWithoutStopWords = removeStopWords({
-							removedStopWords,
-							stopWords: listOfStopWords,
-							string: washedSearchString
-						});
-						//log.debug(`searchStringWithoutStopWords:${toStr({searchStringWithoutStopWords})}`);
-						//log.debug(`removedStopWords:${toStr({removedStopWords})}`);
-
-						const queryParams = {
-							aggregations,
-							count: 1, // TODO DEBUG Use "GraphQL iterator instead..."
-							filters: addQueryFilter({
-								filter: hasValue('_nodeType', [NT_DOCUMENT]),
-								filters
-							}),
-							highlight,
-							query: `fulltext('${fields.map(({name: field, boost = 1}) => `${field}${boost && boost > 1 ? `^${boost}` : ''}`)}', '${searchStringWithoutStopWords}', 'AND')`
 						};
-						log.debug(`queryParams:${toStr({queryParams})}`);
-
-						const multiConnectParams = {
-							principals: [PRINCIPAL_EXPLORER_READ],
-							sources: collections.map(collection => ({
-								repoId: `${COLLECTION_REPO_PREFIX}${collection}`,
-								branch: 'master', // NOTE Hardcoded
-								principals: [PRINCIPAL_EXPLORER_READ]
-							}))
-						};
-						//log.debug(`multiConnectParams:${toStr({multiConnectParams})}`);
-
-						const multiRepoReadConnection = multiConnect(multiConnectParams);
-
-						const queryRes = multiRepoReadConnection.query(queryParams);
-						//log.debug(`queryRes:${toStr({queryRes})}`);
-
-						queryRes.aggregations = Object.keys(queryRes.aggregations).map((name) => ({
-							name,
-							buckets: queryRes.aggregations[name].buckets
-						}));
-
-						queryRes.hits = queryRes.hits.map(({
-							branch,
-							highlight,
-							id,
-							repoId,
-							score
-						}) => {
-							const washedNode = washDocumentNode(connect({
-								branch,
-								principals: [PRINCIPAL_EXPLORER_READ],
-								repoId
-							}).get(id));
-							const json = JSON.stringify(washedNode);
-							/* eslint-disable no-underscore-dangle */
-							washedNode._highlight = highlight;
-							washedNode._json = json;
-							washedNode._score = score;
-							/* eslint-enable no-underscore-dangle */
-							return washedNode;
-						});
-						log.debug(`queryRes:${toStr({queryRes})}`);
-
-						return queryRes;
 					},
-					type: createObjectType({
-						name: 'InterfaceSearch',
-						fields: {
-							aggregations: { type: list(createObjectType({
-								name: 'InterfaceSearchAggregations',
-								fields: {
-									name: { type: nonNull(GraphQLString) },
-									buckets: { type: list(createObjectType({
-										name: 'InterfaceSearchAggregationsBuckets',
-										fields: {
-											docCount: { type: nonNull(GraphQLInt) },
-											key: { type: nonNull(GraphQLString) }
-										}
-									}))}
-								}
-							}))},
-							count: { type: nonNull(GraphQLInt) },
-							hits: { type: list(createObjectType({
-								name: 'InterfaceSearchHits',
-								fields: interfaceSearchHitsFields
-							}))},
-							total: { type: nonNull(GraphQLInt) }
-						}
-					})
+					type: createConnectionType(schemaGenerator, objectTypeInterfaceSearch)
+				},
+				search: {
+					args: {
+						aggregations: list(inputObjectTypeAggregations),
+						count: GraphQLInt,
+						filters: inputObjectTypeFilters,
+						highlight: inputObjectTypeHighlight,
+						searchString: GraphQLString,
+						start: GraphQLInt
+					},
+					resolve: (env) => searchResolver(env),
+					type: objectTypeInterfaceSearch
 				}
 			}
 		})
