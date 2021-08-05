@@ -36,11 +36,16 @@ const INTERFACE_OBJECT_TYPE = createObjectType({
 
 
 export const queryInterfaces = {
-	resolve: (/*env*/) => {
+	args: {
+		count: GraphQLInt
+	},
+	resolve: (env) => {
 		//log.info(`env:${toStr(env)}`);
+		const {count = -1} = env.args;
 		const connection = connect({ principals: [PRINCIPAL_EXPLORER_READ] });
 		const interfacesRes = query({
-			connection
+			connection,
+			count
 		});
 		interfacesRes.hits = interfacesRes.hits.map(({
 			_id,

@@ -215,9 +215,6 @@ app-explorer
 * TODO: dynamic fields (document_metadata.text title uri) _allText?
 * TODO: Allow to setup schema before REST API develper starts working...
 
-Developer:
-endpoint graphql?apiKey=123
-
 search(
 	count, // Use iterators instead
 	start, // Use iterators instead
@@ -234,8 +231,10 @@ search(
   * Support hits field including (_highlight, _json and _score)
   * Wash searchString and remove stopWords
 * Upgrade to lib-graphql:2.0.0
-* Add field boosting and synonyms to Interfaces in Admin GUI
-* Remove filters, query, resultMappings and facets from Interfaces in Admin GUI
+* Add read Interfaces permission to API Keys Admin GUI
+* Interfaces Admin GUI
+  * Add field boosting and synonyms
+  * Remove filters, query, resultMappings and facets
 * Remove listener for EVENT_COLLECTOR_UNREGISTER from main
 * Remove unregister from main
 * Remove register from main

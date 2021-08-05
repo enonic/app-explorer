@@ -66,7 +66,8 @@ export const queryApiKeys = {
 				_path: node._path,
 				_name: node._name,
 				_nodeType: node._nodeType,
-				collections: forceArray(node.collections),
+				collections: node.collections ? forceArray(node.collections) : [],
+				interfaces: node.interfaces ? forceArray(node.interfaces) : [],
 				hashed: node.hashed,
 				key: node.key//,
 				//type: node.type
@@ -90,6 +91,7 @@ export const queryApiKeys = {
 					_nodeType: { type: GraphQLString }, // TODO nonNull?
 					_path: { type: nonNull(GraphQLString) },
 					collections: { type: list(GraphQLString)},
+					interfaces: { type: list(GraphQLString)},
 					hashed: { type: nonNull(GraphQLBoolean) },
 					key: { type: nonNull(GraphQLString) }//,
 					//type: { type: nonNull(GraphQLString) }
