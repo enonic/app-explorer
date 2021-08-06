@@ -11,6 +11,7 @@ import {
 	VALUE_TYPE_STRING,
 	addQueryFilter,
 	camelize,
+	//forceArray,
 	toStr,
 	ucFirst
 } from '@enonic/js-utils';
@@ -27,8 +28,8 @@ import {
 	LocalDateTime as GraphQLLocalDateTime,
 	LocalTime as GraphQLLocalTime,
 	newSchemaGenerator,
-	nonNull/*,
-	reference*/
+	nonNull,
+	reference
 } from '/lib/graphql';
 import {
 	createConnectionType,
@@ -401,13 +402,24 @@ function generateSchemaForInterface(interfaceName) {
 		//log.debug(`highlight:${toStr(highlight)}`);
 
 		//log.debug(`aggregationsArg:${toStr(aggregationsArg)}`);
-		const aggregations = {};
-		aggregationsArg.forEach(({name, ...rest}) => {
-			/*if (isSet(aggregations[name])) {
-				// TODO Throw GraphQLError
-			}*/
-			aggregations[name] = rest;
-		});
+
+		function aggregationsArgToQueryParam(aggregationsArray) {
+			//log.debug(`aggregationsArray:${toStr(aggregationsArray)}`);
+			const aggregationsObj = {};
+			aggregationsArray.forEach(({name, subAggregations, ...rest}) => {
+				/*if (isSet(aggregations[name])) {
+					// TODO Throw GraphQLError
+				}*/
+				aggregationsObj[name] = rest;
+				if (subAggregations) {
+					aggregationsObj[name].aggregations = aggregationsArgToQueryParam(
+						subAggregations
+					); // recurse
+				}
+			});
+			return aggregationsObj;
+		}
+		const aggregations = aggregationsArgToQueryParam(aggregationsArg);
 		//log.debug(`aggregations:${toStr(aggregations)}`);
 
 		//log.debug(`searchString:${toStr(searchString)}`);
@@ -467,12 +479,29 @@ function generateSchemaForInterface(interfaceName) {
 		const multiRepoReadConnection = multiConnect(multiConnectParams);
 
 		const queryRes = multiRepoReadConnection.query(queryParams);
-		//log.debug(`queryRes:${toStr({queryRes})}`);
+		//log.debug(`queryRes:${toStr(queryRes)}`);
 
-		queryRes.aggregations = Object.keys(queryRes.aggregations).map((name) => ({
-			name,
-			buckets: queryRes.aggregations[name].buckets
-		}));
+		function queryResAggregationsObjToArray(obj) {
+			return Object.keys(obj).map((name) => {
+				const {buckets} = obj[name];
+				return {
+					name,
+					buckets: buckets.map(({docCount, key, ...rest}) => {
+						const rObj = {
+							docCount,
+							key
+						};
+						//log.debug(`rest:${toStr(rest)}`);
+						if (Object.keys(rest).length) {
+							rObj.subAggregations = queryResAggregationsObjToArray(rest); // Recurse
+						}
+						return rObj;
+					}) // map buckets
+				};
+			}); // map names
+		}
+		queryRes.aggregations = queryResAggregationsObjToArray(queryRes.aggregations);
+		//log.debug(`queryRes.aggregations:${toStr(queryRes.aggregations)}`);
 
 		queryRes.hits = queryRes.hits.map(({
 			branch,
@@ -494,23 +523,27 @@ function generateSchemaForInterface(interfaceName) {
 			/* eslint-enable no-underscore-dangle */
 			return washedNode;
 		});
-		log.debug(`queryRes:${toStr({queryRes})}`);
+		log.debug(`queryRes:${toStr(queryRes)}`);
 
 		return queryRes;
 	}
 
+	const OBJECT_TYPE_AGGREGATIONS_NAME = 'InterfaceSearchAggregations';
 	const objectTypeInterfaceSearch = createObjectType({
 		name: 'InterfaceSearch',
 		fields: {
 			aggregations: { type: list(createObjectType({
-				name: 'InterfaceSearchAggregations',
+				name: OBJECT_TYPE_AGGREGATIONS_NAME,
 				fields: {
 					name: { type: nonNull(GraphQLString) },
 					buckets: { type: list(createObjectType({
 						name: 'InterfaceSearchAggregationsBuckets',
 						fields: {
 							docCount: { type: nonNull(GraphQLInt) },
-							key: { type: nonNull(GraphQLString) }
+							key: { type: nonNull(GraphQLString) },
+							subAggregations: {
+								type: list(reference(OBJECT_TYPE_AGGREGATIONS_NAME))
+							}
 						}
 					}))}
 				}
@@ -524,8 +557,9 @@ function generateSchemaForInterface(interfaceName) {
 		}
 	});
 
+	const INPUT_OBJECT_AGGREGATIONS_NAME = 'InputObjectAggregations';
 	const inputObjectTypeAggregations = createInputObjectType({
-		name: 'InputObjectAggregations',
+		name: INPUT_OBJECT_AGGREGATIONS_NAME,
 		fields: {
 			name: { type: nonNull(GraphQLString) },
 			terms: { type: createInputObjectType({
@@ -545,11 +579,11 @@ function generateSchemaForInterface(interfaceName) {
 						type: GraphQLInt
 					}
 				}
-			}) }/*,
-			aggregations: { // TODO subAggregations
-				type: reference('InputObjectAggregations')
-			}*/
-		}
+			})}, // terms
+			subAggregations: {
+				type: list(reference(INPUT_OBJECT_AGGREGATIONS_NAME))
+			}
+		} // fields
 	});
 
 	const inputObjectTypeFilters = createInputObjectType({
@@ -775,22 +809,31 @@ export function post(request) {
 {
 	search(
     aggregations: [{
-      name: "myTitleAggregation",
+      name: "nameIsUniqueOnSameLevel",
       terms: {
-        field: "title"
+        field: title
         order: "_term ASC"
         size: 10
         minDocCount: 0
       }
-    },{
-      name: "myUriAggregation",
-      terms: {
-        field: "uri"
-        order: "_term ASC"
-        size: 10
-        minDocCount: 0
-      }
-    }]
+      subAggregations: {
+      	name: "nameIsNotUniqueOnDifferentLevels",
+      	terms: {
+        	field: uri
+        	order: "_term ASC"
+        	size: 10
+        	minDocCount: 0
+      	}
+      } # subAggregations
+    }, {
+      	name: "nameIsNotUniqueOnDifferentLevels",
+      	terms: {
+        	field: uri
+        	order: "_term ASC"
+        	size: 10
+        	minDocCount: 0
+      	}
+      }] # aggregations
     #filters: {
       #boolean: {
         #must: {
@@ -896,6 +939,13 @@ export function post(request) {
       buckets {
         docCount
         key
+        subAggregations {
+          name
+          buckets {
+            docCount
+            key
+          }
+        }
       }
     }
     count
