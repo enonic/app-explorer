@@ -474,32 +474,56 @@ function generateSchemaForInterface(interfaceName) {
 				principals: [PRINCIPAL_EXPLORER_READ]
 			}))
 		};
-		//log.debug(`multiConnectParams:${toStr({multiConnectParams})}`);
+		//log.debug(`multiConnectParams:${toStr(multiConnectParams)}`);
 
 		const multiRepoReadConnection = multiConnect(multiConnectParams);
 
 		const queryRes = multiRepoReadConnection.query(queryParams);
-		//log.debug(`queryRes:${toStr(queryRes)}`);
+		log.debug(`queryRes:${toStr(queryRes)}`);
 
 		function queryResAggregationsObjToArray(obj) {
+			log.debug(`obj:${toStr(obj)}`);
 			return Object.keys(obj).map((name) => {
-				const {buckets} = obj[name];
-				return {
+				const anAggregation = obj[name];
+				log.debug(`anAggregation:${toStr(anAggregation)}`);
+				const {
+					avg,
+					buckets,
+					count,
+					max,
+					min,
+					sum
+				} = anAggregation;
+				const rAggregation = {
+					avg,
+					count,
+					max,
+					min,
 					name,
-					buckets: buckets.map(({docCount, key, ...rest}) => {
-						const rObj = {
+					sum
+				};
+				if (buckets) {
+					rAggregation.buckets = buckets.map(({
+						docCount,
+						key,
+						...rest
+					}) => {
+						const rBucket = {
 							docCount,
 							key
+
 						};
 						//log.debug(`rest:${toStr(rest)}`);
 						if (Object.keys(rest).length) {
-							rObj.subAggregations = queryResAggregationsObjToArray(rest); // Recurse
+							rBucket.subAggregations = queryResAggregationsObjToArray(rest); // Recurse
 						}
-						return rObj;
-					}) // map buckets
-				};
+						return rBucket;
+					}); // map buckets
+				}
+				return rAggregation;
 			}); // map names
 		}
+		queryRes.aggregationsAsJson = JSON.stringify(queryRes.aggregations);
 		queryRes.aggregations = queryResAggregationsObjToArray(queryRes.aggregations);
 		//log.debug(`queryRes.aggregations:${toStr(queryRes.aggregations)}`);
 
@@ -535,8 +559,9 @@ function generateSchemaForInterface(interfaceName) {
 			aggregations: { type: list(createObjectType({
 				name: OBJECT_TYPE_AGGREGATIONS_NAME,
 				fields: {
-					name: { type: nonNull(GraphQLString) },
-					buckets: { type: list(createObjectType({
+					avg: { type: GraphQLInt }, // Can't nonNull since not in terms result
+					count: { type: GraphQLInt }, // Can't nonNull since not in terms result
+					buckets: { type: list(createObjectType({ // Can't nonNull since not in stats result
 						name: 'InterfaceSearchAggregationsBuckets',
 						fields: {
 							docCount: { type: nonNull(GraphQLInt) },
@@ -545,9 +570,14 @@ function generateSchemaForInterface(interfaceName) {
 								type: list(reference(OBJECT_TYPE_AGGREGATIONS_NAME))
 							}
 						}
-					}))}
+					}))},
+					name: { type: nonNull(GraphQLString) },
+					max: { type: GraphQLInt }, // Can't nonNull since not in terms result
+					min: { type: GraphQLInt }, // Can't nonNull since not in terms result
+					sum: { type: GraphQLInt } // Can't nonNull since not in terms result
 				}
 			}))},
+			aggregationsAsJson: { type: GraphQLJson },
 			count: { type: nonNull(GraphQLInt) },
 			hits: { type: list(createObjectType({
 				name: 'InterfaceSearchHits',
@@ -562,6 +592,17 @@ function generateSchemaForInterface(interfaceName) {
 		name: INPUT_OBJECT_AGGREGATIONS_NAME,
 		fields: {
 			name: { type: nonNull(GraphQLString) },
+			stats: {
+				type: createInputObjectType({
+					name: 'InputTypeAggregationStats',
+					fields: {
+						field: {
+							//type: nonNull(GraphQLString)
+							type: nonNull(enumFields)
+						}
+					}
+				})
+			},
 			terms: { type: createInputObjectType({
 				name: 'InputTypeAggregationTerms',
 				fields: {
