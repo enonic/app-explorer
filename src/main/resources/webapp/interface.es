@@ -263,11 +263,11 @@ function generateSchemaForInterface(interfaceName) {
 	//log.debug(`fieldsRes:${toStr(fieldsRes)}`);
 	//log.debug(`fieldsRes.hits[0]:${toStr(fieldsRes.hits[0])}`);
 
+	const camelToFieldObj = {};
 	const enumFieldsValues = [];
 	const highlightParameterPropertiesFields = {};
 	const interfaceSearchHitsFieldsFromSchema = {};
 	const interfaceSearchHitsHighlightsFields = {};
-
 	fieldsRes.hits.forEach(({
 		fieldType: valueType,
 		isSystemField = false,
@@ -277,6 +277,7 @@ function generateSchemaForInterface(interfaceName) {
 	}) => {
 		if (valueType) {
 			const camelizedFieldKey = camelize(key, /[.-]/g);
+			camelToFieldObj[camelizedFieldKey] = key;
 			//log.debug(`key:${toStr(key)} camelized:${toStr(camelizedFieldKey)}`);
 			if (![VALUE_TYPE_ANY, VALUE_TYPE_SET].includes(valueType)) {
 				enumFieldsValues.push(camelizedFieldKey);
@@ -301,6 +302,7 @@ function generateSchemaForInterface(interfaceName) {
 			}
 		}
 	});
+	log.debug(`camelToFieldObj:${toStr(camelToFieldObj)}`);
 
 	// Name must be non-null, non-empty and match [_A-Za-z][_0-9A-Za-z]* - was 'GraphQLScalarType{name='String', description='Built-in String', coercing=graphql.Scalars$3@af372a4}'
 	//enumFieldsValues.push(GraphQLString);
@@ -430,10 +432,19 @@ function generateSchemaForInterface(interfaceName) {
 		function aggregationsArgToQueryParam(aggregationsArray) {
 			//log.debug(`aggregationsArray:${toStr(aggregationsArray)}`);
 			const aggregationsObj = {};
-			aggregationsArray.forEach(({name, subAggregations, ...rest}) => {
+			aggregationsArray.forEach(({
+				name,
+				subAggregations,
+				...rest
+			}) => {
+				//log.debug(`rest:${toStr(rest)}`);
 				/*if (isSet(aggregations[name])) {
 					// TODO Throw GraphQLError
 				}*/
+				if (rest[Object.keys(rest)[0]].field) {
+					// TODO Workaround related to https://github.com/enonic/app-explorer/issues/275
+					rest[Object.keys(rest)[0]].field = camelToFieldObj[rest[Object.keys(rest)[0]].field];
+				}
 				aggregationsObj[name] = rest;
 				if (subAggregations) {
 					aggregationsObj[name].aggregations = aggregationsArgToQueryParam(
@@ -632,6 +643,27 @@ function generateSchemaForInterface(interfaceName) {
 			}
 		}
 	});
+	const INPUT_OBJECT_TYPE_AGGREGATION_DATE_RANGE = createInputObjectType({
+		name: 'InputObjectTypeAggregationDateRange',
+		fields: {
+			field: {
+				//type: nonNull(GraphQLString)
+				type: nonNull(enumFields)
+			},
+			format: { // yyyy-MM-dd’T’HH:mm:ss.SSSZ
+				type: GraphQLString
+			},
+			ranges: {
+				type: list(createInputObjectType({
+					name: 'InputObjectTypeAggregationDateRangeRanges',
+					fields: {
+						from: { type: GraphQLString },
+						to: { type: GraphQLString }
+					}
+				}))
+			}
+		}
+	});
 	const INPUT_OBJECT_TYPE_AGGREGATION_GEO_DISTANCE = createInputObjectType({
 		name: 'InputObjectTypeAggregationGeoDistance',
 		fields: {
@@ -731,23 +763,25 @@ function generateSchemaForInterface(interfaceName) {
 		name: 'InputObjectTypeAggregations',
 		fields: {
 			name: { type: nonNull(GraphQLString) },
-			count: { type: INPUT_OBJECT_TYPE_AGGREGATION_COUNT},
-			// max, min and stats makes no sense on top level
+			count: { type: INPUT_OBJECT_TYPE_AGGREGATION_COUNT },
+			dateRange: { type: INPUT_OBJECT_TYPE_AGGREGATION_DATE_RANGE },
 			geoDistance: { type: INPUT_OBJECT_TYPE_AGGREGATION_GEO_DISTANCE },
-			range: { type: INPUT_OBJECT_TYPE_AGGREGATION_RANGE},
-			terms: { type: INPUT_OBJECT_TYPE_AGGREGATION_TERMS},
+			// max, min and stats makes no sense on top level
+			range: { type: INPUT_OBJECT_TYPE_AGGREGATION_RANGE },
+			terms: { type: INPUT_OBJECT_TYPE_AGGREGATION_TERMS },
 			subAggregations: {
 				type: list(createInputObjectType({
 					name: INPUT_OBJECT_TYPE_SUB_AGGREGATIONS_NAME,
 					fields: {
 						name: { type: nonNull(GraphQLString) },
-						count: { type: INPUT_OBJECT_TYPE_AGGREGATION_COUNT},
+						count: { type: INPUT_OBJECT_TYPE_AGGREGATION_COUNT },
+						dateRange: { type: INPUT_OBJECT_TYPE_AGGREGATION_DATE_RANGE },
 						geoDistance: { type: INPUT_OBJECT_TYPE_AGGREGATION_GEO_DISTANCE },
 						max: { type: INPUT_OBJECT_TYPE_AGGREGATION_MAX },
 						min: { type: INPUT_OBJECT_TYPE_AGGREGATION_MIN },
 						stats: { type: INPUT_OBJECT_TYPE_AGGREGATION_STATS },
-						range: { type: INPUT_OBJECT_TYPE_AGGREGATION_RANGE},
-						terms: { type: INPUT_OBJECT_TYPE_AGGREGATION_TERMS},
+						range: { type: INPUT_OBJECT_TYPE_AGGREGATION_RANGE },
+						terms: { type: INPUT_OBJECT_TYPE_AGGREGATION_TERMS },
 						subAggregations: {
 							type: list(reference(INPUT_OBJECT_TYPE_SUB_AGGREGATIONS_NAME))
 						}
