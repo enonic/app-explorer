@@ -12,6 +12,7 @@ import {
 	addQueryFilter,
 	camelize,
 	//forceArray,
+	//isSet,
 	toStr,
 	ucFirst
 } from '@enonic/js-utils';
@@ -20,6 +21,7 @@ import {
 	Date as GraphQLDate,
 	DateTime as GraphQLDateTime,
 	GraphQLBoolean,
+	//GraphQLDouble, // There is no such type
 	GraphQLFloat,
 	GraphQLInt,
 	GraphQLString,
@@ -482,36 +484,45 @@ function generateSchemaForInterface(interfaceName) {
 		log.debug(`queryRes:${toStr(queryRes)}`);
 
 		function queryResAggregationsObjToArray(obj) {
-			log.debug(`obj:${toStr(obj)}`);
+			//log.debug(`obj:${toStr(obj)}`);
 			return Object.keys(obj).map((name) => {
 				const anAggregation = obj[name];
-				log.debug(`anAggregation:${toStr(anAggregation)}`);
+				//log.debug(`anAggregation:${toStr(anAggregation)}`);
 				const {
-					avg,
+					//avg, TODO https://github.com/enonic/xp/issues/9003
 					buckets,
 					count,
-					max,
-					min,
-					sum
+					//max,
+					//min,
+					sum,
+					value
 				} = anAggregation;
+				/*log.debug(`avg:${toStr(avg)}`);
+				log.debug(`typeof avg:${toStr(typeof avg)}`);
+				log.debug(`parseFloat(avg):${toStr(parseFloat(avg))}`);
+				log.debug(`typeof parseFloat(avg):${toStr(typeof parseFloat(avg))}`);*/
 				const rAggregation = {
-					avg,
 					count,
-					max,
-					min,
 					name,
-					sum
+					sum,
+					value
 				};
+				/*if (isSet(avg) && isSet(parseFloat(avg))) {rAggregation.avg = avg;}
+				if (isSet(max) && isSet(parseFloat(max))) {rAggregation.max = max;}
+				if (isSet(min) && isSet(parseFloat(min))) {rAggregation.min = min;}*/
 				if (buckets) {
 					rAggregation.buckets = buckets.map(({
 						docCount,
+						from,
 						key,
+						to,
 						...rest
 					}) => {
 						const rBucket = {
 							docCount,
-							key
-
+							from,
+							key,
+							to
 						};
 						//log.debug(`rest:${toStr(rest)}`);
 						if (Object.keys(rest).length) {
@@ -559,22 +570,25 @@ function generateSchemaForInterface(interfaceName) {
 			aggregations: { type: list(createObjectType({
 				name: OBJECT_TYPE_AGGREGATIONS_NAME,
 				fields: {
-					avg: { type: GraphQLInt }, // Can't nonNull since not in terms result
+					avg: { type: GraphQLFloat }, // Can't nonNull since not in terms result
 					count: { type: GraphQLInt }, // Can't nonNull since not in terms result
 					buckets: { type: list(createObjectType({ // Can't nonNull since not in stats result
 						name: 'InterfaceSearchAggregationsBuckets',
 						fields: {
 							docCount: { type: nonNull(GraphQLInt) },
+							from: { type: GraphQLInt }, // Can't nonNull since not in terms result
 							key: { type: nonNull(GraphQLString) },
 							subAggregations: {
 								type: list(reference(OBJECT_TYPE_AGGREGATIONS_NAME))
-							}
+							},
+							to: { type: GraphQLInt } // Can't nonNull since not in terms result
 						}
 					}))},
 					name: { type: nonNull(GraphQLString) },
-					max: { type: GraphQLInt }, // Can't nonNull since not in terms result
-					min: { type: GraphQLInt }, // Can't nonNull since not in terms result
-					sum: { type: GraphQLInt } // Can't nonNull since not in terms result
+					max: { type: GraphQLFloat }, // Can't nonNull since not in terms result
+					min: { type: GraphQLFloat }, // Can't nonNull since not in terms result
+					sum: { type: GraphQLFloat }, // Can't nonNull since not in terms result
+					value: { type: GraphQLFloat } // Can't nonNull since not in terms result
 				}
 			}))},
 			aggregationsAsJson: { type: GraphQLJson },
@@ -587,42 +601,104 @@ function generateSchemaForInterface(interfaceName) {
 		}
 	});
 
-	const INPUT_OBJECT_AGGREGATIONS_NAME = 'InputObjectAggregations';
+	const INPUT_OBJECT_TYPE_AGGREGATION_COUNT = createInputObjectType({
+		name: 'InputObjectTypeAggregationCount',
+		fields: {
+			field: {
+				//type: nonNull(GraphQLString)
+				type: nonNull(enumFields)
+			}
+		}
+	});
+	const INPUT_OBJECT_TYPE_AGGREGATION_MAX = createInputObjectType({
+		name: 'InputObjectTypeAggregationMax',
+		fields: {
+			field: {
+				//type: nonNull(GraphQLString)
+				type: nonNull(enumFields)
+			}
+		}
+	});
+	const INPUT_OBJECT_TYPE_AGGREGATION_MIN = createInputObjectType({
+		name: 'InputObjectTypeAggregationMin',
+		fields: {
+			field: {
+				//type: nonNull(GraphQLString)
+				type: nonNull(enumFields)
+			}
+		}
+	});
+	const INPUT_OBJECT_TYPE_AGGREGATION_RANGE = createInputObjectType({
+		name: 'InputObjectTypeAggregationRange',
+		fields: {
+			field: {
+				//type: nonNull(GraphQLString)
+				type: nonNull(enumFields)
+			},
+			ranges: {
+				type: list(createInputObjectType({
+					name: 'InputObjectTypeAggregationRangeRanges',
+					fields: {
+						from: { type: GraphQLFloat },
+						to: { type: GraphQLFloat }
+					}
+				}))
+			}
+		}
+	});
+	const INPUT_OBJECT_TYPE_AGGREGATION_STATS = createInputObjectType({
+		name: 'InputObjectTypeAggregationStats',
+		fields: {
+			field: {
+				//type: nonNull(GraphQLString)
+				type: nonNull(enumFields)
+			}
+		}
+	});
+	const INPUT_OBJECT_TYPE_AGGREGATION_TERMS = createInputObjectType({
+		name: 'InputObjectTypeAggregationTerms',
+		fields: {
+			field: {
+				//type: nonNull(GraphQLString)
+				type: nonNull(enumFields)
+			},
+			order: {
+				type: GraphQLString
+			},
+			size: {
+				type: GraphQLInt
+			},
+			minDocCount: {
+				type: GraphQLInt
+			}
+		}
+	});
+
+	const INPUT_OBJECT_TYPE_SUB_AGGREGATIONS_NAME = 'InputObjectTypeSubAggregations';
 	const inputObjectTypeAggregations = createInputObjectType({
-		name: INPUT_OBJECT_AGGREGATIONS_NAME,
+		name: 'InputObjectTypeAggregations',
 		fields: {
 			name: { type: nonNull(GraphQLString) },
-			stats: {
-				type: createInputObjectType({
-					name: 'InputTypeAggregationStats',
-					fields: {
-						field: {
-							//type: nonNull(GraphQLString)
-							type: nonNull(enumFields)
-						}
-					}
-				})
-			},
-			terms: { type: createInputObjectType({
-				name: 'InputTypeAggregationTerms',
-				fields: {
-					field: {
-						//type: nonNull(GraphQLString)
-						type: nonNull(enumFields)
-					},
-					order: {
-						type: GraphQLString
-					},
-					size: {
-						type: GraphQLInt
-					},
-					minDocCount: {
-						type: GraphQLInt
-					}
-				}
-			})}, // terms
+			count: { type: INPUT_OBJECT_TYPE_AGGREGATION_COUNT},
+			// max, min and stats makes no sense on top level
+			range: { type: INPUT_OBJECT_TYPE_AGGREGATION_RANGE},
+			terms: { type: INPUT_OBJECT_TYPE_AGGREGATION_TERMS},
 			subAggregations: {
-				type: list(reference(INPUT_OBJECT_AGGREGATIONS_NAME))
+				type: list(createInputObjectType({
+					name: INPUT_OBJECT_TYPE_SUB_AGGREGATIONS_NAME,
+					fields: {
+						name: { type: nonNull(GraphQLString) },
+						count: { type: INPUT_OBJECT_TYPE_AGGREGATION_COUNT},
+						max: { type: INPUT_OBJECT_TYPE_AGGREGATION_MAX },
+						min: { type: INPUT_OBJECT_TYPE_AGGREGATION_MIN },
+						stats: { type: INPUT_OBJECT_TYPE_AGGREGATION_STATS },
+						range: { type: INPUT_OBJECT_TYPE_AGGREGATION_RANGE},
+						terms: { type: INPUT_OBJECT_TYPE_AGGREGATION_TERMS},
+						subAggregations: {
+							type: list(reference(INPUT_OBJECT_TYPE_SUB_AGGREGATIONS_NAME))
+						}
+					} // fields
+				}))
 			}
 		} // fields
 	});
