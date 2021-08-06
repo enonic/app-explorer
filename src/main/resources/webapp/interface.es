@@ -69,6 +69,28 @@ const {
 //import {DEFAULT_INTERFACE_FIELDS} from '../constants';
 
 
+const GRAPHQL_ENUM_TYPE_AGGREGATION_GEO_DISTANCE_UNIT = createEnumType({
+	name: 'EnumTypeAggregationGeoDistanceUnit',
+	values: {
+		'km': 'km',
+		'm': 'm',
+		'cm': 'cm',
+		'mm': 'mm',
+		'mi': 'mi',
+		'yd': 'yd',
+		'ft': 'ft',
+		'nmi': 'nmi',
+		kilometers: 'km',
+		meters: 'm',
+		centimeters: 'cm',
+		millimeters: 'mm',
+		miles: 'mi',
+		yards: 'yd',
+		feet: 'ft',
+		nauticalmiles: 'nmi'
+	}
+});
+
 const GRAPHQL_ENUM_TYPE_HIGHLIGHT_OPTION_ENCODER = createEnumType({
 	name: 'EnumTypeHighlightOptionEncoder',
 	values: [
@@ -610,6 +632,36 @@ function generateSchemaForInterface(interfaceName) {
 			}
 		}
 	});
+	const INPUT_OBJECT_TYPE_AGGREGATION_GEO_DISTANCE = createInputObjectType({
+		name: 'InputObjectTypeAggregationGeoDistance',
+		fields: {
+			field: {
+				//type: nonNull(GraphQLString)
+				type: nonNull(enumFields)
+			},
+			origin: {
+				type: createInputObjectType({
+					name: 'InputObjectTypeAggregationGeoDistanceOrigin',
+					fields: {
+						lat: { type: GraphQLString },
+						lon: { type: GraphQLString }
+					}
+				})
+			},
+			ranges: {
+				type: list(createInputObjectType({
+					name: 'InputObjectTypeAggregationGeoDistanceRanges',
+					fields: {
+						from: { type: GraphQLFloat },
+						to: { type: GraphQLFloat }
+					}
+				}))
+			},
+			unit: {
+				type: nonNull(GRAPHQL_ENUM_TYPE_AGGREGATION_GEO_DISTANCE_UNIT)
+			}
+		}
+	});
 	const INPUT_OBJECT_TYPE_AGGREGATION_MAX = createInputObjectType({
 		name: 'InputObjectTypeAggregationMax',
 		fields: {
@@ -681,6 +733,7 @@ function generateSchemaForInterface(interfaceName) {
 			name: { type: nonNull(GraphQLString) },
 			count: { type: INPUT_OBJECT_TYPE_AGGREGATION_COUNT},
 			// max, min and stats makes no sense on top level
+			geoDistance: { type: INPUT_OBJECT_TYPE_AGGREGATION_GEO_DISTANCE },
 			range: { type: INPUT_OBJECT_TYPE_AGGREGATION_RANGE},
 			terms: { type: INPUT_OBJECT_TYPE_AGGREGATION_TERMS},
 			subAggregations: {
@@ -689,6 +742,7 @@ function generateSchemaForInterface(interfaceName) {
 					fields: {
 						name: { type: nonNull(GraphQLString) },
 						count: { type: INPUT_OBJECT_TYPE_AGGREGATION_COUNT},
+						geoDistance: { type: INPUT_OBJECT_TYPE_AGGREGATION_GEO_DISTANCE },
 						max: { type: INPUT_OBJECT_TYPE_AGGREGATION_MAX },
 						min: { type: INPUT_OBJECT_TYPE_AGGREGATION_MIN },
 						stats: { type: INPUT_OBJECT_TYPE_AGGREGATION_STATS },
