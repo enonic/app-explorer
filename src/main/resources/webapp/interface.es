@@ -638,8 +638,24 @@ function generateSchemaForInterface(interfaceName) {
 		name: 'InputObjectTypeAggregationCount',
 		fields: {
 			field: {
-				//type: nonNull(GraphQLString)
 				type: nonNull(enumFields)
+			}
+		}
+	});
+	const INPUT_OBJECT_TYPE_AGGREGATION_DATE_HISTOGRAM = createInputObjectType({
+		name: 'InputObjectTypeAggregationDateHistogram',
+		fields: {
+			field: {
+				type: nonNull(enumFields)
+			},
+			format: { // yyyy-MM-dd’T’HH:mm:ss.SSSZ
+				type: GraphQLString
+			},
+			interval: { // y M d H m s
+				type: GraphQLString
+			},
+			minDocCount: {
+				type: GraphQLInt
 			}
 		}
 	});
@@ -764,6 +780,7 @@ function generateSchemaForInterface(interfaceName) {
 		fields: {
 			name: { type: nonNull(GraphQLString) },
 			count: { type: INPUT_OBJECT_TYPE_AGGREGATION_COUNT },
+			dateHistogram: { type: INPUT_OBJECT_TYPE_AGGREGATION_DATE_HISTOGRAM },
 			dateRange: { type: INPUT_OBJECT_TYPE_AGGREGATION_DATE_RANGE },
 			geoDistance: { type: INPUT_OBJECT_TYPE_AGGREGATION_GEO_DISTANCE },
 			// max, min and stats makes no sense on top level
@@ -775,6 +792,7 @@ function generateSchemaForInterface(interfaceName) {
 					fields: {
 						name: { type: nonNull(GraphQLString) },
 						count: { type: INPUT_OBJECT_TYPE_AGGREGATION_COUNT },
+						dateHistogram: { type: INPUT_OBJECT_TYPE_AGGREGATION_DATE_HISTOGRAM },
 						dateRange: { type: INPUT_OBJECT_TYPE_AGGREGATION_DATE_RANGE },
 						geoDistance: { type: INPUT_OBJECT_TYPE_AGGREGATION_GEO_DISTANCE },
 						max: { type: INPUT_OBJECT_TYPE_AGGREGATION_MAX },
@@ -1014,31 +1032,110 @@ export function post(request) {
 {
 	search(
     aggregations: [{
-      name: "nameIsUniqueOnSameLevel",
-      terms: {
+      name: "countTitle"
+      count: {
         field: title
+      }
+    }, {
+      name: "dateHistogram"
+      dateHistogram: {
+        field: document_metadataCreatedTime
+        format: "MM-yyy"
+        interval: "1M"
+        minDocCount: 0
+      }
+    #},{
+    #  name: "dateRange"
+    #  dateRange: {
+    #    field: document_metadataCreatedTime
+    #    format: "yyyy-MM-dd’T’HH:mm:ss.SSSZ"
+    #    ranges: [{
+    #      to: "now-10M"
+    #    },{
+    #      from: "now-10M"
+    #    }]
+    #  }
+    },{
+      name: "geo"
+      geoDistance: {
+        field: geolocation
+        origin: {
+          lat: "90.0"
+          lon: "0.0"
+        }
+        ranges: [{
+          from: 0
+          to: 1200
+        }]
+        unit: km
+      }
+    },{
+      name: "_nodeType",
+      terms: {
+        field: _nodeType
         order: "_term ASC"
         size: 10
         minDocCount: 0
       }
-      subAggregations: {
-      	name: "nameIsNotUniqueOnDifferentLevels",
-      	terms: {
-        	field: uri
-        	order: "_term ASC"
-        	size: 10
-        	minDocCount: 0
-      	}
-      } # subAggregations
+      subAggregations: [{
+        name: "maxDouble",
+        max: {
+          field: double
+        }
+      }, {
+        name: "minDouble",
+        max: {
+          field: double
+        }
+      }, {
+      	name: "statsDouble",
+      	stats: {
+	        field: double
+	      }
+      }, {
+        name: "countTitle",
+        max: {
+          field: title
+        }
+      }, {
+        name: "maxLong",
+        max: {
+          field: long
+        }
+      }, {
+        name: "minLong",
+        max: {
+          field: long
+        }
+      }, {
+      name: "range"
+      range: {
+        field: long
+        ranges: [{
+          from: 0
+          to: 1
+        },{
+          from: 1
+        }]
+      }
+      }, {
+      	name: "statsLong",
+      	stats: {
+	        field: long
+	      }
+      }] # subAggregations
     }, {
-      	name: "nameIsNotUniqueOnDifferentLevels",
-      	terms: {
-        	field: uri
-        	order: "_term ASC"
-        	size: 10
-        	minDocCount: 0
-      	}
-      }] # aggregations
+      name: "range"
+      range: {
+        field: long
+        ranges: [{
+          from: 0
+          to: 1
+        },{
+          from: 1
+        }]
+      }
+    }] # aggregations
     #filters: {
       #boolean: {
         #must: {
@@ -1140,19 +1237,32 @@ export function post(request) {
     searchString: "domain"
   ) {
     aggregations {
-      name
+      avg
       buckets {
         docCount
         key
         subAggregations {
-          name
+          avg
           buckets {
             docCount
             key
           }
+      		count
+      		max
+      		min
+          name
+          sum
+          value
         }
       }
+      count
+      max
+      min
+      name
+      sum
+      value
     }
+    aggregationsAsJson
     count
     hits {
       _highlight {
