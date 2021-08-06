@@ -121,7 +121,7 @@ const GRAPHQL_INPUT_TYPE_FILTER_HAS_VALUE = createInputObjectType({
 	}
 });*/
 
-const GRAPHQL_INPUT_TYPE_AGGREGATION_TERMS = createInputObjectType({
+/*const GRAPHQL_INPUT_TYPE_AGGREGATION_TERMS = createInputObjectType({
 	name: 'InputTypeAggregationTerms',
 	fields: {
 		field: {
@@ -137,7 +137,7 @@ const GRAPHQL_INPUT_TYPE_AGGREGATION_TERMS = createInputObjectType({
 			type: GraphQLInt
 		}
 	}
-});
+});*/
 
 // TODO: range, dateRange, dateHistogram, geoDistance, min, max and valueCount
 // https://github.com/enonic/lib-guillotine/blob/master/src/main/resources/lib/guillotine/generic/input-types.js
@@ -238,7 +238,7 @@ function generateSchemaForInterface(interfaceName) {
 	//log.debug(`fieldsRes:${toStr(fieldsRes)}`);
 	//log.debug(`fieldsRes.hits[0]:${toStr(fieldsRes.hits[0])}`);
 
-	const enumTypeFilterFieldsValues = [];
+	const enumFieldsValues = [];
 	const highlightParameterPropertiesFields = {};
 	const interfaceSearchHitsFieldsFromSchema = {};
 	const interfaceSearchHitsHighlightsFields = {};
@@ -254,7 +254,7 @@ function generateSchemaForInterface(interfaceName) {
 			const camelizedFieldKey = camelize(key, /[.-]/g);
 			//log.debug(`key:${toStr(key)} camelized:${toStr(camelizedFieldKey)}`);
 			if (![VALUE_TYPE_ANY, VALUE_TYPE_SET].includes(valueType)) {
-				enumTypeFilterFieldsValues.push(camelizedFieldKey);
+				enumFieldsValues.push(camelizedFieldKey);
 			}
 			if (!isSystemField) {
 				highlightParameterPropertiesFields[camelizedFieldKey] = { type: createInputObjectType({
@@ -278,21 +278,21 @@ function generateSchemaForInterface(interfaceName) {
 	});
 
 	// Name must be non-null, non-empty and match [_A-Za-z][_0-9A-Za-z]* - was 'GraphQLScalarType{name='String', description='Built-in String', coercing=graphql.Scalars$3@af372a4}'
-	//enumTypeFilterFieldsValues.push(GraphQLString);
+	//enumFieldsValues.push(GraphQLString);
 
-	//log.debug(`enumTypeFilterFieldsValues:${toStr(enumTypeFilterFieldsValues)}`);
+	//log.debug(`enumFieldsValues:${toStr(enumFieldsValues)}`);
 	//log.debug(`highlightParameterPropertiesFields:${toStr(highlightParameterPropertiesFields)}`);
 
-	const enumTypeFilterFields = createEnumType({
-		name: 'EnumTypeFilterFields',
-		values: enumTypeFilterFieldsValues
+	const enumFields = createEnumType({
+		name: 'enumFields',
+		values: enumFieldsValues
 	});
 
 	/* Can't union enum and scalar, only object...
 	const unionTypeFilterExistsWithDynamicFieldsField = createUnionType({
 		name: 'UnionTypeFilterExistsWithDynamicFieldsField',
 		types: [
-			nonNull(enumTypeFilterFields),
+			nonNull(enumFields),
 			nonNull(GraphQLString)
 		],
 		typeResolver: (a,b) => {
@@ -306,7 +306,7 @@ function generateSchemaForInterface(interfaceName) {
 		name: 'InputTypeFilterExistsWithDynamicFields',
 		fields: {
 			field: {
-				type: nonNull(enumTypeFilterFields)/*,
+				type: nonNull(enumFields)/*,
 				//type: unionTypeFilterExistsWithDynamicFieldsField
 				resolver: (env) => {
 					log.debug(`env:${toStr(env)}`); // This is never reached, perhaps createInputObjectType doesn't have resolver...
@@ -319,7 +319,7 @@ function generateSchemaForInterface(interfaceName) {
 	const graphqlInputTypeFilterHasValueWithDynamicFields = createInputObjectType({
 		name: 'InputTypeFilterHasValueWithDynamicFields',
 		fields: {
-			field: { type: nonNull(enumTypeFilterFields) },
+			field: { type: nonNull(enumFields) },
 			values: { type: nonNull(list(GraphQLString)) }
 		}
 	});
@@ -328,7 +328,7 @@ function generateSchemaForInterface(interfaceName) {
 		name: 'InputTypeFilterNotExistsWithDynamicFields',
 		fields: {
 			field: {
-				type: nonNull(enumTypeFilterFields)
+				type: nonNull(enumFields)
 			}
 		}
 	});
@@ -528,7 +528,24 @@ function generateSchemaForInterface(interfaceName) {
 		name: 'InputObjectAggregations',
 		fields: {
 			name: { type: nonNull(GraphQLString) },
-			terms: { type: GRAPHQL_INPUT_TYPE_AGGREGATION_TERMS }/*,
+			terms: { type: createInputObjectType({
+				name: 'InputTypeAggregationTerms',
+				fields: {
+					field: {
+						//type: nonNull(GraphQLString)
+						type: nonNull(enumFields)
+					},
+					order: {
+						type: GraphQLString
+					},
+					size: {
+						type: GraphQLInt
+					},
+					minDocCount: {
+						type: GraphQLInt
+					}
+				}
+			}) }/*,
 			aggregations: { // TODO subAggregations
 				type: reference('InputObjectAggregations')
 			}*/
@@ -896,5 +913,101 @@ export function post(request) {
     }
     total
   }
+}
+
+{
+  getSearchConnection(
+    #after: 0
+    #aggregations: [{
+    #  name: "myTitleAggregation",
+    #  terms: {
+    #    field: "title"
+    #    order: "_term ASC"
+    #    size: 10
+    #    minDocCount: 0
+    #  }
+    #},{
+    #  name: "myUriAggregation",
+    #  terms: {
+    #    field: "uri"
+    #    order: "_term ASC"
+    #    size: 10
+    #    minDocCount: 0
+    #  }
+    #}]
+    #filters
+    first: 10
+    #highlight: {
+      #encoder: html
+    #  fragmenter: simple
+    #  fragmentSize: 255
+    #  noMatchSize: 255 # This returns many fields like title._stemmed_en, but since I don't expose it, who cares?
+    #  numberOfFragments: 1
+      #order: none
+    #  postTag: "</b>"
+    #  preTag: "<b>"
+    #  requireFieldMatch: false
+      #tagsSchema: styled
+    #  properties: {
+    #    title: {
+          #fragmenter: simple
+          #noMatchSize: 255 # This returns many fields like title._stemmed_en, but since I don't expose it, who cares?
+          #numberOfFragments: 1
+          #order: none
+          #requireFieldMatch: false
+     #   }
+     #   text: {
+     #     fragmenter: span
+     # 		fragmentSize: 50
+      		#noMatchSize: 255 # This returns many fields like title._stemmed_en, but since I don't expose it, who cares?
+     # 		numberOfFragments: 2
+     # 		order: score
+      		#postTag: "</b>"
+      		#preTag: "<b>"
+      		#requireFieldMatch: false
+     #   }
+     #   uri: {
+          #fragmenter: simple
+          #noMatchSize: 255 # This returns many fields like title._stemmed_en, but since I don't expose it, who cares?
+          #numberOfFragments: 1
+          #order: none
+          #requireFieldMatch: false
+     #   }
+     # }
+    #}
+    searchString: "domain"
+  ) {
+    totalCount
+    edges {
+      node {
+        aggregations {
+      		name
+      		buckets {
+        		docCount
+        		key
+      		}
+        } # aggregations
+		count
+		hits {
+	  		_highlight {
+	    		title
+	    		text
+	    		uri
+	      	} # _highlight
+	  		_json
+	  		_score
+	  		title
+	  		text
+	  		uri
+    	} # hits
+	    total
+      } # node
+    } # edges
+    pageInfo {
+      startCursor
+      endCursor
+      hasNext
+    } #pageInfo
+  } #getSearchConnection
 }
 */
