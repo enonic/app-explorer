@@ -12,7 +12,7 @@ import {
 	addQueryFilter,
 	camelize,
 	//forceArray,
-	//isSet,
+	isSet,
 	toStr,
 	ucFirst
 } from '@enonic/js-utils';
@@ -63,12 +63,14 @@ const {
 	createEnumType,
 	createInputObjectType,
 	createObjectType,
-	createSchema/*,
-	createUnionType*/
+	createSchema,
+	createUnionType
 } = schemaGenerator;
 //import {DEFAULT_INTERFACE_FIELDS} from '../constants';
 
-
+//──────────────────────────────────────────────────────────────────────────────
+// Static Input types
+//──────────────────────────────────────────────────────────────────────────────
 const GRAPHQL_ENUM_TYPE_AGGREGATION_GEO_DISTANCE_UNIT = createEnumType({
 	name: 'EnumTypeAggregationGeoDistanceUnit',
 	values: {
@@ -206,6 +208,185 @@ const GRAPHQL_INPUT_TYPE_FILTER_BOOLEAN = createInputObjectType({
 	}
 });*/
 
+//──────────────────────────────────────────────────────────────────────────────
+// Output types
+//──────────────────────────────────────────────────────────────────────────────
+const OBJECT_TYPE_AGGREGATION_COUNT_NAME = 'AggregationCount';
+const OBJECT_TYPE_AGGREGATION_DATE_HISTOGRAM_NAME = 'AggregationDateHistogram';
+const OBJECT_TYPE_AGGREGATION_DATE_RANGE_NAME = 'AggregationDateRange';
+const OBJECT_TYPE_AGGREGATION_GEO_DISTANCE_NAME = 'AggregationGeoDistance';
+const OBJECT_TYPE_AGGREGATION_MAX_NAME = 'AggregationMax';
+const OBJECT_TYPE_AGGREGATION_MIN_NAME = 'AggregationMin';
+const OBJECT_TYPE_AGGREGATION_RANGE_NAME = 'AggregationRange';
+const OBJECT_TYPE_AGGREGATION_STATS_NAME = 'AggregationStats';
+const OBJECT_TYPE_AGGREGATION_TERMS_NAME = 'AggregationTerms';
+const OBJECT_TYPE_AGGREGATIONS_UNION_NAME = 'AggregationsUnion';
+
+
+const OBJECT_TYPE_AGGREGATION_COUNT = createObjectType({
+	name: OBJECT_TYPE_AGGREGATION_COUNT_NAME,
+	fields: {
+		name: { type: nonNull(GraphQLString) },
+		field: { type: nonNull(GraphQLString) }
+	}
+});
+
+const OBJECT_TYPE_AGGREGATION_DATE_HISTOGRAM = createObjectType({
+	name: OBJECT_TYPE_AGGREGATION_DATE_HISTOGRAM_NAME,
+	fields: {
+		buckets: { type: list(createObjectType({ // TODO nonNull?
+			name: 'AggregationDateHistogramBuckets',
+			fields: {
+				docCount: { type: nonNull(GraphQLInt) },
+				key: { type: nonNull(GraphQLString) }
+			}
+		}))},
+		name: { type: nonNull(GraphQLString) }
+	} // fields
+});
+
+const OBJECT_TYPE_AGGREGATION_DATE_RANGE = createObjectType({
+	name: OBJECT_TYPE_AGGREGATION_DATE_RANGE_NAME,
+	fields: {
+		buckets: { type: list(createObjectType({ // TODO nonNull?
+			name: 'AggregationDateRangeBuckets',
+			fields: {
+				docCount: { type: nonNull(GraphQLInt) },
+				from: { type: GraphQLInt },
+				key: { type: nonNull(GraphQLString) },
+				to: { type: GraphQLInt }
+			}
+		}))},
+		name: { type: nonNull(GraphQLString) }
+	} // fields
+});
+
+const OBJECT_TYPE_AGGREGATION_GEO_DISTANCE = createObjectType({
+	name: OBJECT_TYPE_AGGREGATION_GEO_DISTANCE_NAME,
+	fields: {
+		buckets: { type: list(createObjectType({ // TODO nonNull?
+			name: 'AggregationGeoDistanceBuckets',
+			fields: {
+				docCount: { type: nonNull(GraphQLInt) },
+				key: { type: nonNull(GraphQLString) }
+			}
+		}))},
+		name: { type: nonNull(GraphQLString) }
+	} // fields
+});
+
+const OBJECT_TYPE_AGGREGATION_MAX = createObjectType({
+	name: OBJECT_TYPE_AGGREGATION_MAX_NAME,
+	fields: {
+		name: { type: nonNull(GraphQLString) },
+		field: { type: nonNull(GraphQLString) }
+	}
+});
+
+const OBJECT_TYPE_AGGREGATION_MIN = createObjectType({
+	name: OBJECT_TYPE_AGGREGATION_MIN_NAME,
+	fields: {
+		name: { type: nonNull(GraphQLString) },
+		field: { type: nonNull(GraphQLString) }
+	}
+});
+
+const OBJECT_TYPE_AGGREGATION_RANGE = createObjectType({
+	name: OBJECT_TYPE_AGGREGATION_RANGE_NAME,
+	fields: {
+		buckets: { type: list(createObjectType({ // TODO nonNull?
+			name: 'AggregationRangeBuckets',
+			fields: {
+				docCount: { type: nonNull(GraphQLInt) },
+				from: { type: GraphQLInt },
+				key: { type: nonNull(GraphQLString) },
+				to: { type: GraphQLInt }
+			}
+		}))},
+		name: { type: nonNull(GraphQLString) }
+	} // fields
+});
+
+const OBJECT_TYPE_AGGREGATION_STATS = createObjectType({
+	name: OBJECT_TYPE_AGGREGATION_STATS_NAME,
+	fields: {
+		avg: { type: GraphQLFloat }, // TODO nonNull?
+		count: { type: GraphQLInt }, // TODO nonNull?
+		max: { type: GraphQLFloat }, // TODO nonNull?
+		min: { type: GraphQLFloat }, // TODO nonNull?
+		name: { type: nonNull(GraphQLString) },
+		sum: { type: GraphQLFloat } // TODO nonNull?
+	} // fields
+});
+
+const OBJECT_TYPE_AGGREGATION_TERMS = createObjectType({
+	name: OBJECT_TYPE_AGGREGATION_TERMS_NAME,
+	fields: {
+		buckets: { type: list(createObjectType({ // TODO nonNull?
+			name: 'AggregationTermsBuckets',
+			fields: {
+				docCount: { type: nonNull(GraphQLInt) },
+				key: { type: nonNull(GraphQLString) },
+				subAggregations: {
+					type: list(reference(OBJECT_TYPE_AGGREGATIONS_UNION_NAME))
+					//type: list(reference(OBJECT_TYPE_AGGREGATIONS_SUB_UNION_NAME)) // type AggregationsSubUnion not found in schema
+					//type: list(OBJECT_TYPE_AGGREGATIONS_SUB_UNION) // hoisted! // Does not work!!!
+				}
+			}
+		}))},
+		name: { type: nonNull(GraphQLString) }
+	} // fields
+});
+
+const OBJECT_TYPE_AGGREGATIONS_UNION = createUnionType({
+	name: OBJECT_TYPE_AGGREGATIONS_UNION_NAME,
+	typeResolver: (source) => {
+		//log.debug(`source ${toStr(source)}`, source);
+		switch (source.type) {
+		case OBJECT_TYPE_AGGREGATION_COUNT_NAME: return OBJECT_TYPE_AGGREGATION_COUNT;
+		case OBJECT_TYPE_AGGREGATION_DATE_HISTOGRAM_NAME: return OBJECT_TYPE_AGGREGATION_DATE_HISTOGRAM;
+		case OBJECT_TYPE_AGGREGATION_DATE_RANGE_NAME: return OBJECT_TYPE_AGGREGATION_DATE_RANGE;
+		case OBJECT_TYPE_AGGREGATION_GEO_DISTANCE_NAME: return OBJECT_TYPE_AGGREGATION_GEO_DISTANCE;
+		case OBJECT_TYPE_AGGREGATION_MAX_NAME: return OBJECT_TYPE_AGGREGATION_MAX;
+		case OBJECT_TYPE_AGGREGATION_MIN_NAME: return OBJECT_TYPE_AGGREGATION_MIN;
+		case OBJECT_TYPE_AGGREGATION_RANGE_NAME: return OBJECT_TYPE_AGGREGATION_RANGE;
+		case OBJECT_TYPE_AGGREGATION_STATS_NAME: return OBJECT_TYPE_AGGREGATION_STATS;
+		case OBJECT_TYPE_AGGREGATION_TERMS_NAME: return OBJECT_TYPE_AGGREGATION_TERMS;
+		default:
+			throw new Error(`Unknown source.type:${source.type}in source:${toStr(source)}`);
+		}
+	},
+	types: [
+		OBJECT_TYPE_AGGREGATION_COUNT,
+		OBJECT_TYPE_AGGREGATION_DATE_HISTOGRAM,
+		OBJECT_TYPE_AGGREGATION_DATE_RANGE,
+		OBJECT_TYPE_AGGREGATION_GEO_DISTANCE,
+		OBJECT_TYPE_AGGREGATION_MIN,
+		OBJECT_TYPE_AGGREGATION_MAX,
+		OBJECT_TYPE_AGGREGATION_RANGE,
+		OBJECT_TYPE_AGGREGATION_STATS,
+		OBJECT_TYPE_AGGREGATION_TERMS
+	]
+});
+
+//──────────────────────────────────────────────────────────────────────────────
+
+function aggregationArgTypeToGrapQLType(aggregationArgType) {
+	switch (aggregationArgType) {
+	case 'count': return OBJECT_TYPE_AGGREGATION_COUNT_NAME;
+	case 'dateHistogram': return OBJECT_TYPE_AGGREGATION_DATE_HISTOGRAM_NAME;
+	case 'dateRange': return OBJECT_TYPE_AGGREGATION_DATE_RANGE_NAME;
+	case 'geoDistance': return OBJECT_TYPE_AGGREGATION_GEO_DISTANCE_NAME;
+	case 'max': return OBJECT_TYPE_AGGREGATION_MAX_NAME;
+	case 'min': return OBJECT_TYPE_AGGREGATION_MIN_NAME;
+	case 'range': return OBJECT_TYPE_AGGREGATION_RANGE_NAME;
+	case 'stats': return OBJECT_TYPE_AGGREGATION_STATS_NAME;
+	case 'terms': return OBJECT_TYPE_AGGREGATION_TERMS_NAME;
+	default:
+		throw new Error(`Unknown aggregation argument type:${aggregationArgType}`);
+	}
+}
+
 
 function washDocumentNode(node) {
 	Object.keys(node).forEach((k) => {
@@ -248,13 +429,13 @@ function generateSchemaForInterface(interfaceName) {
 	const {
 		collections,
 		fields,// = DEFAULT_INTERFACE_FIELDS, TODO This wont work when fields = [] which filter does
-		stopWords,
-		synonyms
+		stopWords//,
+		//synonyms // TODO
 	} = filterInterface(interfaceNode);
 	//log.debug(`collections:${toStr(collections)}`);
 	//log.debug(`fields:${toStr(fields)}`);
 	//log.debug(`stopWords:${toStr(stopWords)}`);
-	log.debug(`synonyms:${toStr(synonyms)}`);
+	//log.debug(`synonyms:${toStr(synonyms)}`);
 
 	const fieldsRes = getFields({
 		connection: explorerRepoReadConnection,
@@ -302,7 +483,7 @@ function generateSchemaForInterface(interfaceName) {
 			}
 		}
 	});
-	log.debug(`camelToFieldObj:${toStr(camelToFieldObj)}`);
+	//log.debug(`camelToFieldObj:${toStr(camelToFieldObj)}`);
 
 	// Name must be non-null, non-empty and match [_A-Za-z][_0-9A-Za-z]* - was 'GraphQLScalarType{name='String', description='Built-in String', coercing=graphql.Scalars$3@af372a4}'
 	//enumFieldsValues.push(GraphQLString);
@@ -315,30 +496,14 @@ function generateSchemaForInterface(interfaceName) {
 		values: enumFieldsValues
 	});
 
-	/* Can't union enum and scalar, only object...
-	const unionTypeFilterExistsWithDynamicFieldsField = createUnionType({
-		name: 'UnionTypeFilterExistsWithDynamicFieldsField',
-		types: [
-			nonNull(enumFields),
-			nonNull(GraphQLString)
-		],
-		typeResolver: (a,b) => {
-			log.debug(`a:${toStr(a)}`);
-			log.debug(`b:${toStr(b)}`);
-			return GraphQLString;
-		}
-	});*/
-
+	//──────────────────────────────────────────────────────────────────────────
+	// Filters
+	//──────────────────────────────────────────────────────────────────────────
 	const graphqlInputTypeFilterExistsWithDynamicFields = createInputObjectType({
 		name: 'InputTypeFilterExistsWithDynamicFields',
 		fields: {
 			field: {
-				type: nonNull(enumFields)/*,
-				//type: unionTypeFilterExistsWithDynamicFieldsField
-				resolver: (env) => {
-					log.debug(`env:${toStr(env)}`); // This is never reached, perhaps createInputObjectType doesn't have resolver...
-					return '';
-				}*/
+				type: nonNull(enumFields)
 			}
 		}
 	});
@@ -385,6 +550,8 @@ function generateSchemaForInterface(interfaceName) {
 		}
 	});
 
+	//──────────────────────────────────────────────────────────────────────────
+
 	const interfaceSearchHitsFields = {
 		_highlight: { type: createObjectType({
 			name: 'InterfaceSearchHitsHighlights',
@@ -408,18 +575,7 @@ function generateSchemaForInterface(interfaceName) {
 				aggregations: aggregationsArg,
 				count = 10,
 				filters = {},
-				highlight = {
-					//encoder: 'html' // html value will force escaping html, if you use html highlighting tags
-					//fragmenter: 'span', // simple
-					//fragmentSize: 100,
-					//noMatchSize: 0,
-					//numberOfFragments: 5,
-					//order: 'none', // score
-					//postTag: '</em>',
-					//preTag: '<em>',
-					//requireFieldMatch: true,
-					//tagsSchema: 'styled'
-				},
+				highlight = {},
 				searchString = '',
 				start = 0
 			}
@@ -429,9 +585,10 @@ function generateSchemaForInterface(interfaceName) {
 
 		//log.debug(`aggregationsArg:${toStr(aggregationsArg)}`);
 
-		function aggregationsArgToQueryParam(aggregationsArray) {
+		function aggregationsArgToQueryParamAndTypes(aggregationsArray) {
 			//log.debug(`aggregationsArray:${toStr(aggregationsArray)}`);
 			const aggregationsObj = {};
+			const typesObj = {};
 			aggregationsArray.forEach(({
 				name,
 				subAggregations,
@@ -441,21 +598,26 @@ function generateSchemaForInterface(interfaceName) {
 				/*if (isSet(aggregations[name])) {
 					// TODO Throw GraphQLError
 				}*/
+				typesObj[name] = { type: Object.keys(rest)[0] };
 				if (rest[Object.keys(rest)[0]].field) {
 					// TODO Workaround related to https://github.com/enonic/app-explorer/issues/275
 					rest[Object.keys(rest)[0]].field = camelToFieldObj[rest[Object.keys(rest)[0]].field];
 				}
 				aggregationsObj[name] = rest;
 				if (subAggregations) {
-					aggregationsObj[name].aggregations = aggregationsArgToQueryParam(
-						subAggregations
+					[
+						aggregationsObj[name].aggregations,
+						typesObj[name].types
+					] = aggregationsArgToQueryParamAndTypes(
+						subAggregations,
 					); // recurse
 				}
 			});
-			return aggregationsObj;
+			return [aggregationsObj, typesObj];
 		}
-		const aggregations = aggregationsArgToQueryParam(aggregationsArg);
+		const [aggregations, types] = aggregationsArgToQueryParamAndTypes(aggregationsArg);
 		//log.debug(`aggregations:${toStr(aggregations)}`);
+		//log.debug(`types:${toStr(types)}`);
 
 		//log.debug(`searchString:${toStr(searchString)}`);
 		const washedSearchString = wash({string: searchString});
@@ -499,7 +661,7 @@ function generateSchemaForInterface(interfaceName) {
 			query: `fulltext('${fields.map(({name: field, boost = 1}) => `${field}${boost && boost > 1 ? `^${boost}` : ''}`)}', '${searchStringWithoutStopWords}', 'AND')`,
 			start
 		};
-		log.debug(`queryParams:${toStr({queryParams})}`);
+		//log.debug(`queryParams:${toStr({queryParams})}`);
 
 		const multiConnectParams = {
 			principals: [PRINCIPAL_EXPLORER_READ],
@@ -514,11 +676,13 @@ function generateSchemaForInterface(interfaceName) {
 		const multiRepoReadConnection = multiConnect(multiConnectParams);
 
 		const queryRes = multiRepoReadConnection.query(queryParams);
-		log.debug(`queryRes:${toStr(queryRes)}`);
+		//log.debug(`queryRes:${toStr(queryRes)}`);
 
-		function queryResAggregationsObjToArray(obj) {
+		function queryResAggregationsObjToArray(obj, localTypes = types) {
 			//log.debug(`obj:${toStr(obj)}`);
+			//log.debug(`localTypes:${toStr(localTypes)}`);
 			return Object.keys(obj).map((name) => {
+				//log.debug(`name:${toStr(name)}`);
 				const anAggregation = obj[name];
 				//log.debug(`anAggregation:${toStr(anAggregation)}`);
 				const {
@@ -538,7 +702,7 @@ function generateSchemaForInterface(interfaceName) {
 					count,
 					name,
 					sum,
-					value
+					type: aggregationArgTypeToGrapQLType(localTypes[name].type)
 				};
 				/*if (isSet(avg) && isSet(parseFloat(avg))) {rAggregation.avg = avg;}
 				if (isSet(max) && isSet(parseFloat(max))) {rAggregation.max = max;}
@@ -553,23 +717,30 @@ function generateSchemaForInterface(interfaceName) {
 					}) => {
 						const rBucket = {
 							docCount,
-							from,
-							key,
-							to
+							key
 						};
+						if (isSet(from) || isSet(to)) {
+							rAggregation.from = from;
+							rAggregation.to = to;
+						}
 						//log.debug(`rest:${toStr(rest)}`);
 						if (Object.keys(rest).length) {
-							rBucket.subAggregations = queryResAggregationsObjToArray(rest); // Recurse
+							rBucket.subAggregations = queryResAggregationsObjToArray(rest, types[name].types); // Recurse
 						}
 						return rBucket;
 					}); // map buckets
-				}
+				} else {
+					if (isSet(value)) {
+						rAggregation.value = value;
+					}
+				} // if buckets
 				return rAggregation;
 			}); // map names
 		}
-		queryRes.aggregationsAsJson = JSON.stringify(queryRes.aggregations);
 		queryRes.aggregations = queryResAggregationsObjToArray(queryRes.aggregations);
 		//log.debug(`queryRes.aggregations:${toStr(queryRes.aggregations)}`);
+
+		queryRes.aggregationsAsJson = JSON.stringify(queryRes.aggregations);
 
 		queryRes.hits = queryRes.hits.map(({
 			branch,
@@ -591,39 +762,16 @@ function generateSchemaForInterface(interfaceName) {
 			/* eslint-enable no-underscore-dangle */
 			return washedNode;
 		});
-		log.debug(`queryRes:${toStr(queryRes)}`);
+		//log.debug(`queryRes:${toStr(queryRes)}`);
 
 		return queryRes;
 	}
 
-	const OBJECT_TYPE_AGGREGATIONS_NAME = 'InterfaceSearchAggregations';
+	//const OBJECT_TYPE_AGGREGATIONS_NAME = 'InterfaceSearchAggregations';
 	const objectTypeInterfaceSearch = createObjectType({
 		name: 'InterfaceSearch',
 		fields: {
-			aggregations: { type: list(createObjectType({
-				name: OBJECT_TYPE_AGGREGATIONS_NAME,
-				fields: {
-					avg: { type: GraphQLFloat }, // Can't nonNull since not in terms result
-					count: { type: GraphQLInt }, // Can't nonNull since not in terms result
-					buckets: { type: list(createObjectType({ // Can't nonNull since not in stats result
-						name: 'InterfaceSearchAggregationsBuckets',
-						fields: {
-							docCount: { type: nonNull(GraphQLInt) },
-							from: { type: GraphQLInt }, // Can't nonNull since not in terms result
-							key: { type: nonNull(GraphQLString) },
-							subAggregations: {
-								type: list(reference(OBJECT_TYPE_AGGREGATIONS_NAME))
-							},
-							to: { type: GraphQLInt } // Can't nonNull since not in terms result
-						}
-					}))},
-					name: { type: nonNull(GraphQLString) },
-					max: { type: GraphQLFloat }, // Can't nonNull since not in terms result
-					min: { type: GraphQLFloat }, // Can't nonNull since not in terms result
-					sum: { type: GraphQLFloat }, // Can't nonNull since not in terms result
-					value: { type: GraphQLFloat } // Can't nonNull since not in terms result
-				}
-			}))},
+			aggregations: { type: list(OBJECT_TYPE_AGGREGATIONS_UNION) },
 			aggregationsAsJson: { type: GraphQLJson },
 			count: { type: nonNull(GraphQLInt) },
 			hits: { type: list(createObjectType({
@@ -633,6 +781,10 @@ function generateSchemaForInterface(interfaceName) {
 			total: { type: nonNull(GraphQLInt) }
 		}
 	});
+
+	//──────────────────────────────────────────────────────────────────────────
+	// Dynamic Input Types
+	//──────────────────────────────────────────────────────────────────────────
 
 	const INPUT_OBJECT_TYPE_AGGREGATION_COUNT = createInputObjectType({
 		name: 'InputObjectTypeAggregationCount',
@@ -1027,352 +1179,3 @@ export function post(request) {
 		body: execute(generateSchemaForInterface(interfaceName), query, variables, context)
 	};
 }
-
-/*
-{
-	search(
-    aggregations: [{
-      name: "countTitle"
-      count: {
-        field: title
-      }
-    }, {
-      name: "dateHistogram"
-      dateHistogram: {
-        field: document_metadataCreatedTime
-        format: "MM-yyy"
-        interval: "1M"
-        minDocCount: 0
-      }
-    #},{
-    #  name: "dateRange"
-    #  dateRange: {
-    #    field: document_metadataCreatedTime
-    #    format: "yyyy-MM-dd’T’HH:mm:ss.SSSZ"
-    #    ranges: [{
-    #      to: "now-10M"
-    #    },{
-    #      from: "now-10M"
-    #    }]
-    #  }
-    },{
-      name: "geo"
-      geoDistance: {
-        field: geolocation
-        origin: {
-          lat: "90.0"
-          lon: "0.0"
-        }
-        ranges: [{
-          from: 0
-          to: 1200
-        }]
-        unit: km
-      }
-    },{
-      name: "_nodeType",
-      terms: {
-        field: _nodeType
-        order: "_term ASC"
-        size: 10
-        minDocCount: 0
-      }
-      subAggregations: [{
-        name: "maxDouble",
-        max: {
-          field: double
-        }
-      }, {
-        name: "minDouble",
-        max: {
-          field: double
-        }
-      }, {
-      	name: "statsDouble",
-      	stats: {
-	        field: double
-	      }
-      }, {
-        name: "countTitle",
-        max: {
-          field: title
-        }
-      }, {
-        name: "maxLong",
-        max: {
-          field: long
-        }
-      }, {
-        name: "minLong",
-        max: {
-          field: long
-        }
-      }, {
-      name: "range"
-      range: {
-        field: long
-        ranges: [{
-          from: 0
-          to: 1
-        },{
-          from: 1
-        }]
-      }
-      }, {
-      	name: "statsLong",
-      	stats: {
-	        field: long
-	      }
-      }] # subAggregations
-    }, {
-      name: "range"
-      range: {
-        field: long
-        ranges: [{
-          from: 0
-          to: 1
-        },{
-          from: 1
-        }]
-      }
-    }] # aggregations
-    #filters: {
-      #boolean: {
-        #must: {
-          #exists: {
-           	#field: title
-          #}
-          #hasValue: {
-          #  field: title
-          #  values: "Example Domain"
-          #}
-          #ids: {
-          #  values: "530e980b-89dc-4522-af0f-df4b420a1f81"
-          #}
-          #notExists: {
-          #  field: title
-          #}
-        #} #must
-        #mustNot: {
-          #exists: {
-          # 	field: title
-          #}
-          #hasValue: {
-          #  field: "title"
-          #  values: "Example Domain"
-          #}
-          #ids: {
-          #  values: "530e980b-89dc-4522-af0f-df4b420a1f81"
-          #}
-          #notExists: {
-          #  field: "nonExistant" # This is not possible, only enums
-          #}
-        #} # mustNot
-        #should: [{
-        #  exists: {
-        #   	field: title
-        #  }
-        #},{
-        #  exists: {
-        #   	field: text
-        #	}
-        #}] # should
-      #} # boolean
-      #exists: {
-          #field: text
-          #field: "nonExistant" # This is not possible, only enums
-      #}
-      #hasValue: {
-          #field: title
-          #values: "Example Domain"
-        	#values: ["Example Domain"]
-      		#values: "nonExistant" # This is not possible, only enums
-      #}
-      #ids: {
-          #values: "530e980b-89dc-4522-af0f-df4b420a1f81"
-      		#values: "nonExistant"
-      #}
-      #notExists: {
-      #  field: title
-      #}
-    #} #filters
-    highlight: {
-      #encoder: html
-      fragmenter: simple
-      fragmentSize: 255
-      noMatchSize: 255 # This returns many fields like title._stemmed_en, but since I don't expose it, who cares?
-      numberOfFragments: 1
-      #order: none
-      postTag: "</b>"
-      preTag: "<b>"
-      requireFieldMatch: false
-      #tagsSchema: styled
-      properties: {
-        title: {
-          #fragmenter: simple
-          #noMatchSize: 255 # This returns many fields like title._stemmed_en, but since I don't expose it, who cares?
-          #numberOfFragments: 1
-          #order: none
-          #requireFieldMatch: false
-        }
-        text: {
-          fragmenter: span
-      		fragmentSize: 50
-      		#noMatchSize: 255 # This returns many fields like title._stemmed_en, but since I don't expose it, who cares?
-      		numberOfFragments: 2
-      		order: score
-      		#postTag: "</b>"
-      		#preTag: "<b>"
-      		#requireFieldMatch: false
-        }
-        uri: {
-          #fragmenter: simple
-          #noMatchSize: 255 # This returns many fields like title._stemmed_en, but since I don't expose it, who cares?
-          #numberOfFragments: 1
-          #order: none
-          #requireFieldMatch: false
-        }
-      }
-    }
-    searchString: "domain"
-  ) {
-    aggregations {
-      avg
-      buckets {
-        docCount
-        key
-        subAggregations {
-          avg
-          buckets {
-            docCount
-            key
-          }
-      		count
-      		max
-      		min
-          name
-          sum
-          value
-        }
-      }
-      count
-      max
-      min
-      name
-      sum
-      value
-    }
-    aggregationsAsJson
-    count
-    hits {
-      _highlight {
-        title
-        text
-        uri
-      }
-      _json
-      _score
-      title
-      text
-      uri
-    }
-    total
-  }
-}
-
-{
-  getSearchConnection(
-    #after: 0
-    #aggregations: [{
-    #  name: "myTitleAggregation",
-    #  terms: {
-    #    field: "title"
-    #    order: "_term ASC"
-    #    size: 10
-    #    minDocCount: 0
-    #  }
-    #},{
-    #  name: "myUriAggregation",
-    #  terms: {
-    #    field: "uri"
-    #    order: "_term ASC"
-    #    size: 10
-    #    minDocCount: 0
-    #  }
-    #}]
-    #filters
-    first: 10
-    #highlight: {
-      #encoder: html
-    #  fragmenter: simple
-    #  fragmentSize: 255
-    #  noMatchSize: 255 # This returns many fields like title._stemmed_en, but since I don't expose it, who cares?
-    #  numberOfFragments: 1
-      #order: none
-    #  postTag: "</b>"
-    #  preTag: "<b>"
-    #  requireFieldMatch: false
-      #tagsSchema: styled
-    #  properties: {
-    #    title: {
-          #fragmenter: simple
-          #noMatchSize: 255 # This returns many fields like title._stemmed_en, but since I don't expose it, who cares?
-          #numberOfFragments: 1
-          #order: none
-          #requireFieldMatch: false
-     #   }
-     #   text: {
-     #     fragmenter: span
-     # 		fragmentSize: 50
-      		#noMatchSize: 255 # This returns many fields like title._stemmed_en, but since I don't expose it, who cares?
-     # 		numberOfFragments: 2
-     # 		order: score
-      		#postTag: "</b>"
-      		#preTag: "<b>"
-      		#requireFieldMatch: false
-     #   }
-     #   uri: {
-          #fragmenter: simple
-          #noMatchSize: 255 # This returns many fields like title._stemmed_en, but since I don't expose it, who cares?
-          #numberOfFragments: 1
-          #order: none
-          #requireFieldMatch: false
-     #   }
-     # }
-    #}
-    searchString: "domain"
-  ) {
-    totalCount
-    edges {
-      node {
-        aggregations {
-      		name
-      		buckets {
-        		docCount
-        		key
-      		}
-        } # aggregations
-		count
-		hits {
-	  		_highlight {
-	    		title
-	    		text
-	    		uri
-	      	} # _highlight
-	  		_json
-	  		_score
-	  		title
-	  		text
-	  		uri
-    	} # hits
-	    total
-      } # node
-    } # edges
-    pageInfo {
-      startCursor
-      endCursor
-      hasNext
-    } #pageInfo
-  } #getSearchConnection
-}
-*/
