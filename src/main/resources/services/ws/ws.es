@@ -294,7 +294,6 @@ listener({
 							}));
 						} else if (path.startsWith('/fields/')) {
 							// fields...
-							// fieldvalues...
 							sendToGroup(WEBSOCKET_GROUP, JSON.stringify({
 								type: 'fields',
 								data: execute(SCHEMA, `{

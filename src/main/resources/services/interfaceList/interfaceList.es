@@ -9,10 +9,7 @@ import {
 } from '/lib/explorer/model/2/constants';
 import {query as queryCollections} from '/lib/explorer/collection/query';
 import {getFields} from '/lib/explorer/field/getFields';
-import {getFieldValues} from '/lib/explorer/field/getFieldValues';
 import {query as queryInterfaces} from '/lib/explorer/interface/query';
-import {addFilter} from '/lib/explorer/query/addFilter';
-import {hasValue} from '/lib/explorer/query/hasValue';
 import {connect} from '/lib/explorer/repo/connect';
 import {query as getStopWords} from '/lib/explorer/stopWords/query';
 import {query as getThesauri} from '/lib/explorer/thesaurus/query';
@@ -60,55 +57,6 @@ export function get() {
 	});
 	//log.debug(`fieldsIdToKey:${toStr({fieldsIdToKey})}`);
 
-	//──────────────────────────────────────────────────────────────────────────
-	// Get only fieldValues for fieldsInResults
-	//──────────────────────────────────────────────────────────────────────────
-	const fieldValuesArray = getFieldValues({
-		connection,
-		filters: addFilter({
-			filter: hasValue(
-				'fieldReference',
-				fieldsInResultsArray.map(({_id}) => _id)
-			)
-		})
-	}).hits;
-	//log.debug(`fieldValuesArray:${toStr({fieldValuesArray})}`);
-
-	const fieldValuesObj = {};
-	fieldValuesArray.forEach(({
-		_name,
-		_path,
-		displayName,
-
-		// _name of fieldNode, not key of fieldNode
-		// So underscore-nodetype not _nodeType
-		field: fieldName,
-		fieldReference,
-
-		value
-	}) => {
-		const fieldKey = fieldsIdToKey[fieldReference];
-		if (!fieldKey) {
-			throw new Error(`Unable to find field key for fieldName:${fieldName} fieldId:${fieldReference}`);
-		}
-		const key = value || _name;
-		//log.info(toStr({field, displayName, value, _name, key}));
-		/*if (!fieldValuesObj[field]) {fieldValuesObj[field] = []}
-		fieldValuesObj[field].push({
-			label: displayName,
-			value: _name,
-			path: _path
-		});*/
-		if (!fieldValuesObj[fieldKey]) {fieldValuesObj[fieldKey] = {};}
-		fieldValuesObj[fieldKey][key] = {
-			key,
-			text: displayName,
-			path: _path//,
-			//value
-		};
-	});
-	//log.debug(`fieldValuesObj:${toStr({fieldValuesObj})}`);
-
 	const fieldsObj = {};
 	fieldsInResultsArray.forEach(({
 		key: fieldKey,
@@ -124,8 +72,7 @@ export function get() {
 			//label,
 			//inResults,
 			path,
-			text: fieldKey,
-			values: fieldValuesObj[fieldKey]
+			text: fieldKey
 		};
 		//}
 	});

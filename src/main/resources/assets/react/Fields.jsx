@@ -112,10 +112,6 @@ export function Fields(props) {
 								onClick={handleSortGenerator('max')}
 								sorted={column === 'max' ? direction : null}
 							>Max</Table.HeaderCell>
-							<Table.HeaderCell
-								onClick={handleSortGenerator('values')}
-								sorted={column === 'values' ? direction : null}
-							>Values</Table.HeaderCell>
 							<Table.HeaderCell>Actions</Table.HeaderCell>
 						</Table.Row>
 					</Table.Header>
@@ -135,8 +131,7 @@ export function Fields(props) {
 							fulltext,
 							includeInAllText,
 							nGram, // node._indexConfig.default.nGram uses uppercase G in nGram
-							path,
-							valuesRes
+							path
 						}, index) => {
 							return <Table.Row key={`field[${index}]`}>
 								<Table.Cell>
@@ -166,7 +161,6 @@ export function Fields(props) {
 								{/*<Table.Cell>{allowArray ? <Icon color='green' name='checkmark'/> : <Icon color='red' name='x'/>}</Table.Cell>*/}
 								<Table.Cell>{min === 0 ? '*' : min}</Table.Cell>
 								<Table.Cell>{max === 0 ? '∞' : max}</Table.Cell>
-								<Table.Cell>{valuesRes.hits.map(({displayName})=>displayName).join(', ')}</Table.Cell>
 								<Table.Cell>
 									<Button.Group>
 										<DeleteModal

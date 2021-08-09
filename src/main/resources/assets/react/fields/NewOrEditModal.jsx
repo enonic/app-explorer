@@ -14,7 +14,6 @@ import {SubmitButton} from 'semantic-ui-react-form/buttons/SubmitButton';
 //import {VisitAllButton} from 'semantic-ui-react-form/buttons/VisitAllButton';
 
 import {CustomInstructionOptions} from './CustomInstructionOptions';
-import {EditValues} from './EditValues';
 
 
 function notDocumentMetaData(value) {
@@ -47,7 +46,7 @@ const SCHEMA = {
 export function NewOrEditModal(props) {
 	const {
 		disabled = false,
-		field,
+		//field,
 		initialValues = {
 			allowArray: false,
 			description: '',
@@ -299,13 +298,6 @@ export function NewOrEditModal(props) {
 					{/*<ValidateFormButton/>*/}
 				</Form>
 			</EnonicForm>
-			{editMode && <Segment>
-				<Header as='h2' content='Values'/>
-				<EditValues
-					field={field}
-					servicesBaseUrl={servicesBaseUrl}
-				/>
-			</Segment>}
 		</Modal.Content>
 	</Modal>;
 } // NewOrEditModal

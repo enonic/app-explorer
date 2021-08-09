@@ -7,7 +7,6 @@ import {
 } from '/lib/explorer/model/2/constants';
 import {connect} from '/lib/explorer/repo/connect';
 import {getFields} from '/lib/explorer/field/getFields';
-import {getFieldValues} from '/lib/explorer/field/getFieldValues';
 
 
 export function get() {
@@ -17,31 +16,15 @@ export function get() {
 		_name: name,
 		allowArray = false,
 		denyDelete = false,
-		denyValues = false,
 		fieldType,
 		indexConfig, // String or object
 		key,
 		min = 0,
 		max = 0
 	}) => {
-		const valuesRes = getFieldValues({
-			connection,
-			field: name
-		});
-		valuesRes.hits = valuesRes.hits.map(({
-			//_name,
-			//field,
-			//fieldReference,
-			displayName,
-			value
-		}) => ({
-			displayName,
-			value
-		}));
 		return {
 			allowArray,
 			denyDelete,
-			denyValues,
 			fieldType,
 			key,
 			min,
@@ -55,9 +38,7 @@ export function get() {
 			fulltext: getIn(indexConfig, 'fulltext', true),
 			includeInAllText: getIn(indexConfig, 'includeInAllText', true),
 			nGram: getIn(indexConfig, 'nGram', true), // node._indexConfig.default.nGram uses uppercase G in nGram
-			path: getIn(indexConfig, 'path', false),
-
-			valuesRes
+			path: getIn(indexConfig, 'path', false)
 		};
 	});
 	return {

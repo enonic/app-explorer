@@ -1,4 +1,5 @@
 import {
+	COLON_SIGN,
 	forceArray,
 	toStr
 } from '@enonic/js-utils';
@@ -27,7 +28,6 @@ import {
 	REPOSITORIES,
 	USERS,
 	field,
-	//fieldValue,
 	folder,
 	interfaceModel
 } from '/lib/explorer/model/2/index';
@@ -950,6 +950,27 @@ export function run() {
 					progress.finishItem();
 				});
 			}
+
+			const NT_FIELD_VALUE = `${APP_EXPLORER}${COLON_SIGN}field-value`;
+			progress.addItems(1).setInfo('Finding fieldValues so they can be deleted...').report().logInfo();
+			const fieldValueIds = writeConnection.query({
+				count: -1,
+				filters: addFilter({
+					filters: addFilter({
+						filter: hasValue('_nodeType', [NT_FIELD_VALUE])
+					})
+				})
+			}).hits.map(({id}) => id);
+			//log.debug(`fieldValueIds:${toStr(fieldValueIds)}`);
+			progress.finishItem();
+
+			if(fieldValueIds.length) {
+				progress.addItems(1).setInfo(`Deleting ${fieldValueIds.length} fieldValues...`).report().logInfo();
+				writeConnection.delete(fieldValueIds);
+				progress.finishItem();
+			}
+
+			writeConnection.refresh();
 
 			/*setModel({
 				connection: writeConnection,

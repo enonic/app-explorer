@@ -12,28 +12,10 @@ import {
 import {PRINCIPAL_EXPLORER_READ} from '/lib/explorer/model/2/constants';
 import {connect} from '/lib/explorer/repo/connect';
 import {getFields} from '/lib/explorer/field/getFields';
-import {getFieldValues} from '/lib/explorer/field/getFieldValues';
 
 const {
 	createObjectType
 } = newSchemaGenerator();
-
-
-const FIELD_VALUE_OBJECT_TYPE = createObjectType({
-	name: 'FieldValue',
-	//description:
-	fields: {
-		_id: { type: nonNull(GraphQLString) },
-		_name: { type: nonNull(GraphQLString) },
-		_nodeType: { type: GraphQLString }, // TODO nonNull?
-		_path: { type: nonNull(GraphQLString) },
-		displayName: { type: nonNull(GraphQLString) },
-		field: { type: nonNull(GraphQLString) },
-		fieldReference: { type: nonNull(GraphQLString) },
-		//type: { type: nonNull(GraphQLString) },
-		value: { type: GraphQLString } // Found to be null in prod :(
-	}
-});
 
 
 const FIELD_OBJECT_TYPE = createObjectType({
@@ -45,14 +27,12 @@ const FIELD_OBJECT_TYPE = createObjectType({
 		_nodeType: { type: GraphQLString }, // TODO nonNull?
 		_path: { type: nonNull(GraphQLString) },
 		denyDelete: { type: GraphQLBoolean },
-		denyValues: { type: GraphQLBoolean },
 		//displayName: { type: nonNull(GraphQLString) },
 		indexConfig: { type: nonNull(GraphQLString) },
 		inResults: { type: GraphQLBoolean },
 		fieldType: { type: nonNull(GraphQLString) },
-		key: { type: nonNull(GraphQLString) },
+		key: { type: nonNull(GraphQLString) }//,
 		//type: { type: nonNull(GraphQLString) },
-		values: { type: list(FIELD_VALUE_OBJECT_TYPE)}
 	}
 });
 
@@ -72,39 +52,6 @@ export const queryFields = {
 
 		const connection = connect({ principals: [PRINCIPAL_EXPLORER_READ] });
 
-		const fieldValuesRes = getFieldValues({
-			connection,
-			field: fields
-		});
-		//log.info(`fieldValuesRes:${toStr(fieldValuesRes)}`);
-
-		const fieldValuesObjArr = {};
-		fieldValuesRes.hits.forEach(({
-			_id,
-			_name,
-			_nodeType,
-			_path,
-			displayName,
-			field,
-			fieldReference,
-			//type,
-			value
-		}) => {
-			if (!fieldValuesObjArr[field]) {fieldValuesObjArr[field] = [];}
-			fieldValuesObjArr[field].push({
-				_id,
-				_name,
-				_nodeType,
-				_path,
-				displayName,
-				field,
-				fieldReference,
-				//type,
-				value
-			});
-		}); // forEach fieldValue
-		//log.info(`fieldValuesObjArr:${toStr(fieldValuesObjArr)}`);
-
 		const fieldsRes = getFields({
 			connection,
 			fields
@@ -117,7 +64,6 @@ export const queryFields = {
 			_nodeType,
 			_path,
 			denyDelete,
-			denyValues,
 			//displayName,
 			indexConfig,
 			inResults,
@@ -130,14 +76,12 @@ export const queryFields = {
 			_nodeType,
 			_path,
 			denyDelete,
-			denyValues,
 			//displayName,
 			indexConfig,
 			inResults,
 			fieldType,
-			key,
-			//type,
-			values: fieldValuesObjArr[_name]
+			key//,
+			//type
 		}));
 		//log.info(`mapped fieldsRes:${toStr(fieldsRes)}`);
 
@@ -170,23 +114,12 @@ export const queryFields = {
 			_nodeType
 			_path
 			denyDelete
-			denyValues
 			#displayName
 			indexConfig
 			inResults
 			fieldType
 			key
 			#type
-			values {
-				_id
-				_name
-				_path
-				displayName
-				field
-				fieldReference
-				type
-				value
-			}
 		}
 	}
 }
