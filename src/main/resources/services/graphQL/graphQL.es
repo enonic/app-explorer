@@ -18,6 +18,10 @@ import {queryFields} from './field';
 import {queryInterfaces} from './interface';
 import {queryJournals} from './journal';
 import {listScheduledJobs} from './scheduler';
+import {
+	fieldSchemaCreate,
+	fieldSchemaQuery
+} from './schema';
 import {queryStopWords} from './stopWord';
 import {querySynonyms, queryThesauri} from './thesaurus';
 import {queryTasks} from './task';
@@ -29,6 +33,12 @@ const {
 
 
 export const SCHEMA = createSchema({
+	mutation: createObjectType({
+		name: 'Mutation',
+		fields: {
+			createSchema: fieldSchemaCreate
+		}
+	}), // mutation
 	query: createObjectType({
 		name: 'Query',
 		fields: {
@@ -45,6 +55,7 @@ export const SCHEMA = createSchema({
 			queryJournals,
 			queryStopWords,
 			querySynonyms,
+			querySchemas: fieldSchemaQuery,
 			queryThesauri,
 			queryTasks
 		} // fields
@@ -65,8 +76,11 @@ export function post(request) {
 	//log.info(`query:${toStr(query)}`);
 	//log.info(`variables:${toStr(variables)}`);
 
+	const context = {};
+	//log.info(`context:${toStr(context)}`);
+
 	return {
 		contentType: RT_JSON,
-		body: execute(SCHEMA, query, variables)
+		body: execute(SCHEMA, query, variables, context)
 	};
 } // post

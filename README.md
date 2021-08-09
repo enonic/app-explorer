@@ -225,6 +225,7 @@ search(
 
 * TODO: Make api/v1/documents available again
 * Temporarily removed api/v1/documents
+* IN PROGRESS: Support multiple Schemas
 * Remove field values
 * Add api/v1/interface/{interfaceName} GraphQL endpoint with search function
   * Support ApiKey via Authorization HTTP_HEADER

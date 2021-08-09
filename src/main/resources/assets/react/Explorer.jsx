@@ -4,11 +4,12 @@ import {
 
 import {Api} from './Api';
 import {Collections} from './Collections';
-import {Fields} from './Fields';
+//import {Fields} from './Fields';
 import {Interfaces} from './Interfaces';
 import {Journals} from './Journals';
 import {Notifications} from './Notifications';
 import {Schedule} from './Schedule';
+import {Schemas} from './Schemas';
 import {Search} from './Search';
 import {Status} from './Status';
 import {StopWords} from './StopWords';
@@ -321,10 +322,10 @@ export function Explorer(props) {
 
 				<Menu.Item
 					as='a'
-					href='#schema'
-					active={page === 'schema'}
-					onClick={() => setPage('schema')}
-				><Icon name='sitemap'/> Schema</Menu.Item>
+					href='#schemas'
+					active={page === 'schemas'}
+					onClick={() => setPage('schemas')}
+				><Icon name='sitemap'/> Schemas</Menu.Item>
 				<Menu.Item
 					as='a'
 					href='#stopWords'
@@ -408,7 +409,7 @@ export function Explorer(props) {
 				{page === 'schedule' && <Schedule
 					servicesBaseUrl={servicesBaseUrl}
 				/>}
-				{page === 'schema' && <Fields
+				{page === 'schemas' && <Schemas
 					servicesBaseUrl={servicesBaseUrl}
 				/>}
 				{page === 'stopWords' && <StopWords
