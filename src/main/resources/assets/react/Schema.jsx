@@ -11,6 +11,12 @@ const QUERY_Schema_GQL = `{
     hits {
       _id
       _name
+	  properties {
+        max
+        min
+        name
+        valueType
+      }
     }
   }
 }`;
