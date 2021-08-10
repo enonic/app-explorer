@@ -3,11 +3,11 @@ import {
 	Table
 } from 'semantic-ui-react';
 
-import {NewOrEditSchemaModal} from './schemas/NewOrEditSchemaModal';
+import {NewOrEditSchemaModal} from './schema/NewOrEditSchemaModal';
 
 
-const QUERY_SCHEMAS_GQL = `{
-  querySchemas {
+const QUERY_Schema_GQL = `{
+  querySchema {
     hits {
       _id
       _name
@@ -16,36 +16,36 @@ const QUERY_SCHEMAS_GQL = `{
 }`;
 
 
-export function Schemas({
+export function Schema({
 	servicesBaseUrl
 }) {
-	const [schemas, setSchemas] = React.useState([]);
+	const [schema, setSchema] = React.useState([]);
 
-	function fetchSchemas() {
+	function fetchSchema() {
 		fetch(`${servicesBaseUrl}/graphQL`, {
 			method: 'POST',
 			headers: {
 				'Content-Type':	'application/json'
 			},
 			body: JSON.stringify({
-				query: QUERY_SCHEMAS_GQL
+				query: QUERY_Schema_GQL
 			})
 		})
 			.then(response => response.json())
 			.then(data => {
 				//console.debug('data', data);
-				setSchemas(data.data.querySchemas.hits);
+				setSchema(data.data.querySchema.hits);
 			});
-	} // fetchSchemas
+	} // fetchSchema
 
 	React.useEffect(() => {
-		fetchSchemas();
+		fetchSchema();
 	}, []);
 
-	console.debug('schemas', schemas);
+	console.debug('schema', schema);
 
 	return <>
-		<Header as='h1' content='Schemas'/>
+		<Header as='h1' content='Schema'/>
 		<Table celled collapsing compact selectable singleLine striped>
 			<Table.Header>
 				<Table.Row>
@@ -54,7 +54,7 @@ export function Schemas({
 				</Table.Row>
 			</Table.Header>
 			<Table.Body>
-				{schemas.map(({
+				{schema.map(({
 					_id,
 					_name
 				}, index) => {
@@ -72,4 +72,4 @@ export function Schemas({
 			servicesBaseUrl={servicesBaseUrl}
 		/>
 	</>;
-} // Schemas
+} // Schema

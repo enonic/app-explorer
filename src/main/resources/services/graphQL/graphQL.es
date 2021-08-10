@@ -55,7 +55,7 @@ export const SCHEMA = createSchema({
 			queryJournals,
 			queryStopWords,
 			querySynonyms,
-			querySchemas: fieldSchemaQuery,
+			querySchema: fieldSchemaQuery,
 			queryThesauri,
 			queryTasks
 		} // fields

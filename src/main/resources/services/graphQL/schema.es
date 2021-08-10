@@ -26,8 +26,8 @@ const {
 
 
 const NT_SCHEMA = `${APP_EXPLORER}${COLON_SIGN}schema`;
-const SCHEMAS_FOLDER_NAME = 'schemas';
-const SCHEMAS_FOLDER_PATH = `/${SCHEMAS_FOLDER_NAME}`;
+const SCHEMA_FOLDER_NAME = 'schema';
+const SCHEMA_FOLDER_PATH = `/${SCHEMA_FOLDER_NAME}`;
 
 
 export const fieldSchemaCreate = {
@@ -42,14 +42,14 @@ export const fieldSchemaCreate = {
 		//log.debug(`_name:${toStr(_name)}`);
 		const writeConnection = connect({ principals: [PRINCIPAL_EXPLORER_WRITE] });
 
-		if (!writeConnection.exists(SCHEMAS_FOLDER_PATH)) {
+		if (!writeConnection.exists(SCHEMA_FOLDER_PATH)) {
 			writeConnection.create({
-				_name: SCHEMAS_FOLDER_NAME,
+				_name: SCHEMA_FOLDER_NAME,
 				_nodeType: NT_FOLDER
 			});
 		}
 
-		const _parentPath = `/${SCHEMAS_FOLDER_NAME}`;
+		const _parentPath = `/${SCHEMA_FOLDER_NAME}`;
 		const _path = `${_parentPath}/${_name}`;
 		if (writeConnection.exists(_path)) {
 			throw new Error(`A schema with _name:${_name} already exists!`);
@@ -96,7 +96,7 @@ export const fieldSchemaQuery = {
 		return res;
 	}, // resolve
 	type: createObjectType({
-		name: 'QuerySchemas',
+		name: 'QuerySchema',
 		fields: {
 			total: { type: nonNull(GraphQLInt) },
 			count: { type: nonNull(GraphQLInt) },
