@@ -13,7 +13,8 @@ import {getSites} from './site';
 import {getLocales} from './i18n';
 import {queryApiKeys} from './apiKey';
 import {
-	fieldCollectionsQuery
+	fieldCollectionsQuery,
+	fieldCollectionsReindex
 } from './collection';
 import {queryCollectors} from './collector';
 import {queryFields} from './field';
@@ -43,7 +44,8 @@ export const SCHEMA = createSchema({
 		fields: {
 			createSchema: fieldSchemaCreate,
 			deleteSchema: fieldSchemaDelete,
-			updateSchema: fieldSchemaUpdate
+			updateSchema: fieldSchemaUpdate/*,
+			reindexCollections: fieldCollectionsReindex*/
 		}
 	}), // mutation
 	query: createObjectType({

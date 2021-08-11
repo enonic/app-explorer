@@ -22,7 +22,7 @@ export function SchemaSelector(props) {
 	const [context, dispatch] = getEnonicContext();
 
 	const {
-		name = 'schema',
+		name = 'schemaId',
 		parentPath,
 		path = parentPath ? `${parentPath}.${name}` : name,
 		placeholder = 'Please select a schema',
@@ -76,9 +76,12 @@ export function SchemaSelector(props) {
 					value: newValue
 				}));
 			}}
-			options={schema.map(({_name:text}) => ({
+			options={schema.map(({
+				_id: value,
+				_name: text
+			}) => ({
 				text,
-				value: text
+				value
 			}))}
 			placeholder={placeholder}
 			selection

@@ -32,6 +32,8 @@ import {
 	list
 } from '/lib/graphql';
 
+import {getSchema} from './schema/getSchema';
+
 const {
 	createEnumType,
 	createInputObjectType,
@@ -165,26 +167,18 @@ export const fieldSchemaDelete = {
 }; // fieldSchemaDelete
 
 
+
+
+
 export const fieldSchemaGet = {
 	args: {
-		_id: nonNull(GraphQLString)
+		_id: TYPE_ID
 	},
-	resolve: ({args: {
-		_id
-	}}) => {
-		const readConnection = connect({ principals: [PRINCIPAL_EXPLORER_READ] });
-		const {
-			_name,
-			_path,
-			properties
-		} = readConnection.get(_id);
-		return {
-			_id,
-			_name,
-			_path,
-			properties: forceArray(properties).sort((a, b) => (a.name > b.name) ? 1 : -1)
-		};
-	},
+	resolve: ({
+		args: {
+			_id
+		}
+	}) => getSchema({_id}),
 	type: TYPE_SCHEMA
 }; // fieldSchemaGet
 

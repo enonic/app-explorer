@@ -1,4 +1,7 @@
-//import {toStr} from '@enonic/js-utils';
+import {
+	forceArray/*,
+	toStr*/
+} from '@enonic/js-utils';
 //import getIn from 'get-value';
 
 import {
@@ -10,12 +13,14 @@ import {
 	nonNull
 } from '/lib/graphql';
 //import {list as listTasks} from '/lib/xp/task';
+//import {reference} from '/lib/xp/value';
 
 import {PRINCIPAL_EXPLORER_READ} from '/lib/explorer/model/2/constants';
 import {connect} from '/lib/explorer/repo/connect';
 import {getDocumentCount} from '/lib/explorer/collection/getDocumentCount';
 import {query} from '/lib/explorer/collection/query';
 import {usedInInterfaces} from '/lib/explorer/collection/usedInInterfaces';
+import {getSchema} from './schema/getSchema';
 
 const {
 	createObjectType
@@ -69,9 +74,39 @@ const COLLECTION_OBJECT_TYPE = createObjectType({
 		documentCount: { type: nonNull(GraphQLInt) },
 		interfaces: { type: list(GraphQLString)},
 		language: { type: GraphQLString },
-		schema: { type: GraphQLString }
+		schemaId: { type: GraphQLString }
 	}
 }); // COLLECTION_OBJECT_TYPE
+
+
+export const fieldCollectionsReindex = {
+	args: {
+		collectionIds: list(GraphQLString)
+	},
+	resolve({
+		args: {
+			collectionIds = []
+		} = {}
+	}) {
+		const readConnection = connect({ principals: [PRINCIPAL_EXPLORER_READ] });
+		forceArray(collectionIds).forEach((collectionId) => {
+			const collectionNode = readConnection.get(collectionId);
+			if (!collectionNode) {
+				throw new Error(`No collection with id:${collectionId}!`);
+			}
+			const {
+				_name,
+				schemaId
+			} = collectionNode;
+			if(!schemaId) {
+				log.warning(`Collection _id:${collectionId} _name:${_name} has no schema!`);
+			} else { // has schema
+				//getSchema({_id:schemaId})
+			} // end of else has schema
+		}); // collectionIds.forEach
+	}/*,
+	type:*/
+}; // fieldCollectionsReindex
 
 
 export const queryCollectionsResolver = ({
@@ -121,7 +156,7 @@ export const queryCollectionsResolver = ({
 		cron, // TODO remove in app-explorer-2.0.0
 		doCollect, // TODO remove in app-explorer-2.0.0
 		language = '',
-		schema//,
+		schemaId//,
 		//type
 	}) => ({
 		_id,
@@ -135,7 +170,7 @@ export const queryCollectionsResolver = ({
 		documentCount: getDocumentCount(_name),
 		interfaces: usedInInterfaces({connection, name: _name}),
 		language,
-		schema//,
+		schemaId//,
 		//type
 	}));
 	//log.info(`mapped collectionsRes:${toStr(collectionsRes)}`);

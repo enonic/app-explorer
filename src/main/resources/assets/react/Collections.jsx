@@ -36,7 +36,7 @@ const COLLECTIONS_GQL = `queryCollections(
 		documentCount
 		interfaces
 		language
-		schema
+		schemaId
 		#type
 	}
 }`;
@@ -346,7 +346,7 @@ export function Collections(props) {
 						documentCount,
 						interfaces,
 						language = '',
-						schema = ''
+						schemaId = ''
 					}, index) => {
 						const key = `collection[${index}]`;
 						const boolCollectorSelected = !!(collector && collector.name);
@@ -372,7 +372,7 @@ export function Collections(props) {
 									cron,
 									doCollect,
 									language,
-									schema
+									schemaId
 								}}
 								fields={fieldsObj}
 								locales={locales}
@@ -395,7 +395,7 @@ export function Collections(props) {
 							<Table.Cell collapsing>{collector && collector.name || ''}</Table.Cell>
 							<Table.Cell collapsing>{documentCount}</Table.Cell>
 							<Table.Cell collapsing>{language}</Table.Cell>
-							<Table.Cell collapsing>{schema}</Table.Cell>
+							<Table.Cell collapsing>{schemaId}</Table.Cell>
 							<Table.Cell collapsing>{interfaces.map((iface, i) => <p key={i}>
 								{i === 0 ? null : <br/>}
 								<span style={{whitespace: 'nowrap'}}>{iface}</span>
