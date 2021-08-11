@@ -36,6 +36,7 @@ const COLLECTIONS_GQL = `queryCollections(
 		documentCount
 		interfaces
 		language
+		schema
 		#type
 	}
 }`;
@@ -65,24 +66,13 @@ const FIELDS_GQL = `queryFields {
 		#_nodeType
 		#_path
 		#denyDelete
-		#denyValues
+		#deny
 		#displayName
 		#indexConfig
 		#inResults
 		#fieldType
 		key
 		#type
-		values {
-			#_id
-			_name
-			#_nodeType
-			#_path
-			displayName
-			#field
-			#fieldReference
-			#type
-			value
-		}
 	}
 }`;
 
@@ -166,29 +156,14 @@ export function Collections(props) {
 	const fieldsObj = {};
 	queryFieldsGraph.hits ? queryFieldsGraph.hits.forEach(({
 		//displayName: fieldLabel,
-		key,
-		values
+		key
 	}) => {
-		const valuesObj = {};
-		//const mappedValues =
-		values ? values.forEach(({_name, displayName: valueLabel, value}) => {
-			const valueKey = value || _name;
-			valuesObj[valueKey] = {
-				label: valueLabel
-			};
-			/*return {
-				key: value,
-				label: displayName
-			};*/
-		}) : [];
 		fieldsObj[key] = {
-			label: key, //fieldLabel,
-			values: valuesObj
+			label: key
 		};
 		/*return {
 			key,
-			label: displayName,
-			values: mappedValues
+			label: displayName
 		};*/
 	}) : [];
 
@@ -356,6 +331,7 @@ export function Collections(props) {
 						<Table.HeaderCell>Collector</Table.HeaderCell>
 						<Table.HeaderCell>Documents</Table.HeaderCell>
 						<Table.HeaderCell>Language</Table.HeaderCell>
+						<Table.HeaderCell>Schema</Table.HeaderCell>
 						<Table.HeaderCell>Interfaces</Table.HeaderCell>
 						<Table.HeaderCell>Schedule</Table.HeaderCell>
 						<Table.HeaderCell>Actions</Table.HeaderCell>
@@ -369,7 +345,8 @@ export function Collections(props) {
 						collector,
 						documentCount,
 						interfaces,
-						language = ''
+						language = '',
+						schema = ''
 					}, index) => {
 						const key = `collection[${index}]`;
 						const boolCollectorSelected = !!(collector && collector.name);
@@ -394,7 +371,8 @@ export function Collections(props) {
 									collector,
 									cron,
 									doCollect,
-									language
+									language,
+									schema
 								}}
 								fields={fieldsObj}
 								locales={locales}
@@ -417,6 +395,7 @@ export function Collections(props) {
 							<Table.Cell collapsing>{collector && collector.name || ''}</Table.Cell>
 							<Table.Cell collapsing>{documentCount}</Table.Cell>
 							<Table.Cell collapsing>{language}</Table.Cell>
+							<Table.Cell collapsing>{schema}</Table.Cell>
 							<Table.Cell collapsing>{interfaces.map((iface, i) => <p key={i}>
 								{i === 0 ? null : <br/>}
 								<span style={{whitespace: 'nowrap'}}>{iface}</span>

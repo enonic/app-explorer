@@ -34,7 +34,7 @@ export function Schema({
 }) {
 	const [schema, setSchema] = React.useState([]);
 
-	function fetchSchema() {
+	function querySchema() {
 		fetch(`${servicesBaseUrl}/graphQL`, {
 			method: 'POST',
 			headers: {
@@ -49,10 +49,10 @@ export function Schema({
 				//console.debug('data', data);
 				setSchema(data.data.querySchema.hits);
 			});
-	} // fetchSchema
+	} // querySchema
 
 	React.useEffect(() => {
-		fetchSchema();
+		querySchema();
 	}, []);
 
 	//console.debug('schema', schema);
@@ -80,7 +80,7 @@ export function Schema({
 						<Table.Cell collapsing><NewOrEditSchemaModal
 							_id={_id}
 							_name={_name}
-							afterClose={() => fetchSchema()}
+							afterClose={() => querySchema()}
 							servicesBaseUrl={servicesBaseUrl}
 						/></Table.Cell>
 						<Table.Cell collapsing>{_name}</Table.Cell>
@@ -128,7 +128,7 @@ export function Schema({
 								<DeleteSchemaModal
 									_id={_id}
 									_name={_name}
-									afterClose={() => fetchSchema()}
+									afterClose={() => querySchema()}
 									servicesBaseUrl={servicesBaseUrl}
 								/>
 							</Button.Group>
@@ -138,7 +138,7 @@ export function Schema({
 			</Table.Body>
 		</Table>
 		<NewOrEditSchemaModal
-			afterClose={() => fetchSchema()}
+			afterClose={() => querySchema()}
 			servicesBaseUrl={servicesBaseUrl}
 		/>
 	</>;

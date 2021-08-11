@@ -68,7 +68,8 @@ const COLLECTION_OBJECT_TYPE = createObjectType({
 
 		documentCount: { type: nonNull(GraphQLInt) },
 		interfaces: { type: list(GraphQLString)},
-		language: { type: GraphQLString }
+		language: { type: GraphQLString },
+		schema: { type: GraphQLString }
 	}
 }); // COLLECTION_OBJECT_TYPE
 
@@ -119,7 +120,8 @@ export const queryCollectionsResolver = ({
 		collector,
 		cron, // TODO remove in app-explorer-2.0.0
 		doCollect, // TODO remove in app-explorer-2.0.0
-		language = ''//,
+		language = '',
+		schema//,
 		//type
 	}) => ({
 		_id,
@@ -132,7 +134,8 @@ export const queryCollectionsResolver = ({
 		doCollect, // TODO remove in app-explorer-2.0.0
 		documentCount: getDocumentCount(_name),
 		interfaces: usedInInterfaces({connection, name: _name}),
-		language//,
+		language,
+		schema//,
 		//type
 	}));
 	//log.info(`mapped collectionsRes:${toStr(collectionsRes)}`);
@@ -140,7 +143,7 @@ export const queryCollectionsResolver = ({
 }; // queryCollectionsResolver
 
 
-export const queryCollections = {
+export const fieldCollectionsQuery = {
 	args: {
 		count: GraphQLInt,
 		page: GraphQLInt,
@@ -165,37 +168,4 @@ export const queryCollections = {
 			hits: { type: list(COLLECTION_OBJECT_TYPE) }
 		} // fields
 	})
-}; // queryCollections
-
-/* Example query
-{
-	queryCollections(
-		count: -1
-		page: 1
-		perPage: 1
-		sort: "_name ASC"
-	) {
-		total
-		count
-		page
-		pageStart
-		pageEnd
-		pagesTotal
-		hits {
-			_id
-			_name
-			_nodeType
-			_path
-			#collecting
-			collector {
-				name
-				configJson
-			}
-			documentCount
-			interfaces
-			language
-			#type
-		}
-	}
-}
-*/
+}; // fieldCollectionsQuery

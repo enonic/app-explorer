@@ -11,6 +11,7 @@ import {CollectorOptions} from './collection/CollectorOptions';
 import {CollectorSelector} from './collection/CollectorSelector';
 import {LanguageDropdown} from './collection/LanguageDropdown';
 import {SchedulingSegment} from './collection/SchedulingSegment';
+import {SchemaSelector} from './collection/SchemaSelector';
 
 
 function isSane(value) {
@@ -111,6 +112,9 @@ export function Collection(props) {
 			<Header as='h2' dividing content='Collector'/>
 			<CollectorSelector
 				options={collectorOptions}
+			/>
+			<SchemaSelector
+				servicesBaseUrl={servicesBaseUrl}
 			/>
 		</Segment>
 		<CollectorOptions

@@ -15,7 +15,7 @@ export function CollectorSelector(props) {
 		name = 'name',
 		parentPath = 'collector',
 		path = parentPath ? `${parentPath}.${name}` : name,
-		placeholder = 'Please select a collector',
+		placeholder = 'none',
 		value = getIn(context.values, path),
 		...rest
 	} = props;
@@ -23,6 +23,7 @@ export function CollectorSelector(props) {
 
 	return <SemanticUiReactDropdown
 		{...rest}
+		clearable
 		fluid
 		onChange={(ignoredEvent,{value: newName}) => {
 			//console.debug('CollectorSelector newName', newName);

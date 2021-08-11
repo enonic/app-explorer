@@ -12,7 +12,9 @@ import {getLicense} from './license';
 import {getSites} from './site';
 import {getLocales} from './i18n';
 import {queryApiKeys} from './apiKey';
-import {queryCollections} from './collection';
+import {
+	fieldCollectionsQuery
+} from './collection';
 import {queryCollectors} from './collector';
 import {queryFields} from './field';
 import {queryInterfaces} from './interface';
@@ -54,7 +56,7 @@ export const SCHEMA = createSchema({
 			getSites,
 			listScheduledJobs,
 			queryApiKeys,
-			queryCollections,
+			queryCollections: fieldCollectionsQuery,
 			queryCollectors,
 			queryFields,
 			queryInterfaces,
