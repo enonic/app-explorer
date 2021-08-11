@@ -20,7 +20,10 @@ import {queryJournals} from './journal';
 import {listScheduledJobs} from './scheduler';
 import {
 	fieldSchemaCreate,
-	fieldSchemaQuery
+	fieldSchemaDelete,
+	fieldSchemaGet,
+	fieldSchemaQuery,
+	fieldSchemaUpdate
 } from './schema';
 import {queryStopWords} from './stopWord';
 import {querySynonyms, queryThesauri} from './thesaurus';
@@ -36,7 +39,9 @@ export const SCHEMA = createSchema({
 	mutation: createObjectType({
 		name: 'Mutation',
 		fields: {
-			createSchema: fieldSchemaCreate
+			createSchema: fieldSchemaCreate,
+			deleteSchema: fieldSchemaDelete,
+			updateSchema: fieldSchemaUpdate
 		}
 	}), // mutation
 	query: createObjectType({
@@ -45,6 +50,7 @@ export const SCHEMA = createSchema({
 			getContentTypes,
 			getLicense,
 			getLocales,
+			getSchema: fieldSchemaGet,
 			getSites,
 			listScheduledJobs,
 			queryApiKeys,

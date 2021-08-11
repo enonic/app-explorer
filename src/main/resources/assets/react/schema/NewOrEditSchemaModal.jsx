@@ -5,6 +5,7 @@ import {NewOrEditSchema} from './NewOrEditSchema';
 export function NewOrEditSchemaModal({
 	afterClose = () => {/*no-op*/},
 	_id, // optional
+	_name, // optional
 	servicesBaseUrl
 }) {
 	// TODO get name from id
@@ -14,7 +15,7 @@ export function NewOrEditSchemaModal({
 		afterClose();
 	};
 
-	const header = _id ? `Edit schema ${_id}`: 'New schema';
+	const header = _name ? `Edit schema ${_name}`: 'New schema';
 	return <Modal
 		closeIcon
 		onClose={doClose}
@@ -44,7 +45,7 @@ export function NewOrEditSchemaModal({
 		<Modal.Header>{header}</Modal.Header>
 		<Modal.Content>
 			<NewOrEditSchema
-				id={_id}
+				_id={_id}
 				doClose={doClose}
 				servicesBaseUrl={servicesBaseUrl}
 			/>

@@ -24,6 +24,7 @@ import {connect} from '/lib/explorer/repo/connect';
 import {hasValue} from '/lib/explorer/query/hasValue';
 
 import {
+	GraphQLBoolean,
 	GraphQLInt,
 	GraphQLString,
 	newSchemaGenerator,
@@ -54,14 +55,24 @@ const ENUM_VALUE_TYPES = createEnumType({
 	]
 });
 
+const TYPE_ID = nonNull(GraphQLString);
 const TYPE_NAME = nonNull(GraphQLString);
 
 const FIELDS_PROPERTY = {
+	enabled: { type: nonNull(GraphQLBoolean) },
+	fulltext: { type: nonNull(GraphQLBoolean) },
+	includeInAllText: { type: nonNull(GraphQLBoolean) },
 	max: { type: nonNull(GraphQLInt) },
 	min: { type: nonNull(GraphQLInt) },
+	ngram: { type: nonNull(GraphQLBoolean) },
 	name: { type: TYPE_NAME },
 	valueType: { type: nonNull(ENUM_VALUE_TYPES) }
 };
+
+const INPUT_TYPE_SCHEMA_PROPERTIES = createInputObjectType({
+	name: 'InputSchemaProperties',
+	fields: FIELDS_PROPERTY
+});
 
 const TYPE_SCHEMA_PROPERTIES = createObjectType({
 	name: 'SchemaProperties',
@@ -71,9 +82,8 @@ const TYPE_SCHEMA_PROPERTIES = createObjectType({
 const TYPE_SCHEMA = createObjectType({
 	name: 'Schema',
 	fields: {
-		_id: { type: nonNull(GraphQLString) },
+		_id: { type: TYPE_ID },
 		_name: { type: TYPE_NAME },
-		//_nodeType: { type: nonNull(GraphQLString) },
 		_path: { type: nonNull(GraphQLString) },
 		properties: { type: list(TYPE_SCHEMA_PROPERTIES)}
 	}
@@ -86,28 +96,22 @@ const PATH_SCHEMA_FOLDER = `/${NAME_SCHEMA_FOLDER}`;
 
 export const fieldSchemaCreate = {
 	args: {
-		_name: nonNull(GraphQLString),
-		properties: list(createInputObjectType({
-			name: 'InputSchemaProperties',
-			fields: FIELDS_PROPERTY
-		}))
+		_name: TYPE_NAME,
+		properties: list(INPUT_TYPE_SCHEMA_PROPERTIES)
 	},
-	resolve(env) {
-		//log.debug(`env:${toStr(env)}`);
-		const {
+	resolve({
+		args: {
 			_name,
 			properties = []
-		} = env.args;
-		//log.debug(`_name:${toStr(_name)}`);
+		}
+	}) {
 		const writeConnection = connect({ principals: [PRINCIPAL_EXPLORER_WRITE] });
-
 		if (!writeConnection.exists(PATH_SCHEMA_FOLDER)) {
 			writeConnection.create({
 				_name: NAME_SCHEMA_FOLDER,
 				_nodeType: NT_FOLDER
 			});
 		}
-
 		const _parentPath = `/${NAME_SCHEMA_FOLDER}`;
 		const _path = `${_parentPath}/${_name}`;
 		if (writeConnection.exists(_path)) {
@@ -117,11 +121,12 @@ export const fieldSchemaCreate = {
 			_name,
 			_nodeType: NT_SCHEMA,
 			_parentPath,
-			properties // No point in forceArray, since Enonic will "destroy" on store.
+
+			// No point in forceArray, since Enonic will "destroy" on store,
+			// but we're using forceArray so sort don't throw...
+			properties: forceArray(properties).sort((a, b) => (a.name > b.name) ? 1 : -1)
 		};
-		//log.debug(`nodeToBeCreated:${toStr(nodeToBeCreated)}`);
 		const createdNode = writeConnection.create(nodeToBeCreated);
-		//log.debug(`createdNode:${toStr(createdNode)}`);
 		return {
 			_id: createdNode._id,
 			_name: createdNode._name,
@@ -131,6 +136,57 @@ export const fieldSchemaCreate = {
 	}, // resolve
 	type: TYPE_SCHEMA
 }; // fieldSchemaCreate
+
+
+export const fieldSchemaDelete = {
+	args: {
+		_id: TYPE_ID
+	},
+	resolve({
+		args: {
+			_id
+		}
+	}) {
+		const writeConnection = connect({ principals: [PRINCIPAL_EXPLORER_WRITE] });
+		const array = writeConnection.delete(_id);
+		if (!array.length === 1 ) {
+			throw new Error(`Something went wrong while trying to delete schema with id:${_id}!`);
+		}
+		return {
+			_id: array[0]
+		};
+	},
+	type: createObjectType({
+		name: 'DeletedSchema',
+		fields: {
+			_id: { type: TYPE_ID }
+		}
+	})
+}; // fieldSchemaDelete
+
+
+export const fieldSchemaGet = {
+	args: {
+		_id: nonNull(GraphQLString)
+	},
+	resolve: ({args: {
+		_id
+	}}) => {
+		const readConnection = connect({ principals: [PRINCIPAL_EXPLORER_READ] });
+		const {
+			_name,
+			_path,
+			properties
+		} = readConnection.get(_id);
+		return {
+			_id,
+			_name,
+			_path,
+			properties: forceArray(properties).sort((a, b) => (a.name > b.name) ? 1 : -1)
+		};
+	},
+	type: TYPE_SCHEMA
+}; // fieldSchemaGet
 
 
 export const fieldSchemaQuery = {
@@ -166,3 +222,50 @@ export const fieldSchemaQuery = {
 		}
 	}) // type
 }; // fieldSchemaQuery
+
+
+export const fieldSchemaUpdate = {
+	args: {
+		_id: TYPE_ID,
+		_name: TYPE_NAME,
+		properties: list(INPUT_TYPE_SCHEMA_PROPERTIES)
+	},
+	resolve({
+		args: {
+			_id,
+			_name,
+			properties = []
+		}
+	}) {
+		const writeConnection = connect({ principals: [PRINCIPAL_EXPLORER_WRITE] });
+		const oldNode = writeConnection.get(_id);
+		if (!oldNode) {
+			throw new Error(`Could not find schema with id:${_id}!`);
+		}
+		const {
+			_name: oldName
+		} = oldNode;
+		if (_name !== oldName) {
+			writeConnection.move({
+				source: _id, // Path or id of the node to be moved or renamed
+				// New path or name for the node. If the target ends in slash '/',
+				// it specifies the parent path where to be moved.
+				// Otherwise it means the new desired path or name for the node.
+				target: _name
+			}); // NOTE: Will throw Node already exists :)
+			writeConnection.refresh();
+		}
+		const updatedNode = writeConnection.modify({
+			key: _id,
+			editor: (schemaNode) => {
+				// No point in forceArray, since Enonic will "destroy" on store,
+				// but we're using forceArray so sort don't throw...
+				schemaNode.properties = forceArray(properties).sort((a, b) => (a.name > b.name) ? 1 : -1);
+				return schemaNode;
+			}
+		});
+		writeConnection.refresh();
+		return updatedNode;
+	},
+	type: TYPE_SCHEMA
+}; // fieldSchemaUpdate

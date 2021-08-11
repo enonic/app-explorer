@@ -77,10 +77,10 @@ export function NewOrEditModal(props) {
 					fetch(`${servicesBaseUrl}/stopWordsCreateOrUpdate?mode=${editMode ? 'update' : 'create'}&name=${submittedName}&displayName=${submittedDisplayName}&${submittedWords.map(w => `words=${w}`).join('&')}`, {
 						method: 'POST'
 					})
-						.then(response => {
+						.then((/*response*/) => {
 							onClose();
 							//if (response.status === 200) {}
-						})
+						});
 				}}
 			>
 				<Form as='div'>
@@ -172,10 +172,10 @@ export function NewOrEditModal(props) {
 											index={wordsArray.length}
 											value={''}
 										/>}/>
-										<Popup
-											content='Sort'
-											inverted
-											trigger={<SortButton path='words'/>}/>
+									<Popup
+										content='Sort'
+										inverted
+										trigger={<SortButton path='words'/>}/>
 								</>;
 							}}
 						/>
