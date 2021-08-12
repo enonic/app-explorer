@@ -228,6 +228,7 @@ search(
 * Schema features
   * Support multiple Schemas
   * Each collection must have a schema
+  * IN PROGRESS: Support reindex (manually and when schema changes)
 * Remove field values
 * Add api/v1/interface/{interfaceName} GraphQL endpoint with search function
   * Support ApiKey via Authorization HTTP_HEADER

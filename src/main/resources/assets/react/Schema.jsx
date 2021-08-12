@@ -45,9 +45,9 @@ export function Schema({
 			})
 		})
 			.then(response => response.json())
-			.then(data => {
-				//console.debug('data', data);
-				setSchema(data.data.querySchema.hits);
+			.then(json => {
+				//console.debug('json', json);
+				setSchema(json.data.querySchema.hits);
 			});
 	} // querySchema
 

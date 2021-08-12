@@ -168,6 +168,7 @@ const SS_FILES = [
 	'services/uploadLicense/uploadLicense',
 	'services/ws/ws',
 	'tasks/init/init',
+	'tasks/reindexCollection/reindexCollection',
 	'tasks/webcrawl/webcrawl',
 	'webapp/webapp'
 ];

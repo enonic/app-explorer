@@ -98,6 +98,13 @@ const LOCALES_GQL = `getLocales {
 	#variant
 }`;
 
+const GQL_SCHEMA_QUERY = `querySchema {
+	hits {
+		_id
+		_name
+	}
+}`;
+
 const TASKS_GQL = `queryTasks {
 	application
 	description
@@ -124,6 +131,7 @@ const MOUNT_GQL = `{
 	${FIELDS_GQL}
 	${JOBS_GQL}
 	${LOCALES_GQL}
+	${GQL_SCHEMA_QUERY}
 	${TASKS_GQL}
 }`;
 
@@ -132,6 +140,7 @@ const UPDATE_GQL = `{
 	${COLLECTORS_GQL}
 	${FIELDS_GQL}
 	${JOBS_GQL}
+	${GQL_SCHEMA_QUERY}
 	${TASKS_GQL}
 }`;
 
@@ -148,6 +157,7 @@ export function Collections(props) {
 	const [locales, setLocales] = React.useState([]);
 	const [queryCollectionsGraph, setQueryCollectionsGraph] = React.useState({});
 	const [queryCollectorsGraph, setQueryCollectorsGraph] = React.useState({});
+	const [schema, setSchema] = React.useState([]);
 	const [jobsObj, setJobsObj] = React.useState({});
 	const [tasks, setTasks] = React.useState([]);
 	const [boolPoll, setBoolPoll] = React.useState(true);
@@ -255,6 +265,7 @@ export function Collections(props) {
 					setQueryCollectorsGraph(res.data.queryCollectors);
 					setQueryFieldsGraph(res.data.queryFields);
 					setJobsObjFromArr(res.data.listScheduledJobs);
+					setSchema(res.data.querySchema.hits);
 					setTasks(res.data.queryTasks);
 				} // if
 			}); // then
@@ -273,6 +284,7 @@ export function Collections(props) {
 					setQueryCollectorsGraph(res.data.queryCollectors);
 					setQueryFieldsGraph(res.data.queryFields);
 					setJobsObjFromArr(res.data.listScheduledJobs);
+					setSchema(res.data.querySchema.hits);
 					setTasks(res.data.queryTasks);
 				}
 			});
@@ -314,6 +326,11 @@ export function Collections(props) {
 			fetchOnUpdate();
 		}
 	}, 2500);
+
+	const shemaIdToName = {};
+	schema.forEach(({_id, _name}) => {
+		shemaIdToName[_id] = _name;
+	});
 
 	return <>
 		<Header as='h1'>Collections</Header>
@@ -395,7 +412,7 @@ export function Collections(props) {
 							<Table.Cell collapsing>{collector && collector.name || ''}</Table.Cell>
 							<Table.Cell collapsing>{documentCount}</Table.Cell>
 							<Table.Cell collapsing>{language}</Table.Cell>
-							<Table.Cell collapsing>{schemaId}</Table.Cell>
+							<Table.Cell collapsing>{shemaIdToName[schemaId]}</Table.Cell>
 							<Table.Cell collapsing>{interfaces.map((iface, i) => <p key={i}>
 								{i === 0 ? null : <br/>}
 								<span style={{whitespace: 'nowrap'}}>{iface}</span>

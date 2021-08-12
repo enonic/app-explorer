@@ -44,8 +44,8 @@ export const SCHEMA = createSchema({
 		fields: {
 			createSchema: fieldSchemaCreate,
 			deleteSchema: fieldSchemaDelete,
-			updateSchema: fieldSchemaUpdate/*,
-			reindexCollections: fieldCollectionsReindex*/
+			updateSchema: fieldSchemaUpdate,
+			reindexCollections: fieldCollectionsReindex
 		}
 	}), // mutation
 	query: createObjectType({
