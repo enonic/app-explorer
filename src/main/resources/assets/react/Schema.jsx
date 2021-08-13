@@ -7,6 +7,7 @@ import {
 
 import {NewOrEditSchemaModal} from './schema/NewOrEditSchemaModal';
 import {DeleteSchemaModal} from './schema/DeleteSchemaModal';
+import {useInterval} from './utils/useInterval';
 
 
 const GQL_SCHEMA_QUERY = `{
@@ -32,6 +33,7 @@ const GQL_SCHEMA_QUERY = `{
 export function Schema({
 	servicesBaseUrl
 }) {
+	const [boolPoll, setBoolPoll] = React.useState(true);
 	const [schema, setSchema] = React.useState([]);
 
 	function querySchema() {
@@ -54,6 +56,13 @@ export function Schema({
 	React.useEffect(() => {
 		querySchema();
 	}, []);
+
+	useInterval(() => {
+		// This will continue to run as long as the Collections "tab" is open
+		if (boolPoll) {
+			querySchema();
+		}
+	}, 2500);
 
 	//console.debug('schema', schema);
 
@@ -80,7 +89,13 @@ export function Schema({
 						<Table.Cell collapsing><NewOrEditSchemaModal
 							_id={_id}
 							_name={_name}
-							afterClose={() => querySchema()}
+							afterClose={() => {
+								querySchema();
+								setBoolPoll(true);
+							}}
+							onOpen={() => {
+								setBoolPoll(false);
+							}}
 							servicesBaseUrl={servicesBaseUrl}
 						/></Table.Cell>
 						<Table.Cell collapsing>{_name}</Table.Cell>
@@ -128,7 +143,13 @@ export function Schema({
 								<DeleteSchemaModal
 									_id={_id}
 									_name={_name}
-									afterClose={() => querySchema()}
+									afterClose={() => {
+										querySchema();
+										setBoolPoll(true);
+									}}
+									onOpen={() => {
+										setBoolPoll(false);
+									}}
 									servicesBaseUrl={servicesBaseUrl}
 								/>
 							</Button.Group>
@@ -138,7 +159,13 @@ export function Schema({
 			</Table.Body>
 		</Table>
 		<NewOrEditSchemaModal
-			afterClose={() => querySchema()}
+			afterClose={() => {
+				querySchema();
+				setBoolPoll(true);
+			}}
+			onOpen={() => {
+				setBoolPoll(false);
+			}}
 			servicesBaseUrl={servicesBaseUrl}
 		/>
 	</>;

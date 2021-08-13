@@ -3,9 +3,10 @@ import {Button, Icon, Modal, Popup} from 'semantic-ui-react';
 import {NewOrEditSchema} from './NewOrEditSchema';
 
 export function NewOrEditSchemaModal({
-	afterClose = () => {/*no-op*/},
 	_id, // optional
 	_name, // optional
+	afterClose = () => {/*no-op*/},
+	onOpen = () => {},
 	servicesBaseUrl
 }) {
 	// TODO get name from id
@@ -19,6 +20,7 @@ export function NewOrEditSchemaModal({
 	return <Modal
 		closeIcon
 		onClose={doClose}
+		onOpen={onOpen}
 		open={open}
 		size='large'
 		trigger={<Popup

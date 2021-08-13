@@ -13,6 +13,7 @@ export function DeleteSchemaModal({
 	_name,
 	afterClose = () => {},
 	disabled = false,
+	onOpen = () => {},
 	servicesBaseUrl
 }) {
 	const [open, setOpen] = React.useState(false);
@@ -24,6 +25,7 @@ export function DeleteSchemaModal({
 			setOpen(false);
 			afterClose();
 		}}
+		onOpen={onOpen}
 		open={open}
 		trigger={<Button
 			compact

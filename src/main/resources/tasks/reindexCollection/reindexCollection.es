@@ -103,6 +103,7 @@ export function run({
 		if (!documentsRes.total) {
 			return;
 		}
+		const stemmingLanguage = language ? javaLocaleToSupportedLanguage(language) : '';
 		progress.addItems(documentsRes.total);
 		documentsRes.hits.forEach(({id: documentId}) => {
 			infoObj.message = `Reindexing document with id:${documentId}`;
@@ -130,7 +131,6 @@ export function run({
 				}
 			}); // updateIndexConfig
 
-			const stemmingLanguage = language ? javaLocaleToSupportedLanguage(language) : '';
 			documentNode.document_metadata.stemmingLanguage = stemmingLanguage; // Can be ''
 			documentNode._indexConfig = updateIndexConfig({
 				_indexConfig: documentNode._indexConfig,

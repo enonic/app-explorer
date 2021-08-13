@@ -30,7 +30,9 @@ import {
 } from './schema';
 import {queryStopWords} from './stopWord';
 import {querySynonyms, queryThesauri} from './thesaurus';
-import {queryTasks} from './task';
+import {
+	fieldTaskQuery
+} from './task';
 
 const {
 	createObjectType,
@@ -67,7 +69,7 @@ export const SCHEMA = createSchema({
 			querySynonyms,
 			querySchema: fieldSchemaQuery,
 			queryThesauri,
-			queryTasks
+			queryTasks: fieldTaskQuery
 		} // fields
 	}) // query
 }); // SCHEMA

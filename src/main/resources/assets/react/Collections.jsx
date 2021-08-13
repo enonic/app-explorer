@@ -15,6 +15,19 @@ import {NewOrEditCollectionModal} from './collection/NewOrEditCollectionModal';
 import {useInterval} from './utils/useInterval';
 import {Cron} from './utils/Cron';
 
+
+const GQL_MUTATION_COLLECTIONS_REINDEX = `mutation ReindexMutation(
+  $collectionIds: [String]!
+) {
+  reindexCollections(collectionIds: $collectionIds) {
+    collectionId
+    collectionName
+    message
+    schemaId
+    taskId
+  }
+}`;
+
 const COLLECTIONS_GQL = `queryCollections(
 	count: -1
 ) {
@@ -102,6 +115,31 @@ const GQL_SCHEMA_QUERY = `querySchema {
 	hits {
 		_id
 		_name
+	}
+}`;
+
+const GQL_QUERY_TASKS_GET = `query GetTasks(
+  $descriptor: String,
+  $onlyRegisteredCollectorTasks: Boolean,
+  $state: String
+) {
+	queryTasks(
+		name: $descriptor
+		onlyRegisteredCollectorTasks: $onlyRegisteredCollectorTasks
+		state: $state
+	) {
+		application
+		description
+		id
+		name
+		progress {
+			current
+			info
+			total
+		}
+		startTime
+		state
+		user
 	}
 }`;
 
@@ -356,7 +394,7 @@ export function Collections(props) {
 				</Table.Header>
 				<Table.Body>
 					{queryCollectionsGraph.hits && queryCollectionsGraph.hits.map(({
-						_id,
+						_id: collectionId,
 						_name,
 						_path,
 						collector,
@@ -382,7 +420,7 @@ export function Collections(props) {
 								contentTypeOptions={contentTypeOptions}
 								disabled={!editEnabled}
 								initialValues={{
-									_id,
+									_id: collectionId,
 									_name,
 									_path,
 									collector,
@@ -434,6 +472,28 @@ export function Collections(props) {
 							}</Table.Cell>
 							<Table.Cell collapsing>
 								<Button.Group>
+									<Button
+										icon
+										onClick={() => {
+											//
+											fetch(`${servicesBaseUrl}/graphQL`, {
+												method: 'POST',
+												headers: { 'Content-Type': 'application/json' },
+												body: JSON.stringify({
+													query: GQL_MUTATION_COLLECTIONS_REINDEX,
+													variables: {
+														collectionIds: [collectionId]
+													}
+												})
+											})
+												.then(res => res.json())
+												.then(res => {
+													log.debug(res);
+												});
+										}}
+									>
+										<Icon color='green' name='recycle'/>
+									</Button>
 									<Popup
 										content={`Duplicate collection ${_name}`}
 										inverted

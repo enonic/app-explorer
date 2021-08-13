@@ -42,7 +42,7 @@ const TASK_OBJECT_TYPE = createObjectType({
 }); // TASK_OBJECT_TYPE
 
 
-export const queryTasks = {
+export const fieldTaskQuery = {
 	args: {
 		name: GraphQLString, // com.enonic.app.explorer:webcrawl
 		onlyRegisteredCollectorTasks: GraphQLBoolean,
@@ -95,15 +95,19 @@ export const queryTasks = {
 		return taskList;
 	},
 	type: list(TASK_OBJECT_TYPE)
-}; // queryTasks
+}; // fieldTaskQuery
 
 
 /* Example query
-{
+query GetTasks(
+  $descriptor: String,
+  $onlyRegisteredCollectorTasks: Boolean,
+  $state: String
+) {
 	queryTasks(
-		name: "com.enonic.app.explorer:webcrawl"
-		onlyRegisteredCollectorTasks: false
-		state: "RUNNING"
+		name: $descriptor
+		onlyRegisteredCollectorTasks: $onlyRegisteredCollectorTasks
+		state: $state
 	) {
 		application
 		description
