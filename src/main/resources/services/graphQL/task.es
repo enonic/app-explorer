@@ -1,4 +1,11 @@
-//import {toStr} from '@enonic/js-utils';
+import {
+	COLON_SIGN,
+	TASK_STATE_FAILED,
+	TASK_STATE_FINISHED,
+	TASK_STATE_RUNNING,
+	TASK_STATE_WAITING/*,
+	toStr*/
+} from '@enonic/js-utils';
 //import getIn from 'get-value';
 
 import {
@@ -14,8 +21,20 @@ import {list as listTasks} from '/lib/xp/task';
 import {queryCollectorsResolver} from './collector';
 
 const {
+	createEnumType,
 	createObjectType
 } = newSchemaGenerator();
+
+
+const ENUM_TASK_STATES = createEnumType({
+	name: 'EnumTaskStates',
+	values: [
+		TASK_STATE_FAILED,
+		TASK_STATE_FINISHED,
+		TASK_STATE_RUNNING,
+		TASK_STATE_WAITING
+	]
+});
 
 
 const TASK_OBJECT_TYPE = createObjectType({
@@ -44,15 +63,17 @@ const TASK_OBJECT_TYPE = createObjectType({
 
 export const fieldTaskQuery = {
 	args: {
+		appName: GraphQLString, // Filter by appName // com.enonic.app.explorer
 		name: GraphQLString, // com.enonic.app.explorer:webcrawl
 		onlyRegisteredCollectorTasks: GraphQLBoolean,
-		state: GraphQLString // WAITING | RUNNING | FINISHED | FAILED
+		state: ENUM_TASK_STATES
 	},
 	resolve: (env) => {
 		//log.info(`env:${toStr(env)}`);
 		const {
+			appName = undefined,
 			name,
-			onlyRegisteredCollectorTasks = true,
+			onlyRegisteredCollectorTasks = false,
 			state
 		} = env.args;
 		//const activeCollections = {};
@@ -92,6 +113,10 @@ export const fieldTaskQuery = {
 			//log.info(`filtered taskList:${toStr(taskList)}`);
 		} // if onlyRegisteredCollectorTasks
 
+		if(appName) {
+			taskList = taskList.filter(({name}) => name.startsWith(`${appName}${COLON_SIGN}`));
+		}
+
 		return taskList;
 	},
 	type: list(TASK_OBJECT_TYPE)
@@ -115,7 +140,7 @@ query GetTasks(
 		name
 		progress {
 			current
-			info
+			info # Can be JSON
 			total
 		}
 		startTime

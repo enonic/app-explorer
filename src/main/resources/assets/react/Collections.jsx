@@ -1,4 +1,9 @@
 import {
+	COLON_SIGN,
+	TASK_STATE_FAILED,
+	TASK_STATE_FINISHED,
+	TASK_STATE_RUNNING,
+	TASK_STATE_WAITING,
 	lpad,
 	rpad
 } from '@enonic/js-utils';
@@ -118,12 +123,14 @@ const GQL_SCHEMA_QUERY = `querySchema {
 	}
 }`;
 
-const GQL_QUERY_TASKS_GET = `query GetTasks(
+/*const GQL_QUERY_TASKS_GET = `query GetTasks(
+  $appName: String
   $descriptor: String,
   $onlyRegisteredCollectorTasks: Boolean,
-  $state: String
+  $state: EnumTaskStates
 ) {
 	queryTasks(
+		appName: $appName
 		name: $descriptor
 		onlyRegisteredCollectorTasks: $onlyRegisteredCollectorTasks
 		state: $state
@@ -134,14 +141,14 @@ const GQL_QUERY_TASKS_GET = `query GetTasks(
 		name
 		progress {
 			current
-			info
+			info # Can be JSON
 			total
 		}
 		startTime
 		state
 		user
 	}
-}`;
+}`;*/
 
 const TASKS_GQL = `queryTasks {
 	application
@@ -150,7 +157,7 @@ const TASKS_GQL = `queryTasks {
 	name
 	progress {
 		current
-		info
+		info # Can be JSON
 		total
 	}
 	startTime
@@ -215,38 +222,60 @@ export function Collections(props) {
 		};*/
 	}) : [];
 
-	const collectionsTaskState = {};
-	let anyTaskWithoutCollectionName = false;
-	tasks.forEach(({
-		progress: {info},
-		state // WAITING | RUNNING | FINISHED | FAILED
-	}) => {
-		try {
-			const {name} = JSON.parse(info);
-			if (name) {
-				collectionsTaskState[name] = state;
-			} else {
-				anyTaskWithoutCollectionName = true;
-			}
-		} catch (e) {
-			anyTaskWithoutCollectionName = true;
-		}
-	});
-
-	const intInitializedCollectorComponents = Object.keys(collectorComponents).length;
-
+	const collectorsObj = {};
 	let collectorOptions = queryCollectorsGraph.hits
 		? queryCollectorsGraph.hits.map(({
 			appName,
 			collectTaskName,
 			//_name: key,
 			displayName: text
-		}) => ({
-			key: `${appName}:${collectTaskName}`,
-			text,
-			value: `${appName}:${collectTaskName}`
-		}))
+		}) => {
+			collectorsObj[`${appName}:${collectTaskName}`] = true;
+			return {
+				key: `${appName}:${collectTaskName}`,
+				text,
+				value: `${appName}:${collectTaskName}`
+			};
+		})
 		: [];
+
+	const collectionsTaskState = {};
+	let anyTaskWithoutCollectionName = false;
+	const objCollectionsBeingReindexed = {};
+	let anyReindexTaskWithoutCollectionId = false;
+	tasks.forEach(({
+		name: taskDescriptor,
+		progress: {info},
+		state // WAITING | RUNNING | FINISHED | FAILED
+	}) => {
+		if (collectorsObj[taskDescriptor]) { // This is a collector task
+			try {
+				const {name} = JSON.parse(info);
+				if (name) {
+					collectionsTaskState[name] = state;
+				} else {
+					anyTaskWithoutCollectionName = true;
+				}
+			} catch (e) {
+				anyTaskWithoutCollectionName = true;
+			}
+		} else if (taskDescriptor === `com.enonic.app.explorer${COLON_SIGN}reindexCollection`) {
+			try {
+				const {collectionId} = JSON.parse(info);
+				if (collectionId) {
+					objCollectionsBeingReindexed[collectionId] = state;
+				} else {
+					anyReindexTaskWithoutCollectionId = true;
+				}
+			} catch (e) {
+				anyReindexTaskWithoutCollectionId = true;
+			}
+		} else { // Not collector nor reindex task
+			console.debug('taskDescriptor', taskDescriptor);
+		}
+	});
+
+	const intInitializedCollectorComponents = Object.keys(collectorComponents).length;
 
 	const [state/*, setState*/] = React.useState({
 		column: '_name',
@@ -347,6 +376,7 @@ export function Collections(props) {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ query: `{${TASKS_GQL}}` })
+			//GQL_QUERY_TASKS_GET
 		})
 			.then(res => res.json())
 			.then(res => {
@@ -472,28 +502,51 @@ export function Collections(props) {
 							}</Table.Cell>
 							<Table.Cell collapsing>
 								<Button.Group>
-									<Button
-										icon
-										onClick={() => {
-											//
-											fetch(`${servicesBaseUrl}/graphQL`, {
-												method: 'POST',
-												headers: { 'Content-Type': 'application/json' },
-												body: JSON.stringify({
-													query: GQL_MUTATION_COLLECTIONS_REINDEX,
-													variables: {
-														collectionIds: [collectionId]
-													}
-												})
-											})
-												.then(res => res.json())
-												.then(res => {
-													log.debug(res);
-												});
-										}}
-									>
-										<Icon color='green' name='recycle'/>
-									</Button>
+									{anyReindexTaskWithoutCollectionId
+										? <Popup
+											content={`Some reindex task is starting...`}
+											inverted
+											trigger={<Button disabled={true} icon loading><Icon color='yellow' name='question'/></Button>}/>
+										: <Popup
+											content={
+												objCollectionsBeingReindexed[collectionId]
+												&& [TASK_STATE_RUNNING, TASK_STATE_WAITING].includes(objCollectionsBeingReindexed[collectionId])
+													? `Collection is being reindexed...`
+													: 'Start reindex'
+											}
+											inverted
+											trigger={<Button
+												disabled={
+													objCollectionsBeingReindexed[collectionId]
+													&& [TASK_STATE_RUNNING, TASK_STATE_WAITING].includes(objCollectionsBeingReindexed[collectionId]) }
+												icon
+												onClick={() => {
+													fetch(`${servicesBaseUrl}/graphQL`, {
+														method: 'POST',
+														headers: { 'Content-Type': 'application/json' },
+														body: JSON.stringify({
+															query: GQL_MUTATION_COLLECTIONS_REINDEX,
+															variables: {
+																collectionIds: [collectionId]
+															}
+														})
+													})
+														.then(res => res.json())
+														.then(res => {
+															log.debug(res);
+														});
+												}}
+											>
+												<Icon color={
+													objCollectionsBeingReindexed[collectionId]
+														? objCollectionsBeingReindexed[collectionId] === TASK_STATE_FAILED
+															? 'red'
+															: [TASK_STATE_RUNNING, TASK_STATE_WAITING].includes(objCollectionsBeingReindexed[collectionId])
+																? 'yellow'
+																: 'green' // objCollectionsBeingReindexed[collectionId] === TASK_STATE_FINISHED
+														: 'green'} name='recycle'/>
+											</Button>}/>
+									}
 									<Popup
 										content={`Duplicate collection ${_name}`}
 										inverted

@@ -29,8 +29,19 @@ export function run({
 	collectionJson,
 	schemaJson
 }) {
+	const collection = JSON.parse(collectionJson);
+	//log.info(`collection:${toStr(collection)}`);
+
+	const {
+		_id: collectionId,
+		_name: collectionName,
+		language = ''
+	} = collection;
+	//log.info(`collectionName:${toStr(collectionName)}`);
+
 	const progress = new Progress({
 		info: {
+			collectionId,
 			errors: [],
 			message: 'Reindex task started'
 		},
@@ -38,15 +49,6 @@ export function run({
 	}).report().logInfo();
 	const infoObj = progress.getInfo();
 
-	const collection = JSON.parse(collectionJson);
-	//log.info(`collection:${toStr(collection)}`);
-
-	const {
-		//_id: collectionId,
-		_name: collectionName,
-		language = ''
-	} = collection;
-	//log.info(`collectionName:${toStr(collectionName)}`);
 
 	const schema = JSON.parse(schemaJson);
 	//log.info(`schema:${toStr(schema)}`);
