@@ -11,9 +11,14 @@ import {
 	VALUE_TYPE_SET,
 	VALUE_TYPE_STRING,
 	addQueryFilter,
-	forceArray//,
-	//toStr
+	enonify,
+	forceArray,
+	toStr
 } from '@enonic/js-utils';
+//import {detailedDiff} from 'deep-object-diff';
+import deepEqual from 'fast-deep-equal';
+import HumanDiff from 'human-object-diff';
+
 import {
 	APP_EXPLORER,
 	NT_FOLDER,
@@ -34,12 +39,17 @@ import {
 
 import {getSchema} from './schema/getSchema';
 
+//const Diff = require('diff');
+
 const {
 	createEnumType,
 	createInputObjectType,
 	createObjectType
 } = newSchemaGenerator();
 
+const { diff: diffSchemaProperties } = new HumanDiff({
+	objectName: 'schemaProperties'
+});
 
 const ENUM_VALUE_TYPES = createEnumType({
 	name: 'EnumValueTypes',
@@ -240,26 +250,45 @@ export const fieldSchemaUpdate = {
 			_name: oldName
 		} = oldNode;
 		if (_name !== oldName) {
-			writeConnection.move({
+			//log.debug(`Tyring to move/rename _id:${_id} from oldName:${oldName} to name:${_name}...`);
+			const boolMovedorRenamed = writeConnection.move({
 				source: _id, // Path or id of the node to be moved or renamed
 				// New path or name for the node. If the target ends in slash '/',
 				// it specifies the parent path where to be moved.
 				// Otherwise it means the new desired path or name for the node.
 				target: _name
 			}); // NOTE: Will throw Node already exists :)
-			writeConnection.refresh();
-		}
-		const updatedNode = writeConnection.modify({
-			key: _id,
-			editor: (schemaNode) => {
-				// No point in forceArray, since Enonic will "destroy" on store,
-				// but we're using forceArray so sort don't throw...
-				schemaNode.properties = forceArray(properties).sort((a, b) => (a.name > b.name) ? 1 : -1);
-				return schemaNode;
+			if (boolMovedorRenamed) {
+				log.debug(`Moved/renamed _id:${_id} from oldName:${oldName} to name:${_name}`);
+				writeConnection.refresh();
+			} else {
+				throw new Error(`Something went wrong when trying to mode/rename _id:${_id} from oldName:${oldName} to name:${_name}`);
 			}
-		});
-		writeConnection.refresh();
-		return updatedNode;
+		}
+		// No point in forceArray, since Enonic will "destroy" on store,
+		// but we're using forceArray so sort don't throw...
+		properties = forceArray(properties).sort((a, b) => (a.name > b.name) ? 1 : -1);
+		const enonifiedProperties = enonify(properties);
+		if (!deepEqual(oldNode.properties, enonifiedProperties)) {
+			//log.debug(`Changes detected diff:${toStr(detailedDiff(oldNode.properties, enonifiedProperties))}`); // Too narrow
+			//log.debug(`Changes detected diff:${toStr(Diff.diffJson(oldNode.properties, enonifiedProperties))}`); // Too noisy
+
+			// Pretty good. (can crash on complicated data, perhaps circular structures, which we shouldn't have anyway)
+			log.debug(`Changes detected diff:${toStr(diffSchemaProperties(oldNode.properties, enonifiedProperties))}`);
+
+			const updatedNode = writeConnection.modify({
+				key: _id,
+				editor: (schemaNode) => {
+					schemaNode.properties = properties;
+					return schemaNode;
+				}
+			});
+			writeConnection.refresh();
+			// TODO Start reindex of all collections which uses schema
+			return updatedNode;
+		}
+		log.debug('No changes detected.');
+		return oldNode;
 	},
 	type: TYPE_SCHEMA
 }; // fieldSchemaUpdate
