@@ -223,8 +223,6 @@ search(
 	#curations
 }
 
-* TODO: Make api/v1/documents available again
-* Temporarily removed api/v1/documents
 * Schema features
   * Support multiple Schemas
   * Each collection must have a schema
