@@ -3,6 +3,7 @@ import {Button, Header, Icon, Modal, Popup} from 'semantic-ui-react';
 export function DeleteCollectionModal(props) {
 	const {
 		_name,
+		disabled = false,
 		onClose,
 		onOpen = () => {},
 		servicesBaseUrl
@@ -21,6 +22,7 @@ export function DeleteCollectionModal(props) {
 			content={`Delete collection ${_name}`}
 			inverted
 			trigger={<Button
+				disabled={disabled}
 				icon
 				onClick={() => setState({open: true})}><Icon color='red' name='trash alternate outline'/></Button>}/>}
 	>

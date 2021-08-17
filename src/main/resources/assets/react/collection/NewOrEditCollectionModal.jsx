@@ -9,7 +9,7 @@ export function NewOrEditCollectionModal(props) {
 		collectorComponents,
 		collectorOptions,
 		contentTypeOptions,
-		disabled,
+		disabled = false,
 		fields,
 		initialValues,
 		licenseValid,

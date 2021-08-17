@@ -10,7 +10,7 @@ import {
 
 import {parseExpression as parseCronExpression} from 'cron-parser';
 import {
-	Button, Dimmer, Header, Icon, Loader, Popup, Table
+	Button, Dimmer, Header, Icon, Loader, Popup, Progress, Table
 } from 'semantic-ui-react';
 import {
 	MONTH_TO_HUMAN
@@ -246,7 +246,11 @@ export function Collections(props) {
 	let anyReindexTaskWithoutCollectionId = false;
 	tasks.forEach(({
 		name: taskDescriptor,
-		progress: {info},
+		progress: {
+			current,
+			info,
+			total
+		},
 		state // WAITING | RUNNING | FINISHED | FAILED
 	}) => {
 		if (collectorsObj[taskDescriptor]) { // This is a collector task
@@ -264,7 +268,12 @@ export function Collections(props) {
 			try {
 				const {collectionId} = JSON.parse(info);
 				if (collectionId) {
-					objCollectionsBeingReindexed[collectionId] = state;
+					objCollectionsBeingReindexed[collectionId] = {
+						current,
+						//percent: Math.floor(current / total * 10000)/100, // Keeping two decimals,
+						state,
+						total
+					};
 				} else {
 					anyReindexTaskWithoutCollectionId = true;
 				}
@@ -437,7 +446,14 @@ export function Collections(props) {
 						const key = `collection[${index}]`;
 						const boolCollectorSelected = !!(collector && collector.name);
 						const boolCollectorSelectedAndInitialized = boolCollectorSelected && collectorComponents[collector.name];
-						const editEnabled = intInitializedCollectorComponents && (boolCollectorSelectedAndInitialized || !boolCollectorSelected);
+						const busy = anyReindexTaskWithoutCollectionId
+						|| (
+							objCollectionsBeingReindexed[collectionId]
+							&& [TASK_STATE_RUNNING, TASK_STATE_WAITING].includes(objCollectionsBeingReindexed[collectionId].state)
+						);
+						const editEnabled = intInitializedCollectorComponents
+							&& (boolCollectorSelectedAndInitialized || !boolCollectorSelected)
+							&& !busy;
 						const cron = jobsObj[_name]
 							? jobsObj[_name].map(({value}) => {
 								return new Cron(value).toObj();
@@ -478,29 +494,40 @@ export function Collections(props) {
 								totalNumberOfCollections={queryCollectionsGraph.total}
 							/></Table.Cell>
 							<Table.Cell collapsing>{_name}</Table.Cell>
-							<Table.Cell collapsing>{collector && collector.name || ''}</Table.Cell>
-							<Table.Cell collapsing>{documentCount}</Table.Cell>
-							<Table.Cell collapsing>{language}</Table.Cell>
-							<Table.Cell collapsing>{shemaIdToName[schemaId]}</Table.Cell>
-							<Table.Cell collapsing>{interfaces.map((iface, i) => <p key={i}>
-								{i === 0 ? null : <br/>}
-								<span style={{whitespace: 'nowrap'}}>{iface}</span>
-							</p>)}</Table.Cell>
-							<Table.Cell>{
-								jobsObj[_name]
-									? jobsObj[_name].map(({enabled, value}, i) => {
-										const interval = parseCronExpression(value);
-										const fields = JSON.parse(JSON.stringify(interval.fields)); // Fields is immutable
-										return <pre key={`${_name}.cron.${i}`} style={{color:enabled ? 'auto' : 'gray'}}>
-											{`${Cron.hourToHuman(fields.hour)}:${
-												Cron.minuteToHuman(fields.minute)} ${
-												Cron.dayOfWeekToHuman(fields.dayOfWeek)} in ${
-												rpad(MONTH_TO_HUMAN[fields.month.length === 12 ? '*' : fields.month[0]], 11)} (dayOfMonth:${
-												lpad(fields.dayOfMonth.length === 31 ? '*' : fields.dayOfMonth)})`}
-										</pre>;
-									})
-									: 'Not scheduled'
-							}</Table.Cell>
+							{busy
+								? <Table.Cell collapsing colspan={6}><Progress
+									active
+									progress='ratio'
+									total={objCollectionsBeingReindexed[collectionId].total}
+									value={objCollectionsBeingReindexed[collectionId].current}
+								/>{'Reindexing...'}</Table.Cell>
+								: <>
+									<Table.Cell collapsing>{collector && collector.name || ''}</Table.Cell>
+									<Table.Cell collapsing>{documentCount}</Table.Cell>
+									<Table.Cell collapsing>{language}</Table.Cell>
+									<Table.Cell collapsing>{shemaIdToName[schemaId]}</Table.Cell>
+									<Table.Cell collapsing>{interfaces.map((iface, i) => <p key={i}>
+										{i === 0 ? null : <br/>}
+										<span style={{whitespace: 'nowrap'}}>{iface}</span>
+									</p>)}</Table.Cell>
+									<Table.Cell>{
+										jobsObj[_name]
+											? jobsObj[_name].map(({enabled, value}, i) => {
+												const interval = parseCronExpression(value);
+												const fields = JSON.parse(JSON.stringify(interval.fields)); // Fields is immutable
+												return <pre key={`${_name}.cron.${i}`} style={{color:enabled ? 'auto' : 'gray'}}>
+													{`${Cron.hourToHuman(fields.hour)}:${
+														Cron.minuteToHuman(fields.minute)} ${
+														Cron.dayOfWeekToHuman(fields.dayOfWeek)} in ${
+														rpad(MONTH_TO_HUMAN[fields.month.length === 12 ? '*' : fields.month[0]], 11)} (dayOfMonth:${
+														lpad(fields.dayOfMonth.length === 31 ? '*' : fields.dayOfMonth)})`}
+												</pre>;
+											})
+											: 'Not scheduled'
+									}</Table.Cell>
+								</>
+							}
+
 							<Table.Cell collapsing>
 								<Button.Group>
 									{anyReindexTaskWithoutCollectionId
@@ -511,7 +538,7 @@ export function Collections(props) {
 										: <Popup
 											content={
 												objCollectionsBeingReindexed[collectionId]
-												&& [TASK_STATE_RUNNING, TASK_STATE_WAITING].includes(objCollectionsBeingReindexed[collectionId])
+												&& [TASK_STATE_RUNNING, TASK_STATE_WAITING].includes(objCollectionsBeingReindexed[collectionId].state)
 													? `Collection is being reindexed...`
 													: 'Start reindex'
 											}
@@ -519,7 +546,7 @@ export function Collections(props) {
 											trigger={<Button
 												disabled={
 													objCollectionsBeingReindexed[collectionId]
-													&& [TASK_STATE_RUNNING, TASK_STATE_WAITING].includes(objCollectionsBeingReindexed[collectionId]) }
+													&& [TASK_STATE_RUNNING, TASK_STATE_WAITING].includes(objCollectionsBeingReindexed[collectionId].state) }
 												icon
 												onClick={() => {
 													fetch(`${servicesBaseUrl}/graphQL`, {
@@ -540,9 +567,9 @@ export function Collections(props) {
 											>
 												<Icon color={
 													objCollectionsBeingReindexed[collectionId]
-														? objCollectionsBeingReindexed[collectionId] === TASK_STATE_FAILED
+														? objCollectionsBeingReindexed[collectionId].state === TASK_STATE_FAILED
 															? 'red'
-															: [TASK_STATE_RUNNING, TASK_STATE_WAITING].includes(objCollectionsBeingReindexed[collectionId])
+															: [TASK_STATE_RUNNING, TASK_STATE_WAITING].includes(objCollectionsBeingReindexed[collectionId].state)
 																? 'yellow'
 																: 'green' // objCollectionsBeingReindexed[collectionId] === TASK_STATE_FINISHED
 														: 'green'} name='recycle'/>
@@ -592,7 +619,7 @@ export function Collections(props) {
 												: <Popup
 													content={`Start collecting to ${_name}`}
 													inverted
-													trigger={<Button disabled={!boolCollectorSelectedAndInitialized} icon onClick={() => {
+													trigger={<Button disabled={!boolCollectorSelectedAndInitialized || busy} icon onClick={() => {
 														fetch(`${servicesBaseUrl}/collectionCollect?name=${_name}`, {
 															method: 'POST'
 														}).then(() => {
@@ -603,6 +630,7 @@ export function Collections(props) {
 									}
 									<DeleteCollectionModal
 										_name={_name}
+										disabled={busy}
 										onClose={() => {
 											fetchCollections();
 											setBoolPoll(true);
