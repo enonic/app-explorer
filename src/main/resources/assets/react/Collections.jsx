@@ -10,7 +10,8 @@ import {
 
 import {parseExpression as parseCronExpression} from 'cron-parser';
 import {
-	Button, Dimmer, Header, Icon, Loader, Popup, Progress, Table
+	Button, Dimmer, Header, Icon, Label, Loader, Popup, Progress, Radio,
+	Segment, Table
 } from 'semantic-ui-react';
 import {
 	MONTH_TO_HUMAN
@@ -200,15 +201,22 @@ export function Collections(props) {
 		setLicenseValid
 	} = props;
 
+	const [boolPoll, setBoolPoll] = React.useState(true);
+	const [jobsObj, setJobsObj] = React.useState({});
 	const [locales, setLocales] = React.useState([]);
 	const [queryCollectionsGraph, setQueryCollectionsGraph] = React.useState({});
 	const [queryCollectorsGraph, setQueryCollectorsGraph] = React.useState({});
-	const [schema, setSchema] = React.useState([]);
-	const [jobsObj, setJobsObj] = React.useState({});
-	const [tasks, setTasks] = React.useState([]);
-	const [boolPoll, setBoolPoll] = React.useState(true);
-
 	const [queryFieldsGraph, setQueryFieldsGraph] = React.useState({});
+	const [schema, setSchema] = React.useState([]);
+	const [showCollector, setShowCollector] = React.useState(false);
+	const [showDelete, setShowDelete] = React.useState(false);
+	const [showDocumentCount, setShowDocumentCount] = React.useState(true);
+	const [showLanguage, setShowLanguage] = React.useState(false);
+	const [showInterfaces, setShowInterfaces] = React.useState(false);
+	const [showSchema, setShowSchema] = React.useState(false);
+	const [showSchedule, setShowSchedule] = React.useState(false);
+	const [tasks, setTasks] = React.useState([]);
+
 	const fieldsObj = {};
 	queryFieldsGraph.hits ? queryFieldsGraph.hits.forEach(({
 		//displayName: fieldLabel,
@@ -411,10 +419,92 @@ export function Collections(props) {
 	});
 
 	return <>
+		<Segment basic inverted style={{
+			marginLeft: -14,
+			marginTop: -14,
+			marginRight: -14
+		}}>
+			<Table basic collapsing compact inverted>
+				<Table.Body>
+					<Table.Row verticalAlign='middle'>
+						<Table.Cell collapsing>
+							<Radio
+								checked={showCollector}
+								onChange={(ignored,{checked}) => {
+									setShowCollector(checked);
+								}}
+								toggle
+							/>
+							<Label color='black' size='large'>Show collector</Label>
+						</Table.Cell>
+						<Table.Cell collapsing>
+							<Radio
+								checked={showDocumentCount}
+								onChange={(ignored,{checked}) => {
+									setShowDocumentCount(checked);
+								}}
+								toggle
+							/>
+							<Label color='black' size='large'>Show document count</Label>
+						</Table.Cell>
+						<Table.Cell collapsing>
+							<Radio
+								checked={showLanguage}
+								onChange={(ignored,{checked}) => {
+									setShowLanguage(checked);
+								}}
+								toggle
+							/>
+							<Label color='black' size='large'>Show language</Label>
+						</Table.Cell>
+						<Table.Cell collapsing>
+							<Radio
+								checked={showSchema}
+								onChange={(ignored,{checked}) => {
+									setShowSchema(checked);
+								}}
+								toggle
+							/>
+							<Label color='black' size='large'>Show schema</Label>
+						</Table.Cell>
+						<Table.Cell collapsing>
+							<Radio
+								checked={showInterfaces}
+								onChange={(ignored,{checked}) => {
+									setShowInterfaces(checked);
+								}}
+								toggle
+							/>
+							<Label color='black' size='large'>Show interfaces</Label>
+						</Table.Cell>
+						<Table.Cell collapsing>
+							<Radio
+								checked={showSchedule}
+								onChange={(ignored,{checked}) => {
+									setShowSchedule(checked);
+								}}
+								toggle
+							/>
+							<Label color='black' size='large'>Show schedule</Label>
+						</Table.Cell>
+						<Table.Cell collapsing>
+							<Radio
+								checked={showDelete}
+								onChange={(ignored,{checked}) => {
+									setShowDelete(checked);
+								}}
+								toggle
+							/>
+							<Label color='black' size='large'>Show delete</Label>
+						</Table.Cell>
+					</Table.Row>
+				</Table.Body>
+			</Table>
+		</Segment>
 		<Header as='h1'>Collections</Header>
 		<Dimmer.Dimmable dimmed={isLoading}>
 			<Dimmer active={isLoading}><Loader size='massive'>Loading</Loader></Dimmer>
-			<Table celled compact selectable sortable striped>
+			<Table celled collapsing compact selectable sortable striped>
 				<Table.Header>
 					<Table.Row>
 						{/* Width is X columns of total 16 */}
@@ -423,12 +513,12 @@ export function Collections(props) {
 							onClick={null/*handleSortGenerator('displayName')*/}
 							sorted={column === '_name' ? direction : null}
 						>Name</Table.HeaderCell>
-						<Table.HeaderCell>Collector</Table.HeaderCell>
-						<Table.HeaderCell>Documents</Table.HeaderCell>
-						<Table.HeaderCell>Language</Table.HeaderCell>
-						<Table.HeaderCell>Schema</Table.HeaderCell>
-						<Table.HeaderCell>Interfaces</Table.HeaderCell>
-						<Table.HeaderCell>Schedule</Table.HeaderCell>
+						{showCollector ? <Table.HeaderCell>Collector</Table.HeaderCell> : null}
+						{showDocumentCount ? <Table.HeaderCell>Documents</Table.HeaderCell> : null}
+						{showLanguage ? <Table.HeaderCell>Language</Table.HeaderCell> : null}
+						{showSchema ? <Table.HeaderCell>Schema</Table.HeaderCell> : null}
+						{showInterfaces ? <Table.HeaderCell>Interfaces</Table.HeaderCell> : null }
+						{showSchedule ? <Table.HeaderCell>Schedule</Table.HeaderCell> : null }
 						<Table.HeaderCell>Actions</Table.HeaderCell>
 					</Table.Row>
 				</Table.Header>
@@ -495,22 +585,29 @@ export function Collections(props) {
 							/></Table.Cell>
 							<Table.Cell collapsing>{_name}</Table.Cell>
 							{busy
-								? <Table.Cell collapsing colspan={6}><Progress
-									active
-									progress='ratio'
-									total={objCollectionsBeingReindexed[collectionId].total}
-									value={objCollectionsBeingReindexed[collectionId].current}
-								/>{'Reindexing...'}</Table.Cell>
+								? <Table.Cell collapsing colspan={
+									(showCollector ? 1 : 0)
+									+ (showDocumentCount ? 1 : 0)
+									+ (showLanguage ? 1 : 0)
+									+ (showSchema ? 1 : 0)
+									+ (showInterfaces ? 1 : 0)
+									+ (showSchedule ? 1 : 0)
+								}><Progress
+										active
+										progress='ratio'
+										total={objCollectionsBeingReindexed[collectionId].total}
+										value={objCollectionsBeingReindexed[collectionId].current}
+									/>{'Reindexing...'}</Table.Cell>
 								: <>
-									<Table.Cell collapsing>{collector && collector.name || ''}</Table.Cell>
-									<Table.Cell collapsing>{documentCount}</Table.Cell>
-									<Table.Cell collapsing>{language}</Table.Cell>
-									<Table.Cell collapsing>{shemaIdToName[schemaId]}</Table.Cell>
-									<Table.Cell collapsing>{interfaces.map((iface, i) => <p key={i}>
+									{showCollector ? <Table.Cell collapsing>{collector && collector.name || ''}</Table.Cell> : null}
+									{showDocumentCount ? <Table.Cell collapsing>{documentCount}</Table.Cell> : null}
+									{showLanguage ? <Table.Cell collapsing>{language}</Table.Cell> : null}
+									{showSchema ? <Table.Cell collapsing>{shemaIdToName[schemaId]}</Table.Cell> : null }
+									{showInterfaces ? <Table.Cell collapsing>{interfaces.map((iface, i) => <p key={i}>
 										{i === 0 ? null : <br/>}
 										<span style={{whitespace: 'nowrap'}}>{iface}</span>
-									</p>)}</Table.Cell>
-									<Table.Cell>{
+									</p>)}</Table.Cell> : null}
+									{showSchedule ? <Table.Cell>{
 										jobsObj[_name]
 											? jobsObj[_name].map(({enabled, value}, i) => {
 												const interval = parseCronExpression(value);
@@ -524,12 +621,55 @@ export function Collections(props) {
 												</pre>;
 											})
 											: 'Not scheduled'
-									}</Table.Cell>
+									}</Table.Cell> : null}
 								</>
 							}
 
 							<Table.Cell collapsing>
 								<Button.Group>
+									{collector && collector.name
+										? collectionsTaskState[_name]
+											? {
+												WAITING: <Popup
+													content={`Collector is in waiting state`}
+													inverted
+													trigger={<Button disabled={!boolCollectorSelectedAndInitialized} icon><Icon color='yellow' name='pause'/></Button>}/>,
+												RUNNING: <Popup
+													content={`Stop collecting to ${_name}`}
+													inverted
+													trigger={<Button disabled={!boolCollectorSelectedAndInitialized} icon onClick={() => {
+														fetch(`${servicesBaseUrl}/collectorStop?collectionName=${_name}`, {
+															method: 'POST'
+														}).then(() => {
+															fetchTasks();
+														});
+													}}><Icon color='red' name='stop'/></Button>}/>,
+												FINISHED: <Popup
+													content={`Finished collecting to ${_name}`}
+													inverted
+													trigger={<Button disabled={!boolCollectorSelectedAndInitialized} icon><Icon color='green' name='checkmark'/></Button>}/>,
+												FAILED: <Popup
+													content={`Something went wrong while collecting to ${_name}`}
+													inverted
+													trigger={<Button disabled={!boolCollectorSelectedAndInitialized} icon><Icon color='red' name='warning'/></Button>}/>
+											}[collectionsTaskState[_name]]
+											: anyTaskWithoutCollectionName
+												? <Popup
+													content={`Some collector task is starting...`}
+													inverted
+													trigger={<Button disabled={!boolCollectorSelectedAndInitialized} icon loading><Icon color='yellow' name='question'/></Button>}/>
+												: <Popup
+													content={`Start collecting to ${_name}`}
+													inverted
+													trigger={<Button disabled={!boolCollectorSelectedAndInitialized || busy} icon onClick={() => {
+														fetch(`${servicesBaseUrl}/collectionCollect?name=${_name}`, {
+															method: 'POST'
+														}).then(() => {
+															fetchTasks();
+														});
+													}}><Icon color={boolCollectorSelectedAndInitialized ? 'green' : 'grey'} name='cloud download'/></Button>}/>
+										: <Button disabled={true} icon><Icon color='grey' name='cloud download'/></Button>
+									}
 									{anyReindexTaskWithoutCollectionId
 										? <Popup
 											content={`Some reindex task is starting...`}
@@ -585,50 +725,7 @@ export function Collections(props) {
 												fetchCollections();
 											});
 										}}><Icon color='blue' name='copy'/></Button>}/>
-									{collector && collector.name
-										? collectionsTaskState[_name]
-											? {
-												WAITING: <Popup
-													content={`Collector is in waiting state`}
-													inverted
-													trigger={<Button disabled={!boolCollectorSelectedAndInitialized} icon><Icon color='yellow' name='pause'/></Button>}/>,
-												RUNNING: <Popup
-													content={`Stop collecting to ${_name}`}
-													inverted
-													trigger={<Button disabled={!boolCollectorSelectedAndInitialized} icon onClick={() => {
-														fetch(`${servicesBaseUrl}/collectorStop?collectionName=${_name}`, {
-															method: 'POST'
-														}).then(() => {
-															fetchTasks();
-														});
-													}}><Icon color='red' name='stop'/></Button>}/>,
-												FINISHED: <Popup
-													content={`Finished collecting to ${_name}`}
-													inverted
-													trigger={<Button disabled={!boolCollectorSelectedAndInitialized} icon><Icon color='green' name='checkmark'/></Button>}/>,
-												FAILED: <Popup
-													content={`Something went wrong while collecting to ${_name}`}
-													inverted
-													trigger={<Button disabled={!boolCollectorSelectedAndInitialized} icon><Icon color='red' name='warning'/></Button>}/>
-											}[collectionsTaskState[_name]]
-											: anyTaskWithoutCollectionName
-												? <Popup
-													content={`Some collector task is starting...`}
-													inverted
-													trigger={<Button disabled={!boolCollectorSelectedAndInitialized} icon loading><Icon color='yellow' name='question'/></Button>}/>
-												: <Popup
-													content={`Start collecting to ${_name}`}
-													inverted
-													trigger={<Button disabled={!boolCollectorSelectedAndInitialized || busy} icon onClick={() => {
-														fetch(`${servicesBaseUrl}/collectionCollect?name=${_name}`, {
-															method: 'POST'
-														}).then(() => {
-															fetchTasks();
-														});
-													}}><Icon color={boolCollectorSelectedAndInitialized ? 'green' : 'grey'} name='cloud download'/></Button>}/>
-										: <Button disabled={true} icon><Icon color='grey' name='cloud download'/></Button>
-									}
-									<DeleteCollectionModal
+									{showDelete ?<DeleteCollectionModal
 										_name={_name}
 										disabled={busy}
 										onClose={() => {
@@ -639,7 +736,7 @@ export function Collections(props) {
 											setBoolPoll(false);
 										}}
 										servicesBaseUrl={servicesBaseUrl}
-									/>
+									/> : null}
 								</Button.Group>
 							</Table.Cell>
 						</Table.Row>;
