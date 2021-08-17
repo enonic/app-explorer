@@ -260,7 +260,7 @@ search(
   * Move should _nodeType filter to must in all queries
   * Remove should type filter from all queries
 * Build system upgrades:
-  * Gradle 6.4
+  * Gradle 6.9
   * Node 14.17.3
   * Core-js 3.15.2
   * Webpack 5.45.1
