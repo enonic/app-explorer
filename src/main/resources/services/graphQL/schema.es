@@ -100,6 +100,17 @@ const TYPE_SCHEMA = createObjectType({
 		_id: { type: TYPE_ID },
 		_name: { type: TYPE_NAME },
 		_path: { type: nonNull(GraphQLString) },
+		_versionKey: { type: nonNull(GraphQLString) }, // Used with atomicUpdate
+		properties: { type: list(TYPE_SCHEMA_PROPERTIES)}
+	}
+});
+
+const TYPE_SCHEMA_CREATE = createObjectType({
+	name: 'SchemaCreate',
+	fields: {
+		_id: { type: TYPE_ID },
+		_name: { type: TYPE_NAME },
+		_path: { type: nonNull(GraphQLString) },
 		properties: { type: list(TYPE_SCHEMA_PROPERTIES)}
 	}
 });
@@ -149,7 +160,7 @@ export const fieldSchemaCreate = {
 			properties: forceArray(createdNode.properties) // GraphQL Schema doesn't ensure array
 		};
 	}, // resolve
-	type: TYPE_SCHEMA
+	type: TYPE_SCHEMA_CREATE
 }; // fieldSchemaCreate
 
 
@@ -206,11 +217,12 @@ export const fieldSchemaQuery = {
 		//log.debug(`res:${toStr(res)}`);
 		res.hits = res.hits
 			.map(({id}) => readConnection.get(id))
-			.map(({_id, _name, _path, properties}) =>
+			.map(({_id, _name, _path, _versionKey, properties}) =>
 				({
 					_id,
 					_name,
 					_path,
+					_versionKey,
 					properties: forceArray(properties) // GraphQL Schema doesn't ensure array
 				}));
 		return res;
@@ -232,12 +244,14 @@ export const fieldSchemaUpdate = {
 	args: {
 		_id: TYPE_ID,
 		_name: TYPE_NAME,
+		_versionKey: GraphQLString,
 		properties: list(INPUT_TYPE_SCHEMA_PROPERTIES)
 	},
 	resolve({
 		args: {
 			_id: schemaId,
-			_name,
+			_name: newSchemaName,
+			_versionKey,
 			properties = []
 		}
 	}) {
@@ -246,23 +260,33 @@ export const fieldSchemaUpdate = {
 		if (!oldNode) {
 			throw new Error(`Could not find schema with id:${schemaId}!`);
 		}
+		log.debug(`schemaId:${schemaId} newSchemaName:${newSchemaName} _versionKey:${_versionKey} activeVersionKey:${oldNode._versionKey}`);
+		if (_versionKey !== oldNode._versionKey) {
+			const msg = `Denying update! Schema changed since _versionKey:${_versionKey} activeVersionKey:${oldNode._versionKey} schemaId:${schemaId}`;
+			log.error(msg);
+			throw new Error(msg);
+		}
 		const {
 			_name: oldName
 		} = oldNode;
-		if (_name !== oldName) {
-			//log.debug(`Tyring to move/rename _id:${_id} from oldName:${oldName} to name:${_name}...`);
+		if (newSchemaName !== oldName) {
+			//log.debug(`Trying to move/rename _id:${_id} from oldName:${oldName} to name:${_name}...`);
 			const boolMovedorRenamed = writeConnection.move({
-				source: schemaId, // Path or id of the node to be moved or renamed
+
+				// Path or id of the node to be moved or renamed
+				source: schemaId,
+
 				// New path or name for the node. If the target ends in slash '/',
 				// it specifies the parent path where to be moved.
 				// Otherwise it means the new desired path or name for the node.
-				target: _name
+				target: newSchemaName
+
 			}); // NOTE: Will throw Node already exists :)
 			if (boolMovedorRenamed) {
-				log.debug(`Moved/renamed id:${schemaId} from oldName:${oldName} to name:${_name}`);
+				log.debug(`Moved/renamed id:${schemaId} from oldName:${oldName} to name:${newSchemaName}`);
 				writeConnection.refresh();
 			} else {
-				throw new Error(`Something went wrong when trying to mode/rename id:${schemaId} from oldName:${oldName} to name:${_name}`);
+				throw new Error(`Something went wrong when trying to mode/rename id:${schemaId} from oldName:${oldName} to name:${newSchemaName}`);
 			}
 		}
 		// No point in forceArray, since Enonic will "destroy" on store,

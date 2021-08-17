@@ -1,7 +1,7 @@
 import {
 	COLON_SIGN,
 	TASK_STATE_FAILED,
-	TASK_STATE_FINISHED,
+	//TASK_STATE_FINISHED,
 	TASK_STATE_RUNNING,
 	TASK_STATE_WAITING,
 	lpad,
@@ -120,6 +120,7 @@ const GQL_SCHEMA_QUERY = `querySchema {
 	hits {
 		_id
 		_name
+		#_versionKey
 	}
 }`;
 

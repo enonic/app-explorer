@@ -115,7 +115,8 @@ module.exports = {
 				'_parentPath', // node property
 				'_path', // content-type property
 				'_permissions', // node property
-				'_selected' // option-set property
+				'_selected', // option-set property
+				'_versionKey' // node property
 			],
 			allowAfterThis: false,
 			allowAfterSuper: false,

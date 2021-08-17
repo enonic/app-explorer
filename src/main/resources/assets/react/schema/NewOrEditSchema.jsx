@@ -80,6 +80,7 @@ const GQL_SCHEMA_GET = `query GetSchemaQuery($_id: String!) {
 		_id
 		_name
 		_path
+		_versionKey
 		properties {
 			enabled
 			fulltext
@@ -96,11 +97,13 @@ const GQL_SCHEMA_GET = `query GetSchemaQuery($_id: String!) {
 const GQL_SCHEMA_UPDATE = `mutation UpdateSchemaMutation(
 	$_id: String!,
 	$_name: String!,
+	$_versionKey: String!
 	$properties: [InputSchemaProperties]
 ) {
 	updateSchema(
 		_id: $_id
 		_name: $_name
+		_versionKey: $_versionKey
 		properties: $properties
 	) {
 		_id
@@ -178,6 +181,7 @@ export function NewOrEditSchema({
 				//console.debug('submit _name', _name);
 
 				if (_id) {
+					const {_versionKey} = initialValues;
 					fetch(`${servicesBaseUrl}/graphQL`, {
 						method: 'POST',
 						headers: {
@@ -188,6 +192,7 @@ export function NewOrEditSchema({
 							variables: {
 								_id,
 								_name,
+								_versionKey,
 								properties
 							}
 						})

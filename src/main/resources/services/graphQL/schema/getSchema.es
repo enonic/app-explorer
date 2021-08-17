@@ -12,12 +12,14 @@ export function getSchema({_id}) {
 	const {
 		_name,
 		_path,
+		_versionKey,
 		properties
 	} = readConnection.get(_id);
 	return {
 		_id,
 		_name,
 		_path,
+		_versionKey,
 		properties: forceArray(properties).sort((a, b) => (a.name > b.name) ? 1 : -1)
 	};
 }
