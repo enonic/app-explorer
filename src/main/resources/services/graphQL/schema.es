@@ -21,6 +21,7 @@ import HumanDiff from 'human-object-diff';
 
 import {
 	APP_EXPLORER,
+	NT_COLLECTION,
 	NT_FOLDER,
 	PRINCIPAL_EXPLORER_READ,
 	PRINCIPAL_EXPLORER_WRITE
@@ -36,6 +37,8 @@ import {
 	nonNull,
 	list
 } from '/lib/graphql';
+
+import {reindexCollections} from './collection/reindexCollections';
 
 import {getSchema} from './schema/getSchema';
 
@@ -177,9 +180,6 @@ export const fieldSchemaDelete = {
 }; // fieldSchemaDelete
 
 
-
-
-
 export const fieldSchemaGet = {
 	args: {
 		_id: TYPE_ID
@@ -236,15 +236,15 @@ export const fieldSchemaUpdate = {
 	},
 	resolve({
 		args: {
-			_id,
+			_id: schemaId,
 			_name,
 			properties = []
 		}
 	}) {
 		const writeConnection = connect({ principals: [PRINCIPAL_EXPLORER_WRITE] });
-		const oldNode = writeConnection.get(_id);
+		const oldNode = writeConnection.get(schemaId);
 		if (!oldNode) {
-			throw new Error(`Could not find schema with id:${_id}!`);
+			throw new Error(`Could not find schema with id:${schemaId}!`);
 		}
 		const {
 			_name: oldName
@@ -252,17 +252,17 @@ export const fieldSchemaUpdate = {
 		if (_name !== oldName) {
 			//log.debug(`Tyring to move/rename _id:${_id} from oldName:${oldName} to name:${_name}...`);
 			const boolMovedorRenamed = writeConnection.move({
-				source: _id, // Path or id of the node to be moved or renamed
+				source: schemaId, // Path or id of the node to be moved or renamed
 				// New path or name for the node. If the target ends in slash '/',
 				// it specifies the parent path where to be moved.
 				// Otherwise it means the new desired path or name for the node.
 				target: _name
 			}); // NOTE: Will throw Node already exists :)
 			if (boolMovedorRenamed) {
-				log.debug(`Moved/renamed _id:${_id} from oldName:${oldName} to name:${_name}`);
+				log.debug(`Moved/renamed id:${schemaId} from oldName:${oldName} to name:${_name}`);
 				writeConnection.refresh();
 			} else {
-				throw new Error(`Something went wrong when trying to mode/rename _id:${_id} from oldName:${oldName} to name:${_name}`);
+				throw new Error(`Something went wrong when trying to mode/rename id:${schemaId} from oldName:${oldName} to name:${_name}`);
 			}
 		}
 		// No point in forceArray, since Enonic will "destroy" on store,
@@ -277,16 +277,33 @@ export const fieldSchemaUpdate = {
 			log.debug(`Changes detected diff:${toStr(diffSchemaProperties(oldNode.properties, enonifiedProperties))}`);
 
 			const updatedNode = writeConnection.modify({
-				key: _id,
+				key: schemaId,
 				editor: (schemaNode) => {
 					schemaNode.properties = properties;
 					return schemaNode;
 				}
 			});
 			writeConnection.refresh();
-			// TODO Start reindex of all collections which uses schema
+
+			const collectionsUsingSchemaQueryParams = {
+				count: -1,
+				filters: addQueryFilter({
+					filter: hasValue('_nodeType', [NT_COLLECTION]),
+					filters: addQueryFilter({
+						filter: hasValue('schemaId', [schemaId])
+					})
+				}),
+				query: ''
+			};
+			//log.debug(`collectionsUsingSchemaQueryParams:${toStr(collectionsUsingSchemaQueryParams)}`);
+
+			const collectionIds = writeConnection.query(collectionsUsingSchemaQueryParams).hits.map(({id})=>id);
+			log.debug(`collectionIds:${toStr(collectionIds)}`);
+
+			reindexCollections({collectionIds});
+
 			return updatedNode;
-		}
+		} // if schema changed
 		log.debug('No changes detected.');
 		return oldNode;
 	},

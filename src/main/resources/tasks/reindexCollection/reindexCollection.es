@@ -49,6 +49,11 @@ export function run({
 	}).report().logInfo();
 	const infoObj = progress.getInfo();
 
+	// TODO check whether collection is already being reindexed
+	// perhaps just end
+	// perhaps sleep -> resume
+	// perhaps schedule?
+	// What about race conditions, which schema should be applied?
 
 	const schema = JSON.parse(schemaJson);
 	//log.info(`schema:${toStr(schema)}`);
