@@ -108,7 +108,7 @@ export function EditSynonyms(props) {
 					: 'ascending'
 				) : 'ascending'
 		});
-	} // handleSortGenerator
+	}; // handleSortGenerator
 	//console.debug('state', state);
 
 	const {
@@ -118,7 +118,7 @@ export function EditSynonyms(props) {
 		params: {
 			from,
 			perPage,
-			sort,
+			//sort,
 			thesauri,
 			to
 		},
@@ -237,7 +237,7 @@ export function EditSynonyms(props) {
 						{result.hits.map(({
 							from = [''],
 							id,
-							name,
+							//name,
 							score,
 							thesaurus,
 							thesaurusReference,

@@ -14,8 +14,26 @@ import {SortButton} from 'semantic-ui-react-form/buttons/SortButton';
 import {SubmitButton} from 'semantic-ui-react-form/buttons/SubmitButton';
 //import {ValidateFormButton} from 'semantic-ui-react-form/buttons/ValidateFormButton';
 
+
 //import Snowball from 'snowball';
 
+/* Snowball languages
+da: 'Danish',
+nl: 'Dutch',
+en: 'English',
+fi: 'Finnish',
+fr: 'French',
+de: 'German',
+hu: 'Hungarian',
+it: 'Italian',
+no: 'Norwegian',
+pt: 'Portuguese',
+ro: 'Romanian',
+ru: 'Russian',
+es: 'Spanish',
+sv: 'Swedish',
+tr: 'Turkish'
+*/
 
 /*function required(value) {
 	return value ? undefined : 'Required!';
@@ -52,6 +70,8 @@ export function NewOrEditSynonym(props) {
 		setOpen(false); // This needs to be before unmount.
 		onClose(); // This could trigger render in parent, and unmount this Component.
 	}
+	/*const fromStemmer = new Snowball('Norwegian');
+	const toStemmer = new Snowball('English');*/
 	return <Modal
 		closeIcon
 		onClose={doClose}
@@ -104,6 +124,14 @@ export function NewOrEditSynonym(props) {
 					path='from'
 					render={(fromArray) => <>
 						<Table celled compact selectable sortable striped>
+							{/*<Table.Header>
+								<Table.Row>
+									<Table.HeaderCell>Word</Table.HeaderCell>
+									<Table.HeaderCell>Stem</Table.HeaderCell>
+									<Table.HeaderCell>Actions</Table.HeaderCell>
+								</Table.Row>
+							</Table.Header>
+							*/}
 							<Table.Body>{fromArray.map((fromValue, fromIndex) => {
 							//console.debug('fromValue', fromValue, 'fromIndex', fromIndex);
 								const fromPath = `from.${fromIndex}`;
@@ -115,6 +143,13 @@ export function NewOrEditSynonym(props) {
 											value={fromValue}
 										/>
 									</Table.Cell>
+									{/*<Table.Cell>
+										{fromValue.split(' ').map(w => {
+											fromStemmer.setCurrent(w);
+											fromStemmer.stem();
+											return fromStemmer.getCurrent();
+										}).filter((x, i, a) => !i || x != a[i-1]).join(' ')}
+									</Table.Cell>*/}
 									<Table.Cell collapsing>
 										<Button.Group>
 											<InsertButton
@@ -155,6 +190,13 @@ export function NewOrEditSynonym(props) {
 					path='to'
 					render={(toArray) => <>
 						<Table celled compact selectable sortable striped>
+							{/*<Table.Header>
+								<Table.Row>
+									<Table.HeaderCell>Word</Table.HeaderCell>
+									<Table.HeaderCell>Stem</Table.HeaderCell>
+									<Table.HeaderCell>Actions</Table.HeaderCell>
+								</Table.Row>
+							</Table.Header>*/}
 							<Table.Body>{toArray.map((toValue, toIndex) => {
 								const toPath = `to.${toIndex}`;
 								//console.debug('NewOrEditSynonym toValue', toValue, 'toIndex', toIndex, 'toPath', toPath);
@@ -166,6 +208,13 @@ export function NewOrEditSynonym(props) {
 											value={toValue}
 										/>
 									</Table.Cell>
+									{/*<Table.Cell>
+										{toValue.split(' ').map(w => {
+											toStemmer.setCurrent(w);
+											toStemmer.stem();
+											return toStemmer.getCurrent();
+										}).filter((x, i, a) => !i || x != a[i-1]).join(' ')}
+									</Table.Cell>*/}
 									<Table.Cell collapsing>
 										<Button.Group>
 											<InsertButton
