@@ -1,16 +1,57 @@
 import {
-	Button, Form, Header, Icon, Modal, Popup
+	Button, Form, Header, Icon, Label, Modal, Popup
 } from 'semantic-ui-react';
 
-//import {Dropdown} from 'semantic-ui-react-form';
-import {Dropdown} from 'semantic-ui-react-form/inputs/Dropdown';
 import {Form as EnonicForm} from 'semantic-ui-react-form/Form';
 import {Input as EnonicInput} from 'semantic-ui-react-form/inputs/Input';
 import {ResetButton} from 'semantic-ui-react-form/buttons/ResetButton';
 import {SubmitButton} from 'semantic-ui-react-form/buttons/SubmitButton';
 
+import {LanguageDropdown} from '../collection/LanguageDropdown';
 import {EditSynonyms} from './EditSynonyms';
 import {UploadLicense} from '../UploadLicense';
+
+
+const GQL_MUTATION_THESAURUS_CREATE = `mutation CreateThesaurusMutation(
+  $_name: String!,
+  $language: ThesaurusLanguageInput!
+) {
+  createThesaurus(
+    _name: $_name,
+    language: $language
+  ) {
+    _id
+    _name
+    _nodeType
+    _path
+    language {
+      from
+      to
+    }
+  }
+}`;
+
+const GQL_MUTATION_THESAURUS_UPDATE = `mutation UpdateThesaurusMutation(
+  $_id: String!,
+  $_name: String!,
+  $language: ThesaurusLanguageInput!
+) {
+  updateThesaurus(
+    _id: $_id,
+    _name: $_name,
+    language: $language
+  ) {
+    _id
+    _name
+    _nodeType
+    _path
+    language {
+      from
+      to
+    }
+  }
+}`;
+
 
 function required(value) {
 	return value ? undefined : 'Required!';
@@ -19,22 +60,22 @@ function required(value) {
 
 export function NewOrEditThesaurus(props) {
 	const {
-		id,
-		displayName = '',
-		languages = [],
-		languagesOptions,
+		_id,
+		language = {
+			from: '',
+			to: ''
+		},
 		licenseValid,
-		name = '',
+		locales,
+		_name = '',
 		onClose,
 		servicesBaseUrl,
 		setLicensedTo,
 		setLicenseValid
 	} = props;
-	//console.debug('NewOrEditThesaurus id', id);
-	//console.debug('NewOrEditThesaurus displayName', displayName);
-	//console.debug('NewOrEditThesaurus languages', languages);
+	//console.debug('NewOrEditThesaurus _id', _id);
 	//console.debug('NewOrEditThesaurus licenseValid', licenseValid);
-	//console.debug('NewOrEditThesaurus name', name);
+	//console.debug('NewOrEditThesaurus _name', _name);
 
 	const [open, setOpen] = React.useState(false);
 
@@ -49,8 +90,8 @@ export function NewOrEditThesaurus(props) {
 		closeIcon
 		onClose={doClose}
 		open={open}
-		trigger={id ? <Popup
-			content={`Edit thesaurus ${displayName}`}
+		trigger={_id ? <Popup
+			content={`Edit thesaurus ${_name}`}
 			inverted
 			trigger={<Button
 				icon
@@ -72,73 +113,75 @@ export function NewOrEditThesaurus(props) {
 				/></Button>}
 	>{licenseValid
 			? <>
-				<Modal.Header>{id ? `Edit thesaurus ${displayName}` : 'New thesaurus'}</Modal.Header>
+				<Modal.Header>{_id ? `Edit thesaurus ${_name}` : 'New thesaurus'}</Modal.Header>
 				<Modal.Content>
 					<EnonicForm
 						initialValues={{
-							displayName,
-							languages,
-							name
+							language,
+							_name
 						}}
 						onSubmit={(values) => {
 							//console.debug('onSubmit values', values);
-							fetch(`${servicesBaseUrl}/thesaurus${id ? 'Update' : 'Create'}`, {
+							const {
+								_name: newName,
+								language: newLanguage
+							} = values;
+							//console.debug('onSubmit newName', newName);
+							//console.debug('onSubmit newLanguage', newLanguage);
+							fetch(`${servicesBaseUrl}/graphQL`, {
 								method: 'POST',
 								headers: {
 									'Content-Type':	'application/json'
 								},
-								body: JSON.stringify(values)
+								body: JSON.stringify({
+									query: _id ? GQL_MUTATION_THESAURUS_UPDATE : GQL_MUTATION_THESAURUS_CREATE,
+									variables: {
+										_id,
+										_name: newName, // Support rename...
+										language: newLanguage
+									}
+								})
 							}).then((response) => {
 								if (response.status === 200) {doClose();}
 								//doClose();
 							});
 						}}
 						schema={{
-							displayName: (value) => required(value),
-							//languages: (value) => required(value),
-							name: (value) => required(value)
+							language: {
+								from: (value) => required(value),
+								to: (value) => required(value)
+							},
+							_name: (value) => required(value)
 						}}
 					>
 						<Form as='div'>
-							{!id && <Form.Field>
+							{!_id && <Form.Field>
 								<EnonicInput
 									fluid
 									label={{basic: true, content: 'Name'}}
-									path='name'
+									path='_name'
 									placeholder='Please input name'
 								/>
 							</Form.Field>}
 							<Form.Field>
-								<EnonicInput
-									fluid
-									label={{basic: true, content: 'Display name'}}
-									path='displayName'
-									placeholder='Please input display name'
-								/>
+								<Header as='h3' content='Language'/>
+								<Label content='From' size='large'/>
+								<LanguageDropdown locales={locales} parentPath='language' name='from'/>
+								<Label content='To' size='large'/>
+								<LanguageDropdown locales={locales} parentPath='language' name='to'/>
 							</Form.Field>
-							<Form.Field>
-								<Dropdown
-									multiple={true}
-									options={languagesOptions}
-									path='languages'
-									placeholder='Select when to apply thesaurus'
-									search
-									selection
-								/>
-							</Form.Field>
-							{/*value={languages}*/}
 							<Form.Field>
 								<SubmitButton/>
 								<ResetButton/>
 							</Form.Field>
 						</Form>
 					</EnonicForm>
-					{id && <>
+					{_id && <>
 						<Header as='h2' content='Synonyms'/>
 						<EditSynonyms
 							servicesBaseUrl={servicesBaseUrl}
-							thesaurusId={id}
-							thesaurusName={name}
+							thesaurusId={_id}
+							thesaurusName={_name}
 						/>
 					</>}
 				</Modal.Content>

@@ -14,7 +14,7 @@ import {query as qS} from '/lib/explorer/synonym/query';
 import {query} from '/lib/explorer/thesaurus/query';
 
 import {QUERY_FILTERS_INPUT_OBJECT_TYPE} from './noQL';
-
+import {typeThesaurusLanguage} from './thesaurus/typeThesaurusLanguage';
 const {
 	createObjectType
 } = newSchemaGenerator();
@@ -50,7 +50,7 @@ const QUERY_SYNONYMS_OBJECT_TYPE = createObjectType({
 
 
 const THESAURUS_OBJECT_TYPE = createObjectType({
-	name: 'Thesaurus',
+	name: 'QueryThesauriHits',
 	//description:
 	fields: {
 		_id: { type: nonNull(GraphQLString) },
@@ -58,7 +58,8 @@ const THESAURUS_OBJECT_TYPE = createObjectType({
 		_nodeType: { type: GraphQLString }, // TODO nonNull?
 		_path: { type: nonNull(GraphQLString) },
 		description: { type: nonNull(GraphQLString) },
-		displayName: { type: nonNull(GraphQLString) },
+		//displayName: { type: nonNull(GraphQLString) },
+		language: { type: typeThesaurusLanguage },
 		synonyms: { type: QUERY_SYNONYMS_OBJECT_TYPE },
 		synonymsCount: { type: nonNull(GraphQLInt) }//,
 		//type: { type: nonNull(GraphQLString) }
@@ -139,8 +140,9 @@ export const queryThesauri = {
 			_path,
 			description,
 			id: _id,
+			language,
 			name: _name,
-			displayName,
+			//displayName,
 			synonymsCount//,
 			//type
 		}) => ({
@@ -149,7 +151,8 @@ export const queryThesauri = {
 			_nodeType,
 			_path,
 			description,
-			displayName,
+			//displayName,
+			language,
 			synonyms: querySynonymsResolver({
 				filters: {
 					boolean: {
@@ -223,7 +226,11 @@ export const queryThesauri = {
 			_nodeType
 			_path
 			description
-			displayName
+			#displayName
+			language {
+				from
+				to
+			}
 			synonyms {
 				total
 				count
@@ -237,11 +244,9 @@ export const queryThesauri = {
 					thesaurus
 					thesaurusReference
 					to
-					#type
 				}
 			}
 			synonymsCount
-			#type
 		}
 	}
 }

@@ -1,5 +1,5 @@
 import {
-	Button, Form, Header, Icon, Input, Modal, Popup, Table
+	Button, Header, Icon, Modal, Popup, Table
 } from 'semantic-ui-react';
 
 import {Form as EnonicForm} from 'semantic-ui-react-form/Form';
@@ -12,7 +12,9 @@ import {MoveUpButton} from 'semantic-ui-react-form/buttons/MoveUpButton';
 import {ResetButton} from 'semantic-ui-react-form/buttons/ResetButton';
 import {SortButton} from 'semantic-ui-react-form/buttons/SortButton';
 import {SubmitButton} from 'semantic-ui-react-form/buttons/SubmitButton';
-import {ValidateFormButton} from 'semantic-ui-react-form/buttons/ValidateFormButton';
+//import {ValidateFormButton} from 'semantic-ui-react-form/buttons/ValidateFormButton';
+
+//import Snowball from 'snowball';
 
 
 /*function required(value) {
@@ -45,7 +47,7 @@ export function NewOrEditSynonym(props) {
 		to = ['']
 	} = props;
 	const [open, setOpen] = React.useState(false);
-	function doOpen() { setOpen(true); }
+	//function doOpen() { setOpen(true); }
 	function doClose() {
 		setOpen(false); // This needs to be before unmount.
 		onClose(); // This could trigger render in parent, and unmount this Component.
@@ -84,9 +86,9 @@ export function NewOrEditSynonym(props) {
 					//console.debug({from, thesaurusId, to});
 					fetch(`${servicesBaseUrl}/synonym${id ? 'Modify' : 'Create'}?fromJson=${JSON.stringify(from)}${id ? `&id=${id}`: ''}&thesaurusId=${thesaurusId}&toJson=${JSON.stringify(to)}`, {
 						method: 'POST'
-					}).then(response => {
+					}).then((/*response*/) => {
 						doClose();
-					})
+					});
 				}}
 			>
 				{/*schema={{
@@ -136,7 +138,7 @@ export function NewOrEditSynonym(props) {
 											/>
 										</Button.Group>
 									</Table.Cell>
-								</Table.Row>
+								</Table.Row>;
 							})}
 							</Table.Body>
 						</Table>

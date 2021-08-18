@@ -281,12 +281,12 @@ export const fieldSchemaUpdate = {
 				// Otherwise it means the new desired path or name for the node.
 				target: newSchemaName
 
-			}); // NOTE: Will throw Node already exists :)
+			}); // NOTE: Will throw if _path already occupied :)
 			if (boolMovedorRenamed) {
 				log.debug(`Moved/renamed id:${schemaId} from oldName:${oldName} to name:${newSchemaName}`);
 				writeConnection.refresh();
 			} else {
-				throw new Error(`Something went wrong when trying to mode/rename id:${schemaId} from oldName:${oldName} to name:${newSchemaName}`);
+				throw new Error(`Something went wrong when trying to move/rename id:${schemaId} from oldName:${oldName} to name:${newSchemaName}`);
 			}
 		}
 		// No point in forceArray, since Enonic will "destroy" on store,

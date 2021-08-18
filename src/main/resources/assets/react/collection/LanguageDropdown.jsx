@@ -7,9 +7,10 @@ import getIn from 'get-value';
 import {capitalize} from '../utils/capitalize';
 
 export function LanguageDropdown(props) {
+	//console.debug('LanguageDropdown props', props);
 	const {
 		disabled = false,
-		locales,
+		locales = [],
 		name = 'language',
 		parentPath,
 		path = parentPath ? `${parentPath}.${name}` : name

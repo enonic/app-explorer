@@ -1,6 +1,6 @@
 //import getIn from 'get-value';
 import {
-	Button, Header, Icon, Label, Loader, Popup, Radio, Segment, Table
+	Button, Dimmer, Header, Icon, Label, Loader, Popup, Radio, Segment, Table
 } from 'semantic-ui-react';
 
 import {EditSynonymsModal} from './thesaurus/EditSynonymsModal';
@@ -9,16 +9,43 @@ import {NewOrEditThesaurus} from './thesaurus/NewOrEditThesaurus';
 import {DeleteThesaurus} from './thesaurus/DeleteThesaurus';
 import {Import} from './thesaurus/Import';
 
-/*const GQL_FIELD_QUERY = `{
-	queryFields(fields: "language") {
-		total
-		count
-		hits {
-			_name
-			key
+
+const GQL_LOCALES_GET = `getLocales {
+	country
+	#displayCountry
+	#displayLanguage
+	displayName
+	#displayVariant
+	#language
+	tag
+	#variant
+}`;
+
+const GQL_THESAURI_QUERY = `queryThesauri {
+	total
+	count
+	hits {
+		_id
+		_name
+		_nodeType
+		_path
+		description
+		language {
+			from
+			to
 		}
+		synonymsCount
 	}
-}`;*/
+}`;
+
+const GQL_ON_MOUNT = `{
+	${GQL_LOCALES_GET}
+	${GQL_THESAURI_QUERY}
+}`;
+
+const GQL_ON_UPDATE = `{
+	${GQL_THESAURI_QUERY}
+}`;
 
 
 export function Thesauri(props) {
@@ -32,11 +59,7 @@ export function Thesauri(props) {
 	//console.debug('Thesauri licenseValid', licenseValid);
 
 	const [isLoading, setLoading] = React.useState(false);
-	/*const [queryFieldsGraph, setQueryFieldsGraph] = React.useState({
-		count: 0,
-		hits: [],
-		total: 0
-	});*/
+	const [locales, setLocales] = React.useState([]);
 	const [showDelete, setShowDelete] = React.useState(false);
 	const [synonymsSum, setSynonymsSum] = React.useState(0);
 	const [thesauriRes, setThesauriRes] = React.useState({
@@ -44,55 +67,49 @@ export function Thesauri(props) {
 		hits: [],
 		total: 0
 	});
-		//console.debug('Thesauri queryFieldsGraph', queryFieldsGraph);
-	//const languageValues = getIn(queryFieldsGraph, ['hits', 0, 'values'], []);
-	//console.debug('languageValues', languageValues);
-	const languagesOptions = [{
-		key: '_none',
-		text: 'When no language is selected',
-		value: '_none'
-	},{
-		key: '_any',
-		text: 'Any language selected',
-		value: '_any'
-	}]/*.concat(languageValues.map(({
-		_name: key,
-		displayName:text
-	}) => ({
-		key,
-		text,
-		value: key
-	})))*/;
-	//console.debug('languagesOptions', languagesOptions);
 
-	function fetchThesauri() {
+	function fetchOnMount() {
 		setLoading(true);
-		fetch(`${servicesBaseUrl}/thesaurusList`)
-			.then(response => response.json())
-			.then(data => {
-				//console.debug('fetchThesauri data', data);
-				let sum = data.total ? data.hits
-					.map(({synonymsCount}) => synonymsCount)
-					.reduce((accumulator, currentValue) => accumulator + currentValue) : 0;
-				setThesauriRes(data);
-				setSynonymsSum(sum);
-				setLoading(false);
-			});
-		/*fetch(`${servicesBaseUrl}/graphQL`, {
+		fetch(`${servicesBaseUrl}/graphQL`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ query: GQL_FIELD_QUERY })
+			body: JSON.stringify({ query: GQL_ON_MOUNT })
 		})
 			.then(res => res.json())
 			.then(res => {
-				//console.log(res);
 				if (res && res.data) {
-					setQueryFieldsGraph(res.data.queryFields);
-				}
-			});*/
-	} // fetchThesauri
+					setLocales(res.data.getLocales);
+					setThesauriRes(res.data.queryThesauri);
+					let sum = res.data.queryThesauri.total ? res.data.queryThesauri.hits
+						.map(({synonymsCount}) => synonymsCount)
+						.reduce((accumulator, currentValue) => accumulator + currentValue) : 0;
+					setSynonymsSum(sum);
+					setLoading(false);
+				} // if
+			}); // then
+	} // fetchOnMount
 
-	React.useEffect(() => fetchThesauri(), []);
+	function fetchOnUpdate() {
+		setLoading(true);
+		fetch(`${servicesBaseUrl}/graphQL`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ query: GQL_ON_UPDATE })
+		})
+			.then(res => res.json())
+			.then(res => {
+				if (res && res.data) {
+					setThesauriRes(res.data.queryThesauri);
+					let sum = res.data.queryThesauri.total ? res.data.queryThesauri.hits
+						.map(({synonymsCount}) => synonymsCount)
+						.reduce((accumulator, currentValue) => accumulator + currentValue) : 0;
+					setSynonymsSum(sum);
+					setLoading(false);
+				} // if
+			}); // then
+	} // fetchOnUpdate
+
+	React.useEffect(() => fetchOnMount(), []);
 
 	return <>
 		<Segment basic inverted style={{
@@ -118,14 +135,14 @@ export function Thesauri(props) {
 			</Table>
 		</Segment>
 		<Header as='h1'>Synonyms</Header>
-		{isLoading
-			? <Loader active inverted>Loading</Loader>
-			: <Table celled collapsing compact selectable sortable striped attached='top'>
+		<Dimmer.Dimmable dimmed={isLoading}>
+			<Table celled collapsing compact selectable sortable striped attached='top'>
 				<Table.Header>
 					<Table.Row>
 						<Table.HeaderCell>Edit</Table.HeaderCell>
 						<Table.HeaderCell>Name</Table.HeaderCell>
-						<Table.HeaderCell>Languages</Table.HeaderCell>
+						<Table.HeaderCell>From Language</Table.HeaderCell>
+						<Table.HeaderCell>To Language</Table.HeaderCell>
 						<Table.HeaderCell>Synonyms</Table.HeaderCell>
 						<Table.HeaderCell>Actions</Table.HeaderCell>
 					</Table.Row>
@@ -133,57 +150,65 @@ export function Thesauri(props) {
 				<Table.Body>
 					{thesauriRes.hits.map(({
 						//description,
-						id,
-						languages,// = ['_none', '_any'],
-						name,
+						_id,
+						_name,
+						language = {
+							from: '',
+							to: ''
+						},
+						language: {
+							from = '',
+							to = ''
+						} = {},
 						synonymsCount
 					}, index) => {
 						return <Table.Row key={index}>
 							<Table.Cell collapsing>
 								<NewOrEditThesaurus
-									id={id}
-									languages={languages}
-									languagesOptions={languagesOptions}
+									_id={_id}
+									_name={_name}
+									language={language}
 									licenseValid={licenseValid}
-									name={name}
-									onClose={fetchThesauri}
+									locales={locales}
+									onClose={fetchOnUpdate}
 									servicesBaseUrl={servicesBaseUrl}
 								/>
 							</Table.Cell>
-							<Table.Cell collapsing>{name}</Table.Cell>
-							<Table.Cell collapsing>{languages.join(', ')}</Table.Cell>
+							<Table.Cell collapsing>{_name}</Table.Cell>
+							<Table.Cell collapsing>{from}</Table.Cell>
+							<Table.Cell collapsing>{to}</Table.Cell>
 							<Table.Cell collapsing>{synonymsCount}</Table.Cell>
 							<Table.Cell collapsing>
 								<Button.Group>
 									{/*<NewOrEditSynonym
-										onClose={fetchThesauri}
+										onClose={fetchOnUpdate}
 										servicesBaseUrl={servicesBaseUrl}
-										thesaurusId={id}
+										thesaurusId={_id}
 									/>*/}
 									{/*<EditSynonymsModal
-										onClose={fetchThesauri}
+										onClose={fetchOnUpdate}
 										servicesBaseUrl={servicesBaseUrl}
-										thesaurusId={id}
-										thesaurusName={name}
+										thesaurusId={_id}
+										thesaurusName={_name}
 									/>*/}
 									<Import
-										name={name}
-										onClose={fetchThesauri}
+										name={_name}
+										onClose={fetchOnUpdate}
 										servicesBaseUrl={servicesBaseUrl}
 									/>
 									<Popup
-										content={`Export from thesaurus ${name}`}
+										content={`Export from thesaurus ${_name}`}
 										inverted
 										trigger={<Button
 											as='a'
 											icon
-											href={`${servicesBaseUrl}/thesaurusExport?name=${name}`}
+											href={`${servicesBaseUrl}/thesaurusExport?name=${_name}`}
 										><Icon color='blue' name='download'/></Button>}
 									/>
 									{showDelete ? <DeleteThesaurus
-										id={id}
-										name={name}
-										onClose={fetchThesauri}
+										_id={_id}
+										name={_name}
+										onClose={fetchOnUpdate}
 										servicesBaseUrl={servicesBaseUrl}
 									/> : null}
 								</Button.Group>
@@ -194,21 +219,24 @@ export function Thesauri(props) {
 				<Table.Footer>
 					<Table.Row>
 						<Table.HeaderCell><EditSynonymsModal
-							onClose={fetchThesauri}
+							onClose={fetchOnUpdate}
 							servicesBaseUrl={servicesBaseUrl}
 						/></Table.HeaderCell>
+						<Table.HeaderCell></Table.HeaderCell>
 						<Table.HeaderCell></Table.HeaderCell>
 						<Table.HeaderCell></Table.HeaderCell>
 						<Table.HeaderCell>{synonymsSum}</Table.HeaderCell>
 						<Table.HeaderCell></Table.HeaderCell>
 					</Table.Row>
 				</Table.Footer>
-			</Table>}
+			</Table>
+			<Dimmer active={isLoading} inverted><Loader size='massive'>Loading</Loader></Dimmer>
+		</Dimmer.Dimmable>
 		<NewOrEditThesaurus
-			languages={['_none', '_any']}
-			languagesOptions={languagesOptions}
+			language={{from: '', to: ''}}
 			licenseValid={licenseValid}
-			onClose={fetchThesauri}
+			locales={locales}
+			onClose={fetchOnUpdate}
 			servicesBaseUrl={servicesBaseUrl}
 			setLicensedTo={setLicensedTo}
 			setLicenseValid={setLicenseValid}
