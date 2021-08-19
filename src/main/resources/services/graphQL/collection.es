@@ -53,21 +53,6 @@ const COLLECTION_OBJECT_TYPE = createObjectType({
 				configJson: { type: GraphQLString } // Can be null when no config yet...
 			}
 		})},
-
-		// TODO remove in app-explorer-2.0.0
-		cron: { type: list(createObjectType({
-			name: 'Cron',
-			//description: 'Cron description',
-			fields: {
-				month: { type: nonNull(GraphQLString) },
-				dayOfMonth: { type: nonNull(GraphQLString) },
-				dayOfWeek: { type: nonNull(GraphQLString) },
-				hour: { type: nonNull(GraphQLString) },
-				minute: { type: nonNull(GraphQLString) }
-			}
-		}))},
-		doCollect: { type: GraphQLBoolean },
-
 		documentCount: { type: nonNull(GraphQLInt) },
 		interfaces: { type: list(GraphQLString)},
 		language: { type: GraphQLString },
@@ -142,8 +127,6 @@ export const queryCollectionsResolver = ({
 		_nodeType,
 		_path,
 		collector,
-		cron, // TODO remove in app-explorer-2.0.0
-		doCollect, // TODO remove in app-explorer-2.0.0
 		language = '',
 		schemaId//,
 		//type
@@ -154,8 +137,6 @@ export const queryCollectionsResolver = ({
 		_path,
 		//collecting: !!activeCollections[_name],
 		collector,
-		cron: Array.isArray(cron) ? cron : [cron], // TODO remove in app-explorer-2.0.0
-		doCollect, // TODO remove in app-explorer-2.0.0
 		documentCount: getDocumentCount(_name),
 		interfaces: usedInInterfaces({connection, name: _name}),
 		language,

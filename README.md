@@ -209,7 +209,6 @@ app-explorer
 * TODO: Store language (perhaps in document_metadata)
 * TODO: Make link to REST API from GUI?
 * TODO: REST API for /search/documents?collections=all accessible by api.key
-* TODO: Remove any reference to lib-cron
 * TODO: Stemming in synonyms
 
 * TODO: dynamic fields (document_metadata.text title uri) _allText?
@@ -223,6 +222,7 @@ search(
 	#curations
 }
 
+* Remove any reference to lib-cron
 * Remove services/cronJobList
 * Schema features
   * Support multiple Schemas

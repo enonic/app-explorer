@@ -205,12 +205,9 @@ const SS_PLUGINS = [
 ];
 
 if (MODE === 'production') {
-	SS_EXTERNALS.push('/lib/cron'); // TODO: remove in explorer-2.0.0
 	SS_EXTERNALS.push('/lib/util');
 	SS_EXTERNALS.push(/^\/lib\/util\//);
 } else {
-	SS_ALIAS['/lib/cron'] = path.resolve(__dirname, '../lib-cron/src/main/resources/lib/cron/'); // TODO: remove in explorer-2.0.0
-
 	SS_ALIAS['/lib/util'] = path.resolve(__dirname, '../lib-util/src/main/resources/lib/util');
 	/*SS_PLUGINS.push(new BrowserSyncPlugin({
 		host: 'localhost',

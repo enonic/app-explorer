@@ -31,13 +31,6 @@ import {
 			name
 			configJson
 		}
-		cron {
-			month
-			dayOfMonth
-			dayOfWeek
-			hour
-			minute
-		}
 		displayName
 		doCollect
 		documentCount
