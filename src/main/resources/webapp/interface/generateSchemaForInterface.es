@@ -16,13 +16,14 @@ import {
 	GraphQLString,
 	Json as GraphQLJson,
 	list,
+	newSchemaGenerator,
 	nonNull,
 	reference
 } from '/lib/graphql';
 import {
 	createConnectionType,
-	decodeCursor,
-	encodeCursor
+	decodeCursor/*,
+	encodeCursor*/
 } from '/lib/graphql-connection';
 
 import {getFields} from '/lib/explorer/field/getFields';
@@ -41,23 +42,30 @@ import {multiConnect} from '/lib/explorer/repo/multiConnect';
 import {get as getStopWordsList} from '/lib/explorer/stopWords/get';
 
 
-import {schemaGenerator} from './schemaGenerator';
-import {
+//import {schemaGenerator} from './schemaGenerator';
+
+import {generateEnumTypes} from './enumTypes';
+/*import {
 	GRAPHQL_ENUM_TYPE_AGGREGATION_GEO_DISTANCE_UNIT,
 	GRAPHQL_ENUM_TYPE_HIGHLIGHT_OPTION_ENCODER,
 	GRAPHQL_ENUM_TYPE_HIGHLIGHT_OPTION_FRAGMENTER,
 	GRAPHQL_ENUM_TYPE_HIGHLIGHT_OPTION_ORDER,
 	GRAPHQL_ENUM_TYPE_HIGHLIGHT_OPTION_TAG_SCHEMA
-} from './enumTypes';
-import {
+} from './enumTypes';*/
+
+import {generateInputTypes} from './inputTypes';
+/*import {
 	GRAPHQL_INPUT_TYPE_FILTER_IDS
-} from './inputTypes';
-import {OBJECT_TYPE_AGGREGATIONS_UNION} from './types';
+} from './inputTypes';*/
+
+import {generateTypes} from './types';
+//import {OBJECT_TYPE_AGGREGATIONS_UNION} from './types';
+
 import {valueTypeToGraphQLType} from './valueTypeToGraphQLType';
 import {aggregationQueryTypeToGraphQLType} from './aggregationQueryTypeToGraphQLType';
 import {washDocumentNode} from './washDocumentNode';
 
-
+const schemaGenerator = newSchemaGenerator();
 const {
 	createEnumType,
 	createInputObjectType,
@@ -66,6 +74,19 @@ const {
 } = schemaGenerator;
 //import {DEFAULT_INTERFACE_FIELDS} from '../constants';
 
+const {
+	GRAPHQL_ENUM_TYPE_AGGREGATION_GEO_DISTANCE_UNIT,
+	GRAPHQL_ENUM_TYPE_HIGHLIGHT_OPTION_ENCODER,
+	GRAPHQL_ENUM_TYPE_HIGHLIGHT_OPTION_FRAGMENTER,
+	GRAPHQL_ENUM_TYPE_HIGHLIGHT_OPTION_ORDER,
+	GRAPHQL_ENUM_TYPE_HIGHLIGHT_OPTION_TAG_SCHEMA
+} = generateEnumTypes(schemaGenerator);
+
+const {
+	GRAPHQL_INPUT_TYPE_FILTER_IDS
+} = generateInputTypes(schemaGenerator);
+
+const {OBJECT_TYPE_AGGREGATIONS_UNION} = generateTypes(schemaGenerator);
 
 const INPUT_OBJECT_TYPE_SUB_AGGREGATIONS_NAME = 'InputObjectTypeSubAggregations';
 

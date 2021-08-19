@@ -3,10 +3,19 @@ import {
 	list,
 	nonNull
 } from '/lib/graphql';
-import {schemaGenerator} from './schemaGenerator';
+//import {schemaGenerator} from './schemaGenerator';
 
-
-const {createInputObjectType} = schemaGenerator;
+export function generateInputTypes(schemaGenerator) {
+	const {createInputObjectType} = schemaGenerator;
+	return {
+		GRAPHQL_INPUT_TYPE_FILTER_IDS: createInputObjectType({
+			name: 'InputTypeFilterIds',
+			fields: {
+				values: { type: nonNull(list(GraphQLString)) }
+			}
+		})
+	};
+}
 
 /*const GRAPHQL_INPUT_TYPE_FILTER_EXISTS = createInputObjectType({
 	name: 'InputTypeFilterExists',
@@ -52,13 +61,6 @@ const GRAPHQL_INPUT_TYPE_FILTER_HAS_VALUE = createInputObjectType({
 
 // TODO: range, dateRange, dateHistogram, geoDistance, min, max and valueCount
 // https://github.com/enonic/lib-guillotine/blob/master/src/main/resources/lib/guillotine/generic/input-types.js
-
-export const GRAPHQL_INPUT_TYPE_FILTER_IDS = createInputObjectType({
-	name: 'InputTypeFilterIds',
-	fields: {
-		values: { type: nonNull(list(GraphQLString)) }
-	}
-});
 
 /*const GRAPHQL_INPUT_TYPE_FILTER_NOT_EXISTS = createInputObjectType({
 	name: 'InputTypeFilterNotExists',
