@@ -18,7 +18,7 @@ import {
 	listCollections
 } from './collection';
 import {all as documentResponse} from './collection/document';
-import {post as interfacePost} from './interface';
+import {post as interfacePost} from './interface/post';
 
 
 const router = Router();
