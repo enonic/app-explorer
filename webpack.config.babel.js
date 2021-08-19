@@ -133,7 +133,6 @@ const SS_FILES = [
 	'services/collectionDuplicate/collectionDuplicate',
 	'services/collectionModify/collectionModify',
 	'services/collectorStop/collectorStop',
-	'services/cronJobList/cronJobList', // TODO: remove in explorer-2.0.0
 	'services/fieldCreate/fieldCreate',
 	'services/fieldDelete/fieldDelete',
 	'services/fieldList/fieldList',

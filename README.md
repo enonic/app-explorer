@@ -223,6 +223,7 @@ search(
 	#curations
 }
 
+* Remove services/cronJobList
 * Schema features
   * Support multiple Schemas
   * Each collection must have a schema
