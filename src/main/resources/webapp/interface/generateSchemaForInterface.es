@@ -21,9 +21,9 @@ import {
 	reference
 } from '/lib/graphql';
 import {
-	createConnectionType,
-	decodeCursor/*,
-	encodeCursor*/
+	//createConnectionType,
+	decodeCursor,
+	encodeCursor
 } from '/lib/graphql-connection';
 
 import {getFields} from '/lib/explorer/field/getFields';
@@ -443,25 +443,20 @@ export function generateSchemaForInterface(interfaceName) {
 		return queryRes;
 	}
 
+	const objectTypeInterfaceSearchHit = createObjectType({
+		name: 'InterfaceSearchHits',
+		fields: interfaceSearchHitsFields
+	});
+
 	//const OBJECT_TYPE_AGGREGATIONS_NAME = 'InterfaceSearchAggregations';
 	const objectTypeInterfaceSearch = createObjectType({
 		name: 'InterfaceSearch',
 		fields: {
 			aggregations: { type: list(OBJECT_TYPE_AGGREGATIONS_UNION) },
 			aggregationsAsJson: { type: GraphQLJson },
-
-			//TODO does createConnectionType removes count ?
-			//count: { type: nonNull(GraphQLInt) },
-			count: { type: GraphQLInt },
-
-			hits: { type: list(createObjectType({
-				name: 'InterfaceSearchHits',
-				fields: interfaceSearchHitsFields
-			}))},
-
-			//TODO does createConnectionType removes total ?
-			//total: { type: nonNull(GraphQLInt) }
-			total: { type: GraphQLInt }
+			count: { type: nonNull(GraphQLInt) },
+			hits: { type: list(objectTypeInterfaceSearchHit)},
+			total: { type: nonNull(GraphQLInt) }
 		}
 	});
 
@@ -692,47 +687,114 @@ export function generateSchemaForInterface(interfaceName) {
 				getSearchConnection: {
 					args: {
 						after: GraphQLString,
-						//aggregations: list(inputObjectTypeAggregations),
-						//filters: inputObjectTypeFilters,
+						aggregations: list(inputObjectTypeAggregations),
+						filters: inputObjectTypeFilters,
 						first: GraphQLInt,
-						//highlight: inputObjectTypeHighlight,
+						highlight: inputObjectTypeHighlight,
 						searchString: GraphQLString
 					},
 					resolve(env) {
-						log.debug(`env:${toStr({env})}`);
+						//log.debug(`env:${toStr({env})}`);
 						const {
 							after,// = encodeCursor('0'), // encoded representation of start
-							//aggregations,
-							//filters,
+							aggregations,
+							filters,
 							first = 10, // count
-							//highlight,
+							highlight,
 							searchString
 						} = env.args;
-						log.debug(`after:${toStr({after})}`);
-						log.debug(`first:${toStr({first})}`);
+						//log.debug(`after:${toStr({after})}`);
+						//log.debug(`first:${toStr({first})}`);
 						const start = after ? parseInt(decodeCursor(after)) + 1 : 0;
-						log.debug(`start:${toStr({start})}`);
+						//log.debug(`start:${toStr({start})}`);
 						const res = searchResolver({
 							args: {
-								//aggregations,
+								aggregations,
 								count: first,
-								//filters,
-								//highlight,
+								filters,
+								highlight,
 								searchString,
 								start
 							}
 						});
 						//log.debug(`res:${toStr({res})}`);
-						//res.start = start;
-						const rv = {
-							total: res.total,
-							start,
-							hits: res.hits
-						};
-						log.debug(`rv:${toStr({rv})}`);
-						return rv;
+						res.start = start;
+						//log.debug(`res:${toStr({res})}`);
+						return res;
 					},
-					type: createConnectionType(schemaGenerator, objectTypeInterfaceSearch)
+					//type: createConnectionType(schemaGenerator, objectTypeInterfaceSearch)
+					type: createObjectType({
+						name: 'InterfaceSearchConnection',
+						fields: {
+							totalCount: {
+								resolve: (env) => env.source.total,
+								type: nonNull(GraphQLInt)
+							},
+							edges: {
+								resolve(env) {
+									//log.debug(`edges env:${toStr({env})}`);
+									let hits = env.source.hits;
+									let edges = [];
+									for (let i = 0; i < hits.length; i++) {
+										edges.push({
+											node: hits[i],
+											cursor: env.source.start + i
+										});
+									}
+									//log.debug(`edges:${toStr({edges})}`);
+									return edges;
+								},
+								type: list(createObjectType({
+									name: 'InterfaceSearchConnectionEdge',
+									fields: {
+										cursor: {
+											type: nonNull(GraphQLString),
+											resolve(env) {
+												//log.debug(`cursor env:${toStr({env})}`);
+												return env.source.cursor;
+											}
+										},
+										node: {
+											type: objectTypeInterfaceSearchHit,
+											resolve(env) {
+												//log.debug(`node env:${toStr({env})}`);
+												return env.source.node;
+											}
+										}
+									}
+								}))
+							},
+							pageInfo: {
+								resolve(env) {
+									let count = env.source.hits.length;
+									return {
+										startCursor: env.source.start,
+										endCursor: env.source.start + (count === 0 ? 0 : (count - 1)),
+										hasNext: (env.source.start + count) < env.source.total
+									};
+								},
+								type: createObjectType({
+									name: 'InterfaceSearchConnectionPageInfo',
+									fields: {
+										endCursor: {
+											type: nonNull(GraphQLString),
+											resolve: (env) => encodeCursor(env.source.endCursor)
+										},
+										hasNext: {
+											type: nonNull(GraphQLBoolean),
+											resolve: (env) => env.source.hasNext
+										},
+										startCursor: {
+											type: nonNull(GraphQLString),
+											resolve: (env) => encodeCursor(env.source.startCursor)
+										}
+									}
+								})
+							},
+							aggregations: { type: list(OBJECT_TYPE_AGGREGATIONS_UNION) },
+							aggregationsAsJson: { type: GraphQLJson }
+						}
+					})
 				},
 				search: {
 					args: {

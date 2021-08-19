@@ -7,8 +7,8 @@ import {
 	AGGREGATION_MIN,
 	AGGREGATION_RANGE,
 	AGGREGATION_STATS,
-	AGGREGATION_TERMS,
-	toStr
+	AGGREGATION_TERMS/*,
+	toStr*/
 } from '@enonic/js-utils';
 
 import {
@@ -25,7 +25,7 @@ import {
 
 
 export function aggregationQueryTypeToGraphQLType(aggregationQueryType) {
-	log.debug(`aggregationQueryType:${toStr(aggregationQueryType)}`);
+	//log.debug(`aggregationQueryType:${toStr(aggregationQueryType)}`);
 	switch (aggregationQueryType) {
 	case AGGREGATION_COUNT: return OBJECT_TYPE_AGGREGATION_COUNT_NAME;
 	case AGGREGATION_DATE_HISTOGRAM: return OBJECT_TYPE_AGGREGATION_DATE_HISTOGRAM_NAME;
