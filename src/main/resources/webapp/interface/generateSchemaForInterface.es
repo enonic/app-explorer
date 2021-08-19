@@ -677,10 +677,10 @@ export function generateSchemaForInterface(interfaceName) {
 						//highlight: inputObjectTypeHighlight,
 						searchString: GraphQLString
 					},
-					resolve: (env) => {
+					resolve(env) {
 						log.debug(`env:${toStr({env})}`);
 						const {
-							after = encodeCursor('0'), // encoded representation of start
+							after,// = encodeCursor('0'), // encoded representation of start
 							//aggregations,
 							//filters,
 							first = 10, // count
@@ -689,7 +689,7 @@ export function generateSchemaForInterface(interfaceName) {
 						} = env.args;
 						log.debug(`after:${toStr({after})}`);
 						log.debug(`first:${toStr({first})}`);
-						const start = (after && parseInt(decodeCursor(after))) || 0;
+						const start = after ? parseInt(decodeCursor(after)) + 1 : 0;
 						log.debug(`start:${toStr({start})}`);
 						const res = searchResolver({
 							args: {
@@ -702,9 +702,14 @@ export function generateSchemaForInterface(interfaceName) {
 							}
 						});
 						//log.debug(`res:${toStr({res})}`);
-						res.start = start;
-						log.debug(`res:${toStr({res})}`);
-						return res;
+						//res.start = start;
+						const rv = {
+							total: res.total,
+							start,
+							hits: res.hits
+						};
+						log.debug(`rv:${toStr({rv})}`);
+						return rv;
 					},
 					type: createConnectionType(schemaGenerator, objectTypeInterfaceSearch)
 				},
