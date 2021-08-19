@@ -1,5 +1,6 @@
 import {
 	COLON_SIGN,
+	VALUE_TYPE_STRING,
 	forceArray,
 	toStr
 } from '@enonic/js-utils';
@@ -59,6 +60,19 @@ import {get as getRepo} from '/lib/xp/repo';
 //import {delete as deleteJob} from '/lib/xp/scheduler';
 
 import {Progress} from './Progress';
+
+
+const FIELD_TYPE = { // TODO This should not be a system field. Remove in lib-explorer-4.0.0?
+	key: 'type',
+	_name: 'type',
+	denyDelete: true,
+	denyValues: false,
+	fieldType: VALUE_TYPE_STRING,
+	indexConfig: 'minimal',
+	max: 1,
+	min: 0
+	//displayName: 'Type'
+};
 
 
 export const EVENT_INIT_COMPLETE = `${APP_EXPLORER}.init.complete`;
@@ -232,7 +246,7 @@ export function run() {
 					}); // ;( This currently uses sanitize so _ becomes -
 				});
 				progress.finishItem();
-			}); // DEFAULT_FIELDS.forEach
+			}); // READWRITE_FIELDS.forEach
 			writeConnection.refresh();
 
 			progress.addItems(1);
@@ -524,7 +538,7 @@ export function run() {
 			const allInterfaceNodes = writeConnection.query(allInterfaceNodesQueryParams).hits.map(({id}) => writeConnection.get(id));
 			//log.debug(`allInterfaceNodes:${toStr(allInterfaceNodes)}`);
 
-			const SYSTEM_FIELD_KEYS = SYSTEM_FIELDS.map(({key}) => key);
+			const SYSTEM_FIELD_KEYS = [...SYSTEM_FIELDS, FIELD_TYPE].map(({key}) => key);
 			//log.debug(`SYSTEM_FIELD_KEYS:${toStr(SYSTEM_FIELD_KEYS)}`);
 
 			allInterfaceNodes.forEach(({
@@ -608,7 +622,7 @@ export function run() {
 			version: 6
 		})) {
 			progress.addItems(1).setInfo(`Removing "system" fields from explorer repo...`).report().logInfo();
-			const fieldsPathsToDelete = SYSTEM_FIELDS.map(({_name}) => `${PATH_FIELDS}/${_name}`);
+			const fieldsPathsToDelete = [...SYSTEM_FIELDS, FIELD_TYPE].map(({_name}) => `${PATH_FIELDS}/${_name}`);
 			//log.debug(`fieldsPathsToDelete:${toStr(fieldsPathsToDelete)}`);
 
 			//const deleteRes =
