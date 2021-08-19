@@ -99,6 +99,6 @@ export function post(request) {
 
 	return {
 		contentType: RT_JSON,
-		body: execute(SCHEMA, query, variables, context)
+		body: JSON.stringify(execute(SCHEMA, query, variables, context))
 	};
 } // post

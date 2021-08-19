@@ -116,6 +116,6 @@ export function post(request) {
 	//log.debug(`context:${toStr(context)}`);
 	return {
 		contentType: RESPONSE_TYPE_JSON,
-		body: execute(generateSchemaForInterface(interfaceName), query, variables, context)
+		body: JSON.stringify(execute(generateSchemaForInterface(interfaceName), query, variables, context))
 	};
 }
