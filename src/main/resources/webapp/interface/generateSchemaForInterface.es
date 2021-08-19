@@ -331,7 +331,7 @@ export function generateSchemaForInterface(interfaceName) {
 		const multiRepoReadConnection = multiConnect(multiConnectParams);
 
 		const queryRes = multiRepoReadConnection.query(queryParams);
-		//log.debug(`queryRes:${toStr(queryRes)}`);
+		log.debug(`queryRes:${toStr(queryRes)}`);
 
 		function queryResAggregationsObjToArray(obj, localTypes = types) {
 			//log.debug(`obj:${toStr(obj)}`);
@@ -428,12 +428,19 @@ export function generateSchemaForInterface(interfaceName) {
 		fields: {
 			aggregations: { type: list(OBJECT_TYPE_AGGREGATIONS_UNION) },
 			aggregationsAsJson: { type: GraphQLJson },
-			count: { type: nonNull(GraphQLInt) },
+
+			//TODO does createConnectionType removes count ?
+			//count: { type: nonNull(GraphQLInt) },
+			count: { type: GraphQLInt },
+
 			hits: { type: list(createObjectType({
 				name: 'InterfaceSearchHits',
 				fields: interfaceSearchHitsFields
 			}))},
-			total: { type: nonNull(GraphQLInt) }
+
+			//TODO does createConnectionType removes total ?
+			//total: { type: nonNull(GraphQLInt) }
+			total: { type: GraphQLInt }
 		}
 	});
 
@@ -676,7 +683,7 @@ export function generateSchemaForInterface(interfaceName) {
 							after = encodeCursor('0'), // encoded representation of start
 							//aggregations,
 							//filters,
-							first, // count
+							first = 10, // count
 							//highlight,
 							searchString
 						} = env.args;
@@ -684,29 +691,20 @@ export function generateSchemaForInterface(interfaceName) {
 						log.debug(`first:${toStr({first})}`);
 						const start = (after && parseInt(decodeCursor(after))) || 0;
 						log.debug(`start:${toStr({start})}`);
-						const node = searchResolver({
-							//aggregations,
-							count: first,
-							//filters,
-							//highlight,
-							searchString,
-							start
-						});
-						const totalCount = node.total;
-						// TODO I have no idea if these are correct!
-						const endCursor = encodeCursor(totalCount - first);
-						const hasNext = totalCount > start + first;
-						return {
-							totalCount,
-							edges: {
-								node
-							},
-							pageInfo: {
-								startCursor: after,
-								endCursor,
-								hasNext
+						const res = searchResolver({
+							args: {
+								//aggregations,
+								count: first,
+								//filters,
+								//highlight,
+								searchString,
+								start
 							}
-						};
+						});
+						//log.debug(`res:${toStr({res})}`);
+						res.start = start;
+						log.debug(`res:${toStr({res})}`);
+						return res;
 					},
 					type: createConnectionType(schemaGenerator, objectTypeInterfaceSearch)
 				},
