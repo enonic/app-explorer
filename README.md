@@ -196,6 +196,7 @@ app-explorer
 
 ### 1.5.0-SNAPSHOT
 
+* Require Enonic XP 7.7.2
 * Upgrade to lib-explorer-3.19.0
   * Require Enonic XP 7.7.2
   * Start using @enonic/js-utils (0.0.1)
