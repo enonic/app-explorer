@@ -289,7 +289,7 @@ const SS_JS_CONFIG = {
 						'array-includes'
 					],
 					presets: [
-						//'@babel/preset-typescript', // Why did I ever add this???
+						'@babel/preset-typescript', // Needed when @enonic/js-utils/src
 						[
 							'@babel/preset-env',
 							{
@@ -351,8 +351,9 @@ const SS_JS_CONFIG = {
 			//'esm',
 			'es', // Needed to resolve "local" imports starting with / which are .es files
 			//'es6',
-			'js'//, // Needed to resolve node_modules
+			'js', // Needed to resolve node_modules
 			//'json'
+			'ts' // Needed when @enonic/js-utils/src
 		].map(ext => `.${ext}`)
 	},
 	stats: STATS
