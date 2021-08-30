@@ -197,6 +197,7 @@ app-explorer
 ### 1.5.0-SNAPSHOT
 
 * TODO: Upgrade to lib-explorer-3.19.0
+* Created stopwords missing _nodeType
 * Model 8: Add stemmed query expressions to Default interface
 * Update calls to node/create to avoid deprecation warnings
 * Scheduling -> Schedules
