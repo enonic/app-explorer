@@ -196,7 +196,17 @@ app-explorer
 
 ### 1.5.0-SNAPSHOT
 
-* TODO: Upgrade to lib-explorer-3.19.0
+* Upgrade to lib-explorer-3.19.0
+  * Require Enonic XP 7.7.2
+  * Start using @enonic/js-utils (0.0.1)
+  * Fix BUG Default fields title, text index byType does not include ngram!
+  * Fix BUG Change of language doesn't cause document update (by including _indexConfig when diffing)
+  * Add stemmed query expressions to Default interface
+  * Update calls to indexTemplateToConfig to avoid deprecation warnings
+  * BUGFIX Second argument to folder() should be optional
+  * Use collection name rather than collection id when scheduling
+  * Support stemmed queries
+* Start using @enonic/js-utils (0.0.1)
 * Created stopwords missing _nodeType
 * Model 8: Add stemmed query expressions to Default interface
 * Update calls to node/create to avoid deprecation warnings

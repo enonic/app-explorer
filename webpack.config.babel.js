@@ -24,11 +24,11 @@ import webpack from 'webpack';
 const MODE = 'production';
 //print({MODE});
 
-//const BOOL_LIB_EXPLORER_EXTERNAL = MODE === 'production';
-const BOOL_LIB_EXPLORER_EXTERNAL = false;
+const BOOL_LIB_EXPLORER_EXTERNAL = MODE === 'production';
+//const BOOL_LIB_EXPLORER_EXTERNAL = false;
 
-//const BOOL_LOCAL_JS_UTILS = MODE !== 'production';
-const BOOL_LOCAL_JS_UTILS = true;
+const BOOL_LOCAL_JS_UTILS = MODE !== 'production';
+//const BOOL_LOCAL_JS_UTILS = true;
 
 const BOOL_LOCAL_SEMANTIC_UI_REACT_FORM = MODE !== 'production';
 //const BOOL_LOCAL_SEMANTIC_UI_REACT_FORM = true;
@@ -65,10 +65,10 @@ const SS_ALIAS = {
 	'@enonic/nashorn-polyfills': path.resolve(__dirname, 'src/main/resources/lib/nashorn/index.es'),
 	'@enonic/js-utils': BOOL_LIB_EXPLORER_EXTERNAL
 		? BOOL_LOCAL_JS_UTILS
-			? path.resolve(__dirname, '../../comlock/enonic-js-utils/src/index')
+			? path.resolve(__dirname, '../enonic-js-utils/src/index')
 			: path.resolve(__dirname, './node_modules/@enonic/js-utils/src/index')
 		: BOOL_LOCAL_JS_UTILS
-			? path.resolve(__dirname, '../../comlock/enonic-js-utils/dist/cjs/index')
+			? path.resolve(__dirname, '../enonic-js-utils/dist/cjs/index')
 			: path.resolve(__dirname, './node_modules/@enonic/js-utils/dist/cjs/index')
 };
 
@@ -648,7 +648,7 @@ const CLIENT_ES_CONFIG = {
 	resolve: {
 		alias: {
 			'@enonic/js-utils': BOOL_LOCAL_JS_UTILS
-				? path.resolve(__dirname, '../../comlock/enonic-js-utils/src/index')
+				? path.resolve(__dirname, '../enonic-js-utils/src/index')
 				: path.resolve(__dirname, './node_modules/@enonic/js-utils/src/index'),
 			'semantic-ui-react-form': BOOL_LOCAL_SEMANTIC_UI_REACT_FORM
 				? path.resolve(__dirname, '../semantic-ui-react-form/src')
