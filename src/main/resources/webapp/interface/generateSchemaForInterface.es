@@ -342,11 +342,11 @@ export function generateSchemaForInterface(interfaceName) {
 			highlight,
 			//query: `fulltext('${fields.map(({name: field, boost = 1}) => `${field}${boost && boost > 1 ? `^${boost}` : ''}`)}', '${searchStringWithoutStopWords}', 'AND')`,
 			query: or(fulltext(
-				fields.map(({boost, name: field}) => ({boost, field})),
+				fields.map(({boost, name: field}) => ({boost: (parseInt(boost)||1) + (fields.length*2), field})),
 				searchStringWithoutStopWords,
 				QUERY_OPERATOR_AND
 			),stemmed(
-				fields.map(({boost, name: field}) => ({boost, field})),
+				fields.map(({boost, name: field}) => ({boost: (parseInt(boost)||1) + fields.length, field})),
 				searchStringWithoutStopWords,
 				QUERY_OPERATOR_AND,
 				//language // TODO
