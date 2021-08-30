@@ -1,11 +1,17 @@
 import {
+	QUERY_OPERATOR_AND,
 	VALUE_TYPE_ANY,
 	VALUE_TYPE_SET,
 	addQueryFilter,
 	camelize,
 	//forceArray,
+	fulltext,
+	//group,
+	or,
 	isSet,
+	ngram,
 	toStr,
+	stemmed,
 	ucFirst
 } from '@enonic/js-utils';
 import {
@@ -334,7 +340,21 @@ export function generateSchemaForInterface(interfaceName) {
 				filters
 			}),
 			highlight,
-			query: `fulltext('${fields.map(({name: field, boost = 1}) => `${field}${boost && boost > 1 ? `^${boost}` : ''}`)}', '${searchStringWithoutStopWords}', 'AND')`,
+			//query: `fulltext('${fields.map(({name: field, boost = 1}) => `${field}${boost && boost > 1 ? `^${boost}` : ''}`)}', '${searchStringWithoutStopWords}', 'AND')`,
+			query: or(fulltext(
+				fields.map(({boost, name: field}) => ({boost, field})),
+				searchStringWithoutStopWords,
+				QUERY_OPERATOR_AND
+			),stemmed(
+				fields.map(({boost, name: field}) => ({boost, field})),
+				searchStringWithoutStopWords,
+				QUERY_OPERATOR_AND,
+				//language // TODO
+			),ngram(
+				fields.map(({boost, name: field}) => ({boost, field})),
+				searchStringWithoutStopWords,
+				QUERY_OPERATOR_AND
+			)),
 			start
 		};
 		log.debug(`queryParams:${toStr({queryParams})}`);
