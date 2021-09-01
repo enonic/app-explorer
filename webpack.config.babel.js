@@ -111,7 +111,7 @@ const SS_EXTERNALS = [
 if (BOOL_LIB_EXPLORER_EXTERNAL) {
 	SS_EXTERNALS.push(/^\/lib\/explorer\//);
 } else {
-	SS_ALIAS['/lib/explorer'] = path.resolve(__dirname, '../lib-explorer/src/main/resources/lib/explorer/');
+	SS_ALIAS['/lib/explorer'] = path.resolve(__dirname, '../lib-explorer-3.x/src/main/resources/lib/explorer/');
 }
 
 const SS_FILES = [
