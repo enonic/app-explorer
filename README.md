@@ -279,8 +279,8 @@ On a development laptop the Explorer admin to is usually available here:
 * Scheduling should not be visible before one has selected collector
 * Make it possible to select language per collection
 * Build system upgrades
-  * Node 14.17.1
   * Gradle 6.9
+  * Node 14.17.6
   * Babel modules 7.14.7
   * Core-js 3.15.1
   * Webpack 5.40.0
