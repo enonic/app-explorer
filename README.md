@@ -151,7 +151,7 @@ On a development laptop the Explorer admin to is usually available here:
 
 | App version | XP version |
 | ----------- | ---------- |
-| 1.5.0-B1 | 7.7.2 |
+| 1.5.0 | 7.7.2 |
 | 1.4.0 | 7.4.1 |
 | 1.[23].0 | 7.3.2 |
 | 1.1.0 | 7.3.1 |
@@ -159,8 +159,10 @@ On a development laptop the Explorer admin to is usually available here:
 
 ## Changelog
 
-### 1.5.0-B1
+### 1.5.0
 
+* Upgrade to lib-explorer-3.20.1
+  * Service interfaceSelector needs should filter on _nodeType
 * Upgrade to lib-explorer-3.20.0
   * Use http Authorization header: Explorer-Api-Key XXXX
 * Require Enonic XP 7.7.2
