@@ -161,6 +161,8 @@ On a development laptop the Explorer admin to is usually available here:
 
 ### 1.5.0-SNAPSHOT
 
+* Upgrade to lib-explorer-3.20.0
+  * Use http Authorization header: Explorer-Api-Key XXXX
 * Require Enonic XP 7.7.2
 * Upgrade to lib-explorer-3.19.0
   * Require Enonic XP 7.7.2
