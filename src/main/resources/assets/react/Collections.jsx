@@ -701,7 +701,7 @@ export function Collections(props) {
 													})
 														.then(res => res.json())
 														.then(res => {
-															log.debug(res);
+															console.debug(res);
 														});
 												}}
 											>
