@@ -15,36 +15,32 @@ import {connect} from '/lib/explorer/repo/connect';
 import {generateSchemaForInterface} from './generateSchemaForInterface';
 
 
-export function post(request) {
-	//log.debug(`request:${toStr(request)}`);
+const AUTHORIZATION_PREFIX = 'Explorer-Api-Key ';
+
+
+function isUnauthorized({
+	interfaceName,
+	request
+}) {
 	const {
-		body: bodyJson = '{}',
 		headers: {
 			'Authorization': authorization // 'Explorer-Api-Key XXXX'
-		},
-		pathParams: {
-			interfaceName// = 'default'
-		} = {}
+		}
 	} = request;
 	//log.debug(`authorization:${toStr(authorization)}`);
-	const prefix = 'Explorer-Api-Key ';
 	if(!authorization) {
 		log.error(`Authorization header missing!`);
 		return { status: 401 }; // Unauthorized
 	}
-	if(!authorization.startsWith(prefix)) {
+	if(!authorization.startsWith(AUTHORIZATION_PREFIX)) {
 		log.error(`Invalid Authorization header:${authorization}!`);
 		return { status: 401 }; // Unauthorized
 	}
-	const apiKey = authorization.substring(prefix.length);
+	const apiKey = authorization.substring(AUTHORIZATION_PREFIX.length);
 	//log.debug(`apiKey:${toStr(apiKey)}`);
 	if (!apiKey) {
 		log.error(`ApiKey not found in Authorization header:${authorization}!`);
 		return { status: 401 }; // Unauthorized
-	}
-	if (!interfaceName) {
-		log.error(`interfaceName not provided!`);
-		return 404; // Not Found
 	}
 	const hashedApiKey = hash(apiKey);
 	//log.debug(`hashedApiKey:${toStr(hashedApiKey)}`);
@@ -98,15 +94,38 @@ export function post(request) {
 			status: 401 // Unauthorized
 		};
 	}
-
 	//log.debug(`interfaceName:${toStr(interfaceName)}`);
 	if (!interfaceExists({
 		connection: explorerRepoReadConnection,
 		name: interfaceName
 	})) {
 		log.error(`interface:${interfaceName} doesn't exist!`);
-		return 404; // Not Found
+		return {status: 404}; // Not Found
 	}
+	return false; // Authorized
+} // isUnauthorized
+
+
+export function overrideable(request, fn = isUnauthorized) {
+	//log.debug(`request:${toStr(request)}`);
+	const {
+		body: bodyJson = '{}',
+		pathParams: {
+			interfaceName// = 'default'
+		} = {}
+	} = request;
+
+	if (!interfaceName) {
+		log.error(`interfaceName not provided!`);
+		return {status: 404}; // Not Found
+	}
+
+	const unauthorized = fn({
+		interfaceName,
+		request
+	});
+
+	if (unauthorized) { return unauthorized; }
 
 	const body = JSON.parse(bodyJson);
 	const {query, variables} = body;
@@ -118,4 +137,9 @@ export function post(request) {
 		contentType: RESPONSE_TYPE_JSON,
 		body: JSON.stringify(execute(generateSchemaForInterface(interfaceName), query, variables, context))
 	};
+}
+
+
+export function post(request) {
+	return overrideable(request, isUnauthorized);
 }

@@ -15,6 +15,7 @@ import {
 } from '/lib/explorer/model/2/constants';
 import {htmlResponse} from '/admin/tools/explorer/htmlResponse';
 
+import {overrideable as interfacePost} from '../../../webapp/interface/post';
 
 const router = newRouter();
 
@@ -29,12 +30,23 @@ const router = newRouter();
 // So I will try to make routes using as much GET as possible
 // And possibly a few instances of POST.
 //──────────────────────────────────────────────────────────────────────────────
-router.filter((req/*, next*/) => {
+router.filter((
+	req,
+	next
+) => {
 	if (!(hasRole(ROLE_EXPLORER_ADMIN) || hasRole(ROLE_SYSTEM_ADMIN))) { return { status: 401 }; }
 	//log.info(toStr({method: req.method})); // form method only supports get and post
 
-	return htmlResponse(req);
+	//return htmlResponse(req);
+	return next(req);
 });
+
+router.all('/', (r) => htmlResponse(r));
+
+router.post('/api/v1/interface/{interfaceName}', (r) => interfacePost(
+	r,
+	() => false // false means always authorized
+));
 
 // NOTE https://github.com/enonic/xp/issues/6793
 
