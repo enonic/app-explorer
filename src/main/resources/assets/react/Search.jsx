@@ -8,6 +8,39 @@ import {Hits} from './search/Hits';
 
 //const forceArray = data => Array.isArray(data) ? data : [data];
 
+const SEARCH_QUERY = `query SearchQuery(
+	$searchString: String!
+	$count: Int
+	$start: Int
+) {
+	search(
+		searchString: $searchString
+		count: $count
+		start: $start
+		#filters: {}
+		highlight: {
+			properties: {
+				title: {}
+				text: {}
+			}
+		}
+		#aggregations: []
+	) {
+		#aggregationsAsJson
+		count
+		total
+		hits {
+			#_highlight {
+			#	title
+			#	text
+			#}
+			title
+			text
+			uri
+		}
+	}
+}`;
+
 
 export function Search(props) {
 	const {
@@ -52,17 +85,32 @@ export function Search(props) {
 			return;
 		}
 		setLoading(true);
-		const uri = `${servicesBaseUrl}/search?interface=${interfaceName}&name=searchString&searchString=${ss}`;
+		//const uri = `${servicesBaseUrl}/search?interface=${interfaceName}&name=searchString&searchString=${ss}`;
+		const uri = `./explorer/api/v1/interface/${interfaceName}`;
 		//console.debug(uri);
-		fetch(uri)
+		fetch(uri, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				query: SEARCH_QUERY,
+				variables: {
+					//count: 10,
+					searchString: ss//,
+					//start: 0
+				}
+			})
+		})
 			.then(response => response.json())
 			.then(aResult => {
-				setCache(prev => {
-					const deref = JSON.parse(JSON.stringify(prev));
-					setIn(deref, `${interfaceName}.${ss}`, aResult);
-					return deref;
-				});
-				setResult(aResult);
+				//console.debug(aResult);
+				if (aResult && aResult.data && aResult.data.search) {
+					setCache(prev => {
+						const deref = JSON.parse(JSON.stringify(prev));
+						setIn(deref, `${interfaceName}.${ss}`, aResult.data.search);
+						return deref;
+					});
+					setResult(aResult.data.search);
+				}
 				setLoading(false);
 			});
 	}
