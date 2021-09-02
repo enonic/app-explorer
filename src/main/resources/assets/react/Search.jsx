@@ -19,6 +19,10 @@ const SEARCH_QUERY = `query SearchQuery(
 		start: $start
 		#filters: {}
 		highlight: {
+			fragmentSize: 255
+			numberOfFragments: 1
+			postTag: "</b>"
+			preTag: "<b>"
 			properties: {
 				title: {}
 				text: {}

@@ -451,8 +451,27 @@ export function generateSchemaForInterface(interfaceName) {
 				repoId
 			}).get(id));
 			const json = JSON.stringify(washedNode);
+
+			const obj = {};
+			Object.keys(highlight).forEach((k) => {
+				//log.debug(`k:${k} highlight[${k}]:${toStr(highlight[k])}`);
+				//const first = forceArray(highlight[k])[0];
+				if (k.includes('._stemmed_')) {
+					// NOTE If multiple languages, the latter will overwrite the first. A single nodes with multiple lanugages is unsupported.
+					const kWithoutStemmed = k.split('._stemmed_')[0];
+					//log.debug(`k:${k} kWithoutStemmed:${kWithoutStemmed}`);
+					obj[kWithoutStemmed] = highlight[k];
+					washedNode[kWithoutStemmed] = highlight[k][0];
+				} else {
+					if(!obj[k]) {
+						obj[k] = highlight[k];
+						washedNode[k] = highlight[k][0];
+					}
+				}
+			});
+
 			/* eslint-disable no-underscore-dangle */
-			washedNode._highlight = highlight;
+			washedNode._highlight = obj;
 			washedNode._json = json;
 			washedNode._score = score;
 			/* eslint-enable no-underscore-dangle */
