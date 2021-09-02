@@ -152,7 +152,7 @@ On a development laptop the Explorer admin to is usually available here:
 
 | App version | XP version |
 | ----------- | ---------- |
-| 2.0.0 | 7.7.1 |
+| 2.0.0 | 7.7.2 |
 | 1.5.0 | 7.7.1 |
 | 1.4.0 | 7.4.1 |
 | 1.[23].0 | 7.3.2 |
