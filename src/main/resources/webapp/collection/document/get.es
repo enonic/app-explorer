@@ -11,7 +11,7 @@ import {
 //import {get as getCollection} from '/lib/explorer/collection/get';
 import {connect} from '/lib/explorer/repo/connect';
 
-import {respondWithHtml} from '/lib/explorer/api/v1/documents/documentation';
+import {respondWithHtml} from './documentation';
 
 function respondWithJson({
 	collectionName,
