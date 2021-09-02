@@ -1,5 +1,4 @@
 export function respondWithHtml({
-	apiKey,
 	count,
 	query,
 	sort,
@@ -87,11 +86,6 @@ export function respondWithHtml({
 
 				const params = {};
 
-				var getApiKey = document.getElementById('getApiKey').value;
-				if (getApiKey) {
-					params.apiKey = getApiKey;
-				}
-
 				var getCount = document.getElementById('getCount').value;
 				if (getCount) {
 					params.count = getCount;
@@ -167,11 +161,6 @@ export function respondWithHtml({
 				event.preventDefault();
 
 				const params = {};
-				var apiKey = document.getElementById('apiKey').value;
-				//console.log('apiKey', apiKey);
-				if (apiKey) {
-					params.apiKey = apiKey;
-				}
 
 				var requireValidFalse = document.getElementById('requireValidFalse').checked;
 				//console.log('requireValidFalse', requireValidFalse);
@@ -218,9 +207,6 @@ export function respondWithHtml({
 				//console.log('event', event);
 				event.preventDefault();
 
-				var deleteApiKey = document.getElementById('deleteApiKey').value;
-				//console.log('deleteApiKey', deleteApiKey);
-
 				var nodeList = document.querySelectorAll('[name=deleteId]'); // Dynamic
 				//console.debug('nodeList', nodeList);
 				//var array = Array.prototype.slice.call(nodeList); // Static
@@ -234,7 +220,7 @@ export function respondWithHtml({
 					//console.debug('deleteIds', deleteIds);
 				}
 
-				fetch(\`?apiKey=\${deleteApiKey}&\${deleteIds}\`, {
+				fetch(\`?\${deleteIds}\`, {
 					headers: {
 						'Accept': 'application/json',
 						'Content-Type': 'application/json'
@@ -259,12 +245,18 @@ export function respondWithHtml({
 					<tr>
 						<th>Name</th>
 						<th>Value</th>
+						<th>Description</th>
 					</tr>
 				</thead>
 				<tbody>
 					<tr>
 						<th>Accept</th>
 						<td>application/json</td>
+					</tr>
+					<tr>
+						<th>Authorization</th>
+						<td>Explorer-Api-Key XXXX</td>
+						<td>The API key (password) for the collection you want to get documents from.</td>
 					</tr>
 					<tr>
 						<th>Content-Type</th>
@@ -284,13 +276,6 @@ export function respondWithHtml({
 					</tr>
 				</thead>
 				<tbody>
-					<tr>
-						<th>apiKey</th>
-						<td>&lt;required&gt;</td>
-						<td></td>
-						<td>The API key (password) for the collection you want to get documents from.</td>
-					</tr>
-
 					<tr>
 						<th>id</th>
 						<td>&lt;optional&gt;</td>
@@ -346,9 +331,6 @@ export function respondWithHtml({
 			<h2>GET Form (XHR)</h2>
 			<form autocomplete="off" method="GET" novalidate onsubmit="return myGet(event)">
 				<dl>
-					<dt><label for="getApiKey">API Key</label></dt>
-					<dd><input id="getApiKey" name="getApiKey" placeholder="required" required size="80" type="text" value="${apiKey}"/></dd>
-
 					<dt><label for="getId">Id</label></dt>
 					<dd><input name="getId" placeholder="" size="80" type="text" value=""/></dd>
 					<dd><input name="getId" placeholder="" size="80" type="text" value=""/></dd>
@@ -402,12 +384,18 @@ export function respondWithHtml({
 					<tr>
 						<th>Name</th>
 						<th>Value</th>
+						<th>Description</th>
 					</tr>
 				</thead>
 				<tbody>
 					<tr>
 						<th>Accept</th>
 						<td>application/json</td>
+					</tr>
+					<tr>
+						<th>Authorization</th>
+						<td>Explorer-Api-Key XXXX</td>
+						<td>The API key (password) for the collection you want to get documents from.</td>
 					</tr>
 					<tr>
 						<th>Content-Type</th>
@@ -427,12 +415,6 @@ export function respondWithHtml({
 					</tr>
 				</thead>
 				<tbody>
-					<tr>
-						<th>apiKey</th>
-						<td>&lt;required&gt;</td>
-						<td></td>
-						<td>The API key (password) for the collection you want to persist documents to.</td>
-					</tr>
 					<tr>
 						<th>requireValid</th>
 						<td>&lt;optional&gt;</td>
@@ -498,9 +480,6 @@ export function respondWithHtml({
 			<h2>POST Form Create or modify (XHR)</h2>
 			<form autocomplete="off" method="POST" novalidate onsubmit="return myPost(event)">
 				<dl>
-					<dt><label for="apiKey">API Key</label></dt>
-					<dd><input id="apiKey" name="apiKey" placeholder="required" required size="80" type="text" value="${apiKey}"/></dd>
-
 					<dt>Require valid</dt>
 					<dd>
 						<input checked="checked" id="requireValidTrue" name="requireValid" type="radio" value="true"/>
@@ -562,12 +541,18 @@ export function respondWithHtml({
 					<tr>
 						<th>Name</th>
 						<th>Value</th>
+						<th>Description</th>
 					</tr>
 				</thead>
 				<tbody>
 					<tr>
 						<th>Accept</th>
 						<td>application/json</td>
+					</tr>
+					<tr>
+						<th>Authorization</th>
+						<td>Explorer-Api-Key XXXX</td>
+						<td>The API key (password) for the collection you want to get documents from.</td>
 					</tr>
 					<tr>
 						<th>Content-Type</th>
@@ -587,11 +572,6 @@ export function respondWithHtml({
 				</thead>
 				<tbody>
 					<tr>
-						<th>apiKey</th>
-						<td>&lt;required&gt;</td>
-						<td>The API key (password) for the collection you want to delete documents from.</td>
-					</tr>
-					<tr>
 						<th>id</th>
 						<td>&lt;required&gt;</td>
 						<td>Id of document to delete. May supply multiple.</td>
@@ -609,9 +589,6 @@ export function respondWithHtml({
 			<h2>DELETE Form (XHR)</h2>
 			<form autocomplete="off" method="DELETE" novalidate onsubmit="return myDelete(event)">
 				<dl>
-					<dt><label for="deleteApiKey">API Key</label></dt>
-					<dd><input id="deleteApiKey" name="deleteApiKey" placeholder="required" required size="80" type="text" value="${apiKey}"/></dd>
-
 					<dt><label for="deleteId">Id</label></dt>
 					<dd><input name="deleteId" placeholder="" size="80" type="text" value=""/></dd>
 					<dd><input name="deleteId" placeholder="" size="80" type="text" value=""/></dd>

@@ -5,20 +5,16 @@ import {
 
 import {
 	COLLECTION_REPO_PREFIX,
-	NT_API_KEY,
 	PRINCIPAL_EXPLORER_READ,
 	PRINCIPAL_EXPLORER_WRITE
 } from '/lib/explorer/model/2/constants';
 //import {get as getCollection} from '/lib/explorer/collection/get';
 import {connect} from '/lib/explorer/repo/connect';
-import {hash} from '/lib/explorer/string/hash';
 
 
-export function remove(request) {
+export function remove(request, collections = []) {
 	const {
 		params: {
-			apiKey = '',
-			//branch = branchDefault,
 			collection: collectionParam = '',
 			id: idParam
 		} = {},
@@ -35,15 +31,6 @@ export function remove(request) {
 			status: 400 // Bad Request
 		};
 	}
-	if (!apiKey) {
-		return {
-			body: {
-				message: 'Missing required url query parameter apiKey!'
-			},
-			contentType: 'text/json;charset=utf-8',
-			status: 400 // Bad Request
-		};
-	}
 	if (!idParam) {
 		return {
 			body: {
@@ -54,49 +41,8 @@ export function remove(request) {
 		};
 	}
 
-	const readConnection = connect({
-		principals: [PRINCIPAL_EXPLORER_READ]
-	});
-
-	/*const collection = getCollection({
-		connection: readConnection,
-		name: collectionName
-	});
-
-	if (!collection) {
-		return {
-			body: {
-				message: 'Bad Request'
-			},
-			contentType: 'text/json;charset=utf-8',
-			status: 400 // Bad Request
-		};
-	}*/
-
-	const hashedApiKey = hash(apiKey);
-	//log.info(`hashedApiKey:${toStr(hashedApiKey)}`);
-
-	const matchingApiKeys = readConnection.query({
-		count: -1,
-		filters: {
-			boolean: {
-				must: [{
-					hasValue: {
-						field: 'key',
-						values: [hashedApiKey]
-					}
-				},{
-					hasValue: {
-						field: '_nodeType',
-						values: [NT_API_KEY]
-					}
-				}]
-			}
-		}
-	});
-	//log.info(`matchingApiKeys:${toStr(matchingApiKeys)}`);
-	if(matchingApiKeys.total !== 1) {
-		log.error(`API key hashedApiKey:${hashedApiKey} not found!`);
+	if (!collections) {
+		log.error(`Access too no collections!`);
 		return {
 			body: {
 				message: 'Bad Request'
@@ -106,12 +52,8 @@ export function remove(request) {
 		};
 	}
 
-	const apiKeyNodeId = matchingApiKeys.hits[0].id;
-	const apiKeyNode = readConnection.get(apiKeyNodeId);
-	//log.info(`apiKeyNode:${toStr(apiKeyNode)}`);
-
-	if (!apiKeyNode) { // This should never happen (index out of sync)
-		log.error(`API key hashedApiKey:${hashedApiKey} found, but unable to get id:${apiKeyNodeId}!`);
+	if (!forceArray(collections).includes(collectionName)) {
+		log.error(`No access to collection:${collectionName}!`);
 		return {
 			body: {
 				message: 'Bad Request'
@@ -120,57 +62,6 @@ export function remove(request) {
 			status: 400 // Bad Request
 		};
 	}
-
-	if (!apiKeyNode.collections) {
-		log.error(`API key hashedApiKey:${hashedApiKey} found, but access too no collections!`);
-		return {
-			body: {
-				message: 'Bad Request'
-			},
-			contentType: 'text/json;charset=utf-8',
-			status: 400 // Bad Request
-		};
-	}
-
-	if (!forceArray(apiKeyNode.collections).includes(collectionName)) {
-		log.error(`API key hashedApiKey:${hashedApiKey} does not have access to collection:${collectionName}!`);
-		return {
-			body: {
-				message: 'Bad Request'
-			},
-			contentType: 'text/json;charset=utf-8',
-			status: 400 // Bad Request
-		};
-	}
-
-	/*const {
-		collector: {
-			config: {
-				apiKeys = []
-			} = {}
-		} = {}
-	} = collection;
-
-	const arrApiKeys = forceArray(apiKeys);
-	let keyMatch = false;
-	for (let i = 0; i < arrApiKeys.length; i++) {
-		const {key} = arrApiKeys[i];
-		//log.info(`key:${toStr(key)}`);
-		if(key === hashedApiKey) {
-			keyMatch = true;
-			break;
-		}
-	} // for
-
-	if (!keyMatch) {
-		return {
-			body: {
-				message: 'Bad Request'
-			},
-			contentType: 'text/json;charset=utf-8',
-			status: 400 // Bad Request
-		};
-	}*/
 
 	const repoId = `${COLLECTION_REPO_PREFIX}${collectionName}`;
 	//log.info(`repoId:${toStr(repoId)}`);
