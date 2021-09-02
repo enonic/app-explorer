@@ -106,7 +106,7 @@ export function generateSchemaForInterface(interfaceName) {
 	//log.debug(`interfaceNode:${toStr(interfaceNode)}`);
 	const {
 		collections,
-		fields,// = DEFAULT_INTERFACE_FIELDS, TODO This wont work when fields = [] which filter does
+		fields = [],// = DEFAULT_INTERFACE_FIELDS, TODO This wont work when fields = [] which filter does
 		stopWords//,
 		//synonyms // TODO
 	} = filterInterface(interfaceNode);

@@ -22,8 +22,6 @@ import {
 	SYSTEM_FIELDS
 } from '/lib/explorer/model/2/constants';
 import {
-	DEFAULT_INTERFACE,
-	DEFAULT_INTERFACE_NAME,
 	FOLDERS,
 	ROLES,
 	REPOSITORIES,
@@ -60,7 +58,10 @@ import {get as getRepo} from '/lib/xp/repo';
 //import {delete as deleteJob} from '/lib/xp/scheduler';
 
 import {Progress} from './Progress';
-
+import {
+	DEFAULT_INTERFACE,
+	DEFAULT_INTERFACE_NAME
+} from './interfaceDefault';
 
 const FIELD_TYPE = { // TODO This should not be a system field. Remove in lib-explorer-4.0.0?
 	key: 'type',
@@ -451,61 +452,8 @@ export function run() {
 		} // if model < 3
 
 		//──────────────────────────────────────────────────────────────────────
-		// Model 4: Creating/updating default interface
+		// Model 4: Creating/updating default interface (moved to 9)
 		//──────────────────────────────────────────────────────────────────────
-		if (isModelLessThan({
-			connection: writeConnection,
-			version: 4
-		})) {
-			progress.addItems(1).setInfo('Creating/updating default interface...').report().logInfo();
-
-			const existingInterfaceNode = getInterface({
-				connection: writeConnection,
-				interfaceName: DEFAULT_INTERFACE_NAME
-			});
-			//log.debug(`existingInterfaceNode:${toStr(existingInterfaceNode)}`);
-
-			const interfaceParams = interfaceModel(DEFAULT_INTERFACE);
-			//log.debug(`interfaceParams:${toStr(interfaceParams)}`);
-
-			if(existingInterfaceNode) {
-				const maybeChangedInterface = JSON.parse(JSON.stringify(existingInterfaceNode));
-				delete interfaceParams._parentPath;
-				Object.keys(interfaceParams).forEach((k) => {
-					maybeChangedInterface[k] = interfaceParams[k];
-				});
-				//log.debug(`maybeChangedInterface:${toStr(maybeChangedInterface)}`);
-
-				if (!deepEqual(existingInterfaceNode, maybeChangedInterface)) {
-					interfaceParams.modifiedTime = new Date();
-					maybeChangedInterface.modifiedTime = interfaceParams.modifiedTime;
-					ignoreErrors(() => {
-						log.info(`Changes detected, updating default interface. Diff:${toStr(detailedDiff(existingInterfaceNode, maybeChangedInterface))}`);
-						writeConnection.modify({
-							key: existingInterfaceNode._id,
-							editor: (node) => {
-								Object.keys(interfaceParams).forEach((k) => {
-									node[k] = interfaceParams[k];
-								});
-								return node;
-							}
-						});
-					});
-				}
-			} else {
-				ignoreErrors(() => {
-					create(interfaceParams, {
-						connection: writeConnection
-					}); // Should contain _parentPath
-				});
-			}
-
-			progress.finishItem();
-			setModel({
-				connection: writeConnection,
-				version: 4
-			});
-		} // if model < 4
 
 		//──────────────────────────────────────────────────────────────────────
 		// Model 5: Remove filters on SYSTEM_FIELDS from interface nodes
@@ -702,57 +650,9 @@ export function run() {
 		//deleteJob({name:})
 		progress.finishItem();*/
 
-
 		//──────────────────────────────────────────────────────────────────────
-		// Model 8: Add stemmed query expressions to Default interface
+		// Model 8: Add stemmed query expressions to Default interface (not needed anymore, see 9)
 		//──────────────────────────────────────────────────────────────────────
-		if (isModelLessThan({
-			connection: writeConnection,
-			version: 8
-		})) {
-			progress.addItems(1).setInfo('Add stemmed query expressions to Default interface...').report().logInfo();
-
-			const existingInterfaceNode = getInterface({
-				connection: writeConnection,
-				interfaceName: DEFAULT_INTERFACE_NAME
-			});
-			//log.debug(`existingInterfaceNode:${toStr(existingInterfaceNode)}`);
-
-			const interfaceParams = interfaceModel(DEFAULT_INTERFACE);
-			//log.debug(`interfaceParams:${toStr(interfaceParams)}`);
-
-			if(existingInterfaceNode) {
-				const maybeChangedInterface = JSON.parse(JSON.stringify(existingInterfaceNode));
-				delete interfaceParams._parentPath;
-				Object.keys(interfaceParams).forEach((k) => {
-					maybeChangedInterface[k] = interfaceParams[k];
-				});
-				//log.debug(`maybeChangedInterface:${toStr(maybeChangedInterface)}`);
-
-				if (!deepEqual(existingInterfaceNode, maybeChangedInterface)) {
-					interfaceParams.modifiedTime = new Date();
-					maybeChangedInterface.modifiedTime = interfaceParams.modifiedTime;
-					ignoreErrors(() => {
-						log.info(`Changes detected, updating default interface. Diff:${toStr(detailedDiff(existingInterfaceNode, maybeChangedInterface))}`);
-						writeConnection.modify({
-							key: existingInterfaceNode._id,
-							editor: (node) => {
-								Object.keys(interfaceParams).forEach((k) => {
-									node[k] = interfaceParams[k];
-								});
-								return node;
-							}
-						});
-					});
-				}
-			}
-
-			progress.finishItem();
-			setModel({
-				connection: writeConnection,
-				version: 8
-			});
-		} // if model < 8
 
 		//──────────────────────────────────────────────────────────────────────
 		// Model 9: Remove filters and query from interfaces
@@ -984,7 +884,52 @@ export function run() {
 				progress.finishItem();
 			}
 
+			progress.addItems(1).setInfo('Creating/updating default interface...').report().logInfo();
+
+			const existingInterfaceNode = getInterface({
+				connection: writeConnection,
+				interfaceName: DEFAULT_INTERFACE_NAME
+			});
+			//log.debug(`existingInterfaceNode:${toStr(existingInterfaceNode)}`);
+
+			const interfaceParams = interfaceModel(DEFAULT_INTERFACE);
+			//log.debug(`interfaceParams:${toStr(interfaceParams)}`);
+
+			if(existingInterfaceNode) {
+				const maybeChangedInterface = JSON.parse(JSON.stringify(existingInterfaceNode));
+				delete interfaceParams._parentPath;
+				Object.keys(interfaceParams).forEach((k) => {
+					maybeChangedInterface[k] = interfaceParams[k];
+				});
+				//log.debug(`maybeChangedInterface:${toStr(maybeChangedInterface)}`);
+
+				if (!deepEqual(existingInterfaceNode, maybeChangedInterface)) {
+					interfaceParams.modifiedTime = new Date();
+					maybeChangedInterface.modifiedTime = interfaceParams.modifiedTime;
+					ignoreErrors(() => {
+						log.info(`Changes detected, updating default interface. Diff:${toStr(detailedDiff(existingInterfaceNode, maybeChangedInterface))}`);
+						writeConnection.modify({
+							key: existingInterfaceNode._id,
+							editor: (node) => {
+								Object.keys(interfaceParams).forEach((k) => {
+									node[k] = interfaceParams[k];
+								});
+								return node;
+							}
+						});
+					});
+				}
+			} else {
+				ignoreErrors(() => {
+					create(interfaceParams, {
+						connection: writeConnection
+					}); // Should contain _parentPath
+				});
+			}
+
 			writeConnection.refresh();
+
+			progress.finishItem();
 
 			/*setModel({
 				connection: writeConnection,
