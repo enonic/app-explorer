@@ -6,9 +6,9 @@ mapping.api.idProvider.system = default
 */
 import {toStr} from '@enonic/js-utils';
 
-import {get} from '/lib/explorer/api/v1/documents/get';
-import {post} from '/lib/explorer/api/v1/documents/post';
-import {remove} from '/lib/explorer/api/v1/documents/remove';
+import {get} from './get';
+import {post} from './post';
+import {remove} from './remove';
 import {
 	NT_API_KEY,
 	PRINCIPAL_EXPLORER_READ
