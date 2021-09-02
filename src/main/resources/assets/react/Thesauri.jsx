@@ -68,12 +68,11 @@ export function ThesauriList(props) {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ query: `{
-	queryFields(fields: "language") {
+	queryFields(fields: ["language"]) {
 		total
 		count
 		hits {
 			_name
-			displayName
 			key
 			values {
 				_name
