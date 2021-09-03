@@ -349,7 +349,7 @@ export function generateSchemaForInterface(interfaceName) {
 				fields.map(({boost, name: field}) => ({boost: (parseInt(boost)||1) + fields.length, field})),
 				searchStringWithoutStopWords,
 				QUERY_OPERATOR_AND,
-				//language // TODO
+				//language // TODO @enonic/js-utils defaults to english, which is why it works
 			),ngram(
 				fields.map(({boost, name: field}) => ({boost, field})),
 				searchStringWithoutStopWords,
@@ -452,6 +452,8 @@ export function generateSchemaForInterface(interfaceName) {
 			}).get(id));
 			const json = JSON.stringify(washedNode);
 
+			// NOTE By doing this the frontend developer can't get the full field value and highlight in the same query.
+			// TODO We might not want to do that...
 			const obj = {};
 			Object.keys(highlight).forEach((k) => {
 				//log.debug(`k:${k} highlight[${k}]:${toStr(highlight[k])}`);
@@ -463,7 +465,7 @@ export function generateSchemaForInterface(interfaceName) {
 					obj[kWithoutStemmed] = highlight[k];
 					washedNode[kWithoutStemmed] = highlight[k][0];
 				} else {
-					if(!obj[k]) {
+					if(!obj[k]) { // From fulltext
 						obj[k] = highlight[k];
 						washedNode[k] = highlight[k][0];
 					}
