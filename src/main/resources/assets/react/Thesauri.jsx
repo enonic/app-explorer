@@ -223,6 +223,7 @@ export function Thesauri(props) {
 				<Table.Footer>
 					<Table.Row>
 						<Table.HeaderCell><EditSynonymsModal
+							locales={locales}
 							onClose={fetchOnUpdate}
 							servicesBaseUrl={servicesBaseUrl}
 						/></Table.HeaderCell>

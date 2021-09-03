@@ -13,11 +13,12 @@ export function LanguageDropdown(props) {
 		locales = [],
 		name = 'language',
 		parentPath,
-		path = parentPath ? `${parentPath}.${name}` : name
+		path = parentPath ? `${parentPath}.${name}` : name,
+		value
 	} = props;
 	const [context/*, dispatch*/] = getEnonicContext();
 
-	const language = getIn(context.values, path);
+	const language = value || getIn(context.values, path);
 	/*
 	className='icon'
 	button

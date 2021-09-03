@@ -40,12 +40,13 @@ export function post({
 		}
 		const createRes = createRandomNamed({
 			_indexConfig: {default: 'byType'},
+			_nodeType: NT_SYNONYM,
 			_parentPath: thesaurusNode._path,
 			displayName: `${Array.isArray(from) ? from.join(', ') : from} => ${Array.isArray(to) ? to.join(', ') : to}`,
 			from,
 			thesaurusReference: reference(thesaurusNode._id),
-			to,
-			type: NT_SYNONYM
+			to/*,
+			type: NT_SYNONYM*/ // TODO This could be a problem in explorer-1.5.0
 		}, {
 			connection: connect({
 				principals: [PRINCIPAL_EXPLORER_WRITE]

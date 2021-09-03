@@ -8,6 +8,7 @@ import {EditSynonyms} from './EditSynonyms';
 export function EditSynonymsModal(props) {
 	//console.debug('EditSynonymsModal props', props);
 	const {
+		locales,
 		onClose,
 		servicesBaseUrl,
 		thesaurusId,
@@ -37,6 +38,7 @@ export function EditSynonymsModal(props) {
 		<Modal.Header>{thesaurusId ? 'Edit synonyms' : 'Edit all synonyms'}</Modal.Header>
 		<Modal.Content>
 			<EditSynonyms
+				locales={locales}
 				servicesBaseUrl={servicesBaseUrl}
 				thesaurusId={thesaurusId}
 				thesaurusName={thesaurusName}

@@ -10,6 +10,7 @@ import {DeleteSynonym} from './DeleteSynonym';
 export function EditSynonyms(props) {
 	//console.debug('EditSynonyms props', props);
 	const {
+		locales,
 		servicesBaseUrl,
 		thesaurusId,
 		thesaurusName
@@ -214,6 +215,7 @@ export function EditSynonyms(props) {
 				<Table celled compact selectable sortable striped attached='top'>
 					<Table.Header>
 						<Table.Row>
+							<Table.HeaderCell>Edit</Table.HeaderCell>
 							<Table.HeaderCell
 								onClick={handleSortGenerator('from')}
 								sorted={column === 'from' ? direction : null}
@@ -230,7 +232,7 @@ export function EditSynonyms(props) {
 								onClick={handleSortGenerator('_score')}
 								sorted={column === '_score' ? direction : null}
 							>Score</Table.HeaderCell>
-							<Table.HeaderCell>Actions</Table.HeaderCell>
+							<Table.HeaderCell>Delete</Table.HeaderCell>
 						</Table.Row>
 					</Table.Header>
 					<Table.Body>
@@ -243,34 +245,35 @@ export function EditSynonyms(props) {
 							thesaurusReference,
 							to = ['']
 						}, i) => <Table.Row key={i}>
+							<Table.Cell collapsing><NewOrEditSynonym
+								id={id}
+								from={from}
+								locales={locales}
+								onClose={querySynonyms}
+								servicesBaseUrl={servicesBaseUrl}
+								to={to}
+								thesaurusId={thesaurusReference}
+							/></Table.Cell>
 							<Table.Cell>{(Array.isArray(from) ? from : [from]).join(', ')}</Table.Cell>
 							<Table.Cell>{(Array.isArray(to) ? to : [to]).join(', ')}</Table.Cell>
 							{thesaurusId ? null : <Table.Cell>{thesaurus}</Table.Cell>}
 							<Table.Cell>{score}</Table.Cell>
-							<Table.Cell>
-								<Button.Group>
+							<Table.Cell collapsing>
+								{/*<Button.Group>
 									<NewOrEditSynonym
 										onClose={querySynonyms}
 										servicesBaseUrl={servicesBaseUrl}
 										thesaurusId={thesaurusReference}
-									/>
-									<NewOrEditSynonym
-										id={id}
-										from={from}
-										onClose={querySynonyms}
-										servicesBaseUrl={servicesBaseUrl}
-										to={to}
-										thesaurusId={thesaurusReference}
-									/>
-									<DeleteSynonym
-										id={id}
-										from={from}
-										onClose={querySynonyms}
-										servicesBaseUrl={servicesBaseUrl}
-										thesaurusId={thesaurusReference}
-										to={to}
-									/>
-								</Button.Group>
+									/>*/}
+								<DeleteSynonym
+									id={id}
+									from={from}
+									onClose={querySynonyms}
+									servicesBaseUrl={servicesBaseUrl}
+									thesaurusId={thesaurusReference}
+									to={to}
+								/>
+								{/*</Button.Group>*/}
 							</Table.Cell>
 						</Table.Row>)}
 					</Table.Body>
@@ -295,6 +298,7 @@ export function EditSynonyms(props) {
 				/>
 				<p>Displaying {start}-{end} of {total}</p>
 				{thesaurusId && <NewOrEditSynonym
+					locales={locales}
 					onClose={querySynonyms}
 					servicesBaseUrl={servicesBaseUrl}
 					thesaurusId={thesaurusId}

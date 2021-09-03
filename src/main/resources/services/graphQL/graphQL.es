@@ -99,10 +99,10 @@ export function post(request) {
 
 	return {
 		contentType: RT_JSON,
-		body: JSON.stringify(
+		body: //JSON.stringify( // TODO This is causeing problems, commenting it out until I can look at all of them.
 			// NOTE This add null values for missing properties,
 			// but also causes default values in deconstruction to fail :(
 			execute(SCHEMA, query, variables, context)
-		)
+		//)
 	};
 } // post
