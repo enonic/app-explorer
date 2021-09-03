@@ -148,73 +148,77 @@ export function Thesauri(props) {
 					</Table.Row>
 				</Table.Header>
 				<Table.Body>
-					{thesauriRes.hits.map(({
-						//description,
-						_id,
-						_name,
-						language = {
-							from: '',
-							to: ''
-						},
-						language: {
-							from = '',
-							to = ''
-						} = {},
-						synonymsCount
-					}, index) => {
-						return <Table.Row key={index}>
-							<Table.Cell collapsing>
-								<NewOrEditThesaurus
-									_id={_id}
-									_name={_name}
-									language={language}
-									licenseValid={licenseValid}
-									locales={locales}
-									onClose={fetchOnUpdate}
-									servicesBaseUrl={servicesBaseUrl}
-								/>
-							</Table.Cell>
-							<Table.Cell collapsing>{_name}</Table.Cell>
-							<Table.Cell collapsing>{from}</Table.Cell>
-							<Table.Cell collapsing>{to}</Table.Cell>
-							<Table.Cell collapsing>{synonymsCount}</Table.Cell>
-							<Table.Cell collapsing>
-								<Button.Group>
-									{/*<NewOrEditSynonym
-										onClose={fetchOnUpdate}
-										servicesBaseUrl={servicesBaseUrl}
-										thesaurusId={_id}
-									/>*/}
-									{/*<EditSynonymsModal
-										onClose={fetchOnUpdate}
-										servicesBaseUrl={servicesBaseUrl}
-										thesaurusId={_id}
-										thesaurusName={_name}
-									/>*/}
-									<Import
-										name={_name}
-										onClose={fetchOnUpdate}
-										servicesBaseUrl={servicesBaseUrl}
-									/>
-									<Popup
-										content={`Export from thesaurus ${_name}`}
-										inverted
-										trigger={<Button
-											as='a'
-											icon
-											href={`${servicesBaseUrl}/thesaurusExport?name=${_name}`}
-										><Icon color='blue' name='download'/></Button>}
-									/>
-									{showDelete ? <DeleteThesaurus
+					{(() => {
+						//console.debug(thesauriRes);
+						return thesauriRes.hits.map(({
+							//description,
+							_id,
+							_name,
+							language,/* = {  // This doesn't help when null is passed in! Happens when execute is surrounded with JSON.stringify
+								from: '',
+								to: ''
+							},*/
+							synonymsCount
+						}, index) => {
+							if (!language) { language = {
+								from: '',
+								to: ''
+							};}
+							const {from,to} = language;
+							return <Table.Row key={index}>
+								<Table.Cell collapsing>
+									<NewOrEditThesaurus
 										_id={_id}
-										name={_name}
+										_name={_name}
+										language={language}
+										licenseValid={licenseValid}
+										locales={locales}
 										onClose={fetchOnUpdate}
 										servicesBaseUrl={servicesBaseUrl}
-									/> : null}
-								</Button.Group>
-							</Table.Cell>
-						</Table.Row>;
-					})}
+									/>
+								</Table.Cell>
+								<Table.Cell collapsing>{_name}</Table.Cell>
+								<Table.Cell collapsing>{from}</Table.Cell>
+								<Table.Cell collapsing>{to}</Table.Cell>
+								<Table.Cell collapsing>{synonymsCount}</Table.Cell>
+								<Table.Cell collapsing>
+									<Button.Group>
+										{/*<NewOrEditSynonym
+											onClose={fetchOnUpdate}
+											servicesBaseUrl={servicesBaseUrl}
+											thesaurusId={_id}
+										/>*/}
+										{/*<EditSynonymsModal
+											onClose={fetchOnUpdate}
+											servicesBaseUrl={servicesBaseUrl}
+											thesaurusId={_id}
+											thesaurusName={_name}
+										/>*/}
+										<Import
+											name={_name}
+											onClose={fetchOnUpdate}
+											servicesBaseUrl={servicesBaseUrl}
+										/>
+										<Popup
+											content={`Export from thesaurus ${_name}`}
+											inverted
+											trigger={<Button
+												as='a'
+												icon
+												href={`${servicesBaseUrl}/thesaurusExport?name=${_name}`}
+											><Icon color='blue' name='download'/></Button>}
+										/>
+										{showDelete ? <DeleteThesaurus
+											_id={_id}
+											name={_name}
+											onClose={fetchOnUpdate}
+											servicesBaseUrl={servicesBaseUrl}
+										/> : null}
+									</Button.Group>
+								</Table.Cell>
+							</Table.Row>;
+						});
+					})()}
 				</Table.Body>
 				<Table.Footer>
 					<Table.Row>
