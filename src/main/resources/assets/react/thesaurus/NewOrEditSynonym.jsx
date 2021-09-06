@@ -1,10 +1,9 @@
 import {forceArray} from '@enonic/js-utils';
 import {
 	Button,
-	//Divider,
 	Header, Icon, Modal, Popup,
-	//Radio,
-	Table, Segment
+	Table,
+	Segment
 } from 'semantic-ui-react';
 
 import {Checkbox as EnonicCheckbox} from 'semantic-ui-react-form/inputs/Checkbox';
@@ -21,6 +20,7 @@ import {SubmitButton} from 'semantic-ui-react-form/buttons/SubmitButton';
 //import {ValidateFormButton} from 'semantic-ui-react-form/buttons/ValidateFormButton';
 
 import {LanguageDropdown} from '../collection/LanguageDropdown';
+import {Panel} from './Panel';
 
 //import Snowball from 'snowball';
 
@@ -73,6 +73,7 @@ export function NewOrEditSynonym(props) {
 		thesaurusId,
 		to = ['']
 	} = props;
+
 	const [open, setOpen] = React.useState(false);
 	//function doOpen() { setOpen(true); }
 	function doClose() {
@@ -158,7 +159,7 @@ export function NewOrEditSynonym(props) {
 						}];
 						languages = forceArray(languages);
 						//console.debug('languages', languages);
-						return <>{languages.map(({
+						return <Segment.Group>{languages.map(({
 							language,
 							synonyms
 						}, i) => {
@@ -166,137 +167,146 @@ export function NewOrEditSynonym(props) {
 							const pathSynonyms = `${pathALanguage}.synonyms`;
 							if (!language) language = '';
 							if (!synonyms) synonyms = [];
-							return <Segment key={i}>
-								{/*<h3>Language: {language}</h3>*/}
-								<LanguageDropdown
-									disabled={!!language /* FEATURE: As soon as a language is selected, it's disabled so one cannot change language */}
-									locales={locales}
-									parentPath={pathALanguage}
-									value={language}
-								/>
-								<Table celled compact selectable sortable striped>
-									<Table.Header>
-										<Table.Row>
-											<Table.HeaderCell>Enabled</Table.HeaderCell>
-											<Table.HeaderCell>Synonym</Table.HeaderCell>
-											<Table.HeaderCell>Comment</Table.HeaderCell>
-											<Table.HeaderCell>Actions</Table.HeaderCell>
-										</Table.Row>
-									</Table.Header>
-									<Table.Body>
-										{(()=>{
-											//console.debug('synonyms', synonyms);
-											if (!(synonyms && Array.isArray(synonyms) && synonyms.length)) synonyms = [{
-												comment: '',
-												enabled: true,
-												synonym: ''
-											}];
-											return synonyms.map(({
-												comment,
-												enabled,
-												synonym
-											}, j) => {
-												const pathASynonym = `${pathSynonyms}[${j}]`;
-												return <Table.Row key={`${i}.${j}`}>
-													<Table.Cell collapsing><EnonicCheckbox
-														checked={enabled}
-														path={`${pathASynonym}.enabled`}
-														type='radio'
-														toggle
-													/></Table.Cell>
-													<Table.Cell><EnonicInput
-														disabled={!enabled}
-														fluid
-														path={`${pathASynonym}.synonym`}
-														value={synonym}
-													/></Table.Cell>
-													<Table.Cell><EnonicInput
-														disabled={!enabled}
-														fluid
-														path={`${pathASynonym}.comment`}
-														value={comment}
-													/></Table.Cell>
-													<Table.Cell collapsing>
-														<Button.Group>
-															<InsertButton
-																path={pathSynonyms}
-																index={j+1}
-																value={{
-																	comment: '',
-																	enabled: true,
-																	synonym: ''
-																}}
-															/>
-															<MoveDownButton
-																disabled={j + 1 >= synonyms.length}
-																path={pathSynonyms}
-																index={j}
-															/>
-															<MoveUpButton
-																path={pathSynonyms}
-																index={j}
-															/><DeleteItemButton
-																disabled={synonyms.length < 2}
-																path={pathSynonyms}
-																index={j}
-															/>
-														</Button.Group>
-													</Table.Cell>
-												</Table.Row>;
-											});
-										})()}
-									</Table.Body>
-									{/*<Table.Footer>
-										<Table.HeaderCell colspan={4}>
-											<Button.Group>
-												<InsertButton
-													path={pathSynonyms}
-													index={synonyms.length}
-													value={{
-														comment: '',
-														enabled: true,
-														synonym: ''
-													}}
-												/>
-											</Button.Group>
-										</Table.HeaderCell>
-									</Table.Footer>*/}
-								</Table>
-								<SortButton path={pathSynonyms}/>
-								<Button.Group floated='right'>
-									<MoveDownButton
-										disabled={i + 1 >= languages.length}
-										path={PATH_LANGUAGES}
-										index={i}
-									/>
-									<MoveUpButton
-										path={PATH_LANGUAGES}
-										index={i}
-									/>
-									<DeleteItemButton
-										disabled={languages.length < 2}
-										icon={true}
-										path={PATH_LANGUAGES}
-										index={i}
-									><Icon color='red' name='alternate outline trash'/> Delete language {language}</DeleteItemButton>
-								</Button.Group>
-								<div style={{clear:'both'}}></div>
+							return <Segment
+								key={`panel-${i}`}
+							>
+								<Panel
+									fluid
+									title={language || 'Please select language'}
+								>
+									{/*<h3>Language: {language}</h3>*/}
+									{language ? null : <LanguageDropdown
+										disabled={!!language /* FEATURE: As soon as a language is selected, it's disabled so one cannot change language */}
+										locales={locales}
+										parentPath={pathALanguage}
+										value={language}
+									/>}
+									<Table celled compact selectable sortable striped>
+										<Table.Header>
+											<Table.Row>
+												<Table.HeaderCell>Enabled</Table.HeaderCell>
+												<Table.HeaderCell>Synonym</Table.HeaderCell>
+												<Table.HeaderCell>Comment</Table.HeaderCell>
+												<Table.HeaderCell>Actions</Table.HeaderCell>
+											</Table.Row>
+										</Table.Header>
+										<Table.Body>
+											{(()=>{
+												//console.debug('synonyms', synonyms);
+												if (!(synonyms && Array.isArray(synonyms) && synonyms.length)) synonyms = [{
+													comment: '',
+													enabled: true,
+													synonym: ''
+												}];
+												return synonyms.map(({
+													comment,
+													enabled,
+													synonym
+												}, j) => {
+													const pathASynonym = `${pathSynonyms}[${j}]`;
+													return <Table.Row key={`${i}.${j}`}>
+														<Table.Cell collapsing><EnonicCheckbox
+															checked={enabled}
+															path={`${pathASynonym}.enabled`}
+															type='radio'
+															toggle
+														/></Table.Cell>
+														<Table.Cell><EnonicInput
+															disabled={!enabled}
+															fluid
+															path={`${pathASynonym}.synonym`}
+															value={synonym}
+														/></Table.Cell>
+														<Table.Cell><EnonicInput
+															disabled={!enabled}
+															fluid
+															path={`${pathASynonym}.comment`}
+															value={comment}
+														/></Table.Cell>
+														<Table.Cell collapsing>
+															<Button.Group>
+																<InsertButton
+																	path={pathSynonyms}
+																	index={j+1}
+																	value={{
+																		comment: '',
+																		enabled: true,
+																		synonym: ''
+																	}}
+																/>
+																<MoveDownButton
+																	disabled={j + 1 >= synonyms.length}
+																	path={pathSynonyms}
+																	index={j}
+																/>
+																<MoveUpButton
+																	path={pathSynonyms}
+																	index={j}
+																/><DeleteItemButton
+																	disabled={synonyms.length < 2}
+																	path={pathSynonyms}
+																	index={j}
+																/>
+															</Button.Group>
+														</Table.Cell>
+													</Table.Row>;
+												});
+											})()}
+										</Table.Body>
+										{/*<Table.Footer>
+											<Table.HeaderCell colspan={4}>
+												<Button.Group>
+													<InsertButton
+														path={pathSynonyms}
+														index={synonyms.length}
+														value={{
+															comment: '',
+															enabled: true,
+															synonym: ''
+														}}
+													/>
+												</Button.Group>
+											</Table.HeaderCell>
+										</Table.Footer>*/}
+									</Table>
+									{/*<SortButton path={pathSynonyms}/>*/}
+									<Button.Group floated='right'>
+										<MoveDownButton
+											disabled={i + 1 >= languages.length}
+											path={PATH_LANGUAGES}
+											index={i}
+										/>
+										<MoveUpButton
+											path={PATH_LANGUAGES}
+											index={i}
+										/>
+										<DeleteItemButton
+											disabled={languages.length < 2}
+											icon={true}
+											path={PATH_LANGUAGES}
+											index={i}
+										><Icon color='red' name='alternate outline trash'/> Delete language {language}</DeleteItemButton>
+									</Button.Group>
+									<div style={{clear:'both'}}></div>
+								</Panel>
 							</Segment>;
 						})}
-						<InsertButton
-							icon={false}
-							index={languages.length}
-							path={PATH_LANGUAGES}
-							value={{
-								language: '',
-								synonyms: [{
-									comment: '',
-									enabled: true,
-									synonym: ''
-								}]
-							}}
-						><Icon color='green' name='add'/>Add language</InsertButton>
-						</>;
+						<Segment>
+							<InsertButton
+								icon={false}
+								index={languages.length}
+								path={PATH_LANGUAGES}
+								value={{
+									language: '',
+									synonyms: [{
+										comment: '',
+										enabled: true,
+										synonym: ''
+									}]
+								}}
+							><Icon color='green' name='add'/>Add language</InsertButton>
+						</Segment>
+						</Segment.Group>;
 					}}
 				/>
 				<Header as='h2'>From</Header>
