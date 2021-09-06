@@ -3,16 +3,21 @@ import {
 } from 'semantic-ui-react';
 
 
+// NOTE: Must resolve transpile- and bundle- time.
+import {GQL_MUTATION_DELETE_SYNONYM} from '../../../services/graphQL/synonym/mutationDeleteSynonym';
+
+
 export function DeleteSynonym(props) {
 	//console.debug('DeleteSynonym props', props);
 	const {
-		id,
+		_id,
 		from,
 		onClose,
 		servicesBaseUrl,
-		thesaurusReference,
 		to
 	} = props;
+	console.debug('DeleteSynonym id', _id);
+
 	const [open, setOpen] = React.useState(false);
 
 	function doClose() {
@@ -35,8 +40,18 @@ export function DeleteSynonym(props) {
 				return next;
 			});
 			//setButtonText('Deleting...');
-			fetch(`${servicesBaseUrl}/synonymDelete?id=${id}`, {
-				method: 'DELETE'
+			fetch(`${servicesBaseUrl}/graphQL`, {
+				method: 'POST',
+				headers: {
+					'Content-Type':	'application/json'
+				},
+				body: JSON.stringify({
+					query: GQL_MUTATION_DELETE_SYNONYM,
+					variables: {
+						_id
+					}
+				})
+				//
 			}).then(response => {
 				//console.debug(response);
 				if (response.status == 200) {
@@ -50,7 +65,7 @@ export function DeleteSynonym(props) {
 						next.buttonText = 'Click to close dialogue';
 						next.buttonOnClick = () => {
 							doClose();
-						}
+						};
 						return next;
 					});
 				} else {
@@ -64,11 +79,11 @@ export function DeleteSynonym(props) {
 						next.buttonText = 'Click to close dialogue';
 						next.buttonOnClick = () => {
 							doClose();
-						}
+						};
 						return next;
 					});
 				}
-			})
+			});
 		}
 	});
 
@@ -119,5 +134,5 @@ export function DeleteSynonym(props) {
 				size='tiny'
 			><Icon color='red' name={state.buttonIcon}/>{state.buttonText}</Button>
 		</Modal.Content>
-	</Modal>
+	</Modal>;
 } // DeleteSynonym

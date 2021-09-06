@@ -48,10 +48,10 @@ export const fieldSynonymUpdate = {
 		const modifyRes = writeConnection.modify({
 			key: _id,
 			editor: (node) => {
-				log.debug(`node:${toStr(node)}`);
+				//log.debug(`node:${toStr(node)}`);
 				node.from = from;
 				node.to = to;
-				log.debug(`node:${toStr(node)}`);
+				//log.debug(`node:${toStr(node)}`);
 				return node;
 			}
 		});

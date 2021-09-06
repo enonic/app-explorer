@@ -22,6 +22,11 @@ import {SubmitButton} from 'semantic-ui-react-form/buttons/SubmitButton';
 import {LanguageDropdown} from '../collection/LanguageDropdown';
 import {Panel} from './Panel';
 
+// NOTE: Must resolve transpile- and bundle- time.
+import {GQL_MUTATION_CREATE_SYNONYM} from '../../../services/graphQL/synonym/mutationCreateSynonym';
+import {GQL_MUTATION_UPDATE_SYNONYM} from '../../../services/graphQL/synonym/mutationUpdateSynonym';
+
+
 //import Snowball from 'snowball';
 
 /* Snowball languages
@@ -66,7 +71,7 @@ export function NewOrEditSynonym(props) {
 	//console.debug('NewOrEditSynonym props', props);
 	const {
 		from = [''],
-		id,
+		_id,
 		locales,
 		onClose,
 		servicesBaseUrl,
@@ -86,7 +91,7 @@ export function NewOrEditSynonym(props) {
 		closeIcon
 		onClose={doClose}
 		open={open}
-		trigger={id ? <Popup
+		trigger={_id ? <Popup
 			content={`Edit synonym`}
 			inverted
 			trigger={<Button
@@ -102,7 +107,7 @@ export function NewOrEditSynonym(props) {
 				><Icon color='green' name='plus'/></Button>}/>
 		}
 	>
-		<Modal.Header>{id ? `Edit synonym ${id}` : `New synonym`}</Modal.Header>
+		<Modal.Header>{_id ? `Edit synonym ${_id}` : `New synonym`}</Modal.Header>
 		<Modal.Content>
 			<EnonicForm
 				initialValues={{
@@ -114,9 +119,22 @@ export function NewOrEditSynonym(props) {
 					to
 				}) => {
 					//console.debug({from, thesaurusId, to});
-					fetch(`${servicesBaseUrl}/synonym${id ? 'Modify' : 'Create'}?fromJson=${JSON.stringify(from)}${id ? `&id=${id}`: ''}&thesaurusId=${thesaurusId}&toJson=${JSON.stringify(to)}`, {
-						method: 'POST'
+					fetch(`${servicesBaseUrl}/graphQL`, {
+						method: 'POST',
+						headers: {
+							'Content-Type':	'application/json'
+						},
+						body: JSON.stringify({
+							query: _id ? GQL_MUTATION_UPDATE_SYNONYM : GQL_MUTATION_CREATE_SYNONYM,
+							variables: {
+								_id,
+								from,
+								thesaurusId,
+								to
+							}
+						})
 					}).then((/*response*/) => {
+						//if (response.status === 200) {doClose();}
 						doClose();
 					});
 				}}

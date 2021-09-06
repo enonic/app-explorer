@@ -1,6 +1,7 @@
 import Uri from 'jsuri';
 import {
-	Button, Dropdown, Form, Header, Icon, Loader, Pagination, Table
+	//Button,
+	Dropdown, Form, Header, Icon, Loader, Pagination, Table
 } from 'semantic-ui-react';
 
 import {NewOrEditSynonym} from './NewOrEditSynonym';
@@ -135,6 +136,7 @@ export function EditSynonyms(props) {
 		total,
 		totalPages
 	} = result;
+	//console.debug('EditSynonyms result', result);
 
 	return <>
 		<Form>
@@ -238,15 +240,15 @@ export function EditSynonyms(props) {
 					<Table.Body>
 						{result.hits.map(({
 							from = [''],
-							id,
+							_id,
 							//name,
-							score,
+							_score,
 							thesaurus,
 							thesaurusReference,
 							to = ['']
 						}, i) => <Table.Row key={i}>
 							<Table.Cell collapsing><NewOrEditSynonym
-								id={id}
+								_id={_id}
 								from={from}
 								locales={locales}
 								onClose={querySynonyms}
@@ -257,7 +259,7 @@ export function EditSynonyms(props) {
 							<Table.Cell>{(Array.isArray(from) ? from : [from]).join(', ')}</Table.Cell>
 							<Table.Cell>{(Array.isArray(to) ? to : [to]).join(', ')}</Table.Cell>
 							{thesaurusId ? null : <Table.Cell>{thesaurus}</Table.Cell>}
-							<Table.Cell>{score}</Table.Cell>
+							<Table.Cell>{_score}</Table.Cell>
 							<Table.Cell collapsing>
 								{/*<Button.Group>
 									<NewOrEditSynonym
@@ -266,7 +268,7 @@ export function EditSynonyms(props) {
 										thesaurusId={thesaurusReference}
 									/>*/}
 								<DeleteSynonym
-									id={id}
+									_id={_id}
 									from={from}
 									onClose={querySynonyms}
 									servicesBaseUrl={servicesBaseUrl}
