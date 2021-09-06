@@ -1,7 +1,4 @@
-import {
-	forceArray//,
-	//toStr
-} from '@enonic/js-utils';
+//import {toStr} from '@enonic/js-utils';
 
 import {PRINCIPAL_EXPLORER_READ} from '/lib/explorer/model/2/constants';
 import {connect} from '/lib/explorer/repo/connect';
@@ -20,12 +17,12 @@ import {
 
 
 export const querySynonymsResolver = ({
-	count,
+	count, // NOTE: lib-explorer/synonym/query defaults to -1
 	filters = {},
 	//highlight, // TODO?
-	query,
+	query = '',
 	sort,
-	start
+	start = 0
 }) => {
 	//log.info(`filters:${toStr(filters)}`);
 	const connection = connect({ principals: [PRINCIPAL_EXPLORER_READ] });

@@ -66,6 +66,7 @@ export const queryThesauri = {
 			//displayName,
 			language,
 			synonyms: querySynonymsResolver({
+				count: 0, // No need to fetch any data
 				filters: {
 					boolean: {
 						must: {
