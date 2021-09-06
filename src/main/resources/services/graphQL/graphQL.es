@@ -29,10 +29,19 @@ import {
 	fieldSchemaUpdate
 } from './schema';
 import {queryStopWords} from './stopWord';
-import {querySynonyms, queryThesauri} from './thesaurus';
+
+import {
+	fieldSynonymCreate,
+	fieldSynonymDelete,
+	fieldSynonymsQuery,
+	fieldSynonymUpdate
+} from './synonym';
+
+import {queryThesauri} from './thesaurus';
 import {fieldThesaurusCreate} from './thesaurus/fieldThesaurusCreate';
 import {fieldThesaurusDelete} from './thesaurus/fieldThesaurusDelete';
 import {fieldThesaurusUpdate} from './thesaurus/fieldThesaurusUpdate';
+
 import {
 	fieldTaskQuery
 } from './task';
@@ -48,10 +57,13 @@ export const SCHEMA = createSchema({
 		name: 'Mutation',
 		fields: {
 			createSchema: fieldSchemaCreate,
+			createSynonym: fieldSynonymCreate,
 			createThesaurus: fieldThesaurusCreate,
 			deleteSchema: fieldSchemaDelete,
+			deleteSynonym: fieldSynonymDelete,
 			deleteThesaurus: fieldThesaurusDelete,
 			updateSchema: fieldSchemaUpdate,
+			updateSynonym: fieldSynonymUpdate,
 			updateThesaurus: fieldThesaurusUpdate,
 			reindexCollections: fieldCollectionsReindex
 		}
@@ -72,7 +84,7 @@ export const SCHEMA = createSchema({
 			queryInterfaces,
 			queryJournals,
 			queryStopWords,
-			querySynonyms,
+			querySynonyms: fieldSynonymsQuery,
 			querySchema: fieldSchemaQuery,
 			queryThesauri,
 			queryTasks: fieldTaskQuery
