@@ -1,6 +1,7 @@
 import {
 	COLON_SIGN,
 	VALUE_TYPE_STRING,
+	dirname,
 	forceArray,
 	toStr
 } from '@enonic/js-utils';
@@ -14,6 +15,7 @@ import {
 	APP_EXPLORER,
 	//NT_DOCUMENT,
 	NT_INTERFACE,
+	NT_SYNONYM,
 	PATH_FIELDS,
 	PRINCIPAL_EXPLORER_WRITE,
 	READWRITE_FIELDS,
@@ -56,6 +58,7 @@ import {
 import {send} from '/lib/xp/event';
 import {get as getRepo} from '/lib/xp/repo';
 //import {delete as deleteJob} from '/lib/xp/scheduler';
+import {reference} from '/lib/xp/value';
 
 import {Progress} from './Progress';
 import {
@@ -655,7 +658,10 @@ export function run() {
 		//──────────────────────────────────────────────────────────────────────
 
 		//──────────────────────────────────────────────────────────────────────
-		// Model 9: Remove filters and query from interfaces
+		// Model 9:
+		// Remove filters and query from interfaces
+		// ...
+		// Add thesaurusReference to synonym nodes
 		//──────────────────────────────────────────────────────────────────────
 		if (isModelLessThan({
 			connection: writeConnection,
@@ -926,6 +932,53 @@ export function run() {
 					}); // Should contain _parentPath
 				});
 			}
+			progress.finishItem();
+
+			progress.addItems(1).setInfo('Finding synonyms without thesaurusReference...').report().logInfo();
+			const synonymsWithoutThesaurusReferenceParams = {
+				//count: 2, // DEBUG
+				count: -1,
+				filters: addFilter({
+					filter: {
+						notExists: { field: 'thesaurusReference'}
+					},
+					filters: addFilter({
+						filter: hasValue('_nodeType', [NT_SYNONYM])
+					})
+				})
+			};
+			//log.debug(`synonymsWithoutThesaurusReferenceParams:${toStr(synonymsWithoutThesaurusReferenceParams)}`);
+			const synonymsWithoutThesaurusReference = writeConnection
+				.query(synonymsWithoutThesaurusReferenceParams)
+				.hits.map(({id}) => writeConnection.get(id));
+			//log.debug(`synonymsWithoutThesaurusReference:${toStr(synonymsWithoutThesaurusReference)}`);
+
+			const thesaurusPathToId = {};
+
+			progress.addItems(synonymsWithoutThesaurusReference.length);
+			synonymsWithoutThesaurusReference.forEach(({_id, _path}) => {
+				progress.addItems(1).setInfo(`Adding thesaurusReference to synonym _id:${_id}`).report().logInfo();
+				const thesaurusPath = dirname(_path); //_path.match(/[^/]+/g)[1];
+				//log.debug(`thesaurusPath:${toStr(thesaurusPath)}`);
+				if (!thesaurusPathToId[thesaurusPath]) {
+					const thesaurusNode = writeConnection.get(thesaurusPath);
+					//log.debug(`thesaurusNode:${toStr(thesaurusNode)}`);
+					thesaurusPathToId[thesaurusPath] = thesaurusNode._id;
+					//log.debug(`thesaurusPathToId:${toStr(thesaurusPathToId)}`);
+				}
+				const thesaurusId = thesaurusPathToId[thesaurusPath];
+				//log.debug(`thesaurusId:${toStr(thesaurusId)}`);
+				//const synonymWithoutThesaurusModifyRes =
+				writeConnection.modify({
+					key: _id,
+					editor: (node) => {
+						node.thesaurusReference = reference(thesaurusId);
+						return node;
+					}
+				});
+				//log.debug(`synonymWithoutThesaurusModifyRes:${toStr(synonymWithoutThesaurusModifyRes)}`);
+				progress.finishItem();
+			});
 
 			writeConnection.refresh();
 
