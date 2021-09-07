@@ -5,6 +5,8 @@
 } from '@enonic/js-utils';*/
 import {
 	COLLECTION_REPO_PREFIX,
+	FIELD_DOCUMENT_METADATA_LANGUAGE_INDEX_CONFIG,
+	FIELD_DOCUMENT_METADATA_STEMMING_LANGUAGE_INDEX_CONFIG,
 	NT_DOCUMENT//,
 	//PRINCIPAL_EXPLORER_WRITE
 } from '/lib/explorer/model/2/constants';
@@ -35,7 +37,7 @@ export function run({
 	const {
 		_id: collectionId,
 		_name: collectionName,
-		language = ''
+		language: collectionLanguage = ''
 	} = collection;
 	//log.info(`collectionName:${toStr(collectionName)}`);
 
@@ -110,7 +112,12 @@ export function run({
 		if (!documentsRes.total) {
 			return;
 		}
-		const stemmingLanguage = language ? javaLocaleToSupportedLanguage(language) : '';
+
+		const localeToStemmingCache = {};
+		if (collectionLanguage) {
+			localeToStemmingCache[collectionLanguage] = javaLocaleToSupportedLanguage(collectionLanguage);
+		}
+
 		progress.addItems(documentsRes.total);
 		documentsRes.hits.forEach(({id: documentId}) => {
 			infoObj.message = `Reindexing document with id:${documentId}`;
@@ -123,41 +130,35 @@ export function run({
 				documentNode.document_metadata = {};
 			}
 
-			documentNode.document_metadata.language = language; // Can be anything
-			documentNode._indexConfig = updateIndexConfig({
-				_indexConfig: documentNode._indexConfig,
-				path: 'document_metadata.language',
-				config: {
-					enabled: true, // So it can be used in filters
-					decideByType: false, // Always string
-					fulltext: false,
-					includeInAllText: false,
-					languages: [],
-					ngram: false,
-					path: false
+			if (documentNode.document_metadata.language || collectionLanguage) {
+				if (!documentNode.document_metadata.language) {
+					documentNode.document_metadata.language = collectionLanguage; // Can be anything
 				}
-			}); // updateIndexConfig
+				documentNode._indexConfig = updateIndexConfig({
+					_indexConfig: documentNode._indexConfig,
+					path: 'document_metadata.language',
+					config: FIELD_DOCUMENT_METADATA_LANGUAGE_INDEX_CONFIG
+				}); // updateIndexConfig
 
-			documentNode.document_metadata.stemmingLanguage = stemmingLanguage; // Can be ''
-			documentNode._indexConfig = updateIndexConfig({
-				_indexConfig: documentNode._indexConfig,
-				path: 'document_metadata.stemmingLanguage',
-				config: {
-					enabled: true, // So it can be used in filters
-					decideByType: false, // Always string
-					fulltext: false,
-					includeInAllText: false,
-					languages: [],
-					ngram: false,
-					path: false
+				const language = documentNode.document_metadata.language;
+				if (!localeToStemmingCache[language]) {
+					localeToStemmingCache[language] = javaLocaleToSupportedLanguage(language);
 				}
-			}); // updateIndexConfig
+
+				documentNode.document_metadata.stemmingLanguage = localeToStemmingCache[language]; // Can be ''
+				documentNode._indexConfig = updateIndexConfig({
+					_indexConfig: documentNode._indexConfig,
+					path: 'document_metadata.stemmingLanguage',
+					config: FIELD_DOCUMENT_METADATA_STEMMING_LANGUAGE_INDEX_CONFIG
+				}); // updateIndexConfig
+			} // if language is known
+
 
 			try {
 				const documentNodeWithTypes	= applyTypes({
 					boolRequireValid,
 					documentNode,
-					languages: language ? [stemmingLanguage] : [],
+					languages: documentNode.document_metadata.stemmingLanguage ? [documentNode.document_metadata.stemmingLanguage] : [],
 					schema
 				});
 				//log.info(`documentNodeWithTypes:${toStr(documentNodeWithTypes)}`);
@@ -176,7 +177,7 @@ export function run({
 				log.error(errorMessage, e);
 			}
 			progress.finishItem();
-		});
+		}); // forEach document
 		infoObj.message = 'Reindexing complete';
 		progress.setInfo(infoObj).report().logInfo();
 	}); // runInContext
