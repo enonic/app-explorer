@@ -68,11 +68,11 @@ const SS_ALIAS = {
 	'@enonic/nashorn-polyfills': path.resolve(__dirname, 'src/main/resources/lib/nashorn/index.es'),
 	'@enonic/js-utils': BOOL_LIB_EXPLORER_EXTERNAL
 		? BOOL_LOCAL_JS_UTILS
-			? path.resolve(__dirname, '../enonic-js-utils/src/index')
-			: path.resolve(__dirname, './node_modules/@enonic/js-utils/src/index')
+			? path.resolve(__dirname, '../enonic-js-utils/src/index.ts')
+			: path.resolve(__dirname, './node_modules/@enonic/js-utils/src/index.ts')
 		: BOOL_LOCAL_JS_UTILS
-			? path.resolve(__dirname, '../enonic-js-utils/dist/cjs/index')
-			: path.resolve(__dirname, './node_modules/@enonic/js-utils/dist/cjs/index')
+			? path.resolve(__dirname, '../enonic-js-utils/dist/cjs/index.js')
+			: path.resolve(__dirname, './node_modules/@enonic/js-utils/dist/cjs/index.js')
 };
 
 // Avoid bundling and transpile library files seperately.
@@ -280,7 +280,7 @@ const SS_JS_CONFIG = {
 						'array-includes'
 					],
 					presets: [
-						//'@babel/preset-typescript', // Why did I ever add this???
+						'@babel/preset-typescript',
 						[
 							'@babel/preset-env',
 							{
@@ -342,7 +342,8 @@ const SS_JS_CONFIG = {
 			//'esm',
 			'es', // Needed to resolve "local" imports starting with / which are .es files
 			//'es6',
-			'js'//, // Needed to resolve node_modules
+			'js', // Needed to resolve node_modules
+			'ts'
 			//'json'
 		].map(ext => `.${ext}`)
 	},
@@ -552,7 +553,7 @@ const CLIENT_JS_CONFIG = {
 		/*alias: { // NOTE: If the local lib-explorer is not the newest there could be trouble...
 			'/lib/explorer': path.resolve(__dirname, '../lib-explorer/src/main/resources/lib/explorer/')
 		},*/
-		extensions: ['.es', '.js', '.jsx']
+		extensions: ['.es', '.js', '.jsx', '.ts', '.tsx']
 	},
 	stats: STATS
 };
@@ -639,8 +640,8 @@ const CLIENT_ES_CONFIG = {
 	resolve: {
 		alias: {
 			'@enonic/js-utils': BOOL_LOCAL_JS_UTILS
-				? path.resolve(__dirname, '../enonic-js-utils/src/index')
-				: path.resolve(__dirname, './node_modules/@enonic/js-utils/src/index'),
+				? path.resolve(__dirname, '../enonic-js-utils/src/index.ts')
+				: path.resolve(__dirname, './node_modules/@enonic/js-utils/src/index.ts'),
 			'semantic-ui-react-form': BOOL_LOCAL_SEMANTIC_UI_REACT_FORM
 				? path.resolve(__dirname, '../semantic-ui-react-form/src')
 				: path.resolve(__dirname, './node_modules/@enonic/semantic-ui-react-form/src')//,
@@ -648,7 +649,7 @@ const CLIENT_ES_CONFIG = {
 			//'/lib/explorer': path.resolve(__dirname, '../lib-explorer/src/main/resources/lib/explorer/')
 		},
 		extensions: [
-			'mjs', 'jsx', 'esm', 'es', 'es6', 'js', 'json', 'ts'
+			'mjs', 'jsx', 'esm', 'es', 'es6', 'js', 'json', 'ts', 'tsx'
 		].map(ext => `.${ext}`)
 	},
 	stats: STATS

@@ -1,13 +1,14 @@
 {
   "author": "Christian Andreas Westgaard <cwe@enonic.com>",
   "dependencies": {
+    "@enonic/js-utils": "0.0.1",
     "cheerio": "1.0.0-rc.10",
     "core-js": "3.15.2",
     "cron-parser": "3.5.0",
-    "diff": "^5.0.0",
+    "diff": "5.0.0",
     "fast-deep-equal": "3.1.3",
     "get-value": "3.0.1",
-    "human-object-diff": "^2.0.2",
+    "human-object-diff": "2.0.2",
     "nice-react-gantt": "2.0.6",
     "object-hash": "2.2.0",
     "object.getownpropertydescriptors": "2.1.2",
@@ -21,7 +22,7 @@
     "robots-txt-guard": "1.0.2",
     "semantic-ui-css": "2.4.1",
     "set-value": "4.0.0",
-    "snowball": "^0.3.1",
+    "snowball": "0.3.1",
     "yup": "0.32.9"
   },
   "devDependencies": {
@@ -62,6 +63,7 @@
     "@babel/plugin-transform-unicode-regex": "7.14.5",
     "@babel/preset-env": "7.14.7",
     "@babel/preset-react": "7.14.5",
+    "@babel/preset-typescript": "7.15.0",
     "@babel/register": "7.14.5",
     "@enonic/semantic-ui-react-form": "2.2.0",
     "array.prototype.find": "2.1.1",
@@ -71,7 +73,6 @@
     "browser-sync": "2.27.4",
     "browser-sync-webpack-plugin": "2.3.0",
     "buffer": "6.0.3",
-    "caniuse-lite": "1.0.30001245",
     "classnames": "2.3.1",
     "clean-webpack-plugin": "3.0.0",
     "copy-webpack-plugin": "9.0.1",
