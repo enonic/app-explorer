@@ -227,6 +227,7 @@ search(
 * Build system upgrades:
   * Gradle 6.9
   * Node 14.17.6
+  * Babel 7.15.5
   * Core-js 3.15.2
   * Webpack 5.45.1
 
