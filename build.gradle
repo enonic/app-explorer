@@ -68,7 +68,7 @@ dependencies {
 	include 'com.enonic.lib:lib-license:3.0.0'
 	include 'com.enonic.lib:lib-router:2.1.0'
 
-	include 'com.enonic.lib:lib-explorer:3.18.0'
+	include 'com.enonic.lib:lib-explorer:3.20.1'
 	//include 'com.enonic.lib:lib-explorer:4.0.0-SNAPSHOT' // TODO
 
 	include 'com.enonic.lib:lib-util:3.0.0'
