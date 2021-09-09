@@ -302,6 +302,9 @@ export function run({
 							continue linksForLoop;
 						}
 						const href = getAttributeValue(el, 'href');
+						if (href.startsWith('javascript:')) {
+							continue linksForLoop;
+						}
 
 						// Galimatias
 						const resolved = baseUrlObj.resolve(href); //log.info(toStr({resolved}));

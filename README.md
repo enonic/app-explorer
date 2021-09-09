@@ -151,13 +151,17 @@ On a development laptop the Explorer admin to is usually available here:
 
 | App version | XP version |
 | ----------- | ---------- |
-| 1.5.0 | 7.7.2 |
+| 1.5.x | 7.7.2 |
 | 1.4.0 | 7.4.1 |
 | 1.[23].0 | 7.3.2 |
 | 1.1.0 | 7.3.1 |
 | 1.0.0 | 7.3.0 |
 
 ## Changelog
+
+### 1.5.1
+
+* Fix BUG webcrawler collector doesn't handle href="javascript:void(0)"
 
 ### 1.5.0
 
