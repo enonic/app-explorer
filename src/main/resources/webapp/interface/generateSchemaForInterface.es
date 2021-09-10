@@ -123,14 +123,16 @@ export function generateSchemaForInterface(interfaceName) {
 	//log.debug(`fieldsRes.hits[0]:${toStr(fieldsRes.hits[0])}`);
 
 	const camelToFieldObj = {};
-	const enumFieldsValues = [];
+	const fieldKeysForAggregations = [];
+	const fieldKeysForFilters = [];
 	const highlightParameterPropertiesFields = {};
 	const interfaceSearchHitsFieldsFromSchema = {};
 	const interfaceSearchHitsHighlightsFields = {};
 	//log.debug(`fieldsRes.hits:${toStr(fieldsRes.hits)}`);
 	fieldsRes.hits.forEach(({
 		fieldType: valueType,
-		isSystemField = false,
+		inResults,
+		//isSystemField = false,
 		key/*,
 		max, // TODO nonNull list
 		min*/
@@ -140,9 +142,11 @@ export function generateSchemaForInterface(interfaceName) {
 			camelToFieldObj[camelizedFieldKey] = key;
 			//log.debug(`key:${toStr(key)} camelized:${toStr(camelizedFieldKey)}`);
 			if (![VALUE_TYPE_ANY, VALUE_TYPE_SET].includes(valueType)) {
-				enumFieldsValues.push(camelizedFieldKey);
+				fieldKeysForAggregations.push(camelizedFieldKey);
+				fieldKeysForFilters.push(camelizedFieldKey);
 			}
-			if (!isSystemField) {
+			log.debug(`key:${toStr(key)} camelized:${toStr(camelizedFieldKey)} inResults:${toStr(inResults)}`);
+			if (inResults !== false) {
 				highlightParameterPropertiesFields[camelizedFieldKey] = { type: createInputObjectType({
 					name: `HighlightParameterProperties${ucFirst(camelizedFieldKey)}`,
 					fields: {
@@ -161,7 +165,7 @@ export function generateSchemaForInterface(interfaceName) {
 				interfaceSearchHitsHighlightsFields[camelizedFieldKey] = { type: list(type) };
 			}
 		}
-	});
+	}); // fields.forEach
 	//log.debug(`camelToFieldObj:${toStr(camelToFieldObj)}`);
 
 	// Name must be non-null, non-empty and match [_A-Za-z][_0-9A-Za-z]* - was 'GraphQLScalarType{name='String', description='Built-in String', coercing=graphql.Scalars$3@af372a4}'
@@ -170,9 +174,13 @@ export function generateSchemaForInterface(interfaceName) {
 	//log.debug(`enumFieldsValues:${toStr(enumFieldsValues)}`);
 	//log.debug(`highlightParameterPropertiesFields:${toStr(highlightParameterPropertiesFields)}`);
 
-	const enumFields = createEnumType({
-		name: 'enumFields',
-		values: enumFieldsValues
+	const enumFieldsKeysForAggreations = createEnumType({
+		name: 'enumFieldsKeysForAggreations',
+		values: fieldKeysForAggregations
+	});
+	const enumFieldsKeysForFilters = createEnumType({
+		name: 'enumFieldsKeysForFilters',
+		values: fieldKeysForFilters
 	});
 
 	//──────────────────────────────────────────────────────────────────────────
@@ -182,7 +190,7 @@ export function generateSchemaForInterface(interfaceName) {
 		name: 'InputTypeFilterExistsWithDynamicFields',
 		fields: {
 			field: {
-				type: nonNull(enumFields)
+				type: nonNull(enumFieldsKeysForFilters)
 			}
 		}
 	});
@@ -190,7 +198,7 @@ export function generateSchemaForInterface(interfaceName) {
 	const graphqlInputTypeFilterHasValueWithDynamicFields = createInputObjectType({
 		name: 'InputTypeFilterHasValueWithDynamicFields',
 		fields: {
-			field: { type: nonNull(enumFields) },
+			field: { type: nonNull(enumFieldsKeysForFilters) },
 			values: { type: nonNull(list(GraphQLString)) }
 		}
 	});
@@ -199,7 +207,7 @@ export function generateSchemaForInterface(interfaceName) {
 		name: 'InputTypeFilterNotExistsWithDynamicFields',
 		fields: {
 			field: {
-				type: nonNull(enumFields)
+				type: nonNull(enumFieldsKeysForFilters)
 			}
 		}
 	});
@@ -509,7 +517,7 @@ export function generateSchemaForInterface(interfaceName) {
 		name: 'InputObjectTypeAggregationCount',
 		fields: {
 			field: {
-				type: nonNull(enumFields)
+				type: nonNull(enumFieldsKeysForAggreations)
 			}
 		}
 	});
@@ -517,7 +525,7 @@ export function generateSchemaForInterface(interfaceName) {
 		name: 'InputObjectTypeAggregationDateHistogram',
 		fields: {
 			field: {
-				type: nonNull(enumFields)
+				type: nonNull(enumFieldsKeysForAggreations)
 			},
 			format: { // yyyy-MM-dd’T’HH:mm:ss.SSSZ
 				type: GraphQLString
@@ -535,7 +543,7 @@ export function generateSchemaForInterface(interfaceName) {
 		fields: {
 			field: {
 				//type: nonNull(GraphQLString)
-				type: nonNull(enumFields)
+				type: nonNull(enumFieldsKeysForAggreations)
 			},
 			format: { // yyyy-MM-dd’T’HH:mm:ss.SSSZ
 				type: GraphQLString
@@ -556,7 +564,7 @@ export function generateSchemaForInterface(interfaceName) {
 		fields: {
 			field: {
 				//type: nonNull(GraphQLString)
-				type: nonNull(enumFields)
+				type: nonNull(enumFieldsKeysForAggreations)
 			},
 			origin: {
 				type: createInputObjectType({
@@ -586,7 +594,7 @@ export function generateSchemaForInterface(interfaceName) {
 		fields: {
 			field: {
 				//type: nonNull(GraphQLString)
-				type: nonNull(enumFields)
+				type: nonNull(enumFieldsKeysForAggreations)
 			}
 		}
 	});
@@ -595,7 +603,7 @@ export function generateSchemaForInterface(interfaceName) {
 		fields: {
 			field: {
 				//type: nonNull(GraphQLString)
-				type: nonNull(enumFields)
+				type: nonNull(enumFieldsKeysForAggreations)
 			}
 		}
 	});
@@ -604,7 +612,7 @@ export function generateSchemaForInterface(interfaceName) {
 		fields: {
 			field: {
 				//type: nonNull(GraphQLString)
-				type: nonNull(enumFields)
+				type: nonNull(enumFieldsKeysForAggreations)
 			},
 			ranges: {
 				type: list(createInputObjectType({
@@ -622,7 +630,7 @@ export function generateSchemaForInterface(interfaceName) {
 		fields: {
 			field: {
 				//type: nonNull(GraphQLString)
-				type: nonNull(enumFields)
+				type: nonNull(enumFieldsKeysForAggreations)
 			}
 		}
 	});
@@ -631,7 +639,7 @@ export function generateSchemaForInterface(interfaceName) {
 		fields: {
 			field: {
 				//type: nonNull(GraphQLString)
-				type: nonNull(enumFields)
+				type: nonNull(enumFieldsKeysForAggreations)
 			},
 			order: {
 				type: GraphQLString
