@@ -1572,10 +1572,10 @@
   resolved "https://registry.yarnpkg.com/@enonic/js-utils/-/js-utils-0.0.1.tgz#b6de891830aadabd49d6668d4f7fdc3e39b7886b"
   integrity sha512-Z8YZDgDvMLX3ADBpc1ik54IQtaGcmtfXnbWr5GiJXpEBnOVUFgS4Fci73pVwz+3AC8mRV2viCr1taWwDamc75w==
 
-"@enonic/semantic-ui-react-form@2.2.1":
-  version "2.2.1"
-  resolved "https://registry.yarnpkg.com/@enonic/semantic-ui-react-form/-/semantic-ui-react-form-2.2.1.tgz#5ed559b2b21a2e0cb8855b8872dca0248024f163"
-  integrity sha512-GhfmTEP5G0L9hqALERCgb/K7PHDbSXgrOPnkQOtT9z/k5chccj+eoaPirI2Goxz3agZ6wDbDJ3zPEd4qNIqmhg==
+"@enonic/semantic-ui-react-form@2.3.0":
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/@enonic/semantic-ui-react-form/-/semantic-ui-react-form-2.3.0.tgz#8d51224832884bd83e132cc01f274f01a5388335"
+  integrity sha512-VqVmeShnkw79XIBnjNSTNxe51I/Oeu8CciGJQ8rSF1dMloaHzPGhYLwnPmDxapp0eSbk2nXKeJ6ptiUaRiHT1Q==
   dependencies:
     fast-deep-equal "3.1.3"
     get-value "3.0.1"
