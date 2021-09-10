@@ -84,7 +84,7 @@ export function Fields(props) {
 	React.useEffect(() => fetchFields(), []);
 
 	return <>
-		<Header as='h1'>Schema</Header>
+		<Header as='h2'>Fields</Header>
 		{isLoading
 			? <Loader active inverted>Loading</Loader>
 			: <>

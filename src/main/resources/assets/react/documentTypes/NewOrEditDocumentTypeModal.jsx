@@ -1,8 +1,8 @@
 import {Button, Icon, Modal, Popup} from 'semantic-ui-react';
 
-import {NewOrEditSchema} from './NewOrEditSchema';
+import {NewOrEditDocumentType} from './NewOrEditDocumentType';
 
-export function NewOrEditSchemaModal({
+export function NewOrEditDocumentTypeModal({
 	_id, // optional
 	_name, // optional
 	afterClose = () => {/*no-op*/},
@@ -16,7 +16,7 @@ export function NewOrEditSchemaModal({
 		afterClose();
 	};
 
-	const header = _name ? `Edit schema ${_name}`: 'New schema';
+	const header = _name ? `Edit document type ${_name}`: 'New document type';
 	return <Modal
 		closeIcon
 		onClose={doClose}
@@ -46,11 +46,11 @@ export function NewOrEditSchemaModal({
 	>
 		<Modal.Header>{header}</Modal.Header>
 		<Modal.Content>
-			<NewOrEditSchema
+			<NewOrEditDocumentType
 				_id={_id}
 				doClose={doClose}
 				servicesBaseUrl={servicesBaseUrl}
 			/>
 		</Modal.Content>
 	</Modal>;
-} // NewOrEditSchemaModal
+} // NewOrEditDocumentTypeModal

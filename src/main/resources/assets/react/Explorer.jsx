@@ -9,7 +9,7 @@ import {Interfaces} from './Interfaces';
 import {Journals} from './Journals';
 import {Notifications} from './Notifications';
 import {Schedule} from './Schedule';
-import {Schema} from './Schema';
+import {DocumentTypes} from './DocumentTypes/DocumentTypes';
 import {Search} from './Search';
 import {Status} from './Status';
 import {StopWords} from './StopWords';
@@ -322,10 +322,10 @@ export function Explorer(props) {
 
 				<Menu.Item
 					as='a'
-					href='#schema'
-					active={page === 'schema'}
-					onClick={() => setPage('schema')}
-				><Icon name='sitemap'/> Schema</Menu.Item>
+					href='#documentTypes'
+					active={page === 'documentTypes'}
+					onClick={() => setPage('documentTypes')}
+				><Icon name='sitemap'/> DocumentType</Menu.Item>
 				<Menu.Item
 					as='a'
 					href='#stopWords'
@@ -409,7 +409,7 @@ export function Explorer(props) {
 				{page === 'schedule' && <Schedule
 					servicesBaseUrl={servicesBaseUrl}
 				/>}
-				{page === 'schema' && <Schema
+				{page === 'documentTypes' && <DocumentTypes
 					servicesBaseUrl={servicesBaseUrl}
 				/>}
 				{page === 'stopWords' && <StopWords

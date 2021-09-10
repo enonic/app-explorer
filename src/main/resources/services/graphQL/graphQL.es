@@ -22,12 +22,12 @@ import {queryInterfaces} from './interface';
 import {queryJournals} from './journal';
 import {listScheduledJobs} from './scheduler';
 import {
-	fieldSchemaCreate,
-	fieldSchemaDelete,
-	fieldSchemaGet,
-	fieldSchemaQuery,
-	fieldSchemaUpdate
-} from './schema';
+	fieldDocumentTypeCreate,
+	fieldDocumentTypeDelete,
+	fieldDocumentTypeGet,
+	fieldDocumentTypesQuery,
+	fieldDocumentTypeUpdate
+} from './documentType';
 import {queryStopWords} from './stopWord';
 
 import {
@@ -56,13 +56,13 @@ export const SCHEMA = createSchema({
 	mutation: createObjectType({
 		name: 'Mutation',
 		fields: {
-			createSchema: fieldSchemaCreate,
+			createDocumentType: fieldDocumentTypeCreate,
 			createSynonym: fieldSynonymCreate,
 			createThesaurus: fieldThesaurusCreate,
-			deleteSchema: fieldSchemaDelete,
+			deleteDocumentType: fieldDocumentTypeDelete,
 			deleteSynonym: fieldSynonymDelete,
 			deleteThesaurus: fieldThesaurusDelete,
-			updateSchema: fieldSchemaUpdate,
+			updateDocumentType: fieldDocumentTypeUpdate,
 			updateSynonym: fieldSynonymUpdate,
 			updateThesaurus: fieldThesaurusUpdate,
 			reindexCollections: fieldCollectionsReindex
@@ -74,7 +74,7 @@ export const SCHEMA = createSchema({
 			getContentTypes,
 			getLicense,
 			getLocales,
-			getSchema: fieldSchemaGet,
+			getDocumentType: fieldDocumentTypeGet,
 			getSites,
 			listScheduledJobs,
 			queryApiKeys,
@@ -85,7 +85,7 @@ export const SCHEMA = createSchema({
 			queryJournals,
 			queryStopWords,
 			querySynonyms: fieldSynonymsQuery,
-			querySchema: fieldSchemaQuery,
+			queryDocumentTypes: fieldDocumentTypesQuery,
 			queryThesauri,
 			queryTasks: fieldTaskQuery
 		} // fields
