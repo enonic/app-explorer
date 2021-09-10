@@ -12,6 +12,7 @@ module.exports = {
 	globals: {
 		// Node
 		__dirname: false,
+		process: false,
 		require: false,
 
 		// CommonJS (CJS) format

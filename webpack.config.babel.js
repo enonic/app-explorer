@@ -9,37 +9,30 @@ import {
 } from 'esbuild-loader';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import postcssPresetEnv from 'postcss-preset-env';
-//import {print} from 'q-i';
+import {print} from 'q-i';
 import TerserPlugin from 'terser-webpack-plugin';
 
 import webpack from 'webpack';
 
-//console.debug(process.env.NODE_ENV);
+import {
+	BOOL_LIB_EXPLORER_EXTERNAL,
+	BOOL_LOCAL_JS_UTILS,
+	BOOL_LOCAL_SEMANTIC_UI_REACT_FORM,
+	BOOL_MINIMIZE,
+	MODE
+} from './.webpack.constants.js';
 
-// Check which node is used
-//console.log(process.execPath);
-//console.log(process.version);
+
+// Check which version of node is used
+print({
+	//env: process.env,
+	execPath: process.execPath,
+	version: process.version
+}, { maxItems: Infinity });
 
 //──────────────────────────────────────────────────────────────────────────────
 // Common constants
 //──────────────────────────────────────────────────────────────────────────────
-//const MODE = 'development';
-const MODE = 'production';
-//print({MODE});
-
-const BOOL_LIB_EXPLORER_EXTERNAL = MODE === 'production';
-//const BOOL_LIB_EXPLORER_EXTERNAL = false;
-
-const BOOL_LOCAL_JS_UTILS = MODE !== 'production';
-//const BOOL_LOCAL_JS_UTILS = true;
-
-const BOOL_LOCAL_SEMANTIC_UI_REACT_FORM = MODE !== 'production';
-//const BOOL_LOCAL_SEMANTIC_UI_REACT_FORM = true;
-
-//const minimize = MODE === 'production';
-const minimize = true;
-//const minimize = false;
-
 const SRC_DIR = 'src/main/resources';
 const DST_DIR = 'build/resources/main';
 
@@ -318,8 +311,8 @@ const SS_JS_CONFIG = {
 		}]
 	},
 	optimization: {
-		minimize,
-		minimizer: MODE === 'production' ? [
+		minimize: BOOL_MINIMIZE,
+		minimizer: BOOL_MINIMIZE ? [
 			/*new ESBuildMinifyPlugin({ // ES6 destructuring is not yet implemented
 				target: SS_ESBUILD_TARGET
 			})*/
@@ -515,7 +508,7 @@ const CLIENT_JS_CONFIG = {
 		}]
 	},
 	optimization: {
-		minimize,
+		minimize: BOOL_MINIMIZE,
 		minimizer: CS_MINIMIZER
 	},
 	output: {
@@ -604,7 +597,7 @@ const CLIENT_ES_CONFIG = {
 		}]
 	},
 	optimization: {
-		minimize,
+		minimize: BOOL_MINIMIZE,
 		minimizer: MODE === 'production' ? [
 			new ESBuildMinifyPlugin({
 				target: ESBUILD_TARGET
