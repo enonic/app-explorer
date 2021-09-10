@@ -5,69 +5,50 @@ import {
 	Table
 } from 'semantic-ui-react';
 
-import {NewOrEditSchemaModal} from './schema/NewOrEditSchemaModal';
-import {DeleteSchemaModal} from './schema/DeleteSchemaModal';
-import {useInterval} from './utils/useInterval';
+import {NewOrEditDocumentTypeModal} from './NewOrEditDocumentTypeModal';
+import {DeleteDocumentTypeModal} from './DeleteDocumentTypeModal';
+import {useInterval} from '../utils/useInterval';
+import {GQL_QUERY_QUERY_DOCUMENT_TYPES} from '../../../services/graphQL/documentType/queryQueryDocumentTypes';
 
 
-const GQL_SCHEMA_QUERY = `{
-	querySchema {
-		hits {
-			_id
-			_name
-			properties {
-				enabled
-				fulltext
-				includeInAllText
-				max
-				min
-				name
-				ngram
-				valueType
-			}
-		}
-	}
-}`;
-
-
-export function Schema({
+export function DocumentTypes({
 	servicesBaseUrl
 }) {
 	const [boolPoll, setBoolPoll] = React.useState(true);
-	const [schema, setSchema] = React.useState([]);
+	const [documentTypes, setDocumentTypes] = React.useState([]);
 
-	function querySchema() {
+	function queryDocumentTypes() {
 		fetch(`${servicesBaseUrl}/graphQL`, {
 			method: 'POST',
 			headers: {
 				'Content-Type':	'application/json'
 			},
 			body: JSON.stringify({
-				query: GQL_SCHEMA_QUERY
+				query: GQL_QUERY_QUERY_DOCUMENT_TYPES
 			})
 		})
 			.then(response => response.json())
 			.then(json => {
 				//console.debug('json', json);
-				setSchema(json.data.querySchema.hits);
+				setDocumentTypes(json.data.queryDocumentTypes.hits);
 			});
-	} // querySchema
+	} // queryDocumentTypes
 
 	React.useEffect(() => {
-		querySchema();
+		queryDocumentTypes();
 	}, []);
 
 	useInterval(() => {
 		// This will continue to run as long as the Collections "tab" is open
 		if (boolPoll) {
-			querySchema();
+			queryDocumentTypes();
 		}
 	}, 2500);
 
-	//console.debug('schema', schema);
+	//console.debug('documentTypes', documentTypes);
 
 	return <>
-		<Header as='h1' content='Schema'/>
+		<Header as='h1' content='DocumentTypes'/>
 		<Table celled collapsing compact selectable singleLine striped>
 			<Table.Header>
 				<Table.Row>
@@ -80,17 +61,17 @@ export function Schema({
 				</Table.Row>
 			</Table.Header>
 			<Table.Body>
-				{schema.map(({
+				{documentTypes.map(({
 					_id,
 					_name,
 					properties = []
 				}, index) => {
 					return <Table.Row key={index}>
-						<Table.Cell collapsing><NewOrEditSchemaModal
+						<Table.Cell collapsing><NewOrEditDocumentTypeModal
 							_id={_id}
 							_name={_name}
 							afterClose={() => {
-								querySchema();
+								queryDocumentTypes();
 								setBoolPoll(true);
 							}}
 							onOpen={() => {
@@ -140,11 +121,11 @@ export function Schema({
 						</Table.Cell>
 						<Table.Cell collapsing>
 							<Button.Group>
-								<DeleteSchemaModal
+								<DeleteDocumentTypeModal
 									_id={_id}
 									_name={_name}
 									afterClose={() => {
-										querySchema();
+										queryDocumentTypes();
 										setBoolPoll(true);
 									}}
 									onOpen={() => {
@@ -158,9 +139,9 @@ export function Schema({
 				})}
 			</Table.Body>
 		</Table>
-		<NewOrEditSchemaModal
+		<NewOrEditDocumentTypeModal
 			afterClose={() => {
-				querySchema();
+				queryDocumentTypes();
 				setBoolPoll(true);
 			}}
 			onOpen={() => {
@@ -169,4 +150,4 @@ export function Schema({
 			servicesBaseUrl={servicesBaseUrl}
 		/>
 	</>;
-} // Schema
+} // DocumentTypes

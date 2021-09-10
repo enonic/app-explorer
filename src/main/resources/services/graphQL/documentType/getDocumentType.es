@@ -7,7 +7,7 @@ import {
 import {connect} from '/lib/explorer/repo/connect';
 
 
-export function getSchema({_id}) {
+export function getDocumentType({_id}) {
 	const readConnection = connect({ principals: [PRINCIPAL_EXPLORER_READ] });
 	const {
 		_name,

@@ -31,6 +31,10 @@ import {Input} from 'semantic-ui-react-form/inputs/Input';
 
 import {List} from 'semantic-ui-react-form/List';
 
+import {GQL_MUTATION_CREATE_DOCUMENT_TYPE} from '../../../services/graphQL/documentType/mutationCreateDocumentType';
+import {GQL_MUTATION_UPDATE_DOCUMENT_TYPE} from '../../../services/graphQL/documentType/mutationUpdateDocumentType';
+import {GQL_QUERY_GET_DOCUMENT_TYPE} from '../../../services/graphQL/documentType/queryGetDocumentType';
+
 
 const PATH_PROPERTIES = 'properties';
 
@@ -51,76 +55,6 @@ const OPTIONS_VALUE_TYPES = [
 	value: key
 }));
 
-const GQL_SCHEMA_CREATE = `mutation CreateSchemaMutation(
-	$_name: String!,
-	$properties: [InputSchemaProperties]
-) {
-	createSchema(
-		_name: $_name
-		properties: $properties
-	) {
-		_id
-		_name
-		_path
-		properties {
-			enabled
-			fulltext
-			includeInAllText
-			max
-			min
-			name
-			ngram
-			valueType
-		}
-	}
-}`;
-
-const GQL_SCHEMA_GET = `query GetSchemaQuery($_id: String!) {
-	getSchema(_id: $_id) {
-		_id
-		_name
-		_path
-		_versionKey
-		properties {
-			enabled
-			fulltext
-			includeInAllText
-			max
-			min
-			name
-			ngram
-			valueType
-		}
-	}
-}`;
-
-const GQL_SCHEMA_UPDATE = `mutation UpdateSchemaMutation(
-	$_id: String!,
-	$_name: String!,
-	$_versionKey: String!
-	$properties: [InputSchemaProperties]
-) {
-	updateSchema(
-		_id: $_id
-		_name: $_name
-		_versionKey: $_versionKey
-		properties: $properties
-	) {
-		_id
-		_name
-		_path
-		properties {
-			enabled
-			fulltext
-			includeInAllText
-			max
-			min
-			name
-			ngram
-			valueType
-		}
-	}
-}`;
 
 const PROPERTY_DEFAULT = {
 	enabled: true,
@@ -134,21 +68,21 @@ const PROPERTY_DEFAULT = {
 };
 
 
-export function NewOrEditSchema({
+export function NewOrEditDocumentType({
 	doClose,
 	_id,
 	servicesBaseUrl
 }) {
 	const [initialValues, setInitialValues] = React.useState(false);
 
-	function getSchema() {
+	function getDocumentType() {
 		fetch(`${servicesBaseUrl}/graphQL`, {
 			method: 'POST',
 			headers: {
 				'Content-Type':	'application/json'
 			},
 			body: JSON.stringify({
-				query: GQL_SCHEMA_GET,
+				query: GQL_QUERY_GET_DOCUMENT_TYPE,
 				variables: {
 					_id
 				}
@@ -157,13 +91,13 @@ export function NewOrEditSchema({
 			.then(response => response.json())
 			.then(data => {
 				//console.debug('data', data);
-				setInitialValues(data.data.getSchema);
+				setInitialValues(data.data.getDocumentType);
 			});
-	} // fetchSchema
+	} // fetchDocumentType
 
 	React.useEffect(() => {
 		if (_id) {
-			getSchema();
+			getDocumentType();
 		} else {
 			setInitialValues({
 				_name: '',
@@ -188,7 +122,7 @@ export function NewOrEditSchema({
 							'Content-Type':	'application/json'
 						},
 						body: JSON.stringify({
-							query: GQL_SCHEMA_UPDATE,
+							query: GQL_MUTATION_UPDATE_DOCUMENT_TYPE,
 							variables: {
 								_id,
 								_name,
@@ -206,7 +140,7 @@ export function NewOrEditSchema({
 							'Content-Type':	'application/json'
 						},
 						body: JSON.stringify({
-							query: GQL_SCHEMA_CREATE,
+							query: GQL_MUTATION_CREATE_DOCUMENT_TYPE,
 							variables: {
 								_name,
 								properties
@@ -390,4 +324,4 @@ export function NewOrEditSchema({
         		<Loader inverted>Loading</Loader>
       		</Dimmer>
     	</Segment>;
-} // NewOrEditSchema
+} // NewOrEditDocumentType

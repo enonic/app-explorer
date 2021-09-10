@@ -1,14 +1,9 @@
 import {Button, Icon, Input, Message, Modal} from 'semantic-ui-react';
 
-
-const GQL_SCHEMA_DELETE = `mutation DeleteSchemaMutation($_id: String!) {
-  deleteSchema(_id: $_id) {
-    _id
-  }
-}`;
+import {GQL_MUTATION_DELETE_DOCUMENT_TYPE} from '../../../services/graphQL/documentType/mutationDeleteDocumentType';
 
 
-export function DeleteSchemaModal({
+export function DeleteDocumentTypeModal({
 	_id,
 	_name,
 	afterClose = () => {},
@@ -18,7 +13,7 @@ export function DeleteSchemaModal({
 }) {
 	const [open, setOpen] = React.useState(false);
 	const [deleteNameMatches, setDeleteNameMatches] = React.useState(false);
-	const [typedSchemaName, setTypedSchemaName] = React.useState('');
+	const [typedDocumentTypeName, setTypedDocumentTypeName] = React.useState('');
 	return <Modal
 		closeIcon
 		onClose={() => {
@@ -36,17 +31,17 @@ export function DeleteSchemaModal({
 			type='button'
 		><Icon color='red' name='trash alternate outline'/></Button>}
 	>
-		<Modal.Header>Delete schema {_name}</Modal.Header>
+		<Modal.Header>Delete document type {_name}</Modal.Header>
 		<Modal.Content>
 			<Input
 				error={!deleteNameMatches}
 				onChange={(event, {value}) => {
 					//console.debug({name, value});
 					setDeleteNameMatches(_name === value);
-					setTypedSchemaName(value);
+					setTypedDocumentTypeName(value);
 				}}
 				placeholder='Please input name'
-				value={typedSchemaName}
+				value={typedDocumentTypeName}
 			/>
 			{deleteNameMatches ? <Button
 				compact
@@ -57,7 +52,7 @@ export function DeleteSchemaModal({
 							'Content-Type':	'application/json'
 						},
 						body: JSON.stringify({
-							query: GQL_SCHEMA_DELETE,
+							query: GQL_MUTATION_DELETE_DOCUMENT_TYPE,
 							variables: {
 								_id
 							}
@@ -79,4 +74,4 @@ export function DeleteSchemaModal({
 			/>}
 		</Modal.Content>
 	</Modal>;
-} // DeleteSchemaModal
+} // DeleteDocumentTypeModal

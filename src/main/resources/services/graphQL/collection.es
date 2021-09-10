@@ -2,7 +2,7 @@
 //import getIn from 'get-value';
 
 import {
-	GraphQLBoolean,
+	//GraphQLBoolean,
 	GraphQLInt,
 	GraphQLString,
 	list,
@@ -56,7 +56,7 @@ const COLLECTION_OBJECT_TYPE = createObjectType({
 		documentCount: { type: nonNull(GraphQLInt) },
 		interfaces: { type: list(GraphQLString)},
 		language: { type: GraphQLString },
-		schemaId: { type: GraphQLString }
+		documentTypeId: { type: GraphQLString }
 	}
 }); // COLLECTION_OBJECT_TYPE
 
@@ -76,7 +76,7 @@ export const fieldCollectionsReindex = {
 			collectionId: { type: nonNull(GraphQLString) },
 			collectionName: { type: GraphQLString },
 			message: { type: GraphQLString },
-			schemaId: { type: GraphQLString },
+			documentTypeId: { type: GraphQLString },
 			taskId: { type: GraphQLString }
 		}
 	}))
@@ -128,7 +128,7 @@ export const queryCollectionsResolver = ({
 		_path,
 		collector,
 		language = '',
-		schemaId//,
+		documentTypeId//,
 		//type
 	}) => ({
 		_id,
@@ -140,7 +140,7 @@ export const queryCollectionsResolver = ({
 		documentCount: getDocumentCount(_name),
 		interfaces: usedInInterfaces({connection, name: _name}),
 		language,
-		schemaId//,
+		documentTypeId//,
 		//type
 	}));
 	//log.info(`mapped collectionsRes:${toStr(collectionsRes)}`);

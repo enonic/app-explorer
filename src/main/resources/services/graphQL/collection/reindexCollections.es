@@ -10,12 +10,12 @@ import {
 	submitTask
 } from '/lib/xp/task';
 
-import {getSchema} from '../schema/getSchema';
+import {getDocumentType} from '../documentType/getDocumentType';
 
 
 export function reindexCollections({collectionIds}) {
 	const reports = [];
-	const seenSchemas = {};
+	const seenDocumentTypes = {};
 	const readConnection = connect({ principals: [PRINCIPAL_EXPLORER_READ] });
 	forceArray(collectionIds).forEach((collectionId) => {
 		const collectionNode = readConnection.get(collectionId);
@@ -29,50 +29,50 @@ export function reindexCollections({collectionIds}) {
 		} else {
 			const {
 				_name,
-				schemaId
+				documentTypeId
 			} = collectionNode;
-			if(!schemaId) {
-				const message = `Collection _id:${collectionId} _name:${_name} has no schemaId!`;
+			if(!documentTypeId) {
+				const message = `Collection _id:${collectionId} _name:${_name} has no documentTypeId!`;
 				log.warning(message);
 				reports.push({
 					collectionId,
 					collectionName: _name,
 					message
 				});
-			} else { // has schema
-				if (!seenSchemas[schemaId]) {
-					seenSchemas[schemaId] = getSchema({_id:schemaId});
+			} else { // has documentType
+				if (!seenDocumentTypes[documentTypeId]) {
+					seenDocumentTypes[documentTypeId] = getDocumentType({_id:documentTypeId});
 				}
-				const schema = seenSchemas[schemaId];
-				//log.info(`schema:${toStr(schema)}`);
-				if (!schema) {
-					const message = `Unable to get schemaId:${schemaId} for collection _id:${collectionId} _name:${_name}!`;
+				const documentType = seenDocumentTypes[documentTypeId];
+				//log.info(`documentType:${toStr(documentType)}`);
+				if (!documentType) {
+					const message = `Unable to get documentTypeId:${documentTypeId} for collection _id:${collectionId} _name:${_name}!`;
 					log.error(message);
 					reports.push({
 						collectionId,
 						collectionName: _name,
 						message,
-						schemaId
+						documentTypeId
 					});
 				} else {
 					const taskId = submitTask({
 						descriptor: `reindexCollection`,
 						config: {
 							collectionJson: JSON.stringify(collectionNode),
-							schemaJson: JSON.stringify(schema)
+							documentTypeJson: JSON.stringify(documentType)
 						}
 					});
-					const message = `Started reindex of collection _id:${collectionId} _name:${_name} schemaId:${schemaId}`;
+					const message = `Started reindex of collection _id:${collectionId} _name:${_name} documentTypeId:${documentTypeId}`;
 					log.debug(message);
 					reports.push({
 						collectionId,
 						collectionName: _name,
 						message,
-						schemaId,
+						documentTypeId,
 						taskId
 					});
 				}
-			} // end of else has schema
+			} // end of else has documentType
 		}
 	}); // collectionIds.forEach
 	return reports;
