@@ -89,7 +89,6 @@ const FIELDS_GQL = `queryFields {
 		#displayName
 		#indexConfig
 		#inResults
-		#fieldType
 		key
 		#type
 	}
