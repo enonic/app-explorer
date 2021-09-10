@@ -68,6 +68,61 @@ const PROPERTY_DEFAULT = {
 };
 
 
+const SCHEMA = {
+	_name: (v) => {
+		if(!v) {
+			return 'Required!';
+		}
+		const startsWithAnythingButLowercaseLetterRegexp = /^[^a-z]/;
+		const startsWithAnythingButLowercaseLetter = v.match(startsWithAnythingButLowercaseLetterRegexp);
+		if (startsWithAnythingButLowercaseLetter) {
+			return `Must start with a lowercase letter. Illegal characters: ${startsWithAnythingButLowercaseLetter.join('')}`;
+		}
+
+		const disallowedRegexp = /[^a-zA-Z0-9_]/g;
+		const matches = v.match(disallowedRegexp);
+		if (matches) {
+			return `Only letters, digits and underscore is allowed. Illegal characters: ${matches.join('')}`;
+		}
+		return undefined;
+	},
+	properties: (properties) => {
+		//console.debug('properties', properties);
+		if (!Array.isArray(properties)) {
+			return 'properties must be an array';
+		}
+		for (var i = 0; i < properties.length; i++) { // Can't return from forEach?
+			const {name} = properties[i];
+			//console.debug('i', i, 'name', name);
+			if(!name) {
+				return {
+					error: `Required!`,
+					path: `properties.${i}.name`
+				};
+			}
+			const startsWithAnythingButLowercaseLetterRegexp = /^[^a-z]/;
+			const startsWithAnythingButLowercaseLetter = name.match(startsWithAnythingButLowercaseLetterRegexp);
+			if (startsWithAnythingButLowercaseLetter) {
+				return {
+					error: `Must start with a lowercase letter. Illegal characters: ${startsWithAnythingButLowercaseLetter.join('')}`,
+					path: `properties.${i}.name`
+				};
+			}
+			const regexp =/[^a-zA-Z0-9_.]/g;
+			const matches = name.match(regexp);
+			//console.debug('i', i, 'name', name, 'matches', matches);
+			if (matches) {
+				return {
+					error: `Only letters, digits, underscore and dot is allowed. Illegal characters: ${matches.join('')}`,
+					path: `properties.${i}.name`
+				};
+			}
+		} // for properties
+		return undefined;
+	}
+}; // SCHEMA
+
+
 export function NewOrEditDocumentType({
 	doClose,
 	_id,
@@ -151,6 +206,7 @@ export function NewOrEditDocumentType({
 					});
 				}
 			}}
+			schema={SCHEMA}
 		>
 			<Form as='div'>
 				<Form.Field>
