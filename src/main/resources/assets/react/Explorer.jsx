@@ -9,7 +9,7 @@ import {Interfaces} from './Interfaces';
 import {Journals} from './Journals';
 import {Notifications} from './Notifications';
 import {Schedule} from './Schedule';
-import {DocumentTypes} from './DocumentTypes/DocumentTypes';
+import {DocumentTypes} from './documentTypes/DocumentTypes';
 import {Search} from './Search';
 import {Status} from './Status';
 import {StopWords} from './StopWords';
