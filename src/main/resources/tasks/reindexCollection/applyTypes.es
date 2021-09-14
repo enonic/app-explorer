@@ -50,11 +50,11 @@ export function applyTypes({
 	boolRequireValid = false,
 	documentNode,
 	languages = [],
-	schema
+	documentType
 }) {
 	const dereffedDocumentNode = JSON.parse(JSON.stringify(documentNode));
 	let boolValid = true;
-	schema.properties.forEach(({
+	documentType.properties.forEach(({
 		enabled = false,
 		fulltext = false,
 		includeInAllText = false,
@@ -440,7 +440,7 @@ export function applyTypes({
 				path: enabled && false // TODO Hardcode
 			}
 		}); // updateIndexConfig
-	}); // schema.properties.forEach
+	}); // documentType.properties.forEach
 	if (!dereffedDocumentNode.document_metadata) {
 		dereffedDocumentNode.document_metadata = {};
 	}

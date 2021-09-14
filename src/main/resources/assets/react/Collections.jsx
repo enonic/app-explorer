@@ -29,7 +29,7 @@ const GQL_MUTATION_COLLECTIONS_REINDEX = `mutation ReindexMutation(
     collectionId
     collectionName
     message
-    schemaId
+    documentTypeId
     taskId
   }
 }`;
@@ -55,7 +55,7 @@ const COLLECTIONS_GQL = `queryCollections(
 		documentCount
 		interfaces
 		language
-		schemaId
+		documentTypeId
 		#type
 	}
 }`;
@@ -116,7 +116,7 @@ const LOCALES_GQL = `getLocales {
 	#variant
 }`;
 
-const GQL_SCHEMA_QUERY = `querySchema {
+const GQL_DOCUMENT_TYPES_QUERY = `queryDocumentTypes {
 	hits {
 		_id
 		_name
@@ -177,7 +177,7 @@ const MOUNT_GQL = `{
 	${FIELDS_GQL}
 	${JOBS_GQL}
 	${LOCALES_GQL}
-	${GQL_SCHEMA_QUERY}
+	${GQL_DOCUMENT_TYPES_QUERY}
 	${TASKS_GQL}
 }`;
 
@@ -186,7 +186,7 @@ const UPDATE_GQL = `{
 	${COLLECTORS_GQL}
 	${FIELDS_GQL}
 	${JOBS_GQL}
-	${GQL_SCHEMA_QUERY}
+	${GQL_DOCUMENT_TYPES_QUERY}
 	${TASKS_GQL}
 }`;
 
@@ -206,13 +206,13 @@ export function Collections(props) {
 	const [queryCollectionsGraph, setQueryCollectionsGraph] = React.useState({});
 	const [queryCollectorsGraph, setQueryCollectorsGraph] = React.useState({});
 	const [queryFieldsGraph, setQueryFieldsGraph] = React.useState({});
-	const [schema, setSchema] = React.useState([]);
+	const [documentTypes, setDocumentTypes] = React.useState([]);
 	const [showCollector, setShowCollector] = React.useState(false);
 	const [showDelete, setShowDelete] = React.useState(false);
 	const [showDocumentCount, setShowDocumentCount] = React.useState(true);
 	const [showLanguage, setShowLanguage] = React.useState(false);
 	const [showInterfaces, setShowInterfaces] = React.useState(false);
-	const [showSchema, setShowSchema] = React.useState(false);
+	const [showDocumentType, setShowDocumentType] = React.useState(false);
 	const [showSchedule, setShowSchedule] = React.useState(false);
 	const [tasks, setTasks] = React.useState([]);
 
@@ -349,7 +349,7 @@ export function Collections(props) {
 					setQueryCollectorsGraph(res.data.queryCollectors);
 					setQueryFieldsGraph(res.data.queryFields);
 					setJobsObjFromArr(res.data.listScheduledJobs);
-					setSchema(res.data.querySchema.hits);
+					setDocumentTypes(res.data.queryDocumentTypes.hits);
 					setTasks(res.data.queryTasks);
 				} // if
 			}); // then
@@ -368,7 +368,7 @@ export function Collections(props) {
 					setQueryCollectorsGraph(res.data.queryCollectors);
 					setQueryFieldsGraph(res.data.queryFields);
 					setJobsObjFromArr(res.data.listScheduledJobs);
-					setSchema(res.data.querySchema.hits);
+					setDocumentTypes(res.data.queryDocumentTypes.hits);
 					setTasks(res.data.queryTasks);
 				}
 			});
@@ -413,7 +413,7 @@ export function Collections(props) {
 	}, 2500);
 
 	const shemaIdToName = {};
-	schema.forEach(({_id, _name}) => {
+	documentTypes.forEach(({_id, _name}) => {
 		shemaIdToName[_id] = _name;
 	});
 
@@ -458,13 +458,13 @@ export function Collections(props) {
 						</Table.Cell>
 						<Table.Cell collapsing>
 							<Radio
-								checked={showSchema}
+								checked={showDocumentType}
 								onChange={(ignored,{checked}) => {
-									setShowSchema(checked);
+									setShowDocumentType(checked);
 								}}
 								toggle
 							/>
-							<Label color='black' size='large'>Show schema</Label>
+							<Label color='black' size='large'>Show document type</Label>
 						</Table.Cell>
 						<Table.Cell collapsing>
 							<Radio
@@ -515,7 +515,7 @@ export function Collections(props) {
 						{showCollector ? <Table.HeaderCell>Collector</Table.HeaderCell> : null}
 						{showDocumentCount ? <Table.HeaderCell>Documents</Table.HeaderCell> : null}
 						{showLanguage ? <Table.HeaderCell>Language</Table.HeaderCell> : null}
-						{showSchema ? <Table.HeaderCell>Schema</Table.HeaderCell> : null}
+						{showDocumentType ? <Table.HeaderCell>Document Type</Table.HeaderCell> : null}
 						{showInterfaces ? <Table.HeaderCell>Interfaces</Table.HeaderCell> : null }
 						{showSchedule ? <Table.HeaderCell>Schedule</Table.HeaderCell> : null }
 						<Table.HeaderCell>Actions</Table.HeaderCell>
@@ -530,7 +530,7 @@ export function Collections(props) {
 						documentCount,
 						interfaces,
 						language = '',
-						schemaId = ''
+						documentTypeId = ''
 					}, index) => {
 						const key = `collection[${index}]`;
 						const boolCollectorSelected = !!(collector && collector.name);
@@ -563,7 +563,7 @@ export function Collections(props) {
 									cron,
 									doCollect,
 									language,
-									schemaId
+									documentTypeId
 								}}
 								fields={fieldsObj}
 								locales={locales}
@@ -588,7 +588,7 @@ export function Collections(props) {
 									(showCollector ? 1 : 0)
 									+ (showDocumentCount ? 1 : 0)
 									+ (showLanguage ? 1 : 0)
-									+ (showSchema ? 1 : 0)
+									+ (showDocumentType ? 1 : 0)
 									+ (showInterfaces ? 1 : 0)
 									+ (showSchedule ? 1 : 0)
 								}><Progress
@@ -601,7 +601,7 @@ export function Collections(props) {
 									{showCollector ? <Table.Cell collapsing>{collector && collector.name || ''}</Table.Cell> : null}
 									{showDocumentCount ? <Table.Cell collapsing>{documentCount}</Table.Cell> : null}
 									{showLanguage ? <Table.Cell collapsing>{language}</Table.Cell> : null}
-									{showSchema ? <Table.Cell collapsing>{shemaIdToName[schemaId]}</Table.Cell> : null }
+									{showDocumentType ? <Table.Cell collapsing>{shemaIdToName[documentTypeId]}</Table.Cell> : null }
 									{showInterfaces ? <Table.Cell collapsing>{interfaces.map((iface, i) => <p key={i}>
 										{i === 0 ? null : <br/>}
 										<span style={{whitespace: 'nowrap'}}>{iface}</span>

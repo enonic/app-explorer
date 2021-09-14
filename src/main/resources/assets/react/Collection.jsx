@@ -11,7 +11,7 @@ import {CollectorOptions} from './collection/CollectorOptions';
 import {CollectorSelector} from './collection/CollectorSelector';
 import {LanguageDropdown} from './collection/LanguageDropdown';
 import {SchedulingSegment} from './collection/SchedulingSegment';
-import {SchemaSelector} from './collection/SchemaSelector';
+import {DocumentTypeSelector} from './collection/DocumentTypeSelector';
 
 
 function isSane(value) {
@@ -113,7 +113,7 @@ export function Collection(props) {
 			<CollectorSelector
 				options={collectorOptions}
 			/>
-			<SchemaSelector
+			<DocumentTypeSelector
 				servicesBaseUrl={servicesBaseUrl}
 			/>
 		</Segment>
