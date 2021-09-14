@@ -22,7 +22,7 @@
     "regenerator-runtime": "0.13.9",
     "robots-txt-guard": "1.0.2",
     "semantic-ui-css": "2.4.1",
-    "set-value": "4.0.0",
+    "set-value": "4.0.1",
     "snowball": "0.3.1",
     "yup": "0.32.9"
   },
