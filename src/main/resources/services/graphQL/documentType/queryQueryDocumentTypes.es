@@ -3,6 +3,7 @@ export const GQL_QUERY_QUERY_DOCUMENT_TYPES = `query QueryDocumentTypesQuery {
 		hits {
 			_id
 			_name
+			_versionKey
 			properties {
 				enabled
 				fulltext

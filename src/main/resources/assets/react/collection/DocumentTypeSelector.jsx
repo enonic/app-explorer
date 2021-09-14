@@ -8,8 +8,8 @@ import {getEnonicContext} from 'semantic-ui-react-form/Context';
 import {setValue} from 'semantic-ui-react-form/actions';
 
 
-const GQL_SCHEMA_QUERY = `{
-	querySchema {
+const GQL_DOCUMENT_TYPE_QUERY = `{
+	queryDocumentTypes {
 		hits {
 			_id
 			_name
@@ -18,14 +18,14 @@ const GQL_SCHEMA_QUERY = `{
 }`;
 
 
-export function SchemaSelector(props) {
+export function DocumentTypeSelector(props) {
 	const [context, dispatch] = getEnonicContext();
 
 	const {
-		name = 'schemaId',
+		name = 'documentTypeId',
 		parentPath,
 		path = parentPath ? `${parentPath}.${name}` : name,
-		placeholder = 'Please select a schema',
+		placeholder = 'Please select a document type',
 		servicesBaseUrl,
 		value = getIn(context.values, path)/*,
 		...rest*/
@@ -39,36 +39,36 @@ export function SchemaSelector(props) {
 	} = context.values;
 	//console.debug('collectorName',collectorName);
 
-	const [schema, setSchema] = React.useState([]);
+	const [documentTypes, setDocumentTypes] = React.useState([]);
 
-	function querySchema() {
+	function queryDocumentTypes() {
 		fetch(`${servicesBaseUrl}/graphQL`, {
 			method: 'POST',
 			headers: {
 				'Content-Type':	'application/json'
 			},
 			body: JSON.stringify({
-				query: GQL_SCHEMA_QUERY
+				query: GQL_DOCUMENT_TYPE_QUERY
 			})
 		})
 			.then(response => response.json())
 			.then(data => {
 				//console.debug('data', data);
-				setSchema(data.data.querySchema.hits);
+				setDocumentTypes(data.data.queryDocumentTypes.hits);
 			});
-	} // querySchema
+	} // queryDocumentTypes
 
 	React.useEffect(() => {
-		querySchema();
+		queryDocumentTypes();
 	}, [collectorName]);
 
 	if(collectorName) return null;
 
 	return <>
-		<Header as='h2' dividing content='Schema'/>
+		<Header as='h2' dividing content='Document type'/>
 		<Dropdown
 			fluid
-			loading={!schema.length}
+			loading={!documentTypes.length}
 			onChange={(ignoredEvent,{value: newValue}) => {
 				//console.debug('newValue', newValue);
 				dispatch(setValue({
@@ -76,7 +76,7 @@ export function SchemaSelector(props) {
 					value: newValue
 				}));
 			}}
-			options={schema.map(({
+			options={documentTypes.map(({
 				_id: value,
 				_name: text
 			}) => ({

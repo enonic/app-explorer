@@ -29,7 +29,7 @@ import {updateIndexConfig} from './updateIndexConfig';
 export function run({
 	boolRequireValid = false,
 	collectionJson,
-	schemaJson
+	documentTypeJson
 }) {
 	const collection = JSON.parse(collectionJson);
 	//log.info(`collection:${toStr(collection)}`);
@@ -55,13 +55,13 @@ export function run({
 	// perhaps just end
 	// perhaps sleep -> resume
 	// perhaps schedule?
-	// What about race conditions, which schema should be applied?
+	// What about race conditions, which documentType should be applied?
 
-	const schema = JSON.parse(schemaJson);
-	//log.info(`schema:${toStr(schema)}`);
+	const documentType = JSON.parse(documentTypeJson);
+	//log.info(`documentType:${toStr(documentType)}`);
 	/*const {
 		properties
-	} = schema;*/
+	} = documentType;*/
 	//log.info(`properties:${toStr(properties)}`);
 
 	const repoId = `${COLLECTION_REPO_PREFIX}${collectionName}`;
@@ -159,7 +159,7 @@ export function run({
 					boolRequireValid,
 					documentNode,
 					languages: documentNode.document_metadata.stemmingLanguage ? [documentNode.document_metadata.stemmingLanguage] : [],
-					schema
+					documentType
 				});
 				//log.info(`documentNodeWithTypes:${toStr(documentNodeWithTypes)}`);
 
