@@ -48,7 +48,7 @@ export function DocumentTypes({
 	//console.debug('documentTypes', documentTypes);
 
 	return <>
-		<Header as='h1' content='DocumentTypes'/>
+		<Header as='h1' content='Document types'/>
 		<Table celled collapsing compact selectable singleLine striped>
 			<Table.Header>
 				<Table.Row>

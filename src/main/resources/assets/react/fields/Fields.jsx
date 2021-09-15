@@ -7,8 +7,8 @@ import {
 	Table
 } from 'semantic-ui-react';
 
-import {NewOrEditModal} from './fields/NewOrEditModal';
-import {DeleteModal} from './fields/DeleteModal';
+import {NewOrEditModal} from './NewOrEditModal';
+import {DeleteModal} from './DeleteModal';
 
 
 export function Fields(props) {
