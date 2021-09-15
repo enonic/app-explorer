@@ -1,6 +1,6 @@
 import {Button, Icon, Modal, Popup} from 'semantic-ui-react';
 
-import {Collection} from '../Collection';
+import {Collection} from './Collection';
 import {UploadLicense} from '../UploadLicense';
 
 export function NewOrEditCollectionModal(props) {
@@ -71,7 +71,6 @@ export function NewOrEditCollectionModal(props) {
 						fields={fields}
 						initialValues={initialValues}
 						locales={locales}
-						mode={_name ? 'modify' : 'create'}
 						onClose={() => {
 							setState({open: false});
 							onClose();

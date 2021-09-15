@@ -12,15 +12,20 @@ import {getLicense} from './license';
 import {getSites} from './site';
 import {getLocales} from './i18n';
 import {queryApiKeys} from './apiKey';
+
 import {
+	fieldCollectionCreate,
+	fieldCollectionUpdate,
 	fieldCollectionsQuery,
 	fieldCollectionsReindex
 } from './collection';
+
 import {queryCollectors} from './collector';
 import {queryFields} from './field';
 import {queryInterfaces} from './interface';
 import {queryJournals} from './journal';
 import {listScheduledJobs} from './scheduler';
+
 import {
 	fieldDocumentTypeCreate,
 	fieldDocumentTypeDelete,
@@ -28,6 +33,7 @@ import {
 	fieldDocumentTypesQuery,
 	fieldDocumentTypeUpdate
 } from './documentType';
+
 import {queryStopWords} from './stopWord';
 
 import {
@@ -56,15 +62,20 @@ export const SCHEMA = createSchema({
 	mutation: createObjectType({
 		name: 'Mutation',
 		fields: {
+			createCollection: fieldCollectionCreate,
 			createDocumentType: fieldDocumentTypeCreate,
 			createSynonym: fieldSynonymCreate,
 			createThesaurus: fieldThesaurusCreate,
+
 			deleteDocumentType: fieldDocumentTypeDelete,
 			deleteSynonym: fieldSynonymDelete,
 			deleteThesaurus: fieldThesaurusDelete,
+
+			updateCollection: fieldCollectionUpdate,
 			updateDocumentType: fieldDocumentTypeUpdate,
 			updateSynonym: fieldSynonymUpdate,
 			updateThesaurus: fieldThesaurusUpdate,
+
 			reindexCollections: fieldCollectionsReindex
 		}
 	}), // mutation
