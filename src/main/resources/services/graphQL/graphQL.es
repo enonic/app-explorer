@@ -43,10 +43,12 @@ import {
 	fieldSynonymUpdate
 } from './synonym';
 
-import {queryThesauri} from './thesaurus';
-import {fieldThesaurusCreate} from './thesaurus/fieldThesaurusCreate';
-import {fieldThesaurusDelete} from './thesaurus/fieldThesaurusDelete';
-import {fieldThesaurusUpdate} from './thesaurus/fieldThesaurusUpdate';
+import {
+	fieldThesauriQuery,
+	fieldThesaurusCreate,
+	fieldThesaurusDelete,
+	fieldThesaurusUpdate
+} from './thesaurus';
 
 import {
 	fieldTaskQuery
@@ -97,7 +99,7 @@ export const SCHEMA = createSchema({
 			queryStopWords,
 			querySynonyms: fieldSynonymsQuery,
 			queryDocumentTypes: fieldDocumentTypesQuery,
-			queryThesauri,
+			queryThesauri: fieldThesauriQuery,
 			queryTasks: fieldTaskQuery
 		} // fields
 	}) // query
