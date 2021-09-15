@@ -15,11 +15,13 @@ import {
 } from 'semantic-ui-react';
 import {
 	MONTH_TO_HUMAN
-} from './collection/SchedulingSegment';
-import {DeleteCollectionModal} from './collection/DeleteCollectionModal';
-import {NewOrEditCollectionModal} from './collection/NewOrEditCollectionModal';
-import {useInterval} from './utils/useInterval';
-import {Cron} from './utils/Cron';
+} from './SchedulingSegment';
+import {DeleteCollectionModal} from './DeleteCollectionModal';
+import {NewOrEditCollectionModal} from './NewOrEditCollectionModal';
+import {useInterval} from '../utils/useInterval';
+import {Cron} from '../utils/Cron';
+
+//import {GQL_QUERY_QUERY_COLLECTIONS} from '../../../services/graphQL/collection/QueryCollectionsQuery';
 
 
 const GQL_MUTATION_COLLECTIONS_REINDEX = `mutation ReindexMutation(
@@ -35,7 +37,7 @@ const GQL_MUTATION_COLLECTIONS_REINDEX = `mutation ReindexMutation(
 }`;
 
 const COLLECTIONS_GQL = `queryCollections(
-	count: -1
+	perPage: -1
 ) {
 	total
 	count
@@ -48,6 +50,7 @@ const COLLECTIONS_GQL = `queryCollections(
 		_name
 		#_nodeType
 		_path
+		#_score
 		collector {
 			name
 			configJson
@@ -56,7 +59,6 @@ const COLLECTIONS_GQL = `queryCollections(
 		interfaces
 		language
 		documentTypeId
-		#type
 	}
 }`;
 
@@ -287,9 +289,9 @@ export function Collections(props) {
 			} catch (e) {
 				anyReindexTaskWithoutCollectionId = true;
 			}
-		} else { // Not collector nor reindex task
+		} /*else { // Not collector nor reindex task
 			console.debug('taskDescriptor', taskDescriptor);
-		}
+		}*/
 	});
 
 	const intInitializedCollectorComponents = Object.keys(collectorComponents).length;

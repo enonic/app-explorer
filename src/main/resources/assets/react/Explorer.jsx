@@ -3,7 +3,7 @@ import {
 } from 'semantic-ui-react';
 
 import {Api} from './Api';
-import {Collections} from './Collections';
+import {Collections} from './collection/Collections';
 //import {Fields} from './Fields';
 import {Interfaces} from './Interfaces';
 import {Journals} from './Journals';

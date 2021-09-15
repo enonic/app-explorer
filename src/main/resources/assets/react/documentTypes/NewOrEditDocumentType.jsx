@@ -35,6 +35,7 @@ import {GQL_MUTATION_CREATE_DOCUMENT_TYPE} from '../../../services/graphQL/docum
 import {GQL_MUTATION_UPDATE_DOCUMENT_TYPE} from '../../../services/graphQL/documentType/mutationUpdateDocumentType';
 import {GQL_QUERY_GET_DOCUMENT_TYPE} from '../../../services/graphQL/documentType/queryGetDocumentType';
 
+import {nameValidator} from '../utils/nameValidator';
 
 const PATH_PROPERTIES = 'properties';
 
@@ -69,23 +70,7 @@ const PROPERTY_DEFAULT = {
 
 
 const SCHEMA = {
-	_name: (v) => {
-		if(!v) {
-			return 'Required!';
-		}
-		const startsWithAnythingButLowercaseLetterRegexp = /^[^a-z]/;
-		const startsWithAnythingButLowercaseLetter = v.match(startsWithAnythingButLowercaseLetterRegexp);
-		if (startsWithAnythingButLowercaseLetter) {
-			return `Must start with a lowercase letter. Illegal characters: ${startsWithAnythingButLowercaseLetter.join('')}`;
-		}
-
-		const disallowedRegexp = /[^a-zA-Z0-9_]/g;
-		const matches = v.match(disallowedRegexp);
-		if (matches) {
-			return `Only letters, digits and underscore is allowed. Illegal characters: ${matches.join('')}`;
-		}
-		return undefined;
-	},
+	_name: (v) => nameValidator(v),
 	properties: (properties) => {
 		//console.debug('properties', properties);
 		if (!Array.isArray(properties)) {
