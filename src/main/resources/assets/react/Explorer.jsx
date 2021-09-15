@@ -4,7 +4,7 @@ import {
 
 import {Api} from './Api';
 import {Collections} from './collection/Collections';
-//import {Fields} from './Fields';
+import {Fields} from './fields/Fields';
 import {Interfaces} from './Interfaces';
 import {Journals} from './Journals';
 import {Notifications} from './Notifications';
@@ -325,7 +325,13 @@ export function Explorer(props) {
 					href='#documentTypes'
 					active={page === 'documentTypes'}
 					onClick={() => setPage('documentTypes')}
-				><Icon name='sitemap'/> DocumentType</Menu.Item>
+				><Icon name='file'/> Document types</Menu.Item>
+				<Menu.Item
+					as='a'
+					href='#fields'
+					active={page === 'fields'}
+					onClick={() => setPage('fields')}
+				><Icon name='sitemap'/> Fields</Menu.Item>
 				<Menu.Item
 					as='a'
 					href='#stopWords'
@@ -410,6 +416,9 @@ export function Explorer(props) {
 					servicesBaseUrl={servicesBaseUrl}
 				/>}
 				{page === 'documentTypes' && <DocumentTypes
+					servicesBaseUrl={servicesBaseUrl}
+				/>}
+				{page === 'fields' && <Fields
 					servicesBaseUrl={servicesBaseUrl}
 				/>}
 				{page === 'stopWords' && <StopWords
