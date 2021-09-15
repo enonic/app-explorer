@@ -7,32 +7,19 @@ import {
 	SubmitButton
 } from 'semantic-ui-react-form';
 
-import {CollectorOptions} from './collection/CollectorOptions';
-import {CollectorSelector} from './collection/CollectorSelector';
-import {LanguageDropdown} from './collection/LanguageDropdown';
-import {SchedulingSegment} from './collection/SchedulingSegment';
-import {DocumentTypeSelector} from './collection/DocumentTypeSelector';
+import {GQL_MUTATION_CREATE_COLLECTION} from '../../../services/graphQL/collection/mutationCreateCollection';
+import {GQL_MUTATION_UPDATE_COLLECTION} from '../../../services/graphQL/collection/mutationUpdateCollection';
+import {nameValidator} from '../utils/nameValidator';
 
-
-function isSane(value) {
-	if(!value) {
-		return 'Required!';
-	}
-	const matches = value.match(/[^-a-zA-Z0-9+]/g);
-	if (matches) {
-		return `Illegal characters: ${matches.join('')}`;
-	}
-	return undefined;
-}
-
-
-/*function required(value) {
-	return value ? undefined : 'Required!';
-}*/
+import {CollectorOptions} from './CollectorOptions';
+import {CollectorSelector} from './CollectorSelector';
+import {LanguageDropdown} from './LanguageDropdown';
+import {SchedulingSegment} from './SchedulingSegment';
+import {DocumentTypeSelector} from './DocumentTypeSelector';
 
 
 const SCHEMA = {
-	_name: (v) => isSane(v)
+	_name: (v) => nameValidator(v)
 };
 
 
@@ -45,7 +32,6 @@ export function Collection(props) {
 		contentTypeOptions,
 		fields = {},
 		locales, // []
-		mode,
 		onClose,
 		servicesBaseUrl,
 		siteOptions,
@@ -86,14 +72,60 @@ export function Collection(props) {
 		}}
 		onSubmit={(values) => {
 			//console.debug('submit values', values);
-			fetch(`${servicesBaseUrl}/collection${mode === 'create' ? 'Create' : 'Modify'}`, {
+
+			const {_id} = initialValues;
+			//console.debug('submit _id', _id);
+
+			const {
+				_name,
+				collector: {
+					name: collectorName,
+					config: collectorConfig
+				} = {},
+				cron,
+				doCollect,
+				documentTypeId,
+				language
+			} = values;
+			//console.debug('submit _name', _name);
+			//console.debug('submit collectorName', collectorName);
+			//console.debug('submit collectorConfig', collectorConfig);
+			//console.debug('submit cron', cron);
+			//console.debug('submit doCollect', doCollect);
+			//console.debug('submit documentTypeId', documentTypeId);
+
+			const variables = {
+				_name,
+				cron,
+				doCollect,
+				documentTypeId,
+				language
+			};
+			if (collectorName || collectorConfig) {
+				variables.collector = {};
+				if (collectorName) {
+					variables.collector.name = collectorName;
+				}
+				if (collectorConfig) {
+					variables.collector.configJson = JSON.stringify(collectorConfig);
+				}
+			}
+			if (_id) {
+				variables._id = _id;
+			}
+			//console.debug('submit variables', variables);
+
+			fetch(`${servicesBaseUrl}/graphQL`, {
 				method: 'POST',
 				headers: {
 					'Content-Type':	'application/json'
 				},
-				body: JSON.stringify(values)
-			}).then((/*response*/) => {
-				onClose();
+				body: JSON.stringify({
+					query: _id ? GQL_MUTATION_UPDATE_COLLECTION : GQL_MUTATION_CREATE_COLLECTION,
+					variables
+				})
+			}).then(response => {
+				if (response.status === 200) { onClose(); }
 			});
 		}}
 		schema={SCHEMA}
