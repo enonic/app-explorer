@@ -5,10 +5,10 @@ import {getEnonicContext} from 'semantic-ui-react-form/Context';
 import {Checkbox} from 'semantic-ui-react-form/inputs/Checkbox';
 
 
-export function CustomInstructionOptions(props) {
+export function CustomInstructionOptions(/*props*/) {
 	//console.debug('CustomInstructionOptions props', props);
 
-	const [context, dispatch] = getEnonicContext();
+	const [context/*, dispatch*/] = getEnonicContext();
 	//console.debug('CustomInstructionOptions context', context);
 
 	const instruction = getIn(context.values, 'instruction');
@@ -59,5 +59,5 @@ export function CustomInstructionOptions(props) {
 				toggle
 			/>
 		</Form.Field>
-	</>
+	</>;
 } // function CustomInstructionOptions

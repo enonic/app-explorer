@@ -124,8 +124,6 @@ const SS_FILES = [
 	'services/collectionDelete/collectionDelete',
 	'services/collectionDuplicate/collectionDuplicate',
 	'services/collectorStop/collectorStop',
-	'services/fieldCreate/fieldCreate',
-	'services/fieldModify/fieldModify',
 	'services/graphQL/graphQL',
 	'services/interfaceCopy/interfaceCopy',
 	'services/interfaceCreate/interfaceCreate',
