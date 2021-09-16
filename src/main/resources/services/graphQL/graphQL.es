@@ -22,7 +22,10 @@ import {
 
 import {queryCollectors} from './collector';
 
-import {fieldFieldsQuery} from './field';
+import {
+	fieldFieldDelete,
+	fieldFieldsQuery
+} from './field';
 
 import {queryInterfaces} from './interface';
 import {queryJournals} from './journal';
@@ -72,6 +75,7 @@ export const SCHEMA = createSchema({
 			createThesaurus: fieldThesaurusCreate,
 
 			deleteDocumentType: fieldDocumentTypeDelete,
+			deleteField: fieldFieldDelete,
 			deleteSynonym: fieldSynonymDelete,
 			deleteThesaurus: fieldThesaurusDelete,
 

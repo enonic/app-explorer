@@ -2,11 +2,13 @@ import {
 	Button, Header, Icon, Modal, Popup
 } from 'semantic-ui-react';
 
+import{GQL_MUTATION_FIELD_DELETE} from '../../../services/graphQL/field/mutationFieldDelete';
 
 export function DeleteModal(props) {
 	const {
+		_id,
+		_name,
 		disabled,
-		name,
 		onClose,
 		servicesBaseUrl
 	} = props;
@@ -16,26 +18,35 @@ export function DeleteModal(props) {
 		onClose={onClose}
 		open={open}
 		trigger={<Popup
-			content={`Delete field ${name}`}
+			content={`Delete field ${_name}`}
 			inverted
 			trigger={<Button
 				icon
 				disabled={disabled}
 				onClick={() => setOpen(true)}><Icon color='red' name='trash alternate outline'/></Button>}/>}
 	>
-		<Modal.Header>Delete field {name}</Modal.Header>
+		<Modal.Header>Delete field {_name}</Modal.Header>
 		<Modal.Content>
-			<Header as='h2'>Do you really want to delete {name}?</Header>
+			<Header as='h2'>Do you really want to delete {_name}?</Header>
 			<Button
 				compact
 				onClick={() => {
-					fetch(`${servicesBaseUrl}/fieldDelete?name=${name}`, {
-						method: 'DELETE'
-					}).then(response => {
+					fetch(`${servicesBaseUrl}/graphQL`, {
+						method: 'POST',
+						headers: {
+							'Content-Type':	'application/json'
+						},
+						body: JSON.stringify({
+							query: GQL_MUTATION_FIELD_DELETE,
+							variables: {
+								_id
+							}
+						})
+					}).then((/*response*/) => {
 						//if (response.status === 200) {}
 						setOpen(false); // This needs to be before unmount.
 						onClose(); // This could trigger render in parent, and unmount this Component.
-					})
+					});
 				}}
 				size='tiny'
 			><Icon color='red' name='trash alternate outline'/>Confirm Delete</Button>
