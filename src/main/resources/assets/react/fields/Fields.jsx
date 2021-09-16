@@ -1,11 +1,18 @@
+import {VALUE_TYPE_STRING} from '@enonic/js-utils';
+
 import _ from 'lodash';
 import {
 	Button,
 	Header,
 	//Icon,
+	Label,
 	Loader,
+	Radio,
+	Segment,
 	Table
 } from 'semantic-ui-react';
+
+import {GQL_QUERY_FIELDS_QUERY} from '../../../services/graphQL/field/queryFieldsQuery';
 
 import {NewOrEditModal} from './NewOrEditModal';
 import {DeleteModal} from './DeleteModal';
@@ -24,7 +31,8 @@ export function Fields(props) {
 			hits: [],
 			total: 0
 		},
-		isLoading: true
+		isLoading: true,
+		showSystemFields: false
 	});
 	//console.debug('Fields', {props, state});
 
@@ -32,21 +40,40 @@ export function Fields(props) {
 		column,
 		direction,
 		fieldsRes,
-		isLoading
+		isLoading,
+		showSystemFields
 	} = state;
+	//console.debug('Fields fieldsRes', fieldsRes);
 
-	function fetchFields() {
+	function fetchFields({
+		includeSystemFields = showSystemFields
+	} = {}) {
 		setState(prev => ({
 			...prev,
 			isLoading: true
 		}));
-		fetch(`${servicesBaseUrl}/fieldList`)
+		fetch(`${servicesBaseUrl}/graphQL`, {
+			method: 'POST',
+			headers: {
+				'Content-Type':	'application/json'
+			},
+			body: JSON.stringify({
+				query: GQL_QUERY_FIELDS_QUERY,
+				variables: {
+					includeSystemFields
+				}
+			})
+		})
 			.then(response => response.json())
-			.then(data => setState(prev => ({
-				...prev,
-				...data,
-				isLoading: false
-			})));
+			.then(data => {
+				//console.debug('Fields data', data);
+				setState(prev => ({
+					...prev,
+					fieldsRes: data.data.queryFields,
+					isLoading: false,
+					showSystemFields: includeSystemFields
+				}));
+			});
 	} // fetchFields
 
 	const handleSortGenerator = (clickedColumn) => () => {
@@ -84,7 +111,29 @@ export function Fields(props) {
 	React.useEffect(() => fetchFields(), []);
 
 	return <>
-		<Header as='h2'>Fields</Header>
+		<Segment basic inverted style={{
+			marginLeft: -14,
+			marginTop: -14,
+			marginRight: -14
+		}}>
+			<Table basic collapsing compact inverted>
+				<Table.Body>
+					<Table.Row verticalAlign='middle'>
+						<Table.Cell collapsing>
+							<Radio
+								checked={showSystemFields}
+								onChange={(ignored,{checked}) => {
+									fetchFields({includeSystemFields: checked});
+								}}
+								toggle
+							/>
+							<Label color='black' size='large'>Show system fields</Label>
+						</Table.Cell>
+					</Table.Row>
+				</Table.Body>
+			</Table>
+		</Segment>
+		<Header as='h1'>Fields</Header>
 		{isLoading
 			? <Loader active inverted>Loading</Loader>
 			: <>
@@ -100,10 +149,6 @@ export function Fields(props) {
 								onClick={handleSortGenerator('fieldType')}
 								sorted={column === 'fieldType' ? direction : null}
 							>Type</Table.HeaderCell>
-							{/*<Table.HeaderCell
-								onClick={handleSortGenerator('allowArray')}
-								sorted={column === 'allowArray' ? direction : null}
-							>Allow array</Table.HeaderCell>*/}
 							<Table.HeaderCell
 								onClick={handleSortGenerator('min')}
 								sorted={column === 'min' ? direction : null}
@@ -117,10 +162,8 @@ export function Fields(props) {
 					</Table.Header>
 					<Table.Body>
 						{fieldsRes.hits.map(({
-							allowArray = false,
 							denyDelete = false,
-							denyValues = false,
-							fieldType = 'text',
+							fieldType = VALUE_TYPE_STRING,
 							key,
 							min = 0,
 							max = 0,
@@ -133,13 +176,12 @@ export function Fields(props) {
 							nGram, // node._indexConfig.default.nGram uses uppercase G in nGram
 							path
 						}, index) => {
-							return <Table.Row key={`field[${index}]`}>
+							return <Table.Row disabled={denyDelete} key={`field[${index}]`}>
 								<Table.Cell>
 									<NewOrEditModal
-										disabled={denyValues}
+										disabled={denyDelete}
 										field={name}
 										initialValues={{
-											allowArray,
 											fieldType,
 											key,
 											min,
@@ -158,7 +200,6 @@ export function Fields(props) {
 								</Table.Cell>
 								<Table.Cell>{key}</Table.Cell>
 								<Table.Cell>{fieldType === 'any' ? '*' : fieldType}</Table.Cell>
-								{/*<Table.Cell>{allowArray ? <Icon color='green' name='checkmark'/> : <Icon color='red' name='x'/>}</Table.Cell>*/}
 								<Table.Cell>{min === 0 ? '*' : min}</Table.Cell>
 								<Table.Cell>{max === 0 ? '∞' : max}</Table.Cell>
 								<Table.Cell>

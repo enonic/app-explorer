@@ -21,7 +21,9 @@ import {
 } from './collection';
 
 import {queryCollectors} from './collector';
-import {queryFields} from './field';
+
+import {fieldFieldsQuery} from './field';
+
 import {queryInterfaces} from './interface';
 import {queryJournals} from './journal';
 import {listScheduledJobs} from './scheduler';
@@ -93,7 +95,7 @@ export const SCHEMA = createSchema({
 			queryApiKeys,
 			queryCollections: fieldCollectionsQuery,
 			queryCollectors,
-			queryFields,
+			queryFields: fieldFieldsQuery,
 			queryInterfaces,
 			queryJournals,
 			queryStopWords,
