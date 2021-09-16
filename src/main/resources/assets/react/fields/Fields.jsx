@@ -162,12 +162,13 @@ export function Fields(props) {
 					</Table.Header>
 					<Table.Body>
 						{fieldsRes.hits.map(({
+							_id,
+							_name,
 							denyDelete = false,
 							fieldType = VALUE_TYPE_STRING,
 							key,
 							min = 0,
 							max = 0,
-							name,
 							instruction,
 							decideByType,
 							enabled,
@@ -180,7 +181,7 @@ export function Fields(props) {
 								<Table.Cell>
 									<NewOrEditModal
 										disabled={denyDelete}
-										field={name}
+										field={_name}
 										initialValues={{
 											fieldType,
 											key,
@@ -206,7 +207,8 @@ export function Fields(props) {
 									<Button.Group>
 										<DeleteModal
 											disabled={denyDelete}
-											name={name}
+											_id={_id}
+											_name={_name}
 											onClose={fetchFields}
 											servicesBaseUrl={servicesBaseUrl}
 										/>
