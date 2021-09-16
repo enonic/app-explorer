@@ -23,8 +23,10 @@ import {
 import {queryCollectors} from './collector';
 
 import {
+	fieldFieldCreate,
 	fieldFieldDelete,
-	fieldFieldsQuery
+	fieldFieldsQuery,
+	fieldFieldUpdate
 } from './field';
 
 import {queryInterfaces} from './interface';
@@ -71,6 +73,7 @@ export const SCHEMA = createSchema({
 		fields: {
 			createCollection: fieldCollectionCreate,
 			createDocumentType: fieldDocumentTypeCreate,
+			createField: fieldFieldCreate,
 			createSynonym: fieldSynonymCreate,
 			createThesaurus: fieldThesaurusCreate,
 
@@ -81,6 +84,7 @@ export const SCHEMA = createSchema({
 
 			updateCollection: fieldCollectionUpdate,
 			updateDocumentType: fieldDocumentTypeUpdate,
+			updateField: fieldFieldUpdate,
 			updateSynonym: fieldSynonymUpdate,
 			updateThesaurus: fieldThesaurusUpdate,
 

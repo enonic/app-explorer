@@ -13,15 +13,28 @@ export const GQL_QUERY_FIELDS_QUERY = `query QueryFieldsQuery(
 			_name
 			_nodeType
 			_path
-			decideByType
-			denyDelete
-			enabled
-			fieldType
-			includeInAllText
-			indexConfig
-			inResults
-			instruction
+
 			key
+
+			denyDelete
+			fieldType
+			inResults
+			max
+			min
+
+			instruction
+			indexConfig {
+				decideByType
+				enabled
+				fulltext
+				includeInAllText
+				nGram
+				path
+			}
+			decideByType
+			enabled
+			fulltext
+			includeInAllText
 			nGram
 			path
 		}

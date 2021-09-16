@@ -1,3 +1,11 @@
+import {
+	INDEX_CONFIG_TEMPLATE_NONE,
+	INDEX_CONFIG_TEMPLATE_BY_TYPE,
+	INDEX_CONFIG_TEMPLATE_FULLTEXT,
+	INDEX_CONFIG_TEMPLATE_PATH,
+	INDEX_CONFIG_TEMPLATE_MINIMAL
+} from '@enonic/js-utils';
+
 //import getIn from 'get-value';
 import {
 	Button, Form, Header, Icon, Modal, Popup, Segment
@@ -12,6 +20,9 @@ import {ResetButton} from 'semantic-ui-react-form/buttons/ResetButton';
 import {SubmitButton} from 'semantic-ui-react-form/buttons/SubmitButton';
 //import {ValidateFormButton} from 'semantic-ui-react-form/buttons/ValidateFormButton';
 //import {VisitAllButton} from 'semantic-ui-react-form/buttons/VisitAllButton';
+
+import {GQL_MUTATION_FIELD_CREATE} from '../../../services/graphQL/field/mutationFieldCreate';
+import {GQL_MUTATION_FIELD_UPDATE} from '../../../services/graphQL/field/mutationFieldUpdate';
 
 import {CustomInstructionOptions} from './CustomInstructionOptions';
 
@@ -45,6 +56,7 @@ const SCHEMA = {
 
 export function NewOrEditModal(props) {
 	const {
+		_id, // Props because not allowed to change
 		disabled = false,
 		//field,
 		initialValues = {
@@ -53,7 +65,7 @@ export function NewOrEditModal(props) {
 			key: '',
 			min: 0,
 			max: 0,
-			instruction: 'type',
+			instruction: INDEX_CONFIG_TEMPLATE_BY_TYPE,
 			decideByType: true,
 			enabled: true,
 			fulltext: true,
@@ -105,11 +117,23 @@ export function NewOrEditModal(props) {
 			<EnonicForm
 				initialValues={initialValues}
 				onSubmit={(values) => {
-					//console.debug('NewOrEditModal onSubmit values', values);
-					fetch(`${servicesBaseUrl}/field${editMode ? 'Modify' : 'Create'}?json=${JSON.stringify(values)}`, {
-						method: 'POST'
-					}).then((/*response*/) => {
-						doClose();
+					console.debug('NewOrEditModal onSubmit values', values);
+					fetch(`${servicesBaseUrl}/graphQL`, {
+						method: 'POST',
+						headers: {
+							'Content-Type':	'application/json'
+						},
+						body: JSON.stringify({
+							query: _id ? GQL_MUTATION_FIELD_UPDATE : GQL_MUTATION_FIELD_CREATE,
+							variables: {
+								...values,
+								_id
+							}
+						})
+					}).then((response) => {
+						if (response.status === 200) {
+							doClose();
+						}
 					});
 				}}
 				schema={SCHEMA}
@@ -251,25 +275,25 @@ export function NewOrEditModal(props) {
 									fluid
 									path='instruction'
 									options={[{
-										key: 'type',
-										text: 'type (default) - Indexing is done based on type; e.g numeric values are indexed as both string and numeric.',
-										value: 'type'
+										key: INDEX_CONFIG_TEMPLATE_BY_TYPE,
+										text: `${INDEX_CONFIG_TEMPLATE_BY_TYPE} (default) - Indexing is done based on type; e.g numeric values are indexed as both string and numeric.`,
+										value: INDEX_CONFIG_TEMPLATE_BY_TYPE
 									},{
-										key: 'minimal',
+										key: INDEX_CONFIG_TEMPLATE_MINIMAL,
 										text: 'minimal - Value is indexed as a string-value only, no matter what type of data.',
-										value: 'minimal'
+										value: INDEX_CONFIG_TEMPLATE_MINIMAL
 									},{
-										key: 'none',
+										key: INDEX_CONFIG_TEMPLATE_NONE,
 										text: 'none - Value is not indexed.',
-										value: 'none'
+										value: INDEX_CONFIG_TEMPLATE_NONE
 									},{
-										key: 'fulltext',
+										key: INDEX_CONFIG_TEMPLATE_FULLTEXT,
 										text: 'fulltext - Values are stored as ‘nGrm’, ‘analyzed’ and also added to the _allText-field',
-										value: 'fulltext'
+										value: INDEX_CONFIG_TEMPLATE_FULLTEXT
 									},{
-										key: 'path',
+										key: INDEX_CONFIG_TEMPLATE_PATH,
 										text: 'path - Values are stored as ‘path’ type and applicable for the pathMatch-function',
-										value: 'path'
+										value: INDEX_CONFIG_TEMPLATE_PATH
 									},{
 										key: 'custom',
 										text: 'custom - use settings below',

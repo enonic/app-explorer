@@ -4,7 +4,7 @@ import _ from 'lodash';
 import {
 	Button,
 	Header,
-	//Icon,
+	Icon,
 	Label,
 	Loader,
 	Radio,
@@ -145,6 +145,7 @@ export function Fields(props) {
 								onClick={handleSortGenerator('key')}
 								sorted={column === 'key' ? direction : null}
 							>Name</Table.HeaderCell>
+							<Table.HeaderCell>Description</Table.HeaderCell>
 							<Table.HeaderCell
 								onClick={handleSortGenerator('fieldType')}
 								sorted={column === 'fieldType' ? direction : null}
@@ -157,6 +158,14 @@ export function Fields(props) {
 								onClick={handleSortGenerator('max')}
 								sorted={column === 'max' ? direction : null}
 							>Max</Table.HeaderCell>
+
+							<Table.HeaderCell>Enabled</Table.HeaderCell>
+							<Table.HeaderCell>Decide by type</Table.HeaderCell>
+							<Table.HeaderCell>Fulltext</Table.HeaderCell>
+							<Table.HeaderCell>Include in _allText</Table.HeaderCell>
+							<Table.HeaderCell>nGram</Table.HeaderCell>
+							<Table.HeaderCell>path</Table.HeaderCell>
+
 							<Table.HeaderCell>Actions</Table.HeaderCell>
 						</Table.Row>
 					</Table.Header>
@@ -167,8 +176,11 @@ export function Fields(props) {
 							denyDelete = false,
 							fieldType = VALUE_TYPE_STRING,
 							key,
+
+							description,
 							min = 0,
 							max = 0,
+
 							instruction,
 							decideByType,
 							enabled,
@@ -177,9 +189,11 @@ export function Fields(props) {
 							nGram, // node._indexConfig.default.nGram uses uppercase G in nGram
 							path
 						}, index) => {
+							//console.debug(`Fields key:${key} fulltext:`, fulltext);
 							return <Table.Row disabled={denyDelete} key={`field[${index}]`}>
 								<Table.Cell>
 									<NewOrEditModal
+										_id={_id}
 										disabled={denyDelete}
 										field={_name}
 										initialValues={{
@@ -187,6 +201,7 @@ export function Fields(props) {
 											key,
 											min,
 											max,
+											description,
 											instruction,
 											decideByType,
 											enabled,
@@ -200,9 +215,16 @@ export function Fields(props) {
 									/>
 								</Table.Cell>
 								<Table.Cell>{key}</Table.Cell>
+								<Table.Cell>{description}</Table.Cell>
 								<Table.Cell>{fieldType === 'any' ? '*' : fieldType}</Table.Cell>
-								<Table.Cell>{min === 0 ? '*' : min}</Table.Cell>
-								<Table.Cell>{max === 0 ? '∞' : max}</Table.Cell>
+								<Table.Cell textAlign='center'>{min === 0 ? '*' : min}</Table.Cell>
+								<Table.Cell textAlign='center'>{max === 0 ? '∞' : max}</Table.Cell>
+								<Table.Cell textAlign='center'>{enabled ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='red' name='x' size='large'/>}</Table.Cell>
+								<Table.Cell textAlign='center'>{decideByType ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='red' name='x' size='large'/>}</Table.Cell>
+								<Table.Cell textAlign='center'>{fulltext ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='red' name='x' size='large'/>}</Table.Cell>
+								<Table.Cell textAlign='center'>{includeInAllText ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='red' name='x' size='large'/>}</Table.Cell>
+								<Table.Cell textAlign='center'>{nGram ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='red' name='x' size='large'/>}</Table.Cell>
+								<Table.Cell textAlign='center'>{path ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='red' name='x' size='large'/>}</Table.Cell>
 								<Table.Cell>
 									<Button.Group>
 										<DeleteModal
