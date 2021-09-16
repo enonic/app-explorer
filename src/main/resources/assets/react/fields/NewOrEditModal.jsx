@@ -48,7 +48,6 @@ export function NewOrEditModal(props) {
 		disabled = false,
 		//field,
 		initialValues = {
-			allowArray: false,
 			description: '',
 			fieldType: 'any',
 			key: '',
@@ -220,12 +219,6 @@ export function NewOrEditModal(props) {
 
 						<Segment>
 							<Header as='h3' content='Occurrences'/>
-							{/*<Form.Field>
-								<Checkbox
-								label='Allow array?'
-								path='allowArray'
-								/>
-								</Form.Field>*/}
 							<Form.Field>
 								<Popup content='>0 means required' trigger={
 									<Input
