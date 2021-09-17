@@ -12,10 +12,9 @@ import {
 	Table
 } from 'semantic-ui-react';
 
-import {GQL_QUERY_FIELDS_QUERY} from '../../../services/graphQL/field/queryFieldsQuery';
-
 import {NewOrEditModal} from './NewOrEditModal';
 import {DeleteModal} from './DeleteModal';
+import {fetchFields} from './fetchFields';
 
 
 export function Fields(props) {
@@ -53,36 +52,28 @@ export function Fields(props) {
 	} = state;
 	//console.debug('Fields fieldsRes', fieldsRes);
 
-	function fetchFields({
+	function updateFields({
 		includeSystemFields = showSystemFields
 	} = {}) {
 		setState(prev => ({
 			...prev,
 			isLoading: true
 		}));
-		fetch(`${servicesBaseUrl}/graphQL`, {
-			method: 'POST',
-			headers: {
-				'Content-Type':	'application/json'
-			},
-			body: JSON.stringify({
-				query: GQL_QUERY_FIELDS_QUERY,
-				variables: {
-					includeSystemFields
-				}
-			})
-		})
-			.then(response => response.json())
-			.then(data => {
-				//console.debug('Fields data', data);
+		fetchFields({
+			handleData: (data) => {
 				setState(prev => ({
 					...prev,
-					fieldsRes: data.data.queryFields,
+					fieldsRes: data.queryFields,
 					isLoading: false,
 					showSystemFields: includeSystemFields
 				}));
-			});
-	} // fetchFields
+			},
+			url: `${servicesBaseUrl}/graphQL`,
+			variables: {
+				includeSystemFields
+			}
+		});
+	} // updateFields
 
 	const handleSortGenerator = (clickedColumn) => () => {
 		const {
@@ -116,7 +107,7 @@ export function Fields(props) {
 		}));
 	}; // handleSortGenerator
 
-	React.useEffect(() => fetchFields(), []);
+	React.useEffect(() => updateFields(), []);
 
 	return <>
 		<Segment basic inverted style={{
@@ -131,7 +122,7 @@ export function Fields(props) {
 							<Radio
 								checked={showSystemFields}
 								onChange={(ignored,{checked}) => {
-									fetchFields({includeSystemFields: checked});
+									updateFields({includeSystemFields: checked});
 								}}
 								toggle
 							/>
@@ -275,7 +266,7 @@ export function Fields(props) {
 											nGram, // node._indexConfig.default.nGram uses uppercase G in nGram
 											path
 										}}
-										onClose={fetchFields}
+										onClose={updateFields}
 										servicesBaseUrl={servicesBaseUrl}
 									/>
 								</Table.Cell>
@@ -306,7 +297,7 @@ export function Fields(props) {
 											disabled={denyDelete}
 											_id={_id}
 											_name={_name}
-											onClose={fetchFields}
+											onClose={updateFields}
 											servicesBaseUrl={servicesBaseUrl}
 										/>
 									</Button.Group>
@@ -317,7 +308,7 @@ export function Fields(props) {
 					</Table.Body>
 				</Table>
 				<NewOrEditModal
-					onClose={fetchFields}
+					onClose={updateFields}
 					servicesBaseUrl={servicesBaseUrl}
 				/>
 			</>

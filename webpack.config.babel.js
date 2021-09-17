@@ -216,7 +216,11 @@ const SS_JS_CONFIG = {
 			//test: /\.es$/,
 
 			// TypeError: isObject is not a function
-			test: /\.(es6?|tsx?|js)$/, // Will need js for node module depenencies
+
+			// NOTE ECMAScript Modules doesn't support named imports :(
+			// Thus we skip *.mjs
+			// No need to support pure client-side files either: *.jsx *.tsx
+			test: /\.(es6?|ts|js)$/, // Will need js for node module depenencies
 
 			exclude: [ // It takes time to transpile, if you know they don't need transpilation to run in Enonic you may list them here:
 				/node_modules[\\/]core-js/, // will cause errors if they are transpiled by Babel
@@ -324,13 +328,14 @@ const SS_JS_CONFIG = {
 	resolve: {
 		alias: SS_ALIAS,
 		extensions: [
-			//'mjs',
-			//'jsx',
-			//'esm',
+			//'mjs', // NOTE ECMAScript Modules doesn't support named imports :(
 			'es', // Needed to resolve "local" imports starting with / which are .es files
+			//'esm', // NOTE ECMAScript Modules doesn't support named imports :(
 			//'es6',
 			'js', // Needed to resolve node_modules
-			'ts'
+			//'jsx', // Client-side only
+			'ts'//,
+			//'tsx', // Client-side only
 			//'json'
 		].map(ext => `.${ext}`)
 	},
@@ -540,7 +545,14 @@ const CLIENT_JS_CONFIG = {
 		/*alias: { // NOTE: If the local lib-explorer is not the newest there could be trouble...
 			'/lib/explorer': path.resolve(__dirname, '../lib-explorer/src/main/resources/lib/explorer/')
 		},*/
-		extensions: ['.es', '.js', '.jsx', '.ts', '.tsx']
+		extensions: [
+			'mjs',
+			'es',
+			'js',
+			'jsx',
+			'ts',
+			'tsx'
+		].map(ext => `.${ext}`)
 	},
 	stats: STATS
 };

@@ -2,17 +2,24 @@ export const GQL_MUTATION_UPDATE_DOCUMENT_TYPE = `mutation UpdateDocumentTypeMut
 	$_id: String!,
 	$_name: String!,
 	$_versionKey: String!
+	$fields: [InputDocumentTypeFields]
 	$properties: [InputDocumentTypeProperties]
 ) {
 	updateDocumentType(
 		_id: $_id
 		_name: $_name
 		_versionKey: $_versionKey
+		fields: $fields
 		properties: $properties
 	) {
 		_id
 		_name
 		_path
+		_versionKey
+		fields {
+			active,
+			fieldId
+		}
 		properties {
 			enabled
 			fulltext
@@ -25,3 +32,27 @@ export const GQL_MUTATION_UPDATE_DOCUMENT_TYPE = `mutation UpdateDocumentTypeMut
 		}
 	}
 }`;
+
+// NOTE indexConfig.path hath not been implemented for documentTypes
+
+/* Example variables for manual testing
+{
+	"_id": "88a0fa01-46e0-4536-a499-c8cf227fdcd0",
+	"_name": "a",
+	"_versionKey": "200f7cc6-4787-41f4-bf94-0662f0380c80",
+	"fields": [{
+		"fieldId": "de39eb2a-f7ac-4dfb-b91a-ecd4f3e3f128",
+		"active": false
+	}],
+	"properties": [{
+		"enabled": false,
+		"fulltext": true,
+		"includeInAllText": true,
+		"max": 2,
+		"min": 3,
+		"name": "myObject.subProperty",
+		"ngram": true,
+		"valueType": "double"
+	}]
+}
+*/

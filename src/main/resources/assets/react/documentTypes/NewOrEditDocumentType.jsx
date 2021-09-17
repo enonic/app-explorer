@@ -12,7 +12,14 @@ import {
 } from '@enonic/js-utils';
 
 import {
-	Button, Dimmer, Form, Header, Loader, Popup, Segment, Table
+	Button,
+	Dimmer,
+	Form,
+	Header,
+	Loader,
+	Popup,
+	Segment,
+	Table
 } from 'semantic-ui-react';
 
 
@@ -35,8 +42,12 @@ import {GQL_MUTATION_CREATE_DOCUMENT_TYPE} from '../../../services/graphQL/docum
 import {GQL_MUTATION_UPDATE_DOCUMENT_TYPE} from '../../../services/graphQL/documentType/mutationUpdateDocumentType';
 import {GQL_QUERY_GET_DOCUMENT_TYPE} from '../../../services/graphQL/documentType/queryGetDocumentType';
 
+import {fetchFields} from '../fields/fetchFields';
+
 import {nameValidator} from '../utils/nameValidator';
 
+
+const PATH_FIELDS = 'fields';
 const PATH_PROPERTIES = 'properties';
 
 const OPTIONS_VALUE_TYPES = [
@@ -56,6 +67,11 @@ const OPTIONS_VALUE_TYPES = [
 	value: key
 }));
 
+
+const FIELD_DEFAULT = {
+	active: true,
+	fieldId: ''
+};
 
 const PROPERTY_DEFAULT = {
 	enabled: true,
@@ -114,6 +130,14 @@ export function NewOrEditDocumentType({
 	servicesBaseUrl
 }) {
 	const [initialValues, setInitialValues] = React.useState(false);
+	const [globalFields, setGlobalFields] = React.useState([]);
+	//console.debug(`NewOrEditDocumentType globalFields`, globalFields);
+
+	const GLOBAL_FIELD_OPTIONS = globalFields.map(({_id, key}) => ({
+		key: _id,
+		text: key,
+		value: _id
+	}));
 
 	function getDocumentType() {
 		fetch(`${servicesBaseUrl}/graphQL`, {
@@ -136,233 +160,324 @@ export function NewOrEditDocumentType({
 	} // fetchDocumentType
 
 	React.useEffect(() => {
+		fetchFields({
+			handleData: (data) => {
+				setGlobalFields(data.queryFields.hits);
+			},
+			url: `${servicesBaseUrl}/graphQL`,
+			variables: {
+				includeSystemFields: false
+			}
+		});
 		if (_id) {
 			getDocumentType();
 		} else {
 			setInitialValues({
 				_name: '',
+				fields: [],
 				properties: []
 			});
 		}
 	}, []);
 
-	return initialValues
-		? <EnonicForm
-			initialValues={initialValues}
-			onSubmit={(values) => {
-				//console.debug('submit values', values);
-				const {_name, properties} = values;
-				//console.debug('submit _name', _name);
+	return initialValues ? <EnonicForm
+		initialValues={initialValues}
+		onSubmit={(values) => {
+			//console.debug('submit values', values);
+			const {_name, fields, properties} = values;
+			//console.debug('submit _name', _name);
 
-				if (_id) {
-					const {_versionKey} = initialValues;
-					fetch(`${servicesBaseUrl}/graphQL`, {
-						method: 'POST',
-						headers: {
-							'Content-Type':	'application/json'
-						},
-						body: JSON.stringify({
-							query: GQL_MUTATION_UPDATE_DOCUMENT_TYPE,
-							variables: {
-								_id,
-								_name,
-								_versionKey,
-								properties
-							}
-						})
-					}).then(response => {
-						if (response.status === 200) { doClose(); }
-					});
-				} else {
-					fetch(`${servicesBaseUrl}/graphQL`, {
-						method: 'POST',
-						headers: {
-							'Content-Type':	'application/json'
-						},
-						body: JSON.stringify({
-							query: GQL_MUTATION_CREATE_DOCUMENT_TYPE,
-							variables: {
-								_name,
-								properties
-							}
-						})
-					}).then(response => {
-						if (response.status === 200) { doClose(); }
-					});
-				}
-			}}
-			schema={SCHEMA}
-		>
-			<Form as='div'>
-				<Form.Field>
-					<Input
-						fluid
-						label={{basic: true, content: 'Name'}}
-						path='_name'
-						placeholder='Please input an unique name'
-					/>
-				</Form.Field>
-				<Header as='h2'>Properties</Header>
-				<Form.Field>
-					<List
-						path={PATH_PROPERTIES}
-						render={(propertiesArray) => {
-							if(!propertiesArray.length) {
-								return <Popup
-									content='Add property'
-									inverted
-									trigger={<InsertButton
-										path={PATH_PROPERTIES}
-										index={0}
-										value={PROPERTY_DEFAULT}
-									/>}
-								/>;
-							}
-							return <>
-								<Table celled compact selectable singleLine striped>
-									<Table.Header>
-										<Table.Row>
-											<Table.HeaderCell>Name</Table.HeaderCell>
-											<Table.HeaderCell>Min</Table.HeaderCell>
-											<Table.HeaderCell>Max</Table.HeaderCell>
-											<Table.HeaderCell>Indexing</Table.HeaderCell>
-											<Table.HeaderCell>Value type</Table.HeaderCell>
-											<Table.HeaderCell>Fulltext</Table.HeaderCell>
-											<Table.HeaderCell>nGram</Table.HeaderCell>
-											<Table.HeaderCell>Include in _allText</Table.HeaderCell>
-											<Table.HeaderCell>Actions</Table.HeaderCell>
-										</Table.Row>
-									</Table.Header>
-									<Table.Body>
-										{propertiesArray.map(({
-											enabled,
-											max,
-											min,
-											name/*,
-											valueType*/
-										}, index) => {
-											const PATH_PROPERTY = `${PATH_PROPERTIES}.${index}`;
-											return <Table.Row key={PATH_PROPERTY}>
-												<Table.Cell>
-													<Input
-														fluid
-														name='name'
-														parentPath={PATH_PROPERTY}
-														placeholder='Please input a name'
-														value={name}
+			const variables = {
+				_name,
+				fields,
+				properties
+			};
+			if (_id) {
+				variables._id = _id;
+				variables._versionKey = initialValues._versionKey;
+			}
+			//console.debug('submit variables', variables);
+
+			fetch(`${servicesBaseUrl}/graphQL`, {
+				method: 'POST',
+				headers: {
+					'Content-Type':	'application/json'
+				},
+				body: JSON.stringify({
+					query: _id ? GQL_MUTATION_UPDATE_DOCUMENT_TYPE : GQL_MUTATION_CREATE_DOCUMENT_TYPE,
+					variables
+				})
+			}).then(response => {
+				if (response.status === 200) { doClose(); }
+			});
+		}}
+		schema={SCHEMA}
+	>
+		<Form as='div'>
+			<Form.Field>
+				<Input
+					fluid
+					label={{basic: true, content: 'Name'}}
+					path='_name'
+					placeholder='Please input an unique name'
+				/>
+			</Form.Field>
+
+			<Header as='h2'>Global fields</Header>
+			<Form.Field>
+				<List
+					path={PATH_FIELDS}
+					render={(fieldsArray) => {
+						//console.debug(`NewOrEditDocumentType fieldsArray`, fieldsArray);
+						if(!fieldsArray.length) {
+							return <Popup
+								content='Add field'
+								inverted
+								trigger={<InsertButton
+									path={PATH_FIELDS}
+									index={0}
+									value={FIELD_DEFAULT}
+								/>}
+							/>;
+						}
+						return <Table celled compact selectable singleLine striped>
+							<Table.Header>
+								<Table.Row>
+									<Table.HeaderCell>Active</Table.HeaderCell>
+									<Table.HeaderCell>Field</Table.HeaderCell>
+									<Table.HeaderCell>Actions</Table.HeaderCell>
+								</Table.Row>
+							</Table.Header>
+							<Table.Body>{
+								fieldsArray.map(({
+									active = true,
+									fieldId = ''
+								}, index) => {
+									//console.debug('NewOrEditDocumentType active', active, 'fieldId', fieldId);
+									const PATH_FIELD = `${PATH_FIELDS}.${index}`;
+									return <Table.Row key={index}>
+										<Table.Cell><Checkbox
+											name='active'
+											parentPath={PATH_FIELD}
+											toggle
+											value={active}
+										/></Table.Cell>
+										<Table.Cell><Dropdown
+											disabled={!active}
+											options={GLOBAL_FIELD_OPTIONS}
+											name='fieldId'
+											parentPath={PATH_FIELD}
+											selection
+											placeholder='Please select a field'
+										/></Table.Cell>
+										<Table.Cell collapsing>
+											<Button.Group>
+												<Popup
+													content='Add field'
+													inverted
+													trigger={<InsertButton
+														path={PATH_FIELDS}
+														index={index+1}
+														value={FIELD_DEFAULT}
+													/>}
+												/>
+												<Popup
+													content='Move down'
+													inverted
+													trigger={<MoveDownButton
+														disabled={index + 1 >= fieldsArray.length}
+														path={PATH_FIELDS}
+														index={index}
+													/>}/>
+												<Popup
+													content='Move up'
+													inverted
+													trigger={<MoveUpButton
+														path={PATH_FIELDS}
+														index={index}
+													/>}/>
+												<Popup
+													content='Delete field'
+													inverted
+													trigger={<DeleteItemButton
+														disabled={fieldsArray.length < 2}
+														path={PATH_FIELDS}
+														index={index}
+													/>}/>
+											</Button.Group>
+										</Table.Cell>
+									</Table.Row>;
+								}) // map
+							}</Table.Body>
+						</Table>;
+					}}
+				/>
+			</Form.Field>
+
+			<Header as='h2'>Properties</Header>
+			<Form.Field>
+				<List
+					path={PATH_PROPERTIES}
+					render={(propertiesArray) => {
+						if(!propertiesArray.length) {
+							return <Popup
+								content='Add property'
+								inverted
+								trigger={<InsertButton
+									path={PATH_PROPERTIES}
+									index={0}
+									value={PROPERTY_DEFAULT}
+								/>}
+							/>;
+						}
+						return <>
+							<Table celled compact selectable singleLine striped>
+								<Table.Header>
+									<Table.Row>
+										<Table.HeaderCell>Name</Table.HeaderCell>
+										<Table.HeaderCell>Min</Table.HeaderCell>
+										<Table.HeaderCell>Max</Table.HeaderCell>
+										<Table.HeaderCell>Indexing</Table.HeaderCell>
+										<Table.HeaderCell>Value type</Table.HeaderCell>
+										<Table.HeaderCell>Fulltext</Table.HeaderCell>
+										<Table.HeaderCell>nGram</Table.HeaderCell>
+										<Table.HeaderCell>Include in _allText</Table.HeaderCell>
+										<Table.HeaderCell>Actions</Table.HeaderCell>
+									</Table.Row>
+								</Table.Header>
+								<Table.Body>{
+									propertiesArray.map(({
+										enabled,
+										max,
+										min,
+										name/*,
+									valueType*/
+									}, index) => {
+										const PATH_PROPERTY = `${PATH_PROPERTIES}.${index}`;
+										return <Table.Row key={PATH_PROPERTY}>
+											<Table.Cell>
+												<Input
+													fluid
+													name='name'
+													parentPath={PATH_PROPERTY}
+													placeholder='Please input a name'
+													value={name}
+												/>
+											</Table.Cell>
+											<Table.Cell>
+												<Input
+													fluid
+													name='min'
+													parentPath={PATH_PROPERTY}
+													type='number'
+													value={min}
+												/>
+											</Table.Cell>
+											<Table.Cell>
+												<Input
+													fluid
+													name='max'
+													parentPath={PATH_PROPERTY}
+													type='number'
+													value={max}
+												/>
+											</Table.Cell>
+											<Table.Cell collapsing>
+												<Checkbox
+													name='enabled'
+													parentPath={PATH_PROPERTY}
+													toggle
+												/>
+											</Table.Cell>
+											<Table.Cell collapsing>
+												{enabled ? <Dropdown
+													disabled={!enabled}
+													options={OPTIONS_VALUE_TYPES}
+													name='valueType'
+													parentPath={PATH_PROPERTY}
+													selection
+												/> : null}
+											</Table.Cell>
+											<Table.Cell collapsing>
+												{enabled ? <Checkbox
+													disabled={!enabled}
+													name='fulltext'
+													parentPath={PATH_PROPERTY}
+													toggle
+												/> : null}
+											</Table.Cell>
+											<Table.Cell collapsing>
+												{enabled ? <Checkbox
+													disabled={!enabled}
+													name='ngram'
+													parentPath={PATH_PROPERTY}
+													toggle
+												/> : null}
+											</Table.Cell>
+											<Table.Cell collapsing>
+												{enabled ? <Checkbox
+													disabled={!enabled}
+													name='includeInAllText'
+													parentPath={PATH_PROPERTY}
+													toggle
+												/> : null}
+											</Table.Cell>
+											<Table.Cell collapsing>
+												<Button.Group>
+													<Popup
+														content='Add property'
+														inverted
+														trigger={<InsertButton
+															path={PATH_PROPERTIES}
+															index={index+1}
+															value={PROPERTY_DEFAULT}
+														/>}
 													/>
-												</Table.Cell>
-												<Table.Cell>
-													<Input
-														fluid
-														name='min'
-														parentPath={PATH_PROPERTY}
-														type='number'
-														value={min}
+													<Popup
+														content='Move down'
+														inverted
+														trigger={<MoveDownButton
+															disabled={index + 1 >= propertiesArray.length}
+															path={PATH_PROPERTIES}
+															index={index}
+														/>}
 													/>
-												</Table.Cell>
-												<Table.Cell>
-													<Input
-														fluid
-														name='max'
-														parentPath={PATH_PROPERTY}
-														type='number'
-														value={max}
+													<Popup
+														content='Move up'
+														inverted
+														trigger={<MoveUpButton
+															path={PATH_PROPERTIES}
+															index={index}
+														/>}
 													/>
-												</Table.Cell>
-												<Table.Cell collapsing>
-													<Checkbox
-														name='enabled'
-														parentPath={PATH_PROPERTY}
-														toggle
+													<Popup
+														content='Delete property'
+														inverted
+														trigger={<DeleteItemButton
+															disabled={propertiesArray.length < 2}
+															path={PATH_PROPERTIES}
+															index={index}
+														/>}
 													/>
-												</Table.Cell>
-												<Table.Cell collapsing>
-													{enabled ? <Dropdown
-														disabled={!enabled}
-														options={OPTIONS_VALUE_TYPES}
-														name='valueType'
-														parentPath={PATH_PROPERTY}
-														selection
-													/> : null}
-												</Table.Cell>
-												<Table.Cell collapsing>
-													{enabled ? <Checkbox
-														disabled={!enabled}
-														name='fulltext'
-														parentPath={PATH_PROPERTY}
-														toggle
-													/> : null}
-												</Table.Cell>
-												<Table.Cell collapsing>
-													{enabled ? <Checkbox
-														disabled={!enabled}
-														name='ngram'
-														parentPath={PATH_PROPERTY}
-														toggle
-													/> : null}
-												</Table.Cell>
-												<Table.Cell collapsing>
-													{enabled ? <Checkbox
-														disabled={!enabled}
-														name='includeInAllText'
-														parentPath={PATH_PROPERTY}
-														toggle
-													/> : null}
-												</Table.Cell>
-												<Table.Cell collapsing>
-													<Button.Group>
-														<Popup
-															content='Add property'
-															inverted
-															trigger={<InsertButton
-																path={PATH_PROPERTIES}
-																index={index+1}
-																value={PROPERTY_DEFAULT}
-															/>}
-														/>
-														<Popup
-															content='Move down'
-															inverted
-															trigger={<MoveDownButton
-																disabled={index + 1 >= propertiesArray.length}
-																path={PATH_PROPERTIES}
-																index={index}
-															/>}/>
-														<Popup
-															content='Move up'
-															inverted
-															trigger={<MoveUpButton
-																path={PATH_PROPERTIES}
-																index={index}
-															/>}/>
-														<Popup
-															content='Delete property'
-															inverted
-															trigger={<DeleteItemButton
-																disabled={propertiesArray.length < 2}
-																path={PATH_PROPERTIES}
-																index={index}
-															/>}/>
-													</Button.Group>
-												</Table.Cell>
-											</Table.Row>;
-										})}
-									</Table.Body>
-								</Table>
-							</>;
-						}}
-					/>
-				</Form.Field>
-				<Form.Field>
-					<SubmitButton/>
-					<ResetButton/>
-				</Form.Field>
-			</Form>
-		</EnonicForm>
+												</Button.Group>
+											</Table.Cell>
+										</Table.Row>;
+									})}
+								</Table.Body>
+							</Table>
+						</>;
+					}}
+				/>
+			</Form.Field>
+			<Form.Field>
+				<SubmitButton/>
+				<ResetButton/>
+			</Form.Field>
+		</Form>
+	</EnonicForm>
 		: <Segment>
-  			<Dimmer active inverted>
-        		<Loader inverted>Loading</Loader>
-      		</Dimmer>
-    	</Segment>;
+			<Dimmer active inverted>
+				<Loader inverted>Loading</Loader>
+			</Dimmer>
+		</Segment>;
 } // NewOrEditDocumentType
