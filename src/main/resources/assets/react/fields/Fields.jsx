@@ -32,6 +32,10 @@ export function Fields(props) {
 			total: 0
 		},
 		isLoading: true,
+		showDeleteButton: false,
+		showDescriptionColumn: false,
+		showIndexConfigColumns: false,
+		showOccurencesColumns: true,
 		showSystemFields: false
 	});
 	//console.debug('Fields', {props, state});
@@ -41,6 +45,10 @@ export function Fields(props) {
 		direction,
 		fieldsRes,
 		isLoading,
+		showDeleteButton,
+		showDescriptionColumn,
+		showIndexConfigColumns,
+		showOccurencesColumns,
 		showSystemFields
 	} = state;
 	//console.debug('Fields fieldsRes', fieldsRes);
@@ -129,6 +137,58 @@ export function Fields(props) {
 							/>
 							<Label color='black' size='large'>Show system fields</Label>
 						</Table.Cell>
+						<Table.Cell collapsing>
+							<Radio
+								checked={showDescriptionColumn}
+								onChange={(ignored,{checked}) => {
+									setState(prev => ({
+										...prev,
+										showDescriptionColumn: checked
+									}));
+								}}
+								toggle
+							/>
+							<Label color='black' size='large'>Show description column</Label>
+						</Table.Cell>
+						<Table.Cell collapsing>
+							<Radio
+								checked={showOccurencesColumns}
+								onChange={(ignored,{checked}) => {
+									setState(prev => ({
+										...prev,
+										showOccurencesColumns: checked
+									}));
+								}}
+								toggle
+							/>
+							<Label color='black' size='large'>Show occurences columns</Label>
+						</Table.Cell>
+						<Table.Cell collapsing>
+							<Radio
+								checked={showIndexConfigColumns}
+								onChange={(ignored,{checked}) => {
+									setState(prev => ({
+										...prev,
+										showIndexConfigColumns: checked
+									}));
+								}}
+								toggle
+							/>
+							<Label color='black' size='large'>Show index config columns</Label>
+						</Table.Cell>
+						<Table.Cell collapsing>
+							<Radio
+								checked={showDeleteButton}
+								onChange={(ignored,{checked}) => {
+									setState(prev => ({
+										...prev,
+										showDeleteButton: checked
+									}));
+								}}
+								toggle
+							/>
+							<Label color='black' size='large'>Show delete button</Label>
+						</Table.Cell>
 					</Table.Row>
 				</Table.Body>
 			</Table>
@@ -145,28 +205,33 @@ export function Fields(props) {
 								onClick={handleSortGenerator('key')}
 								sorted={column === 'key' ? direction : null}
 							>Name</Table.HeaderCell>
-							<Table.HeaderCell>Description</Table.HeaderCell>
+							{showDescriptionColumn ? <Table.HeaderCell>Description</Table.HeaderCell> : null}
 							<Table.HeaderCell
 								onClick={handleSortGenerator('fieldType')}
 								sorted={column === 'fieldType' ? direction : null}
 							>Type</Table.HeaderCell>
-							<Table.HeaderCell
-								onClick={handleSortGenerator('min')}
-								sorted={column === 'min' ? direction : null}
-							>Min</Table.HeaderCell>
-							<Table.HeaderCell
-								onClick={handleSortGenerator('max')}
-								sorted={column === 'max' ? direction : null}
-							>Max</Table.HeaderCell>
 
-							<Table.HeaderCell>Enabled</Table.HeaderCell>
-							<Table.HeaderCell>Decide by type</Table.HeaderCell>
-							<Table.HeaderCell>Fulltext</Table.HeaderCell>
-							<Table.HeaderCell>Include in _allText</Table.HeaderCell>
-							<Table.HeaderCell>nGram</Table.HeaderCell>
-							<Table.HeaderCell>path</Table.HeaderCell>
+							{showOccurencesColumns ? <>
+								<Table.HeaderCell
+									onClick={handleSortGenerator('min')}
+									sorted={column === 'min' ? direction : null}
+								>Min</Table.HeaderCell>
+								<Table.HeaderCell
+									onClick={handleSortGenerator('max')}
+									sorted={column === 'max' ? direction : null}
+								>Max</Table.HeaderCell>
+							</>: null}
 
-							<Table.HeaderCell>Actions</Table.HeaderCell>
+							{showIndexConfigColumns ? <>
+								<Table.HeaderCell>Enabled</Table.HeaderCell>
+								<Table.HeaderCell>Decide by type</Table.HeaderCell>
+								<Table.HeaderCell>Fulltext</Table.HeaderCell>
+								<Table.HeaderCell>Include in _allText</Table.HeaderCell>
+								<Table.HeaderCell>nGram</Table.HeaderCell>
+								<Table.HeaderCell>path</Table.HeaderCell>
+							</> : null}
+
+							{showDeleteButton ? <Table.HeaderCell>Actions</Table.HeaderCell> : null}
 						</Table.Row>
 					</Table.Header>
 					<Table.Body>
@@ -214,18 +279,28 @@ export function Fields(props) {
 										servicesBaseUrl={servicesBaseUrl}
 									/>
 								</Table.Cell>
+
 								<Table.Cell>{key}</Table.Cell>
-								<Table.Cell>{description}</Table.Cell>
+
+								{showDescriptionColumn ? <Table.Cell>{description}</Table.Cell> : null}
+
 								<Table.Cell>{fieldType === 'any' ? '*' : fieldType}</Table.Cell>
-								<Table.Cell textAlign='center'>{min === 0 ? '*' : min}</Table.Cell>
-								<Table.Cell textAlign='center'>{max === 0 ? '∞' : max}</Table.Cell>
-								<Table.Cell textAlign='center'>{enabled ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='red' name='x' size='large'/>}</Table.Cell>
-								<Table.Cell textAlign='center'>{decideByType ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='red' name='x' size='large'/>}</Table.Cell>
-								<Table.Cell textAlign='center'>{fulltext ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='red' name='x' size='large'/>}</Table.Cell>
-								<Table.Cell textAlign='center'>{includeInAllText ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='red' name='x' size='large'/>}</Table.Cell>
-								<Table.Cell textAlign='center'>{nGram ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='red' name='x' size='large'/>}</Table.Cell>
-								<Table.Cell textAlign='center'>{path ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='red' name='x' size='large'/>}</Table.Cell>
-								<Table.Cell>
+
+								{showOccurencesColumns ? <>
+									<Table.Cell textAlign='center'>{min === 0 ? '*' : min}</Table.Cell>
+									<Table.Cell textAlign='center'>{max === 0 ? '∞' : max}</Table.Cell>
+								</>: null}
+
+								{showIndexConfigColumns ? <>
+									<Table.Cell textAlign='center'>{enabled ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='red' name='x' size='large'/>}</Table.Cell>
+									<Table.Cell textAlign='center'>{decideByType ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='red' name='x' size='large'/>}</Table.Cell>
+									<Table.Cell textAlign='center'>{fulltext ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='red' name='x' size='large'/>}</Table.Cell>
+									<Table.Cell textAlign='center'>{includeInAllText ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='red' name='x' size='large'/>}</Table.Cell>
+									<Table.Cell textAlign='center'>{nGram ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='red' name='x' size='large'/>}</Table.Cell>
+									<Table.Cell textAlign='center'>{path ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='red' name='x' size='large'/>}</Table.Cell>
+								</> : null}
+
+								{showDeleteButton ? <Table.Cell>
 									<Button.Group>
 										<DeleteModal
 											disabled={denyDelete}
@@ -235,7 +310,8 @@ export function Fields(props) {
 											servicesBaseUrl={servicesBaseUrl}
 										/>
 									</Button.Group>
-								</Table.Cell>
+								</Table.Cell> : null}
+
 							</Table.Row>;
 						})}
 					</Table.Body>
