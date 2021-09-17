@@ -17,6 +17,7 @@ export const GQL_QUERY_FIELDS_QUERY = `query QueryFieldsQuery(
 			key
 
 			denyDelete
+			description
 			fieldType
 			inResults
 			max

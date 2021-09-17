@@ -36,6 +36,7 @@ export const GQL_MUTATION_FIELD_CREATE = `mutation CreateField(
 	  key
 
 	  denyDelete
+	  description
 	  fieldType
 	  inResults
 	  instruction
@@ -61,8 +62,8 @@ export const GQL_MUTATION_FIELD_CREATE = `mutation CreateField(
 {
 	"key": "a",
 	"decideByType": false,
-	"enabled": false,
 	"description": "description",
+	"enabled": false,
 	"fieldType": "long",
 	"fulltext": false,
 	"includeInAllText": false,

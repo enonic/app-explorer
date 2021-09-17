@@ -36,6 +36,7 @@ export const GQL_MUTATION_FIELD_UPDATE = `mutation UpdateField(
 	  key
 
 	  denyDelete
+	  description
 	  fieldType
 	  inResults
 
@@ -61,7 +62,7 @@ export const GQL_MUTATION_FIELD_UPDATE = `mutation UpdateField(
 /* Example variables for testing
 {
 	"_id": FIND VALID FIELD ID,
-	"description": "description",
+	"description": "description changed",
 	"fieldType": "long",
 	"max": 2,
 	"min": 2,
@@ -78,10 +79,10 @@ export const GQL_MUTATION_FIELD_UPDATE = `mutation UpdateField(
 
 {
 	"_id": FIND VALID FIELD ID,
-	"description": "description",
-	"fieldType": "long",
-	"max": 2,
-	"min": 2,
+	"description": "description changed again",
+	"fieldType": "double",
+	"max": 3,
+	"min": 3,
 
 	"instruction": "minimal",
 }

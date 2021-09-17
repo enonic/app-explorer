@@ -73,6 +73,7 @@ const GQL_FIELDS_FIELD_COMMON = {
 	_name: { type: GQL_TYPE_NAME },
 	decideByType: { type: GraphQLBoolean }, // TODO nonNull?
 	denyDelete: { type: GraphQLBoolean },
+	description: { type: GraphQLString },
 	enabled: { type: GraphQLBoolean }, // TODO nonNull?
 	fieldType: { type: nonNull(GraphQLString) },
 	fulltext: { type: GraphQLBoolean },
@@ -116,6 +117,7 @@ export function coerseFieldType({
 	_nodeType,
 	_path,
 	denyDelete,
+	description,
 	indexConfig = INDEX_CONFIG_TEMPLATE_BY_TYPE,
 	inResults,
 	fieldType,
@@ -151,6 +153,7 @@ export function coerseFieldType({
 		_nodeType,
 		_path,
 		denyDelete,
+		description,
 		fieldType,
 		inResults,
 		key,
