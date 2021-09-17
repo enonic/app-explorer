@@ -1,6 +1,5 @@
 import {
-	addQueryFilter,
-	forceArray/*,
+	addQueryFilter/*,
 	toStr*/
 } from '@enonic/js-utils';
 
@@ -16,6 +15,7 @@ import {
 	list
 } from '/lib/graphql';
 
+import {coerseDocumentType} from './coerseDocumentType';
 import {NT_DOCUMENT_TYPE} from './constants';
 import {GQL_TYPE_DOCUMENT_TYPE} from './types';
 
@@ -37,14 +37,11 @@ export const fieldDocumentTypesQuery = {
 		//log.debug(`res:${toStr(res)}`);
 		res.hits = res.hits
 			.map(({id}) => readConnection.get(id))
-			.map(({_id, _name, _path, _versionKey, properties}) =>
-				({
-					_id,
-					_name,
-					_path,
-					_versionKey,
-					properties: forceArray(properties) // GraphQL Schema doesn't ensure array
-				}));
+			.map(({
+				_id, _name, _path, _versionKey, fields, properties
+			}) => coerseDocumentType({
+				_id, _name, _path, _versionKey, fields, properties
+			}));
 		return res;
 	}, // resolve
 	type: createObjectType({

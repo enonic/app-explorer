@@ -7,6 +7,7 @@ import {
 	PRINCIPAL_EXPLORER_WRITE
 } from '/lib/explorer/model/2/constants';
 import {connect} from '/lib/explorer/repo/connect';
+import {reference} from '/lib/xp/value';
 
 import {
 	NAME_DOCUMENT_TYPE_FOLDER,
@@ -14,9 +15,12 @@ import {
 	PATH_DOCUMENT_TYPE_FOLDER
 } from './constants';
 
+import {coerseDocumentType} from './coerseDocumentType';
+
 
 export function createDocumentType({
 	_name,
+	fields = [],
 	properties = []
 }) {
 	const writeConnection = connect({ principals: [PRINCIPAL_EXPLORER_WRITE] });
@@ -37,14 +41,19 @@ export function createDocumentType({
 		_parentPath,
 
 		// No point in forceArray, since Enonic will "destroy" on store,
+		// but we're using forceArray so map don't throw...
+		fields: forceArray(fields).map(({
+			active,
+			fieldId
+		}) => ({
+			active,
+			fieldId: reference(fieldId)
+		})),
+
+		// No point in forceArray, since Enonic will "destroy" on store,
 		// but we're using forceArray so sort don't throw...
 		properties: forceArray(properties).sort((a, b) => (a.name > b.name) ? 1 : -1)
 	};
 	const createdNode = writeConnection.create(nodeToBeCreated);
-	return {
-		_id: createdNode._id,
-		_name: createdNode._name,
-		_path: createdNode._path,
-		properties: forceArray(createdNode.properties) // GraphQL Schema doesn't ensure array
-	};
+	return coerseDocumentType(createdNode);
 }

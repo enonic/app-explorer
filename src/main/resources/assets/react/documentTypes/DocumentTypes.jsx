@@ -2,36 +2,59 @@ import {
 	Button,
 	Header,
 	Icon,
+	Label,
+	Radio,
+	Segment,
 	Table
 } from 'semantic-ui-react';
 
+import {useInterval} from '../utils/useInterval';
+
 import {NewOrEditDocumentTypeModal} from './NewOrEditDocumentTypeModal';
 import {DeleteDocumentTypeModal} from './DeleteDocumentTypeModal';
-import {useInterval} from '../utils/useInterval';
-import {GQL_QUERY_QUERY_DOCUMENT_TYPES} from '../../../services/graphQL/documentType/queryQueryDocumentTypes';
+import {fetchDocumentTypes} from './fetchDocumentTypes';
+import {fetchFields} from '../fields/fetchFields';
 
 
 export function DocumentTypes({
 	servicesBaseUrl
 }) {
 	const [boolPoll, setBoolPoll] = React.useState(true);
+	const [globalFields, setGlobalFields] = React.useState([]);
 	const [documentTypes, setDocumentTypes] = React.useState([]);
+	const [showDeleteButton, setShowDeleteButton] = React.useState(false);
+	//console.debug('DocumentTypes documentTypes', documentTypes);
+
+	const globalFieldsObj = {};
+	globalFields.forEach(({
+		_id, key, fieldType,
+		min, max,
+		decideByType, enabled, fulltext, includeInAllText, nGram, path
+	}) => {
+		globalFieldsObj[_id] = {
+			key, fieldType,
+			min, max,
+			decideByType, enabled, fulltext, includeInAllText, nGram, path
+		};
+	});
+	//console.debug('DocumentTypes globalFieldsObj', globalFieldsObj);
 
 	function queryDocumentTypes() {
-		fetch(`${servicesBaseUrl}/graphQL`, {
-			method: 'POST',
-			headers: {
-				'Content-Type':	'application/json'
+		fetchFields({
+			handleData: (data) => {
+				setGlobalFields(data.queryFields.hits);
 			},
-			body: JSON.stringify({
-				query: GQL_QUERY_QUERY_DOCUMENT_TYPES
-			})
-		})
-			.then(response => response.json())
-			.then(json => {
-				//console.debug('json', json);
-				setDocumentTypes(json.data.queryDocumentTypes.hits);
-			});
+			url: `${servicesBaseUrl}/graphQL`,
+			variables: {
+				includeSystemFields: false
+			}
+		});
+		fetchDocumentTypes({
+			handleData: (data) => {
+				setDocumentTypes(data.queryDocumentTypes.hits);
+			},
+			url: `${servicesBaseUrl}/graphQL`
+		});
 	} // queryDocumentTypes
 
 	React.useEffect(() => {
@@ -45,9 +68,29 @@ export function DocumentTypes({
 		}
 	}, 2500);
 
-	//console.debug('documentTypes', documentTypes);
-
 	return <>
+		<Segment basic inverted style={{
+			marginLeft: -14,
+			marginTop: -14,
+			marginRight: -14
+		}}>
+			<Table basic collapsing compact inverted>
+				<Table.Body>
+					<Table.Row verticalAlign='middle'>
+						<Table.Cell collapsing>
+							<Radio
+								checked={showDeleteButton}
+								onChange={(ignored,{checked}) => {
+									setShowDeleteButton(checked);
+								}}
+								toggle
+							/>
+							<Label color='black' size='large'>Show delete button</Label>
+						</Table.Cell>
+					</Table.Row>
+				</Table.Body>
+			</Table>
+		</Segment>
 		<Header as='h1' content='Document types'/>
 		<Table celled collapsing compact selectable singleLine striped>
 			<Table.Header>
@@ -57,13 +100,15 @@ export function DocumentTypes({
 					<Table.HeaderCell>Property count</Table.HeaderCell>
 					<Table.HeaderCell>Properties</Table.HeaderCell>
 					<Table.HeaderCell>Properties</Table.HeaderCell>
-					<Table.HeaderCell>Actions</Table.HeaderCell>
+					{showDeleteButton ?<Table.HeaderCell>Delete</Table.HeaderCell> : null}
 				</Table.Row>
 			</Table.Header>
 			<Table.Body>
 				{documentTypes.map(({
 					_id,
 					_name,
+					//_versionKey, // We get this inside NewOrEditDocumentTypeModal
+					fields = [],
 					properties = []
 				}, index) => {
 					return <Table.Row key={index}>
@@ -87,10 +132,52 @@ export function DocumentTypes({
 								<Table.Header>
 									<Table.Row>
 										<Table.HeaderCell>Name</Table.HeaderCell>
+										<Table.HeaderCell>Value type</Table.HeaderCell>
 										<Table.HeaderCell>Min</Table.HeaderCell>
 										<Table.HeaderCell>Max</Table.HeaderCell>
 										<Table.HeaderCell>Indexing</Table.HeaderCell>
+										<Table.HeaderCell>Fulltext</Table.HeaderCell>
+										<Table.HeaderCell>nGram</Table.HeaderCell>
+										<Table.HeaderCell>Include in _allText</Table.HeaderCell>
+									</Table.Row>
+								</Table.Header>
+								<Table.Body>
+									{fields.map(({
+										active,
+										fieldId
+									}, j) => {
+										const fieldObj = globalFieldsObj[fieldId] || {};
+										const {
+											enabled,
+											fieldType,
+											fulltext,
+											includeInAllText,
+											max,
+											min,
+											key,
+											ngram
+										} = fieldObj;
+										return <Table.Row disabled={!active} key={`${index}.${j}`}>
+											<Table.Cell collapsing>{key}</Table.Cell>
+											<Table.Cell collapsing>{fieldType}</Table.Cell>
+											<Table.Cell collapsing>{min}</Table.Cell>
+											<Table.Cell collapsing>{max}</Table.Cell>
+											<Table.Cell collapsing>{enabled ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='red' name='x' size='large'/>}</Table.Cell>
+											<Table.Cell disabled={!enabled} collapsing>{fulltext ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='red' name='x' size='large'/>}</Table.Cell>
+											<Table.Cell disabled={!enabled} collapsing>{ngram ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='red' name='x' size='large'/>}</Table.Cell>
+											<Table.Cell disabled={!enabled} collapsing>{includeInAllText ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='red' name='x' size='large'/>}</Table.Cell>
+										</Table.Row>;
+									})}
+								</Table.Body>
+							</Table>
+							<Table>
+								<Table.Header>
+									<Table.Row>
+										<Table.HeaderCell>Name</Table.HeaderCell>
 										<Table.HeaderCell>Value type</Table.HeaderCell>
+										<Table.HeaderCell>Min</Table.HeaderCell>
+										<Table.HeaderCell>Max</Table.HeaderCell>
+										<Table.HeaderCell>Indexing</Table.HeaderCell>
 										<Table.HeaderCell>Fulltext</Table.HeaderCell>
 										<Table.HeaderCell>nGram</Table.HeaderCell>
 										<Table.HeaderCell>Include in _allText</Table.HeaderCell>
@@ -106,20 +193,20 @@ export function DocumentTypes({
 										name,
 										ngram,
 										valueType
-									}, j) => <Table.Row key={`${index}.${j}`}>
+									}, k) => <Table.Row key={`${index}.${k}`}>
 										<Table.Cell collapsing>{name}</Table.Cell>
+										<Table.Cell collapsing>{valueType}</Table.Cell>
 										<Table.Cell collapsing>{min}</Table.Cell>
 										<Table.Cell collapsing>{max}</Table.Cell>
 										<Table.Cell collapsing>{enabled ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='red' name='x' size='large'/>}</Table.Cell>
-										<Table.Cell collapsing>{valueType}</Table.Cell>
-										<Table.Cell collapsing>{fulltext ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='red' name='x' size='large'/>}</Table.Cell>
-										<Table.Cell collapsing>{ngram ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='red' name='x' size='large'/>}</Table.Cell>
-										<Table.Cell collapsing>{includeInAllText ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='red' name='x' size='large'/>}</Table.Cell>
+										<Table.Cell disabled={!enabled} collapsing>{fulltext ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='red' name='x' size='large'/>}</Table.Cell>
+										<Table.Cell disabled={!enabled} collapsing>{ngram ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='red' name='x' size='large'/>}</Table.Cell>
+										<Table.Cell disabled={!enabled} collapsing>{includeInAllText ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='red' name='x' size='large'/>}</Table.Cell>
 									</Table.Row>)}
 								</Table.Body>
 							</Table>
 						</Table.Cell>
-						<Table.Cell collapsing>
+						{showDeleteButton ?<Table.Cell collapsing>
 							<Button.Group>
 								<DeleteDocumentTypeModal
 									_id={_id}
@@ -134,7 +221,7 @@ export function DocumentTypes({
 									servicesBaseUrl={servicesBaseUrl}
 								/>
 							</Button.Group>
-						</Table.Cell>
+						</Table.Cell> : null}
 					</Table.Row>;
 				})}
 			</Table.Body>

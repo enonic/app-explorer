@@ -22,7 +22,9 @@ import {
 
 import {
 	GQL_TYPE_ID,
-	GQL_TYPE_NAME
+	GQL_TYPE_NAME,
+	GQL_TYPE_PATH,
+	GQL_TYPE_VERSION_KEY
 } from '../types';
 
 const {
@@ -45,6 +47,22 @@ const ENUM_VALUE_TYPES = createEnumType({
 		VALUE_TYPE_SET,
 		VALUE_TYPE_STRING
 	]
+});
+
+export const GQL_INPUT_TYPE_DOCUMENT_TYPE_FIELDS = createInputObjectType({
+	name: 'InputDocumentTypeFields',
+	fields: {
+		active: { type: nonNull(GraphQLBoolean) },
+		fieldId: { type: GQL_TYPE_ID }
+	}
+});
+
+const GQL_TYPE_DOCUMENT_TYPE_FIELDS = createObjectType({
+	name: 'DocumentTypeFields',
+	fields: {
+		active: { type: nonNull(GraphQLBoolean) },
+		fieldId: { type: GQL_TYPE_ID }
+	}
 });
 
 const FIELDS_PROPERTY = {
@@ -73,18 +91,9 @@ export const GQL_TYPE_DOCUMENT_TYPE = createObjectType({
 	fields: {
 		_id: { type: GQL_TYPE_ID },
 		_name: { type: GQL_TYPE_NAME },
-		_path: { type: nonNull(GraphQLString) },
-		_versionKey: { type: nonNull(GraphQLString) }, // Used with atomicUpdate
-		properties: { type: list(GQL_TYPE_DOCUMENT_TYPE_PROPERTIES)}
-	}
-});
-
-export const GQL_TYPE_DOCUMENT_TYPE_CREATE = createObjectType({
-	name: 'DocumentTypeCreate',
-	fields: {
-		_id: { type: GQL_TYPE_ID },
-		_name: { type: GQL_TYPE_NAME },
-		_path: { type: nonNull(GraphQLString) },
+		_path: { type: GQL_TYPE_PATH },
+		_versionKey: { type: GQL_TYPE_VERSION_KEY }, // Used with atomicUpdate
+		fields: { type: list(GQL_TYPE_DOCUMENT_TYPE_FIELDS)},
 		properties: { type: list(GQL_TYPE_DOCUMENT_TYPE_PROPERTIES)}
 	}
 });

@@ -4,6 +4,10 @@ export const GQL_QUERY_QUERY_DOCUMENT_TYPES = `query QueryDocumentTypesQuery {
 			_id
 			_name
 			_versionKey
+			fields {
+				active
+				fieldId
+			}
 			properties {
 				enabled
 				fulltext
@@ -17,3 +21,5 @@ export const GQL_QUERY_QUERY_DOCUMENT_TYPES = `query QueryDocumentTypesQuery {
 		}
 	}
 }`;
+
+// NOTE indexConfig.path hath not been implemented for documentTypes
