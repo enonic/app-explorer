@@ -14,7 +14,6 @@ import {
 import {
 	GraphQLBoolean,
 	GraphQLInt,
-	GraphQLString,
 	newSchemaGenerator,
 	nonNull,
 	list
@@ -32,6 +31,8 @@ const {
 	createInputObjectType,
 	createObjectType
 } = newSchemaGenerator();
+
+export const GQL_INPUT_TYPE_ADD_FIELDS = GraphQLBoolean;
 
 const ENUM_VALUE_TYPES = createEnumType({
 	name: 'EnumValueTypes',
@@ -93,6 +94,7 @@ export const GQL_TYPE_DOCUMENT_TYPE = createObjectType({
 		_name: { type: GQL_TYPE_NAME },
 		_path: { type: GQL_TYPE_PATH },
 		_versionKey: { type: GQL_TYPE_VERSION_KEY }, // Used with atomicUpdate
+		addFields: { type: nonNull(GraphQLBoolean) },
 		fields: { type: list(GQL_TYPE_DOCUMENT_TYPE_FIELDS)},
 		properties: { type: list(GQL_TYPE_DOCUMENT_TYPE_PROPERTIES)}
 	}

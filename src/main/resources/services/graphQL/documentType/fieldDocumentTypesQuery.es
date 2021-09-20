@@ -36,12 +36,7 @@ export const fieldDocumentTypesQuery = {
 		});
 		//log.debug(`res:${toStr(res)}`);
 		res.hits = res.hits
-			.map(({id}) => readConnection.get(id))
-			.map(({
-				_id, _name, _path, _versionKey, fields, properties
-			}) => coerseDocumentType({
-				_id, _name, _path, _versionKey, fields, properties
-			}));
+			.map(({id}) => coerseDocumentType(readConnection.get(id)));
 		return res;
 	}, // resolve
 	type: createObjectType({

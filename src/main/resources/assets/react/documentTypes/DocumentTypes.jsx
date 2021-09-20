@@ -99,6 +99,7 @@ export function DocumentTypes({
 					<Table.HeaderCell>Name</Table.HeaderCell>
 					<Table.HeaderCell>Property count</Table.HeaderCell>
 					<Table.HeaderCell>Properties</Table.HeaderCell>
+					<Table.HeaderCell>Add fields</Table.HeaderCell>
 					<Table.HeaderCell>Properties</Table.HeaderCell>
 					{showDeleteButton ?<Table.HeaderCell>Delete</Table.HeaderCell> : null}
 				</Table.Row>
@@ -108,6 +109,7 @@ export function DocumentTypes({
 					_id,
 					_name,
 					//_versionKey, // We get this inside NewOrEditDocumentTypeModal
+					addFields = true,
 					fields = [],
 					properties = []
 				}, index) => {
@@ -127,6 +129,7 @@ export function DocumentTypes({
 						<Table.Cell collapsing>{_name}</Table.Cell>
 						<Table.Cell collapsing>{properties.length}</Table.Cell>
 						<Table.Cell collapsing>{properties.map(({name})=>name).join(', ')}</Table.Cell>
+						<Table.Cell collapsing>{addFields ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='red' name='x' size='large'/>}</Table.Cell>
 						<Table.Cell collapsing>
 							<Table>
 								<Table.Header>

@@ -4,6 +4,7 @@ export const GQL_QUERY_QUERY_DOCUMENT_TYPES = `query QueryDocumentTypesQuery {
 			_id
 			_name
 			_versionKey
+			addFields
 			fields {
 				active
 				fieldId
