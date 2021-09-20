@@ -28,6 +28,7 @@ import {run} from '/lib/xp/context';
 
 function createDocument({
 	boolRequireValid = true,
+	collectionName,
 	connection,
 	idField,
 	responseArray,
@@ -35,6 +36,7 @@ function createDocument({
 }) {
 	const createdNode = create(toPersist, {
 		boolRequireValid,
+		collectionName,
 		connection
 	});
 	if(createdNode) {
@@ -55,6 +57,7 @@ function createDocument({
 function modifyDocument({
 	boolPartial = false,
 	boolRequireValid = true,
+	collectionName,
 	connection,
 	id,
 	idField,
@@ -68,6 +71,7 @@ function modifyDocument({
 	}, {
 		boolPartial,
 		boolRequireValid,
+		collectionName,
 		connection
 	});
 	//log.info(`updatedNode:${toStr(updatedNode)}`);
@@ -223,6 +227,7 @@ export function post(request, collections = []) {
 						modifyDocument({
 							boolPartial,
 							boolRequireValid,
+							collectionName,
 							connection: writeToCollectionBranchConnection,
 							id: toPersist._id,
 							responseArray,
@@ -231,6 +236,7 @@ export function post(request, collections = []) {
 					} else {
 						createDocument({
 							boolRequireValid,
+							collectionName,
 							connection: writeToCollectionBranchConnection,
 							responseArray,
 							toPersist
@@ -241,6 +247,7 @@ export function post(request, collections = []) {
 						modifyDocument({
 							boolPartial,
 							boolRequireValid,
+							collectionName,
 							connection: writeToCollectionBranchConnection,
 							id: `/${toPersist._name}`,
 							responseArray,
@@ -249,6 +256,7 @@ export function post(request, collections = []) {
 					} else {
 						createDocument({
 							boolRequireValid,
+							collectionName,
 							connection: writeToCollectionBranchConnection,
 							responseArray,
 							toPersist
@@ -259,6 +267,7 @@ export function post(request, collections = []) {
 						modifyDocument({
 							boolPartial,
 							boolRequireValid,
+							collectionName,
 							connection: writeToCollectionBranchConnection,
 							id: toPersist._path,
 							responseArray,
@@ -267,6 +276,7 @@ export function post(request, collections = []) {
 					} else {
 						createDocument({
 							boolRequireValid,
+							collectionName,
 							connection: writeToCollectionBranchConnection,
 							responseArray,
 							toPersist
@@ -275,6 +285,7 @@ export function post(request, collections = []) {
 				} else {
 					createDocument({
 						boolRequireValid,
+						collectionName,
 						connection: writeToCollectionBranchConnection,
 						responseArray,
 						toPersist
