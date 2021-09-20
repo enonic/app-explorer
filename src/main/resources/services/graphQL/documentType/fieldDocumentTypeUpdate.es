@@ -1,5 +1,6 @@
 //import {toStr} from '@enonic/js-utils';
 
+import {updateDocumentType} from '/lib/explorer/documentType/updateDocumentType';
 import {
 	GraphQLString,
 	list
@@ -14,7 +15,6 @@ import {
 	GQL_INPUT_TYPE_DOCUMENT_TYPE_PROPERTIES,
 	GQL_TYPE_DOCUMENT_TYPE
 } from './types';
-import {updateDocumentType} from './updateDocumentType';
 
 
 export const fieldDocumentTypeUpdate = {

@@ -4,6 +4,7 @@ import {
 	NT_COLLECTION,
 	PRINCIPAL_EXPLORER_WRITE
 } from '/lib/explorer/model/2/constants';
+import {createDocumentType} from '/lib/explorer/documentType/createDocumentType';
 import {exists} from '/lib/explorer/node/exists';
 import {connect} from '/lib/explorer/repo/connect';
 import {createOrModifyJobsFromCollectionNode} from '/lib/explorer/scheduler/createOrModifyJobsFromCollectionNode';
@@ -17,7 +18,6 @@ import {reference} from '/lib/xp/value';
 
 import {GQL_TYPE_NAME} from '../types';
 
-import {createDocumentType} from '../documentType/createDocumentType';
 import {
 	GQL_INPUT_TYPE_COLLECTOR,
 	GQL_INPUT_TYPE_CRON,

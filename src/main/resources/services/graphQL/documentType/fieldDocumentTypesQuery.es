@@ -3,6 +3,8 @@ import {
 	toStr*/
 } from '@enonic/js-utils';
 
+import {coerseDocumentType} from '/lib/explorer/documentType/coerseDocumentType';
+import {NT_DOCUMENT_TYPE} from '/lib/explorer/documentType/constants';
 import {
 	PRINCIPAL_EXPLORER_READ
 } from '/lib/explorer/model/2/constants';
@@ -15,8 +17,6 @@ import {
 	list
 } from '/lib/graphql';
 
-import {coerseDocumentType} from './coerseDocumentType';
-import {NT_DOCUMENT_TYPE} from './constants';
 import {GQL_TYPE_DOCUMENT_TYPE} from './types';
 
 const {
