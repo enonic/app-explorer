@@ -1,3 +1,4 @@
+import {createDocumentType} from '/lib/explorer/documentType/createDocumentType';
 import {list} from '/lib/graphql';
 
 import {GQL_TYPE_NAME} from '../types';
@@ -7,7 +8,6 @@ import {
 	GQL_TYPE_DOCUMENT_TYPE
 } from './types';
 
-import {createDocumentType} from './createDocumentType';
 
 
 export const fieldDocumentTypeCreate = {

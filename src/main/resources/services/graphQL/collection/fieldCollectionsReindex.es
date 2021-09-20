@@ -1,11 +1,10 @@
+import {reindexCollections} from '/lib/explorer/collection/reindexCollections';
 import {
 	GraphQLString,
 	list,
 	newSchemaGenerator,
 	nonNull
 } from '/lib/graphql';
-
-import {reindexCollections} from './reindexCollections';
 
 
 const {

@@ -1,5 +1,6 @@
+import {getDocumentType} from '/lib/explorer/documentType/getDocumentType';
+
 import {GQL_TYPE_ID} from '../types';
-import {getDocumentType} from './getDocumentType';
 import {GQL_TYPE_DOCUMENT_TYPE} from './types';
 
 
