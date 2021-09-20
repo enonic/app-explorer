@@ -1,10 +1,12 @@
 export const GQL_MUTATION_CREATE_DOCUMENT_TYPE = `mutation CreateDocumentTypeMutation(
-	$_name: String!,
+	$_name: String!
+	$addFields: Boolean
 	$fields: [InputDocumentTypeFields]
 	$properties: [InputDocumentTypeProperties]
 ) {
 	createDocumentType(
 		_name: $_name
+		addFields: $addFields
 		fields: $fields
 		properties: $properties
 	) {
@@ -12,6 +14,7 @@ export const GQL_MUTATION_CREATE_DOCUMENT_TYPE = `mutation CreateDocumentTypeMut
 		_name
 		_path
 		_versionKey
+		addFields
 		fields {
 			active
 			fieldId

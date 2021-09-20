@@ -46,7 +46,6 @@ import {fetchFields} from '../fields/fetchFields';
 
 import {nameValidator} from '../utils/nameValidator';
 
-
 const PATH_FIELDS = 'fields';
 const PATH_PROPERTIES = 'properties';
 
@@ -174,6 +173,7 @@ export function NewOrEditDocumentType({
 		} else {
 			setInitialValues({
 				_name: '',
+				addFields: true,
 				fields: [],
 				properties: []
 			});
@@ -184,11 +184,12 @@ export function NewOrEditDocumentType({
 		initialValues={initialValues}
 		onSubmit={(values) => {
 			//console.debug('submit values', values);
-			const {_name, fields, properties} = values;
+			const {_name, addFields, fields, properties} = values;
 			//console.debug('submit _name', _name);
 
 			const variables = {
 				_name,
+				addFields,
 				fields,
 				properties
 			};
@@ -250,8 +251,8 @@ export function NewOrEditDocumentType({
 							</Table.Header>
 							<Table.Body>{
 								fieldsArray.map(({
-									active = true,
-									fieldId = ''
+									active = true//,
+									//fieldId = ''
 								}, index) => {
 									//console.debug('NewOrEditDocumentType active', active, 'fieldId', fieldId);
 									const PATH_FIELD = `${PATH_FIELDS}.${index}`;
@@ -314,14 +315,21 @@ export function NewOrEditDocumentType({
 				/>
 			</Form.Field>
 
-			<Header as='h2'>Properties</Header>
+			<Header as='h2'>Local fields</Header>
+			<Form.Field>
+				<Checkbox
+					label='Add new fields automatically when creating/updating documents?'
+					name='addFields'
+					toggle
+				/>
+			</Form.Field>
 			<Form.Field>
 				<List
 					path={PATH_PROPERTIES}
 					render={(propertiesArray) => {
 						if(!propertiesArray.length) {
 							return <Popup
-								content='Add property'
+								content='Add local field'
 								inverted
 								trigger={<InsertButton
 									path={PATH_PROPERTIES}
@@ -425,7 +433,7 @@ export function NewOrEditDocumentType({
 											<Table.Cell collapsing>
 												<Button.Group>
 													<Popup
-														content='Add property'
+														content='Add local field'
 														inverted
 														trigger={<InsertButton
 															path={PATH_PROPERTIES}
