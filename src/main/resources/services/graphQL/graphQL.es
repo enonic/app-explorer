@@ -31,7 +31,8 @@ import {
 
 import {queryInterfaces} from './interface';
 import {queryJournals} from './journal';
-import {listScheduledJobs} from './scheduler';
+
+import {fieldScheduledJobsList} from './scheduler/fieldScheduledJobsList';
 
 import {
 	fieldDocumentTypeCreate,
@@ -99,7 +100,7 @@ export const SCHEMA = createSchema({
 			getLocales,
 			getDocumentType: fieldDocumentTypeGet,
 			getSites,
-			listScheduledJobs,
+			listScheduledJobs: fieldScheduledJobsList,
 			queryApiKeys,
 			queryCollections: fieldCollectionsQuery,
 			queryCollectors,

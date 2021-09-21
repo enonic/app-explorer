@@ -97,7 +97,7 @@ const FIELDS_GQL = `queryFields {
 }`;
 
 const JOBS_GQL = `listScheduledJobs {
-	collectionName
+	collectionId
 	enabled
 	descriptor
 	schedule {
@@ -318,7 +318,8 @@ export function Collections(props) {
 	function setJobsObjFromArr(arr) {
 		const obj={};
 		arr.forEach(({
-			collectionName,
+			collectionId,
+			//collectionName,
 			enabled,
 			schedule: {
 				type,
@@ -327,10 +328,10 @@ export function Collections(props) {
 			}
 		}) => {
 			if (type === 'CRON') {
-				if(obj[collectionName]) {
-					obj[collectionName].push({enabled, value});
+				if(obj[collectionId]) {
+					obj[collectionId].push({enabled, value});
 				} else {
-					obj[collectionName] = [{enabled, value}];
+					obj[collectionId] = [{enabled, value}];
 				}
 			}
 		});
@@ -545,12 +546,12 @@ export function Collections(props) {
 						const editEnabled = intInitializedCollectorComponents
 							&& (boolCollectorSelectedAndInitialized || !boolCollectorSelected)
 							&& !busy;
-						const cron = jobsObj[_name]
-							? jobsObj[_name].map(({value}) => {
+						const cron = jobsObj[collectionId]
+							? jobsObj[collectionId].map(({value}) => {
 								return new Cron(value).toObj();
 							})
 							: [new Cron('0 0 * * 0').toObj()]; // Default once a week
-						const doCollect = jobsObj[_name] ? jobsObj[_name][0].enabled : false;
+						const doCollect = jobsObj[collectionId] ? jobsObj[collectionId][0].enabled : false;
 						return <Table.Row key={key}>
 							<Table.Cell collapsing><NewOrEditCollectionModal
 								collectorOptions={collectorOptions}
@@ -609,8 +610,8 @@ export function Collections(props) {
 										<span style={{whitespace: 'nowrap'}}>{iface}</span>
 									</p>)}</Table.Cell> : null}
 									{showSchedule ? <Table.Cell>{
-										jobsObj[_name]
-											? jobsObj[_name].map(({enabled, value}, i) => {
+										jobsObj[collectionId]
+											? jobsObj[collectionId].map(({enabled, value}, i) => {
 												const interval = parseCronExpression(value);
 												const fields = JSON.parse(JSON.stringify(interval.fields)); // Fields is immutable
 												return <pre key={`${_name}.cron.${i}`} style={{color:enabled ? 'auto' : 'gray'}}>

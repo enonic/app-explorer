@@ -18,11 +18,11 @@ import {reference} from '/lib/xp/value';
 
 import {GQL_TYPE_NAME} from '../types';
 
+import {coerseCollectionType} from './coerseCollectionType';
 import {
 	GQL_INPUT_TYPE_COLLECTOR,
 	GQL_INPUT_TYPE_CRON,
-	GQL_TYPE_COLLECTION,
-	coerseCollectionType
+	GQL_TYPE_COLLECTION
 } from './types';
 
 

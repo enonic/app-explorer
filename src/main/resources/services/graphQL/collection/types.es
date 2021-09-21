@@ -96,38 +96,3 @@ export const GQL_TYPE_COLLECTION_QUERY_RESULT = createObjectType({
 		hits: { type: list(GQL_TYPE_COLLECTION_WITH_SCORE) }
 	} // fields
 });
-
-
-export function coerseCollectionType({
-	_id,
-	_name,
-	_nodeType,
-	_path,
-	_score,
-	collector,
-	createdTime,
-	creator,
-	documentCount,
-	documentTypeId,
-	interfaces,
-	language,
-	modifiedTime,
-	modifier
-}) {
-	return {
-		_id,
-		_name,
-		_nodeType,
-		_path,
-		_score,
-		collector,
-		createdTime,
-		creator,
-		documentCount,
-		documentTypeId,
-		interfaces,
-		language,
-		modifiedTime,
-		modifier
-	};
-}
