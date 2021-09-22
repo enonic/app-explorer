@@ -20,6 +20,7 @@ export const GQL_MUTATION_CREATE_DOCUMENT_TYPE = `mutation CreateDocumentTypeMut
 			fieldId
 		}
 		properties {
+			active
 			enabled
 			fulltext
 			includeInAllText
