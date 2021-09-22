@@ -25,8 +25,8 @@ import {
 
 import {DeleteItemButton} from 'semantic-ui-react-form/buttons/DeleteItemButton';
 import {InsertButton} from 'semantic-ui-react-form/buttons/InsertButton';
-import {MoveDownButton} from 'semantic-ui-react-form/buttons/MoveDownButton';
-import {MoveUpButton} from 'semantic-ui-react-form/buttons/MoveUpButton';
+//import {MoveDownButton} from 'semantic-ui-react-form/buttons/MoveDownButton';
+//import {MoveUpButton} from 'semantic-ui-react-form/buttons/MoveUpButton';
 import {ResetButton} from 'semantic-ui-react-form/buttons/ResetButton';
 import {SubmitButton} from 'semantic-ui-react-form/buttons/SubmitButton';
 
@@ -282,7 +282,7 @@ export function NewOrEditDocumentType({
 														value={FIELD_DEFAULT}
 													/>}
 												/>
-												<Popup
+												{/*<Popup
 													content='Move down'
 													inverted
 													trigger={<MoveDownButton
@@ -297,6 +297,7 @@ export function NewOrEditDocumentType({
 														path={PATH_FIELDS}
 														index={index}
 													/>}/>
+												*/}
 												<Popup
 													content='Delete field'
 													inverted
@@ -441,7 +442,7 @@ export function NewOrEditDocumentType({
 															value={PROPERTY_DEFAULT}
 														/>}
 													/>
-													<Popup
+													{/*<Popup
 														content='Move down'
 														inverted
 														trigger={<MoveDownButton
@@ -458,6 +459,7 @@ export function NewOrEditDocumentType({
 															index={index}
 														/>}
 													/>
+													*/}
 													<Popup
 														content='Delete property'
 														inverted
