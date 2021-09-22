@@ -387,7 +387,7 @@ export function NewOrEditDocumentType({
 														content='Delete field'
 														inverted
 														trigger={<DeleteItemButton
-															disabled={active || !fieldId}
+															disabled={active && fieldId}
 															path={PATH_FIELDS}
 															index={index}
 														/>}/>
@@ -570,7 +570,7 @@ export function NewOrEditDocumentType({
 														content='Delete property'
 														inverted
 														trigger={<DeleteItemButton
-															disabled={active || !name}
+															disabled={active && name}
 															path={PATH_PROPERTIES}
 															index={index}
 														/>}
