@@ -24,6 +24,7 @@ export const GQL_MUTATION_UPDATE_DOCUMENT_TYPE = `mutation UpdateDocumentTypeMut
 			fieldId
 		}
 		properties {
+			active
 			enabled
 			fulltext
 			includeInAllText

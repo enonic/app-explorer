@@ -10,6 +10,7 @@ export const GQL_QUERY_QUERY_DOCUMENT_TYPES = `query QueryDocumentTypesQuery {
 				fieldId
 			}
 			properties {
+				active
 				enabled
 				fulltext
 				includeInAllText

@@ -67,6 +67,7 @@ const GQL_TYPE_DOCUMENT_TYPE_FIELDS = createObjectType({
 });
 
 const FIELDS_PROPERTY = {
+	active: { type: nonNull(GraphQLBoolean) },
 	enabled: { type: nonNull(GraphQLBoolean) },
 	fulltext: { type: nonNull(GraphQLBoolean) },
 	includeInAllText: { type: nonNull(GraphQLBoolean) },
