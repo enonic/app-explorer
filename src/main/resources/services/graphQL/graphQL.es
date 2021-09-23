@@ -29,6 +29,8 @@ import {
 	fieldFieldUpdate
 } from './field';
 
+import {fieldReferencedBy} from './fieldReferencedBy';
+
 import {queryInterfaces} from './interface';
 import {queryJournals} from './journal';
 
@@ -111,7 +113,8 @@ export const SCHEMA = createSchema({
 			querySynonyms: fieldSynonymsQuery,
 			queryDocumentTypes: fieldDocumentTypesQuery,
 			queryThesauri: fieldThesauriQuery,
-			queryTasks: fieldTaskQuery
+			queryTasks: fieldTaskQuery,
+			referencedBy: fieldReferencedBy
 		} // fields
 	}) // query
 }); // SCHEMA
