@@ -29,7 +29,7 @@ import {
 	fieldFieldUpdate
 } from './field';
 
-import {fieldReferencedBy} from './fieldReferencedBy';
+import {generateFieldReferencedBy} from './generateFieldReferencedBy';
 
 import {queryInterfaces} from './interface';
 import {queryJournals} from './journal';
@@ -114,7 +114,7 @@ export const SCHEMA = createSchema({
 			queryDocumentTypes: fieldDocumentTypesQuery,
 			queryThesauri: fieldThesauriQuery,
 			queryTasks: fieldTaskQuery,
-			referencedBy: fieldReferencedBy
+			referencedBy: generateFieldReferencedBy(createObjectType)
 		} // fields
 	}) // query
 }); // SCHEMA
