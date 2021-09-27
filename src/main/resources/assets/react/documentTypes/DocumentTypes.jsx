@@ -97,6 +97,7 @@ export function DocumentTypes({
 				<Table.Row>
 					<Table.HeaderCell>Edit</Table.HeaderCell>
 					<Table.HeaderCell>Name</Table.HeaderCell>
+					<Table.HeaderCell>Used in collections</Table.HeaderCell>
 					<Table.HeaderCell>Property count</Table.HeaderCell>
 					<Table.HeaderCell>Properties</Table.HeaderCell>
 					<Table.HeaderCell>Add fields</Table.HeaderCell>
@@ -111,8 +112,23 @@ export function DocumentTypes({
 					//_versionKey, // We get this inside NewOrEditDocumentTypeModal
 					addFields = true,
 					fields = [],
-					properties = []
+					properties = [],
+					referencedBy: {
+						//count
+						hits: referencedByHits
+						//total
+					}
 				}, index) => {
+					const collections = [];
+					referencedByHits.forEach(({
+						_name,
+						_nodeType
+					}) => {
+						if (_nodeType === 'com.enonic.app.explorer:collection' && !collections.includes(_name)) {
+							collections.push(_name);
+						}
+					});
+
 					return <Table.Row key={index}>
 						<Table.Cell collapsing><NewOrEditDocumentTypeModal
 							_id={_id}
@@ -127,6 +143,11 @@ export function DocumentTypes({
 							servicesBaseUrl={servicesBaseUrl}
 						/></Table.Cell>
 						<Table.Cell collapsing>{_name}</Table.Cell>
+						<Table.Cell><ul style={{
+							listStyleType: 'none',
+							margin: 0,
+							padding: 0
+						}}>{collections.sort().map((c, i) => <li key={i}>{c}</li>)}</ul></Table.Cell>
 						<Table.Cell collapsing>{properties.length}</Table.Cell>
 						<Table.Cell collapsing>{properties.map(({name})=>name).join(', ')}</Table.Cell>
 						<Table.Cell collapsing>{addFields ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='red' name='x' size='large'/>}</Table.Cell>

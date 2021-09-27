@@ -20,6 +20,17 @@ export const GQL_QUERY_QUERY_DOCUMENT_TYPES = `query QueryDocumentTypesQuery {
 				ngram
 				valueType
 			}
+			referencedBy {
+				count
+				hits {
+					_id
+					_name
+					_nodeType
+					_path
+					_score
+				}
+				total
+			}
 		}
 	}
 }`;

@@ -15,8 +15,12 @@ import {
 	GraphQLBoolean,
 	GraphQLInt,
 	nonNull,
-	list
+	list,
+	reference
 } from '/lib/graphql';
+
+import {GQL_TYPE_REFERENCED_BY_NAME} from '../generateReferencedByField';
+import {referencedByMapped} from '../referencedByMapped';
 
 
 export function generateDocumentTypeTypes({
@@ -90,7 +94,11 @@ export function generateDocumentTypeTypes({
 				_versionKey: { type: GQL_TYPE_VERSION_KEY }, // Used with atomicUpdate
 				addFields: { type: nonNull(GraphQLBoolean) },
 				fields: { type: list(GQL_TYPE_DOCUMENT_TYPE_FIELDS)},
-				properties: { type: list(GQL_TYPE_DOCUMENT_TYPE_PROPERTIES)}
+				properties: { type: list(GQL_TYPE_DOCUMENT_TYPE_PROPERTIES)},
+				referencedBy: {
+					resolve: ({source: {_id}}) => referencedByMapped({_id}),
+					type: reference(GQL_TYPE_REFERENCED_BY_NAME)
+				}
 			}
 		})
 	};
