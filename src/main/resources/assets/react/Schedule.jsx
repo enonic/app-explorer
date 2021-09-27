@@ -10,7 +10,7 @@ import {useInterval} from './utils/useInterval';
 
 const JOBS_GQL = `{
 	listScheduledJobs {
-    	collectionName
+    	collectionId
     	enabled
     	descriptor
     	schedule {
@@ -55,7 +55,7 @@ export const Schedule = (props) => {
 						? res.data.listScheduledJobs
 						: res.data.listScheduledJobs.filter(({enabled}) => enabled)
 					).map(({
-						collectionName,
+						collectionId,
 						//descriptor,
 						//enabled,
 						schedule: {
@@ -64,7 +64,7 @@ export const Schedule = (props) => {
 							value: cronExpression
 						}
 					}) => {
-						const projectId = collectionName;
+						const projectId = collectionId;
 						const tasks = [];
 						let taskCount = 1;
 						try {

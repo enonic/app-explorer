@@ -7,114 +7,228 @@ import {
 
 import {RT_JSON} from '/lib/explorer/model/2/constants';
 
-import {getContentTypes} from './contentType';
-import {getLicense} from './license';
-import {getSites} from './site';
-import {getLocales} from './i18n';
-import {queryApiKeys} from './apiKey';
+import {generateGetContentTypesField} from './generateGetContentTypesField';
+import {generateGetLicenseField} from './generateGetLicenseField';
+import {generateGetLocalesField} from './generateGetLocalesField';
+import {generateGetSitesField} from './generateGetSitesField';
+import {generateListTasksField} from './generateListTasksField';
+import {generateQueryJournalsField} from './generateQueryJournalsField';
+import {generateQueryStopWordsField} from './generateQueryStopWordsField';
+import {generateReferencedByField} from './generateReferencedByField';
+import {generateTypes} from './generateTypes';
 
-import {
-	fieldCollectionCreate,
-	fieldCollectionUpdate,
-	fieldCollectionsQuery,
-	fieldCollectionsReindex
-} from './collection';
+import {generateQueryApiKeysField} from './apiKey/generateQueryApiKeysField';
+import {generateCollectionFields} from './collection/generateCollectionFields';
+import {generateQueryCollectorsField} from './collector/generateQueryCollectorsField';
+import {generateFieldsField} from './field/generateFieldsField';
+import {generateQueryInterfacesField} from './interface/generateQueryInterfacesField';
+import {generateScheduledJobsListField} from './scheduler/generateScheduledJobsListField';
+import {generateSchedulerTypes} from './scheduler/generateSchedulerTypes';
+import {generateDocumentTypeFields} from './documentType/generateDocumentTypeFields';
+import {generateSynonymFields} from './synonym/generateSynonymFields';
+import {generateThesaurusFields} from './thesaurus/generateThesaurusFields';
 
-import {queryCollectors} from './collector';
 
-import {
-	fieldFieldCreate,
-	fieldFieldDelete,
-	fieldFieldsQuery,
-	fieldFieldUpdate
-} from './field';
-
-import {generateFieldReferencedBy} from './generateFieldReferencedBy';
-
-import {queryInterfaces} from './interface';
-import {queryJournals} from './journal';
-
-import {fieldScheduledJobsList} from './scheduler/fieldScheduledJobsList';
-
-import {
-	fieldDocumentTypeCreate,
-	fieldDocumentTypeDelete,
-	fieldDocumentTypeGet,
-	fieldDocumentTypesQuery,
-	fieldDocumentTypeUpdate
-} from './documentType';
-
-import {queryStopWords} from './stopWord';
-
-import {
-	fieldSynonymCreate,
-	fieldSynonymDelete,
-	fieldSynonymsQuery,
-	fieldSynonymUpdate
-} from './synonym';
-
-import {
-	fieldThesauriQuery,
-	fieldThesaurusCreate,
-	fieldThesaurusDelete,
-	fieldThesaurusUpdate
-} from './thesaurus';
-
-import {
-	fieldTaskQuery
-} from './task';
+const schemaGenerator = newSchemaGenerator();
 
 const {
 	createObjectType,
 	createSchema
-} = newSchemaGenerator();
+} = schemaGenerator;
 
+const {
+	GQL_TYPE_COUNT,
+	GQL_TYPE_ID,
+	GQL_TYPE_NAME,
+	GQL_TYPE_NODE_DELETED,
+	GQL_TYPE_NODE_TYPE,
+	GQL_TYPE_PATH,
+	GQL_TYPE_TOTAL,
+	GQL_TYPE_VERSION_KEY
+} = generateTypes({
+	schemaGenerator
+});
+
+const queryApiKeysField = generateQueryApiKeysField({
+	GQL_TYPE_ID,
+	GQL_TYPE_NAME,
+	//GQL_TYPE_NODE_TYPE,
+	GQL_TYPE_PATH,
+	schemaGenerator
+});
+
+const {
+	createCollectionField,
+	queryCollectionsField,
+	reindexCollectionsField,
+	updateCollectionField
+} = generateCollectionFields({
+	GQL_TYPE_ID,
+	GQL_TYPE_NAME,
+	schemaGenerator
+});
+
+const {
+	createDocumentTypeField,
+	deleteDocumentTypeField,
+	getDocumentTypeField,
+	queryDocumentTypesField,
+	updateDocumentTypeField
+} = generateDocumentTypeFields({
+	GQL_TYPE_ID,
+	GQL_TYPE_NAME,
+	GQL_TYPE_PATH,
+	GQL_TYPE_VERSION_KEY,
+	schemaGenerator
+});
+
+const {
+	createFieldField,
+	deleteFieldField,
+	queryFieldsField,
+	updateFieldField
+} = generateFieldsField({
+	GQL_TYPE_ID,
+	GQL_TYPE_NAME,
+	GQL_TYPE_PATH,
+	schemaGenerator
+});
+
+const getContentTypesField = generateGetContentTypesField({
+	schemaGenerator
+});
+
+const {
+	GQL_TYPE_JOB
+} = generateSchedulerTypes({
+	GQL_TYPE_ID,
+	schemaGenerator
+});
+
+const {
+	createSynonymField,
+	deleteSynonymField,
+	querySynonymsField,
+	updateSynonymField,
+	GQL_TYPE_SYNONYM
+} = generateSynonymFields({
+	GQL_TYPE_ID,
+	//GQL_TYPE_NAME,
+	GQL_TYPE_NODE_DELETED,
+	GQL_TYPE_NODE_TYPE,
+	GQL_TYPE_PATH,
+	schemaGenerator
+});
+
+const {
+	createThesaurusField,
+	deleteThesaurusField,
+	queryThesauriField,
+	updateThesaurusField
+} = generateThesaurusFields({
+	GQL_TYPE_COUNT,
+	GQL_TYPE_ID,
+	GQL_TYPE_NAME,
+	//GQL_TYPE_NODE_TYPE,
+	GQL_TYPE_PATH,
+	GQL_TYPE_SYNONYM,
+	GQL_TYPE_TOTAL,
+	schemaGenerator
+});
 
 export const SCHEMA = createSchema({
 	mutation: createObjectType({
 		name: 'Mutation',
 		fields: {
-			createCollection: fieldCollectionCreate,
-			createDocumentType: fieldDocumentTypeCreate,
-			createField: fieldFieldCreate,
-			createSynonym: fieldSynonymCreate,
-			createThesaurus: fieldThesaurusCreate,
+			createCollection: createCollectionField,
+			createDocumentType: createDocumentTypeField,
+			createField: createFieldField,
+			createSynonym: createSynonymField,
+			createThesaurus: createThesaurusField,
 
-			deleteDocumentType: fieldDocumentTypeDelete,
-			deleteField: fieldFieldDelete,
-			deleteSynonym: fieldSynonymDelete,
-			deleteThesaurus: fieldThesaurusDelete,
+			deleteDocumentType: deleteDocumentTypeField,
+			deleteField: deleteFieldField,
+			deleteSynonym: deleteSynonymField,
+			deleteThesaurus: deleteThesaurusField,
 
-			updateCollection: fieldCollectionUpdate,
-			updateDocumentType: fieldDocumentTypeUpdate,
-			updateField: fieldFieldUpdate,
-			updateSynonym: fieldSynonymUpdate,
-			updateThesaurus: fieldThesaurusUpdate,
+			updateCollection: updateCollectionField,
+			updateDocumentType: updateDocumentTypeField,
+			updateField: updateFieldField,
+			updateSynonym: updateSynonymField,
+			updateThesaurus: updateThesaurusField,
 
-			reindexCollections: fieldCollectionsReindex
+			reindexCollections: reindexCollectionsField
 		}
 	}), // mutation
 	query: createObjectType({
 		name: 'Query',
 		fields: {
-			getContentTypes,
-			getLicense,
-			getLocales,
-			getDocumentType: fieldDocumentTypeGet,
-			getSites,
-			listScheduledJobs: fieldScheduledJobsList,
-			queryApiKeys,
-			queryCollections: fieldCollectionsQuery,
-			queryCollectors,
-			queryFields: fieldFieldsQuery,
-			queryInterfaces,
-			queryJournals,
-			queryStopWords,
-			querySynonyms: fieldSynonymsQuery,
-			queryDocumentTypes: fieldDocumentTypesQuery,
-			queryThesauri: fieldThesauriQuery,
-			queryTasks: fieldTaskQuery,
-			referencedBy: generateFieldReferencedBy(createObjectType)
+			getContentTypes: getContentTypesField,
+			getLicense: generateGetLicenseField({
+				schemaGenerator
+			}),
+			getLocales: generateGetLocalesField({
+				schemaGenerator
+			}),
+			getDocumentType: getDocumentTypeField,
+			getSites: generateGetSitesField({
+				GQL_TYPE_COUNT,
+				GQL_TYPE_ID,
+				GQL_TYPE_NAME,
+				//GQL_TYPE_NODE_TYPE,
+				GQL_TYPE_PATH,
+				GQL_TYPE_TOTAL,
+				schemaGenerator
+			}),
+			listScheduledJobs: generateScheduledJobsListField({
+				GQL_TYPE_JOB
+			}),
+			queryApiKeys: queryApiKeysField,
+			queryCollections: queryCollectionsField,
+			queryCollectors: generateQueryCollectorsField({
+				schemaGenerator
+			}),
+			queryFields: queryFieldsField,
+			queryInterfaces: generateQueryInterfacesField({
+				GQL_TYPE_COUNT,
+				GQL_TYPE_ID,
+				GQL_TYPE_NAME,
+				//GQL_TYPE_NODE_TYPE,
+				GQL_TYPE_PATH,
+				GQL_TYPE_TOTAL,
+				schemaGenerator
+			}),
+			queryJournals: generateQueryJournalsField({
+				GQL_TYPE_COUNT,
+				GQL_TYPE_ID,
+				GQL_TYPE_NAME,
+				//GQL_TYPE_NODE_TYPE,
+				GQL_TYPE_PATH,
+				GQL_TYPE_TOTAL,
+				schemaGenerator
+			}),
+			queryStopWords: generateQueryStopWordsField({
+				GQL_TYPE_COUNT,
+				GQL_TYPE_ID,
+				GQL_TYPE_NAME,
+				//GQL_TYPE_NODE_TYPE,
+				GQL_TYPE_PATH,
+				GQL_TYPE_TOTAL,
+				schemaGenerator
+			}),
+			querySynonyms: querySynonymsField,
+			queryDocumentTypes: queryDocumentTypesField,
+			queryThesauri: queryThesauriField,
+			queryTasks: generateListTasksField({
+				schemaGenerator
+			}),
+			referencedBy: generateReferencedByField({
+				GQL_TYPE_ID,
+				GQL_TYPE_NAME,
+				GQL_TYPE_NODE_TYPE,
+				GQL_TYPE_PATH,
+				schemaGenerator
+			})
 		} // fields
 	}) // query
 }); // SCHEMA

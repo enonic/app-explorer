@@ -1,10 +1,10 @@
 export const GQL_MUTATION_UPDATE_COLLECTION = `mutation UpdateCollectionMutation(
-	$_id: String!
+	$_id: ID!
 	$_name: String!
 	$collector: CollectionCollectorInput
 	$cron: [CollectionCronInput]
 	$doCollect: Boolean
-	$documentTypeId: String
+	$documentTypeId: ID
 	$language: String
 ) {
 	updateCollection(

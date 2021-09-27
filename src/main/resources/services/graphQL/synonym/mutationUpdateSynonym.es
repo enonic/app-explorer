@@ -1,5 +1,5 @@
 export const GQL_MUTATION_UPDATE_SYNONYM = `mutation UpdateSynonymMutation(
-  $_id: String!,
+  $_id: ID!,
   $from: [String]!,
   $to: [String]!
 ) {

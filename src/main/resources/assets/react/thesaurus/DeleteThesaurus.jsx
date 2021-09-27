@@ -2,7 +2,7 @@ import {Button, Header, Icon, Modal, Popup} from 'semantic-ui-react';
 
 
 const GQL_MUTATION_THESAURUS_DELETE = `mutation DeleteThesaurusMutation(
-  $_id: String!
+  $_id: ID!
 ) {
   deleteThesaurus(
     _id: $_id

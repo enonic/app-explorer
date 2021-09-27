@@ -1,5 +1,5 @@
 export const GQL_MUTATION_FIELD_UPDATE = `mutation UpdateField(
-	$_id: String!
+	$_id: ID!
 
 	$decideByType: Boolean
 	$enabled: Boolean
