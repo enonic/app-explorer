@@ -2,11 +2,11 @@ import {VALUE_TYPE_STRING} from '@enonic/js-utils';
 
 import _ from 'lodash';
 import {
-	Button,
 	Header,
 	Icon,
 	Label,
 	Loader,
+	Message,
 	Radio,
 	Segment,
 	Table
@@ -196,11 +196,15 @@ export function Fields(props) {
 								onClick={handleSortGenerator('key')}
 								sorted={column === 'key' ? direction : null}
 							>Name</Table.HeaderCell>
+
 							{showDescriptionColumn ? <Table.HeaderCell>Description</Table.HeaderCell> : null}
+
 							<Table.HeaderCell
 								onClick={handleSortGenerator('fieldType')}
 								sorted={column === 'fieldType' ? direction : null}
 							>Type</Table.HeaderCell>
+							<Table.HeaderCell>Used in document types</Table.HeaderCell>
+							<Table.HeaderCell>Used in collections</Table.HeaderCell>
 
 							{showOccurencesColumns ? <>
 								<Table.HeaderCell
@@ -243,10 +247,43 @@ export function Fields(props) {
 							fulltext,
 							includeInAllText,
 							nGram, // node._indexConfig.default.nGram uses uppercase G in nGram
-							path
+							path,
+
+							referencedBy: {
+								//count,
+								hits: referencedByHits//,
+								//total
+							}
 						}, index) => {
+							console.debug(`Fields key:${key} referencedByHits:`, referencedByHits);
+							const documentTypes = [];
+							const collections = [];
+							referencedByHits.forEach(({
+								_name,
+								_nodeType,
+								referencedBy: {
+									//count,
+									hits: referencedByLevel2Hits//,
+									//total
+								}
+							}) => {
+								if (_nodeType === 'com.enonic.app.explorer:documentType' && !documentTypes.includes(_name)) {
+									documentTypes.push(_name);
+								}
+								referencedByLevel2Hits.forEach(({
+									_name,
+									_nodeType
+								}) => {
+									if (_nodeType === 'com.enonic.app.explorer:collection' && !collections.includes(_name)) {
+										collections.push(_name);
+									}
+								});
+							});
+							//console.debug(`Fields key:${key} documentTypes:`, documentTypes);
+							//console.debug(`Fields key:${key} collections:`, collections);
 							//console.debug(`Fields key:${key} fulltext:`, fulltext);
-							return <Table.Row disabled={denyDelete} key={`field[${index}]`}>
+
+							return <Table.Row key={`field[${index}]`}>
 								<Table.Cell>
 									<NewOrEditModal
 										_id={_id}
@@ -271,36 +308,78 @@ export function Fields(props) {
 									/>
 								</Table.Cell>
 
-								<Table.Cell>{key}</Table.Cell>
+								<Table.Cell disabled={denyDelete}>{key}</Table.Cell>
 
-								{showDescriptionColumn ? <Table.Cell>{description}</Table.Cell> : null}
+								{showDescriptionColumn ? <Table.Cell disabled={denyDelete}>{description}</Table.Cell> : null}
 
-								<Table.Cell>{fieldType === 'any' ? '*' : fieldType}</Table.Cell>
+								<Table.Cell disabled={denyDelete}>{fieldType === 'any' ? '*' : fieldType}</Table.Cell>
+
+								<Table.Cell disabled={denyDelete}><ul style={{
+									listStyleType: 'none',
+									margin: 0,
+									padding: 0
+								}}>{documentTypes.sort().map((dT, i) => <li key={i}>{dT}</li>)}</ul></Table.Cell>
+
+								<Table.Cell disabled={denyDelete}><ul style={{
+									listStyleType: 'none',
+									margin: 0,
+									padding: 0
+								}}>{collections.sort().map((c, i) => <li key={i}>{c}</li>)}</ul></Table.Cell>
 
 								{showOccurencesColumns ? <>
-									<Table.Cell textAlign='center'>{min === 0 ? '*' : min}</Table.Cell>
-									<Table.Cell textAlign='center'>{max === 0 ? '∞' : max}</Table.Cell>
+									<Table.Cell disabled={denyDelete} textAlign='center'>{min === 0 ? '*' : min}</Table.Cell>
+									<Table.Cell disabled={denyDelete} textAlign='center'>{max === 0 ? '∞' : max}</Table.Cell>
 								</>: null}
 
 								{showIndexConfigColumns ? <>
-									<Table.Cell textAlign='center'>{enabled ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='red' name='x' size='large'/>}</Table.Cell>
-									<Table.Cell textAlign='center'>{decideByType ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='red' name='x' size='large'/>}</Table.Cell>
-									<Table.Cell textAlign='center'>{fulltext ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='red' name='x' size='large'/>}</Table.Cell>
-									<Table.Cell textAlign='center'>{includeInAllText ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='red' name='x' size='large'/>}</Table.Cell>
-									<Table.Cell textAlign='center'>{nGram ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='red' name='x' size='large'/>}</Table.Cell>
-									<Table.Cell textAlign='center'>{path ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='red' name='x' size='large'/>}</Table.Cell>
+									<Table.Cell disabled={denyDelete} textAlign='center'>{enabled ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='red' name='x' size='large'/>}</Table.Cell>
+									<Table.Cell disabled={denyDelete} textAlign='center'>{decideByType ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='red' name='x' size='large'/>}</Table.Cell>
+									<Table.Cell disabled={denyDelete} textAlign='center'>{fulltext ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='red' name='x' size='large'/>}</Table.Cell>
+									<Table.Cell disabled={denyDelete} textAlign='center'>{includeInAllText ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='red' name='x' size='large'/>}</Table.Cell>
+									<Table.Cell disabled={denyDelete} textAlign='center'>{nGram ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='red' name='x' size='large'/>}</Table.Cell>
+									<Table.Cell disabled={denyDelete} textAlign='center'>{path ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='red' name='x' size='large'/>}</Table.Cell>
 								</> : null}
 
 								{showDeleteButton ? <Table.Cell>
-									<Button.Group>
-										<DeleteModal
-											disabled={denyDelete}
-											_id={_id}
-											_name={_name}
-											onClose={updateFields}
-											servicesBaseUrl={servicesBaseUrl}
-										/>
-									</Button.Group>
+									<DeleteModal
+										disabled={denyDelete || documentTypes.length || collections.length}
+										_id={_id}
+										_name={_name}
+										onClose={updateFields}
+										popupContent={denyDelete
+											? <Message
+												error
+												icon
+											>
+												<Icon name='warning sign' />
+												<Message.Content>You are not allowed to delete a system field.</Message.Content>
+											</Message>
+											: collections.length
+												? <Message
+													error
+													icon
+												>
+													<Icon name='warning sign' />
+													<Message.Content>You are not allowed to a delete a field that is used in a collection.</Message.Content>
+												</Message>
+												: documentTypes.length
+													? <Message
+														error
+														icon
+													>
+														<Icon name='warning sign' />
+														<Message.Content>You are not allowed to a delete a field that is used in a document type.</Message.Content>
+													</Message>
+													: <Message
+														icon
+														positive
+													>
+														<Icon name='question' />
+														<Message.Content>{`Delete field ${_name}?`}</Message.Content>
+													</Message>
+										}
+										servicesBaseUrl={servicesBaseUrl}
+									/>
 								</Table.Cell> : null}
 
 							</Table.Row>;

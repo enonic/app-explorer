@@ -8,8 +8,12 @@ import {
 	GraphQLInt,
 	GraphQLString,
 	list,
-	nonNull
+	nonNull,
+	reference
 } from '/lib/graphql';
+
+import {GQL_TYPE_REFERENCED_BY_NAME} from '../generateReferencedByField';
+import {referencedByMapped} from '../referencedByMapped';
 
 
 /*const GQL_TYPE_INDEX_CONFIG_UNION = createUnionType({
@@ -88,7 +92,11 @@ export function generateFieldTypes({
 			...GQL_FIELDS_FIELD_COMMON,
 			_id: { type: GraphQLString }, // NOTE System fields doesn't have _id
 			_nodeType: { type: GraphQLString },
-			_path: { type: GraphQLString } // NOTE System fields doesn't have _path
+			_path: { type: GraphQLString }, // NOTE System fields doesn't have _path
+			referencedBy: {
+				resolve: ({source: {_id}}) => referencedByMapped({_id}),
+				type: reference(GQL_TYPE_REFERENCED_BY_NAME)
+			}
 		}
 	});
 

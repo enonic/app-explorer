@@ -38,6 +38,29 @@ export const GQL_QUERY_FIELDS_QUERY = `query QueryFieldsQuery(
 			includeInAllText
 			nGram
 			path
+
+			referencedBy {
+				count
+				hits {
+					_id
+					_name
+					_nodeType
+					_path
+					_score
+					referencedBy {
+						count
+						hits {
+							_id
+							_name
+							_nodeType
+							_path
+							_score
+						}
+						total
+					}
+				}
+				total
+			}
 		}
 	}
 }`;
