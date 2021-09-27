@@ -1,11 +1,5 @@
-import {
-	forceArray,
-	toStr
-} from '@enonic/js-utils';
+//import {toStr} from '@enonic/js-utils';
 
-import {PRINCIPAL_EXPLORER_READ} from '/lib/explorer/model/2/constants';
-import {referencedBy as referencedByQuery} from '/lib/explorer/node/referencedBy';
-import {connect} from '/lib/explorer/repo/connect';
 import {
 	GraphQLFloat,
 	GraphQLInt,
@@ -14,50 +8,9 @@ import {
 	reference
 } from '/lib/graphql';
 
+import {referencedByMapped} from './referencedByMapped';
 
-const GQL_TYPE_REFERENCED_BY = 'referencedBy';
-
-
-function referencedById(_id) {
-	log.debug(`_id:${toStr(_id)}`);
-	const connection = connect({ principals: [PRINCIPAL_EXPLORER_READ] });
-	const res = referencedByQuery({
-		_id,
-		connection
-	});
-	//log.debug(`res:${toStr(res)}`);
-
-	const nodes = connection.get(res.hits.map(({id}) => id));
-	//log.debug(`nodes:${toStr(nodes)}`);
-
-	const nodesObj = {};
-	forceArray(nodes).forEach(({
-		_id,
-		_name,
-		_nodeType,
-		_path
-	}) => {
-		nodesObj[_id] = {
-			_name,
-			_nodeType,
-			_path
-		};
-	});
-	//log.debug(`nodesObj:${toStr(nodesObj)}`);
-
-	res.hits = res.hits.map(({
-		id,
-		score
-	}) => ({
-		...nodesObj[id],
-		_id: id,
-		_score: score
-	}));
-
-	//log.debug(`res:${toStr(res)}`);
-	return res;
-} // referencedById
-
+export const GQL_TYPE_REFERENCED_BY_NAME = 'referencedBy';
 
 export function generateReferencedByField({
 	GQL_TYPE_ID,
@@ -71,9 +24,9 @@ export function generateReferencedByField({
 		args: {
 			_id: GQL_TYPE_ID
 		},
-		resolve: ({args: {_id}}) => referencedById(_id),
+		resolve: ({args: {_id}}) => referencedByMapped({_id}),
 		type: createObjectType({
-			name: GQL_TYPE_REFERENCED_BY,
+			name: GQL_TYPE_REFERENCED_BY_NAME,
 			fields: {
 				count: { type: nonNull(GraphQLInt) },
 				hits: {
@@ -86,8 +39,8 @@ export function generateReferencedByField({
 							_path: { type: GQL_TYPE_PATH },
 							_score: { type: nonNull(GraphQLFloat) },
 							referencedBy: {
-								resolve: ({source: {_id}}) => referencedById(_id),
-								type: reference(GQL_TYPE_REFERENCED_BY)
+								resolve: ({source: {_id}}) => referencedByMapped({_id}),
+								type: reference(GQL_TYPE_REFERENCED_BY_NAME)
 							}
 						}
 					}))

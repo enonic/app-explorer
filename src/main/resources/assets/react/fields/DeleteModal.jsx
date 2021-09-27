@@ -10,6 +10,7 @@ export function DeleteModal(props) {
 		_name,
 		disabled,
 		onClose,
+		popupContent,
 		servicesBaseUrl
 	} = props;
 	const [open, setOpen] = React.useState(false);
@@ -18,12 +19,16 @@ export function DeleteModal(props) {
 		onClose={onClose}
 		open={open}
 		trigger={<Popup
-			content={`Delete field ${_name}`}
-			inverted
-			trigger={<Button
+			content={popupContent}
+			trigger={<div style={{ display: "inline-block" }}>
+				<Button
 				icon
 				disabled={disabled}
-				onClick={() => setOpen(true)}><Icon color='red' name='trash alternate outline'/></Button>}/>}
+					onClick={() => setOpen(true)}>
+					<Icon color='red' name='trash alternate outline'/>
+				</Button>
+			</div>
+			}/>}
 	>
 		<Modal.Header>Delete field {_name}</Modal.Header>
 		<Modal.Content>
