@@ -1,6 +1,6 @@
 export const GQL_MUTATION_CREATE_SYNONYM = `mutation CreateSynonymMutation(
   $from: [String]!,
-  $thesaurusId: String!,
+  $thesaurusId: ID!,
   $to: [String]!
 ) {
   createSynonym(

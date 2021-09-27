@@ -3,7 +3,7 @@ export const GQL_MUTATION_CREATE_COLLECTION = `mutation CreateCollectionMutation
 	$collector: CollectionCollectorInput
 	$cron: [CollectionCronInput]
 	$doCollect: Boolean
-	$documentTypeId: String
+	$documentTypeId: ID
 	$language: String
 ) {
 	createCollection(
