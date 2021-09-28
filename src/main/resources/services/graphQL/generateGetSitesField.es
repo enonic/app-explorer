@@ -9,24 +9,15 @@ import {getSites as gS} from '/lib/util/content/getSites';
 
 
 export function generateGetSitesField({
-	GQL_TYPE_COUNT,
-	GQL_TYPE_ID,
-	GQL_TYPE_NAME,
-	//GQL_TYPE_NODE_TYPE,
-	GQL_TYPE_PATH,
-	GQL_TYPE_TOTAL,
-	schemaGenerator
+	glue
 }) {
-	const {
-		createObjectType
-	} = schemaGenerator;
-	const SITE_OBJECT_TYPE = createObjectType({
+	const SITE_OBJECT_TYPE = glue.addObjectType({
 		name: 'Site',
 		//description:,
 		fields: {
-			_id: { type: GQL_TYPE_ID },
-			_name: { type: GQL_TYPE_NAME },
-			_path: { type: GQL_TYPE_PATH },
+			_id: { type: glue.scalarTypes._id },
+			_name: { type: glue.scalarTypes._name },
+			_path: { type: glue.scalarTypes._path },
 			displayName: { type: nonNull(GraphQLString) }
 		}
 	});
@@ -39,13 +30,13 @@ export function generateGetSitesField({
 			//log.info(`sites:${toStr(sites)}`);
 			return sites;
 		},
-		type: createObjectType({
+		type: glue.addObjectType({
 			name: 'GetSites',
 			//description:
 			fields: {
-				count: { type: GQL_TYPE_COUNT },
+				count: { type: glue.scalarTypes.count },
 				hits: { type: list(SITE_OBJECT_TYPE) },
-				total: { type: GQL_TYPE_TOTAL }
+				total: { type: glue.scalarTypes.total }
 			} // fields
 		})
 	};

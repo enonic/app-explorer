@@ -5,14 +5,53 @@ import {
 	nonNull
 } from '/lib/graphql';
 
+import {GQL_TYPE_NODE_DELETED_NAME} from './constants';
+
 
 export function generateTypes({
-	schemaGenerator
+	glue
 }) {
+	glue.addScalarType({
+		name: '_id',
+		type: nonNull(GraphQLID)
+	});
 
-	const {
-		createObjectType
-	} = schemaGenerator;
+	glue.addScalarType({
+		name: '_name',
+		type: nonNull(GraphQLString)
+	});
+
+	glue.addScalarType({
+		name: '_nodeType',
+		type: nonNull(GraphQLString)
+	});
+
+	glue.addScalarType({
+		name: '_path',
+		type: nonNull(GraphQLString)
+	});
+
+	glue.addScalarType({
+		name: '_versionKey',
+		type: nonNull(GraphQLID)
+	});
+
+	glue.addScalarType({
+		name: 'count',
+		type: nonNull(GraphQLInt)
+	});
+
+	glue.addScalarType({
+		name: 'total',
+		type: nonNull(GraphQLInt)
+	});
+
+	glue.addObjectType({
+		name: GQL_TYPE_NODE_DELETED_NAME,
+		fields: {
+			_id: { type: glue.scalarTypes._id }
+		}
+	});
 
 	const GQL_TYPE_ID = nonNull(GraphQLID);
 	const GQL_TYPE_NAME = nonNull(GraphQLString);
@@ -23,12 +62,7 @@ export function generateTypes({
 		GQL_TYPE_COUNT: nonNull(GraphQLInt),
 		GQL_TYPE_ID,
 		GQL_TYPE_NAME,
-		GQL_TYPE_NODE_DELETED: createObjectType({
-			name: 'NodeDeleted',
-			fields: {
-				_id: { type: GQL_TYPE_ID }
-			}
-		}),
+		GQL_TYPE_NODE_DELETED: glue.objectTypes[GQL_TYPE_NODE_DELETED_NAME],
 		GQL_TYPE_NODE_TYPE,
 		GQL_TYPE_PATH,
 		GQL_TYPE_TOTAL: nonNull(GraphQLInt),

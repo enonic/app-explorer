@@ -9,11 +9,8 @@ import {validateLicense} from '/lib/license';
 
 
 export function generateGetLicenseField({
-	schemaGenerator
+	glue
 }) {
-	const {
-		createObjectType
-	} = schemaGenerator;
 	return {
 		resolve: (/*env*/) => {
 			//log.info(`env:${toStr(env)}`);
@@ -25,7 +22,7 @@ export function generateGetLicenseField({
 				licenseValid
 			};
 		},
-		type: createObjectType({
+		type: glue.addObjectType({
 			name: 'License',
 			//description:
 			fields: {

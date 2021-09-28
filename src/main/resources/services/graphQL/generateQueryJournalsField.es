@@ -10,29 +10,20 @@ import {query} from '/lib/explorer/journal/query';
 
 
 export function generateQueryJournalsField({
-	GQL_TYPE_COUNT,
-	GQL_TYPE_ID,
-	GQL_TYPE_NAME,
-	//GQL_TYPE_NODE_TYPE,
-	GQL_TYPE_PATH,
-	GQL_TYPE_TOTAL,
-	schemaGenerator
+	glue
 }) {
-	const {
-		createObjectType
-	} = schemaGenerator;
-	const JOURNAL_OBJECT_TYPE = createObjectType({
+	const JOURNAL_OBJECT_TYPE = glue.addObjectType({
 		name: 'Journal',
 		//description:
 		fields: {
-			_id: { type: GQL_TYPE_ID },
-			_name: { type: GQL_TYPE_NAME },
+			_id: { type: glue.scalarTypes._id },
+			_name: { type: glue.scalarTypes._name },
 			_nodeType: { type: GraphQLString }, // TODO nonNull?
-			_path: { type: GQL_TYPE_PATH },
+			_path: { type: glue.scalarTypes._path },
 			displayName: { type: nonNull(GraphQLString) },
 			endTime: { type: nonNull(GraphQLString) },
 			errorCount: { type: nonNull(GraphQLInt) },
-			errors: { type: list(createObjectType({
+			errors: { type: list(glue.addObjectType({
 				name: 'JournalErrors',
 				//description:
 				fields: {
@@ -44,7 +35,7 @@ export function generateQueryJournalsField({
 			name: { type: nonNull(GraphQLString) },
 			startTime: { type: nonNull(GraphQLString) },
 			successCount: { type: nonNull(GraphQLInt) },
-			successes: { type: list(createObjectType({
+			successes: { type: list(glue.addObjectType({
 				name: 'JournalSuccesses',
 				//description:
 				fields: {
@@ -102,17 +93,17 @@ export function generateQueryJournalsField({
 			//log.info(`journalsRes:${toStr(journalsRes)}`);
 			return journalsRes;
 		},
-		type: createObjectType({
+		type: glue.addObjectType({
 			name: 'QueryJournals',
 			//description:
 			fields: {
-				total: { type: GQL_TYPE_TOTAL },
-				count: { type: GQL_TYPE_COUNT },
+				count: { type: glue.scalarTypes.count },
 				page: { type: GraphQLInt },
 				pageStart: { type: GraphQLInt },
 				pageEnd: { type: GraphQLInt },
 				pagesTotal: { type: GraphQLInt },
-				hits: { type: list(JOURNAL_OBJECT_TYPE) }
+				hits: { type: list(JOURNAL_OBJECT_TYPE) },
+				total: { type: glue.scalarTypes.total }
 			} // fields
 		})
 	}; // queryJournals

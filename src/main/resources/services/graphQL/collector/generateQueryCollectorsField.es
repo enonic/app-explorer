@@ -11,13 +11,9 @@ import {queryCollectors} from './queryCollectors';
 
 
 export function generateQueryCollectorsField({
-	schemaGenerator
+	glue
 }) {
-	const {
-		createObjectType
-	} = schemaGenerator;
-
-	const COLLECTOR_OBJECT_TYPE = createObjectType({
+	const COLLECTOR_OBJECT_TYPE = glue.addObjectType({
 		name: 'Collector',
 		//description:
 		fields: {
@@ -43,7 +39,7 @@ export function generateQueryCollectorsField({
 			//log.info(`env:${toStr(env)}`);
 			return queryCollectors();
 		},
-		type: createObjectType({
+		type: glue.addObjectType({
 			name: 'QueryCollectors',
 			//description:
 			fields: {

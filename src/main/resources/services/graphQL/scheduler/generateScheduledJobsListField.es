@@ -5,8 +5,11 @@ import {list} from '/lib/graphql';
 import {list as listJobs} from '/lib/xp/scheduler';
 
 
+import {GQL_TYPE_JOB_NAME} from '../constants';
+
+
 export function generateScheduledJobsListField({
-	GQL_TYPE_JOB
+	glue
 }) {
 	return {
 		resolve: (/*env*/) => {
@@ -29,7 +32,7 @@ export function generateScheduledJobsListField({
 			//log.debug(`scheduledJobs:${toStr(scheduledJobs)}`);
 			return scheduledJobs;
 		}, // resolve
-		type: list(GQL_TYPE_JOB)
+		type: list(glue.objectTypes[GQL_TYPE_JOB_NAME])
 	};
 }
 

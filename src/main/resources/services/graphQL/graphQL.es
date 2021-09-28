@@ -11,14 +11,15 @@
      └───────────────┴─────────────────────────────────────────────┘
 */
 
-//import {toStr} from '@enonic/js-utils';
+import {toStr} from '@enonic/js-utils';
 
 import {
-	execute,
-	newSchemaGenerator
+	execute
 } from '/lib/graphql';
 
 import {RT_JSON} from '/lib/explorer/model/2/constants';
+
+import {Glue} from './Glue';
 
 import {generateGetContentTypesField} from './generateGetContentTypesField';
 import {generateGetLicenseField} from './generateGetLicenseField';
@@ -44,12 +45,7 @@ import {generateSynonymFields} from './synonym/generateSynonymFields';
 import {generateThesaurusFields} from './thesaurus/generateThesaurusFields';
 
 
-const schemaGenerator = newSchemaGenerator();
-
-const {
-	createObjectType,
-	createSchema
-} = schemaGenerator;
+const glue = new Glue();
 
 const {
 	GQL_TYPE_COUNT,
@@ -58,11 +54,12 @@ const {
 	GQL_TYPE_NODE_DELETED,
 	GQL_TYPE_NODE_TYPE,
 	GQL_TYPE_PATH,
-	GQL_TYPE_TOTAL,
-	GQL_TYPE_VERSION_KEY
+	GQL_TYPE_TOTAL
 } = generateTypes({
-	schemaGenerator
+	glue
 });
+
+const {schemaGenerator} = glue;
 
 const queryApiKeysField = generateQueryApiKeysField({
 	GQL_TYPE_ID,
@@ -73,12 +70,13 @@ const queryApiKeysField = generateQueryApiKeysField({
 });
 
 const {
-	GQL_TYPE_COLLECTION,
+	//GQL_TYPE_COLLECTION,
 	createCollectionField,
 	queryCollectionsField,
 	reindexCollectionsField,
 	updateCollectionField
 } = generateCollectionFields({
+	glue,
 	GQL_TYPE_ID,
 	GQL_TYPE_NAME,
 	GQL_TYPE_NODE_TYPE,
@@ -86,7 +84,7 @@ const {
 });
 
 const {
-	GQL_TYPE_DOCUMENT_TYPE,
+	//GQL_TYPE_DOCUMENT_TYPE,
 	createDocumentTypeField,
 	deleteDocumentTypeField,
 	getDocumentTypeField,
@@ -95,14 +93,12 @@ const {
 } = generateDocumentTypeFields({
 	GQL_TYPE_ID,
 	GQL_TYPE_NAME,
-	GQL_TYPE_NODE_TYPE,
-	GQL_TYPE_PATH,
-	GQL_TYPE_VERSION_KEY,
+	glue,
 	schemaGenerator
 });
 
 const {
-	GQL_TYPE_FIELD_NODE,
+	//GQL_TYPE_FIELD_NODE,
 	createFieldField,
 	deleteFieldField,
 	queryFieldsField,
@@ -110,8 +106,7 @@ const {
 } = generateFieldsField({
 	//GQL_INTERFACE_NODE,
 	GQL_TYPE_ID,
-	GQL_TYPE_NAME,
-	GQL_TYPE_PATH,
+	glue,
 	schemaGenerator
 });
 
@@ -119,11 +114,8 @@ const getContentTypesField = generateGetContentTypesField({
 	schemaGenerator
 });
 
-const {
-	GQL_TYPE_JOB
-} = generateSchedulerTypes({
-	GQL_TYPE_ID,
-	schemaGenerator
+generateSchedulerTypes({
+	glue
 });
 
 const {
@@ -157,123 +149,108 @@ const {
 	schemaGenerator
 });
 
-const {
-	GQL_INTERFACE_NODE
-} = generateInterfaces({
-	// Common types
-	GQL_TYPE_ID,
-	GQL_TYPE_NAME,
-	//GQL_TYPE_NODE_TYPE,
-	GQL_TYPE_PATH,
-
-	// Specific types
-	GQL_TYPE_COLLECTION,
-	GQL_TYPE_DOCUMENT_TYPE,
-	GQL_TYPE_FIELD_NODE,
-
-	schemaGenerator
+generateInterfaces({
+	glue
 });
 
+const getLicense = generateGetLicenseField({
+	glue
+});
+
+const getLocales = generateGetLocalesField({
+	glue
+});
+
+const getSites = generateGetSitesField({
+	glue
+});
+
+const listScheduledJobs = generateScheduledJobsListField({
+	glue
+});
+
+const queryCollectors = generateQueryCollectorsField({
+	glue
+});
+
+const queryInterfaces = generateQueryInterfacesField({
+	glue
+});
+
+const queryJournals = generateQueryJournalsField({
+	glue
+});
+
+const queryStopWords = generateQueryStopWordsField({
+	glue
+});
+
+const queryTasks = generateListTasksField({
+	glue
+});
+
+const referencedBy = generateReferencedByField({
+	glue
+});
+
+const mutation = glue.addObjectType({
+	name: 'Mutation',
+	fields: {
+		createCollection: createCollectionField,
+		createDocumentType: createDocumentTypeField,
+		createField: createFieldField,
+		createSynonym: createSynonymField,
+		createThesaurus: createThesaurusField,
+
+		deleteDocumentType: deleteDocumentTypeField,
+		deleteField: deleteFieldField,
+		deleteSynonym: deleteSynonymField,
+		deleteThesaurus: deleteThesaurusField,
+
+		updateCollection: updateCollectionField,
+		updateDocumentType: updateDocumentTypeField,
+		updateField: updateFieldField,
+		updateSynonym: updateSynonymField,
+		updateThesaurus: updateThesaurusField,
+
+		reindexCollections: reindexCollectionsField
+	}
+});
+
+const query = glue.addObjectType({
+	name: 'Query',
+	fields: {
+		getContentTypes: getContentTypesField,
+		getLicense,
+		getLocales,
+		getDocumentType: getDocumentTypeField,
+		getSites,
+		listScheduledJobs,
+		queryApiKeys: queryApiKeysField,
+		queryCollections: queryCollectionsField,
+		queryCollectors,
+		queryFields: queryFieldsField,
+		queryInterfaces,
+		queryJournals,
+		queryStopWords,
+		querySynonyms: querySynonymsField,
+		queryDocumentTypes: queryDocumentTypesField,
+		queryThesauri: queryThesauriField,
+		queryTasks,
+		referencedBy
+	} // fields
+}); // query
+
+const {
+	createSchema
+} = schemaGenerator;
+
+log.debug(`Object.keys(glue.objectTypes).sort():${toStr(Object.keys(glue.objectTypes).sort())}`);
+
 export const SCHEMA = createSchema({
-	dictionary: [
-		// Without this we get the Error: type Node not found in schema
-		// But with this it seems we get: Cannot cast graphql.schema.GraphQLInterfaceType to graphql.schema.GraphQLObjectType
-		GQL_INTERFACE_NODE
-	],
-	mutation: createObjectType({
-		name: 'Mutation',
-		fields: {
-			createCollection: createCollectionField,
-			createDocumentType: createDocumentTypeField,
-			createField: createFieldField,
-			createSynonym: createSynonymField,
-			createThesaurus: createThesaurusField,
-
-			deleteDocumentType: deleteDocumentTypeField,
-			deleteField: deleteFieldField,
-			deleteSynonym: deleteSynonymField,
-			deleteThesaurus: deleteThesaurusField,
-
-			updateCollection: updateCollectionField,
-			updateDocumentType: updateDocumentTypeField,
-			updateField: updateFieldField,
-			updateSynonym: updateSynonymField,
-			updateThesaurus: updateThesaurusField,
-
-			reindexCollections: reindexCollectionsField
-		}
-	}), // mutation
-	query: createObjectType({
-		name: 'Query',
-		fields: {
-			getContentTypes: getContentTypesField,
-			getLicense: generateGetLicenseField({
-				schemaGenerator
-			}),
-			getLocales: generateGetLocalesField({
-				schemaGenerator
-			}),
-			getDocumentType: getDocumentTypeField,
-			getSites: generateGetSitesField({
-				GQL_TYPE_COUNT,
-				GQL_TYPE_ID,
-				GQL_TYPE_NAME,
-				//GQL_TYPE_NODE_TYPE,
-				GQL_TYPE_PATH,
-				GQL_TYPE_TOTAL,
-				schemaGenerator
-			}),
-			listScheduledJobs: generateScheduledJobsListField({
-				GQL_TYPE_JOB
-			}),
-			queryApiKeys: queryApiKeysField,
-			queryCollections: queryCollectionsField,
-			queryCollectors: generateQueryCollectorsField({
-				schemaGenerator
-			}),
-			queryFields: queryFieldsField,
-			queryInterfaces: generateQueryInterfacesField({
-				GQL_TYPE_COUNT,
-				GQL_TYPE_ID,
-				GQL_TYPE_NAME,
-				//GQL_TYPE_NODE_TYPE,
-				GQL_TYPE_PATH,
-				GQL_TYPE_TOTAL,
-				schemaGenerator
-			}),
-			queryJournals: generateQueryJournalsField({
-				GQL_TYPE_COUNT,
-				GQL_TYPE_ID,
-				GQL_TYPE_NAME,
-				//GQL_TYPE_NODE_TYPE,
-				GQL_TYPE_PATH,
-				GQL_TYPE_TOTAL,
-				schemaGenerator
-			}),
-			queryStopWords: generateQueryStopWordsField({
-				GQL_TYPE_COUNT,
-				GQL_TYPE_ID,
-				GQL_TYPE_NAME,
-				//GQL_TYPE_NODE_TYPE,
-				GQL_TYPE_PATH,
-				GQL_TYPE_TOTAL,
-				schemaGenerator
-			}),
-			querySynonyms: querySynonymsField,
-			queryDocumentTypes: queryDocumentTypesField,
-			queryThesauri: queryThesauriField,
-			queryTasks: generateListTasksField({
-				schemaGenerator
-			}),
-			referencedBy: generateReferencedByField({
-				GQL_TYPE_ID,
-				GQL_TYPE_NAME,
-				GQL_TYPE_NODE_TYPE,
-				GQL_TYPE_PATH,
-				schemaGenerator
-			})
-		} // fields
-	}) // query
+	//dictionary: Object.keys(glue.objectTypes).map((k) => glue.objectTypes[k]), // Necessary for types accessed through references
+	mutation,
+	query
 }); // SCHEMA
 
 

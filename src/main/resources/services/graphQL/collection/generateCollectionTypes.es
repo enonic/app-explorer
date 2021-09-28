@@ -10,34 +10,34 @@ import {
 } from '/lib/graphql';
 
 import {
+	GQL_TYPE_COLLECTION_COLLECTOR_NAME,
 	GQL_TYPE_COLLECTION_NAME
 } from '../constants';
 
 
 export function generateCollectionTypes({
-	GQL_TYPE_ID,
-	GQL_TYPE_NAME,
-	GQL_TYPE_NODE_TYPE,
-	schemaGenerator
+	glue
 }) {
 	const {
-		createInputObjectType,
-		createObjectType
-	} = schemaGenerator;
+		scalarTypes
+	} = glue;
+
+	glue.addObjectType({ // optional
+		name: GQL_TYPE_COLLECTION_COLLECTOR_NAME,
+		fields: {
+			name: { type: nonNull(GraphQLString) },
+			configJson: { type: GraphQLJson } // Can be null when no config yet...
+		}
+	});
+
 	const GQL_TYPE_COLLECTION_FIELDS = {
-		_id: { type: GQL_TYPE_ID },
-		_name: { type: GQL_TYPE_NAME },
-		_nodeType: { type: GQL_TYPE_NODE_TYPE },
-		_path: { type: nonNull(GraphQLString) },
+		_id: { type: scalarTypes._id },
+		_name: { type: scalarTypes._name },
+		_nodeType: { type: scalarTypes._nodeType },
+		_path: { type: scalarTypes._path },
 		createdTime: { type: GraphQLDateTime },
 		creator: { type: GraphQLString },
-		collector: { type: createObjectType({ // optional
-			name: 'CollectionCollector',
-			fields: {
-				name: { type: nonNull(GraphQLString) },
-				configJson: { type: GraphQLJson } // Can be null when no config yet...
-			}
-		})},
+		collector: { type: glue.objectTypes[GQL_TYPE_COLLECTION_COLLECTOR_NAME]},
 		documentCount: { type: GraphQLInt }, // This is not a node.property
 
 		// NOTE Collections pre app-explorer-2.0.0 doesn't have documentTypeId
@@ -52,22 +52,26 @@ export function generateCollectionTypes({
 		modifiedTime: { type: GraphQLDateTime },
 		modifier: { type: GraphQLString }
 	};
-	const GQL_TYPE_COLLECTION_WITH_SCORE = createObjectType({
+	const GQL_TYPE_COLLECTION_WITH_SCORE = glue.addObjectType({
 		name: 'CollectionWithScore', // [_A-Za-z][_0-9A-Za-z]*
 		fields: {
 			...GQL_TYPE_COLLECTION_FIELDS,
 			_score: { type: nonNull(GraphQLFloat) }
 		}
 	});
+	glue.addObjectType({
+		name: GQL_TYPE_COLLECTION_NAME,
+		fields: GQL_TYPE_COLLECTION_FIELDS
+	});
 	return {
-		GQL_INPUT_TYPE_COLLECTOR: createInputObjectType({
+		GQL_INPUT_TYPE_COLLECTOR: glue.addInputType({
 			name: 'CollectionCollectorInput',
 			fields: {
 				name: { type: nonNull(GraphQLString) },
 				configJson: { type: GraphQLJson } // Can be null when no config yet...
 			}
 		}),
-		GQL_INPUT_TYPE_CRON: createInputObjectType({
+		GQL_INPUT_TYPE_CRON: glue.addInputType({
 			name: 'CollectionCronInput',
 			fields: {
 				minute: { type: GraphQLString },
@@ -77,11 +81,11 @@ export function generateCollectionTypes({
 				dayOfWeek: { type: GraphQLString }
 			}
 		}),
-		GQL_TYPE_COLLECTION: createObjectType({
+		GQL_TYPE_COLLECTION: glue.objectTypes[GQL_TYPE_COLLECTION_NAME],/*createObjectType({
 			name: GQL_TYPE_COLLECTION_NAME,
 			fields: GQL_TYPE_COLLECTION_FIELDS
-		}),
-		GQL_TYPE_COLLECTION_QUERY_RESULT: createObjectType({
+		}),*/
+		GQL_TYPE_COLLECTION_QUERY_RESULT: glue.addObjectType({
 			name: 'CollectionsQueryResult', // [_A-Za-z][_0-9A-Za-z]*
 			fields: {
 				total: { type: nonNull(GraphQLInt) },
@@ -93,13 +97,13 @@ export function generateCollectionTypes({
 				hits: { type: list(GQL_TYPE_COLLECTION_WITH_SCORE) }
 			} // fields
 		}),
-		GQL_TYPE_REINDEX_COLLECTIONS_REPORT: createObjectType({
+		GQL_TYPE_REINDEX_COLLECTIONS_REPORT: glue.addObjectType({
 			name: 'ReindexReport',
 			fields: {
-				collectionId: { type: GQL_TYPE_ID },
+				collectionId: { type: scalarTypes._id },
 				collectionName: { type: GraphQLString },
 				message: { type: GraphQLString },
-				documentTypeId: { type: GQL_TYPE_ID },
+				documentTypeId: { type: scalarTypes._id },
 				taskId: { type: GraphQLString }
 			}
 		})
