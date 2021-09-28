@@ -21,6 +21,7 @@ export function generateFieldsField({
 		schemaGenerator
 	});
 	return {
+		GQL_TYPE_FIELD_NODE,
 		createFieldField: generateCreateFieldField({
 			GQL_TYPE_FIELD_NODE
 		}),
