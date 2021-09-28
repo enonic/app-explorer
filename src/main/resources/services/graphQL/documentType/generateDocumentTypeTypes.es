@@ -19,6 +19,7 @@ import {
 	reference
 } from '/lib/graphql';
 
+import {GQL_TYPE_DOCUMENT_TYPE_NAME} from '../constants';
 import {GQL_TYPE_REFERENCED_BY_NAME} from '../generateReferencedByField';
 import {referencedByMapped} from '../referencedByMapped';
 
@@ -26,6 +27,7 @@ import {referencedByMapped} from '../referencedByMapped';
 export function generateDocumentTypeTypes({
 	GQL_TYPE_ID,
 	GQL_TYPE_NAME,
+	GQL_TYPE_NODE_TYPE,
 	GQL_TYPE_PATH,
 	GQL_TYPE_VERSION_KEY,
 	schemaGenerator
@@ -86,10 +88,11 @@ export function generateDocumentTypeTypes({
 			fields: FIELDS_PROPERTY
 		}),
 		GQL_TYPE_DOCUMENT_TYPE: createObjectType({
-			name: 'DocumentType',
+			name: GQL_TYPE_DOCUMENT_TYPE_NAME,
 			fields: {
 				_id: { type: GQL_TYPE_ID },
 				_name: { type: GQL_TYPE_NAME },
+				_nodeType: { type: GQL_TYPE_NODE_TYPE },
 				_path: { type: GQL_TYPE_PATH },
 				_versionKey: { type: GQL_TYPE_VERSION_KEY }, // Used with atomicUpdate
 				addFields: { type: nonNull(GraphQLBoolean) },

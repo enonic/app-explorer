@@ -16,7 +16,7 @@ export function generateTypes({
 
 	const GQL_TYPE_ID = nonNull(GraphQLID);
 	const GQL_TYPE_NAME = nonNull(GraphQLString);
-	const GQL_TYPE_NODE_TYPE = nonNull(GraphQLString);
+	const GQL_TYPE_NODE_TYPE = nonNull(GraphQLString); // TODO enum or scalar?
 	const GQL_TYPE_PATH = nonNull(GraphQLString);
 
 	return {

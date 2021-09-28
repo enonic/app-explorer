@@ -6,6 +6,7 @@ import {generateUpdateFieldField} from './generateUpdateFieldField';
 
 
 export function generateFieldsField({
+	//GQL_INTERFACE_NODE,
 	GQL_TYPE_ID,
 	GQL_TYPE_NAME,
 	GQL_TYPE_PATH,
@@ -16,6 +17,7 @@ export function generateFieldsField({
 		GQL_TYPE_FIELDS_QUERY_RESULT
 	} = generateFieldTypes({
 		GQL_TYPE_ID,
+		//GQL_INTERFACE_NODE,
 		GQL_TYPE_NAME,
 		GQL_TYPE_PATH,
 		schemaGenerator
@@ -23,6 +25,7 @@ export function generateFieldsField({
 	return {
 		GQL_TYPE_FIELD_NODE,
 		createFieldField: generateCreateFieldField({
+			//GQL_INTERFACE_NODE,
 			GQL_TYPE_FIELD_NODE
 		}),
 		deleteFieldField: generateDeleteFieldField({

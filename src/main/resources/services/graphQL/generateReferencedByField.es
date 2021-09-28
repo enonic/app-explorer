@@ -8,9 +8,12 @@ import {
 	reference
 } from '/lib/graphql';
 
+import {
+	//GQL_INTERFACE_NODE_NAME,
+	GQL_TYPE_REFERENCED_BY_NAME
+} from './constants';
 import {referencedByMapped} from './referencedByMapped';
 
-export const GQL_TYPE_REFERENCED_BY_NAME = 'referencedBy';
 
 export function generateReferencedByField({
 	GQL_TYPE_ID,
@@ -30,6 +33,7 @@ export function generateReferencedByField({
 			fields: {
 				count: { type: nonNull(GraphQLInt) },
 				hits: {
+					//type: list(reference(GQL_INTERFACE_NODE_NAME))
 					type: list(createObjectType({
 						name: 'referencedByHits',
 						fields: {
