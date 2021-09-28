@@ -8,6 +8,9 @@ import {
 import {reference} from '/lib/graphql';
 
 import {
+	GQL_TYPE_COLLECTION_NAME,
+	GQL_TYPE_DOCUMENT_TYPE_NAME,
+	GQL_TYPE_FIELD_NODE_NAME,
 	GQL_INTERFACE_NODE_NAME,
 	GQL_TYPE_REFERENCED_BY_NAME/*,
 	GQL_TYPE_FIELD_NODE_NAME*/
@@ -16,31 +19,21 @@ import {
 
 
 export function generateInterfaces({
-	// Common types
-	GQL_TYPE_ID,
-	GQL_TYPE_NAME,
-	GQL_TYPE_NODE_TYPE,
-	GQL_TYPE_PATH,
-
-	// Specific types
-	GQL_TYPE_COLLECTION,
-	GQL_TYPE_DOCUMENT_TYPE,
-	GQL_TYPE_FIELD_NODE,
-
-	schemaGenerator
+	glue
 }) {
 
 	const {
-		createInterfaceType
-	} = schemaGenerator;
+		objectTypes,
+		scalarTypes
+	} = glue;
 
-	const GQL_INTERFACE_NODE = createInterfaceType({
+	glue.addInterfaceType({
 		name: GQL_INTERFACE_NODE_NAME,
 		fields: {
-			_id: { type: GQL_TYPE_ID },
-			_name: { type: GQL_TYPE_NAME },
-			_nodeType: { type: GQL_TYPE_NODE_TYPE },
-			_path: { type: GQL_TYPE_PATH },
+			_id: { type: scalarTypes._id },
+			_name: { type: scalarTypes._name },
+			_nodeType: { type: scalarTypes._nodeType },
+			_path: { type: scalarTypes._path },
 			referencedBy: {
 				//resolve: ({source: {_id}}) => referencedByMapped({_id}),
 				//type: reference(GQL_INTERFACE_NODE_NAME)
@@ -54,22 +47,18 @@ export function generateInterfaces({
 			log.debug(`_nodeType:${toStr(_nodeType)}`);
 			switch (_nodeType) {
 			case NT_COLLECTION:
-				return GQL_TYPE_COLLECTION;
+				return objectTypes[GQL_TYPE_COLLECTION_NAME];//GQL_TYPE_COLLECTION;
 			case NT_DOCUMENT_TYPE:
-				return GQL_TYPE_DOCUMENT_TYPE;
+				return objectTypes[GQL_TYPE_DOCUMENT_TYPE_NAME];//GQL_TYPE_DOCUMENT_TYPE;
 			case NT_FIELD:
-				return GQL_TYPE_FIELD_NODE;
+				return objectTypes[GQL_TYPE_FIELD_NODE_NAME];//GQL_TYPE_FIELD_NODE;
 			default: {
 				const msg = `Unhandeled _nodeType:${_nodeType}!`;
 				log.error(msg);
 				//throw new Error(msg);
-				return GQL_TYPE_FIELD_NODE;
+				return objectTypes[GQL_TYPE_FIELD_NODE_NAME];
 			}
 			}
 		}
 	});
-
-	return {
-		GQL_INTERFACE_NODE
-	};
 } // generateInterfaces

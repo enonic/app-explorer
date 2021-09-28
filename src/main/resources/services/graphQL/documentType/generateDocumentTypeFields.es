@@ -9,9 +9,7 @@ import {generateUpdateDocumentTypeField} from './generateUpdateDocumentTypeField
 export function generateDocumentTypeFields({
 	GQL_TYPE_ID,
 	GQL_TYPE_NAME,
-	GQL_TYPE_NODE_TYPE,
-	GQL_TYPE_PATH,
-	GQL_TYPE_VERSION_KEY,
+	glue,
 	schemaGenerator
 }) {
 	const {
@@ -20,15 +18,10 @@ export function generateDocumentTypeFields({
 		GQL_INPUT_TYPE_DOCUMENT_TYPE_PROPERTIES,
 		GQL_TYPE_DOCUMENT_TYPE
 	} = generateDocumentTypeTypes({
-		GQL_TYPE_ID,
-		GQL_TYPE_NAME,
-		GQL_TYPE_NODE_TYPE,
-		GQL_TYPE_PATH,
-		GQL_TYPE_VERSION_KEY,
-		schemaGenerator
+		glue
 	});
 	return {
-		GQL_TYPE_DOCUMENT_TYPE,
+		//GQL_TYPE_DOCUMENT_TYPE,
 		createDocumentTypeField: generateCreateDocumentTypeField({
 			GQL_INPUT_TYPE_ADD_FIELDS,
 			GQL_INPUT_TYPE_DOCUMENT_TYPE_FIELDS,

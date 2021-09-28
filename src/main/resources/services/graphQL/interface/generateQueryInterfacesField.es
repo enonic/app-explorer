@@ -16,24 +16,15 @@ import {query} from '/lib/explorer/interface/query';
 
 
 export function generateQueryInterfacesField({
-	GQL_TYPE_COUNT,
-	GQL_TYPE_ID,
-	GQL_TYPE_NAME,
-	//GQL_TYPE_NODE_TYPE,
-	GQL_TYPE_PATH,
-	GQL_TYPE_TOTAL,
-	schemaGenerator
+	glue
 }) {
-	const {
-		createObjectType
-	} = schemaGenerator;
-	const INTERFACE_OBJECT_TYPE = createObjectType({
+	const INTERFACE_OBJECT_TYPE = glue.addObjectType({
 		name: 'Interface',
 		fields: {
-			_id: { type: GQL_TYPE_ID },
-			_name: { type: GQL_TYPE_NAME },
+			_id: { type: glue.scalarTypes._id },
+			_name: { type: glue.scalarTypes._name },
 			_nodeType: { type: GraphQLString }, // TODO nonNull?
-			_path: { type: GQL_TYPE_PATH },
+			_path: { type: glue.scalarTypes._path },
 			displayName: { type: nonNull(GraphQLString) },
 			//name: { type: nonNull(GraphQLString) } // Same as displayName
 			synonyms: { type: list(GraphQLString) }//,
@@ -68,12 +59,12 @@ export function generateQueryInterfacesField({
 			}));
 			return interfacesRes;
 		},
-		type: createObjectType({
+		type: glue.addObjectType({
 			name: 'QueryInterfaces',
 			fields: {
-				count: { type: GQL_TYPE_COUNT },
+				count: { type: glue.scalarTypes.count },
 				hits: { type: list(INTERFACE_OBJECT_TYPE) },
-				total: { type: GQL_TYPE_TOTAL }
+				total: { type: glue.scalarTypes.total }
 			} // fields
 		})
 	};

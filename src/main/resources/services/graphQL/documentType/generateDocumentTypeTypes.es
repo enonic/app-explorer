@@ -25,19 +25,13 @@ import {referencedByMapped} from '../referencedByMapped';
 
 
 export function generateDocumentTypeTypes({
-	GQL_TYPE_ID,
-	GQL_TYPE_NAME,
-	GQL_TYPE_NODE_TYPE,
-	GQL_TYPE_PATH,
-	GQL_TYPE_VERSION_KEY,
-	schemaGenerator
+	glue
 }) {
 	const {
-		createEnumType,
-		createInputObjectType,
-		createObjectType
-	} = schemaGenerator;
-	const ENUM_VALUE_TYPES = createEnumType({
+		objectTypes,
+		scalarTypes
+	} = glue;
+	const ENUM_VALUE_TYPES = glue.addEnumType({
 		name: 'EnumValueTypes',
 		values: [
 			VALUE_TYPE_BOOLEAN,
@@ -60,49 +54,52 @@ export function generateDocumentTypeTypes({
 		max: { type: nonNull(GraphQLInt) },
 		min: { type: nonNull(GraphQLInt) },
 		ngram: { type: nonNull(GraphQLBoolean) },
-		name: { type: GQL_TYPE_NAME },
+		name: { type: scalarTypes._name },
 		valueType: { type: nonNull(ENUM_VALUE_TYPES) }
 	};
-	const GQL_TYPE_DOCUMENT_TYPE_FIELDS = createObjectType({
+	const GQL_TYPE_DOCUMENT_TYPE_FIELDS = glue.addObjectType({
 		name: 'DocumentTypeFields',
 		fields: {
 			active: { type: nonNull(GraphQLBoolean) },
-			fieldId: { type: GQL_TYPE_ID }
+			fieldId: { type: scalarTypes._id }
 		}
 	});
-	const GQL_TYPE_DOCUMENT_TYPE_PROPERTIES = createObjectType({
+	const GQL_TYPE_DOCUMENT_TYPE_PROPERTIES = glue.addObjectType({
 		name: 'DocumentTypeProperties',
 		fields: FIELDS_PROPERTY
 	});
+
+	glue.addObjectType({
+		name: GQL_TYPE_DOCUMENT_TYPE_NAME,
+		fields: {
+			_id: { type: scalarTypes._id },
+			_name: { type: scalarTypes._name },
+			_nodeType: { type: scalarTypes._nodeType },
+			_path: { type: scalarTypes._path },
+			_versionKey: { type: scalarTypes._versionKey }, // Used with atomicUpdate
+			addFields: { type: nonNull(GraphQLBoolean) },
+			fields: { type: list(GQL_TYPE_DOCUMENT_TYPE_FIELDS)},
+			properties: { type: list(GQL_TYPE_DOCUMENT_TYPE_PROPERTIES)},
+			referencedBy: {
+				resolve: ({source: {_id}}) => referencedByMapped({_id}),
+				type: reference(GQL_TYPE_REFERENCED_BY_NAME)
+			}
+		}
+	});
+
 	return {
 		GQL_INPUT_TYPE_ADD_FIELDS: GraphQLBoolean,
-		GQL_INPUT_TYPE_DOCUMENT_TYPE_FIELDS: createInputObjectType({
+		GQL_INPUT_TYPE_DOCUMENT_TYPE_FIELDS: glue.addInputType({
 			name: 'InputDocumentTypeFields',
 			fields: {
 				active: { type: nonNull(GraphQLBoolean) },
-				fieldId: { type: GQL_TYPE_ID }
+				fieldId: { type: scalarTypes._id }
 			}
 		}),
-		GQL_INPUT_TYPE_DOCUMENT_TYPE_PROPERTIES: createInputObjectType({
+		GQL_INPUT_TYPE_DOCUMENT_TYPE_PROPERTIES: glue.addInputType({
 			name: 'InputDocumentTypeProperties',
 			fields: FIELDS_PROPERTY
 		}),
-		GQL_TYPE_DOCUMENT_TYPE: createObjectType({
-			name: GQL_TYPE_DOCUMENT_TYPE_NAME,
-			fields: {
-				_id: { type: GQL_TYPE_ID },
-				_name: { type: GQL_TYPE_NAME },
-				_nodeType: { type: GQL_TYPE_NODE_TYPE },
-				_path: { type: GQL_TYPE_PATH },
-				_versionKey: { type: GQL_TYPE_VERSION_KEY }, // Used with atomicUpdate
-				addFields: { type: nonNull(GraphQLBoolean) },
-				fields: { type: list(GQL_TYPE_DOCUMENT_TYPE_FIELDS)},
-				properties: { type: list(GQL_TYPE_DOCUMENT_TYPE_PROPERTIES)},
-				referencedBy: {
-					resolve: ({source: {_id}}) => referencedByMapped({_id}),
-					type: reference(GQL_TYPE_REFERENCED_BY_NAME)
-				}
-			}
-		})
+		GQL_TYPE_DOCUMENT_TYPE: objectTypes[GQL_TYPE_DOCUMENT_TYPE_NAME]
 	};
 } // generateDocumentTypeTypes

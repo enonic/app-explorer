@@ -21,14 +21,9 @@ import {queryCollectors} from './collector/queryCollectors';
 
 
 export function generateListTasksField({
-	schemaGenerator
+	glue
 }) {
-	const {
-		createEnumType,
-		createObjectType
-	} = schemaGenerator;
-
-	const ENUM_TASK_STATES = createEnumType({
+	const ENUM_TASK_STATES = glue.addEnumType({
 		name: 'EnumTaskStates',
 		values: [
 			TASK_STATE_FAILED,
@@ -39,7 +34,7 @@ export function generateListTasksField({
 	});
 
 
-	const TASK_OBJECT_TYPE = createObjectType({
+	const TASK_OBJECT_TYPE = glue.addObjectType({
 		name: 'Task',
 		//description:,
 		fields: {
@@ -47,7 +42,7 @@ export function generateListTasksField({
 			description: { type: nonNull(GraphQLString) },
 			id: { type: nonNull(GraphQLString) },
 			name: { type: nonNull(GraphQLString) },
-			progress: { type: nonNull(createObjectType({
+			progress: { type: nonNull(glue.addObjectType({
 				name: 'TaskProgress',
 				//description:,
 				fields: {

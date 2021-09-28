@@ -16,31 +16,26 @@ import {referencedByMapped} from './referencedByMapped';
 
 
 export function generateReferencedByField({
-	GQL_TYPE_ID,
-	GQL_TYPE_NAME,
-	GQL_TYPE_NODE_TYPE,
-	GQL_TYPE_PATH,
-	schemaGenerator
+	glue
 }) {
-	const {createObjectType} = schemaGenerator;
 	return {
 		args: {
-			_id: GQL_TYPE_ID
+			_id: glue.scalarTypes._id
 		},
 		resolve: ({args: {_id}}) => referencedByMapped({_id}),
-		type: createObjectType({
+		type: glue.addObjectType({
 			name: GQL_TYPE_REFERENCED_BY_NAME,
 			fields: {
 				count: { type: nonNull(GraphQLInt) },
 				hits: {
 					//type: list(reference(GQL_INTERFACE_NODE_NAME))
-					type: list(createObjectType({
+					type: list(glue.addObjectType({
 						name: 'referencedByHits',
 						fields: {
-							_id: { type: GQL_TYPE_ID },
-							_name: { type: GQL_TYPE_NAME },
-							_nodeType: { type: GQL_TYPE_NODE_TYPE },
-							_path: { type: GQL_TYPE_PATH },
+							_id: { type: glue.scalarTypes._id },
+							_name: { type: glue.scalarTypes._name },
+							_nodeType: { type: glue.scalarTypes._nodeType },
+							_path: { type: glue.scalarTypes._path },
 							_score: { type: nonNull(GraphQLFloat) },
 							referencedBy: {
 								resolve: ({source: {_id}}) => referencedByMapped({_id}),

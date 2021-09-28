@@ -9,11 +9,8 @@ import {getLocales as importedGetLocales} from '../../lib/locales';
 
 
 export function generateGetLocalesField({
-	schemaGenerator
+	glue
 }) {
-	const {
-		createObjectType
-	} = schemaGenerator;
 	return {
 		args: {
 			locale: GraphQLString,
@@ -30,7 +27,7 @@ export function generateGetLocalesField({
 				query
 			});
 		},
-		type: list(createObjectType({
+		type: list(glue.addObjectType({
 			name: 'Locale',
 			fields: {
 				country: { type: GraphQLString },

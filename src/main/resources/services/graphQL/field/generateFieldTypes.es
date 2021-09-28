@@ -38,20 +38,15 @@ import {referencedByMapped} from '../referencedByMapped';
 
 export function generateFieldTypes({
 	//GQL_INTERFACE_NODE,
-	GQL_TYPE_ID,
-	GQL_TYPE_NAME,
-	GQL_TYPE_PATH,
-	schemaGenerator
+	glue
 }) {
 	const {
-		createEnumType,
-		createObjectType//,
-		//createUnionType
-	} = schemaGenerator;
+		scalarTypes
+	} = glue;
 
 	const INSTRUCTION_CUSTOM = 'custom';
 
-	const GQL_ENUM_INSTRUCTION = createEnumType({
+	const GQL_ENUM_INSTRUCTION = glue.addEnumType({
 		name: 'EnumInstructions',
 		values: [
 			...INDEX_CONFIG_TEMPLATES,
@@ -60,7 +55,7 @@ export function generateFieldTypes({
 	});
 
 
-	const GQL_TYPE_INDEX_CONFIG_OBJECT = createObjectType({
+	const GQL_TYPE_INDEX_CONFIG_OBJECT = glue.addObjectType({
 		name: 'FieldIndexConfigObject',
 		fields: {
 			decideByType: { type: GraphQLBoolean },
@@ -73,7 +68,7 @@ export function generateFieldTypes({
 	});
 
 	const GQL_FIELDS_FIELD_COMMON = {
-		_name: { type: GQL_TYPE_NAME },
+		_name: { type: scalarTypes._name },
 		decideByType: { type: GraphQLBoolean }, // TODO nonNull?
 		denyDelete: { type: GraphQLBoolean },
 		description: { type: GraphQLString },
@@ -91,7 +86,7 @@ export function generateFieldTypes({
 		path: { type: GraphQLBoolean }
 	};
 
-	const GQL_TYPE_FIELD = createObjectType({
+	const GQL_TYPE_FIELD = glue.addObjectType({
 		name: 'Field',
 		fields: {
 			...GQL_FIELDS_FIELD_COMMON,
@@ -106,20 +101,20 @@ export function generateFieldTypes({
 	});
 
 	return {
-		GQL_TYPE_FIELD_NODE: createObjectType({
+		GQL_TYPE_FIELD_NODE: glue.addObjectType({
 			name: GQL_TYPE_FIELD_NODE_NAME,
 			fields: {
 				...GQL_FIELDS_FIELD_COMMON,
-				_id: { type: GQL_TYPE_ID },
+				_id: { type: scalarTypes._id },
 				_nodeType: { type: nonNull(GraphQLString) },
-				_path: { type: GQL_TYPE_PATH }
+				_path: { type: scalarTypes._path }
 			}/*,
 			interfaces: [
 				//reference(GQL_INTERFACE_NODE_NAME)
 				GQL_INTERFACE_NODE
 			]*/
 		}),
-		GQL_TYPE_FIELDS_QUERY_RESULT: createObjectType({
+		GQL_TYPE_FIELDS_QUERY_RESULT: glue.addObjectType({
 			name: 'FieldsQueryResult',
 			//description:
 			fields: {
