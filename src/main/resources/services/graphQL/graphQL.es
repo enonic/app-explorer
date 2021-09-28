@@ -73,6 +73,7 @@ const queryApiKeysField = generateQueryApiKeysField({
 });
 
 const {
+	GQL_TYPE_COLLECTION,
 	createCollectionField,
 	queryCollectionsField,
 	reindexCollectionsField,
@@ -80,10 +81,12 @@ const {
 } = generateCollectionFields({
 	GQL_TYPE_ID,
 	GQL_TYPE_NAME,
+	GQL_TYPE_NODE_TYPE,
 	schemaGenerator
 });
 
 const {
+	GQL_TYPE_DOCUMENT_TYPE,
 	createDocumentTypeField,
 	deleteDocumentTypeField,
 	getDocumentTypeField,
@@ -92,6 +95,7 @@ const {
 } = generateDocumentTypeFields({
 	GQL_TYPE_ID,
 	GQL_TYPE_NAME,
+	GQL_TYPE_NODE_TYPE,
 	GQL_TYPE_PATH,
 	GQL_TYPE_VERSION_KEY,
 	schemaGenerator
@@ -104,6 +108,7 @@ const {
 	queryFieldsField,
 	updateFieldField
 } = generateFieldsField({
+	//GQL_INTERFACE_NODE,
 	GQL_TYPE_ID,
 	GQL_TYPE_NAME,
 	GQL_TYPE_PATH,
@@ -155,20 +160,26 @@ const {
 const {
 	GQL_INTERFACE_NODE
 } = generateInterfaces({
+	// Common types
 	GQL_TYPE_ID,
 	GQL_TYPE_NAME,
-	GQL_TYPE_NODE_TYPE,
+	//GQL_TYPE_NODE_TYPE,
 	GQL_TYPE_PATH,
+
+	// Specific types
+	GQL_TYPE_COLLECTION,
+	GQL_TYPE_DOCUMENT_TYPE,
 	GQL_TYPE_FIELD_NODE,
+
 	schemaGenerator
 });
 
 export const SCHEMA = createSchema({
-	/*dictionary: [
+	dictionary: [
 		// Without this we get the Error: type Node not found in schema
 		// But with this it seems we get: Cannot cast graphql.schema.GraphQLInterfaceType to graphql.schema.GraphQLObjectType
 		GQL_INTERFACE_NODE
-	],*/
+	],
 	mutation: createObjectType({
 		name: 'Mutation',
 		fields: {
@@ -281,7 +292,7 @@ export function post(request) {
 
 	const context = {
 		/*types: [
-			GQL_INTERFACE_NODE // This did not fix: type Node not found in schema
+			GQL_INTERFACE_NODE // This is not the place to add interfaceTypes. lib-guillotine context is something else...
 		]*/
 	};
 	//log.info(`context:${toStr(context)}`);

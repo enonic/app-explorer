@@ -8,6 +8,7 @@ import {generateUpdateCollectionField} from './generateUpdateCollectionField';
 export function generateCollectionFields({
 	GQL_TYPE_ID,
 	GQL_TYPE_NAME,
+	GQL_TYPE_NODE_TYPE,
 	schemaGenerator
 }) {
 	const {
@@ -19,9 +20,11 @@ export function generateCollectionFields({
 	} = generateCollectionTypes({
 		GQL_TYPE_ID,
 		GQL_TYPE_NAME,
+		GQL_TYPE_NODE_TYPE,
 		schemaGenerator
 	});
 	return {
+		GQL_TYPE_COLLECTION,
 		createCollectionField: generateCreateCollectionField({
 			GQL_TYPE_NAME,
 			GQL_INPUT_TYPE_COLLECTOR,

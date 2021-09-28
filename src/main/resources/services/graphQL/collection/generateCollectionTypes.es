@@ -9,10 +9,15 @@ import {
 	nonNull
 } from '/lib/graphql';
 
+import {
+	GQL_TYPE_COLLECTION_NAME
+} from '../constants';
+
 
 export function generateCollectionTypes({
 	GQL_TYPE_ID,
 	GQL_TYPE_NAME,
+	GQL_TYPE_NODE_TYPE,
 	schemaGenerator
 }) {
 	const {
@@ -22,7 +27,7 @@ export function generateCollectionTypes({
 	const GQL_TYPE_COLLECTION_FIELDS = {
 		_id: { type: GQL_TYPE_ID },
 		_name: { type: GQL_TYPE_NAME },
-		_nodeType: { type: GraphQLString }, // TODO nonNull enum or scalar?
+		_nodeType: { type: GQL_TYPE_NODE_TYPE },
 		_path: { type: nonNull(GraphQLString) },
 		createdTime: { type: GraphQLDateTime },
 		creator: { type: GraphQLString },
@@ -73,7 +78,7 @@ export function generateCollectionTypes({
 			}
 		}),
 		GQL_TYPE_COLLECTION: createObjectType({
-			name: 'Collection', // [_A-Za-z][_0-9A-Za-z]*
+			name: GQL_TYPE_COLLECTION_NAME,
 			fields: GQL_TYPE_COLLECTION_FIELDS
 		}),
 		GQL_TYPE_COLLECTION_QUERY_RESULT: createObjectType({
