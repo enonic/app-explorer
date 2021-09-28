@@ -12,6 +12,7 @@ import {
 	reference
 } from '/lib/graphql';
 
+import {GQL_INTERFACE_NODE_NAME} from '../constants';
 import {GQL_TYPE_REFERENCED_BY_NAME} from '../generateReferencedByField';
 import {referencedByMapped} from '../referencedByMapped';
 
@@ -108,7 +109,10 @@ export function generateFieldTypes({
 				_id: { type: GQL_TYPE_ID },
 				_nodeType: { type: nonNull(GraphQLString) },
 				_path: { type: GQL_TYPE_PATH }
-			}
+			},
+			interfaces: [
+				reference(GQL_INTERFACE_NODE_NAME)
+			]
 		}),
 		GQL_TYPE_FIELDS_QUERY_RESULT: createObjectType({
 			name: 'FieldsQueryResult',

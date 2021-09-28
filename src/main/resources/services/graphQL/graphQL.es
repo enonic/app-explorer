@@ -1,3 +1,16 @@
+/*
+                  Explorer repo                             Collection repos
+      ┌─────────────────┼───────────────────┐                      │
+┌─────┴─────┐   ┌───────┴───────┐   ┌───────┴────────┐     ┌───────┴────────┐
+│ Field     │   │ Document type │   │ Collection     │     │ Document       │
+├───────────┤Ref├───────────────┤Ref├────────────────┤Loose├────────────────┤
+│ _id       │<──┤ fieldIds      │<──┤ documentTypeId │<────┤ collectionName │
+│ fieldPath │   │ fieldPaths    │   │                │     │ fieldPaths     │
+└───────────┘   └───────────────┘   └────────────────┘     └───────┬────────┘
+     ^               ^                                        Loose│
+     └───────────────┴─────────────────────────────────────────────┘
+*/
+
 //import {toStr} from '@enonic/js-utils';
 
 import {
@@ -11,11 +24,13 @@ import {generateGetContentTypesField} from './generateGetContentTypesField';
 import {generateGetLicenseField} from './generateGetLicenseField';
 import {generateGetLocalesField} from './generateGetLocalesField';
 import {generateGetSitesField} from './generateGetSitesField';
+import {generateInterfaces} from './generateInterfaces';
 import {generateListTasksField} from './generateListTasksField';
 import {generateQueryJournalsField} from './generateQueryJournalsField';
 import {generateQueryStopWordsField} from './generateQueryStopWordsField';
 import {generateReferencedByField} from './generateReferencedByField';
 import {generateTypes} from './generateTypes';
+
 
 import {generateQueryApiKeysField} from './apiKey/generateQueryApiKeysField';
 import {generateCollectionFields} from './collection/generateCollectionFields';
@@ -83,6 +98,7 @@ const {
 });
 
 const {
+	GQL_TYPE_FIELD_NODE,
 	createFieldField,
 	deleteFieldField,
 	queryFieldsField,
@@ -136,7 +152,23 @@ const {
 	schemaGenerator
 });
 
+const {
+	GQL_INTERFACE_NODE
+} = generateInterfaces({
+	GQL_TYPE_ID,
+	GQL_TYPE_NAME,
+	GQL_TYPE_NODE_TYPE,
+	GQL_TYPE_PATH,
+	GQL_TYPE_FIELD_NODE,
+	schemaGenerator
+});
+
 export const SCHEMA = createSchema({
+	/*dictionary: [
+		// Without this we get the Error: type Node not found in schema
+		// But with this it seems we get: Cannot cast graphql.schema.GraphQLInterfaceType to graphql.schema.GraphQLObjectType
+		GQL_INTERFACE_NODE
+	],*/
 	mutation: createObjectType({
 		name: 'Mutation',
 		fields: {
@@ -247,7 +279,11 @@ export function post(request) {
 	//log.info(`query:${toStr(query)}`);
 	//log.info(`variables:${toStr(variables)}`);
 
-	const context = {};
+	const context = {
+		/*types: [
+			GQL_INTERFACE_NODE // This did not fix: type Node not found in schema
+		]*/
+	};
 	//log.info(`context:${toStr(context)}`);
 
 	return {
