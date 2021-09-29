@@ -5,7 +5,7 @@ import {
 	NT_COLLECTION,
 	NT_FIELD
 } from '/lib/explorer/model/2/constants';
-import {reference} from '/lib/graphql';
+//import {reference} from '/lib/graphql';
 
 import {
 	GQL_TYPE_COLLECTION_NAME,
@@ -31,7 +31,8 @@ export function generateInterfaces({
 			referencedBy: {
 				//resolve: ({source: {_id}}) => referencedByMapped({_id}),
 				//type: reference(GQL_INTERFACE_NODE_NAME)
-				type: reference(GQL_TYPE_REFERENCED_BY_NAME)
+				//type: reference(GQL_TYPE_REFERENCED_BY_NAME)
+				type: glue.getObjectType(GQL_TYPE_REFERENCED_BY_NAME)
 			}
 		},
 		typeResolver(node) {

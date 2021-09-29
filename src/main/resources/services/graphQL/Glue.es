@@ -30,7 +30,7 @@ export class Glue {
 		name,
 		values
 	}) {
-		log.debug(`addEnumType({name:${name}})`);
+		//log.debug(`addEnumType({name:${name}})`);
 		if(this.#enumTypes[name]) {
 			throw new Error(`Enum type ${name} already defined!`);
 		}
@@ -50,7 +50,7 @@ export class Glue {
 		name
 	}) {
 		//log.debug(`addInputType({name:${name},fields:${toStr(fields)}})`);
-		log.debug(`addInputType({name:${name}})`);
+		//log.debug(`addInputType({name:${name}})`);
 		if(this.#inputTypes[name]) {
 			throw new Error(`Input type ${name} already defined!`);
 		}
@@ -71,7 +71,7 @@ export class Glue {
 		typeResolver
 	}) {
 		//log.debug(`addInterfaceType({name:${name},fields:${toStr(fields)}})`);
-		log.debug(`addInterfaceType({name:${name}})`);
+		//log.debug(`addInterfaceType({name:${name}})`);
 		if(this.#interfaceTypes[name]) {
 			throw new Error(`Interface type ${name} already defined!`);
 		}
@@ -92,7 +92,7 @@ export class Glue {
 		name
 	}) {
 		//log.debug(`addObjectType({name:${name},fields:${toStr(fields)})`);
-		log.debug(`addObjectType({name:${name}})`);
+		//log.debug(`addObjectType({name:${name}})`);
 		if(this.#objectTypes[name]) {
 			throw new Error(`Object type ${name} already defined!`);
 		}
@@ -111,7 +111,7 @@ export class Glue {
 		name,
 		type
 	}) {
-		log.debug(`addScalarType({name:${name}})`);
+		//log.debug(`addScalarType({name:${name}})`);
 		if(this.#scalarTypes[name]) {
 			throw new Error(`Scalar type ${name} already defined!`);
 		}

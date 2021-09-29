@@ -15,17 +15,17 @@ import {
 	GraphQLBoolean,
 	GraphQLInt,
 	nonNull,
-	list,
-	reference
+	list/*,
+	reference*/
 } from '/lib/graphql';
 
 import {
 	GQL_INPUT_TYPE_DOCUMENT_TYPE_FIELDS_NAME,
 	GQL_INPUT_TYPE_DOCUMENT_TYPE_PROPERTIES_NAME,
 	GQL_TYPE_DOCUMENT_TYPE_NAME,
-	GQL_TYPE_DOCUMENT_TYPE_QUERY_RESULT_NAME
+	GQL_TYPE_DOCUMENT_TYPE_QUERY_RESULT_NAME,
+	GQL_TYPE_REFERENCED_BY_NAME
 } from '../constants';
-import {GQL_TYPE_REFERENCED_BY_NAME} from '../generateReferencedByField';
 import {referencedByMapped} from '../referencedByMapped';
 
 
@@ -99,7 +99,8 @@ export function generateDocumentTypeTypes({
 						}))},
 						referencedBy: {
 							resolve: ({source: {_id}}) => referencedByMapped({_id}),
-							type: reference(GQL_TYPE_REFERENCED_BY_NAME)
+							//type: reference(GQL_TYPE_REFERENCED_BY_NAME)
+							type: glue.getObjectType(GQL_TYPE_REFERENCED_BY_NAME)
 						}
 					}
 				}))
