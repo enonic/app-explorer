@@ -38,7 +38,7 @@ export function generateReferencedByField({
 							_score: { type: nonNull(GraphQLFloat) },
 							referencedBy: {
 								resolve: ({source: {_id}}) => referencedByMapped({_id}),
-								type: reference(GQL_TYPE_REFERENCED_BY_NAME)
+								type: reference(GQL_TYPE_REFERENCED_BY_NAME) // Self-reference
 							}
 						}
 					}))

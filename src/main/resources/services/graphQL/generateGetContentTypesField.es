@@ -10,35 +10,8 @@ import {getTypes} from '/lib/xp/content';
 
 
 export function generateGetContentTypesField({
-	schemaGenerator
+	glue
 }) {
-	const {
-		createObjectType
-	} = schemaGenerator;
-
-	const CONTENT_TYPE_OBJECT_TYPE = createObjectType({
-		name: 'ContentType',
-		//description:,
-		fields: {
-			abstract: { type: nonNull(GraphQLBoolean) },
-			allowChildContent: { type: nonNull(GraphQLBoolean) },
-			description: { type: GraphQLString },
-			displayName: { type: nonNull(GraphQLString) },
-			final: { type: nonNull(GraphQLBoolean) },
-			formJson: { type: nonNull(GraphQLString) },
-			icon: { type: createObjectType({
-				name: 'ContentTypeIcon',
-				//description:,
-				fields: {
-					mimeType: { type: nonNull(GraphQLString) },
-					modifiedTime: { type: nonNull(GraphQLString) }
-				}
-			})},
-			name: { type: nonNull(GraphQLString) },
-			supertype: { type: GraphQLString } // For some reason still says undefined?
-		}
-	});
-
 	return {
 		resolve: (/*env*/) => {
 			//log.info(`env:${toStr(env)}`);
@@ -50,7 +23,28 @@ export function generateGetContentTypesField({
 			//log.info(`contentTypes:${toStr(contentTypes)}`);
 			return contentTypes;
 		},
-		type: list(CONTENT_TYPE_OBJECT_TYPE)
+		type: list(glue.addObjectType({
+			name: 'ContentType',
+			//description:,
+			fields: {
+				abstract: { type: nonNull(GraphQLBoolean) },
+				allowChildContent: { type: nonNull(GraphQLBoolean) },
+				description: { type: GraphQLString },
+				displayName: { type: nonNull(GraphQLString) },
+				final: { type: nonNull(GraphQLBoolean) },
+				formJson: { type: nonNull(GraphQLString) },
+				icon: { type: glue.addObjectType({
+					name: 'ContentTypeIcon',
+					//description:,
+					fields: {
+						mimeType: { type: nonNull(GraphQLString) },
+						modifiedTime: { type: nonNull(GraphQLString) }
+					}
+				})},
+				name: { type: nonNull(GraphQLString) },
+				supertype: { type: GraphQLString } // For some reason still says undefined?
+			}
+		}))
 	};
 } // generateGetContentTypesField
 

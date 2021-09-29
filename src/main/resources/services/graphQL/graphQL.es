@@ -11,7 +11,7 @@
      └───────────────┴─────────────────────────────────────────────┘
 */
 
-import {toStr} from '@enonic/js-utils';
+//import {toStr} from '@enonic/js-utils';
 
 import {
 	execute
@@ -33,7 +33,6 @@ import {generateQueryStopWordsField} from './generateQueryStopWordsField';
 import {generateReferencedByField} from './generateReferencedByField';
 import {generateTypes} from './generateTypes';
 
-
 import {generateQueryApiKeysField} from './apiKey/generateQueryApiKeysField';
 import {generateCollectionFields} from './collection/generateCollectionFields';
 import {generateQueryCollectorsField} from './collector/generateQueryCollectorsField';
@@ -51,7 +50,9 @@ const glue = new Glue();
 generateTypes({glue});
 generateNoQLTypes({glue});
 
-const {schemaGenerator} = glue;
+const referencedBy = generateReferencedByField({
+	glue
+});
 
 const queryApiKeysField = generateQueryApiKeysField({
 	glue
@@ -86,7 +87,7 @@ const {
 });
 
 const getContentTypesField = generateGetContentTypesField({
-	schemaGenerator
+	glue
 });
 
 generateSchedulerTypes({
@@ -151,11 +152,8 @@ const queryTasks = generateListTasksField({
 	glue
 });
 
-const referencedBy = generateReferencedByField({
-	glue
-});
-
-const mutation = glue.addObjectType({
+//const mutation = glue.addObjectType({
+const mutation = glue.schemaGenerator.createObjectType({
 	name: 'Mutation',
 	fields: {
 		createCollection: createCollectionField,
@@ -179,7 +177,8 @@ const mutation = glue.addObjectType({
 	}
 });
 
-const query = glue.addObjectType({
+//const query = glue.addObjectType({
+const query = glue.schemaGenerator.createObjectType({
 	name: 'Query',
 	fields: {
 		getContentTypes: getContentTypesField,
@@ -203,15 +202,11 @@ const query = glue.addObjectType({
 	} // fields
 }); // query
 
-const {
-	createSchema
-} = schemaGenerator;
-
-log.debug(`glue.getSortedObjectTypeNames():${toStr(glue.getSortedObjectTypeNames())}`);
+//log.debug(`glue.getSortedObjectTypeNames():${toStr(glue.getSortedObjectTypeNames())}`);
 
 //const objectTypes = glue.getObjectTypes();
 
-export const SCHEMA = createSchema({
+export const SCHEMA = glue.schemaGenerator.createSchema({
 	//dictionary: Object.keys(objectTypes).map((k) => objectTypes[k]), // Necessary for types accessed through references
 	mutation,
 	query

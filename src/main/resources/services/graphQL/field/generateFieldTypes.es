@@ -8,16 +8,16 @@ import {
 	GraphQLInt,
 	GraphQLString,
 	list,
-	nonNull,
-	reference
+	nonNull/*,
+	reference*/
 } from '/lib/graphql';
 
 import {
 	//GQL_INTERFACE_NODE_NAME,
 	GQL_TYPE_FIELD_NODE_NAME,
-	GQL_TYPE_FIELDS_QUERY_RESULT_NAME
+	GQL_TYPE_FIELDS_QUERY_RESULT_NAME,
+	GQL_TYPE_REFERENCED_BY_NAME
 } from '../constants';
-import {GQL_TYPE_REFERENCED_BY_NAME} from '../generateReferencedByField';
 import {referencedByMapped} from '../referencedByMapped';
 
 
@@ -91,7 +91,8 @@ export function generateFieldTypes({
 			_path: { type: GraphQLString }, // NOTE System fields doesn't have _path
 			referencedBy: {
 				resolve: ({source: {_id}}) => referencedByMapped({_id}),
-				type: reference(GQL_TYPE_REFERENCED_BY_NAME)
+				//type: reference(GQL_TYPE_REFERENCED_BY_NAME)
+				type: glue.getObjectType(GQL_TYPE_REFERENCED_BY_NAME)
 			}
 		}
 	});
