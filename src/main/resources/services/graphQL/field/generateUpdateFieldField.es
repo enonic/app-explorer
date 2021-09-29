@@ -1,20 +1,20 @@
+import {coerseFieldType} from '/lib/explorer/field/coerseFieldType';
+import {updateField} from '/lib/explorer/field/updateField';
 import {
 	GraphQLBoolean,
 	GraphQLInt,
 	GraphQLString
 } from '/lib/graphql';
 
-import {coerseFieldType} from '/lib/explorer/field/coerseFieldType';
-import {updateField} from '/lib/explorer/field/updateField';
+import {GQL_TYPE_FIELD_NODE_NAME} from '../constants';
 
 
 export function generateUpdateFieldField({
-	GQL_TYPE_ID,
-	GQL_TYPE_FIELD_NODE
+	glue
 }) {
 	return {
 		args: {
-			_id: GQL_TYPE_ID,
+			_id: glue.getScalarType('_id'),
 
 			decideByType: GraphQLBoolean,
 			enabled: GraphQLBoolean,
@@ -34,6 +34,6 @@ export function generateUpdateFieldField({
 		}) {
 			return coerseFieldType(updateField(args));
 		},
-		type: GQL_TYPE_FIELD_NODE
+		type: glue.getObjectType(GQL_TYPE_FIELD_NODE_NAME)
 	};
 }

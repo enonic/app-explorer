@@ -6,27 +6,29 @@ import {
 	list
 } from '/lib/graphql';
 
+import {
+	GQL_INPUT_TYPE_DOCUMENT_TYPE_FIELDS_NAME,
+	GQL_INPUT_TYPE_DOCUMENT_TYPE_PROPERTIES_NAME,
+	GQL_TYPE_DOCUMENT_TYPE_NAME
+} from '../constants';
+
 
 export function generateUpdateDocumentTypeField({
 	GQL_INPUT_TYPE_ADD_FIELDS,
-	GQL_INPUT_TYPE_DOCUMENT_TYPE_FIELDS,
-	GQL_INPUT_TYPE_DOCUMENT_TYPE_PROPERTIES,
-	GQL_TYPE_DOCUMENT_TYPE,
-	GQL_TYPE_ID,
-	GQL_TYPE_NAME
+	glue
 }) {
 	return {
 		args: {
-			_id: GQL_TYPE_ID,
-			_name: GQL_TYPE_NAME,
+			_id: glue.getScalarType('_id'),
+			_name: glue.getScalarType('_name'),
 			_versionKey: GraphQLString,
 			addFields: GQL_INPUT_TYPE_ADD_FIELDS,
-			fields: list(GQL_INPUT_TYPE_DOCUMENT_TYPE_FIELDS),
-			properties: list(GQL_INPUT_TYPE_DOCUMENT_TYPE_PROPERTIES)
+			fields: list(glue.getInputType(GQL_INPUT_TYPE_DOCUMENT_TYPE_FIELDS_NAME)),
+			properties: list(glue.getInputType(GQL_INPUT_TYPE_DOCUMENT_TYPE_PROPERTIES_NAME))
 		},
 		resolve({args}) {
 			return updateDocumentType(args);
 		},
-		type: GQL_TYPE_DOCUMENT_TYPE
+		type: glue.getObjectType(GQL_TYPE_DOCUMENT_TYPE_NAME)
 	};
 }

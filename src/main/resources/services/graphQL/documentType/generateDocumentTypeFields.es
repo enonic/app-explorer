@@ -7,47 +7,28 @@ import {generateUpdateDocumentTypeField} from './generateUpdateDocumentTypeField
 
 
 export function generateDocumentTypeFields({
-	GQL_TYPE_ID,
-	GQL_TYPE_NAME,
-	glue,
-	schemaGenerator
+	glue
 }) {
-	const {
-		GQL_INPUT_TYPE_ADD_FIELDS,
-		GQL_INPUT_TYPE_DOCUMENT_TYPE_FIELDS,
-		GQL_INPUT_TYPE_DOCUMENT_TYPE_PROPERTIES,
-		GQL_TYPE_DOCUMENT_TYPE
-	} = generateDocumentTypeTypes({
+	const {GQL_INPUT_TYPE_ADD_FIELDS} = generateDocumentTypeTypes({
 		glue
 	});
 	return {
-		//GQL_TYPE_DOCUMENT_TYPE,
 		createDocumentTypeField: generateCreateDocumentTypeField({
 			GQL_INPUT_TYPE_ADD_FIELDS,
-			GQL_INPUT_TYPE_DOCUMENT_TYPE_FIELDS,
-			GQL_INPUT_TYPE_DOCUMENT_TYPE_PROPERTIES,
-			GQL_TYPE_DOCUMENT_TYPE,
-			GQL_TYPE_NAME
+			glue
 		}),
 		deleteDocumentTypeField: generateDeleteDocumentTypeField({
-			GQL_TYPE_ID,
-			schemaGenerator
+			glue
 		}),
 		getDocumentTypeField: generateGetDocumentTypeField({
-			GQL_TYPE_DOCUMENT_TYPE,
-			GQL_TYPE_ID
+			glue
 		}),
 		queryDocumentTypesField: generateQueryDocumentTypesField({
-			GQL_TYPE_DOCUMENT_TYPE,
-			schemaGenerator
+			glue
 		}),
 		updateDocumentTypeField: generateUpdateDocumentTypeField({
 			GQL_INPUT_TYPE_ADD_FIELDS,
-			GQL_INPUT_TYPE_DOCUMENT_TYPE_FIELDS,
-			GQL_INPUT_TYPE_DOCUMENT_TYPE_PROPERTIES,
-			GQL_TYPE_DOCUMENT_TYPE,
-			GQL_TYPE_ID,
-			GQL_TYPE_NAME
+			glue
 		})
 	};
 } // generateDocumentTypeFields

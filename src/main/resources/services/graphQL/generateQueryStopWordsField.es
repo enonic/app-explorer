@@ -19,10 +19,10 @@ export  function generateQueryStopWordsField({
 		name: 'StopWords',
 		//description:
 		fields: {
-			_id: { type: glue.scalarTypes._id },
-			_name: { type: glue.scalarTypes._name },
+			_id: { type: glue.getScalarType('_id') },
+			_name: { type: glue.getScalarType('_name') },
 			_nodeType: { type: GraphQLString }, // TODO nonNull?
-			_path: { type: glue.scalarTypes._path },
+			_path: { type: glue.getScalarType('_path') },
 			displayName: { type: nonNull(GraphQLString) },
 			words: { type: list(GraphQLString) }//,
 			//type: { type: nonNull(GraphQLString) }
@@ -61,9 +61,9 @@ export  function generateQueryStopWordsField({
 			name: 'QueryStopWords',
 			//description:
 			fields: {
-				count: { type: glue.scalarTypes.count },
+				count: { type: glue.getScalarType('count') },
 				hits: { type: list(STOPWORDS_OBJECT_TYPE) },
-				total: { type: glue.scalarTypes.total }
+				total: { type: glue.getScalarType('total') }
 			} // fields
 		})
 	};

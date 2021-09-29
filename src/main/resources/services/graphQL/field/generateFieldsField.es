@@ -6,34 +6,23 @@ import {generateUpdateFieldField} from './generateUpdateFieldField';
 
 
 export function generateFieldsField({
-	//GQL_INTERFACE_NODE,
-	GQL_TYPE_ID,
-	glue,
-	schemaGenerator
+	glue
 }) {
-	const {
-		GQL_TYPE_FIELD_NODE,
-		GQL_TYPE_FIELDS_QUERY_RESULT
-	} = generateFieldTypes({
-		//GQL_INTERFACE_NODE,
+	generateFieldTypes({
 		glue
 	});
 	return {
-		//GQL_TYPE_FIELD_NODE,
 		createFieldField: generateCreateFieldField({
-			//GQL_INTERFACE_NODE,
-			GQL_TYPE_FIELD_NODE
+			glue
 		}),
 		deleteFieldField: generateDeleteFieldField({
-			GQL_TYPE_ID,
-			schemaGenerator
+			glue
 		}),
 		queryFieldsField: generateQueryFieldsField({
-			GQL_TYPE_FIELDS_QUERY_RESULT
+			glue
 		}),
 		updateFieldField: generateUpdateFieldField({
-			GQL_TYPE_ID,
-			GQL_TYPE_FIELD_NODE
+			glue
 		})
 	};
 }

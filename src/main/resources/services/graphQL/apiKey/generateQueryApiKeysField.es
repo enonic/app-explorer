@@ -21,15 +21,8 @@ import {
 
 
 export function generateQueryApiKeysField({
-	GQL_TYPE_ID,
-	GQL_TYPE_NAME,
-	//GQL_TYPE_NODE_TYPE,
-	GQL_TYPE_PATH,
-	schemaGenerator
+	glue
 }) {
-	const {
-		createObjectType
-	} = schemaGenerator;
 	return {
 		args: {
 			count: GraphQLInt,
@@ -82,19 +75,19 @@ export function generateQueryApiKeysField({
 
 			return apiKeysRes;
 		},
-		type: createObjectType({
+		type: glue.addObjectType({
 			name: 'QueryApiKeys',
 			//description:
 			fields: {
 				total: { type: nonNull(GraphQLInt) },
 				count: { type: nonNull(GraphQLInt) },
-				hits: { type: list(createObjectType({
+				hits: { type: list(glue.addObjectType({
 					name: 'ApiKey',
 					fields: {
-						_id: { type: GQL_TYPE_ID },
-						_name: { type: GQL_TYPE_NAME },
+						_id: { type: glue.getScalarType('_id') },
+						_name: { type: glue.getScalarType('_name') },
 						_nodeType: { type: GraphQLString }, // TODO nonNull?
-						_path: { type: GQL_TYPE_PATH },
+						_path: { type: glue.getScalarType('_path') },
 						collections: { type: list(GraphQLString)},
 						interfaces: { type: list(GraphQLString)},
 						hashed: { type: nonNull(GraphQLBoolean) },

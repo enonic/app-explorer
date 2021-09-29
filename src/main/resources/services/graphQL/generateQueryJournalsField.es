@@ -16,10 +16,10 @@ export function generateQueryJournalsField({
 		name: 'Journal',
 		//description:
 		fields: {
-			_id: { type: glue.scalarTypes._id },
-			_name: { type: glue.scalarTypes._name },
+			_id: { type: glue.getScalarType('_id') },
+			_name: { type: glue.getScalarType('_name') },
 			_nodeType: { type: GraphQLString }, // TODO nonNull?
-			_path: { type: glue.scalarTypes._path },
+			_path: { type: glue.getScalarType('_path') },
 			displayName: { type: nonNull(GraphQLString) },
 			endTime: { type: nonNull(GraphQLString) },
 			errorCount: { type: nonNull(GraphQLInt) },
@@ -97,13 +97,13 @@ export function generateQueryJournalsField({
 			name: 'QueryJournals',
 			//description:
 			fields: {
-				count: { type: glue.scalarTypes.count },
+				count: { type: glue.getScalarType('count') },
 				page: { type: GraphQLInt },
 				pageStart: { type: GraphQLInt },
 				pageEnd: { type: GraphQLInt },
 				pagesTotal: { type: GraphQLInt },
 				hits: { type: list(JOURNAL_OBJECT_TYPE) },
-				total: { type: glue.scalarTypes.total }
+				total: { type: glue.getScalarType('total') }
 			} // fields
 		})
 	}; // queryJournals

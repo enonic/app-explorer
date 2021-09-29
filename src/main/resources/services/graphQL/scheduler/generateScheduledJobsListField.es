@@ -32,7 +32,7 @@ export function generateScheduledJobsListField({
 			//log.debug(`scheduledJobs:${toStr(scheduledJobs)}`);
 			return scheduledJobs;
 		}, // resolve
-		type: list(glue.objectTypes[GQL_TYPE_JOB_NAME])
+		type: list(glue.getObjectType(GQL_TYPE_JOB_NAME))
 	};
 }
 

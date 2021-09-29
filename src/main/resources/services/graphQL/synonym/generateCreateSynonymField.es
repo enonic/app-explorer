@@ -11,17 +11,18 @@ import {createRandomNamed} from '/lib/explorer/node/createRandomNamed';
 import {coerseSynonymType} from '/lib/explorer/synonym/coerseSynonymType';
 import {reference} from '/lib/xp/value';
 
+import {GQL_TYPE_SYNONYM_NAME} from '../constants';
+
 
 export function generateCreateSynonymField({
 	GQL_TYPE_FROM,
-	GQL_TYPE_ID,
 	GQL_TYPE_TO,
-	GQL_TYPE_SYNONYM
+	glue
 }) {
 	return {
 		args: {
 			from: GQL_TYPE_FROM,
-			thesaurusId: GQL_TYPE_ID,
+			thesaurusId: glue.getScalarType('_id'),
 			to: GQL_TYPE_TO
 		},
 		resolve({
@@ -65,6 +66,6 @@ export function generateCreateSynonymField({
 
 			return coerseSynonymType(createRes);
 		},
-		type: GQL_TYPE_SYNONYM
+		type: glue.getObjectType(GQL_TYPE_SYNONYM_NAME)
 	};
 }

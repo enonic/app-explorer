@@ -27,6 +27,7 @@ import {generateGetLocalesField} from './generateGetLocalesField';
 import {generateGetSitesField} from './generateGetSitesField';
 import {generateInterfaces} from './generateInterfaces';
 import {generateListTasksField} from './generateListTasksField';
+import {generateNoQLTypes} from './generateNoQLTypes';
 import {generateQueryJournalsField} from './generateQueryJournalsField';
 import {generateQueryStopWordsField} from './generateQueryStopWordsField';
 import {generateReferencedByField} from './generateReferencedByField';
@@ -47,67 +48,41 @@ import {generateThesaurusFields} from './thesaurus/generateThesaurusFields';
 
 const glue = new Glue();
 
-const {
-	GQL_TYPE_COUNT,
-	GQL_TYPE_ID,
-	GQL_TYPE_NAME,
-	GQL_TYPE_NODE_DELETED,
-	GQL_TYPE_NODE_TYPE,
-	GQL_TYPE_PATH,
-	GQL_TYPE_TOTAL
-} = generateTypes({
-	glue
-});
+generateTypes({glue});
+generateNoQLTypes({glue});
 
 const {schemaGenerator} = glue;
 
 const queryApiKeysField = generateQueryApiKeysField({
-	GQL_TYPE_ID,
-	GQL_TYPE_NAME,
-	//GQL_TYPE_NODE_TYPE,
-	GQL_TYPE_PATH,
-	schemaGenerator
+	glue
 });
 
 const {
-	//GQL_TYPE_COLLECTION,
 	createCollectionField,
 	queryCollectionsField,
 	reindexCollectionsField,
 	updateCollectionField
 } = generateCollectionFields({
-	glue,
-	GQL_TYPE_ID,
-	GQL_TYPE_NAME,
-	GQL_TYPE_NODE_TYPE,
-	schemaGenerator
+	glue
 });
 
 const {
-	//GQL_TYPE_DOCUMENT_TYPE,
 	createDocumentTypeField,
 	deleteDocumentTypeField,
 	getDocumentTypeField,
 	queryDocumentTypesField,
 	updateDocumentTypeField
 } = generateDocumentTypeFields({
-	GQL_TYPE_ID,
-	GQL_TYPE_NAME,
-	glue,
-	schemaGenerator
+	glue
 });
 
 const {
-	//GQL_TYPE_FIELD_NODE,
 	createFieldField,
 	deleteFieldField,
 	queryFieldsField,
 	updateFieldField
 } = generateFieldsField({
-	//GQL_INTERFACE_NODE,
-	GQL_TYPE_ID,
-	glue,
-	schemaGenerator
+	glue
 });
 
 const getContentTypesField = generateGetContentTypesField({
@@ -122,15 +97,9 @@ const {
 	createSynonymField,
 	deleteSynonymField,
 	querySynonymsField,
-	updateSynonymField,
-	GQL_TYPE_SYNONYM
+	updateSynonymField
 } = generateSynonymFields({
-	GQL_TYPE_ID,
-	//GQL_TYPE_NAME,
-	GQL_TYPE_NODE_DELETED,
-	GQL_TYPE_NODE_TYPE,
-	GQL_TYPE_PATH,
-	schemaGenerator
+	glue
 });
 
 const {
@@ -139,14 +108,7 @@ const {
 	queryThesauriField,
 	updateThesaurusField
 } = generateThesaurusFields({
-	GQL_TYPE_COUNT,
-	GQL_TYPE_ID,
-	GQL_TYPE_NAME,
-	//GQL_TYPE_NODE_TYPE,
-	GQL_TYPE_PATH,
-	GQL_TYPE_SYNONYM,
-	GQL_TYPE_TOTAL,
-	schemaGenerator
+	glue
 });
 
 generateInterfaces({
@@ -245,10 +207,12 @@ const {
 	createSchema
 } = schemaGenerator;
 
-log.debug(`Object.keys(glue.objectTypes).sort():${toStr(Object.keys(glue.objectTypes).sort())}`);
+log.debug(`glue.getSortedObjectTypeNames():${toStr(glue.getSortedObjectTypeNames())}`);
+
+//const objectTypes = glue.getObjectTypes();
 
 export const SCHEMA = createSchema({
-	//dictionary: Object.keys(glue.objectTypes).map((k) => glue.objectTypes[k]), // Necessary for types accessed through references
+	//dictionary: Object.keys(objectTypes).map((k) => objectTypes[k]), // Necessary for types accessed through references
 	mutation,
 	query
 }); // SCHEMA

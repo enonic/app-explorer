@@ -8,20 +8,13 @@ import {NT_DOCUMENT_TYPE} from '/lib/explorer/documentType/constants';
 import {PRINCIPAL_EXPLORER_READ} from '/lib/explorer/model/2/constants';
 import {hasValue} from '/lib/explorer/query/hasValue';
 import {connect} from '/lib/explorer/repo/connect';
-import {
-	GraphQLInt,
-	nonNull,
-	list
-} from '/lib/graphql';
+
+import {GQL_TYPE_DOCUMENT_TYPE_QUERY_RESULT_NAME} from '../constants';
 
 
 export function generateQueryDocumentTypesField({
-	GQL_TYPE_DOCUMENT_TYPE,
-	schemaGenerator
+	glue
 }) {
-	const {
-		createObjectType
-	} = schemaGenerator;
 	return {
 		resolve: () => {
 			const readConnection = connect({ principals: [PRINCIPAL_EXPLORER_READ] });
@@ -37,15 +30,6 @@ export function generateQueryDocumentTypesField({
 				.map(({id}) => coerseDocumentType(readConnection.get(id)));
 			return res;
 		}, // resolve
-		type: createObjectType({
-			name: 'QueryDocumentType',
-			fields: {
-				total: { type: nonNull(GraphQLInt) },
-				count: { type: nonNull(GraphQLInt) },
-				hits: {
-					type: list(GQL_TYPE_DOCUMENT_TYPE)
-				}
-			}
-		}) // type
+		type: glue.getObjectType(GQL_TYPE_DOCUMENT_TYPE_QUERY_RESULT_NAME)
 	};
 }

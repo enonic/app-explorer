@@ -9,7 +9,7 @@ import {
 } from '/lib/graphql';
 
 import {
-	//GQL_INTERFACE_NODE_NAME,
+	GQL_TYPE_REFERENCED_BY_HITS_NAME,
 	GQL_TYPE_REFERENCED_BY_NAME
 } from './constants';
 import {referencedByMapped} from './referencedByMapped';
@@ -20,7 +20,7 @@ export function generateReferencedByField({
 }) {
 	return {
 		args: {
-			_id: glue.scalarTypes._id
+			_id: glue.getScalarType('_id')
 		},
 		resolve: ({args: {_id}}) => referencedByMapped({_id}),
 		type: glue.addObjectType({
@@ -28,14 +28,13 @@ export function generateReferencedByField({
 			fields: {
 				count: { type: nonNull(GraphQLInt) },
 				hits: {
-					//type: list(reference(GQL_INTERFACE_NODE_NAME))
 					type: list(glue.addObjectType({
-						name: 'referencedByHits',
+						name: GQL_TYPE_REFERENCED_BY_HITS_NAME,
 						fields: {
-							_id: { type: glue.scalarTypes._id },
-							_name: { type: glue.scalarTypes._name },
-							_nodeType: { type: glue.scalarTypes._nodeType },
-							_path: { type: glue.scalarTypes._path },
+							_id: { type: glue.getScalarType('_id') },
+							_name: { type: glue.getScalarType('_name') },
+							_nodeType: { type: glue.getScalarType('_nodeType') },
+							_path: { type: glue.getScalarType('_path') },
 							_score: { type: nonNull(GraphQLFloat) },
 							referencedBy: {
 								resolve: ({source: {_id}}) => referencedByMapped({_id}),

@@ -1,20 +1,20 @@
 //import {toStr} from '@enonic/js-utils';
 
+import {coerseFieldType} from '/lib/explorer/field/coerseFieldType';
+import {getFields} from '/lib/explorer/field/getFields';
+import {PRINCIPAL_EXPLORER_READ} from '/lib/explorer/model/2/constants';
+import {connect} from '/lib/explorer/repo/connect';
 import {
 	GraphQLBoolean,
 	GraphQLString,
 	list
 } from '/lib/graphql';
 
-import {PRINCIPAL_EXPLORER_READ} from '/lib/explorer/model/2/constants';
-import {connect} from '/lib/explorer/repo/connect';
-import {getFields} from '/lib/explorer/field/getFields';
-
-import {coerseFieldType} from '/lib/explorer/field/coerseFieldType';
+import {GQL_TYPE_FIELDS_QUERY_RESULT_NAME} from '../constants';
 
 
 export function generateQueryFieldsField({
-	GQL_TYPE_FIELDS_QUERY_RESULT
+	glue
 }) {
 	return {
 		args: {
@@ -47,6 +47,6 @@ export function generateQueryFieldsField({
 
 			return fieldsRes;
 		},
-		type: GQL_TYPE_FIELDS_QUERY_RESULT
+		type: glue.getObjectType(GQL_TYPE_FIELDS_QUERY_RESULT_NAME)
 	};
 }

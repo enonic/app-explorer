@@ -2,18 +2,17 @@ import {
 	GraphQLBoolean,
 	GraphQLInt,
 	GraphQLString,
-	nonNull/*,
-	reference*/
+	nonNull
 } from '/lib/graphql';
 
 import {coerseFieldType} from '/lib/explorer/field/coerseFieldType';
 import {createField} from '/lib/explorer/field/createField';
 
-//import {GQL_INTERFACE_NODE_NAME} from '../constants';
+import {GQL_TYPE_FIELD_NODE_NAME} from '../constants';
 
 
 export function generateCreateFieldField({
-	GQL_TYPE_FIELD_NODE
+	glue
 }) {
 	return {
 		args: {
@@ -37,7 +36,6 @@ export function generateCreateFieldField({
 		}) {
 			return coerseFieldType(createField(args));
 		},
-		type: GQL_TYPE_FIELD_NODE
-		//type: reference(GQL_INTERFACE_NODE_NAME)
+		type: glue.getObjectType(GQL_TYPE_FIELD_NODE_NAME)
 	};
 }

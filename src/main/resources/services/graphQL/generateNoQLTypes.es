@@ -4,57 +4,41 @@ import {
 	nonNull
 } from '/lib/graphql';
 
+import {GQL_INPUT_TYPE_QUERY_FILTERS_NAME} from './constants';
+
 
 export function generateNoQLTypes({
-	schemaGenerator
+	glue
 }) {
-
-	const {
-		createInputObjectType
-	} = schemaGenerator;
-
-	const HAS_VALUE_FILTER_OBJECT_TYPE = createInputObjectType({
-		name: 'HasValueFilter',
-		//description:,
-		fields: {
-			field: { type: nonNull(GraphQLString) },
-			values: { type: nonNull(list(nonNull(GraphQLString)))}
-		}
-	});
-
-	const IDS_FILTER_INPUT_OBJECT_TYPE = createInputObjectType({
-		name: 'IdsFilter',
-		//description:,
-		fields: {
-			values: { type: nonNull(list(nonNull(GraphQLString)))}
-		}
-	});
-
-	const FILTERS_OBJECT_TYPE = createInputObjectType({
+	const FILTERS_OBJECT_TYPE = glue.addInputType({
 		name: 'Filters',
-		//description:,
 		fields: {
-			hasValue: { type: HAS_VALUE_FILTER_OBJECT_TYPE },
-			ids: { type: IDS_FILTER_INPUT_OBJECT_TYPE }
+			hasValue: { type: glue.addInputType({
+				name: 'HasValueFilter',
+				fields: {
+					field: { type: nonNull(GraphQLString) },
+					values: { type: nonNull(list(nonNull(GraphQLString)))}
+				}
+			})},
+			ids: { type: glue.addInputType({
+				name: 'IdsFilter',
+				fields: {
+					values: { type: nonNull(list(nonNull(GraphQLString)))}
+				}
+			})}
 		}
 	});
-
-	return {
-		QUERY_FILTERS_INPUT_OBJECT_TYPE: createInputObjectType({
-			name: 'QueryFilters',
-			//description:,
-			fields: {
-				boolean: { type: createInputObjectType({
-					name: 'BooleanFilter',
-					//description:,
-					fields: {
-						must: { type: FILTERS_OBJECT_TYPE },
-						mustNot: { type: FILTERS_OBJECT_TYPE },
-						should: { type: FILTERS_OBJECT_TYPE }
-					}
-				}) }
-			}
-		})
-	}; // return
-
+	glue.addInputType({
+		name: GQL_INPUT_TYPE_QUERY_FILTERS_NAME,
+		fields: {
+			boolean: { type: glue.addInputType({
+				name: 'BooleanFilter',
+				fields: {
+					must: { type: FILTERS_OBJECT_TYPE },
+					mustNot: { type: FILTERS_OBJECT_TYPE },
+					should: { type: FILTERS_OBJECT_TYPE }
+				}
+			}) }
+		}
+	});
 } // generateNoQlTypes

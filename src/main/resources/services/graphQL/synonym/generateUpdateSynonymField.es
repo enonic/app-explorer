@@ -8,16 +8,17 @@ import {get} from '/lib/explorer/node/get';
 import {connect} from '/lib/explorer/repo/connect';
 import {coerseSynonymType} from '/lib/explorer/synonym/coerseSynonymType';
 
+import {GQL_TYPE_SYNONYM_NAME} from '../constants';
+
 
 export function generateUpdateSynonymField({
 	GQL_TYPE_FROM,
-	GQL_TYPE_ID,
 	GQL_TYPE_TO,
-	GQL_TYPE_SYNONYM
+	glue
 }) {
 	return {
 		args: {
-			_id: GQL_TYPE_ID,
+			_id: glue.getScalarType('_id'),
 			from: GQL_TYPE_FROM,
 			to: GQL_TYPE_TO
 		},
@@ -60,6 +61,6 @@ export function generateUpdateSynonymField({
 			//log.debug(`modifyRes:${toStr(modifyRes)}`);
 			return coerseSynonymType(modifyRes);
 		},
-		type: GQL_TYPE_SYNONYM
+		type: glue.getObjectType(GQL_TYPE_SYNONYM_NAME)
 	};
 }

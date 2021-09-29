@@ -7,16 +7,20 @@ import {
 	nonNull
 } from '/lib/graphql';
 
+import {
+	GQL_INPUT_TYPE_THESAURUS_LANGUAGE_NAME,
+	GQL_TYPE_THESAURUS_NAME
+} from '../constants';
+
 
 export function generateUpdateThesaurusField({
-	GQL_INPUT_TYPE_THESAURUS_LANGUAGE,
-	GQL_TYPE_THESAURUS
+	glue
 }) {
 	return {
 		args: {
 			_id: nonNull(GraphQLString),
 			_name: nonNull(GraphQLString),
-			language: GQL_INPUT_TYPE_THESAURUS_LANGUAGE
+			language: glue.getInputType(GQL_INPUT_TYPE_THESAURUS_LANGUAGE_NAME)
 		},
 		resolve({
 			args: {
@@ -68,6 +72,6 @@ export function generateUpdateThesaurusField({
 			writeConnection.refresh();
 			return modifiedNode;
 		},
-		type: GQL_TYPE_THESAURUS
+		type: glue.getObjectType(GQL_TYPE_THESAURUS_NAME)
 	};
 }

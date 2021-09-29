@@ -1,19 +1,20 @@
 import {getDocumentType} from '/lib/explorer/documentType/getDocumentType';
 
+import {GQL_TYPE_DOCUMENT_TYPE_NAME} from '../constants';
+
 
 export function generateGetDocumentTypeField({
-	GQL_TYPE_DOCUMENT_TYPE,
-	GQL_TYPE_ID
+	glue
 }) {
 	return {
 		args: {
-			_id: GQL_TYPE_ID
+			_id: glue.getScalarType('_id')
 		},
 		resolve: ({
 			args: {
 				_id
 			}
 		}) => getDocumentType({_id}),
-		type: GQL_TYPE_DOCUMENT_TYPE
+		type: glue.getObjectType(GQL_TYPE_DOCUMENT_TYPE_NAME)
 	};
 }
