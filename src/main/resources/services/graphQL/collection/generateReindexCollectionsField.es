@@ -4,9 +4,11 @@ import {
 	list
 } from '/lib/graphql';
 
+import {GQL_TYPE_COLLECTION_REINDEX_REPORT} from '../constants';
+
 
 export function generateReindexCollectionsField({
-	GQL_TYPE_REINDEX_COLLECTIONS_REPORT
+	glue
 }) {
 	return {
 		args: {
@@ -17,6 +19,6 @@ export function generateReindexCollectionsField({
 				collectionIds = []
 			} = {}
 		}) => reindexCollections({collectionIds}),
-		type: list(GQL_TYPE_REINDEX_COLLECTIONS_REPORT)
+		type: list(glue.getObjectType(GQL_TYPE_COLLECTION_REINDEX_REPORT))
 	};
 }

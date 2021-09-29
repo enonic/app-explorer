@@ -21,19 +21,13 @@ import {
 export function generateInterfaces({
 	glue
 }) {
-
-	const {
-		objectTypes,
-		scalarTypes
-	} = glue;
-
 	glue.addInterfaceType({
 		name: GQL_INTERFACE_NODE_NAME,
 		fields: {
-			_id: { type: scalarTypes._id },
-			_name: { type: scalarTypes._name },
-			_nodeType: { type: scalarTypes._nodeType },
-			_path: { type: scalarTypes._path },
+			_id: { type: glue.getScalarType('_id') },
+			_name: { type: glue.getScalarType('_name') },
+			_nodeType: { type: glue.getScalarType('_nodeType') },
+			_path: { type: glue.getScalarType('_path') },
 			referencedBy: {
 				//resolve: ({source: {_id}}) => referencedByMapped({_id}),
 				//type: reference(GQL_INTERFACE_NODE_NAME)
@@ -47,16 +41,16 @@ export function generateInterfaces({
 			log.debug(`_nodeType:${toStr(_nodeType)}`);
 			switch (_nodeType) {
 			case NT_COLLECTION:
-				return objectTypes[GQL_TYPE_COLLECTION_NAME];//GQL_TYPE_COLLECTION;
+				return glue.getObjectType(GQL_TYPE_COLLECTION_NAME);
 			case NT_DOCUMENT_TYPE:
-				return objectTypes[GQL_TYPE_DOCUMENT_TYPE_NAME];//GQL_TYPE_DOCUMENT_TYPE;
+				return glue.getObjectType(GQL_TYPE_DOCUMENT_TYPE_NAME);
 			case NT_FIELD:
-				return objectTypes[GQL_TYPE_FIELD_NODE_NAME];//GQL_TYPE_FIELD_NODE;
+				return glue.getObjectType(GQL_TYPE_FIELD_NODE_NAME);
 			default: {
 				const msg = `Unhandeled _nodeType:${_nodeType}!`;
 				log.error(msg);
 				//throw new Error(msg);
-				return objectTypes[GQL_TYPE_FIELD_NODE_NAME];
+				return glue.getObjectType(GQL_TYPE_FIELD_NODE_NAME);
 			}
 			}
 		}

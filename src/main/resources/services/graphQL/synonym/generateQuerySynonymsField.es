@@ -5,23 +5,20 @@ import {
 	GraphQLString
 } from '/lib/graphql';
 
-import {generateNoQLTypes} from '../generateNoQLTypes';
+import {
+	GQL_INPUT_TYPE_QUERY_FILTERS_NAME,
+	GQL_TYPE_SYNONYMS_QUERY_RESULT_NAME
+} from '../constants';
 import {querySynonyms} from './querySynonyms';
 
 
 export function generateQuerySynonymsField({
-	GQL_TYPE_OBJECT_SYNONYMS_QUERY,
-	schemaGenerator
+	glue
 }) {
-	const {
-		QUERY_FILTERS_INPUT_OBJECT_TYPE
-	} = generateNoQLTypes({
-		schemaGenerator
-	});
 	return {
 		args: {
 			count: GraphQLInt,
-			filters: QUERY_FILTERS_INPUT_OBJECT_TYPE,
+			filters: glue.getInputType(GQL_INPUT_TYPE_QUERY_FILTERS_NAME),
 			query: GraphQLString,
 			sort: GraphQLString,
 			start: GraphQLInt
@@ -30,7 +27,7 @@ export function generateQuerySynonymsField({
 			//log.info(`env:${toStr(env)}`);
 			return querySynonyms(env.args);
 		},
-		type: GQL_TYPE_OBJECT_SYNONYMS_QUERY
+		type: glue.getObjectType(GQL_TYPE_SYNONYMS_QUERY_RESULT_NAME)
 	};
 }
 

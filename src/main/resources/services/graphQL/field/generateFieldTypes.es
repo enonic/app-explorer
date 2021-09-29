@@ -14,7 +14,8 @@ import {
 
 import {
 	//GQL_INTERFACE_NODE_NAME,
-	GQL_TYPE_FIELD_NODE_NAME
+	GQL_TYPE_FIELD_NODE_NAME,
+	GQL_TYPE_FIELDS_QUERY_RESULT_NAME
 } from '../constants';
 import {GQL_TYPE_REFERENCED_BY_NAME} from '../generateReferencedByField';
 import {referencedByMapped} from '../referencedByMapped';
@@ -37,13 +38,8 @@ import {referencedByMapped} from '../referencedByMapped';
 
 
 export function generateFieldTypes({
-	//GQL_INTERFACE_NODE,
 	glue
 }) {
-	const {
-		scalarTypes
-	} = glue;
-
 	const INSTRUCTION_CUSTOM = 'custom';
 
 	const GQL_ENUM_INSTRUCTION = glue.addEnumType({
@@ -68,7 +64,7 @@ export function generateFieldTypes({
 	});
 
 	const GQL_FIELDS_FIELD_COMMON = {
-		_name: { type: scalarTypes._name },
+		_name: { type: glue.getScalarType('_name') },
 		decideByType: { type: GraphQLBoolean }, // TODO nonNull?
 		denyDelete: { type: GraphQLBoolean },
 		description: { type: GraphQLString },
@@ -100,32 +96,30 @@ export function generateFieldTypes({
 		}
 	});
 
-	return {
-		GQL_TYPE_FIELD_NODE: glue.addObjectType({
-			name: GQL_TYPE_FIELD_NODE_NAME,
-			fields: {
-				...GQL_FIELDS_FIELD_COMMON,
-				_id: { type: scalarTypes._id },
-				_nodeType: { type: nonNull(GraphQLString) },
-				_path: { type: scalarTypes._path }
-			}/*,
-			interfaces: [
-				//reference(GQL_INTERFACE_NODE_NAME)
-				GQL_INTERFACE_NODE
-			]*/
-		}),
-		GQL_TYPE_FIELDS_QUERY_RESULT: glue.addObjectType({
-			name: 'FieldsQueryResult',
-			//description:
-			fields: {
-				total: { type: nonNull(GraphQLInt) },
-				count: { type: nonNull(GraphQLInt) },
-				/*page: { type: nonNull(GraphQLInt) },
-				pageStart: { type: nonNull(GraphQLInt) },
-				pageEnd: { type: nonNull(GraphQLInt) },
-				pagesTotal: { type: nonNull(GraphQLInt) },*/
-				hits: { type: list(GQL_TYPE_FIELD) }
-			} // fields
-		})
-	};
+	glue.addObjectType({
+		name: GQL_TYPE_FIELD_NODE_NAME,
+		fields: {
+			...GQL_FIELDS_FIELD_COMMON,
+			_id: { type: glue.getScalarType('_id') },
+			_nodeType: { type: nonNull(GraphQLString) },
+			_path: { type: glue.getScalarType('_path') }
+		}/*,
+		interfaces: [
+			//reference(GQL_INTERFACE_NODE_NAME)
+			GQL_INTERFACE_NODE
+		]*/
+	});
+
+	glue.addObjectType({
+		name: GQL_TYPE_FIELDS_QUERY_RESULT_NAME,
+		fields: {
+			total: { type: nonNull(GraphQLInt) },
+			count: { type: nonNull(GraphQLInt) },
+			/*page: { type: nonNull(GraphQLInt) },
+			pageStart: { type: nonNull(GraphQLInt) },
+			pageEnd: { type: nonNull(GraphQLInt) },
+			pagesTotal: { type: nonNull(GraphQLInt) },*/
+			hits: { type: list(GQL_TYPE_FIELD) }
+		} // fields
+	});
 } // generateFieldTypes

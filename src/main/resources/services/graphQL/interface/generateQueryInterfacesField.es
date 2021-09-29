@@ -21,10 +21,10 @@ export function generateQueryInterfacesField({
 	const INTERFACE_OBJECT_TYPE = glue.addObjectType({
 		name: 'Interface',
 		fields: {
-			_id: { type: glue.scalarTypes._id },
-			_name: { type: glue.scalarTypes._name },
+			_id: { type: glue.getScalarType('_id') },
+			_name: { type: glue.getScalarType('_name') },
 			_nodeType: { type: GraphQLString }, // TODO nonNull?
-			_path: { type: glue.scalarTypes._path },
+			_path: { type: glue.getScalarType('_path') },
 			displayName: { type: nonNull(GraphQLString) },
 			//name: { type: nonNull(GraphQLString) } // Same as displayName
 			synonyms: { type: list(GraphQLString) }//,
@@ -62,9 +62,9 @@ export function generateQueryInterfacesField({
 		type: glue.addObjectType({
 			name: 'QueryInterfaces',
 			fields: {
-				count: { type: glue.scalarTypes.count },
+				count: { type: glue.getScalarType('count') },
 				hits: { type: list(INTERFACE_OBJECT_TYPE) },
-				total: { type: glue.scalarTypes.total }
+				total: { type: glue.getScalarType('total') }
 			} // fields
 		})
 	};

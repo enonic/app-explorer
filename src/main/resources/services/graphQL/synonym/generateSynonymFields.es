@@ -6,48 +6,32 @@ import {generateUpdateSynonymField} from './generateUpdateSynonymField';
 
 
 export function generateSynonymFields({
-	GQL_TYPE_ID,
-	//GQL_TYPE_NAME,
-	GQL_TYPE_NODE_DELETED,
-	GQL_TYPE_NODE_TYPE,
-	GQL_TYPE_PATH,
-	schemaGenerator
+	glue
 }) {
 
 	const {
 		GQL_TYPE_FROM,
-		GQL_TYPE_TO,
-		GQL_TYPE_OBJECT_SYNONYMS_QUERY,
-		GQL_TYPE_SYNONYM
+		GQL_TYPE_TO
 	} = generateSynonymTypes({
-		GQL_TYPE_ID,
-		//GQL_TYPE_NAME,
-		GQL_TYPE_NODE_TYPE,
-		GQL_TYPE_PATH,
-		schemaGenerator
+		glue
 	});
 
 	return {
-		GQL_TYPE_SYNONYM,
 		createSynonymField: generateCreateSynonymField({
 			GQL_TYPE_FROM,
-			GQL_TYPE_ID,
 			GQL_TYPE_TO,
-			GQL_TYPE_SYNONYM
+			glue
 		}),
 		deleteSynonymField: generateDeleteSynonymField({
-			GQL_TYPE_ID,
-			GQL_TYPE_NODE_DELETED
+			glue
 		}),
 		querySynonymsField: generateQuerySynonymsField({
-			GQL_TYPE_OBJECT_SYNONYMS_QUERY,
-			schemaGenerator
+			glue
 		}),
 		updateSynonymField: generateUpdateSynonymField({
 			GQL_TYPE_FROM,
-			GQL_TYPE_ID,
 			GQL_TYPE_TO,
-			GQL_TYPE_SYNONYM
+			glue
 		})
 	}; // return
 

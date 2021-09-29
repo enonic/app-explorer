@@ -6,49 +6,23 @@ import {generateUpdateThesaurusField} from './generateUpdateThesaurusField';
 
 
 export function generateThesaurusFields({
-	GQL_TYPE_COUNT,
-	GQL_TYPE_ID,
-	GQL_TYPE_NAME,
-	//GQL_TYPE_NODE_TYPE,
-	GQL_TYPE_PATH,
-	GQL_TYPE_SYNONYM,
-	GQL_TYPE_TOTAL,
-	schemaGenerator
+	glue
 }) {
-	const {
-		GQL_INPUT_TYPE_THESAURUS_LANGUAGE,
-		GQL_TYPE_THESAURUS,
-		GQL_TYPE_THESAURUS_LANGUAGE
-	} = generateThesaurusTypes({
-		GQL_TYPE_ID,
-		GQL_TYPE_NAME,
-		//GQL_TYPE_NODE_TYPE,
-		GQL_TYPE_PATH,
-		schemaGenerator
+	generateThesaurusTypes({
+		glue
 	});
 	return {
 		createThesaurusField: generateCreateThesaurusField({
-			GQL_INPUT_TYPE_THESAURUS_LANGUAGE,
-			GQL_TYPE_THESAURUS
+			glue
 		}),
 		deleteThesaurusField: generateDeleteThesaurusField({
-			GQL_TYPE_ID,
-			schemaGenerator
+			glue
 		}),
 		queryThesauriField: generateQueryThesauriField({
-			GQL_TYPE_COUNT,
-			GQL_TYPE_ID,
-			GQL_TYPE_NAME,
-			//GQL_TYPE_NODE_TYPE,
-			GQL_TYPE_PATH,
-			GQL_TYPE_SYNONYM,
-			GQL_TYPE_THESAURUS_LANGUAGE,
-			GQL_TYPE_TOTAL,
-			schemaGenerator
+			glue
 		}),
 		updateThesaurusField: generateUpdateThesaurusField({
-			GQL_INPUT_TYPE_THESAURUS_LANGUAGE,
-			GQL_TYPE_THESAURUS
+			glue
 		})
 	};
 }

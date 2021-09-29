@@ -3,14 +3,15 @@
 import {PRINCIPAL_EXPLORER_WRITE} from '/lib/explorer/model/2/constants';
 import {connect} from '/lib/explorer/repo/connect';
 
+import {GQL_TYPE_NODE_DELETED_NAME} from '../constants';
+
 
 export function generateDeleteSynonymField({
-	GQL_TYPE_ID,
-	GQL_TYPE_NODE_DELETED
+	glue
 }) {
 	return {
 		args: {
-			_id: GQL_TYPE_ID
+			_id: glue.getScalarType('_id')
 		},
 		resolve({
 			args: {
@@ -28,6 +29,6 @@ export function generateDeleteSynonymField({
 				_id: array[0]
 			};
 		},
-		type: GQL_TYPE_NODE_DELETED
+		type: glue.getObjectType(GQL_TYPE_NODE_DELETED_NAME)
 	};
 }

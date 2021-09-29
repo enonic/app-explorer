@@ -1,20 +1,23 @@
 import {createDocumentType} from '/lib/explorer/documentType/createDocumentType';
 import {list} from '/lib/graphql';
 
+import {
+	GQL_INPUT_TYPE_DOCUMENT_TYPE_FIELDS_NAME,
+	GQL_INPUT_TYPE_DOCUMENT_TYPE_PROPERTIES_NAME,
+	GQL_TYPE_DOCUMENT_TYPE_NAME
+} from '../constants';
+
 
 export function generateCreateDocumentTypeField({
 	GQL_INPUT_TYPE_ADD_FIELDS,
-	GQL_INPUT_TYPE_DOCUMENT_TYPE_FIELDS,
-	GQL_INPUT_TYPE_DOCUMENT_TYPE_PROPERTIES,
-	GQL_TYPE_DOCUMENT_TYPE,
-	GQL_TYPE_NAME
+	glue
 }) {
 	return {
 		args: {
-			_name: GQL_TYPE_NAME,
+			_name: glue.getScalarType('_name'),
 			addFields: GQL_INPUT_TYPE_ADD_FIELDS,
-			fields: list(GQL_INPUT_TYPE_DOCUMENT_TYPE_FIELDS),
-			properties: list(GQL_INPUT_TYPE_DOCUMENT_TYPE_PROPERTIES)
+			fields: list(glue.getInputType(GQL_INPUT_TYPE_DOCUMENT_TYPE_FIELDS_NAME)),
+			properties: list(glue.getInputType(GQL_INPUT_TYPE_DOCUMENT_TYPE_PROPERTIES_NAME))
 		},
 		resolve({
 			args: {
@@ -26,6 +29,6 @@ export function generateCreateDocumentTypeField({
 		}) {
 			return createDocumentType({_name, addFields, fields, properties});
 		}, // resolve
-		type: GQL_TYPE_DOCUMENT_TYPE
+		type: glue.getObjectType(GQL_TYPE_DOCUMENT_TYPE_NAME)
 	};
 }

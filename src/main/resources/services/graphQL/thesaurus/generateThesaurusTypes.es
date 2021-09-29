@@ -1,45 +1,68 @@
 import {
+	GraphQLInt,
 	GraphQLString,
-	nonNull
+	nonNull,
+	list
 } from '/lib/graphql';
+
+import {
+	GQL_INPUT_TYPE_THESAURUS_LANGUAGE_NAME,
+	GQL_TYPE_SYNONYM_NAME,
+	GQL_TYPE_THESAURI_QUERY_HITS,
+	GQL_TYPE_THESAURI_QUERY_RESULT,
+	GQL_TYPE_THESAURUS_LANGUAGE_NAME,
+	GQL_TYPE_THESAURUS_NAME
+} from '../constants';
 
 
 export function generateThesaurusTypes({
-	GQL_TYPE_ID,
-	GQL_TYPE_NAME,
-	//GQL_TYPE_NODE_TYPE,
-	GQL_TYPE_PATH,
-	schemaGenerator
+	glue
 }) {
-	const {
-		createInputObjectType,
-		createObjectType
-	} = schemaGenerator;
-	const GQL_TYPE_THESAURUS_LANGUAGE = createObjectType({
-		name: 'ThesaurusLanguage',
+	glue.addInputType({
+		name: GQL_INPUT_TYPE_THESAURUS_LANGUAGE_NAME,
 		fields: {
 			from: { type: nonNull(GraphQLString)},
 			to: { type: nonNull(GraphQLString)}
 		}
 	});
-	return {
-		GQL_INPUT_TYPE_THESAURUS_LANGUAGE: createInputObjectType({
-			name: 'ThesaurusLanguageInput',
-			fields: {
-				from: { type: nonNull(GraphQLString)},
-				to: { type: nonNull(GraphQLString)}
-			}
-		}),
-		GQL_TYPE_THESAURUS: createObjectType({
-			name: 'Thesaurus',
-			fields: {
-				_id: { type: GQL_TYPE_ID },
-				_name: { type: GQL_TYPE_NAME },
-				_nodeType: { type: GraphQLString },
-				_path: { type: GQL_TYPE_PATH },
-				language: { type: GQL_TYPE_THESAURUS_LANGUAGE }
-			}
-		}),
-		GQL_TYPE_THESAURUS_LANGUAGE
-	};
+	glue.addObjectType({
+		name: GQL_TYPE_THESAURUS_NAME,
+		fields: {
+			_id: { type: glue.getScalarType('_id') },
+			_name: { type: glue.getScalarType('_name') },
+			_nodeType: { type: GraphQLString },
+			_path: { type: glue.getScalarType('_path') },
+			language: { type: glue.addObjectType({
+				name: GQL_TYPE_THESAURUS_LANGUAGE_NAME,
+				fields: {
+					from: { type: nonNull(GraphQLString)},
+					to: { type: nonNull(GraphQLString)}
+				}
+			})}
+		}
+	});
+	glue.addObjectType({
+		name: GQL_TYPE_THESAURI_QUERY_RESULT,
+		//description:
+		fields: {
+			count: { type: glue.getScalarType('count') },
+			hits: { type: list(glue.addObjectType({
+				name: GQL_TYPE_THESAURI_QUERY_HITS,
+				//description:
+				fields: {
+					_id: { type: glue.getScalarType('_id') },
+					_name: { type: glue.getScalarType('_name') },
+					_nodeType: { type: GraphQLString }, // TODO nonNull?
+					_path: { type: glue.getScalarType('_path') },
+					description: { type: nonNull(GraphQLString) },
+					//displayName: { type: nonNull(GraphQLString) },
+					language: { type: glue.getObjectType(GQL_TYPE_THESAURUS_LANGUAGE_NAME) },
+					synonyms: { type: glue.getObjectType(GQL_TYPE_SYNONYM_NAME) },
+					synonymsCount: { type: nonNull(GraphQLInt) }//,
+					//type: { type: nonNull(GraphQLString) }
+				}
+			}))},
+			total: { type: glue.getScalarType('total') }
+		} // fields
+	});
 } // generateThesaurusTypes

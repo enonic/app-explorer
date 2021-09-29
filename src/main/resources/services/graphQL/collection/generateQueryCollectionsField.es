@@ -12,6 +12,8 @@ import {getDocumentCount} from '/lib/explorer/collection/getDocumentCount';
 import {query as queryCollections} from '/lib/explorer/collection/query';
 import {usedInInterfaces} from '/lib/explorer/collection/usedInInterfaces';
 
+import {GQL_TYPE_COLLECTIONS_QUERY_RESULT} from '../constants';
+
 
 export const queryCollectionsResolver = ({
 	//count, // Preferring perPage for now
@@ -86,7 +88,7 @@ export const queryCollectionsResolver = ({
 
 
 export function generateQueryCollectionsField({
-	GQL_TYPE_COLLECTION_QUERY_RESULT
+	glue
 }) {
 	return {
 		args: {
@@ -101,6 +103,6 @@ export function generateQueryCollectionsField({
 			//log.info(`env:${toStr(env)}`);
 			return queryCollectionsResolver(env.args);
 		},
-		type: GQL_TYPE_COLLECTION_QUERY_RESULT
+		type: glue.getObjectType(GQL_TYPE_COLLECTIONS_QUERY_RESULT)
 	};
 }

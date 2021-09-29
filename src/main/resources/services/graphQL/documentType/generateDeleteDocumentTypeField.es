@@ -1,19 +1,15 @@
-import {
-	PRINCIPAL_EXPLORER_WRITE
-} from '/lib/explorer/model/2/constants';
+import {PRINCIPAL_EXPLORER_WRITE} from '/lib/explorer/model/2/constants';
 import {connect} from '/lib/explorer/repo/connect';
+
+import {GQL_TYPE_NODE_DELETED_NAME} from '../constants';
 
 
 export function generateDeleteDocumentTypeField({
-	GQL_TYPE_ID,
-	schemaGenerator
+	glue
 }) {
-	const {
-		createObjectType
-	} = schemaGenerator;
 	return {
 		args: {
-			_id: GQL_TYPE_ID
+			_id: glue.getScalarType('_id')
 		},
 		resolve({
 			args: {
@@ -29,11 +25,6 @@ export function generateDeleteDocumentTypeField({
 				_id: array[0]
 			};
 		},
-		type: createObjectType({
-			name: 'DeletedDocumentType',
-			fields: {
-				_id: { type: GQL_TYPE_ID }
-			}
-		})
+		type: glue.getObjectType(GQL_TYPE_NODE_DELETED_NAME)
 	};
 }

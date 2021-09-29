@@ -15,9 +15,9 @@ export function generateGetSitesField({
 		name: 'Site',
 		//description:,
 		fields: {
-			_id: { type: glue.scalarTypes._id },
-			_name: { type: glue.scalarTypes._name },
-			_path: { type: glue.scalarTypes._path },
+			_id: { type: glue.getScalarType('_id') },
+			_name: { type: glue.getScalarType('_name') },
+			_path: { type: glue.getScalarType('_path') },
 			displayName: { type: nonNull(GraphQLString) }
 		}
 	});
@@ -34,9 +34,9 @@ export function generateGetSitesField({
 			name: 'GetSites',
 			//description:
 			fields: {
-				count: { type: glue.scalarTypes.count },
+				count: { type: glue.getScalarType('count') },
 				hits: { type: list(SITE_OBJECT_TYPE) },
-				total: { type: glue.scalarTypes.total }
+				total: { type: glue.getScalarType('total') }
 			} // fields
 		})
 	};

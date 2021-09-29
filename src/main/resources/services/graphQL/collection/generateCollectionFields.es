@@ -6,39 +6,23 @@ import {generateUpdateCollectionField} from './generateUpdateCollectionField';
 
 
 export function generateCollectionFields({
-	GQL_TYPE_ID,
-	GQL_TYPE_NAME,
 	glue
 }) {
-	const {
-		GQL_INPUT_TYPE_COLLECTOR,
-		GQL_INPUT_TYPE_CRON,
-		GQL_TYPE_COLLECTION,
-		GQL_TYPE_COLLECTION_QUERY_RESULT,
-		GQL_TYPE_REINDEX_COLLECTIONS_REPORT
-	} = generateCollectionTypes({
+	generateCollectionTypes({
 		glue
 	});
 	return {
-		//GQL_TYPE_COLLECTION,
 		createCollectionField: generateCreateCollectionField({
-			GQL_TYPE_NAME,
-			GQL_INPUT_TYPE_COLLECTOR,
-			GQL_INPUT_TYPE_CRON,
-			GQL_TYPE_COLLECTION
+			glue
 		}),
 		queryCollectionsField: generateQueryCollectionsField({
-			GQL_TYPE_COLLECTION_QUERY_RESULT
+			glue
 		}),
 		reindexCollectionsField: generateReindexCollectionsField({
-			GQL_TYPE_REINDEX_COLLECTIONS_REPORT
+			glue
 		}),
 		updateCollectionField: generateUpdateCollectionField({
-			GQL_TYPE_ID,
-			GQL_TYPE_NAME,
-			GQL_INPUT_TYPE_COLLECTOR,
-			GQL_INPUT_TYPE_CRON,
-			GQL_TYPE_COLLECTION
+			glue
 		})
 	}; // return
 } // generateCollectionFields

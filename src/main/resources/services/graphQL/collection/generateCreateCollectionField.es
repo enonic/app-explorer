@@ -4,6 +4,7 @@ import {
 	NT_COLLECTION,
 	PRINCIPAL_EXPLORER_WRITE
 } from '/lib/explorer/model/2/constants';
+import {coerseCollectionType} from '/lib/explorer/collection/coerseCollectionType';
 import {createDocumentType} from '/lib/explorer/documentType/createDocumentType';
 import {exists} from '/lib/explorer/node/exists';
 import {connect} from '/lib/explorer/repo/connect';
@@ -17,26 +18,21 @@ import {
 import {getUser} from '/lib/xp/auth';
 import {reference} from '/lib/xp/value';
 
-//import {GQL_TYPE_NAME} from '../types';
+import {
+	GQL_INPUT_TYPE_COLLECTION_COLLECTOR_NAME,
+	GQL_INPUT_TYPE_COLLECTION_CRON_NAME,
+	GQL_TYPE_COLLECTION_NAME
+} from '../constants';
 
-import {coerseCollectionType} from '/lib/explorer/collection/coerseCollectionType';
-/*import {
-	GQL_INPUT_TYPE_COLLECTOR,
-	GQL_INPUT_TYPE_CRON,
-	GQL_TYPE_COLLECTION
-} from './types';*/
 
 export function generateCreateCollectionField({
-	GQL_TYPE_NAME,
-	GQL_INPUT_TYPE_COLLECTOR,
-	GQL_INPUT_TYPE_CRON,
-	GQL_TYPE_COLLECTION
+	glue
 }) {
 	return {
 		args: {
-			_name: GQL_TYPE_NAME,
-			collector: GQL_INPUT_TYPE_COLLECTOR,
-			cron: list(GQL_INPUT_TYPE_CRON),
+			_name: glue.getScalarType('_name'),
+			collector: glue.getInputType(GQL_INPUT_TYPE_COLLECTION_COLLECTOR_NAME),
+			cron: list(glue.getInputType(GQL_INPUT_TYPE_COLLECTION_CRON_NAME)),
 			doCollect: GraphQLBoolean,
 			documentTypeId: GraphQLID, // NOTE NOT nonNull
 			language: GraphQLString
@@ -131,6 +127,6 @@ export function generateCreateCollectionField({
 
 			return coerseCollectionType(createdNode);
 		},
-		type: GQL_TYPE_COLLECTION
+		type: glue.getObjectType(GQL_TYPE_COLLECTION_NAME)
 	};
 }
