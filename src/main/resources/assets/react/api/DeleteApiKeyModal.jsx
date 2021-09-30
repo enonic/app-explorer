@@ -11,20 +11,27 @@ export const DeleteApiKeyModal = (props) => {
 	//console.debug('props', props);
 	const {
 		_name,
-		onClose = () => {},
-		onOpen = () => {},
+		afterClose = () => {},
+		beforeOpen = () => {},
 		servicesBaseUrl
 	} = props;
 	const [state, setState] = React.useState({
 		open: false
 	});
+	const doClose = () => {
+		setState({open: false});
+		afterClose();
+	};
+	const doOpen = () => {
+		beforeOpen();
+		setState({open: true});
+	};
 	return <Modal
 		closeIcon
-		onClose={() => {
-			setState({open: false});
-			onClose();
+		onClose={doClose}
+		onOpen={()=>{
+			//console.debug('DeleteApiKeyModal onOpen');
 		}}
-		onOpen={onOpen}
 		open={state.open}
 		size='large'
 		trigger={<Popup
@@ -32,7 +39,7 @@ export const DeleteApiKeyModal = (props) => {
 			inverted
 			trigger={<Button
 				icon
-				onClick={() => setState({open: true})}
+				onClick={doOpen}
 			><Icon color='red' name='trash alternate outline'/></Button>}/>
 		}
 	>
@@ -46,8 +53,7 @@ export const DeleteApiKeyModal = (props) => {
 						method: 'DELETE'
 					}).then((/*response*/) => {
 						//if (response.status === 200) {}
-						setState({open: false});
-						onClose();
+						doClose();
 					});
 				}}
 			><Icon color='red' name='trash alternate outline'/>Confirm Delete</Button>

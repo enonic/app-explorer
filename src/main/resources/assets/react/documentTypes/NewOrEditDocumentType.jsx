@@ -126,8 +126,8 @@ const SCHEMA = {
 
 
 export function NewOrEditDocumentType({
-	doClose,
-	_id,
+	doClose = () => {},
+	_id, // optional
 	servicesBaseUrl
 }) {
 	const [initialValues, setInitialValues] = React.useState(false);

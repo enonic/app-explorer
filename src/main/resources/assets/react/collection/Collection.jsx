@@ -30,9 +30,9 @@ export function Collection(props) {
 		collectorComponents,
 		collectorOptions,
 		contentTypeOptions,
+		doClose,
 		fields = {},
 		locales, // []
-		onClose,
 		servicesBaseUrl,
 		siteOptions,
 		initialValues = {
@@ -125,7 +125,7 @@ export function Collection(props) {
 					variables
 				})
 			}).then(response => {
-				if (response.status === 200) { onClose(); }
+				if (response.status === 200) { doClose(); }
 			});
 		}}
 		schema={SCHEMA}

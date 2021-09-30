@@ -133,13 +133,13 @@ export const Api = (props) => {
 									collections,
 									interfaces
 								}}
-								onClose={() => {
-									//console.debug('onClose');
+								afterClose={() => {
+									//console.debug('NewOrEditApiKeyModal afterClose');
 									fetchApiKeys();
 									setBoolPoll(true);
 								}}
-								onOpen={() => {
-									console.debug('onOpen'); // For some reason does not get called???
+								beforeOpen={() => {
+									//console.debug('NewOrEditApiKeyModal beforeOpen');
 									setBoolPoll(false);
 								}}
 								queryCollectionsGraph={queryCollectionsGraph}
@@ -153,13 +153,13 @@ export const Api = (props) => {
 						<Table.Cell collapsing>
 							<DeleteApiKeyModal
 								_name={_name}
-								onClose={() => {
-									//console.debug('onClose');
+								afterClose={() => {
+									//console.debug('DeleteApiKeyModal afterClose');
 									fetchApiKeys();
 									setBoolPoll(true);
 								}}
-								onOpen={() => {
-									//console.debug('onOpen'); // For some reason does not get called???
+								beforeOpen={() => {
+									//console.debug('DeleteApiKeyModal beforeOpen');
 									setBoolPoll(false);
 								}}
 								servicesBaseUrl={servicesBaseUrl}
@@ -170,13 +170,13 @@ export const Api = (props) => {
 			</Table.Body>
 		</Table>
 		<NewOrEditApiKeyModal
-			onClose={() => {
-				//console.debug('onClose');
+			afterClose={() => {
+				//console.debug('NewOrEditApiKeyModal afterClose');
 				fetchApiKeys();
 				setBoolPoll(true);
 			}}
-			onOpen={() => {
-				//console.debug('onOpen'); // Why this one gets called and not the other ones is beyond me???
+			beforeOpen={() => {
+				//console.debug('NewOrEditApiKeyModal beforeOpen');
 				setBoolPoll(false);
 			}}
 			queryCollectionsGraph={queryCollectionsGraph}

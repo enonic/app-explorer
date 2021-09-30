@@ -58,11 +58,18 @@ export function DocumentTypes({
 	} // queryDocumentTypes
 
 	React.useEffect(() => {
+		// By default, useEffect() runs both after the first render and after every update.
+		// React guarantees the DOM has been updated by the time it runs the effects.
+		// React defers running useEffect until after the browser has painted, so doing extra work is less of a problem.
+		//console.debug('DocumentTypes useEffect');
 		queryDocumentTypes();
-	}, []);
+	}, []); // Only re-run the effect if whatevers inside [] changes
+	// An empty array [] means on mount and unmount. This tells React that your effect doesn’t depend on any values from props or state.
+	// If you pass an empty array ([]), the props and state inside the effect will always have their initial values
 
 	useInterval(() => {
-		// This will continue to run as long as the Collections "tab" is open
+		// This will not run when a modal popup is open
+		//console.debug('boolPoll', boolPoll);
 		if (boolPoll) {
 			queryDocumentTypes();
 		}
@@ -133,11 +140,14 @@ export function DocumentTypes({
 						<Table.Cell collapsing><NewOrEditDocumentTypeModal
 							_id={_id}
 							_name={_name}
+							collections={collections}
 							afterClose={() => {
+								//console.debug('NewOrEditDocumentTypeModal afterClose');
 								queryDocumentTypes();
 								setBoolPoll(true);
 							}}
-							onOpen={() => {
+							beforeOpen={() => {
+								//console.debug('NewOrEditDocumentTypeModal beforeOpen');
 								setBoolPoll(false);
 							}}
 							servicesBaseUrl={servicesBaseUrl}
@@ -236,10 +246,12 @@ export function DocumentTypes({
 									_id={_id}
 									_name={_name}
 									afterClose={() => {
+										//console.debug('DeleteDocumentTypeModal afterClose');
 										queryDocumentTypes();
 										setBoolPoll(true);
 									}}
-									onOpen={() => {
+									beforeOpen={() => {
+										//console.debug('DeleteDocumentTypeModal beforeOpen');
 										setBoolPoll(false);
 									}}
 									servicesBaseUrl={servicesBaseUrl}
@@ -252,10 +264,12 @@ export function DocumentTypes({
 		</Table>
 		<NewOrEditDocumentTypeModal
 			afterClose={() => {
+				//console.debug('NewOrEditDocumentTypeModal afterClose');
 				queryDocumentTypes();
 				setBoolPoll(true);
 			}}
-			onOpen={() => {
+			beforeOpen={() => {
+				//console.debug('NewOrEditDocumentTypeModal beforeOpen');
 				setBoolPoll(false);
 			}}
 			servicesBaseUrl={servicesBaseUrl}

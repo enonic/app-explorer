@@ -3,9 +3,9 @@ import {Button, Header, Icon, Modal, Popup} from 'semantic-ui-react';
 export function DeleteCollectionModal(props) {
 	const {
 		_name,
+		afterClose = () => {},
+		beforeOpen = () => {},
 		disabled = false,
-		onClose,
-		onOpen = () => {},
 		servicesBaseUrl
 	} = props;
 	const [state, setState] = React.useState({
@@ -13,10 +13,19 @@ export function DeleteCollectionModal(props) {
 	});
 	//console.debug('DeleteModal', {props, state});
 
+	const doClose = () => {
+		setState({open: false});
+		afterClose();
+	};
+	const doOpen = () => {
+		beforeOpen();
+		setState({open: true});
+	};
+
 	return <Modal
 		closeIcon
-		onClose={() => setState({open: false})}
-		onOpen={onOpen}
+		onClose={doClose}
+		onOpen={() => {console.debug('DeleteCollectionModal onOpen');}}
 		open={state.open}
 		trigger={<Popup
 			content={`Delete collection ${_name}`}
@@ -24,7 +33,7 @@ export function DeleteCollectionModal(props) {
 			trigger={<Button
 				disabled={disabled}
 				icon
-				onClick={() => setState({open: true})}><Icon color='red' name='trash alternate outline'/></Button>}/>}
+				onClick={doOpen}><Icon color='red' name='trash alternate outline'/></Button>}/>}
 	>
 		<Modal.Header>Delete collection {_name}</Modal.Header>
 		<Modal.Content>
@@ -36,8 +45,7 @@ export function DeleteCollectionModal(props) {
 						method: 'DELETE'
 					}).then((/*response*/) => {
 						//if (response.status === 200) {}
-						setState({open: false});
-						onClose();
+						doClose();
 					});
 				}}
 			><Icon color='red' name='trash alternate outline'/>Confirm Delete</Button>

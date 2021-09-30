@@ -572,11 +572,13 @@ export function Collections(props) {
 								locales={locales}
 								licenseValid={licenseValid}
 								_name={_name}
-								onClose={() => {
+								afterClose={() => {
+									//console.debug('NewOrEditCollectionModal afterClose');
 									fetchOnUpdate();
 									setBoolPoll(true);
 								}}
-								onOpen={() => {
+								beforeOpen={() => {
+									//console.debug('NewOrEditCollectionModal beforeOpen');
 									setBoolPoll(false);
 								}}
 								servicesBaseUrl={servicesBaseUrl}
@@ -730,11 +732,13 @@ export function Collections(props) {
 									{showDelete ?<DeleteCollectionModal
 										_name={_name}
 										disabled={busy}
-										onClose={() => {
+										afterClose={() => {
+											//console.debug('DeleteCollectionModal afterClose');
 											fetchCollections();
 											setBoolPoll(true);
 										}}
-										onOpen={() => {
+										beforeOpen={() => {
+											//console.debug('DeleteCollectionModal beforeOpen');
 											setBoolPoll(false);
 										}}
 										servicesBaseUrl={servicesBaseUrl}
@@ -753,11 +757,13 @@ export function Collections(props) {
 				fields={fieldsObj}
 				licenseValid={licenseValid}
 				locales={locales}
-				onClose={() => {
+				afterClose={() => {
+					//console.debug('NewOrEditCollectionModal afterClose');
 					fetchOnUpdate();
 					setBoolPoll(true);
 				}}
-				onOpen={() => {
+				beforeOpen={() => {
+					//console.debug('NewOrEditCollectionModal beforeOpen');
 					setBoolPoll(false);
 				}}
 				servicesBaseUrl={servicesBaseUrl}

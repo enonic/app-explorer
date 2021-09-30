@@ -12,9 +12,9 @@ export const NewOrEditApiKeyModal = (props) => {
 	//console.debug('props', props);
 	const {
 		_name,
+		afterClose = () => {},
+		beforeOpen = () => {},
 		initialValues,
-		onClose = () => {},
-		onOpen = () => {},
 		queryCollectionsGraph,
 		queryInterfacesGraph,
 		servicesBaseUrl
@@ -22,13 +22,21 @@ export const NewOrEditApiKeyModal = (props) => {
 	const [state, setState] = React.useState({
 		open: false
 	});
+	const doClose = () => {
+		setState({open: false});
+		afterClose();
+	};
+	const doOpen = () => {
+		beforeOpen();
+		setState({open: true});
+	};
 	return <Modal
 		closeIcon
-		onClose={() => {
-			setState({open: false});
-			onClose();
+		onClose={doClose}
+		onOpen={() => {
+			// For some reason this gets executed when one clicks the green (+) button, but not the edit one...
+			//console.debug('NewOrEditApiKeyModal onOpen');
 		}}
-		onOpen={onOpen}
 		open={state.open}
 		size='large'
 		trigger={_name ? <Popup
@@ -36,13 +44,13 @@ export const NewOrEditApiKeyModal = (props) => {
 			inverted
 			trigger={<Button
 				icon
-				onClick={() => setState({open: true})}
+				onClick={doOpen}
 			><Icon color='blue' name='edit'/></Button>}/>
 			: <Button
 				circular
 				color='green'
 				icon
-				onClick={() => setState({open: true})}
+				onClick={doOpen}
 				size='massive'
 				style={{
 					bottom: 13.5,
@@ -56,11 +64,8 @@ export const NewOrEditApiKeyModal = (props) => {
 		<Modal.Content>
 			<NewOrEditApiKey
 				_name={_name}
+				doClose={doClose}
 				initialValues={initialValues}
-				onClose={() => {
-					setState({open: false});
-					onClose();
-				}}
 				queryCollectionsGraph={queryCollectionsGraph}
 				queryInterfacesGraph={queryInterfacesGraph}
 				servicesBaseUrl={servicesBaseUrl}
