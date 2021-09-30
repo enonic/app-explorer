@@ -79,16 +79,20 @@ export class Glue {
 			throw new Error(`Name ${name} already used as ${this.#uniqueNames[name]}!`);
 		}
 		this.#uniqueNames[name] = 'interfaceType';
-		this.#interfaceTypes[name] = this.schemaGenerator.createInterfaceType({
+		this.#interfaceTypes[name] = {
 			fields,
-			name,
-			typeResolver
-		});
-		return this.#interfaceTypes[name];
+			type: this.schemaGenerator.createInterfaceType({
+				fields,
+				name,
+				typeResolver
+			})
+		};
+		return this.#interfaceTypes[name].type;
 	}
 
 	addObjectType({
 		fields,
+		interfaces = [],
 		name
 	}) {
 		//log.debug(`addObjectType({name:${name},fields:${toStr(fields)})`);
@@ -102,6 +106,7 @@ export class Glue {
 		this.#uniqueNames[name] = 'objectType';
 		this.#objectTypes[name] = this.schemaGenerator.createObjectType({
 			fields,
+			interfaces,
 			name
 		});
 		return this.#objectTypes[name];
@@ -126,19 +131,55 @@ export class Glue {
 	getInputType(name) {
 		//log.debug(`getInputType(${name})`);
 		if (!Object.hasOwn(this.#inputTypes, name)) { // true also when property is set to undefined
-			throw new Error(`name:${name} not found in inputTypes, perhaps you're trying to use it before it's defined?`);
+			if (this.#uniqueNames[name]) {
+				throw new Error(`name:${name} is not an inputType! but ${this.#uniqueNames[name]}`);
+			}
+			throw new Error(`inputTypes[${name}] not found! Perhaps you're trying to use it before it's defined?`);
 		}
 		const type = this.#inputTypes[name];
 		if (!type) {
-			throw new Error(`inputType name:${name} is falsy!`);
+			throw new Error(`inputType[${name}] is falsy!`);
 		}
 		//log.debug(`getinputType(${name}) --> ${typeof type}`);
 		return type;
 	}
 
+	getInterfaceType(name) {
+		//log.debug(`getInterfaceType(${name})`);
+		if (!Object.hasOwn(this.#interfaceTypes, name)) { // true also when property is set to undefined
+			if (this.#uniqueNames[name]) {
+				throw new Error(`name:${name} is not an interfaceType! but ${this.#uniqueNames[name]}`);
+			}
+			throw new Error(`name:${name} not found in interfaceTypes, perhaps you're trying to use it before it's defined?`);
+		}
+		const type = this.#interfaceTypes[name].type;
+		if (!type) {
+			throw new Error(`interfaceType[${name}].type is falsy!`);
+		}
+		//log.debug(`getInterfaceType(${name}) --> ${typeof type}`);
+		return type;
+	}
+
+	getInterfaceTypeFields(name) {
+		//log.debug(`getInterfaceTypeFields(${name})`);
+		if (!Object.hasOwn(this.#interfaceTypes, name)) { // true also when property is set to undefined
+			throw new Error(`interfaceTypes[${name}] not found! Perhaps you're trying to use it before it's defined?`);
+		}
+		const fields = this.#interfaceTypes[name].fields;
+		if (!fields) {
+			throw new Error(`interfaceTypes[${name}].fields is falsy!`);
+		}
+		//log.debug(`getInterfaceTypeFields(${name}) --> ${typeof type}`);
+		return fields;
+	}
+
+
 	getObjectType(name) {
 		//log.debug(`getobjectType(${name})`);
 		if (!Object.hasOwn(this.#objectTypes, name)) { // true also when property is set to undefined
+			if (this.#uniqueNames[name]) {
+				throw new Error(`name:${name} is not an objectType! but ${this.#uniqueNames[name]}`);
+			}
 			throw new Error(`name:${name} not found in objectTypes, perhaps you're trying to use it before it's defined?`);
 		}
 		const type = this.#objectTypes[name];
@@ -156,6 +197,9 @@ export class Glue {
 	getScalarType(name) {
 		//log.debug(`getScalarType(${name})`);
 		if (!Object.hasOwn(this.#scalarTypes, name)) { // true also when property is set to undefined
+			if (this.#uniqueNames[name]) {
+				throw new Error(`name:${name} is not an scalarType! but ${this.#uniqueNames[name]}`);
+			}
 			throw new Error(`name:${name} not found in scalarTypes, perhaps you're trying to use it before it's defined?`);
 		}
 		const type = this.#scalarTypes[name];

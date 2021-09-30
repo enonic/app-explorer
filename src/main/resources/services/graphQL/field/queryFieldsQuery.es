@@ -39,7 +39,7 @@ export const GQL_QUERY_FIELDS_QUERY = `query QueryFieldsQuery(
 			nGram
 			path
 
-			referencedBy {
+			_referencedBy {
 				count
 				hits {
 					_id
@@ -47,7 +47,7 @@ export const GQL_QUERY_FIELDS_QUERY = `query QueryFieldsQuery(
 					_nodeType
 					_path
 					_score
-					referencedBy {
+					_referencedBy {
 						count
 						hits {
 							_id

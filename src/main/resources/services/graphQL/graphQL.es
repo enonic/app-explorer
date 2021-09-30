@@ -21,17 +21,19 @@ import {RT_JSON} from '/lib/explorer/model/2/constants';
 
 import {Glue} from './Glue';
 
+import {addScalarTypes} from './addScalarTypes';
+import {addInputTypes} from './addInputTypes';
+import {addObjectTypes} from './addObjectTypes';
+
 import {generateGetContentTypesField} from './generateGetContentTypesField';
 import {generateGetLicenseField} from './generateGetLicenseField';
 import {generateGetLocalesField} from './generateGetLocalesField';
 import {generateGetSitesField} from './generateGetSitesField';
-import {generateInterfaces} from './generateInterfaces';
+import {addInterfaceTypes} from './addInterfaceTypes';
 import {generateListTasksField} from './generateListTasksField';
-import {generateNoQLTypes} from './generateNoQLTypes';
 import {generateQueryJournalsField} from './generateQueryJournalsField';
 import {generateQueryStopWordsField} from './generateQueryStopWordsField';
 import {generateReferencedByField} from './generateReferencedByField';
-import {generateTypes} from './generateTypes';
 
 import {generateQueryApiKeysField} from './apiKey/generateQueryApiKeysField';
 import {generateCollectionFields} from './collection/generateCollectionFields';
@@ -47,25 +49,76 @@ import {generateThesaurusFields} from './thesaurus/generateThesaurusFields';
 
 const glue = new Glue();
 
-generateTypes({glue});
-generateNoQLTypes({glue});
+// There is a bit of a chicken and egg problem with
+// interface-, and object-types as they can use each other.
+//
+// Inside and interfaceType resolver I believe you cannot use lib-graphql.reference,
+// but this is not a problem.
+// Instead first create an "global" object (which JS passes as a reference).
+// Then inside the interfaceType resolver, get the objectType you need from some property in that object.
+// It doesn't matter that the property is not set yet,
+// as long as you set it before the interfaceType resolver is run.
+// Thus when you define the objectType also add it to the global object.
+//
+// When defining an objectType to implement an interfaceType you are allowed to use lib-graphql.reference,
+// so that's not a problem.
+//
+// When implementing an interface type inside an objectType,
+// I want to avoid copyNpaste of the same fields into ALL the objectTypes which
+// implement the interface type.
+// Even though you will get a runtime error to spot your mistake,
+// it's better to not make the mistake.
+// So I want to define the interfaceType fields first and the use the both in
+// the interfaceType and objectTypes.
+//
+// NOTE The challenge then is that some interfaceType field use objectTypes,
+// lets see if lib-graphql.reference can be used?
 
-const referencedBy = generateReferencedByField({
-	glue
-});
 
-const queryApiKeysField = generateQueryApiKeysField({
-	glue
-});
+// Can be first since it doesn't depend on anything
+addScalarTypes({glue});
+
+// Must be after ScalarTypes!
+// Should be before InterfaceTypes (unless we use lib-graphql.reference)
+// Must be before ObjectTypes?
+addInputTypes({glue});
+
+// Must be after ScalarTypes!
+// Must be after InputTypes
+// Must be before ObjectTypes
+addInterfaceTypes({glue});
+
+// Must be after ScalarTypes!
+// Must be after InputTypes?
+// Must be after InterfaceTypes
+addObjectTypes({glue});
+
+
+// GIVEN we want to define an interfaceType fields,
+//       at the same time that we define the interfaceType
+// WHEN any objectType spreads that interfaceType fields
+// THEN that objectType needs to be defined after the interfaceType
+// AND any objectType used in an interfaceType field must be lib-graphql.reference
+// AND you can use either getInterFaceType or lib-graphql.reference in that objectType interfaces:[]
+
+// IF interfaceType fields are first defined
+// THEN they can be used/spread both when defining the interfaceType and the objectTypes.
+
+
+// ObjectTypes which implements interfaces
+// https://github.com/enonic/lib-graphql/blob/master/docs/api.adoc#createobjecttype
+// interfaces: Array<GraphQLInterfaceType OR GraphQLTypeReference>
+
+const referencedBy = generateReferencedByField({glue});
+
+const queryApiKeysField = generateQueryApiKeysField({glue});
 
 const {
 	createCollectionField,
 	queryCollectionsField,
 	reindexCollectionsField,
 	updateCollectionField
-} = generateCollectionFields({
-	glue
-});
+} = generateCollectionFields({glue});
 
 const {
 	createDocumentTypeField,
@@ -73,84 +126,42 @@ const {
 	getDocumentTypeField,
 	queryDocumentTypesField,
 	updateDocumentTypeField
-} = generateDocumentTypeFields({
-	glue
-});
+} = generateDocumentTypeFields({glue});
 
 const {
 	createFieldField,
 	deleteFieldField,
 	queryFieldsField,
 	updateFieldField
-} = generateFieldsField({
-	glue
-});
+} = generateFieldsField({glue});
 
-const getContentTypesField = generateGetContentTypesField({
-	glue
-});
+const getContentTypesField = generateGetContentTypesField({glue});
 
-generateSchedulerTypes({
-	glue
-});
+generateSchedulerTypes({glue});
 
 const {
 	createSynonymField,
 	deleteSynonymField,
 	querySynonymsField,
 	updateSynonymField
-} = generateSynonymFields({
-	glue
-});
+} = generateSynonymFields({glue});
 
 const {
 	createThesaurusField,
 	deleteThesaurusField,
 	queryThesauriField,
 	updateThesaurusField
-} = generateThesaurusFields({
-	glue
-});
+} = generateThesaurusFields({glue});
 
-generateInterfaces({
-	glue
-});
-
-const getLicense = generateGetLicenseField({
-	glue
-});
-
-const getLocales = generateGetLocalesField({
-	glue
-});
-
-const getSites = generateGetSitesField({
-	glue
-});
-
-const listScheduledJobs = generateScheduledJobsListField({
-	glue
-});
-
-const queryCollectors = generateQueryCollectorsField({
-	glue
-});
-
-const queryInterfaces = generateQueryInterfacesField({
-	glue
-});
-
-const queryJournals = generateQueryJournalsField({
-	glue
-});
-
-const queryStopWords = generateQueryStopWordsField({
-	glue
-});
-
-const queryTasks = generateListTasksField({
-	glue
-});
+const getLicense = generateGetLicenseField({glue});
+const getLocales = generateGetLocalesField({glue});
+const getSites = generateGetSitesField({glue});
+const listScheduledJobs = generateScheduledJobsListField({glue});
+const queryCollectors = generateQueryCollectorsField({glue});
+const queryInterfaces = generateQueryInterfacesField({glue});
+const queryJournals = generateQueryJournalsField({glue});
+const queryStopWords = generateQueryStopWordsField({glue});
+const queryTasks = generateListTasksField({glue});
 
 //const mutation = glue.addObjectType({
 const mutation = glue.schemaGenerator.createObjectType({

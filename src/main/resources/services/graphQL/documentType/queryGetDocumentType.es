@@ -3,6 +3,30 @@ export const GQL_QUERY_GET_DOCUMENT_TYPE = `query GetDocumentTypeQuery($_id: ID!
 		_id
 		_name
 		_path
+		_referencedBy(
+			filters: {
+				boolean: {
+					must: {
+						hasValue: {
+							field: "_nodeType"
+							values: [
+								"com.enonic.app.explorer:collection"
+							]
+						}
+					}
+				}
+			}
+		) {
+			count
+			hits {
+				_id
+				_name
+				_nodeType
+				_path
+				_score
+			}
+			total
+		} # _referencedBy
 		_versionKey
 		addFields
 		fields {

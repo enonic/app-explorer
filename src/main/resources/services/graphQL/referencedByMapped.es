@@ -5,13 +5,17 @@ import {connect} from '/lib/explorer/repo/connect';
 
 export function referencedByMapped({
 	_id,
-	count = -1
+	count = -1,
+	filters = {},
+	start
 }) {
 	const res = referencedBy({
 		_id,
 		boolGetNode: true,
 		connection: connect({ principals: [PRINCIPAL_EXPLORER_READ] }),
-		count
+		count,
+		filters,
+		start
 	});
 
 	// Limit what is exposed
