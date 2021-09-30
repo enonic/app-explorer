@@ -109,6 +109,7 @@ module.exports = {
 			allow: [
 				'__connection', // My own stupidity
 				'_id', // content-type property
+				'_branchId', // fake node property
 				'_indexConfig', // node property
 				'_inheritsPermissions', // node property
 				'_name', // node property
@@ -116,6 +117,8 @@ module.exports = {
 				'_parentPath', // node property
 				'_path', // content-type property
 				'_permissions', // node property
+				'_repoId', // fake node property
+				'_score', // fake node property
 				'_selected', // option-set property
 				'_versionKey' // node property
 			],
@@ -130,6 +133,8 @@ module.exports = {
 		//'react/jsx-uses-vars': 'error',
 		'react/prop-types': 'off',
 		'react/react-in-jsx-scope': 'off', // Since React is a global
+		'react-hooks/rules-of-hooks': 'error',
+		'react-hooks/exhaustive-deps': 'warn',
 		semi: 'error',
 		'spaced-comment': ['off'],
 		strict: 1

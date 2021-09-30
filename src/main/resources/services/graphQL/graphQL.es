@@ -46,6 +46,7 @@ import {generateDocumentTypeFields} from './documentType/generateDocumentTypeFie
 import {generateSynonymFields} from './synonym/generateSynonymFields';
 import {generateThesaurusFields} from './thesaurus/generateThesaurusFields';
 
+import {hasFieldQuery} from './hasFieldQuery';
 
 const glue = new Glue();
 
@@ -197,6 +198,7 @@ const query = glue.schemaGenerator.createObjectType({
 		getLocales,
 		getDocumentType: getDocumentTypeField,
 		getSites,
+		hasField: hasFieldQuery({glue}),
 		listScheduledJobs,
 		queryApiKeys: queryApiKeysField,
 		queryCollections: queryCollectionsField,
