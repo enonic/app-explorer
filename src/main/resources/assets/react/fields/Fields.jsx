@@ -233,6 +233,12 @@ export function Fields(props) {
 						{fieldsRes.hits.map(({
 							_id,
 							_name,
+							_referencedBy: {
+								//count,
+								hits: referencedByHits//,
+								//total
+							},
+
 							denyDelete = false,
 							fieldType = VALUE_TYPE_STRING,
 							key,
@@ -247,13 +253,7 @@ export function Fields(props) {
 							fulltext,
 							includeInAllText,
 							nGram, // node._indexConfig.default.nGram uses uppercase G in nGram
-							path,
-
-							referencedBy: {
-								//count,
-								hits: referencedByHits//,
-								//total
-							}
+							path
 						}, index) => {
 							console.debug(`Fields key:${key} referencedByHits:`, referencedByHits);
 							const documentTypes = [];
@@ -261,7 +261,7 @@ export function Fields(props) {
 							referencedByHits.forEach(({
 								_name,
 								_nodeType,
-								referencedBy: {
+								_referencedBy: {
 									//count,
 									hits: referencedByLevel2Hits//,
 									//total

@@ -7,11 +7,14 @@ export const GQL_INPUT_TYPE_COLLECTION_CRON_NAME = 'CollectionCronInput';
 export const GQL_INPUT_TYPE_DOCUMENT_TYPE_FIELDS_NAME = 'DocumentTypeFieldsInput';
 export const GQL_INPUT_TYPE_DOCUMENT_TYPE_PROPERTIES_NAME = 'DocumentTypePropertiesInput';
 
-export const GQL_INPUT_TYPE_QUERY_FILTERS_NAME = 'QueryFilters';
+export const GQL_INPUT_TYPE_FILTERS_NAME = 'Filters';
+export const GQL_INPUT_TYPE_FILTERS_BOOLEAN_NAME = 'FiltersBoolean';
+
 export const GQL_INPUT_TYPE_THESAURUS_LANGUAGE_NAME = 'ThesaurusLanguageInput';
 
 // Interface type names
 export const GQL_INTERFACE_NODE_NAME = 'Node';
+export const GQL_INTERFACE_QUERY_RESULT_NAME = 'QueryResult';
 
 // Object type names
 export const GQL_TYPE_COLLECTION_COLLECTOR_NAME = 'CollectionCollector';

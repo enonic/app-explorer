@@ -9,6 +9,7 @@ import {
 } from '/lib/graphql';
 
 import {
+	GQL_INPUT_TYPE_FILTERS_NAME,
 	GQL_TYPE_REFERENCED_BY_HITS_NAME,
 	GQL_TYPE_REFERENCED_BY_NAME
 } from './constants';
@@ -20,9 +21,10 @@ export function generateReferencedByField({
 }) {
 	return {
 		args: {
-			_id: glue.getScalarType('_id')
+			_id: glue.getScalarType('_id'),
+			filters: glue.getInputType(GQL_INPUT_TYPE_FILTERS_NAME)
 		},
-		resolve: ({args: {_id}}) => referencedByMapped({_id}),
+		resolve: ({args: {_id, filters}}) => referencedByMapped({_id, filters}),
 		type: glue.addObjectType({
 			name: GQL_TYPE_REFERENCED_BY_NAME,
 			fields: {
@@ -36,8 +38,14 @@ export function generateReferencedByField({
 							_nodeType: { type: glue.getScalarType('_nodeType') },
 							_path: { type: glue.getScalarType('_path') },
 							_score: { type: nonNull(GraphQLFloat) },
-							referencedBy: {
-								resolve: ({source: {_id}}) => referencedByMapped({_id}),
+							_referencedBy: {
+								args: {
+									filters: glue.getInputType(GQL_INPUT_TYPE_FILTERS_NAME)
+								},
+								resolve: ({
+									args: {filters},
+									source: {_id}
+								}) => referencedByMapped({_id, filters}),
 								type: reference(GQL_TYPE_REFERENCED_BY_NAME) // Self-reference
 							}
 						}
@@ -61,7 +69,7 @@ query QueryReferencedBy(
 			_nodeType
 			_path
 			_score
-			referencedBy {
+			_referencedBy {
 				count
 				hits {
 					_id

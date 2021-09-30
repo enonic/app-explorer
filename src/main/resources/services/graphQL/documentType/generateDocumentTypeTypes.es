@@ -22,11 +22,11 @@ import {
 import {
 	GQL_INPUT_TYPE_DOCUMENT_TYPE_FIELDS_NAME,
 	GQL_INPUT_TYPE_DOCUMENT_TYPE_PROPERTIES_NAME,
+	GQL_INTERFACE_NODE_NAME,
+	//GQL_INTERFACE_QUERY_RESULT_NAME,
 	GQL_TYPE_DOCUMENT_TYPE_NAME,
-	GQL_TYPE_DOCUMENT_TYPE_QUERY_RESULT_NAME,
-	GQL_TYPE_REFERENCED_BY_NAME
+	GQL_TYPE_DOCUMENT_TYPE_QUERY_RESULT_NAME
 } from '../constants';
-import {referencedByMapped} from '../referencedByMapped';
 
 
 export function generateDocumentTypeTypes({
@@ -74,17 +74,13 @@ export function generateDocumentTypeTypes({
 	glue.addObjectType({
 		name: GQL_TYPE_DOCUMENT_TYPE_QUERY_RESULT_NAME,
 		fields: {
-			total: { type: nonNull(GraphQLInt) },
-			count: { type: nonNull(GraphQLInt) },
+			count: { type: glue.getScalarType('count') },
+			total: { type: glue.getScalarType('total') },
+			//...glue.getInterfaceTypeFields(GQL_INTERFACE_QUERY_RESULT_NAME),
 			hits: {
 				type: list(glue.addObjectType({
 					name: GQL_TYPE_DOCUMENT_TYPE_NAME,
 					fields: {
-						_id: { type: glue.getScalarType('_id') },
-						_name: { type: glue.getScalarType('_name') },
-						_nodeType: { type: glue.getScalarType('_nodeType') },
-						_path: { type: glue.getScalarType('_path') },
-						_versionKey: { type: glue.getScalarType('_versionKey') }, // Used with atomicUpdate
 						addFields: { type: nonNull(GraphQLBoolean) },
 						fields: { type: list(glue.addObjectType({
 							name: 'DocumentTypeFields',
@@ -97,15 +93,13 @@ export function generateDocumentTypeTypes({
 							name: 'DocumentTypeProperties',
 							fields: FIELDS_PROPERTY
 						}))},
-						referencedBy: {
-							resolve: ({source: {_id}}) => referencedByMapped({_id}),
-							//type: reference(GQL_TYPE_REFERENCED_BY_NAME)
-							type: glue.getObjectType(GQL_TYPE_REFERENCED_BY_NAME)
-						}
-					}
+						...glue.getInterfaceTypeFields(GQL_INTERFACE_NODE_NAME)
+					},
+					interfaces: [glue.getInterfaceType(GQL_INTERFACE_NODE_NAME)]
 				}))
 			}
-		}
+		}/*,
+		interfaces: [glue.getInterfaceType(GQL_INTERFACE_QUERY_RESULT_NAME)]*/
 	});
 
 	return {

@@ -5,10 +5,8 @@ import {
 	nonNull
 } from '/lib/graphql';
 
-import {GQL_TYPE_NODE_DELETED_NAME} from './constants';
 
-
-export function generateTypes({
+export function addScalarTypes({
 	glue
 }) {
 	glue.addScalarType({
@@ -44,12 +42,5 @@ export function generateTypes({
 	glue.addScalarType({
 		name: 'total',
 		type: nonNull(GraphQLInt)
-	});
-
-	glue.addObjectType({
-		name: GQL_TYPE_NODE_DELETED_NAME,
-		fields: {
-			_id: { type: glue.getScalarType('_id') }
-		}
 	});
 }

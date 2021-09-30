@@ -6,7 +6,7 @@ import {
 } from '/lib/graphql';
 
 import {
-	GQL_INPUT_TYPE_QUERY_FILTERS_NAME,
+	GQL_INPUT_TYPE_FILTERS_NAME,
 	GQL_TYPE_SYNONYMS_QUERY_RESULT_NAME
 } from '../constants';
 import {querySynonyms} from './querySynonyms';
@@ -18,7 +18,7 @@ export function generateQuerySynonymsField({
 	return {
 		args: {
 			count: GraphQLInt,
-			filters: glue.getInputType(GQL_INPUT_TYPE_QUERY_FILTERS_NAME),
+			filters: glue.getInputType(GQL_INPUT_TYPE_FILTERS_NAME),
 			query: GraphQLString,
 			sort: GraphQLString,
 			start: GraphQLInt

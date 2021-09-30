@@ -109,15 +109,15 @@ export function DocumentTypes({
 				{documentTypes.map(({
 					_id,
 					_name,
-					//_versionKey, // We get this inside NewOrEditDocumentTypeModal
-					addFields = true,
-					fields = [],
-					properties = [],
-					referencedBy: {
+					_referencedBy: {
 						//count
 						hits: referencedByHits
 						//total
-					}
+					},
+					//_versionKey, // We get this inside NewOrEditDocumentTypeModal
+					addFields = true,
+					fields = [],
+					properties = []
 				}, index) => {
 					const collections = [];
 					referencedByHits.forEach(({
