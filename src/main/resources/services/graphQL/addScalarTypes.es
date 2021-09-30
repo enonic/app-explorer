@@ -10,6 +10,11 @@ export function addScalarTypes({
 	glue
 }) {
 	glue.addScalarType({
+		name: '_branchId',
+		type: nonNull(GraphQLID)
+	});
+
+	glue.addScalarType({
 		name: '_id',
 		type: nonNull(GraphQLID)
 	});
@@ -27,6 +32,16 @@ export function addScalarTypes({
 	glue.addScalarType({
 		name: '_path',
 		type: nonNull(GraphQLString)
+	});
+
+	glue.addScalarType({
+		name: '_repoId',
+		type: nonNull(GraphQLID)
+	});
+
+	glue.addScalarType({
+		name: '_score',
+		type: nonNull(GraphQLInt)
 	});
 
 	glue.addScalarType({
