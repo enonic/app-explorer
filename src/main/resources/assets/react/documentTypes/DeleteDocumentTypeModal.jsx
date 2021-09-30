@@ -6,27 +6,41 @@ import {GQL_MUTATION_DELETE_DOCUMENT_TYPE} from '../../../services/graphQL/docum
 export function DeleteDocumentTypeModal({
 	_id,
 	_name,
-	afterClose = () => {},
+	afterClose = () => {
+		//console.debug('DeleteDocumentTypeModal default afterClose');
+	},
 	disabled = false,
-	onOpen = () => {},
+	beforeOpen = () => {
+		//console.debug('DeleteDocumentTypeModal default beforeOpen');
+	},
 	servicesBaseUrl
 }) {
 	const [open, setOpen] = React.useState(false);
 	const [deleteNameMatches, setDeleteNameMatches] = React.useState(false);
 	const [typedDocumentTypeName, setTypedDocumentTypeName] = React.useState('');
+
+	const doClose = () => {
+		//console.debug('DeleteDocumentTypeModal default doClose');
+		setOpen(false);
+		afterClose();
+	};
+	const doOpen = () => {
+		//console.debug('DeleteDocumentTypeModal default doOpen');
+		beforeOpen();
+		setOpen(true);
+	};
 	return <Modal
 		closeIcon
-		onClose={() => {
-			setOpen(false);
-			afterClose();
+		onClose={doClose}
+		onOpen={() => {
+			//console.debug('DeleteDocumentTypeModal default onOpen');
 		}}
-		onOpen={onOpen}
 		open={open}
 		trigger={<Button
 			compact
 			disabled={disabled}
 			icon
-			onClick={() => setOpen(true)}
+			onClick={doOpen}
 			size='tiny'
 			type='button'
 		><Icon color='red' name='trash alternate outline'/></Button>}
@@ -60,8 +74,7 @@ export function DeleteDocumentTypeModal({
 					})
 						.then(response => {
 							if (response.status === 200) {
-								setOpen(false);
-								afterClose();
+								doClose();
 							}
 						});
 				}}

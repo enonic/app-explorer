@@ -31,12 +31,12 @@ export const NewOrEditApiKey = (props) => {
 	//console.debug('props', props);
 	const {
 		_name,
+		doClose,
 		initialValues = {
 			collections: [],
 			key: _name ? '' : makeKey()//,
 			//name: _name
 		},
-		onClose,
 		queryCollectionsGraph,
 		queryInterfacesGraph,
 		servicesBaseUrl
@@ -69,7 +69,7 @@ export const NewOrEditApiKey = (props) => {
 				},
 				body: JSON.stringify(values)
 			}).then((/*response*/) => {
-				onClose();
+				doClose();
 			});
 		}}
 	>
