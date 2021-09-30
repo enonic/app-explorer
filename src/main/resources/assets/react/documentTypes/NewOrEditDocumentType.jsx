@@ -14,6 +14,7 @@ import {
 import {
 	Button,
 	Dimmer,
+	Dropdown,
 	Form,
 	Header,
 	Icon,
@@ -34,7 +35,7 @@ import {SubmitButton} from 'semantic-ui-react-form/buttons/SubmitButton';
 import {Form as EnonicForm} from 'semantic-ui-react-form/Form';
 
 import {Checkbox} from 'semantic-ui-react-form/inputs/Checkbox';
-import {Dropdown} from 'semantic-ui-react-form/inputs/Dropdown';
+import {Dropdown as EnonicDropdown} from 'semantic-ui-react-form/inputs/Dropdown';
 import {Input} from 'semantic-ui-react-form/inputs/Input';
 
 import {List} from 'semantic-ui-react-form/List';
@@ -46,6 +47,9 @@ import {GQL_QUERY_GET_DOCUMENT_TYPE} from '../../../services/graphQL/documentTyp
 import {fetchFields} from '../fields/fetchFields';
 
 import {nameValidator} from '../utils/nameValidator';
+
+import {RemoveFieldFromDocumentTypeModal} from './RemoveFieldFromDocumentTypeModal';
+
 
 const PATH_FIELDS = 'fields';
 const PATH_PROPERTIES = 'properties';
@@ -128,6 +132,7 @@ const SCHEMA = {
 export function NewOrEditDocumentType({
 	doClose = () => {},
 	_id, // optional
+	collections = [], // optional
 	servicesBaseUrl
 }) {
 	const [initialValues, setInitialValues] = React.useState(false);
@@ -188,6 +193,7 @@ export function NewOrEditDocumentType({
 	} // fetchDocumentType
 
 	React.useEffect(() => {
+		//console.debug('NewOrEditDocumentType useEffect');
 		fetchFields({
 			handleData: (data) => {
 				setGlobalFields(data.queryFields.hits);
@@ -253,7 +259,7 @@ export function NewOrEditDocumentType({
 				/>
 			</Form.Field>
 
-			<Header as='h2'>Global fields</Header>
+			<Header as='h2'>Fields</Header>
 			<Form.Field>
 				<List
 					path={PATH_FIELDS}
@@ -320,7 +326,7 @@ export function NewOrEditDocumentType({
 											/></Table.Cell>
 											<Table.Cell disabled={!active}>{fieldId // Remove dropdown as soon as a field is selected.
 												? key
-												: <Dropdown
+												: <EnonicDropdown
 													disabled={!active}
 													options={GLOBAL_FIELD_OPTIONS.filter(({key: k}) => !selectedFields[k])}
 													name='fieldId'
@@ -383,14 +389,12 @@ export function NewOrEditDocumentType({
 															index={index}
 														/>}/>
 													*/}
-													<Popup
-														content='Delete field'
-														inverted
-														trigger={<DeleteItemButton
-															disabled={active && fieldId}
-															path={PATH_FIELDS}
-															index={index}
-														/>}/>
+													<RemoveFieldFromDocumentTypeModal
+														collections={collections}
+														disabled={active}
+														name={key}
+														servicesBaseUrl={servicesBaseUrl}
+													/>
 												</Button.Group>
 											</Table.Cell>
 										</Table.Row>;
@@ -411,7 +415,6 @@ export function NewOrEditDocumentType({
 				/>
 			</Form.Field>
 
-			<Header as='h2'>Local fields</Header>
 			<Form.Field>
 				<Checkbox
 					label='Add new fields automatically when creating/updating documents?'
@@ -505,7 +508,7 @@ export function NewOrEditDocumentType({
 												/>
 											</Table.Cell>
 											<Table.Cell collapsing>
-												{enabled ? <Dropdown
+												{enabled ? <EnonicDropdown
 													disabled={!active || !enabled}
 													options={OPTIONS_VALUE_TYPES}
 													name='valueType'
@@ -590,9 +593,38 @@ export function NewOrEditDocumentType({
 									value={PROPERTY_DEFAULT}
 								><Icon color='green' name='add'/>Add local field</InsertButton>}
 							/>
+
 						</>;
 					}}
 				/>
+			</Form.Field>
+			<Form.Field>
+				<Button.Group>
+					<Button icon><Icon color='green' name='add'/> Add local </Button>
+					<Button.Or icon ></Button.Or>
+					<Button icon> global field <Icon color='green' name='add'/></Button>
+				</Button.Group>
+				<Button.Group>
+					<Button icon><Icon color='green' name='add'/> Add field</Button>
+					<Dropdown
+						button
+						icon='dropdown'
+						className='icon'
+					>
+						<Dropdown.Menu>
+							<Dropdown.Item
+								onClick={(syntheticEvent, data) => {
+									console.debug('syntheticEvent', syntheticEvent);
+									console.debug('data', data);
+								}}
+							>Global</Dropdown.Item>
+							<Dropdown.Item>Local</Dropdown.Item>
+						</Dropdown.Menu>
+					</Dropdown>
+					{/*
+						<Button icon='dropdown'/>
+					*/}
+				</Button.Group>
 			</Form.Field>
 			<Form.Field>
 				<SubmitButton/>

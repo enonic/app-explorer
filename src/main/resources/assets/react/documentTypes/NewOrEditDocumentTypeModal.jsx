@@ -11,6 +11,7 @@ export function NewOrEditDocumentTypeModal({
 	beforeOpen = () => {
 		//console.debug('NewOrEditDocumentTypeModal default beforeOpen');
 	},
+	collections = [], // optional
 	servicesBaseUrl
 }) {
 	// TODO get name from id
@@ -64,6 +65,7 @@ export function NewOrEditDocumentTypeModal({
 		<Modal.Content>
 			<NewOrEditDocumentType
 				_id={_id}
+				collections={collections}
 				doClose={doClose}
 				servicesBaseUrl={servicesBaseUrl}
 			/>
