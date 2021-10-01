@@ -1,4 +1,4 @@
-import {GQL_QUERY_QUERY_DOCUMENT_TYPES} from '../../../services/graphQL/documentType/queryQueryDocumentTypes.es';
+import {GQL_QUERY_QUERY_DOCUMENT_TYPES} from '../queries/documentTypesQuery.mjs';
 
 
 export function fetchDocumentTypes({

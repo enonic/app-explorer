@@ -25,7 +25,7 @@ import {
 } from 'semantic-ui-react';
 
 
-import {DeleteItemButton} from 'semantic-ui-react-form/buttons/DeleteItemButton';
+//import {DeleteItemButton} from 'semantic-ui-react-form/buttons/DeleteItemButton';
 import {InsertButton} from 'semantic-ui-react-form/buttons/InsertButton';
 //import {MoveDownButton} from 'semantic-ui-react-form/buttons/MoveDownButton';
 //import {MoveUpButton} from 'semantic-ui-react-form/buttons/MoveUpButton';
@@ -133,6 +133,7 @@ export function NewOrEditDocumentType({
 	doClose = () => {},
 	_id, // optional
 	collections = [], // optional
+	interfaces = [], // optional
 	servicesBaseUrl
 }) {
 	const [initialValues, setInitialValues] = React.useState(false);
@@ -391,8 +392,11 @@ export function NewOrEditDocumentType({
 													*/}
 													<RemoveFieldFromDocumentTypeModal
 														collections={collections}
+														index={index}
+														interfaces={interfaces}
 														disabled={active}
 														name={key}
+														path={PATH_FIELDS}
 														servicesBaseUrl={servicesBaseUrl}
 													/>
 												</Button.Group>
@@ -569,14 +573,14 @@ export function NewOrEditDocumentType({
 														/>}
 													/>
 													*/}
-													<Popup
-														content='Delete property'
-														inverted
-														trigger={<DeleteItemButton
-															disabled={active && name}
-															path={PATH_PROPERTIES}
-															index={index}
-														/>}
+													<RemoveFieldFromDocumentTypeModal
+														collections={collections}
+														index={index}
+														interfaces={interfaces}
+														disabled={active}
+														name={name}
+														path={PATH_PROPERTIES}
+														servicesBaseUrl={servicesBaseUrl}
 													/>
 												</Button.Group>
 											</Table.Cell>

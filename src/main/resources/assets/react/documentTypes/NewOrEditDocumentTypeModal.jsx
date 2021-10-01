@@ -12,6 +12,7 @@ export function NewOrEditDocumentTypeModal({
 		//console.debug('NewOrEditDocumentTypeModal default beforeOpen');
 	},
 	collections = [], // optional
+	interfaces = [], // optional
 	servicesBaseUrl
 }) {
 	// TODO get name from id
@@ -66,6 +67,7 @@ export function NewOrEditDocumentTypeModal({
 			<NewOrEditDocumentType
 				_id={_id}
 				collections={collections}
+				interfaces={interfaces}
 				doClose={doClose}
 				servicesBaseUrl={servicesBaseUrl}
 			/>
