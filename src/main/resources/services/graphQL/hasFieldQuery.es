@@ -1,6 +1,6 @@
 import {
-	addQueryFilter,
-	toStr
+	addQueryFilter//,
+	//toStr
 } from '@enonic/js-utils';
 
 import {
@@ -43,14 +43,6 @@ export function hasFieldQuery({
 				throw new Error(`Missing required parameter collections!`);
 			}
 			//log.debug(`field:${field}`);
-			addQueryFilter({
-				filter: {
-					exists: {
-						field
-					}
-				},
-				filters
-			});
 			const queryParams = {
 				// WARNING Can't aggregate on branch and repoId as they are not actual fields :(
 				// TODO We could add document_metadata.repoId to enable aggregation...
@@ -80,10 +72,17 @@ export function hasFieldQuery({
 					}
 				},*/
 				count,
-				filters,
+				filters: addQueryFilter({
+					filter: {
+						exists: {
+							field
+						}
+					},
+					filters
+				}),
 				query: ''
 			};
-			log.debug(`queryParams:${toStr(queryParams)}`);
+			//log.debug(`queryParams:${toStr(queryParams)}`);
 
 			const multiConnectParams = {
 				principals: [PRINCIPAL_EXPLORER_READ],
@@ -97,7 +96,7 @@ export function hasFieldQuery({
 			const multiRepoReadConnection = multiConnect(multiConnectParams);
 
 			const queryRes = multiRepoReadConnection.query(queryParams);
-			log.debug(`queryRes:${toStr(queryRes)}`);
+			//log.debug(`queryRes:${toStr(queryRes)}`);
 
 			queryRes.hits = queryRes.hits.map(({
 				id,

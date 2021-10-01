@@ -1,4 +1,4 @@
-import {GQL_QUERY_HAS_FIELD} from '../queries/hasField';
+import {GQL_QUERY_HAS_FIELD} from '../queries/hasField.mjs';
 
 
 export function fetchHasField({

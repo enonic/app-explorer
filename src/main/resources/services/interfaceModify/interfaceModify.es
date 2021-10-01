@@ -1,7 +1,9 @@
-//import {toStr} from '@enonic/js-utils';
+import {
+	forceArray//,
+	//toStr
+} from '@enonic/js-utils';
 
-import {sanitize} from '/lib/xp/common';
-
+import {query as queryCollections} from '/lib/explorer/collection/query';
 import {
 	PRINCIPAL_EXPLORER_WRITE,
 	RT_JSON
@@ -10,7 +12,8 @@ import {modify} from '/lib/explorer/node/modify';
 import {connect} from '/lib/explorer/repo/connect';
 import {interfaceModel} from '/lib/explorer/model/2/nodeTypes/interface';
 import {jsonError} from '/lib/explorer/jsonError';
-
+import {sanitize} from '/lib/xp/common';
+import {reference} from '/lib/xp/value';
 
 export function post({
 	body: json,
@@ -50,6 +53,22 @@ export function post({
 		}
 	}
 
+	const collectionsNameToId = {};
+	queryCollections({
+		connection: writeConnection,
+		count: -1
+	}).hits.forEach(({_id, _name}) => {
+		collectionsNameToId[_name] = _id;
+	});
+	obj.collectionIds = [];
+	forceArray(obj.collections).forEach((collectionName) => {
+		const collectionId = collectionsNameToId[collectionName];
+		if (collectionId) {
+			obj.collectionIds.push(reference(collectionId));
+		} else {
+			log.error(`Unable to find collectionId for collectionName:${collectionName}`);
+		}
+	});
 
 	const node = modify(interfaceModel(obj), {
 		connection: writeConnection

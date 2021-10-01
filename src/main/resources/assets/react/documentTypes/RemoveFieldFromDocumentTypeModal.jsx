@@ -4,24 +4,32 @@ import {
 	Modal,
 	Popup
 } from 'semantic-ui-react';
+import {DeleteItemButton} from 'semantic-ui-react-form/buttons/DeleteItemButton';
+
 import {fetchHasField} from '../../../services/graphQL/fetchers/fetchHasField';
+
 
 export function RemoveFieldFromDocumentTypeModal({
 	afterClose = () => {
 		//console.debug('RemoveFieldFromDocumentTypeModal default afterClose');
 	},
 	collections = [], // optional
+	index,
+	interfaces = [],  // optional
 	disabled = false,
 	name,
 	beforeOpen = () => {
 		//console.debug('RemoveFieldFromDocumentTypeModal default beforeOpen');
 	},
+	path,
 	servicesBaseUrl
 }) {
 	//console.debug('collections', collections);
+	//console.debug('interfaces', interfaces);
 	//console.debug('name', name);
 	// State
 	const [open, setOpen] = React.useState(false);
+	const [fieldHasValueInDocumentsTotal, setFieldHasValueInDocumentsTotal] = React.useState('...fetching count...');
 
 	const doClose = () => {
 		//console.debug('RemoveFieldFromDocumentTypeModal doClose');
@@ -34,7 +42,8 @@ export function RemoveFieldFromDocumentTypeModal({
 		beforeOpen();
 		fetchHasField({
 			handleData(data) {
-				console.debug('data', data);
+				//console.debug('data', data);
+				setFieldHasValueInDocumentsTotal(data.hasField.total);
 			},
 			url: `${servicesBaseUrl}/graphQL` ,
 			variables: {
@@ -79,6 +88,27 @@ export function RemoveFieldFromDocumentTypeModal({
 	>
 		<Modal.Header>{`Remove field ${name}?`}</Modal.Header>
 		<Modal.Content>
+			<p>If there are any graphql clients out there, which use this field, deleting it will cause the very next query to throw an error!</p>
+			<p>Deactivating a field is safe, and a better option, unless you are certain the field is not in use...</p>
+			<p>This documentType is used by the following...</p>
+
+			<h4>Interfaces</h4>
+			<ul>{interfaces.sort().map((c, i) => <li key={i}>{c}</li>)}</ul>
+
+			<h4>Collections</h4>
+			<ul>{collections.sort().map((c, i) => <li key={i}>{c}</li>)}</ul>
+
+			<h4>Documents</h4>
+			<p>This field is present in {fieldHasValueInDocumentsTotal} documents!</p>
+			<Button.Group>
+				<DeleteItemButton
+					index={index}
+					negative
+					path={path}
+				><Icon color='white' name='alternate outline trash'/> Remove </DeleteItemButton>
+				<Button.Or/>
+				<Button icon onClick={doClose} positive> Cancel <Icon color='white' name='cancel'/></Button>
+			</Button.Group>
 		</Modal.Content>
 	</Modal>;
 } // RemoveFieldFromDocumentTypeModal

@@ -12,7 +12,7 @@ import {useInterval} from '../utils/useInterval';
 
 import {NewOrEditDocumentTypeModal} from './NewOrEditDocumentTypeModal';
 import {DeleteDocumentTypeModal} from './DeleteDocumentTypeModal';
-import {fetchDocumentTypes} from './fetchDocumentTypes';
+import {fetchDocumentTypes} from '../../../services/graphQL/fetchers/fetchDocumentTypes.mjs';
 import {fetchFields} from '../fields/fetchFields';
 
 
@@ -105,6 +105,7 @@ export function DocumentTypes({
 					<Table.HeaderCell>Edit</Table.HeaderCell>
 					<Table.HeaderCell>Name</Table.HeaderCell>
 					<Table.HeaderCell>Used in collections</Table.HeaderCell>
+					<Table.HeaderCell>Used in interfaces</Table.HeaderCell>
 					<Table.HeaderCell>Property count</Table.HeaderCell>
 					<Table.HeaderCell>Properties</Table.HeaderCell>
 					<Table.HeaderCell>Add fields</Table.HeaderCell>
@@ -118,7 +119,7 @@ export function DocumentTypes({
 					_name,
 					_referencedBy: {
 						//count
-						hits: referencedByHits
+						hits: referencedByCollections
 						//total
 					},
 					//_versionKey, // We get this inside NewOrEditDocumentTypeModal
@@ -127,12 +128,26 @@ export function DocumentTypes({
 					properties = []
 				}, index) => {
 					const collections = [];
-					referencedByHits.forEach(({
-						_name,
-						_nodeType
+					const interfaces = [];
+					referencedByCollections.forEach(({
+						_name: collectionName,
+						_nodeType,
+						_referencedBy: {
+							//count
+							hits: referencedByInterfaces
+							//total
+						}
 					}) => {
-						if (_nodeType === 'com.enonic.app.explorer:collection' && !collections.includes(_name)) {
-							collections.push(_name);
+						if (_nodeType === 'com.enonic.app.explorer:collection' && !collections.includes(collectionName)) {
+							collections.push(collectionName);
+							referencedByInterfaces.forEach(({
+								_name: interfaceName,
+								_nodeType: interfaceNodeType
+							}) => {
+								if (interfaceNodeType === 'com.enonic.app.explorer:interface' && !interfaces.includes(interfaceName)) {
+									interfaces.push(interfaceName);
+								}
+							});
 						}
 					});
 
@@ -141,6 +156,7 @@ export function DocumentTypes({
 							_id={_id}
 							_name={_name}
 							collections={collections}
+							interfaces={interfaces}
 							afterClose={() => {
 								//console.debug('NewOrEditDocumentTypeModal afterClose');
 								queryDocumentTypes();
@@ -158,6 +174,11 @@ export function DocumentTypes({
 							margin: 0,
 							padding: 0
 						}}>{collections.sort().map((c, i) => <li key={i}>{c}</li>)}</ul></Table.Cell>
+						<Table.Cell><ul style={{
+							listStyleType: 'none',
+							margin: 0,
+							padding: 0
+						}}>{interfaces.sort().map((c, i) => <li key={i}>{c}</li>)}</ul></Table.Cell>
 						<Table.Cell collapsing>{properties.length}</Table.Cell>
 						<Table.Cell collapsing>{properties.map(({name})=>name).join(', ')}</Table.Cell>
 						<Table.Cell collapsing>{addFields ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='red' name='x' size='large'/>}</Table.Cell>
