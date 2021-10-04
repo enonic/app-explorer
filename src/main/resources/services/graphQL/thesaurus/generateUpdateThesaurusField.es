@@ -52,7 +52,7 @@ export function generateUpdateThesaurusField({
 
 				}); // NOTE: Will throw if _path already occupied :)
 				if (boolMovedorRenamed) {
-					log.debug(`Moved/renamed id:${_id} from oldName:${oldName} to name:${_name}`);
+					//log.debug(`Moved/renamed id:${_id} from oldName:${oldName} to name:${_name}`);
 					writeConnection.refresh();
 				} else {
 					const msg = `Something went wrong when trying to move/rename id:${_id} from oldName:${oldName} to name:${_name}`;
