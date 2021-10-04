@@ -255,7 +255,7 @@ export function Fields(props) {
 							nGram, // node._indexConfig.default.nGram uses uppercase G in nGram
 							path
 						}, index) => {
-							console.debug(`Fields key:${key} referencedByHits:`, referencedByHits);
+							//console.debug(`Fields key:${key} referencedByHits:`, referencedByHits);
 							const documentTypes = [];
 							const collections = [];
 							referencedByHits.forEach(({
