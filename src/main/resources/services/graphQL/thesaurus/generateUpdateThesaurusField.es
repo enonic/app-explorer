@@ -1,4 +1,4 @@
-import {toStr} from '@enonic/js-utils';
+//import {toStr} from '@enonic/js-utils';
 
 import {PRINCIPAL_EXPLORER_WRITE} from '/lib/explorer/model/2/constants';
 import {connect} from '/lib/explorer/repo/connect';
@@ -68,7 +68,7 @@ export function generateUpdateThesaurusField({
 					return node;
 				}
 			});
-			log.debug(`modifiedNode:${toStr(modifiedNode)}`);
+			//log.debug(`modifiedNode:${toStr(modifiedNode)}`);
 			writeConnection.refresh();
 			return modifiedNode;
 		},
