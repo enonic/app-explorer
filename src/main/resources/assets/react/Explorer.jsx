@@ -337,13 +337,13 @@ export function Explorer(props) {
 					href='#stopWords'
 					active={page === 'stopWords'}
 					onClick={() => setPage('stopWords')}
-				><Icon name='crop'/> StopWords</Menu.Item>
+				><Icon name='ban'/> StopWords</Menu.Item>
 				<Menu.Item
 					as='a'
 					href='#synonyms'
 					active={page === 'synonyms'}
 					onClick={() => setPage('synonyms')}
-				><Icon name='font'/> Synonyms</Menu.Item>
+				><Icon name='code branch'/> Synonyms</Menu.Item>
 				<Menu.Item
 					as='a'
 					href='#interfaces'
