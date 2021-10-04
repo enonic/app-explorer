@@ -15,9 +15,9 @@ import {DEFAULT_INTERFACE_FIELDS} from '../../../constants';
 export function NewOrEditInterface(props) {
 	const {
 		collectionOptions,
+		doClose = () => {},
 		fieldsObj,
 		id, // nullable
-		onClose,
 		servicesBaseUrl,
 		stopWordOptions,
 		thesauriOptions
@@ -82,7 +82,7 @@ export function NewOrEditInterface(props) {
 				},
 				body: JSON.stringify(values)
 			}).then(response => {
-				if (response.status === 200) { onClose(); }
+				if (response.status === 200) { doClose(); }
 			});
 		}}
 	>

@@ -3,11 +3,11 @@ import {
 	Button, Dimmer, Header, Icon, Label, Loader, Popup, Radio, Segment, Table
 } from 'semantic-ui-react';
 
-import {EditSynonymsModal} from './thesaurus/EditSynonymsModal';
-//import {NewOrEditSynonym} from './thesaurus/NewOrEditSynonym';
-import {NewOrEditThesaurus} from './thesaurus/NewOrEditThesaurus';
-import {DeleteThesaurus} from './thesaurus/DeleteThesaurus';
-import {Import} from './thesaurus/Import';
+import {EditSynonymsModal} from './EditSynonymsModal';
+//import {NewOrEditSynonym} from './NewOrEditSynonym';
+import {NewOrEditThesaurus} from './NewOrEditThesaurus';
+import {DeleteThesaurus} from './DeleteThesaurus';
+import {Import} from './Import';
 
 
 const GQL_LOCALES_GET = `getLocales {
@@ -173,7 +173,7 @@ export function Thesauri(props) {
 										language={language}
 										licenseValid={licenseValid}
 										locales={locales}
-										onClose={fetchOnUpdate}
+										afterClose={fetchOnUpdate}
 										servicesBaseUrl={servicesBaseUrl}
 									/>
 								</Table.Cell>
@@ -184,19 +184,19 @@ export function Thesauri(props) {
 								<Table.Cell collapsing>
 									<Button.Group>
 										{/*<NewOrEditSynonym
-											onClose={fetchOnUpdate}
+											afterClose={fetchOnUpdate}
 											servicesBaseUrl={servicesBaseUrl}
 											thesaurusId={_id}
 										/>*/}
 										{/*<EditSynonymsModal
-											onClose={fetchOnUpdate}
+											afterClose={fetchOnUpdate}
 											servicesBaseUrl={servicesBaseUrl}
 											thesaurusId={_id}
 											thesaurusName={_name}
 										/>*/}
 										<Import
 											name={_name}
-											onClose={fetchOnUpdate}
+											afterClose={fetchOnUpdate}
 											servicesBaseUrl={servicesBaseUrl}
 										/>
 										<Popup
@@ -211,7 +211,7 @@ export function Thesauri(props) {
 										{showDelete ? <DeleteThesaurus
 											_id={_id}
 											name={_name}
-											onClose={fetchOnUpdate}
+											afterClose={fetchOnUpdate}
 											servicesBaseUrl={servicesBaseUrl}
 										/> : null}
 									</Button.Group>
@@ -224,7 +224,7 @@ export function Thesauri(props) {
 					<Table.Row>
 						<Table.HeaderCell><EditSynonymsModal
 							locales={locales}
-							onClose={fetchOnUpdate}
+							afterClose={fetchOnUpdate}
 							servicesBaseUrl={servicesBaseUrl}
 						/></Table.HeaderCell>
 						<Table.HeaderCell></Table.HeaderCell>
@@ -241,7 +241,7 @@ export function Thesauri(props) {
 			language={{from: '', to: ''}}
 			licenseValid={licenseValid}
 			locales={locales}
-			onClose={fetchOnUpdate}
+			afterClose={fetchOnUpdate}
 			servicesBaseUrl={servicesBaseUrl}
 			setLicensedTo={setLicensedTo}
 			setLicenseValid={setLicenseValid}

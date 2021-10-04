@@ -18,20 +18,21 @@ export const DeleteApiKeyModal = (props) => {
 	const [state, setState] = React.useState({
 		open: false
 	});
+
 	const doClose = () => {
 		setState({open: false});
 		afterClose();
 	};
+
+	// Made doOpen since onOpen doesn't get called consistently.
 	const doOpen = () => {
 		beforeOpen();
 		setState({open: true});
 	};
+
 	return <Modal
 		closeIcon
 		onClose={doClose}
-		onOpen={()=>{
-			//console.debug('DeleteApiKeyModal onOpen');
-		}}
 		open={state.open}
 		size='large'
 		trigger={<Popup

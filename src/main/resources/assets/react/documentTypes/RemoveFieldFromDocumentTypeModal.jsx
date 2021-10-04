@@ -37,6 +37,7 @@ export function RemoveFieldFromDocumentTypeModal({
 		afterClose();
 	};
 
+	// Made doOpen since onOpen doesn't get called consistently.
 	const doOpen = () => {
 		//console.debug('RemoveFieldFromDocumentTypeModal doOpen');
 		beforeOpen();
@@ -74,9 +75,6 @@ export function RemoveFieldFromDocumentTypeModal({
 	return <Modal
 		closeIcon
 		onClose={doClose}
-		onOpen={() => {
-			//console.debug('RemoveFieldFromDocumentTypeModal onOpen');
-		}}
 		open={open}
 		size='large'
 		trigger={<Popup

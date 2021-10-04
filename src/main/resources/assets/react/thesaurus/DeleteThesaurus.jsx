@@ -14,16 +14,26 @@ const GQL_MUTATION_THESAURUS_DELETE = `mutation DeleteThesaurusMutation(
 
 export function DeleteThesaurus(props) {
 	const {
-		onClose,
 		_id,
+		afterClose = () => {},
+		beforeOpen = () => {},
 		name,
 		servicesBaseUrl
 	} = props;
+
 	const [open, setOpen] = React.useState(false);
+
 	function doClose() {
 		setOpen(false); // This needs to be before unmount.
-		onClose(); // This could trigger render in parent, and unmount this Component.
+		afterClose(); // This could trigger render in parent, and unmount this Component.
 	}
+
+	// Made doOpen since onOpen doesn't get called consistently.
+	const doOpen = () => {
+		beforeOpen();
+		setOpen(true);
+	};
+
 	return <Modal
 		closeIcon
 		onClose={doClose}
@@ -33,7 +43,7 @@ export function DeleteThesaurus(props) {
 			inverted
 			trigger={<Button
 				icon
-				onClick={() => setOpen(true)}
+				onClick={doOpen}
 			><Icon color='red' name='trash alternate outline'/></Button>}/>}
 	>
 		<Modal.Header>Delete thesaurus {name}</Modal.Header>

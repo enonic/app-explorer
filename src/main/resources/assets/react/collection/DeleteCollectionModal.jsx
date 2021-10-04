@@ -17,6 +17,8 @@ export function DeleteCollectionModal(props) {
 		setState({open: false});
 		afterClose();
 	};
+
+	// Made doOpen since onOpen doesn't get called consistently.
 	const doOpen = () => {
 		beforeOpen();
 		setState({open: true});
@@ -25,7 +27,6 @@ export function DeleteCollectionModal(props) {
 	return <Modal
 		closeIcon
 		onClose={doClose}
-		onOpen={() => {console.debug('DeleteCollectionModal onOpen');}}
 		open={state.open}
 		trigger={<Popup
 			content={`Delete collection ${_name}`}

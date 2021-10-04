@@ -22,6 +22,8 @@ export function NewOrEditDocumentTypeModal({
 		setOpen(false);
 		afterClose();
 	};
+
+	// Made doOpen since onOpen doesn't get called consistently.
 	const doOpen = () => {
 		//console.debug('NewOrEditDocumentTypeModal doOpen');
 		beforeOpen();
@@ -29,16 +31,10 @@ export function NewOrEditDocumentTypeModal({
 	};
 
 	const header = _name ? `Edit document type ${_name}`: 'New document type';
-	//onMount={() => {console.debug('NewOrEditDocumentTypeModal onMount');}}
-	//onUnmount={() => {console.debug('NewOrEditDocumentTypeModal onUnmount');}}
 	return <Modal
 		closeIcon
 		defaultOpen={false}
 		onClose={doClose}
-		onOpen={() => {
-			// For some reason this gets executed when one clicks the green (+) button, but not the edit one...
-			//console.debug('NewOrEditDocumentTypeModal onOpen');
-		}}
 		open={open}
 		size='large'
 		trigger={<Popup

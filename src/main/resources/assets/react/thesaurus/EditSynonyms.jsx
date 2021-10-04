@@ -249,9 +249,9 @@ export function EditSynonyms(props) {
 						}, i) => <Table.Row key={i}>
 							<Table.Cell collapsing><NewOrEditSynonym
 								_id={_id}
+								afterClose={querySynonyms}
 								from={from}
 								locales={locales}
-								onClose={querySynonyms}
 								servicesBaseUrl={servicesBaseUrl}
 								to={to}
 								thesaurusId={thesaurusReference}
@@ -263,14 +263,14 @@ export function EditSynonyms(props) {
 							<Table.Cell collapsing>
 								{/*<Button.Group>
 									<NewOrEditSynonym
-										onClose={querySynonyms}
+										afterClose={querySynonyms}
 										servicesBaseUrl={servicesBaseUrl}
 										thesaurusId={thesaurusReference}
 									/>*/}
 								<DeleteSynonym
 									_id={_id}
 									from={from}
-									onClose={querySynonyms}
+									afterClose={querySynonyms}
 									servicesBaseUrl={servicesBaseUrl}
 									thesaurusId={thesaurusReference}
 									to={to}
@@ -301,7 +301,7 @@ export function EditSynonyms(props) {
 				<p>Displaying {start}-{end} of {total}</p>
 				{thesaurusId && <NewOrEditSynonym
 					locales={locales}
-					onClose={querySynonyms}
+					afterClose={querySynonyms}
 					servicesBaseUrl={servicesBaseUrl}
 					thesaurusId={thesaurusId}
 				/>}

@@ -22,21 +22,21 @@ export const NewOrEditApiKeyModal = (props) => {
 	const [state, setState] = React.useState({
 		open: false
 	});
+
 	const doClose = () => {
 		setState({open: false});
 		afterClose();
 	};
+
+	// Made doOpen since onOpen doesn't get called consistently.
 	const doOpen = () => {
 		beforeOpen();
 		setState({open: true});
 	};
+
 	return <Modal
 		closeIcon
 		onClose={doClose}
-		onOpen={() => {
-			// For some reason this gets executed when one clicks the green (+) button, but not the edit one...
-			//console.debug('NewOrEditApiKeyModal onOpen');
-		}}
 		open={state.open}
 		size='large'
 		trigger={_name ? <Popup

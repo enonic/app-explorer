@@ -5,18 +5,32 @@ import {Search} from '../Search';
 
 export function SearchModal(props) {
 	const {
+		afterClose = () => {},
+		beforeOpen = () => {},
 		interfaceName,
 		servicesBaseUrl
 	} = props;
 	const [open, setOpen] = React.useState(false);
+
+	const doClose = () => {
+		setOpen(false); // This needs to be before unmount.
+		afterClose(); // This could trigger render in parent, and unmount this Component.
+	};
+
+	// Made doOpen since onOpen doesn't get called consistently.
+	const doOpen = () => {
+		beforeOpen();
+		setOpen(true);
+	};
+
 	return <Modal
 		closeIcon
-		onClose={() => setOpen(false)}
+		onClose={doClose}
 		open={open}
 		size='large'
 		trigger={<Button
 			compact
-			onClick={() => setOpen(true)}
+			onClick={doOpen}
 			size='tiny'
 		><Icon name='search'/>Search</Button>}
 	>

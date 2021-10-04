@@ -8,30 +8,43 @@ import {EditSynonyms} from './EditSynonyms';
 export function EditSynonymsModal(props) {
 	//console.debug('EditSynonymsModal props', props);
 	const {
+		afterClose = () => {},
+		beforeOpen = () => {},
 		locales,
-		onClose,
 		servicesBaseUrl,
 		thesaurusId,
 		thesaurusName
 	} = props;
 
 	const [open, setOpen] = React.useState(false);
+
+	const doClose = () => {
+		setOpen(false); // This needs to be before unmount.
+		afterClose(); // This could trigger render in parent, and unmount this Component.
+	};
+
+	// Made doOpen since onOpen doesn't get called consistently.
+	const doOpen = () => {
+		beforeOpen();
+		setOpen(true);
+	};
+
 	return <Modal
 		closeIcon
-		onClose={onClose}
+		onClose={doClose}
 		open={open}
 		size='fullscreen'
 		trigger={thesaurusId
 			? <Button
 				icon
-				onClick={() => setOpen(true)}
+				onClick={doOpen}
 			><Icon color='blue' name='edit'/> Edit synonyms</Button>
 			: <Popup
 				content='Edit all synonyms'
 				inverted
 				trigger={<Button
 					icon
-					onClick={() => setOpen(true)}
+					onClick={doOpen}
 				><Icon color='blue' name='edit'/></Button>}
 			/>
 		}>
