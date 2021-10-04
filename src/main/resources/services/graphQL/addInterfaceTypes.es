@@ -1,4 +1,4 @@
-import {toStr} from '@enonic/js-utils';
+//import {toStr} from '@enonic/js-utils';
 
 import {NT_DOCUMENT_TYPE} from '/lib/explorer/documentType/constants';
 import {
@@ -50,10 +50,10 @@ export function addInterfaceTypes({
 		},
 		typeResolver(node) {
 			// WARNING I believe you cannot use lib-graphql.reference in here!
-			log.debug(`node:${toStr(node)}`);
+			//log.debug(`node:${toStr(node)}`);
 			//return GQL_TYPE_FIELD_NODE;
 			const {_nodeType} = node;
-			log.debug(`_nodeType:${toStr(_nodeType)}`);
+			//log.debug(`_nodeType:${toStr(_nodeType)}`);
 			switch (_nodeType) {
 			case NT_COLLECTION:
 				return glue.getObjectType(GQL_TYPE_COLLECTION_NAME); // This works because it's resolved later
