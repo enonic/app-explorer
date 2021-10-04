@@ -143,7 +143,23 @@ export function NewOrEditDocumentType({
 		local: true,
 		open: false
 	});
+	console.debug(`NewOrEditDocumentType initialValues`, initialValues);
 	//console.debug(`NewOrEditDocumentType globalFields`, globalFields);
+
+	const initialFields = {};
+	const initialProperties = {};
+	if (initialValues) {
+		if (initialValues.fields) {
+			initialValues.fields.forEach(({fieldId}) => {
+				initialFields[fieldId] = true;
+			});
+		}
+		if (initialValues.properties) {
+			initialValues.properties.forEach(({name}) => {
+				initialProperties[name] = true;
+			});
+		}
+	}
 
 	const GLOBAL_FIELD_OBJ = {};
 	const GLOBAL_FIELD_OPTIONS = globalFields.map(({
@@ -400,7 +416,7 @@ export function NewOrEditDocumentType({
 														collections={collections}
 														index={index}
 														interfaces={interfaces}
-														disabled={active}
+														disabled={initialFields[fieldId] && active}
 														name={key}
 														path={PATH_FIELDS}
 														servicesBaseUrl={servicesBaseUrl}
@@ -539,7 +555,7 @@ export function NewOrEditDocumentType({
 												collections={collections}
 												index={index}
 												interfaces={interfaces}
-												disabled={active}
+												disabled={initialProperties[name] && active}
 												name={name}
 												path={PATH_PROPERTIES}
 												servicesBaseUrl={servicesBaseUrl}
