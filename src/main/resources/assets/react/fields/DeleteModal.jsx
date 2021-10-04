@@ -9,14 +9,27 @@ export function DeleteModal(props) {
 		_id,
 		_name,
 		disabled,
-		onClose,
+		afterClose = () => {},
+		beforeOpen = () => {},
 		popupContent,
 		servicesBaseUrl
 	} = props;
 	const [open, setOpen] = React.useState(false);
+
+	const doClose = () => {
+		setOpen(false);
+		afterClose();
+	};
+
+	// Made doOpen since onOpen doesn't get called consistently.
+	const doOpen = () => {
+		beforeOpen();
+		setOpen(true);
+	};
+
 	return <Modal
 		closeIcon
-		onClose={onClose}
+		onClose={doClose}
 		open={open}
 		trigger={<Popup
 			content={popupContent}
@@ -24,7 +37,7 @@ export function DeleteModal(props) {
 				<Button
 				icon
 				disabled={disabled}
-					onClick={() => setOpen(true)}>
+					onClick={doOpen}>
 					<Icon color='red' name='trash alternate outline'/>
 				</Button>
 			</div>
@@ -49,8 +62,7 @@ export function DeleteModal(props) {
 						})
 					}).then((/*response*/) => {
 						//if (response.status === 200) {}
-						setOpen(false); // This needs to be before unmount.
-						onClose(); // This could trigger render in parent, and unmount this Component.
+						doClose();
 					});
 				}}
 				size='tiny'

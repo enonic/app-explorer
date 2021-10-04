@@ -2,25 +2,35 @@ import {Button, Icon, Input, Message, Modal} from 'semantic-ui-react';
 
 
 export function DeleteModal({
+	afterClose = () => {},
+	beforeOpen = () => {},
 	disabled = false,
 	name,
-	onClose = () => {},
 	servicesBaseUrl
 }) {
 	const [deleteNameMatches, setDeleteNameMatches] = React.useState(false);
 	const [typedInterfaceName, setTypedInterfaceName] = React.useState('');
 	const [open, setOpen] = React.useState(false);
+
+	const doClose = () => {
+		setOpen(false); // This needs to be before unmount.
+		afterClose(); // This could trigger render in parent, and unmount this Component.
+	};
+
+	// Made doOpen since onOpen doesn't get called consistently.
+	const doOpen = () => {
+		beforeOpen();
+		setOpen(true);
+	};
+
 	return <Modal
 		closeIcon
-		onClose={() => {
-			setOpen(false);
-			onClose();
-		}}
+		onClose={doClose}
 		open={open}
 		trigger={<Button
 			compact
 			disabled={disabled}
-			onClick={() => setOpen(true)}
+			onClick={doOpen}
 			size='tiny'
 			type='button'
 		><Icon color='red' name='trash alternate outline'/>Delete</Button>}
@@ -45,8 +55,7 @@ export function DeleteModal({
 					})
 						.then(response => {
 							if (response.status === 200) {
-								setOpen(false);
-								onClose();
+								doClose();
 							}
 						});
 				}}

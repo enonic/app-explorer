@@ -5,15 +5,15 @@ import {
 import {Api} from './Api';
 import {Collections} from './collection/Collections';
 import {Fields} from './fields/Fields';
-import {Interfaces} from './Interfaces';
+import {Interfaces} from './interfaces/Interfaces';
 import {Journals} from './Journals';
 import {Notifications} from './Notifications';
 import {Schedule} from './Schedule';
 import {DocumentTypes} from './documentTypes/DocumentTypes';
 import {Search} from './Search';
 import {Status} from './Status';
-import {StopWords} from './StopWords';
-import {Thesauri} from './Thesauri';
+import {StopWords} from './stopWords/StopWords';
+import {Thesauri} from './thesaurus/Thesauri';
 import {UploadLicense} from './UploadLicense';
 
 

@@ -1,19 +1,29 @@
 import {
-	Button, Form, Header, Icon, Input, Modal, Popup
+	Button, Form, Icon, Input, Modal, Popup
 } from 'semantic-ui-react';
 
 
 export function Import(props) {
 	const {
+		afterClose = () => {},
+		beforeOpen = () => {},
 		name,
-		onClose,
 		servicesBaseUrl
 	} = props;
+
 	const [open, setOpen] = React.useState(false);
+
 	function doClose() {
 		setOpen(false); // This needs to be before unmount.
-		onClose(); // This could trigger render in parent, and unmount this Component.
+		afterClose(); // This could trigger render in parent, and unmount this Component.
 	}
+
+	// Made doOpen since onOpen doesn't get called consistently.
+	const doOpen = () => {
+		beforeOpen();
+		setOpen(true);
+	};
+
 	return <Modal
 		closeIcon
 		onClose={doClose}
@@ -23,7 +33,7 @@ export function Import(props) {
 			inverted
 			trigger={<Button
 				icon
-				onClick={() => setOpen(true)}
+				onClick={doOpen}
 			><Icon color='blue' name='upload'/></Button>}
 		/>}
 	>
@@ -49,9 +59,9 @@ export function Import(props) {
 						fetch(`${servicesBaseUrl}/thesaurusImport`, {
 							body,
 							method: 'POST'
-						}).then(response => {
+						}).then((/*response*/) => {
 							doClose();
-						})
+						});
 					}}
 					size='tiny'
 					type='submit'

@@ -11,8 +11,9 @@ export function DeleteSynonym(props) {
 	//console.debug('DeleteSynonym props', props);
 	const {
 		_id,
+		afterClose = () => {},
+		beforeOpen = () => {},
 		from,
-		onClose,
 		servicesBaseUrl,
 		to
 	} = props;
@@ -22,8 +23,14 @@ export function DeleteSynonym(props) {
 
 	function doClose() {
 		setOpen(false); // This needs to be before unmount.
-		onClose(); // This could trigger render in parent, and unmount this Component.
+		afterClose(); // This could trigger render in parent, and unmount this Component.
 	}
+
+	// Made doOpen since onOpen doesn't get called consistently.
+	const doOpen = () => {
+		beforeOpen();
+		setOpen(true);
+	};
 
 	const [state, setState] = React.useState({
 		modalHeader: 'Delete synonym?',
@@ -96,7 +103,7 @@ export function DeleteSynonym(props) {
 			inverted
 			trigger={<Button
 				icon
-				onClick={() => setOpen(true)}
+				onClick={doOpen}
 			><Icon color='red' name='trash alternate outline'/></Button>}/>}
 	>
 		<Modal.Header>{state.modalHeader}</Modal.Header>

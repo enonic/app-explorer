@@ -19,7 +19,8 @@ import {SubmitButton} from 'semantic-ui-react-form/buttons/SubmitButton';
 export function NewOrEditModal(props) {
 	//console.debug('NewOrEditModal props', props);
 	const {
-		afterClose,
+		afterClose = () => {},
+		beforeOpen = () => {},
 		displayName = '',
 		name = '',
 		editMode = !!name,
@@ -31,26 +32,32 @@ export function NewOrEditModal(props) {
 
 	const [open, setOpen] = React.useState(false);
 
-	function onClose() {
+	function doClose() {
 		setOpen(false); // This needs to be before unmount.
 		afterClose(); // This could trigger render in parent, and unmount this Component.
 	}
 
+	// Made doOpen since onOpen doesn't get called consistently.
+	const doOpen = () => {
+		beforeOpen();
+		setOpen(true);
+	};
+
 	return <Modal
 		closeIcon
-		onClose={onClose}
+		onClose={doClose}
 		open={open}
 		trigger={<Popup
 			content={header}
 			inverted
 			trigger={editMode ? <Button
 				icon
-				onClick={() => setOpen(true)}
+				onClick={doOpen}
 			><Icon color='blue' name='edit'/></Button> : <Button
 				circular
 				color='green'
 				icon
-				onClick={() => setOpen(true)}
+				onClick={doOpen}
 				size='massive'
 				style={{
 					bottom: 13.5,
@@ -78,7 +85,7 @@ export function NewOrEditModal(props) {
 						method: 'POST'
 					})
 						.then((/*response*/) => {
-							onClose();
+							doClose();
 							//if (response.status === 200) {}
 						});
 				}}

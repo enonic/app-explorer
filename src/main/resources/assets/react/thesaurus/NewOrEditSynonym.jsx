@@ -70,21 +70,29 @@ const PATH_LANGUAGES = 'languages';
 export function NewOrEditSynonym(props) {
 	//console.debug('NewOrEditSynonym props', props);
 	const {
-		from = [''],
 		_id,
+		afterClose = () => {},
+		beforeOpen = () => {},
+		from = [''],
 		locales,
-		onClose,
 		servicesBaseUrl,
 		thesaurusId,
 		to = ['']
 	} = props;
 
 	const [open, setOpen] = React.useState(false);
-	//function doOpen() { setOpen(true); }
+
 	function doClose() {
 		setOpen(false); // This needs to be before unmount.
-		onClose(); // This could trigger render in parent, and unmount this Component.
+		afterClose(); // This could trigger render in parent, and unmount this Component.
 	}
+
+	// Made doOpen since onOpen doesn't get called consistently.
+	const doOpen = () => {
+		beforeOpen();
+		setOpen(true);
+	};
+
 	/*const fromStemmer = new Snowball('Norwegian');
 	const toStemmer = new Snowball('English');*/
 	return <Modal
@@ -96,14 +104,14 @@ export function NewOrEditSynonym(props) {
 			inverted
 			trigger={<Button
 				icon
-				onClick={() => setOpen(true)}
+				onClick={doOpen}
 			><Icon color='blue' name='edit'/></Button>}/>
 			: <Popup
 				content={`New synonym`}
 				inverted
 				trigger={<Button
 					icon
-					onClick={() => setOpen(true)}
+					onClick={doOpen}
 				><Icon color='green' name='plus'/></Button>}/>
 		}
 	>

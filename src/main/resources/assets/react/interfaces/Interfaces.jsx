@@ -7,10 +7,10 @@ import {
 	Table
 } from 'semantic-ui-react';
 
-import {NewOrEditInterfaceModal} from './interfaces/NewOrEditInterfaceModal';
-import {CopyModal} from './interfaces/CopyModal';
-import {DeleteModal} from './interfaces/DeleteModal';
-import {SearchModal} from './interfaces/SearchModal';
+import {NewOrEditInterfaceModal} from './NewOrEditInterfaceModal';
+import {CopyModal} from './CopyModal';
+import {DeleteModal} from './DeleteModal';
+import {SearchModal} from './SearchModal';
 
 
 /*const INTERFACES_GQL = `queryInterfaces {
@@ -220,13 +220,13 @@ export function Interfaces({
 								/>
 								<CopyModal
 									name={_name}
-									updateInterfaces={() => memoizedUpdateInterfacesCallback()}
+									afterClose={memoizedUpdateInterfacesCallback}
 									servicesBaseUrl={servicesBaseUrl}
 								/>
 								{showDelete ? <DeleteModal
 									name={_name}
 									disabled={_name === 'default'}
-									onClose={() => memoizedUpdateInterfacesCallback()}
+									afterClose={memoizedUpdateInterfacesCallback}
 									servicesBaseUrl={servicesBaseUrl}
 								/> : null}
 							</Button.Group>
@@ -238,7 +238,7 @@ export function Interfaces({
 		<NewOrEditInterfaceModal
 			collectionOptions={collectionOptions}
 			fieldsObj={fieldsObj}
-			afterClose={() => memoizedUpdateInterfacesCallback()}
+			afterClose={memoizedUpdateInterfacesCallback}
 			licenseValid={licenseValid}
 			servicesBaseUrl={servicesBaseUrl}
 			setLicensedTo={setLicensedTo}

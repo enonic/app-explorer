@@ -303,7 +303,7 @@ export function Fields(props) {
 											nGram, // node._indexConfig.default.nGram uses uppercase G in nGram
 											path
 										}}
-										onClose={updateFields}
+										afterClose={updateFields}
 										servicesBaseUrl={servicesBaseUrl}
 									/>
 								</Table.Cell>
@@ -345,7 +345,7 @@ export function Fields(props) {
 										disabled={denyDelete || documentTypes.length || collections.length}
 										_id={_id}
 										_name={_name}
-										onClose={updateFields}
+										afterClose={updateFields}
 										popupContent={denyDelete
 											? <Message
 												error
@@ -387,7 +387,7 @@ export function Fields(props) {
 					</Table.Body>
 				</Table>
 				<NewOrEditModal
-					onClose={updateFields}
+					afterClose={updateFields}
 					servicesBaseUrl={servicesBaseUrl}
 				/>
 			</>

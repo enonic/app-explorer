@@ -61,6 +61,8 @@ function required(value) {
 export function NewOrEditThesaurus(props) {
 	const {
 		_id,
+		afterClose = () => {},
+		beforeOpen = () => {},
 		language = {
 			from: '',
 			to: ''
@@ -68,7 +70,6 @@ export function NewOrEditThesaurus(props) {
 		licenseValid,
 		locales,
 		_name = '',
-		onClose,
 		servicesBaseUrl,
 		setLicensedTo,
 		setLicenseValid
@@ -79,11 +80,15 @@ export function NewOrEditThesaurus(props) {
 
 	const [open, setOpen] = React.useState(false);
 
-	function doOpen() { setOpen(true); }
+	// Made doOpen since onOpen doesn't get called consistently.
+	function doOpen() {
+		beforeOpen();
+		setOpen(true);
+	}
 
 	function doClose() {
 		setOpen(false); // This needs to be before unmount.
-		onClose(); // This could trigger render in parent, and unmount this Component.
+		afterClose(); // This could trigger render in parent, and unmount this Component.
 	}
 
 	return <Modal

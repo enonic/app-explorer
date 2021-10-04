@@ -6,7 +6,8 @@ import {UploadLicense} from '../UploadLicense';
 
 export function NewOrEditInterfaceModal(props) {
 	const {
-		afterClose = () => {/*no-op*/},
+		afterClose = () => {},
+		beforeOpen = () => {},
 		collectionOptions,
 		disabled = false,
 		displayName,
@@ -27,14 +28,20 @@ export function NewOrEditInterfaceModal(props) {
 
 	const header = id ? `Edit interface ${displayName}`: 'New interface';
 
-	const onClose = () => {
+	const doClose = () => {
 		setOpen(false);
 		afterClose();
 	};
 
+	// Made doOpen since onOpen doesn't get called consistently.
+	const doOpen = () => {
+		beforeOpen();
+		setOpen(true);
+	};
+
 	return <Modal
 		closeIcon
-		onClose={onClose}
+		onClose={doClose}
 		open={open}
 		size='large'
 		trigger={<Popup
@@ -43,14 +50,14 @@ export function NewOrEditInterfaceModal(props) {
 			trigger={id ? <Button
 				disabled={disabled}
 				icon
-				onClick={() => setOpen(true)}
+				onClick={doOpen}
 			><Icon color='blue' name='edit'/></Button>
 				: <Button
 					circular
 					color='green'
 					disabled={disabled}
 					icon
-					onClick={() => setOpen(true)}
+					onClick={doOpen}
 					size='massive'
 					style={{
 						bottom: 13.5,
@@ -67,7 +74,7 @@ export function NewOrEditInterfaceModal(props) {
 						collectionOptions={collectionOptions}
 						fieldsObj={fieldsObj}
 						id={id}
-						onClose={onClose}
+						doClose={doClose}
 						servicesBaseUrl={servicesBaseUrl}
 						stopWordOptions={stopWordOptions}
 						thesauriOptions={thesauriOptions}

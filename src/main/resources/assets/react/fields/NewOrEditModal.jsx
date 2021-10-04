@@ -73,7 +73,8 @@ export function NewOrEditModal(props) {
 			nGram: true, // node._indexConfig.default.nGram uses uppercase G in nGram
 			path: false
 		},
-		onClose,
+		afterClose = () => {},
+		beforeOpen = () => {},
 		servicesBaseUrl
 	} = props;
 	const editMode = !!initialValues.key;
@@ -82,7 +83,13 @@ export function NewOrEditModal(props) {
 
 	const doClose = () => {
 		setOpen(false); // This needs to be before unmount.
-		onClose(); // This could trigger render in parent, and unmount this Component.
+		afterClose(); // This could trigger render in parent, and unmount this Component.
+	};
+
+	// Made doOpen since onOpen doesn't get called consistently.
+	const doOpen = () => {
+		beforeOpen();
+		setOpen(true);
 	};
 
 	return <Modal
@@ -95,14 +102,14 @@ export function NewOrEditModal(props) {
 			trigger={<Button
 				icon
 				disabled={disabled}
-				onClick={() => setOpen(true)}
+				onClick={doOpen}
 			><Icon color='blue' name='edit'/></Button>}/>
 			: <Button
 				circular
 				color='green'
 				disabled={disabled}
 				icon
-				onClick={() => setOpen(true)}
+				onClick={doOpen}
 				size='massive'
 				style={{
 					bottom: 13.5,

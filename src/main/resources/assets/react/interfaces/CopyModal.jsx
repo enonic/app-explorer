@@ -2,18 +2,31 @@ import {Button, Icon, Input, Message, Modal} from 'semantic-ui-react';
 
 
 export function CopyModal({
+	afterClose = () => {},
+	beforeOpen = () => {},
 	name,
-	servicesBaseUrl,
-	updateInterfaces
+	servicesBaseUrl
 }) {
 	const [interfaceExists, setInterfaceExists] = React.useState(false);
 	const [interfaceTo, setInterfaceTo] = React.useState('');
 	const [open, setOpen] = React.useState(false);
+
+	const doClose = () => {
+		setOpen(false); // This needs to be before unmount.
+		afterClose(); // This could trigger render in parent, and unmount this Component.
+	};
+
+	// Made doOpen since onOpen doesn't get called consistently.
+	const doOpen = () => {
+		beforeOpen();
+		setOpen(true);
+	};
+
 	return <Modal
 		closeIcon
-		onClose={() => setOpen(false)}
+		onClose={doClose}
 		open={open}
-		trigger={<Button onClick={() => setOpen(true)} compact size='tiny' type='button'><Icon color='green' name='copy'/>Copy</Button>}
+		trigger={<Button onClick={doOpen} compact size='tiny' type='button'><Icon color='green' name='copy'/>Copy</Button>}
 	>
 		<Modal.Header>Copy</Modal.Header>
 		<Modal.Content>
@@ -26,7 +39,7 @@ export function CopyModal({
 							//console.debug(exists);
 							setInterfaceExists(exists);
 							setInterfaceTo(value);
-						})
+						});
 				}}
 				placeholder='Please input name'
 			/>
@@ -40,13 +53,12 @@ export function CopyModal({
 					fetch(`${servicesBaseUrl}/interfaceCopy?from=${name}&to=${interfaceTo}`)
 						.then(response => {
 							if (response.status === 200) {
-								updateInterfaces();
-								setOpen(false);
+								doClose();
 							}
-						})
+						});
 				}}
 				type='button'
 			><Icon color='green' name='copy'/>Copy</Button>}
 		</Modal.Content>
-	</Modal>
+	</Modal>;
 } // function CopyModal

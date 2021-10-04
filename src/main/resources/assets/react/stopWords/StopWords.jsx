@@ -1,7 +1,7 @@
 import {Button, Header, Table} from 'semantic-ui-react';
 
-import {DeleteModal} from './stopWords/DeleteModal';
-import {NewOrEditModal} from './stopWords/NewOrEditModal';
+import {DeleteModal} from './DeleteModal';
+import {NewOrEditModal} from './NewOrEditModal';
 
 
 export function StopWords(props) {
@@ -70,7 +70,7 @@ export function StopWords(props) {
 							<Button.Group>
 								{/* MAYBE copy/duplicate? */}
 								<DeleteModal
-									afterClose={() => updateStopwords()}
+									afterClose={updateStopwords}
 									name={name}
 									servicesBaseUrl={servicesBaseUrl}
 								/>
@@ -81,7 +81,7 @@ export function StopWords(props) {
 			</Table.Body>
 		</Table>
 		<NewOrEditModal
-			afterClose={() => updateStopwords()}
+			afterClose={updateStopwords}
 			servicesBaseUrl={servicesBaseUrl}
 		/>
 	</>;

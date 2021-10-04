@@ -24,17 +24,17 @@ export function DeleteDocumentTypeModal({
 		setOpen(false);
 		afterClose();
 	};
+
+	// Made doOpen since onOpen doesn't get called consistently.
 	const doOpen = () => {
 		//console.debug('DeleteDocumentTypeModal default doOpen');
 		beforeOpen();
 		setOpen(true);
 	};
+
 	return <Modal
 		closeIcon
 		onClose={doClose}
-		onOpen={() => {
-			//console.debug('DeleteDocumentTypeModal default onOpen');
-		}}
 		open={open}
 		trigger={<Button
 			compact
