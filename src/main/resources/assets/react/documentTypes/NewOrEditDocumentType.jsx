@@ -48,7 +48,7 @@ import {fetchFields} from '../fields/fetchFields';
 
 import {nameValidator} from '../utils/nameValidator';
 
-import {AddGlobalFieldModal} from './AddGlobalFieldModal';
+import {AddFieldModal} from './AddFieldModal';
 import {RemoveFieldFromDocumentTypeModal} from './RemoveFieldFromDocumentTypeModal';
 
 
@@ -139,7 +139,10 @@ export function NewOrEditDocumentType({
 }) {
 	const [initialValues, setInitialValues] = React.useState(false);
 	const [globalFields, setGlobalFields] = React.useState([]);
-	const [addGlobalFieldModalOpen, setAddGlobalFieldModalOpen] = React.useState(false);
+	const [fieldModalState, setFieldModalState] = React.useState({
+		local: true,
+		open: false
+	});
 	//console.debug(`NewOrEditDocumentType globalFields`, globalFields);
 
 	const GLOBAL_FIELD_OBJ = {};
@@ -277,10 +280,10 @@ export function NewOrEditDocumentType({
 					<Table.Row>
 						<Table.HeaderCell>Active</Table.HeaderCell>
 						<Table.HeaderCell>Field</Table.HeaderCell>
+						<Table.HeaderCell>Value type</Table.HeaderCell>
 						<Table.HeaderCell>Min</Table.HeaderCell>
 						<Table.HeaderCell>Max</Table.HeaderCell>
 						<Table.HeaderCell>Indexing</Table.HeaderCell>
-						<Table.HeaderCell>Value type</Table.HeaderCell>
 						<Table.HeaderCell>Fulltext</Table.HeaderCell>
 						<Table.HeaderCell>nGram</Table.HeaderCell>
 						<Table.HeaderCell>Include in _allText</Table.HeaderCell>
@@ -336,44 +339,36 @@ export function NewOrEditDocumentType({
 												toggle
 												value={active}
 											/></Table.Cell>
-											<Table.Cell disabled={!active}>{fieldId // Remove dropdown as soon as a field is selected.
-												? key
-												: <EnonicDropdown
-													disabled={!active}
-													options={GLOBAL_FIELD_OPTIONS.filter(({key: k}) => !selectedFields[k])}
-													name='fieldId'
-													parentPath={PATH_FIELD}
-													search
-													selection
-													selectOnBlur={false}
-													selectOnNavigation={false}
-													placeholder='Please select a field'
-												/>
+											<Table.Cell disabled={true} style={{
+												textDecoration: active ? 'none' : 'line-through'
+											}}>{key}</Table.Cell>
+											<Table.Cell disabled={true}>{active ? fieldType : null}</Table.Cell>
+											<Table.Cell disabled={true}>{active ? min : null}</Table.Cell>
+											<Table.Cell disabled={true}>{active ? max : null}</Table.Cell>
+											<Table.Cell>{active
+												? (enabled === true || enabled === false)
+													? <Icon color='grey' disabled={true} name={enabled ? 'checkmark' : 'x'} size='large'/>
+													: null // enabled === undefined
+												: null // !active
 											}</Table.Cell>
-											<Table.Cell disabled={!active}>{min}</Table.Cell>
-											<Table.Cell disabled={!active}>{max}</Table.Cell>
-											<Table.Cell>{enabled === true
-												? <Icon color={active ? 'green' : 'grey'} disabled={!active} name='checkmark' size='large'/>
-												: enabled === false
-													? <Icon color={active ? 'red' : 'grey'} disabled={!active} name='x' size='large'/>
-													: null
+											<Table.Cell>{(active && enabled)
+												? (fulltext === true || fulltext === false)
+													? <Icon color='grey' disabled={true} name={fulltext ? 'checkmark' : 'x'} size='large'/>
+													: null // fulltext === undefined
+												: null // !active
 											}</Table.Cell>
-											<Table.Cell disabled={!active}>{fieldType}</Table.Cell>
-											<Table.Cell>{fulltext=== true
-												? <Icon color={active ? 'green' : 'grey'} disabled={!active} name='checkmark' size='large'/>
-												: fulltext === false
-													? <Icon color={active ? 'red' : 'grey'} disabled={!active} name='x' size='large'/>
-													: null}</Table.Cell>
-											<Table.Cell>{nGram === true
-												? <Icon color={active ? 'green' : 'grey'} disabled={!active} name='checkmark' size='large'/>
-												: nGram === false
-													? <Icon color={active ? 'red' : 'grey'} disabled={!active} name='x' size='large'/>
-													: null}</Table.Cell>
-											<Table.Cell>{includeInAllText=== true
-												? <Icon color={active ? 'green' : 'grey'} disabled={!active} name='checkmark' size='large'/>
-												: includeInAllText === false
-													? <Icon color={active ? 'red' : 'grey'} disabled={!active} name='x' size='large'/>
-													: null}</Table.Cell>
+											<Table.Cell>{(active && enabled)
+												? (nGram === true || nGram === false)
+													? <Icon color='grey' disabled={true} name={nGram ? 'checkmark' : 'x'} size='large'/>
+													: null // nGram === undefined
+												: null // !active
+											}</Table.Cell>
+											<Table.Cell>{(active && enabled)
+												? (includeInAllText === true || includeInAllText === false)
+													? <Icon color='grey' disabled={true} name={includeInAllText ? 'checkmark' : 'x'} size='large'/>
+													: null // includeInAllText === undefined
+												: null // !active
+											}</Table.Cell>
 											<Table.Cell collapsing>
 												<Button.Group>
 													{/*<Popup
@@ -448,54 +443,47 @@ export function NewOrEditDocumentType({
 										toggle
 										value={active}
 									/></Table.Cell>
-									<Table.Cell>
-										<Input
-											disabled={!active}
-											fluid
-											name='name'
-											parentPath={PATH_PROPERTY}
-											placeholder='Please input a name'
-											value={name}
-										/>
-									</Table.Cell>
-									<Table.Cell>
-										<Input
-											disabled={!active}
-											fluid
-											name='min'
-											parentPath={PATH_PROPERTY}
-											type='number'
-											value={min}
-										/>
-									</Table.Cell>
-									<Table.Cell>
-										<Input
-											disabled={!active}
-											fluid
-											name='max'
-											parentPath={PATH_PROPERTY}
-											type='number'
-											value={max}
-										/>
-									</Table.Cell>
+									<Table.Cell disabled={!active} style={{
+										textDecoration: active ? 'none' : 'line-through'
+									}}>{name}</Table.Cell>
 									<Table.Cell collapsing>
-										<Checkbox
-											name='enabled'
-											parentPath={PATH_PROPERTY}
-											toggle
-										/>
-									</Table.Cell>
-									<Table.Cell collapsing>
-										{enabled ? <EnonicDropdown
-											disabled={!active || !enabled}
+										{active ? <EnonicDropdown
+											disabled={!active}
 											options={OPTIONS_VALUE_TYPES}
 											name='valueType'
 											parentPath={PATH_PROPERTY}
 											selection
 										/> : null}
 									</Table.Cell>
+									<Table.Cell>
+										{active ? <Input
+											disabled={!active}
+											fluid
+											name='min'
+											parentPath={PATH_PROPERTY}
+											type='number'
+											value={min}
+										/> : null}
+									</Table.Cell>
+									<Table.Cell>
+										{active ? <Input
+											disabled={!active}
+											fluid
+											name='max'
+											parentPath={PATH_PROPERTY}
+											type='number'
+											value={max}
+										/> : null}
+									</Table.Cell>
 									<Table.Cell collapsing>
-										{enabled ? <Checkbox
+										{active ? <Checkbox
+											name='enabled'
+											parentPath={PATH_PROPERTY}
+											toggle
+										/> : null}
+									</Table.Cell>
+									<Table.Cell collapsing>
+										{active && enabled ? <Checkbox
 											disabled={!active || !enabled}
 											name='fulltext'
 											parentPath={PATH_PROPERTY}
@@ -503,7 +491,7 @@ export function NewOrEditDocumentType({
 										/> : null}
 									</Table.Cell>
 									<Table.Cell collapsing>
-										{enabled ? <Checkbox
+										{active && enabled ? <Checkbox
 											disabled={!active || !enabled}
 											name='ngram'
 											parentPath={PATH_PROPERTY}
@@ -511,7 +499,7 @@ export function NewOrEditDocumentType({
 										/> : null}
 									</Table.Cell>
 									<Table.Cell collapsing>
-										{enabled ? <Checkbox
+										{active && enabled ? <Checkbox
 											disabled={!active || !enabled}
 											name='includeInAllText'
 											parentPath={PATH_PROPERTY}
@@ -567,12 +555,27 @@ export function NewOrEditDocumentType({
 			</Table>
 			<Form.Field>
 				<Button.Group>
-					<Button icon><Icon color='green' name='add'/> Add local </Button>
+					<Button icon onClick={() => {
+						setFieldModalState({
+							local: true,
+							open: true
+						});
+					}}><Icon color='green' name='add'/> Add local </Button>
 					<Button.Or icon ></Button.Or>
-					<Button icon onClick={() => setAddGlobalFieldModalOpen(true)}> global field <Icon color='green' name='add'/></Button>
+					<Button icon onClick={() => {
+						setFieldModalState({
+							local: false,
+							open: true
+						});
+					}}> global field <Icon color='green' name='add'/></Button>
 				</Button.Group>
 				<Button.Group>
-					<Button icon><Icon color='green' name='add'/> Add field</Button>
+					<Button icon onClick={() => {
+						setFieldModalState({
+							local: true,
+							open: true
+						});
+					}}><Icon color='green' name='add'/> Add field</Button>
 					<Dropdown
 						button
 						icon='dropdown'
@@ -583,10 +586,20 @@ export function NewOrEditDocumentType({
 								onClick={(/*syntheticEvent, data*/) => {
 									//console.debug('syntheticEvent', syntheticEvent);
 									//console.debug('data', data);
-									setAddGlobalFieldModalOpen(true);
+									setFieldModalState({
+										local: false,
+										open: true
+									});
 								}}
 							>Global</Dropdown.Item>
-							<Dropdown.Item>Local</Dropdown.Item>
+							<Dropdown.Item
+								onClick={() => {
+									setFieldModalState({
+										local: true,
+										open: true
+									});
+								}}
+							>Local</Dropdown.Item>
 						</Dropdown.Menu>
 					</Dropdown>
 					{/*
@@ -594,10 +607,15 @@ export function NewOrEditDocumentType({
 					*/}
 				</Button.Group>
 			</Form.Field>
-			<AddGlobalFieldModal
+			<AddFieldModal
+				doClose={() => setFieldModalState((prev) => ({
+					local: prev.local,
+					open: false
+				}))}
+				globalFieldObj={GLOBAL_FIELD_OBJ}
 				globalFieldOptions={GLOBAL_FIELD_OPTIONS}
-				open={addGlobalFieldModalOpen}
-				setOpen={setAddGlobalFieldModalOpen}
+				local={fieldModalState.local}
+				open={fieldModalState.open}
 			/>
 			<Form.Field>
 				<SubmitButton/>
