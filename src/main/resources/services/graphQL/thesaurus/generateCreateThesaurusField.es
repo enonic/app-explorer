@@ -1,4 +1,4 @@
-import {toStr} from '@enonic/js-utils';
+//import {toStr} from '@enonic/js-utils';
 
 import {
 	//NT_THESAURUS,
@@ -36,7 +36,7 @@ export function generateCreateThesaurusField({
 				_name,
 				language
 			}));
-			log.debug(`createdNode:${toStr(createdNode)}`);
+			//log.debug(`createdNode:${toStr(createdNode)}`);
 			writeConnection.refresh();
 			return createdNode;
 		},
