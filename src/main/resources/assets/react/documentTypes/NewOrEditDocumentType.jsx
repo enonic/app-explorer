@@ -261,39 +261,48 @@ export function NewOrEditDocumentType({
 			</Form.Field>
 
 			<Header as='h2'>Fields</Header>
+
 			<Form.Field>
-				<List
-					path={PATH_FIELDS}
-					render={(fieldsArray) => {
-						//console.debug(`NewOrEditDocumentType fieldsArray`, fieldsArray);
-						if(!fieldsArray.length) {
-							return <Popup
-								content='Add global field'
-								inverted
-								trigger={<InsertButton
-									path={PATH_FIELDS}
-									index={0}
-									value={FIELD_DEFAULT}
-								><Icon color='green' name='add'/>Add global field</InsertButton>}
-							/>;
-						}
-						return <>
-							<Table celled compact selectable singleLine striped>
-								<Table.Header>
-									<Table.Row>
-										<Table.HeaderCell>Active</Table.HeaderCell>
-										<Table.HeaderCell>Field</Table.HeaderCell>
-										<Table.HeaderCell>Min</Table.HeaderCell>
-										<Table.HeaderCell>Max</Table.HeaderCell>
-										<Table.HeaderCell>Indexing</Table.HeaderCell>
-										<Table.HeaderCell>Value type</Table.HeaderCell>
-										<Table.HeaderCell>Fulltext</Table.HeaderCell>
-										<Table.HeaderCell>nGram</Table.HeaderCell>
-										<Table.HeaderCell>Include in _allText</Table.HeaderCell>
-										<Table.HeaderCell>Delete</Table.HeaderCell>
-									</Table.Row>
-								</Table.Header>
-								<Table.Body>{(() => {
+				<Checkbox
+					label='Add new fields automatically when creating/updating documents?'
+					name='addFields'
+					toggle
+				/>
+			</Form.Field>
+
+			<Table celled compact selectable singleLine striped>
+				<Table.Header>
+					<Table.Row>
+						<Table.HeaderCell>Active</Table.HeaderCell>
+						<Table.HeaderCell>Field</Table.HeaderCell>
+						<Table.HeaderCell>Min</Table.HeaderCell>
+						<Table.HeaderCell>Max</Table.HeaderCell>
+						<Table.HeaderCell>Indexing</Table.HeaderCell>
+						<Table.HeaderCell>Value type</Table.HeaderCell>
+						<Table.HeaderCell>Fulltext</Table.HeaderCell>
+						<Table.HeaderCell>nGram</Table.HeaderCell>
+						<Table.HeaderCell>Include in _allText</Table.HeaderCell>
+						<Table.HeaderCell>Delete</Table.HeaderCell>
+					</Table.Row>
+				</Table.Header>
+				<Table.Body>
+					<List
+						path={PATH_FIELDS}
+						render={(fieldsArray) => {
+							//console.debug(`NewOrEditDocumentType fieldsArray`, fieldsArray);
+							if(!fieldsArray.length) {
+								return <Popup
+									content='Add global field'
+									inverted
+									trigger={<InsertButton
+										path={PATH_FIELDS}
+										index={0}
+										value={FIELD_DEFAULT}
+									><Icon color='green' name='add'/>Add global field</InsertButton>}
+								/>;
+							}
+							return <>
+								{(() => {
 									const selectedFields = {};
 									return fieldsArray.map(({
 										active,
@@ -403,205 +412,157 @@ export function NewOrEditDocumentType({
 											</Table.Cell>
 										</Table.Row>;
 									}); // map
-								})()}</Table.Body>
-							</Table>
-							<Popup
-								content='Add global field'
-								inverted
-								trigger={<InsertButton
-									path={PATH_FIELDS}
-									index={fieldsArray.length}
-									value={FIELD_DEFAULT}
-								><Icon color='green' name='add'/>Add global field</InsertButton>}
-							/>
-						</>;
-					}}
-				/>
-			</Form.Field>
-
-			<Form.Field>
-				<Checkbox
-					label='Add new fields automatically when creating/updating documents?'
-					name='addFields'
-					toggle
-				/>
-			</Form.Field>
-			<Form.Field>
-				<List
-					path={PATH_PROPERTIES}
-					render={(propertiesArray) => {
-						if(!propertiesArray.length) {
-							return <Popup
-								content='Add local field'
-								inverted
-								trigger={<InsertButton
-									path={PATH_PROPERTIES}
-									index={0}
-									value={PROPERTY_DEFAULT}
-								><Icon color='green' name='add'/>Add local field</InsertButton>}
-							/>;
-						}
-						return <>
-							<Table celled compact selectable singleLine striped>
-								<Table.Header>
-									<Table.Row>
-										<Table.HeaderCell>Active</Table.HeaderCell>
-										<Table.HeaderCell>Name</Table.HeaderCell>
-										<Table.HeaderCell>Min</Table.HeaderCell>
-										<Table.HeaderCell>Max</Table.HeaderCell>
-										<Table.HeaderCell>Indexing</Table.HeaderCell>
-										<Table.HeaderCell>Value type</Table.HeaderCell>
-										<Table.HeaderCell>Fulltext</Table.HeaderCell>
-										<Table.HeaderCell>nGram</Table.HeaderCell>
-										<Table.HeaderCell>Include in _allText</Table.HeaderCell>
-										<Table.HeaderCell>Delete</Table.HeaderCell>
-									</Table.Row>
-								</Table.Header>
-								<Table.Body>{
-									propertiesArray.map(({
-										active,
-										enabled,
-										max,
-										min,
-										name/*,
-									valueType*/
-									}, index) => {
-										const PATH_PROPERTY = `${PATH_PROPERTIES}.${index}`;
-										return <Table.Row key={PATH_PROPERTY}>
-											<Table.Cell><Checkbox
-												name='active'
-												parentPath={PATH_PROPERTY}
-												toggle
-												value={active}
-											/></Table.Cell>
-											<Table.Cell>
-												<Input
-													disabled={!active}
-													fluid
-													name='name'
-													parentPath={PATH_PROPERTY}
-													placeholder='Please input a name'
-													value={name}
-												/>
-											</Table.Cell>
-											<Table.Cell>
-												<Input
-													disabled={!active}
-													fluid
-													name='min'
-													parentPath={PATH_PROPERTY}
-													type='number'
-													value={min}
-												/>
-											</Table.Cell>
-											<Table.Cell>
-												<Input
-													disabled={!active}
-													fluid
-													name='max'
-													parentPath={PATH_PROPERTY}
-													type='number'
-													value={max}
-												/>
-											</Table.Cell>
-											<Table.Cell collapsing>
-												<Checkbox
-													name='enabled'
-													parentPath={PATH_PROPERTY}
-													toggle
-												/>
-											</Table.Cell>
-											<Table.Cell collapsing>
-												{enabled ? <EnonicDropdown
-													disabled={!active || !enabled}
-													options={OPTIONS_VALUE_TYPES}
-													name='valueType'
-													parentPath={PATH_PROPERTY}
-													selection
-												/> : null}
-											</Table.Cell>
-											<Table.Cell collapsing>
-												{enabled ? <Checkbox
-													disabled={!active || !enabled}
-													name='fulltext'
-													parentPath={PATH_PROPERTY}
-													toggle
-												/> : null}
-											</Table.Cell>
-											<Table.Cell collapsing>
-												{enabled ? <Checkbox
-													disabled={!active || !enabled}
-													name='ngram'
-													parentPath={PATH_PROPERTY}
-													toggle
-												/> : null}
-											</Table.Cell>
-											<Table.Cell collapsing>
-												{enabled ? <Checkbox
-													disabled={!active || !enabled}
-													name='includeInAllText'
-													parentPath={PATH_PROPERTY}
-													toggle
-												/> : null}
-											</Table.Cell>
-											<Table.Cell collapsing>
-												<Button.Group>
-													{/*<Popup
-														content='Add local field'
-														inverted
-														trigger={<InsertButton
-															path={PATH_PROPERTIES}
-															index={index+1}
-															value={PROPERTY_DEFAULT}
-														/>}
-													/>
-													<Popup
-														content='Move down'
-														inverted
-														trigger={<MoveDownButton
-															disabled={index + 1 >= propertiesArray.length}
-															path={PATH_PROPERTIES}
-															index={index}
-														/>}
-													/>
-													<Popup
-														content='Move up'
-														inverted
-														trigger={<MoveUpButton
-															path={PATH_PROPERTIES}
-															index={index}
-														/>}
-													/>
-													*/}
-													<RemoveFieldFromDocumentTypeModal
-														collections={collections}
-														index={index}
-														interfaces={interfaces}
-														disabled={active}
-														name={name}
-														path={PATH_PROPERTIES}
-														servicesBaseUrl={servicesBaseUrl}
-													/>
-												</Button.Group>
-											</Table.Cell>
-										</Table.Row>;
-									})}
-								</Table.Body>
-							</Table>
-							<Popup
-								content='Add local field'
-								inverted
-								trigger={<InsertButton
-									path={PATH_PROPERTIES}
-									index={propertiesArray.length}
-									value={PROPERTY_DEFAULT}
-								><Icon color='green' name='add'/>Add local field</InsertButton>}
-							/>
-
-						</>;
-					}}
-				/>
-			</Form.Field>
+								})()}
+							</>;
+						}}
+					/>
+					<List
+						path={PATH_PROPERTIES}
+						render={(propertiesArray) => {
+							if(!propertiesArray.length) {
+								return <Popup
+									content='Add local field'
+									inverted
+									trigger={<InsertButton
+										path={PATH_PROPERTIES}
+										index={0}
+										value={PROPERTY_DEFAULT}
+									><Icon color='green' name='add'/>Add local field</InsertButton>}
+								/>;
+							}
+							return <>{propertiesArray.map(({
+								active,
+								enabled,
+								max,
+								min,
+								name/*,
+							valueType*/
+							}, index) => {
+								const PATH_PROPERTY = `${PATH_PROPERTIES}.${index}`;
+								return <Table.Row key={PATH_PROPERTY}>
+									<Table.Cell><Checkbox
+										name='active'
+										parentPath={PATH_PROPERTY}
+										toggle
+										value={active}
+									/></Table.Cell>
+									<Table.Cell>
+										<Input
+											disabled={!active}
+											fluid
+											name='name'
+											parentPath={PATH_PROPERTY}
+											placeholder='Please input a name'
+											value={name}
+										/>
+									</Table.Cell>
+									<Table.Cell>
+										<Input
+											disabled={!active}
+											fluid
+											name='min'
+											parentPath={PATH_PROPERTY}
+											type='number'
+											value={min}
+										/>
+									</Table.Cell>
+									<Table.Cell>
+										<Input
+											disabled={!active}
+											fluid
+											name='max'
+											parentPath={PATH_PROPERTY}
+											type='number'
+											value={max}
+										/>
+									</Table.Cell>
+									<Table.Cell collapsing>
+										<Checkbox
+											name='enabled'
+											parentPath={PATH_PROPERTY}
+											toggle
+										/>
+									</Table.Cell>
+									<Table.Cell collapsing>
+										{enabled ? <EnonicDropdown
+											disabled={!active || !enabled}
+											options={OPTIONS_VALUE_TYPES}
+											name='valueType'
+											parentPath={PATH_PROPERTY}
+											selection
+										/> : null}
+									</Table.Cell>
+									<Table.Cell collapsing>
+										{enabled ? <Checkbox
+											disabled={!active || !enabled}
+											name='fulltext'
+											parentPath={PATH_PROPERTY}
+											toggle
+										/> : null}
+									</Table.Cell>
+									<Table.Cell collapsing>
+										{enabled ? <Checkbox
+											disabled={!active || !enabled}
+											name='ngram'
+											parentPath={PATH_PROPERTY}
+											toggle
+										/> : null}
+									</Table.Cell>
+									<Table.Cell collapsing>
+										{enabled ? <Checkbox
+											disabled={!active || !enabled}
+											name='includeInAllText'
+											parentPath={PATH_PROPERTY}
+											toggle
+										/> : null}
+									</Table.Cell>
+									<Table.Cell collapsing>
+										<Button.Group>
+											{/*<Popup
+												content='Add local field'
+												inverted
+												trigger={<InsertButton
+													path={PATH_PROPERTIES}
+													index={index+1}
+													value={PROPERTY_DEFAULT}
+												/>}
+											/>
+											<Popup
+												content='Move down'
+												inverted
+												trigger={<MoveDownButton
+													disabled={index + 1 >= propertiesArray.length}
+													path={PATH_PROPERTIES}
+													index={index}
+												/>}
+											/>
+											<Popup
+												content='Move up'
+												inverted
+												trigger={<MoveUpButton
+													path={PATH_PROPERTIES}
+													index={index}
+												/>}
+											/>
+											*/}
+											<RemoveFieldFromDocumentTypeModal
+												collections={collections}
+												index={index}
+												interfaces={interfaces}
+												disabled={active}
+												name={name}
+												path={PATH_PROPERTIES}
+												servicesBaseUrl={servicesBaseUrl}
+											/>
+										</Button.Group>
+									</Table.Cell>
+								</Table.Row>;
+							})}
+							</>;
+						}}
+					/>
+				</Table.Body>
+			</Table>
 			<Form.Field>
 				<Button.Group>
 					<Button icon><Icon color='green' name='add'/> Add local </Button>
