@@ -94,6 +94,11 @@ export const AddFieldModal = ({
 						onChange={(event, {value: newValue}) => {
 							setName(newValue);
 						}}
+						onKeyUp={({code}) => {
+							if(code === 'Enter') {
+								onConfirm();
+							}
+						}}
 						placeholder='Please input a local field name'
 					/>
 					{msg}
