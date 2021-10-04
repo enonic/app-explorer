@@ -184,7 +184,7 @@ export function Fields(props) {
 				</Table.Body>
 			</Table>
 		</Segment>
-		<Header as='h1'>Fields</Header>
+		<Header as='h1'>Global fields</Header>
 		{isLoading
 			? <Loader active inverted>Loading</Loader>
 			: <>

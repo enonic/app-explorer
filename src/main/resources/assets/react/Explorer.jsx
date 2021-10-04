@@ -331,7 +331,7 @@ export function Explorer(props) {
 					href='#fields'
 					active={page === 'fields'}
 					onClick={() => setPage('fields')}
-				><Icon name='sitemap'/> Fields</Menu.Item>
+				><Icon name='list'/> Global fields</Menu.Item>
 				<Menu.Item
 					as='a'
 					href='#stopWords'
