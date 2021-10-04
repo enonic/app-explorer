@@ -3,8 +3,8 @@ export const GQL_MUTATION_UPDATE_DOCUMENT_TYPE = `mutation UpdateDocumentTypeMut
 	$_name: String!,
 	$_versionKey: ID!
 	$addFields: Boolean
-	$fields: [InputDocumentTypeFields]
-	$properties: [InputDocumentTypeProperties]
+	$fields: [DocumentTypeFieldsInput]
+	$properties: [DocumentTypePropertiesInput]
 ) {
 	updateDocumentType(
 		_id: $_id

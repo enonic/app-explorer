@@ -2,7 +2,7 @@
 
 import {updateDocumentType} from '/lib/explorer/documentType/updateDocumentType';
 import {
-	GraphQLString,
+	GraphQLID,
 	list
 } from '/lib/graphql';
 
@@ -21,7 +21,7 @@ export function generateUpdateDocumentTypeField({
 		args: {
 			_id: glue.getScalarType('_id'),
 			_name: glue.getScalarType('_name'),
-			_versionKey: GraphQLString,
+			_versionKey: GraphQLID,
 			addFields: GQL_INPUT_TYPE_ADD_FIELDS,
 			fields: list(glue.getInputType(GQL_INPUT_TYPE_DOCUMENT_TYPE_FIELDS_NAME)),
 			properties: list(glue.getInputType(GQL_INPUT_TYPE_DOCUMENT_TYPE_PROPERTIES_NAME))
