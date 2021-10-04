@@ -48,6 +48,7 @@ import {fetchFields} from '../fields/fetchFields';
 
 import {nameValidator} from '../utils/nameValidator';
 
+import {AddGlobalFieldModal} from './AddGlobalFieldModal';
 import {RemoveFieldFromDocumentTypeModal} from './RemoveFieldFromDocumentTypeModal';
 
 
@@ -138,6 +139,7 @@ export function NewOrEditDocumentType({
 }) {
 	const [initialValues, setInitialValues] = React.useState(false);
 	const [globalFields, setGlobalFields] = React.useState([]);
+	const [addGlobalFieldModalOpen, setAddGlobalFieldModalOpen] = React.useState(false);
 	//console.debug(`NewOrEditDocumentType globalFields`, globalFields);
 
 	const GLOBAL_FIELD_OBJ = {};
@@ -567,7 +569,7 @@ export function NewOrEditDocumentType({
 				<Button.Group>
 					<Button icon><Icon color='green' name='add'/> Add local </Button>
 					<Button.Or icon ></Button.Or>
-					<Button icon> global field <Icon color='green' name='add'/></Button>
+					<Button icon onClick={() => setAddGlobalFieldModalOpen(true)}> global field <Icon color='green' name='add'/></Button>
 				</Button.Group>
 				<Button.Group>
 					<Button icon><Icon color='green' name='add'/> Add field</Button>
@@ -578,9 +580,10 @@ export function NewOrEditDocumentType({
 					>
 						<Dropdown.Menu>
 							<Dropdown.Item
-								onClick={(syntheticEvent, data) => {
-									console.debug('syntheticEvent', syntheticEvent);
-									console.debug('data', data);
+								onClick={(/*syntheticEvent, data*/) => {
+									//console.debug('syntheticEvent', syntheticEvent);
+									//console.debug('data', data);
+									setAddGlobalFieldModalOpen(true);
 								}}
 							>Global</Dropdown.Item>
 							<Dropdown.Item>Local</Dropdown.Item>
@@ -591,6 +594,11 @@ export function NewOrEditDocumentType({
 					*/}
 				</Button.Group>
 			</Form.Field>
+			<AddGlobalFieldModal
+				globalFieldOptions={GLOBAL_FIELD_OPTIONS}
+				open={addGlobalFieldModalOpen}
+				setOpen={setAddGlobalFieldModalOpen}
+			/>
 			<Form.Field>
 				<SubmitButton/>
 				<ResetButton/>
