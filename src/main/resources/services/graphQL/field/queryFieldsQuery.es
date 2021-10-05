@@ -39,25 +39,53 @@ export const GQL_QUERY_FIELDS_QUERY = `query QueryFieldsQuery(
 			nGram
 			path
 
-			_referencedBy {
-				count
-				hits {
-					_id
-					_name
-					_nodeType
-					_path
-					_score
-					_referencedBy {
-						count
-						hits {
-							_id
-							_name
-							_nodeType
-							_path
-							_score
+			__referencedBy(
+				filters: {
+					boolean: {
+						must: {
+							hasValue: {
+								field: "_nodeType"
+								values: ["com.enonic.app.explorer:documentType"]
+							}
 						}
-						total
 					}
+				}
+			) {
+				count
+				hits { # Only documentType nodes
+					#__typename
+					... on DocumentType {
+						_id
+						_name
+						_nodeType
+						_path
+						#_score # WHY NOT IMPLEMENTED???
+						__referencedBy(
+							filters: {
+								boolean: {
+									must: {
+										hasValue: {
+											field: "_nodeType"
+											values: ["com.enonic.app.explorer:collection"]
+										}
+									}
+								}
+							}
+						) {
+							count
+							hits { # Only collection nodes
+								#__typename
+								... on Collection {
+									_id
+									_name
+									_nodeType
+									_path
+									#_score # WHY NOT IMPLEMENTED???
+								}
+							}
+							total
+						}
+					} # on DocumentType
 				}
 				total
 			}

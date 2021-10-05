@@ -12,12 +12,14 @@ if (!Object.hasOwn) {
 export class Glue {
 
 	// Private fields
-	#uniqueNames = {};
 	#enumTypes = {};
+	#fields = {};
 	#inputTypes = {};
 	#interfaceTypes = {};
 	#objectTypes = {};
 	#scalarTypes = {};
+	#uniqueNames = {};
+	#unionTypes = {};
 
 	// Public fields
 	schemaGenerator;
@@ -43,6 +45,22 @@ export class Glue {
 			values
 		});
 		return this.#enumTypes[name];
+	}
+
+	addFields({
+		name,
+		fields
+	}) {
+		//log.debug(`addEnumType({name:${name}})`);
+		if(this.#fields[name]) {
+			throw new Error(`Field ${name} already defined!`);
+		}
+		/*if(this.#uniqueNames[name]) {
+			throw new Error(`Name ${name} already used as ${this.#uniqueNames[name]}!`);
+		}
+		this.#uniqueNames[name] = 'enumType';*/
+		this.#fields[name] = fields;
+		return fields;
 	}
 
 	addInputType({
@@ -85,7 +103,8 @@ export class Glue {
 				fields,
 				name,
 				typeResolver
-			})
+			})//,
+			//typeResolver // NOTE This should be fetched from the unionType instead...
 		};
 		return this.#interfaceTypes[name].type;
 	}
@@ -126,6 +145,47 @@ export class Glue {
 		this.#uniqueNames[name] = 'scalarType';
 		this.#scalarTypes[name] = type;
 		return this.#scalarTypes[name];
+	}
+
+	addUnionType({
+		name,
+		typeResolver,
+		types = []
+	}) {
+		//log.debug(`addUnionType({name:${name}})`);
+		if(this.#unionTypes[name]) {
+			throw new Error(`Union type ${name} already defined!`);
+		}
+		if(this.#uniqueNames[name]) {
+			throw new Error(`Name ${name} already used as ${this.#uniqueNames[name]}!`);
+		}
+		this.#uniqueNames[name] = 'unionType';
+		this.#unionTypes[name] = {
+			type: this.schemaGenerator.createUnionType({
+				name,
+				typeResolver,
+				types
+			}),
+			typeResolver,
+			types
+		};
+		return this.#unionTypes[name];
+	}
+
+	getFields(name) {
+		//log.debug(`getFields(${name})`);
+		if (!Object.hasOwn(this.#fields, name)) { // true also when property is set to undefined
+			/*if (this.#uniqueNames[name]) {
+				throw new Error(`name:${name} is not an inputType! but ${this.#uniqueNames[name]}`);
+			}*/
+			throw new Error(`fields[${name}] not found! Perhaps you're trying to use it before it's defined?`);
+		}
+		const fields = this.#fields[name];
+		if (!fields) {
+			throw new Error(`inputType[${name}] is falsy!`);
+		}
+		//log.debug(`getFields(${name}) --> ${typeof type}`);
+		return fields;
 	}
 
 	getInputType(name) {
@@ -173,6 +233,21 @@ export class Glue {
 		return fields;
 	}
 
+	getInterfaceTypeObj(name) {
+		//log.debug(`getInterfaceTypeObj(${name})`);
+		if (!Object.hasOwn(this.#interfaceTypes, name)) { // true also when property is set to undefined
+			if (this.#uniqueNames[name]) {
+				throw new Error(`name:${name} is not an interfaceType! but ${this.#uniqueNames[name]}`);
+			}
+			throw new Error(`name:${name} not found in interfaceTypes, perhaps you're trying to use it before it's defined?`);
+		}
+		const obj = this.#interfaceTypes[name];
+		if (!obj) {
+			throw new Error(`interfaceType[${name}].type is falsy!`);
+		}
+		//log.debug(`getInterfaceTypeObj(${name}) --> ${typeof type}`);
+		return obj;
+	}
 
 	getObjectType(name) {
 		//log.debug(`getobjectType(${name})`);
@@ -212,5 +287,25 @@ export class Glue {
 
 	getSortedObjectTypeNames() {
 		return Object.keys(this.#objectTypes).sort();
+	}
+
+	getUnionTypeObj(name) {
+		//log.debug(`getUnionTypeObj(${name})`);
+		if (!Object.hasOwn(this.#unionTypes, name)) { // true also when property is set to undefined
+			if (this.#uniqueNames[name]) {
+				throw new Error(`name:${name} is not an unionType! but ${this.#uniqueNames[name]}`);
+			}
+			throw new Error(`name:${name} not found in unionTypes, perhaps you're trying to use it before it's defined?`);
+		}
+		const obj = this.#unionTypes[name];
+		if (!obj) {
+			throw new Error(`unionType[${name}].type is falsy!`);
+		}
+		//log.debug(`getUnionTypeObj(${name}) --> ${typeof type}`);
+		return obj;
+	}
+
+	getUnionTypes() {
+		return this.#unionTypes;
 	}
 } // Glue

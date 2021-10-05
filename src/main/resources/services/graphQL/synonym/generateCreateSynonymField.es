@@ -9,7 +9,7 @@ import {get} from '/lib/explorer/node/get';
 import {connect} from '/lib/explorer/repo/connect';
 import {createRandomNamed} from '/lib/explorer/node/createRandomNamed';
 import {coerseSynonymType} from '/lib/explorer/synonym/coerseSynonymType';
-import {reference} from '/lib/xp/value';
+import {reference as referenceValue} from '/lib/xp/value';
 
 import {GQL_TYPE_SYNONYM_NAME} from '../constants';
 
@@ -51,7 +51,7 @@ export function generateCreateSynonymField({
 				_parentPath: thesaurusNode._path,
 				//displayName: `${Array.isArray(from) ? from.join(', ') : from} => ${Array.isArray(to) ? to.join(', ') : to}`,
 				from,
-				thesaurusReference: reference(thesaurusNode._id),
+				thesaurusReference: referenceValue(thesaurusNode._id),
 				to/*,
 				type: NT_SYNONYM*/ // TODO This could be a problem in explorer-1.5.0
 			}, {

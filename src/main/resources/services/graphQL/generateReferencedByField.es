@@ -1,17 +1,15 @@
 //import {toStr} from '@enonic/js-utils';
 
 import {
-	GraphQLFloat,
 	GraphQLInt,
 	nonNull,
-	list,
-	reference
+	list
 } from '/lib/graphql';
 
 import {
 	GQL_INPUT_TYPE_FILTERS_NAME,
-	GQL_TYPE_REFERENCED_BY_HITS_NAME,
-	GQL_TYPE_REFERENCED_BY_NAME
+	GQL_TYPE_REFERENCED_BY_NAME,
+	GQL_UNION_TYPE_ANY_NODE
 } from './constants';
 import {referencedByMapped} from './referencedByMapped';
 
@@ -30,26 +28,7 @@ export function generateReferencedByField({
 			fields: {
 				count: { type: nonNull(GraphQLInt) },
 				hits: {
-					type: list(glue.addObjectType({
-						name: GQL_TYPE_REFERENCED_BY_HITS_NAME,
-						fields: {
-							_id: { type: glue.getScalarType('_id') },
-							_name: { type: glue.getScalarType('_name') },
-							_nodeType: { type: glue.getScalarType('_nodeType') },
-							_path: { type: glue.getScalarType('_path') },
-							_score: { type: nonNull(GraphQLFloat) },
-							_referencedBy: {
-								args: {
-									filters: glue.getInputType(GQL_INPUT_TYPE_FILTERS_NAME)
-								},
-								resolve: ({
-									args: {filters},
-									source: {_id}
-								}) => referencedByMapped({_id, filters}),
-								type: reference(GQL_TYPE_REFERENCED_BY_NAME) // Self-reference
-							}
-						}
-					}))
+					type: list(glue.getUnionTypeObj(GQL_UNION_TYPE_ANY_NODE).type)
 				},
 				total: { type: nonNull(GraphQLInt) }
 			}
@@ -69,7 +48,7 @@ query QueryReferencedBy(
 			_nodeType
 			_path
 			_score
-			_referencedBy {
+			__referencedBy {
 				count
 				hits {
 					_id
