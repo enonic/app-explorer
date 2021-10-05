@@ -47,6 +47,8 @@ import {generateSynonymFields} from './synonym/generateSynonymFields';
 import {generateThesaurusFields} from './thesaurus/generateThesaurusFields';
 
 import {hasFieldQuery} from './hasFieldQuery';
+import {addUnionTypes} from './addUnionTypes';
+import {createObjectTypesUsingUnionTypes} from './createObjectTypesUsingUnionTypes';
 
 const glue = new Glue();
 
@@ -84,8 +86,12 @@ addScalarTypes({glue});
 // Must be before ObjectTypes?
 addInputTypes({glue});
 
+// Must be before InterfaceTypes!
+addUnionTypes({glue});
+
 // Must be after ScalarTypes!
 // Must be after InputTypes
+// Must be after UnionTypes
 // Must be before ObjectTypes
 addInterfaceTypes({glue});
 
@@ -114,6 +120,8 @@ const referencedBy = generateReferencedByField({glue});
 
 const queryApiKeysField = generateQueryApiKeysField({glue});
 
+const hasField = hasFieldQuery({glue});
+
 const {
 	createCollectionField,
 	queryCollectionsField,
@@ -125,7 +133,6 @@ const {
 	createDocumentTypeField,
 	deleteDocumentTypeField,
 	getDocumentTypeField,
-	queryDocumentTypesField,
 	updateDocumentTypeField
 } = generateDocumentTypeFields({glue});
 
@@ -164,6 +171,10 @@ const queryJournals = generateQueryJournalsField({glue});
 const queryStopWords = generateQueryStopWordsField({glue});
 const queryTasks = generateListTasksField({glue});
 
+const {
+	queryDocumentTypesField
+} = createObjectTypesUsingUnionTypes({glue});
+
 //const mutation = glue.addObjectType({
 const mutation = glue.schemaGenerator.createObjectType({
 	name: 'Mutation',
@@ -198,7 +209,7 @@ const query = glue.schemaGenerator.createObjectType({
 		getLocales,
 		getDocumentType: getDocumentTypeField,
 		getSites,
-		hasField: hasFieldQuery({glue}),
+		hasField,
 		listScheduledJobs,
 		queryApiKeys: queryApiKeysField,
 		queryCollections: queryCollectionsField,
@@ -218,9 +229,11 @@ const query = glue.schemaGenerator.createObjectType({
 //log.debug(`glue.getSortedObjectTypeNames():${toStr(glue.getSortedObjectTypeNames())}`);
 
 //const objectTypes = glue.getObjectTypes();
+//const unionTypes = glue.getUnionTypes();
 
 export const SCHEMA = glue.schemaGenerator.createSchema({
 	//dictionary: Object.keys(objectTypes).map((k) => objectTypes[k]), // Necessary for types accessed through references
+	//dictionary: Object.keys(unionTypes).map((k) => unionTypes[k]), // Necessary for types accessed through references
 	mutation,
 	query
 }); // SCHEMA

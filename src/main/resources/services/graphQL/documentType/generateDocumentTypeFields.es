@@ -2,7 +2,6 @@ import {generateCreateDocumentTypeField} from './generateCreateDocumentTypeField
 import {generateDeleteDocumentTypeField} from './generateDeleteDocumentTypeField';
 import {generateDocumentTypeTypes} from './generateDocumentTypeTypes';
 import {generateGetDocumentTypeField} from './generateGetDocumentTypeField';
-import {generateQueryDocumentTypesField} from './generateQueryDocumentTypesField';
 import {generateUpdateDocumentTypeField} from './generateUpdateDocumentTypeField';
 
 
@@ -21,9 +20,6 @@ export function generateDocumentTypeFields({
 			glue
 		}),
 		getDocumentTypeField: generateGetDocumentTypeField({
-			glue
-		}),
-		queryDocumentTypesField: generateQueryDocumentTypesField({
 			glue
 		}),
 		updateDocumentTypeField: generateUpdateDocumentTypeField({

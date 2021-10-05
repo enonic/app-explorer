@@ -14,21 +14,28 @@ import {PRINCIPAL_EXPLORER_READ} from '/lib/explorer/model/2/constants';
 import {connect} from '/lib/explorer/repo/connect';
 import {query} from '/lib/explorer/interface/query';
 
+import {
+	GQL_INTERFACE_NODE_NAME,
+	GQL_TYPE_INTERFACE_NAME
+} from '../constants';
+
 
 export function generateQueryInterfacesField({
 	glue
 }) {
+	const {
+		fields: interfaceNodeFields,
+		type: interfaceNodeType
+	} = glue.getInterfaceTypeObj(GQL_INTERFACE_NODE_NAME);
 	const INTERFACE_OBJECT_TYPE = glue.addObjectType({
-		name: 'Interface',
+		name: GQL_TYPE_INTERFACE_NAME,
 		fields: {
-			_id: { type: glue.getScalarType('_id') },
-			_name: { type: glue.getScalarType('_name') },
-			_nodeType: { type: GraphQLString }, // TODO nonNull?
-			_path: { type: glue.getScalarType('_path') },
+			...interfaceNodeFields,
 			displayName: { type: nonNull(GraphQLString) },
 			//name: { type: nonNull(GraphQLString) } // Same as displayName
 			synonyms: { type: list(GraphQLString) }//,
-		}
+		},
+		interfaces: [interfaceNodeType]
 	}); // INTERFACE_OBJECT_TYPE
 	return {
 		args: {

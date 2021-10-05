@@ -106,6 +106,7 @@ export function DocumentTypes({
 					<Table.HeaderCell>Name</Table.HeaderCell>
 					<Table.HeaderCell>Used in collections</Table.HeaderCell>
 					<Table.HeaderCell>Used in interfaces</Table.HeaderCell>
+					<Table.HeaderCell>Documents</Table.HeaderCell>
 					<Table.HeaderCell>Property count</Table.HeaderCell>
 					<Table.HeaderCell>Properties</Table.HeaderCell>
 					<Table.HeaderCell>Add fields</Table.HeaderCell>
@@ -117,7 +118,7 @@ export function DocumentTypes({
 				{documentTypes.map(({
 					_id,
 					_name,
-					_referencedBy: {
+					__referencedBy: {
 						//count
 						hits: referencedByCollections
 						//total
@@ -127,19 +128,26 @@ export function DocumentTypes({
 					fields = [],
 					properties = []
 				}, index) => {
-					const collections = [];
+					const collections = {};
 					const interfaces = [];
+					let documentsInTotal = 0;
 					referencedByCollections.forEach(({
 						_name: collectionName,
 						_nodeType,
-						_referencedBy: {
+						__hasField: {
+							total: documentsWithNameInCollectionRepoTotal
+						},
+						__referencedBy: {
 							//count
 							hits: referencedByInterfaces
 							//total
 						}
 					}) => {
-						if (_nodeType === 'com.enonic.app.explorer:collection' && !collections.includes(collectionName)) {
-							collections.push(collectionName);
+						documentsInTotal += documentsWithNameInCollectionRepoTotal;
+						if (_nodeType === 'com.enonic.app.explorer:collection' && !collections[collectionName]) {
+							collections[collectionName] = {
+								documentsTotal: documentsWithNameInCollectionRepoTotal
+							};
 							referencedByInterfaces.forEach(({
 								_name: interfaceName,
 								_nodeType: interfaceNodeType
@@ -149,13 +157,14 @@ export function DocumentTypes({
 								}
 							});
 						}
-					});
+					}); // forEach referencedByCollections
+					const collectionNames = Object.keys(collections).sort();
 
 					return <Table.Row key={index}>
 						<Table.Cell collapsing><NewOrEditDocumentTypeModal
 							_id={_id}
 							_name={_name}
-							collections={collections}
+							collections={collectionNames}
 							interfaces={interfaces}
 							afterClose={() => {
 								//console.debug('NewOrEditDocumentTypeModal afterClose');
@@ -173,12 +182,22 @@ export function DocumentTypes({
 							listStyleType: 'none',
 							margin: 0,
 							padding: 0
-						}}>{collections.sort().map((c, i) => <li key={i}>{c}</li>)}</ul></Table.Cell>
+						}}>{collectionNames.map((c, i) => <li key={i}>{c}</li>)}</ul></Table.Cell>
 						<Table.Cell><ul style={{
 							listStyleType: 'none',
 							margin: 0,
 							padding: 0
 						}}>{interfaces.sort().map((c, i) => <li key={i}>{c}</li>)}</ul></Table.Cell>
+						<Table.Cell collapsing>
+							<ul style={{
+								listStyleType: 'none',
+								margin: 0,
+								padding: 0
+							}}>
+								{Object.keys(collections).map((k, i) => <li key={i}>{k}({collections[k].documentsTotal})</li>)}
+								<li>Total: {documentsInTotal}</li>
+							</ul>
+						</Table.Cell>
 						<Table.Cell collapsing>{properties.length}</Table.Cell>
 						<Table.Cell collapsing>{properties.map(({name})=>name).join(', ')}</Table.Cell>
 						<Table.Cell collapsing>{addFields ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='red' name='x' size='large'/>}</Table.Cell>

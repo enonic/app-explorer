@@ -12,11 +12,15 @@ import {
 import {
 	GQL_INPUT_TYPE_COLLECTION_COLLECTOR_NAME,
 	GQL_INPUT_TYPE_COLLECTION_CRON_NAME,
+	GQL_INPUT_TYPE_FILTERS_NAME,
+	GQL_INTERFACE_NODE_NAME,
 	GQL_TYPE_COLLECTION_COLLECTOR_NAME,
 	GQL_TYPE_COLLECTION_NAME,
 	GQL_TYPE_COLLECTION_REINDEX_REPORT,
-	GQL_TYPE_COLLECTIONS_QUERY_RESULT
+	GQL_TYPE_COLLECTIONS_QUERY_RESULT,
+	GQL_TYPE_HAS_FIELD_QUERY_RESULT_NAME
 } from '../constants';
+import {hasField} from './hasField';
 
 
 export function generateCollectionTypes({
@@ -30,11 +34,36 @@ export function generateCollectionTypes({
 		}
 	});
 
+	const {
+		fields: interfaceNodeFields,
+		type: interfaceNodeType
+	} = glue.getInterfaceTypeObj(GQL_INTERFACE_NODE_NAME);
+
 	const GQL_TYPE_COLLECTION_FIELDS = {
-		_id: { type: glue.getScalarType('_id') },
-		_name: { type: glue.getScalarType('_name') },
-		_nodeType: { type: glue.getScalarType('_nodeType') },
-		_path: { type: glue.getScalarType('_path') },
+		...interfaceNodeFields,
+		__hasField: { // Specific to 'Collection', not 'AnyNode'
+			args: {
+				count: GraphQLInt,
+				field: nonNull(GraphQLString),
+				filters: glue.getInputType(GQL_INPUT_TYPE_FILTERS_NAME)
+			},
+			resolve: ({
+				args: {
+					count,
+					field,
+					filters
+				},
+				source: {
+					_name: collectionName
+				}
+			}) => hasField({
+				collectionName,
+				count,
+				field,
+				filters
+			}),
+			type: glue.getObjectType(GQL_TYPE_HAS_FIELD_QUERY_RESULT_NAME)
+		},
 		createdTime: { type: GraphQLDateTime },
 		creator: { type: GraphQLString },
 		collector: { type: glue.getObjectType(GQL_TYPE_COLLECTION_COLLECTOR_NAME) },
@@ -61,7 +90,8 @@ export function generateCollectionTypes({
 	});
 	glue.addObjectType({
 		name: GQL_TYPE_COLLECTION_NAME,
-		fields: GQL_TYPE_COLLECTION_FIELDS
+		fields: GQL_TYPE_COLLECTION_FIELDS,
+		interfaces: [interfaceNodeType]
 	});
 	glue.addInputType({
 		name: GQL_INPUT_TYPE_COLLECTION_COLLECTOR_NAME,

@@ -233,7 +233,7 @@ export function Fields(props) {
 						{fieldsRes.hits.map(({
 							_id,
 							_name,
-							_referencedBy: {
+							__referencedBy: {
 								//count,
 								hits: referencedByHits//,
 								//total
@@ -261,7 +261,7 @@ export function Fields(props) {
 							referencedByHits.forEach(({
 								_name,
 								_nodeType,
-								_referencedBy: {
+								__referencedBy: {
 									//count,
 									hits: referencedByLevel2Hits//,
 									//total

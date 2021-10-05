@@ -16,7 +16,7 @@ import {
 	list
 } from '/lib/graphql';
 import {getUser} from '/lib/xp/auth';
-import {reference} from '/lib/xp/value';
+import {reference as referenceValue} from '/lib/xp/value';
 
 import {
 	GQL_INPUT_TYPE_COLLECTION_COLLECTOR_NAME,
@@ -104,7 +104,7 @@ export function generateCreateCollectionField({
 				//log.debug(`createdDocumentTypeNode:${toStr(createdDocumentTypeNode)}`);
 				documentTypeId = createdDocumentTypeNode._id;
 			}
-			nodeToBeCreated.documentTypeId = reference(documentTypeId);
+			nodeToBeCreated.documentTypeId = referenceValue(documentTypeId);
 			//log.debug(`nodeToBeCreated:${toStr(nodeToBeCreated)}`);
 
 			const createdNode = writeConnection.create(nodeToBeCreated);

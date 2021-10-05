@@ -90,7 +90,7 @@ export function generateFieldTypes({
 			_id: { type: GraphQLString }, // NOTE System fields doesn't have _id
 			_nodeType: { type: GraphQLString },
 			_path: { type: GraphQLString }, // NOTE System fields doesn't have _path
-			_referencedBy: {
+			__referencedBy: {
 				args: {
 					filters: glue.getInputType(GQL_INPUT_TYPE_FILTERS_NAME)
 				},
