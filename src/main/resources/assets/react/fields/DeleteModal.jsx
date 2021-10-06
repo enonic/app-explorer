@@ -15,6 +15,36 @@ export function DeleteModal(props) {
 		servicesBaseUrl
 	} = props;
 	const [open, setOpen] = React.useState(false);
+	/*const [referencedByRes, setReferencedByRes] = React.useState(false);
+
+	React.useEffect(() => {
+		fetch(`${servicesBaseUrl}/graphQL`, {
+			method: 'POST',
+			headers: {
+				'Content-Type':	'application/json'
+			},
+			body: JSON.stringify({
+				query: `query QueryReferencedBy(
+  $_id: ID!
+) {
+  referencedBy(_id: $_id) {
+    count
+    hits {
+      _id
+      _name
+      _nodeType
+      _path
+      _score
+    }
+    total
+  }
+}`,
+				variables: {
+					_id
+				}
+			})
+		})
+	}, []);*/
 
 	const doClose = () => {
 		setOpen(false);
@@ -36,8 +66,8 @@ export function DeleteModal(props) {
 			content={popupContent}
 			trigger={<div style={{ display: "inline-block" }}>
 				<Button
-				icon
-				disabled={disabled}
+					icon
+					disabled={disabled}
 					onClick={doOpen}>
 					<Icon color='red' name='trash alternate outline'/>
 				</Button>
