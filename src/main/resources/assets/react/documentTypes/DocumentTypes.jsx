@@ -22,7 +22,13 @@ export function DocumentTypes({
 	const [boolPoll, setBoolPoll] = React.useState(true);
 	const [globalFields, setGlobalFields] = React.useState([]);
 	const [documentTypes, setDocumentTypes] = React.useState([]);
+
+	const [showAddFields, setShowAddFields] = React.useState(false);
+	const [showCollections, setShowCollections] = React.useState(false);
+	const [showDocumentsPerCollection, setShowDocumentsPerCollection] = React.useState(false);
 	const [showDeleteButton, setShowDeleteButton] = React.useState(false);
+	const [showDetails, setShowDetails] = React.useState(false);
+	const [showInterfaces, setShowInterfaces] = React.useState(false);
 	//console.debug('DocumentTypes documentTypes', documentTypes);
 
 	const globalFieldsObj = {};
@@ -86,6 +92,56 @@ export function DocumentTypes({
 					<Table.Row verticalAlign='middle'>
 						<Table.Cell collapsing>
 							<Radio
+								checked={showCollections}
+								onChange={(ignored,{checked}) => {
+									setShowCollections(checked);
+								}}
+								toggle
+							/>
+							<Label color='black' size='large'>Show collections</Label>
+						</Table.Cell>
+						<Table.Cell collapsing>
+							<Radio
+								checked={showInterfaces}
+								onChange={(ignored,{checked}) => {
+									setShowInterfaces(checked);
+								}}
+								toggle
+							/>
+							<Label color='black' size='large'>Show interfaces</Label>
+						</Table.Cell>
+						<Table.Cell collapsing>
+							<Radio
+								checked={showAddFields}
+								onChange={(ignored,{checked}) => {
+									setShowAddFields(checked);
+								}}
+								toggle
+							/>
+							<Label color='black' size='large'>Show add fields</Label>
+						</Table.Cell>
+						<Table.Cell collapsing>
+							<Radio
+								checked={showDocumentsPerCollection}
+								onChange={(ignored,{checked}) => {
+									setShowDocumentsPerCollection(checked);
+								}}
+								toggle
+							/>
+							<Label color='black' size='large'>Show documents per collection</Label>
+						</Table.Cell>
+						<Table.Cell collapsing>
+							<Radio
+								checked={showDetails}
+								onChange={(ignored,{checked}) => {
+									setShowDetails(checked);
+								}}
+								toggle
+							/>
+							<Label color='black' size='large'>Show details</Label>
+						</Table.Cell>
+						<Table.Cell collapsing>
+							<Radio
 								checked={showDeleteButton}
 								onChange={(ignored,{checked}) => {
 									setShowDeleteButton(checked);
@@ -104,13 +160,26 @@ export function DocumentTypes({
 				<Table.Row>
 					<Table.HeaderCell>Edit</Table.HeaderCell>
 					<Table.HeaderCell>Name</Table.HeaderCell>
-					<Table.HeaderCell>Used in collections</Table.HeaderCell>
-					<Table.HeaderCell>Used in interfaces</Table.HeaderCell>
+					{showCollections ? <Table.HeaderCell>Used in collections</Table.HeaderCell> : null}
+					{showInterfaces ? <Table.HeaderCell>Used in interfaces</Table.HeaderCell> : null}
 					<Table.HeaderCell>Documents</Table.HeaderCell>
-					<Table.HeaderCell>Property count</Table.HeaderCell>
-					<Table.HeaderCell>Properties</Table.HeaderCell>
-					<Table.HeaderCell>Add fields</Table.HeaderCell>
-					<Table.HeaderCell>Properties</Table.HeaderCell>
+					{showDocumentsPerCollection ? <Table.HeaderCell>Documents per collection</Table.HeaderCell> : null}
+
+					<Table.HeaderCell>Field count</Table.HeaderCell>
+					{/*
+						<Table.HeaderCell>Global field count</Table.HeaderCell>
+						<Table.HeaderCell>Local field count</Table.HeaderCell>
+					*/}
+
+					<Table.HeaderCell>Fields</Table.HeaderCell>
+
+					{/*
+						<Table.HeaderCell>Global fields</Table.HeaderCell>
+						<Table.HeaderCell>Local fields</Table.HeaderCell>
+					*/}
+
+					{showAddFields ? <Table.HeaderCell>Add fields</Table.HeaderCell> : null}
+					{showDetails ? <Table.HeaderCell>Details</Table.HeaderCell> : null}
 					{showDeleteButton ?<Table.HeaderCell>Delete</Table.HeaderCell> : null}
 				</Table.Row>
 			</Table.Header>
@@ -160,6 +229,21 @@ export function DocumentTypes({
 					}); // forEach referencedByCollections
 					const collectionNames = Object.keys(collections).sort();
 
+					const activeFields = fields.filter(({active}) => active);
+
+					const activeFieldNames = [];
+					activeFields.forEach(({fieldId}) => {
+						if (globalFieldsObj[fieldId] && globalFieldsObj[fieldId].key) {
+							activeFieldNames.push(globalFieldsObj[fieldId].key);
+						} else {
+							console.error(`Unable to find global field name for field id:${fieldId}!`);
+						}
+					});
+					activeFieldNames.sort(); // in_place
+
+					const activeProperties = properties.filter(({active}) => active);
+					const activePropertyNames = activeProperties.map(({name})=>name).sort();
+
 					return <Table.Row key={index}>
 						<Table.Cell collapsing><NewOrEditDocumentTypeModal
 							_id={_id}
@@ -178,17 +262,22 @@ export function DocumentTypes({
 							servicesBaseUrl={servicesBaseUrl}
 						/></Table.Cell>
 						<Table.Cell collapsing>{_name}</Table.Cell>
-						<Table.Cell><ul style={{
+
+						{showCollections ? <Table.Cell><ul style={{
 							listStyleType: 'none',
 							margin: 0,
 							padding: 0
-						}}>{collectionNames.map((c, i) => <li key={i}>{c}</li>)}</ul></Table.Cell>
-						<Table.Cell><ul style={{
+						}}>{collectionNames.map((c, i) => <li key={i}>{c}</li>)}</ul></Table.Cell> : null}
+
+						{showInterfaces ? <Table.Cell><ul style={{
 							listStyleType: 'none',
 							margin: 0,
 							padding: 0
-						}}>{interfaces.sort().map((c, i) => <li key={i}>{c}</li>)}</ul></Table.Cell>
-						<Table.Cell collapsing>
+						}}>{interfaces.sort().map((c, i) => <li key={i}>{c}</li>)}</ul></Table.Cell> : null}
+
+						<Table.Cell collapsing>{documentsInTotal}</Table.Cell>
+
+						{showDocumentsPerCollection ? <Table.Cell collapsing>
 							<ul style={{
 								listStyleType: 'none',
 								margin: 0,
@@ -197,11 +286,23 @@ export function DocumentTypes({
 								{Object.keys(collections).map((k, i) => <li key={i}>{k}({collections[k].documentsTotal})</li>)}
 								<li>Total: {documentsInTotal}</li>
 							</ul>
-						</Table.Cell>
-						<Table.Cell collapsing>{properties.length}</Table.Cell>
-						<Table.Cell collapsing>{properties.map(({name})=>name).join(', ')}</Table.Cell>
-						<Table.Cell collapsing>{addFields ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='red' name='x' size='large'/>}</Table.Cell>
-						<Table.Cell collapsing>
+						</Table.Cell> : null}
+
+						<Table.Cell collapsing>{activeFields.length + activeProperties.length}</Table.Cell>
+						{/*
+							<Table.Cell collapsing>{activeFields.length}</Table.Cell>
+							<Table.Cell collapsing>{activeProperties.length}</Table.Cell>
+						*/}
+
+						<Table.Cell collapsing>{activeFieldNames.concat(activePropertyNames).sort().join(', ')}</Table.Cell>
+						{/*
+							<Table.Cell collapsing>{activeFieldNames.join(', ')}</Table.Cell>
+							<Table.Cell collapsing>{activePropertyNames.join(', ')}</Table.Cell>
+						*/}
+
+						{showAddFields ? <Table.Cell collapsing>{addFields ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='red' name='x' size='large'/>}</Table.Cell> : null}
+
+						{showDetails ? <Table.Cell collapsing>
 							<Table>
 								<Table.Header>
 									<Table.Row>
@@ -216,8 +317,7 @@ export function DocumentTypes({
 									</Table.Row>
 								</Table.Header>
 								<Table.Body>
-									{fields.map(({
-										active,
+									{activeFields.map(({
 										fieldId
 									}, j) => {
 										const fieldObj = globalFieldsObj[fieldId] || {};
@@ -231,34 +331,18 @@ export function DocumentTypes({
 											key,
 											ngram
 										} = fieldObj;
-										return <Table.Row disabled={!active} key={`${index}.${j}`}>
+										return <Table.Row disabled={true} key={`${index}.${j}`}>
 											<Table.Cell collapsing>{key}</Table.Cell>
 											<Table.Cell collapsing>{fieldType}</Table.Cell>
 											<Table.Cell collapsing>{min}</Table.Cell>
 											<Table.Cell collapsing>{max}</Table.Cell>
-											<Table.Cell collapsing>{enabled ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='red' name='x' size='large'/>}</Table.Cell>
-											<Table.Cell disabled={!enabled} collapsing>{fulltext ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='red' name='x' size='large'/>}</Table.Cell>
-											<Table.Cell disabled={!enabled} collapsing>{ngram ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='red' name='x' size='large'/>}</Table.Cell>
-											<Table.Cell disabled={!enabled} collapsing>{includeInAllText ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='red' name='x' size='large'/>}</Table.Cell>
+											<Table.Cell collapsing>{enabled ? <Icon color='grey' disabled={true} name='checkmark' size='large'/> : <Icon color='grey' name='x' size='large'/>}</Table.Cell>
+											<Table.Cell collapsing>{enabled ? <Icon color='grey' disabled={true} name={fulltext ? 'checkmark' : 'x'} size='large'/> : null}</Table.Cell>
+											<Table.Cell collapsing>{enabled ? <Icon color='grey' disabled={true} name={ngram ? 'checkmark' : 'x'} size='large'/> : null}</Table.Cell>
+											<Table.Cell collapsing>{enabled ? <Icon color='grey' disabled={true} name={includeInAllText ? 'checkmark' : 'x'} size='large'/> : null}</Table.Cell>
 										</Table.Row>;
 									})}
-								</Table.Body>
-							</Table>
-							<Table>
-								<Table.Header>
-									<Table.Row>
-										<Table.HeaderCell>Name</Table.HeaderCell>
-										<Table.HeaderCell>Value type</Table.HeaderCell>
-										<Table.HeaderCell>Min</Table.HeaderCell>
-										<Table.HeaderCell>Max</Table.HeaderCell>
-										<Table.HeaderCell>Indexing</Table.HeaderCell>
-										<Table.HeaderCell>Fulltext</Table.HeaderCell>
-										<Table.HeaderCell>nGram</Table.HeaderCell>
-										<Table.HeaderCell>Include in _allText</Table.HeaderCell>
-									</Table.Row>
-								</Table.Header>
-								<Table.Body>
-									{properties.map(({
+									{activeProperties.map(({
 										enabled,
 										fulltext,
 										includeInAllText,
@@ -273,13 +357,23 @@ export function DocumentTypes({
 										<Table.Cell collapsing>{min}</Table.Cell>
 										<Table.Cell collapsing>{max}</Table.Cell>
 										<Table.Cell collapsing>{enabled ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='red' name='x' size='large'/>}</Table.Cell>
-										<Table.Cell disabled={!enabled} collapsing>{fulltext ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='red' name='x' size='large'/>}</Table.Cell>
-										<Table.Cell disabled={!enabled} collapsing>{ngram ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='red' name='x' size='large'/>}</Table.Cell>
-										<Table.Cell disabled={!enabled} collapsing>{includeInAllText ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='red' name='x' size='large'/>}</Table.Cell>
+										<Table.Cell collapsing>{enabled
+											? fulltext ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='red' name='x' size='large'/>
+											: null
+										}</Table.Cell>
+										<Table.Cell collapsing>{enabled
+											? ngram ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='red' name='x' size='large'/>
+											: null
+										}</Table.Cell>
+										<Table.Cell collapsing>{enabled
+											? includeInAllText ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='red' name='x' size='large'/>
+											: null
+										}</Table.Cell>
 									</Table.Row>)}
 								</Table.Body>
 							</Table>
-						</Table.Cell>
+						</Table.Cell> : null}
+
 						{showDeleteButton ?<Table.Cell collapsing>
 							<Button.Group>
 								<DeleteDocumentTypeModal
@@ -298,6 +392,7 @@ export function DocumentTypes({
 								/>
 							</Button.Group>
 						</Table.Cell> : null}
+
 					</Table.Row>;
 				})}
 			</Table.Body>
