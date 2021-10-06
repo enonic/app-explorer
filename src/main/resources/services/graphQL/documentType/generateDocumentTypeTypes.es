@@ -14,6 +14,7 @@ import {
 import {
 	GraphQLBoolean,
 	GraphQLInt,
+	GraphQLString,
 	nonNull,
 	list
 } from '/lib/graphql';
@@ -80,6 +81,10 @@ export function generateDocumentTypeTypes({
 	glue.addObjectType({
 		name: GQL_TYPE_DOCUMENT_TYPE_NAME,
 		fields: {
+
+			// This appears in source without beeing defined here:
+			//__fieldKey: { type: GraphQLString }, // Passed on from field.referencedBy(documentType)
+
 			addFields: { type: nonNull(GraphQLBoolean) },
 			fields: { type: list(glue.addObjectType({
 				name: 'DocumentTypeFields',

@@ -8,18 +8,15 @@ import {
 	GraphQLInt,
 	GraphQLString,
 	list,
-	nonNull,
-	reference
+	nonNull//,
+	//reference
 } from '/lib/graphql';
 
 import {
-	GQL_INPUT_TYPE_FILTERS_NAME,
 	GQL_INTERFACE_NODE_NAME,
 	GQL_TYPE_FIELD_NODE_NAME,
-	GQL_TYPE_FIELDS_QUERY_RESULT_NAME,
-	GQL_TYPE_REFERENCED_BY_NAME
+	GQL_TYPE_FIELDS_QUERY_RESULT_NAME
 } from '../constants';
-import {referencedByMapped} from '../referencedByMapped';
 
 
 /*const GQL_TYPE_INDEX_CONFIG_UNION = createUnionType({
@@ -64,7 +61,13 @@ export function generateFieldTypes({
 		}
 	});
 
+	const {
+		fields: interfaceNodeFields,
+		type: interfaceNodeType
+	} = glue.getInterfaceTypeObj(GQL_INTERFACE_NODE_NAME);
+
 	const GQL_FIELDS_FIELD_COMMON = {
+		...interfaceNodeFields,
 		_name: { type: glue.getScalarType('_name') },
 		decideByType: { type: GraphQLBoolean }, // TODO nonNull?
 		denyDelete: { type: GraphQLBoolean },
@@ -84,39 +87,22 @@ export function generateFieldTypes({
 	};
 
 	const GQL_TYPE_FIELD = glue.addObjectType({
-		name: 'Field',
+		name: 'FieldAny',
 		fields: {
 			...GQL_FIELDS_FIELD_COMMON,
-			_id: { type: GraphQLString }, // NOTE System fields doesn't have _id
+
+			// NOTE System fields doesn't have these, so override without nonNull
+			_id: { type: GraphQLString },
 			_nodeType: { type: GraphQLString },
-			_path: { type: GraphQLString }, // NOTE System fields doesn't have _path
-			__referencedBy: {
-				args: {
-					filters: glue.getInputType(GQL_INPUT_TYPE_FILTERS_NAME)
-				},
-				resolve: ({
-					args: {filters},
-					source: {_id}
-				}) => referencedByMapped({_id, filters}),
-				//type: reference(GQL_TYPE_REFERENCED_BY_NAME)
-				type: glue.getObjectType(GQL_TYPE_REFERENCED_BY_NAME)
-			}
-		}
+			_path: { type: GraphQLString }
+		}//,
+		//interfaces: [interfaceNodeType] // NOTE System fields doesn't quite implement the node interface
 	});
 
 	glue.addObjectType({
 		name: GQL_TYPE_FIELD_NODE_NAME,
-		fields: {
-			...GQL_FIELDS_FIELD_COMMON,
-			...glue.getInterfaceTypeFields(GQL_INTERFACE_NODE_NAME)
-			//_id: { type: glue.getScalarType('_id') },
-			//_nodeType: { type: nonNull(GraphQLString) },
-			//_path: { type: glue.getScalarType('_path') }
-		},
-		// https://github.com/enonic/lib-graphql/blob/master/docs/api.adoc#createobjecttype
-		// interfaces: Array<GraphQLInterfaceType OR GraphQLTypeReference>
-		interfaces: [glue.getInterfaceType(GQL_INTERFACE_NODE_NAME)]
-		//interfaces: [reference(GQL_INTERFACE_NODE_NAME)]
+		fields: GQL_FIELDS_FIELD_COMMON,
+		interfaces: [interfaceNodeType]
 	});
 
 	glue.addObjectType({

@@ -1,4 +1,4 @@
-export const GQL_QUERY_FIELDS_QUERY = `query QueryFieldsQuery(
+export const GQL_QUERY_QUERY_FIELDS = `query QueryFieldsQuery(
 	$fields: [String]
 	$includeSystemFields: Boolean
 ) {
@@ -81,6 +81,30 @@ export const GQL_QUERY_FIELDS_QUERY = `query QueryFieldsQuery(
 									_nodeType
 									_path
 									#_score # WHY NOT IMPLEMENTED???
+									__hasField(
+									   count: 0
+									   filters: {
+										   boolean: {
+											   must: {
+												   hasValue: {
+													   field: "_nodeType"
+													   values: ["com.enonic.app.explorer:document"]
+												   }
+											   }
+										   }
+									   }
+								   ) {
+									   #count
+									   #hits { # Only document nodes
+									   #	_branchId
+									   #	_id
+									   #	_name
+									   #	_nodeType
+									   #	_path
+									   #	_versionKey
+									   #}
+									   total
+								   } # __hasField
 								}
 							}
 							total

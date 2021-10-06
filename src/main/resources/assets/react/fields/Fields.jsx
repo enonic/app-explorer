@@ -14,7 +14,7 @@ import {
 
 import {NewOrEditModal} from './NewOrEditModal';
 import {DeleteModal} from './DeleteModal';
-import {fetchFields} from './fetchFields';
+import {fetchFields} from '../../../services/graphQL/fetchers/fetchFields';
 
 
 export function Fields(props) {
@@ -34,10 +34,12 @@ export function Fields(props) {
 		showDeleteButton: false,
 		showDescriptionColumn: false,
 		showIndexConfigColumns: false,
-		showOccurencesColumns: true,
+		showOccurencesColumns: false,
 		showSystemFields: false
 	});
 	//console.debug('Fields', {props, state});
+	const [showCollections, setShowCollections] = React.useState(false);
+	const [showDocumentTypes, setShowDocumentTypes] = React.useState(false);
 
 	const {
 		column,
@@ -156,6 +158,26 @@ export function Fields(props) {
 						</Table.Cell>
 						<Table.Cell collapsing>
 							<Radio
+								checked={showDocumentTypes}
+								onChange={(ignored,{checked}) => {
+									setShowDocumentTypes(checked);
+								}}
+								toggle
+							/>
+							<Label color='black' size='large'>Show document types</Label>
+						</Table.Cell>
+						<Table.Cell collapsing>
+							<Radio
+								checked={showCollections}
+								onChange={(ignored,{checked}) => {
+									setShowCollections(checked);
+								}}
+								toggle
+							/>
+							<Label color='black' size='large'>Show collections</Label>
+						</Table.Cell>
+						<Table.Cell collapsing>
+							<Radio
 								checked={showIndexConfigColumns}
 								onChange={(ignored,{checked}) => {
 									setState(prev => ({
@@ -203,30 +225,34 @@ export function Fields(props) {
 								onClick={handleSortGenerator('fieldType')}
 								sorted={column === 'fieldType' ? direction : null}
 							>Type</Table.HeaderCell>
-							<Table.HeaderCell>Used in document types</Table.HeaderCell>
-							<Table.HeaderCell>Used in collections</Table.HeaderCell>
 
 							{showOccurencesColumns ? <>
 								<Table.HeaderCell
 									onClick={handleSortGenerator('min')}
 									sorted={column === 'min' ? direction : null}
+									textAlign='center'
 								>Min</Table.HeaderCell>
 								<Table.HeaderCell
 									onClick={handleSortGenerator('max')}
 									sorted={column === 'max' ? direction : null}
+									textAlign='center'
 								>Max</Table.HeaderCell>
 							</>: null}
 
 							{showIndexConfigColumns ? <>
-								<Table.HeaderCell>Enabled</Table.HeaderCell>
-								<Table.HeaderCell>Decide by type</Table.HeaderCell>
-								<Table.HeaderCell>Fulltext</Table.HeaderCell>
-								<Table.HeaderCell>Include in _allText</Table.HeaderCell>
-								<Table.HeaderCell>nGram</Table.HeaderCell>
-								<Table.HeaderCell>path</Table.HeaderCell>
+								<Table.HeaderCell textAlign='center'>Enabled</Table.HeaderCell>
+								<Table.HeaderCell textAlign='center'>Decide by type</Table.HeaderCell>
+								<Table.HeaderCell textAlign='center'>Fulltext</Table.HeaderCell>
+								<Table.HeaderCell textAlign='center'>Include in _allText</Table.HeaderCell>
+								<Table.HeaderCell textAlign='center'>nGram</Table.HeaderCell>
+								<Table.HeaderCell textAlign='center'>path</Table.HeaderCell>
 							</> : null}
 
-							{showDeleteButton ? <Table.HeaderCell>Actions</Table.HeaderCell> : null}
+							{showDocumentTypes ? <Table.HeaderCell textAlign='center'>Used in document types</Table.HeaderCell> : null}
+							{showCollections ? <Table.HeaderCell textAlign='center'>Used in fieldCollections</Table.HeaderCell> : null}
+							<Table.HeaderCell textAlign='right'>Documents with field</Table.HeaderCell>
+
+							{showDeleteButton ? <Table.HeaderCell textAlign='center'>Delete</Table.HeaderCell> : null}
 						</Table.Row>
 					</Table.Header>
 					<Table.Body>
@@ -235,7 +261,7 @@ export function Fields(props) {
 							_name,
 							__referencedBy: {
 								//count,
-								hits: referencedByHits//,
+								hits: documentTypesReferencingField//,
 								//total
 							},
 
@@ -255,35 +281,40 @@ export function Fields(props) {
 							nGram, // node._indexConfig.default.nGram uses uppercase G in nGram
 							path
 						}, index) => {
-							//console.debug(`Fields key:${key} referencedByHits:`, referencedByHits);
-							const documentTypes = [];
-							const collections = [];
-							referencedByHits.forEach(({
+							//console.debug(`Fields key:${key} documentTypesReferencingField:`, documentTypesReferencingField);
+							const fieldDocumentTypes = [];
+							const fieldCollections = [];
+							let documentsWithFieldTotal = 0;
+							documentTypesReferencingField.forEach(({
 								_name,
 								_nodeType,
 								__referencedBy: {
 									//count,
-									hits: referencedByLevel2Hits//,
+									hits: collectionsReferencingDocumentType//,
 									//total
 								}
 							}) => {
-								if (_nodeType === 'com.enonic.app.explorer:documentType' && !documentTypes.includes(_name)) {
-									documentTypes.push(_name);
+								if (_nodeType === 'com.enonic.app.explorer:documentType' && !fieldDocumentTypes.includes(_name)) {
+									fieldDocumentTypes.push(_name);
+									collectionsReferencingDocumentType.forEach(({
+										_name,
+										_nodeType,
+										__hasField: {
+											total
+										}
+									}) => {
+										if (_nodeType === 'com.enonic.app.explorer:collection' && !fieldCollections.includes(_name)) {
+											fieldCollections.push(_name);
+											documentsWithFieldTotal += total;
+										}
+									});
 								}
-								referencedByLevel2Hits.forEach(({
-									_name,
-									_nodeType
-								}) => {
-									if (_nodeType === 'com.enonic.app.explorer:collection' && !collections.includes(_name)) {
-										collections.push(_name);
-									}
-								});
 							});
-							//console.debug(`Fields key:${key} documentTypes:`, documentTypes);
-							//console.debug(`Fields key:${key} collections:`, collections);
+							//console.debug(`Fields key:${key} fieldDocumentTypes:`, fieldDocumentTypes);
+							//console.debug(`Fields key:${key} fieldCollections:`, fieldCollections);
 							//console.debug(`Fields key:${key} fulltext:`, fulltext);
 
-							return <Table.Row key={`field[${index}]`}>
+							return <Table.Row disabled={denyDelete} key={`field[${index}]`}>
 								<Table.Cell>
 									<NewOrEditModal
 										_id={_id}
@@ -314,35 +345,76 @@ export function Fields(props) {
 
 								<Table.Cell disabled={denyDelete}>{fieldType === 'any' ? '*' : fieldType}</Table.Cell>
 
-								<Table.Cell disabled={denyDelete}><ul style={{
-									listStyleType: 'none',
-									margin: 0,
-									padding: 0
-								}}>{documentTypes.sort().map((dT, i) => <li key={i}>{dT}</li>)}</ul></Table.Cell>
-
-								<Table.Cell disabled={denyDelete}><ul style={{
-									listStyleType: 'none',
-									margin: 0,
-									padding: 0
-								}}>{collections.sort().map((c, i) => <li key={i}>{c}</li>)}</ul></Table.Cell>
-
 								{showOccurencesColumns ? <>
-									<Table.Cell disabled={denyDelete} textAlign='center'>{min === 0 ? '*' : min}</Table.Cell>
+									<Table.Cell disabled={denyDelete} textAlign='center'>{min === 0 ? null : min}</Table.Cell>
 									<Table.Cell disabled={denyDelete} textAlign='center'>{max === 0 ? '∞' : max}</Table.Cell>
 								</>: null}
 
 								{showIndexConfigColumns ? <>
-									<Table.Cell disabled={denyDelete} textAlign='center'>{enabled ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='red' name='x' size='large'/>}</Table.Cell>
-									<Table.Cell disabled={denyDelete} textAlign='center'>{decideByType ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='red' name='x' size='large'/>}</Table.Cell>
-									<Table.Cell disabled={denyDelete} textAlign='center'>{fulltext ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='red' name='x' size='large'/>}</Table.Cell>
-									<Table.Cell disabled={denyDelete} textAlign='center'>{includeInAllText ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='red' name='x' size='large'/>}</Table.Cell>
-									<Table.Cell disabled={denyDelete} textAlign='center'>{nGram ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='red' name='x' size='large'/>}</Table.Cell>
-									<Table.Cell disabled={denyDelete} textAlign='center'>{path ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='red' name='x' size='large'/>}</Table.Cell>
+									<Table.Cell disabled={denyDelete} textAlign='center'>{enabled
+										? <Icon color={denyDelete ? 'grey' : 'green'} disabled={denyDelete} name='checkmark' size='large'/>
+										: <Icon color='grey' disabled={denyDelete} name='x' size='large'/>}
+									</Table.Cell>
+
+									<Table.Cell disabled={denyDelete} textAlign='center'>{enabled
+										? decideByType
+											? <Icon color={denyDelete ? 'grey' : 'green'} disabled={denyDelete} name='checkmark' size='large'/>
+											: <Icon color='grey' disabled={denyDelete} name='x' size='large'/>
+										: null
+									}</Table.Cell>
+
+									<Table.Cell disabled={denyDelete} textAlign='center'>{enabled
+										? fulltext
+											? <Icon color={denyDelete ? 'grey' : 'green'} disabled={denyDelete} name='checkmark' size='large'/>
+											: <Icon color='grey' disabled={denyDelete} name='x' size='large'/>
+										: null
+									}</Table.Cell>
+
+									<Table.Cell disabled={denyDelete} textAlign='center'>{enabled
+										? includeInAllText
+											? <Icon color={denyDelete ? 'grey' : 'green'} disabled={denyDelete} name='checkmark' size='large'/>
+											: <Icon color='grey' disabled={denyDelete} name='x' size='large'/>
+										: null
+									}</Table.Cell>
+
+									<Table.Cell disabled={denyDelete} textAlign='center'>{enabled
+										? nGram
+											? <Icon color={denyDelete ? 'grey' : 'green'} disabled={denyDelete} name='checkmark' size='large'/>
+											: <Icon color='grey' disabled={denyDelete} name='x' size='large'/>
+										: null
+									}</Table.Cell>
+
+									<Table.Cell disabled={denyDelete} textAlign='center'>{enabled
+										? path
+											? <Icon color={denyDelete ? 'grey' : 'green'} disabled={denyDelete} name='checkmark' size='large'/>
+											: <Icon color='grey' disabled={denyDelete} name='x' size='large'/>
+										: null
+									}</Table.Cell>
+
 								</> : null}
 
-								{showDeleteButton ? <Table.Cell>
+								{showDocumentTypes ? <Table.Cell disabled={denyDelete} textAlign='center'>{denyDelete ? 'n/a' :<ul style={{
+									listStyleType: 'none',
+									margin: 0,
+									padding: 0
+								}}>{fieldDocumentTypes.sort().map((dT, i) => <li key={i}>{dT}</li>)}</ul>}</Table.Cell> : null}
+
+								{showCollections ? <Table.Cell disabled={denyDelete} textAlign='center'>{denyDelete ? 'n/a' :<ul style={{
+									listStyleType: 'none',
+									margin: 0,
+									padding: 0
+								}}>{fieldCollections.sort().map((c, i) => <li key={i}>{c}</li>)}</ul>}</Table.Cell> : null}
+
+								<Table.Cell disabled={denyDelete} textAlign='right'>{denyDelete
+									? 'n/a'
+									: documentsWithFieldTotal === 0
+										? null
+										: documentsWithFieldTotal
+								}</Table.Cell>
+
+								{showDeleteButton ? <Table.Cell textAlign='center'>
 									<DeleteModal
-										disabled={denyDelete || documentTypes.length || collections.length}
+										disabled={denyDelete || fieldDocumentTypes.length || fieldCollections.length}
 										_id={_id}
 										_name={_name}
 										afterClose={updateFields}
@@ -354,7 +426,7 @@ export function Fields(props) {
 												<Icon name='warning sign' />
 												<Message.Content>You are not allowed to delete a system field.</Message.Content>
 											</Message>
-											: collections.length
+											: fieldCollections.length
 												? <Message
 													error
 													icon
@@ -362,7 +434,7 @@ export function Fields(props) {
 													<Icon name='warning sign' />
 													<Message.Content>You are not allowed to a delete a field that is used in a collection.</Message.Content>
 												</Message>
-												: documentTypes.length
+												: fieldDocumentTypes.length
 													? <Message
 														error
 														icon

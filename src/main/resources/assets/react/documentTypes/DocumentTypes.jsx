@@ -13,7 +13,7 @@ import {useInterval} from '../utils/useInterval';
 import {NewOrEditDocumentTypeModal} from './NewOrEditDocumentTypeModal';
 import {DeleteDocumentTypeModal} from './DeleteDocumentTypeModal';
 import {fetchDocumentTypes} from '../../../services/graphQL/fetchers/fetchDocumentTypes.mjs';
-import {fetchFields} from '../fields/fetchFields';
+import {fetchFields} from '../../../services/graphQL/fetchers/fetchFields.mjs';
 
 
 export function DocumentTypes({
@@ -162,10 +162,10 @@ export function DocumentTypes({
 					<Table.HeaderCell>Name</Table.HeaderCell>
 					{showCollections ? <Table.HeaderCell>Used in collections</Table.HeaderCell> : null}
 					{showInterfaces ? <Table.HeaderCell>Used in interfaces</Table.HeaderCell> : null}
-					<Table.HeaderCell>Documents</Table.HeaderCell>
+					<Table.HeaderCell textAlign='right'>Documents</Table.HeaderCell>
 					{showDocumentsPerCollection ? <Table.HeaderCell>Documents per collection</Table.HeaderCell> : null}
 
-					<Table.HeaderCell>Field count</Table.HeaderCell>
+					<Table.HeaderCell textAlign='right'>Field count</Table.HeaderCell>
 					{/*
 						<Table.HeaderCell>Global field count</Table.HeaderCell>
 						<Table.HeaderCell>Local field count</Table.HeaderCell>
@@ -275,7 +275,7 @@ export function DocumentTypes({
 							padding: 0
 						}}>{interfaces.sort().map((c, i) => <li key={i}>{c}</li>)}</ul></Table.Cell> : null}
 
-						<Table.Cell collapsing>{documentsInTotal}</Table.Cell>
+						<Table.Cell collapsing textAlign='right'>{documentsInTotal}</Table.Cell>
 
 						{showDocumentsPerCollection ? <Table.Cell collapsing>
 							<ul style={{
@@ -288,7 +288,7 @@ export function DocumentTypes({
 							</ul>
 						</Table.Cell> : null}
 
-						<Table.Cell collapsing>{activeFields.length + activeProperties.length}</Table.Cell>
+						<Table.Cell collapsing textAlign='right'>{activeFields.length + activeProperties.length}</Table.Cell>
 						{/*
 							<Table.Cell collapsing>{activeFields.length}</Table.Cell>
 							<Table.Cell collapsing>{activeProperties.length}</Table.Cell>
@@ -300,7 +300,7 @@ export function DocumentTypes({
 							<Table.Cell collapsing>{activePropertyNames.join(', ')}</Table.Cell>
 						*/}
 
-						{showAddFields ? <Table.Cell collapsing>{addFields ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='red' name='x' size='large'/>}</Table.Cell> : null}
+						{showAddFields ? <Table.Cell collapsing>{addFields ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='grey' name='x' size='large'/>}</Table.Cell> : null}
 
 						{showDetails ? <Table.Cell collapsing>
 							<Table>
@@ -308,12 +308,12 @@ export function DocumentTypes({
 									<Table.Row>
 										<Table.HeaderCell>Name</Table.HeaderCell>
 										<Table.HeaderCell>Value type</Table.HeaderCell>
-										<Table.HeaderCell>Min</Table.HeaderCell>
-										<Table.HeaderCell>Max</Table.HeaderCell>
-										<Table.HeaderCell>Indexing</Table.HeaderCell>
-										<Table.HeaderCell>Fulltext</Table.HeaderCell>
-										<Table.HeaderCell>nGram</Table.HeaderCell>
-										<Table.HeaderCell>Include in _allText</Table.HeaderCell>
+										<Table.HeaderCell textAlign='center'>Min</Table.HeaderCell>
+										<Table.HeaderCell textAlign='center'>Max</Table.HeaderCell>
+										<Table.HeaderCell textAlign='center'>Indexing</Table.HeaderCell>
+										<Table.HeaderCell textAlign='center'>Fulltext</Table.HeaderCell>
+										<Table.HeaderCell textAlign='center'>nGram</Table.HeaderCell>
+										<Table.HeaderCell textAlign='center'>Include in _allText</Table.HeaderCell>
 									</Table.Row>
 								</Table.Header>
 								<Table.Body>
@@ -334,12 +334,12 @@ export function DocumentTypes({
 										return <Table.Row disabled={true} key={`${index}.${j}`}>
 											<Table.Cell collapsing>{key}</Table.Cell>
 											<Table.Cell collapsing>{fieldType}</Table.Cell>
-											<Table.Cell collapsing>{min}</Table.Cell>
-											<Table.Cell collapsing>{max}</Table.Cell>
-											<Table.Cell collapsing>{enabled ? <Icon color='grey' disabled={true} name='checkmark' size='large'/> : <Icon color='grey' name='x' size='large'/>}</Table.Cell>
-											<Table.Cell collapsing>{enabled ? <Icon color='grey' disabled={true} name={fulltext ? 'checkmark' : 'x'} size='large'/> : null}</Table.Cell>
-											<Table.Cell collapsing>{enabled ? <Icon color='grey' disabled={true} name={ngram ? 'checkmark' : 'x'} size='large'/> : null}</Table.Cell>
-											<Table.Cell collapsing>{enabled ? <Icon color='grey' disabled={true} name={includeInAllText ? 'checkmark' : 'x'} size='large'/> : null}</Table.Cell>
+											<Table.Cell collapsing textAlign='center'>{min === 0 ? null : min}</Table.Cell>
+											<Table.Cell collapsing textAlign='center'>{max === 0 ? '∞' : max}</Table.Cell>
+											<Table.Cell collapsing textAlign='center'><Icon color='grey' disabled={true} name={enabled ? 'checkmark' : 'x'} size='large'/></Table.Cell>
+											<Table.Cell collapsing textAlign='center'>{enabled ? <Icon color='grey' disabled={true} name={fulltext ? 'checkmark' : 'x'} size='large'/> : null}</Table.Cell>
+											<Table.Cell collapsing textAlign='center'>{enabled ? <Icon color='grey' disabled={true} name={ngram ? 'checkmark' : 'x'} size='large'/> : null}</Table.Cell>
+											<Table.Cell collapsing textAlign='center'>{enabled ? <Icon color='grey' disabled={true} name={includeInAllText ? 'checkmark' : 'x'} size='large'/> : null}</Table.Cell>
 										</Table.Row>;
 									})}
 									{activeProperties.map(({
@@ -354,19 +354,19 @@ export function DocumentTypes({
 									}, k) => <Table.Row key={`${index}.${k}`}>
 										<Table.Cell collapsing>{name}</Table.Cell>
 										<Table.Cell collapsing>{valueType}</Table.Cell>
-										<Table.Cell collapsing>{min}</Table.Cell>
-										<Table.Cell collapsing>{max}</Table.Cell>
-										<Table.Cell collapsing>{enabled ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='red' name='x' size='large'/>}</Table.Cell>
-										<Table.Cell collapsing>{enabled
-											? fulltext ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='red' name='x' size='large'/>
+										<Table.Cell collapsing textAlign='center'>{min}</Table.Cell>
+										<Table.Cell collapsing textAlign='center'>{max}</Table.Cell>
+										<Table.Cell collapsing textAlign='center'>{enabled ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='grey' name='x' size='large'/>}</Table.Cell>
+										<Table.Cell collapsing textAlign='center'>{enabled
+											? fulltext ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='grey' name='x' size='large'/>
 											: null
 										}</Table.Cell>
-										<Table.Cell collapsing>{enabled
-											? ngram ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='red' name='x' size='large'/>
+										<Table.Cell collapsing textAlign='center'>{enabled
+											? ngram ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='grey' name='x' size='large'/>
 											: null
 										}</Table.Cell>
-										<Table.Cell collapsing>{enabled
-											? includeInAllText ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='red' name='x' size='large'/>
+										<Table.Cell collapsing textAlign='center'>{enabled
+											? includeInAllText ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='grey' name='x' size='large'/>
 											: null
 										}</Table.Cell>
 									</Table.Row>)}
