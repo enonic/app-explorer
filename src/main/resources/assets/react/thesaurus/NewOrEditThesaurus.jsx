@@ -93,6 +93,7 @@ export function NewOrEditThesaurus(props) {
 
 	return <Modal
 		closeIcon
+		closeOnDimmerClick={false}
 		onClose={doClose}
 		open={open}
 		trigger={_id ? <Popup

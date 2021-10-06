@@ -42,6 +42,7 @@ export function NewOrEditCollectionModal(props) {
 
 	return <Modal
 		closeIcon
+		closeOnDimmerClick={false}
 		onClose={doClose}
 		open={state.open}
 		size='large'

@@ -45,6 +45,7 @@ export function NewOrEditModal(props) {
 
 	return <Modal
 		closeIcon
+		closeOnDimmerClick={false}
 		onClose={doClose}
 		open={open}
 		trigger={<Popup

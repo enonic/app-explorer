@@ -24,6 +24,7 @@ export function CopyModal({
 
 	return <Modal
 		closeIcon
+		closeOnDimmerClick={false}
 		onClose={doClose}
 		open={open}
 		trigger={<Button onClick={doOpen} compact size='tiny' type='button'><Icon color='green' name='copy'/>Copy</Button>}

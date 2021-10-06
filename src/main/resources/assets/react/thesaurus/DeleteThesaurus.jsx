@@ -36,6 +36,7 @@ export function DeleteThesaurus(props) {
 
 	return <Modal
 		closeIcon
+		closeOnDimmerClick={false}
 		onClose={doClose}
 		open={open}
 		trigger={<Popup

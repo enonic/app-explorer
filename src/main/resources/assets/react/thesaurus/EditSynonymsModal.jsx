@@ -31,6 +31,7 @@ export function EditSynonymsModal(props) {
 
 	return <Modal
 		closeIcon
+		closeOnDimmerClick={false}
 		onClose={doClose}
 		open={open}
 		size='fullscreen'
