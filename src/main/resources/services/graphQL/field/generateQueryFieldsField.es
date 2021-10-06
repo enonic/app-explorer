@@ -24,7 +24,7 @@ export function generateQueryFieldsField({
 		resolve: (env) => {
 			//log.info(`env:${toStr(env)}`);
 
-			const {args} = env;
+			const {args/*, context*/} = env;
 			//log.info(`args:${toStr(args)}`);
 
 			const {
@@ -44,6 +44,9 @@ export function generateQueryFieldsField({
 
 			fieldsRes.hits = fieldsRes.hits.map(hit => coerseFieldType(hit));
 			//log.info(`mapped fieldsRes:${toStr(fieldsRes)}`);
+
+			// WARNING The context is a global read-only, you can't use it to pass data.
+			//context.hits = fieldsRes.hits.map(({key}) => ({key}));
 
 			return fieldsRes;
 		},

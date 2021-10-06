@@ -43,8 +43,7 @@ import {List} from 'semantic-ui-react-form/List';
 import {GQL_MUTATION_CREATE_DOCUMENT_TYPE} from '../../../services/graphQL/documentType/mutationCreateDocumentType';
 import {GQL_MUTATION_UPDATE_DOCUMENT_TYPE} from '../../../services/graphQL/documentType/mutationUpdateDocumentType';
 import {GQL_QUERY_GET_DOCUMENT_TYPE} from '../../../services/graphQL/documentType/queryGetDocumentType';
-
-import {fetchFields} from '../fields/fetchFields';
+import {fetchFields} from '../../../services/graphQL/fetchers/fetchFields';
 
 import {nameValidator} from '../utils/nameValidator';
 

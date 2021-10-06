@@ -1,3 +1,5 @@
+import {toStr} from '@enonic/js-utils';
+
 import {
 	DateTime as GraphQLDateTime,
 	GraphQLID,
@@ -41,27 +43,36 @@ export function generateCollectionTypes({
 
 	const GQL_TYPE_COLLECTION_FIELDS = {
 		...interfaceNodeFields,
+
+		// This appears in source without beeing defined here:
+		//__fieldKey: { type: GraphQLString }, // Passed on from field.referencedBy(documentType).referencedBy(collection)
+
 		__hasField: { // Specific to 'Collection', not 'AnyNode'
 			args: {
 				count: GraphQLInt,
-				field: nonNull(GraphQLString),
+				field: GraphQLString, // Not nonNull, because field can come from source.__fieldKey
 				filters: glue.getInputType(GQL_INPUT_TYPE_FILTERS_NAME)
 			},
-			resolve: ({
-				args: {
+			resolve: (env) => {
+				//log.debug(`__hasField env:${toStr(env)}`);
+				const {
+					args: {
+						count,
+						field,
+						filters
+					},
+					source: {
+						__fieldKey,
+						_name: collectionName
+					}
+				} = env;
+				return hasField({
+					collectionName,
 					count,
-					field,
+					field: field ? field : __fieldKey,
 					filters
-				},
-				source: {
-					_name: collectionName
-				}
-			}) => hasField({
-				collectionName,
-				count,
-				field,
-				filters
-			}),
+				});
+			},
 			type: glue.getObjectType(GQL_TYPE_HAS_FIELD_QUERY_RESULT_NAME)
 		},
 		createdTime: { type: GraphQLDateTime },

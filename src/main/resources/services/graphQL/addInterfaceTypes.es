@@ -1,5 +1,7 @@
-//import {toStr} from '@enonic/js-utils';
+import {toStr} from '@enonic/js-utils';
 
+//import {NT_DOCUMENT_TYPE} from '/lib/explorer/documentType/constants';
+import {NT_FIELD} from '/lib/explorer/model/2/constants';
 import {reference} from '/lib/graphql';
 
 import {
@@ -27,10 +29,25 @@ export function addInterfaceTypes({
 					// Input types are defined before interfaceTypes, so we can use getInputType here
 					filters: glue.getInputType(GQL_INPUT_TYPE_FILTERS_NAME)
 				},
-				resolve: ({
-					args: {filters},
-					source: {_id}
-				}) => referencedByMapped({_id, filters}),
+				resolve: (env) => {
+					//log.debug(`__referencedBy env:${toStr(env)}`);
+					const {
+						args: {filters},
+						source: {
+							__fieldKey,
+							_id,
+							_nodeType,
+							key
+						}
+					} = env;
+					const res = referencedByMapped({_id, filters});
+					if (_nodeType && _nodeType === NT_FIELD && key) {
+						res.hits = res.hits.map((node) => ({...node, __fieldKey: key}));
+					} else if (__fieldKey) {
+						res.hits = res.hits.map((node) => ({...node, __fieldKey}));
+					}
+					return res;
+				},
 				type: reference(GQL_TYPE_REFERENCED_BY_NAME) // NOTE Must use reference, since type not defined yet
 			},
 			_versionKey: { type: glue.getScalarType('_versionKey') }
