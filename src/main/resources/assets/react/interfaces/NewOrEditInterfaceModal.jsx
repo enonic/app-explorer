@@ -41,6 +41,7 @@ export function NewOrEditInterfaceModal(props) {
 
 	return <Modal
 		closeIcon
+		closeOnDimmerClick={false}
 		onClose={doClose}
 		open={open}
 		size='large'

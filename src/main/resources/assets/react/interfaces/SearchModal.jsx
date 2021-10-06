@@ -25,6 +25,7 @@ export function SearchModal(props) {
 
 	return <Modal
 		closeIcon
+		closeOnDimmerClick={false}
 		onClose={doClose}
 		open={open}
 		size='large'

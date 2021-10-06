@@ -34,6 +34,7 @@ export function DeleteDocumentTypeModal({
 
 	return <Modal
 		closeIcon
+		closeOnDimmerClick={false}
 		onClose={doClose}
 		open={open}
 		trigger={<Button

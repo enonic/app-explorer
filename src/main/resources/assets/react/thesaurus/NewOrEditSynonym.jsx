@@ -97,6 +97,7 @@ export function NewOrEditSynonym(props) {
 	const toStemmer = new Snowball('English');*/
 	return <Modal
 		closeIcon
+		closeOnDimmerClick={false}
 		onClose={doClose}
 		open={open}
 		trigger={_id ? <Popup

@@ -25,6 +25,7 @@ export function DeleteModal({
 
 	return <Modal
 		closeIcon
+		closeOnDimmerClick={false}
 		onClose={doClose}
 		open={open}
 		trigger={<Button

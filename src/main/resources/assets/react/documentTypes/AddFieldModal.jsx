@@ -86,6 +86,7 @@ export const AddFieldModal = ({
 			primary: true
 		}]}
 		closeIcon
+		closeOnDimmerClick={false}
 		content={<Segment basic>
 			{local
 				? <>

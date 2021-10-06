@@ -79,6 +79,7 @@ const UploadLicenseModal = (props) => {
 	const [open, setOpen] = React.useState(false);
 	return <Modal
 		closeIcon
+		closeOnDimmerClick={false}
 		onClose={() => {setOpen(false);}}
 		open={open}
 		size='large'

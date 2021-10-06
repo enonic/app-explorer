@@ -74,6 +74,7 @@ export function RemoveFieldFromDocumentTypeModal({
 
 	return <Modal
 		closeIcon
+		closeOnDimmerClick={false}
 		onClose={doClose}
 		open={open}
 		size='large'

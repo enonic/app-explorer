@@ -26,6 +26,7 @@ export function DeleteCollectionModal(props) {
 
 	return <Modal
 		closeIcon
+		closeOnDimmerClick={false}
 		onClose={doClose}
 		open={state.open}
 		trigger={<Popup

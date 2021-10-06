@@ -33,6 +33,7 @@ export function NewOrEditDocumentTypeModal({
 	const header = _name ? `Edit document type ${_name}`: 'New document type';
 	return <Modal
 		closeIcon
+		closeOnDimmerClick={false}
 		defaultOpen={false}
 		onClose={doClose}
 		open={open}
