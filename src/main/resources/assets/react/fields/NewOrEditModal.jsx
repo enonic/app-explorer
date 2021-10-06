@@ -120,31 +120,31 @@ export function NewOrEditModal(props) {
 				/></Button>}
 	>
 		<Modal.Header>{editMode ? `Edit field ${initialValues.key}`: 'New field'}</Modal.Header>
-		<Modal.Content>
-			<EnonicForm
-				initialValues={initialValues}
-				onSubmit={(values) => {
-					console.debug('NewOrEditModal onSubmit values', values);
-					fetch(`${servicesBaseUrl}/graphQL`, {
-						method: 'POST',
-						headers: {
-							'Content-Type':	'application/json'
-						},
-						body: JSON.stringify({
-							query: _id ? GQL_MUTATION_FIELD_UPDATE : GQL_MUTATION_FIELD_CREATE,
-							variables: {
-								...values,
-								_id
-							}
-						})
-					}).then((response) => {
-						if (response.status === 200) {
-							doClose();
+		<EnonicForm
+			initialValues={initialValues}
+			onSubmit={(values) => {
+				console.debug('NewOrEditModal onSubmit values', values);
+				fetch(`${servicesBaseUrl}/graphQL`, {
+					method: 'POST',
+					headers: {
+						'Content-Type':	'application/json'
+					},
+					body: JSON.stringify({
+						query: _id ? GQL_MUTATION_FIELD_UPDATE : GQL_MUTATION_FIELD_CREATE,
+						variables: {
+							...values,
+							_id
 						}
-					});
-				}}
-				schema={SCHEMA}
-			>
+					})
+				}).then((response) => {
+					if (response.status === 200) {
+						doClose();
+					}
+				});
+			}}
+			schema={SCHEMA}
+		>
+			<Modal.Content>
 				<Form autoComplete='off'>
 					<Segment.Group>
 						<Segment>
@@ -314,14 +314,18 @@ export function NewOrEditModal(props) {
 						</Segment>
 
 						<Segment>
-							<SubmitButton/>
-							<ResetButton/>
+
 						</Segment>
 					</Segment.Group>
 					{/*<VisitAllButton/>*/}
 					{/*<ValidateFormButton/>*/}
 				</Form>
-			</EnonicForm>
-		</Modal.Content>
+			</Modal.Content>
+			<Modal.Actions>
+				<Button onClick={doClose}>Cancel</Button>
+				<ResetButton secondary/>
+				<SubmitButton primary><Icon name='save'/>Save</SubmitButton>
+			</Modal.Actions>
+		</EnonicForm>
 	</Modal>;
 } // NewOrEditModal
