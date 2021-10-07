@@ -281,7 +281,6 @@ export function Fields(props) {
 							min = 0,
 							max = 0,
 
-							instruction,
 							decideByType,
 							enabled,
 							fulltext,
@@ -334,7 +333,6 @@ export function Fields(props) {
 											min,
 											max,
 											description,
-											instruction,
 											decideByType,
 											enabled,
 											fulltext,

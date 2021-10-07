@@ -23,7 +23,6 @@ export const GQL_QUERY_QUERY_FIELDS = `query QueryFieldsQuery(
 			max
 			min
 
-			instruction
 			indexConfig {
 				decideByType
 				enabled

@@ -25,7 +25,6 @@ export function generateCreateFieldField({
 			fulltext: GraphQLBoolean,
 			includeInAllText: GraphQLBoolean,
 			//indexConfig,
-			instruction: GraphQLString,
 			max: GraphQLInt,
 			min: GraphQLInt,
 			nGram: GraphQLBoolean,

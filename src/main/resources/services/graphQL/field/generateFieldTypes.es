@@ -1,15 +1,11 @@
-import {
-	INDEX_CONFIG_TEMPLATES//,
-	//toStr
-} from '@enonic/js-utils';
+//import {toStr} from '@enonic/js-utils';
 
 import {
 	GraphQLBoolean,
 	GraphQLInt,
 	GraphQLString,
 	list,
-	nonNull//,
-	//reference
+	nonNull
 } from '/lib/graphql';
 
 import {
@@ -19,36 +15,9 @@ import {
 } from '../constants';
 
 
-/*const GQL_TYPE_INDEX_CONFIG_UNION = createUnionType({
-	name: 'FieldIndexConfigUnion',
-	typeResolver: (source) => {
-		log.debug(`source ${toStr(source)}`);
-		return isString(source) ? GQL_ENUM_INSTRUCTION : GQL_TYPE_INDEX_CONFIG_OBJECT;
-		//return isString(source) ? GraphQLString : GQL_TYPE_INDEX_CONFIG_OBJECT;
-		//return GraphQLString;
-	},
-	types: [
-		//GraphQLString,
-		GQL_ENUM_INSTRUCTION,
-		GQL_TYPE_INDEX_CONFIG_OBJECT
-	]
-});*/
-
-
 export function generateFieldTypes({
 	glue
 }) {
-	const INSTRUCTION_CUSTOM = 'custom';
-
-	const GQL_ENUM_INSTRUCTION = glue.addEnumType({
-		name: 'EnumInstructions',
-		values: [
-			...INDEX_CONFIG_TEMPLATES,
-			INSTRUCTION_CUSTOM
-		]
-	});
-
-
 	const GQL_TYPE_INDEX_CONFIG_OBJECT = glue.addObjectType({
 		name: 'FieldIndexConfigObject',
 		fields: {
@@ -78,7 +47,6 @@ export function generateFieldTypes({
 		includeInAllText: { type: GraphQLBoolean }, // TODO nonNull?
 		indexConfig: { type: GQL_TYPE_INDEX_CONFIG_OBJECT }, // NOTE System field _allText doesn't have indexconfig
 		inResults: { type: GraphQLBoolean },
-		instruction: { type: GQL_ENUM_INSTRUCTION }, // TODO nonNull?
 		key: { type: nonNull(GraphQLString) },
 		max: { type: GraphQLInt },
 		min: { type: GraphQLInt },

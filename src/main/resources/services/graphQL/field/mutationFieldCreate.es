@@ -7,7 +7,6 @@ export const GQL_MUTATION_FIELD_CREATE = `mutation CreateField(
 	$fieldType: String
 	$fulltext: Boolean
 	$includeInAllText: Boolean
-	$instruction: String
 	$max: Int
 	$min: Int
 	$nGram: Boolean
@@ -22,7 +21,6 @@ export const GQL_MUTATION_FIELD_CREATE = `mutation CreateField(
 		fieldType: $fieldType
 		fulltext: $fulltext
 		includeInAllText: $includeInAllText
-		instruction: $instruction
 		max: $max
 		min: $min
 		nGram: $nGram
@@ -39,7 +37,6 @@ export const GQL_MUTATION_FIELD_CREATE = `mutation CreateField(
 	  description
 	  fieldType
 	  inResults
-	  instruction
 	  indexConfig {
 		  decideByType
 		  enabled
@@ -67,7 +64,6 @@ export const GQL_MUTATION_FIELD_CREATE = `mutation CreateField(
 	"fieldType": "long",
 	"fulltext": false,
 	"includeInAllText": false,
-	"instruction": "custom",
 	"max": 1,
 	"min": 1,
 	"nGram": false,

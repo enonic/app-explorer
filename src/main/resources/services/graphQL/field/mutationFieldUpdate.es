@@ -7,7 +7,6 @@ export const GQL_MUTATION_FIELD_UPDATE = `mutation UpdateField(
 	$fieldType: String
 	$fulltext: Boolean
 	$includeInAllText: Boolean
-	$instruction: String
 	$max: Int
 	$min: Int
 	$nGram: Boolean
@@ -22,7 +21,6 @@ export const GQL_MUTATION_FIELD_UPDATE = `mutation UpdateField(
 		fieldType: $fieldType
 		fulltext: $fulltext
 		includeInAllText: $includeInAllText
-		instruction: $instruction
 		max: $max
 		min: $min
 		nGram: $nGram
@@ -40,7 +38,6 @@ export const GQL_MUTATION_FIELD_UPDATE = `mutation UpdateField(
 	  fieldType
 	  inResults
 
-	  instruction
 	  indexConfig {
 		  decideByType
 		  enabled
@@ -67,23 +64,11 @@ export const GQL_MUTATION_FIELD_UPDATE = `mutation UpdateField(
 	"max": 2,
 	"min": 2,
 
-	"instruction": "custom",
-
 	"decideByType": true,
 	"enabled": true,
 	"fulltext": true,
 	"includeInAllText": true,
 	"nGram": true,
 	"path": false
-}
-
-{
-	"_id": FIND VALID FIELD ID,
-	"description": "description changed again",
-	"fieldType": "double",
-	"max": 3,
-	"min": 3,
-
-	"instruction": "minimal",
 }
 */
