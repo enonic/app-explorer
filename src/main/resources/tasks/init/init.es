@@ -1075,6 +1075,83 @@ export function run() {
 			});
 		}
 		//──────────────────────────────────────────────────────────────────────
+		// Model 11: interface.collections -> interface.collectionIds
+		//──────────────────────────────────────────────────────────────────────
+		if (isModelLessThan({
+			connection: writeConnection,
+			version: 11
+		})) {
+			progress.addItems(1).setInfo('Finding interfaces with collections...').report().logInfo();
+			const allCollections = queryCollections({
+				connection: writeConnection
+			}).hits;
+			//log.debug(`allCollections:${toStr(allCollections)}`); // HUGE!
+
+			const collectionNameToIdObj = {};
+			allCollections.forEach(({_id, _name}) => {
+				collectionNameToIdObj[_name] = _id;
+			});
+			//log.debug(`collectionNameToIdObj:${toStr(collectionNameToIdObj)}`);
+
+			const interfacesWithCollectionsQueryParams = {
+				count: -1,
+				filters: addFilter({
+					filter: {
+						exists: { field: 'collections'}
+					},
+					filters: addFilter({
+						filter: hasValue('_nodeType', [NT_INTERFACE])
+					})
+				})
+			};
+			//log.debug(`interfacesWithCollectionsQueryParams:${toStr(interfacesWithCollectionsQueryParams)}`);
+
+			const interfaceIds = writeConnection.query(interfacesWithCollectionsQueryParams).hits.map(({id}) => id);
+			//log.debug(`interfaceIds:${toStr(interfaceIds)}`);
+
+			progress.addItems(interfaceIds.length); // .setInfo(`Found ${interfaceIds.length} interfaces with collections.`)
+			progress.finishItem(); // .setInfo('Done finding interfaces with collections.')
+
+			interfaceIds.forEach((interfaceId) => {
+				progress.setInfo(`Converting collections -> collectionIds in interfaceId:${interfaceId}`).report().logInfo();
+				writeConnection.modify({
+					key: interfaceId,
+					editor: (interfaceNode) => {
+						//log.debug(`(in) collectionIdReferences:${toStr(interfaceNode.collectionIds)}`); // Oh, NO! Seems they all come in as nulls???
+						interfaceNode.collectionIds = interfaceNode.collectionIds
+							? forceArray(interfaceNode.collectionIds)
+								.map((collectionIdReference) => `${collectionIdReference}`) // Convert reference to string, so comparisons work
+								.filter((v,i,a)=>a.indexOf(v)==i) // Remove duplicates (NOTE Doesn't work on references)
+							: [];
+						//log.debug(`(before) interfaceNode.collectionIds:${toStr(interfaceNode.collectionIds)}`); // Should be strings
+						interfaceNode.collections && forceArray(interfaceNode.collections).forEach((collectionName) => {
+							const collectionId = collectionNameToIdObj[collectionName];
+							if (collectionId) {
+								if (!interfaceNode.collectionIds.includes(collectionId)) { // NOTE Comparison doesn't work on references
+									interfaceNode.collectionIds.push(collectionId);
+								} else {
+									log.warning(`collectionId:${collectionId} already present in collectionIds`);
+								}
+							} else {
+								log.error(`Unable to find collectionId from collectionName:${collectionName}. Dropped from interface!`);
+							}
+						}); // forEach collectionName
+						//log.debug(`(after) interfaceNode.collectionIds:${toStr(interfaceNode.collectionIds)}`); // Should be strings
+						interfaceNode.collectionIds = interfaceNode.collectionIds.map((collectionId) => reference(collectionId));
+						//log.debug(`(out) collectionIdReferences:${toStr(interfaceNode.collectionIds)}`); // This should report nulls again
+						delete interfaceNode.collections;
+						return interfaceNode;
+					} // editor
+				}); // modify
+				progress.finishItem(); // setInfo(`Done converting collections -> collectionIds in interfaceId:${interfaceId}`)
+			}); // forEach interfaceId
+
+			setModel({
+				connection: writeConnection,
+				version: 11
+			});
+		}
+		//──────────────────────────────────────────────────────────────────────
 
 		progress.setInfo('Initialization complete :)').report().logInfo();
 		const event = {
