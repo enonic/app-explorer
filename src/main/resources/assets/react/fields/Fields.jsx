@@ -35,7 +35,8 @@ export function Fields(props) {
 		showDescriptionColumn: false,
 		showIndexConfigColumns: false,
 		showOccurencesColumns: false,
-		showSystemFields: false
+		showSystemFields: false,
+		usedFieldKeysObj: {}
 	});
 	//console.debug('Fields', {props, state});
 	const [showCollections, setShowCollections] = React.useState(false);
@@ -50,9 +51,11 @@ export function Fields(props) {
 		showDescriptionColumn,
 		showIndexConfigColumns,
 		showOccurencesColumns,
-		showSystemFields
+		showSystemFields,
+		usedFieldKeysObj
 	} = state;
 	//console.debug('Fields fieldsRes', fieldsRes);
+
 
 	function updateFields({
 		includeSystemFields = showSystemFields
@@ -63,11 +66,16 @@ export function Fields(props) {
 		}));
 		fetchFields({
 			handleData: (data) => {
+				const usedFieldKeysObj = {};
+				data.queryFields.hits.forEach(({key}) => {
+					usedFieldKeysObj[key] = true;
+				});
 				setState(prev => ({
 					...prev,
 					fieldsRes: data.queryFields,
 					isLoading: false,
-					showSystemFields: includeSystemFields
+					showSystemFields: includeSystemFields,
+					usedFieldKeysObj
 				}));
 			},
 			url: `${servicesBaseUrl}/graphQL`,
@@ -336,6 +344,7 @@ export function Fields(props) {
 										}}
 										afterClose={updateFields}
 										servicesBaseUrl={servicesBaseUrl}
+										usedFieldKeysObj={{}/* Since key isn't editable, no need to check for unique name*/}
 									/>
 								</Table.Cell>
 
@@ -461,6 +470,7 @@ export function Fields(props) {
 				<NewOrEditModal
 					afterClose={updateFields}
 					servicesBaseUrl={servicesBaseUrl}
+					usedFieldKeysObj={usedFieldKeysObj}
 				/>
 			</>
 		}
