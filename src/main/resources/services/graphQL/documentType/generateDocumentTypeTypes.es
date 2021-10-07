@@ -14,13 +14,12 @@ import {
 import {
 	GraphQLBoolean,
 	GraphQLInt,
-	GraphQLString,
 	nonNull,
 	list
 } from '/lib/graphql';
 
 import {
-	GQL_FIELD_DOCUMENT_TYPE_PROPERTY_NAME,
+	GQL_FIELDS_DOCUMENT_TYPE_PROPERTY_NAME,
 	GQL_INPUT_TYPE_DOCUMENT_TYPE_FIELDS_NAME,
 	GQL_INPUT_TYPE_DOCUMENT_TYPE_PROPERTIES_NAME,
 	GQL_INTERFACE_NODE_NAME,
@@ -32,7 +31,7 @@ export function generateDocumentTypeTypes({
 	glue
 }) {
 	const FIELDS_PROPERTY = glue.addFields({
-		name: GQL_FIELD_DOCUMENT_TYPE_PROPERTY_NAME,
+		name: GQL_FIELDS_DOCUMENT_TYPE_PROPERTY_NAME,
 		fields: {
 			active: { type: nonNull(GraphQLBoolean) },
 			enabled: { type: nonNull(GraphQLBoolean) },

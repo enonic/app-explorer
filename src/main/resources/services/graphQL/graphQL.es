@@ -39,7 +39,11 @@ import {generateQueryApiKeysField} from './apiKey/generateQueryApiKeysField';
 import {generateCollectionFields} from './collection/generateCollectionFields';
 import {generateQueryCollectorsField} from './collector/generateQueryCollectorsField';
 import {generateFieldsField} from './field/generateFieldsField';
+
+import {addInterfaceTypes as addExplorerInterfaceTypes} from './interface/addInterfaceTypes';
+import {addMutationInterfaceCreate} from './interface/addMutationInterfaceCreate';
 import {generateQueryInterfacesField} from './interface/generateQueryInterfacesField';
+
 import {generateScheduledJobsListField} from './scheduler/generateScheduledJobsListField';
 import {generateSchedulerTypes} from './scheduler/generateSchedulerTypes';
 import {generateDocumentTypeFields} from './documentType/generateDocumentTypeFields';
@@ -166,7 +170,11 @@ const getLocales = generateGetLocalesField({glue});
 const getSites = generateGetSitesField({glue});
 const listScheduledJobs = generateScheduledJobsListField({glue});
 const queryCollectors = generateQueryCollectorsField({glue});
+
+addExplorerInterfaceTypes({glue});
+addMutationInterfaceCreate({glue});
 const queryInterfaces = generateQueryInterfacesField({glue});
+
 const queryJournals = generateQueryJournalsField({glue});
 const queryStopWords = generateQueryStopWordsField({glue});
 const queryTasks = generateListTasksField({glue});
@@ -179,6 +187,7 @@ const {
 const mutation = glue.schemaGenerator.createObjectType({
 	name: 'Mutation',
 	fields: {
+		...glue.getMutations(),
 		createCollection: createCollectionField,
 		createDocumentType: createDocumentTypeField,
 		createField: createFieldField,

@@ -1,6 +1,6 @@
 // [_A-Za-z][_0-9A-Za-z]*
 
-export const GQL_FIELD_DOCUMENT_TYPE_PROPERTY = 'DocumentTypeProperty';
+export const GQL_FIELDS_DOCUMENT_TYPE_PROPERTY_NAME = 'DocumentTypePropertyFields';
 
 // Input type names
 export const GQL_INPUT_TYPE_COLLECTION_COLLECTOR_NAME = 'CollectionCollectorInput';
@@ -11,6 +11,8 @@ export const GQL_INPUT_TYPE_DOCUMENT_TYPE_PROPERTIES_NAME = 'DocumentTypePropert
 
 export const GQL_INPUT_TYPE_FILTERS_NAME = 'Filters';
 export const GQL_INPUT_TYPE_FILTERS_BOOLEAN_NAME = 'FiltersBoolean';
+
+export const GQL_INPUT_TYPE_INTERFACE_FIELD_NAME = 'InterfaceFieldInput';
 
 export const GQL_INPUT_TYPE_THESAURUS_LANGUAGE_NAME = 'ThesaurusLanguageInput';
 
@@ -33,6 +35,7 @@ export const GQL_TYPE_FIELDS_QUERY_RESULT_NAME = 'FieldsQueryResult';
 export const GQL_TYPE_HAS_FIELD_QUERY_RESULT_NAME = 'HasFieldQueryResult';
 
 export const GQL_TYPE_INTERFACE_NAME = 'Interface';
+export const GQL_TYPE_INTERFACE_FIELD_NAME = 'InterfaceField';
 
 export const GQL_TYPE_JOB_NAME = 'ScheduledJob';
 export const GQL_TYPE_NODE_DELETED_NAME = 'NodeDeleted';
@@ -49,3 +52,6 @@ export const GQL_TYPE_THESAURUS_NAME = 'Thesaurus';
 
 // Union type names
 export const GQL_UNION_TYPE_ANY_NODE = 'AnyNode';
+
+// Mutation field names
+export const GQL_MUTATION_INTERFACE_CREATE_NAME = 'createInterface';
