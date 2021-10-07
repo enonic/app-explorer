@@ -55,19 +55,6 @@ function required(value) {
 }
 
 
-const SCHEMA = {
-	fieldType: (value) => required(value),
-	instruction: (value) => required(value),
-	key: (v) => required(v)
-		|| mustStartWithALowercaseLetter(v)
-		//|| notStartWithUnderscore(v)
-		|| onlyLettersDigitsUnderscoresAndDots(v)
-		|| notDoubleUnderscore(v)
-		|| notDoubleDot(v)
-		|| notDocumentMetaData(v)
-};
-
-
 export function NewOrEditModal(props) {
 	const {
 		_id, // Props because not allowed to change
@@ -89,7 +76,8 @@ export function NewOrEditModal(props) {
 		},
 		afterClose = () => {},
 		beforeOpen = () => {},
-		servicesBaseUrl
+		servicesBaseUrl,
+		usedFieldKeysObj = {}
 	} = props;
 	const editMode = !!initialValues.key;
 
@@ -105,6 +93,28 @@ export function NewOrEditModal(props) {
 		beforeOpen();
 		setOpen(true);
 	};
+
+	function mustBeUnique(v) {
+		//console.debug(`mustBeUnique(${v}) usedFieldKeysObj:`, usedFieldKeysObj, ` usedFieldKeysObj[${v}]:`, usedFieldKeysObj[v]);
+		if (usedFieldKeysObj[v]) {
+			return `Name must be unique: Name '${v}' is already in use!`;
+		}
+	}
+
+	const schema = {
+		//fieldType: (value) => required(value), // No need to validate this as it has a default value
+		//instruction: (value) => required(value) // No need to validate this as it is not used anymore
+	};
+	if (!_id) { // No need to validate key on edit, since key is uneditable...
+		schema.key = (v) => required(v)
+			|| mustStartWithALowercaseLetter(v)
+			//|| notStartWithUnderscore(v)
+			|| onlyLettersDigitsUnderscoresAndDots(v)
+			|| notDoubleUnderscore(v)
+			|| notDoubleDot(v)
+			|| notDocumentMetaData(v)
+			|| mustBeUnique(v);
+	}
 
 	return <Modal
 		closeIcon
@@ -158,7 +168,7 @@ export function NewOrEditModal(props) {
 					}
 				});
 			}}
-			schema={SCHEMA}
+			schema={schema}
 		>
 			<Modal.Content>
 				<Form autoComplete='off'>
