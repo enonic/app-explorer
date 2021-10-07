@@ -23,13 +23,13 @@ import {Glue} from './Glue';
 
 import {addScalarTypes} from './addScalarTypes';
 import {addInputTypes} from './addInputTypes';
+import {addGraphQLInterfaceTypes} from './addGraphQLInterfaceTypes';
 import {addObjectTypes} from './addObjectTypes';
 
 import {generateGetContentTypesField} from './generateGetContentTypesField';
 import {generateGetLicenseField} from './generateGetLicenseField';
 import {generateGetLocalesField} from './generateGetLocalesField';
 import {generateGetSitesField} from './generateGetSitesField';
-import {addInterfaceTypes} from './addInterfaceTypes';
 import {generateListTasksField} from './generateListTasksField';
 import {generateQueryJournalsField} from './generateQueryJournalsField';
 import {generateQueryStopWordsField} from './generateQueryStopWordsField';
@@ -93,7 +93,7 @@ addUnionTypes({glue});
 // Must be after InputTypes
 // Must be after UnionTypes
 // Must be before ObjectTypes
-addInterfaceTypes({glue});
+addGraphQLInterfaceTypes({glue});
 
 // Must be after ScalarTypes!
 // Must be after InputTypes?
