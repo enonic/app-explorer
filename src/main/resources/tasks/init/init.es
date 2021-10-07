@@ -678,6 +678,7 @@ export function run() {
 		})) {
 			progress.addItems(1).setInfo('Finding interfaces which has filters, so they can be removed...').report().logInfo();
 			const interfacesWithFilters = writeConnection.query({
+				count: -1,
 				filters: addFilter({
 					filter: { exists: { field: 'filters'}},
 					filters: addFilter({
@@ -706,6 +707,7 @@ export function run() {
 
 			progress.addItems(1).setInfo('Finding interfaces which has a query, so it can be removed...').report().logInfo();
 			const interfacesWithQuery = writeConnection.query({
+				count: -1,
 				filters: addFilter({
 					filter: { exists: { field: 'query'}},
 					filters: addFilter({
@@ -734,6 +736,7 @@ export function run() {
 
 			progress.addItems(1).setInfo('Finding interfaces which has resultMappings, so they can be removed...').report().logInfo();
 			const interfacesWithResultMappings = writeConnection.query({
+				count: -1,
 				filters: addFilter({
 					filter: { exists: { field: 'resultMappings'}},
 					filters: addFilter({
@@ -762,6 +765,7 @@ export function run() {
 
 			progress.addItems(1).setInfo('Finding all interfaces so resultMappings can be removed from indexConfig...').report().logInfo();
 			const allInterfaces = writeConnection.query({
+				count: -1,
 				filters: addFilter({
 					filter: hasValue('_nodeType', [NT_INTERFACE])
 				})
@@ -798,6 +802,7 @@ export function run() {
 
 			progress.addItems(1).setInfo('Finding interfaces which has facets, so they can be removed...').report().logInfo();
 			const interfacesWithFacets = writeConnection.query({
+				count: -1,
 				filters: addFilter({
 					filter: { exists: { field: 'facets'}},
 					filters: addFilter({
@@ -826,6 +831,7 @@ export function run() {
 
 			progress.addItems(1).setInfo('Finding interfaces which has pagination, so they can be removed...').report().logInfo();
 			const interfacesWithPagination = writeConnection.query({
+				count: -1,
 				filters: addFilter({
 					filter: { exists: { field: 'pagination'}},
 					filters: addFilter({
@@ -854,6 +860,7 @@ export function run() {
 
 			progress.addItems(1).setInfo('Finding interfaces which has thesauri, so they can be removed...').report().logInfo();
 			const interfacesWithThesauri = writeConnection.query({
+				count: -1,
 				filters: addFilter({
 					filter: { exists: { field: 'thesauri'}},
 					filters: addFilter({
