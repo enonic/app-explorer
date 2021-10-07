@@ -1,4 +1,4 @@
-import {toStr} from '@enonic/js-utils';
+//import {toStr} from '@enonic/js-utils';
 
 //import {NT_DOCUMENT_TYPE} from '/lib/explorer/documentType/constants';
 import {NT_FIELD} from '/lib/explorer/model/2/constants';
@@ -13,7 +13,7 @@ import {
 import {referencedByMapped} from './referencedByMapped';
 
 
-export function addInterfaceTypes({
+export function addGraphQLInterfaceTypes({
 	glue
 }) {
 	glue.addInterfaceType({
@@ -67,4 +67,4 @@ export function addInterfaceTypes({
 			log.debug(`result:${toStr(result)}`);
 		}
 	});*/
-} // addInterfaceTypes
+} // addGraphQLInterfaceTypes
