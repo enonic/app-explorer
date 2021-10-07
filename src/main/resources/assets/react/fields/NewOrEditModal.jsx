@@ -125,7 +125,7 @@ export function NewOrEditModal(props) {
 		<EnonicForm
 			initialValues={initialValues}
 			onSubmit={(values) => {
-				console.debug('NewOrEditModal onSubmit values', values);
+				//console.debug('NewOrEditModal onSubmit values', values);
 				fetch(`${servicesBaseUrl}/graphQL`, {
 					method: 'POST',
 					headers: {
