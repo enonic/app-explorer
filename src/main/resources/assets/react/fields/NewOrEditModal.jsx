@@ -1,23 +1,6 @@
-import {
-	/*INDEX_CONFIG_TEMPLATE_NONE,
-	INDEX_CONFIG_TEMPLATE_BY_TYPE,
-	INDEX_CONFIG_TEMPLATE_FULLTEXT,
-	INDEX_CONFIG_TEMPLATE_PATH,
-	INDEX_CONFIG_TEMPLATE_MINIMAL,*/
-	VALUE_TYPE_STRING
-} from '@enonic/js-utils';
-
-//import getIn from 'get-value';
-import {
-	Button, Form,
-	//Header,
-	Icon, Modal, Popup//,
-	//Segment
-} from 'semantic-ui-react';
-
+import {VALUE_TYPE_STRING} from '@enonic/js-utils';
+import {Button, Form, Icon, Modal, Popup} from 'semantic-ui-react';
 import {Form as EnonicForm} from 'semantic-ui-react-form/Form';
-//import {Checkbox} from 'semantic-ui-react-form/inputs/Checkbox';
-//import {Dropdown} from 'semantic-ui-react-form/inputs/Dropdown';
 import {Input} from 'semantic-ui-react-form/inputs/Input';
 
 import {ResetButton} from 'semantic-ui-react-form/buttons/ResetButton';
@@ -33,7 +16,6 @@ import {onlyLettersDigitsUnderscoresAndDots} from '../utils/onlyLettersDigitsUnd
 import {notDoubleUnderscore} from '../utils/notDoubleUnderscore';
 import {notDoubleDot} from '../utils/notDoubleDot';
 
-//import {CustomInstructionOptions} from './CustomInstructionOptions';
 import {EditFieldTable} from './EditFieldTable';
 
 
@@ -46,9 +28,6 @@ function notDocumentMetaData(value) {
 	return undefined;
 }
 
-/*function notStartWithUnderscore(value) {
-	return value.startsWith('_') ? "Can't start with underscore!" : undefined;
-}*/
 
 function required(value) {
 	return value ? undefined : 'Required!';
@@ -66,7 +45,6 @@ export function NewOrEditModal(props) {
 			key: '',
 			min: 0,
 			max: 0,
-			instruction: 'custom',//INDEX_CONFIG_TEMPLATE_BY_TYPE,
 			decideByType: true,
 			enabled: true,
 			fulltext: true,
@@ -103,12 +81,10 @@ export function NewOrEditModal(props) {
 
 	const schema = {
 		//fieldType: (value) => required(value), // No need to validate this as it has a default value
-		//instruction: (value) => required(value) // No need to validate this as it is not used anymore
 	};
 	if (!_id) { // No need to validate key on edit, since key is uneditable...
 		schema.key = (v) => required(v)
 			|| mustStartWithALowercaseLetter(v)
-			//|| notStartWithUnderscore(v)
 			|| onlyLettersDigitsUnderscoresAndDots(v)
 			|| notDoubleUnderscore(v)
 			|| notDoubleDot(v)
@@ -186,41 +162,6 @@ export function NewOrEditModal(props) {
 						/>
 					</Form.Field>
 					<EditFieldTable/>
-					{/*<Header as='h3' content='Indexing'/>
-					<Form.Field>
-						<Dropdown
-							fluid
-							path='instruction'
-							options={[{
-								key: INDEX_CONFIG_TEMPLATE_BY_TYPE,
-								text: `${INDEX_CONFIG_TEMPLATE_BY_TYPE} (default) - Indexing is done based on type; e.g numeric values are indexed as both string and numeric.`,
-								value: INDEX_CONFIG_TEMPLATE_BY_TYPE
-							},{
-								key: INDEX_CONFIG_TEMPLATE_MINIMAL,
-								text: 'minimal - Value is indexed as a string-value only, no matter what type of data.',
-								value: INDEX_CONFIG_TEMPLATE_MINIMAL
-							},{
-								key: INDEX_CONFIG_TEMPLATE_NONE,
-								text: 'none - Value is not indexed.',
-								value: INDEX_CONFIG_TEMPLATE_NONE
-							},{
-								key: INDEX_CONFIG_TEMPLATE_FULLTEXT,
-								text: 'fulltext - Values are stored as ‘nGrm’, ‘analyzed’ and also added to the _allText-field',
-								value: INDEX_CONFIG_TEMPLATE_FULLTEXT
-							},{
-								key: INDEX_CONFIG_TEMPLATE_PATH,
-								text: 'path - Values are stored as ‘path’ type and applicable for the pathMatch-function',
-								value: INDEX_CONFIG_TEMPLATE_PATH
-							},{
-								key: 'custom',
-								text: 'custom - use settings below',
-								value: 'custom'
-							}]}
-							search
-							selection
-						/>
-					</Form.Field>
-					<CustomInstructionOptions/>*/}
 				</Form>
 			</Modal.Content>
 			<Modal.Actions>
