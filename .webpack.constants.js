@@ -1,8 +1,8 @@
 export const MODE = 'production';
 //export const MODE = 'development';
 
-export const BOOL_LIB_EXPLORER_EXTERNAL = MODE === 'production';
-//export const BOOL_LIB_EXPLORER_EXTERNAL = false;
+export const BOOL_LOCAL_LIB_EXPLORER = MODE !== 'production';
+//export const BOOL_LOCAL_LIB_EXPLORER = true;
 
 export const BOOL_LOCAL_JS_UTILS = MODE !== 'production';
 //export const BOOL_LOCAL_JS_UTILS = true;

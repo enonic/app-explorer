@@ -15,8 +15,8 @@ import TerserPlugin from 'terser-webpack-plugin';
 import webpack from 'webpack';
 
 import {
-	BOOL_LIB_EXPLORER_EXTERNAL,
 	BOOL_LOCAL_JS_UTILS,
+	BOOL_LOCAL_LIB_EXPLORER,
 	BOOL_LOCAL_SEMANTIC_UI_REACT_FORM,
 	BOOL_MINIMIZE,
 	MODE
@@ -59,13 +59,13 @@ const DST_DIR_ABS = path.join(__dirname, DST_DIR);
 
 const SS_ALIAS = {
 	'@enonic/nashorn-polyfills': path.resolve(__dirname, 'src/main/resources/lib/nashorn/index.es'),
-	'@enonic/js-utils': BOOL_LIB_EXPLORER_EXTERNAL
+	'@enonic/js-utils': BOOL_LOCAL_LIB_EXPLORER
 		? BOOL_LOCAL_JS_UTILS
-			? path.resolve(__dirname, '../enonic-js-utils/src/index.ts')
-			: path.resolve(__dirname, './node_modules/@enonic/js-utils/src/index.ts')
-		: BOOL_LOCAL_JS_UTILS
 			? path.resolve(__dirname, '../enonic-js-utils/dist/cjs/index.js')
 			: path.resolve(__dirname, './node_modules/@enonic/js-utils/dist/cjs/index.js')
+		: BOOL_LOCAL_JS_UTILS
+			? path.resolve(__dirname, '../enonic-js-utils/src/index.ts')
+			: path.resolve(__dirname, './node_modules/@enonic/js-utils/src/index.ts') // This is used in production build
 };
 
 // Avoid bundling and transpile library files seperately.
@@ -105,10 +105,10 @@ const SS_EXTERNALS = [
 	'/lib/xp/websocket'
 ];
 
-if (BOOL_LIB_EXPLORER_EXTERNAL) {
-	SS_EXTERNALS.push(/^\/lib\/explorer\//);
-} else {
+if (BOOL_LOCAL_LIB_EXPLORER) {
 	SS_ALIAS['/lib/explorer'] = path.resolve(__dirname, '../lib-explorer/src/main/resources/lib/explorer/');
+} else {
+	SS_EXTERNALS.push(/^\/lib\/explorer\//);
 }
 
 const SS_FILES = [
