@@ -16,8 +16,11 @@ export class Glue {
 	#fields = {};
 	#inputTypes = {};
 	#interfaceTypes = {};
+	#mutations = {};
 	#objectTypes = {};
+	#queries = {};
 	#scalarTypes = {};
+	#uniqueFieldNames = {}; // mutation and query field names should be unique?
 	#uniqueNames = {};
 	#unionTypes = {};
 
@@ -129,6 +132,28 @@ export class Glue {
 			name
 		});
 		return this.#objectTypes[name];
+	}
+
+	addMutation({
+		args = {},
+		name,
+		resolve,
+		type
+	}) {
+		//log.debug(`addEnumType({name:${name}})`);
+		if(this.#mutations[name]) {
+			throw new Error(`Enum type ${name} already defined!`);
+		}
+		if(this.#uniqueFieldNames[name]) {
+			throw new Error(`Name ${name} already used as ${this.#uniqueFieldNames[name]}!`);
+		}
+		this.#uniqueFieldNames[name] = 'mutation';
+		this.#mutations[name] = {
+			args,
+			resolve,
+			type
+		};
+		return this.#mutations[name];
 	}
 
 	addScalarType({
@@ -247,6 +272,10 @@ export class Glue {
 		}
 		//log.debug(`getInterfaceTypeObj(${name}) --> ${typeof type}`);
 		return obj;
+	}
+
+	getMutations() {
+		return this.#mutations;
 	}
 
 	getObjectType(name) {
