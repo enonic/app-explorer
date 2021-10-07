@@ -121,7 +121,7 @@ export const EditFieldTable = () => {
 		max,
 		enabled
 	} = context.values;
-	console.debug('enabled', enabled);
+	//console.debug('enabled', enabled);
 	return <Table celled compact>
 		<Table.Header>
 			<Table.Row>
