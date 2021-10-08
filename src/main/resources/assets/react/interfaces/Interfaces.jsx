@@ -22,6 +22,15 @@ import {SearchModal} from './SearchModal';
  It should NOT be possible to use document_metadata fields?
 */
 
+const GQL_COLLECTIONS = `queryCollections(
+	perPage: -1
+) {
+	hits {
+		_id
+		_name
+	}
+}`;
+
 const GQL_FIELDS = `queryFields(
 	includeSystemFields: true
 ) {
@@ -79,10 +88,12 @@ const GQL_INTERFACES = `queryInterfaces(
 }`;
 
 const GQL_ALL = `{
-	${GQL_FIELDS}
-	${GQL_INTERFACES}
+	${GQL_COLLECTIONS}
 }`;
-
+/*
+${GQL_FIELDS}
+${GQL_INTERFACES}
+*/
 //console.debug('GQL_ALL', GQL_ALL);
 
 export function Interfaces({
@@ -91,6 +102,12 @@ export function Interfaces({
 	setLicensedTo,
 	setLicenseValid
 }) {
+	//const [boolIsLoadingGraphQL, setboolIsLoadingGraphQL] = React.useState(false);
+	//const [boolIsLoadingService, setboolIsLoadingService] = React.useState(false);
+	//const [boolIsLoadingAnything, setboolIsLoadingAnything] = React.useState(false);
+
+	const [collections, setCollections] = React.useState([]);
+
 	const [state, setState] = React.useState({
 		interfaceExists: false,
 		interfaceTo: '',
@@ -98,8 +115,7 @@ export function Interfaces({
 			count: 0,
 			hits: [],
 			total: 0
-		},
-		isLoading: false
+		}
 	});
 
 	const [showCollectionCount, setShowCollectionCount] = React.useState(true);
@@ -110,31 +126,42 @@ export function Interfaces({
 	const [showDelete, setShowDelete] = React.useState(false);
 
 	const memoizedUpdateInterfacesCallback = React.useCallback(() => {
-		setState((oldState) => {
-			const deref = JSON.parse(JSON.stringify(oldState));
-			deref.isLoading = true;
-			return deref;
-		});
-		fetch(`${servicesBaseUrl}/graphQL`)
+		//setboolIsLoadingGraphQL(true);
+		//setboolIsLoadingService(true);
+
+		fetch(`${servicesBaseUrl}/graphQL`, {
+			method: 'POST',
+			headers: {
+				'Content-Type':	'application/json'
+			},
+			body: JSON.stringify({
+				query: GQL_ALL
+			})
+		})
 			.then(response => response.json())
 			.then(json => {
 				const data = json.data;
-				console.debug('data', data);
+				//console.debug('data', data);
+				setCollections(data.queryCollections.hits);
+				//setboolIsLoadingGraphQL(false);
 			});
+
 		fetch(`${servicesBaseUrl}/interfaceList`)
 			.then(response => response.json())
-			.then(data => setState((oldState) => {
-				const deref = JSON.parse(JSON.stringify(oldState));
-				deref.collectionOptions = data.collectionOptions;
-				deref.collections = data.collections;
-				deref.fieldsObj = data.fieldsObj;
-				deref.interfaces = data.interfaces;
-				deref.isLoading = false;
-				deref.stopWordOptions = data.stopWordOptions;
-				deref.synonyms = data.synonyms;
-				deref.thesauriOptions = data.thesauriOptions;
-				return deref;
-			}));
+			.then(data => {
+				setState((oldState) => {
+					const deref = JSON.parse(JSON.stringify(oldState));
+					//deref.collectionOptions = data.collectionOptions;
+					//deref.collections = data.collections; // Never been used?
+					deref.fieldsObj = data.fieldsObj;
+					deref.interfaces = data.interfaces;
+					deref.stopWordOptions = data.stopWordOptions;
+					deref.synonyms = data.synonyms;
+					deref.thesauriOptions = data.thesauriOptions;
+					return deref;
+				});
+				//setboolIsLoadingService(false);
+			});
 
 	}, [servicesBaseUrl]);
 
@@ -142,8 +169,29 @@ export function Interfaces({
 		memoizedUpdateInterfacesCallback();
 	}, [memoizedUpdateInterfacesCallback]);
 
+	/*React.useEffect(() => {
+		setboolIsLoadingAnything(boolIsLoadingGraphQL || boolIsLoadingService);
+	}, [boolIsLoadingGraphQL, boolIsLoadingService]);*/
+
+	/*console.debug(
+		'boolIsLoadingGraphQL', boolIsLoadingGraphQL,
+		'boolIsLoadingService', boolIsLoadingService,
+		'boolIsLoadingAnything', boolIsLoadingAnything
+	);*/
+
+	const collectionIdToName = {};
+	const collectionOptions = collections.map(({_id, _name}) => {
+		collectionIdToName[_id] = _name;
+		return {
+			key: _id,
+			text: _name,
+			value: _id
+		};
+	});
+	//console.debug('collectionOptions', collectionOptions);
+
 	const {
-		collectionOptions,
+		//collectionOptions,
 		fieldsObj,
 		interfaces: {
 			hits,
@@ -250,10 +298,12 @@ export function Interfaces({
 					const {
 						_id,
 						_name,
-						collections,
+						collectionIds = [],
 						fields,
 						stopWords,
+						//stopWordIds = [],
 						synonyms
+						//synonymIds = []
 					} = initialValues;
 					//console.debug({_name, index});
 					return <Table.Row key={index}>
@@ -275,9 +325,13 @@ export function Interfaces({
 							/>
 						</Table.Cell>
 						<Table.Cell collapsing>{_name}</Table.Cell>
-						{showCollectionCount ? <Table.Cell collapsing>{_name === 'default' ? '∞' : collections.length}</Table.Cell> : null}
-						{showCollections ? <Table.Cell collapsing>{_name === 'default' ? '∞' : collections.join(', ')}</Table.Cell> : null}
-						{showFields ? <Table.Cell collapsing>{fields.map(({name, boost}) => `${name}^${boost}`).join(', ')}</Table.Cell> : null}
+						{showCollectionCount ? <Table.Cell collapsing>{_name === 'default' ? '∞' : collectionIds.length}</Table.Cell> : null}
+						{showCollections ? <Table.Cell collapsing>{_name === 'default' ? '∞' : collectionIds.map((cI)=>collectionIdToName[cI]).join(', ')}</Table.Cell> : null}
+						{showFields ? <Table.Cell collapsing>{fields.map(({
+							boost,
+							//fieldId,
+							name
+						}) => `${name}^${boost}`).join(', ')}</Table.Cell> : null}
 						{showSynonyms ? <Table.Cell collapsing>{synonyms.join(', ')}</Table.Cell> : null}
 						{showStopWords ? <Table.Cell collapsing>{stopWords.join(', ')}</Table.Cell> : null}
 						<Table.Cell collapsing>

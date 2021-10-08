@@ -43,10 +43,12 @@ export function addMutationInterfaceCreate({glue}) {
 				collectionIds: collectionIds.map((collectionId) => reference(collectionId)), // empty array allowed
 				fields: fields.map(({ // empty array allowed
 					boost, // undefined allowed
-					fieldId
+					fieldId//,
+					//name
 				}) => ({
 					boost,
-					fieldId: reference(fieldId)
+					fieldId: reference(fieldId)//,
+					//name
 				})),
 				stopWordIds: stopWordIds.map((stopWordId) => reference(stopWordId)), // empty array allowed
 				synonymIds: synonymIds.map((synonymId) => reference(synonymId)) // empty array allowed

@@ -5,6 +5,7 @@
 import {
 	GraphQLID,
 	GraphQLInt,
+	GraphQLString,
 	list,
 	nonNull
 } from '/lib/graphql';
@@ -21,7 +22,8 @@ export function addInterfaceTypes({glue}) {
 	glue.addInputType({
 		name: GQL_INPUT_TYPE_INTERFACE_FIELD_NAME,
 		fields: {
-			fieldId: { type: nonNull(GraphQLID) },
+			//fieldId: { type: nonNull(GraphQLID) },
+			name: { type: nonNull(GraphQLString) },
 			boost: { type: GraphQLInt } // null allowed
 		}
 	});
@@ -29,7 +31,8 @@ export function addInterfaceTypes({glue}) {
 	glue.addObjectType({
 		name: GQL_TYPE_INTERFACE_FIELD_NAME,
 		fields: {
-			fieldId: { type: nonNull(GraphQLID) },
+			//fieldId: { type: nonNull(GraphQLID) },
+			name: { type: nonNull(GraphQLString) },
 			boost: { type: GraphQLInt } // null allowed
 		}
 	});
@@ -45,8 +48,10 @@ export function addInterfaceTypes({glue}) {
 			...interfaceNodeFields,
 			collectionIds: { type: list(GraphQLID) }, // null allowed
 			fields: { type: list(glue.getObjectType(GQL_TYPE_INTERFACE_FIELD_NAME)) }, // null allowed
-			stopWordIds: { type: list(GraphQLID) }, // null allowed
-			synonymIds: { type: list(GraphQLID) } // null allowed
+			//stopWordIds: { type: list(GraphQLID) }, // null allowed
+			stopWords: { type: nonNull(list(GraphQLString)) }, // empty list allowed
+			//synonymIds: { type: list(GraphQLID) } // null allowed
+			synonyms: { type: nonNull(list(GraphQLString)) } // empty list allowed
 		},
 		interfaces: [interfaceNodeType]
 	});
