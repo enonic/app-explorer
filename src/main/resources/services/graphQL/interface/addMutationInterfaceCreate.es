@@ -10,6 +10,7 @@ import {create} from '/lib/explorer/node/create';
 import {connect} from '/lib/explorer/repo/connect';
 import {
 	GraphQLID,
+	GraphQLString,
 	list
 } from '/lib/graphql';
 import {reference} from '/lib/xp/value';
@@ -29,9 +30,9 @@ export function addMutationInterfaceCreate({glue}) {
 			collectionIds: list(GraphQLID), // null allowed
 			fields: list(glue.getInputType(GQL_INPUT_TYPE_INTERFACE_FIELD_NAME)), // null allowed
 			//stopWordIds: list(GraphQLID), // null allowed
-			stopWords: list(GraphQLID), // null allowed
+			stopWords: list(GraphQLString), // null allowed
 			//synonymIds: list(GraphQLID) // null allowed
-			synonyms: list(GraphQLID) // null allowed
+			synonyms: list(GraphQLString) // null allowed
 		},
 		resolve(env) {
 			//log.debug(`env:${toStr(env)}`);
