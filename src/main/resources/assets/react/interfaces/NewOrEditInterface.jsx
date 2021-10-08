@@ -79,7 +79,7 @@ export function NewOrEditInterface(props) {
 	const disabled = _name === 'default';
 
 	function mustBeUnique(v) {
-		console.debug(`mustBeUnique(${v}) interfaceNamesObj:`, interfaceNamesObj, ` interfaceNamesObj[${v}]:`, interfaceNamesObj[v]);
+		//console.debug(`mustBeUnique(${v}) interfaceNamesObj:`, interfaceNamesObj, ` interfaceNamesObj[${v}]:`, interfaceNamesObj[v]);
 		if (interfaceNamesObj[v]) {
 			return `Name must be unique: Name '${v}' is already in use!`;
 		}
