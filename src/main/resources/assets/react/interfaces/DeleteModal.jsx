@@ -1,11 +1,14 @@
 import {Button, Icon, Input, Message, Modal} from 'semantic-ui-react';
 
+import {fetchInterfaceDelete} from '../../../services/graphql/fetchers/fetchInterfaceDelete.mjs';
+
 
 export function DeleteModal({
+	_id,
+	_name,
 	afterClose = () => {},
 	beforeOpen = () => {},
 	disabled = false,
-	name,
 	servicesBaseUrl
 }) {
 	const [deleteNameMatches, setDeleteNameMatches] = React.useState(false);
@@ -36,13 +39,13 @@ export function DeleteModal({
 			type='button'
 		><Icon color='red' name='trash alternate outline'/>Delete</Button>}
 	>
-		<Modal.Header>Delete interface {name}</Modal.Header>
+		<Modal.Header>Delete interface {_name}</Modal.Header>
 		<Modal.Content>
 			<Input
 				error={!deleteNameMatches}
 				onChange={(event, {value}) => {
 					//console.debug({name, value});
-					setDeleteNameMatches(name === value);
+					setDeleteNameMatches(_name === value);
 					setTypedInterfaceName(value);
 				}}
 				placeholder='Please input name'
@@ -60,14 +63,17 @@ export function DeleteModal({
 			<Button
 				disabled={!deleteNameMatches}
 				onClick={() => {
-					fetch(`${servicesBaseUrl}/interfaceDelete?name=${name}`, {
-						method: 'POST'
-					})
-						.then(response => {
+					fetchInterfaceDelete({
+						handleResponse: (response) => {
 							if (response.status === 200) {
 								doClose();
 							}
-						});
+						},
+						url: `${servicesBaseUrl}/graphQL`,
+						variables: {
+							_id
+						}
+					});
 				}}
 				primary
 			><Icon color='white' name='trash alternate outline'/>Confirm Delete</Button>

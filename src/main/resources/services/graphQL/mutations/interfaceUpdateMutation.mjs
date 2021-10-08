@@ -1,11 +1,13 @@
-export const GQL_MUTATION_INTERFACE_CREATE = `mutation InterfaceCreateMutation(
+export const GQL_MUTATION_INTERFACE_CREATE = `mutation InterfaceUpdateMutation(
+	$_id: ID!
 	$_name: String!
 	$collectionIds: [ID]
 	$fields: [InterfaceFieldInput]
 	$stopWordIds: [ID]
 	$synonymIds: [ID]
 ) {
-	createInterface(
+	updateInterface(
+		_id: $_id
 		_name: $_name
 		collectionIds: $collectionIds
 		fields: $fields
@@ -24,12 +26,13 @@ export const GQL_MUTATION_INTERFACE_CREATE = `mutation InterfaceCreateMutation(
 		}
 		stopWordIds
 		synonymIds
-	} # createInterface
+	} # updateInterface
 }`;
 
 
 /* Example query variables:
 {
+	"_id": "",
 	"_name": "a",
 	"collectionIds": "556e04a5-dbb5-4db4-92c1-afb2fc031e2b",
 	"fields": {

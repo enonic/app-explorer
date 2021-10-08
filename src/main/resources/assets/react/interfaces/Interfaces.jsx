@@ -347,7 +347,8 @@ export function Interfaces({
 								/>
 								{showDelete ? <DeleteModal
 									afterClose={memoizedUpdateInterfacesCallback}
-									name={_name}
+									_id={_id}
+									_name={_name}
 									disabled={_name === 'default'}
 									servicesBaseUrl={servicesBaseUrl}
 								/> : null}

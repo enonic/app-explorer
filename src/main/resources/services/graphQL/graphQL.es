@@ -42,6 +42,8 @@ import {generateFieldsField} from './field/generateFieldsField';
 
 import {addInterfaceTypes as addExplorerInterfaceTypes} from './interface/addInterfaceTypes';
 import {addMutationInterfaceCreate} from './interface/addMutationInterfaceCreate';
+import {addMutationInterfaceDelete} from './interface/addMutationInterfaceDelete';
+import {addMutationInterfaceUpdate} from './interface/addMutationInterfaceUpdate';
 import {addQueryInterfaceGet} from './interface/addQueryInterfaceGet';
 import {generateQueryInterfacesField} from './interface/generateQueryInterfacesField';
 
@@ -174,6 +176,8 @@ const queryCollectors = generateQueryCollectorsField({glue});
 
 addExplorerInterfaceTypes({glue});
 addMutationInterfaceCreate({glue});
+addMutationInterfaceDelete({glue});
+addMutationInterfaceUpdate({glue});
 addQueryInterfaceGet({glue});
 const queryInterfaces = generateQueryInterfacesField({glue});
 
