@@ -12,22 +12,78 @@ import {CopyModal} from './CopyModal';
 import {DeleteModal} from './DeleteModal';
 import {SearchModal} from './SearchModal';
 
+/* NOTE
+ A search administrator should be able to choose which fields are queried (and boost among the choosen fields).
 
-/*const INTERFACES_GQL = `queryInterfaces {
-	total
+ It should be possible to choose fields within the "schema" (interface -> collections -> documentTypes -> fields (both global and local))
+ In addition it should be possible to choose the system field _allText.
+
+ It should NOT be possible to use fields starting with underscore (except _allText)
+ It should NOT be possible to use document_metadata fields?
+*/
+
+const GQL_FIELDS = `queryFields(
+	includeSystemFields: true
+) {
 	count
+	total
+	hits {
+		_id
+		#_name
+		#_nodeType
+		#_path
+		key
+		denyDelete
+		#description
+		#fieldType
+		inResults
+		#max
+		#min
+		#indexConfig {
+		#	decideByType
+		#	enabled
+		#	fulltext
+		#	includeInAllText
+		#	nGram
+		#	path
+		#} # indexConfig
+		#decideByType
+		enabled
+		#fulltext
+		#includeInAllText
+		#nGram
+		#path
+	} # hits
+}`;
+
+const GQL_INTERFACES = `queryInterfaces(
+	count: -1
+) {
+	#count
 	hits {
 		_id
 		_name
 		#_nodeType
-		_path
+		#_path
+		#_versionKey
+		collectionIds
+		fields {
+			boost
+			fieldId
+			#name
+		}
+		stopWordIds
+		synonymIds
 	}
-}`;*/
+	total
+}`;
 
-/*const ALL_GQL = `{
-	${INTERFACES_GQL}
-}`;*/
+const GQL_ALL = `{
+	${GQL_FIELDS}
+	${GQL_INTERFACES}
+}`;
 
+//console.debug('GQL_ALL', GQL_ALL);
 
 export function Interfaces({
 	licenseValid,
@@ -59,6 +115,12 @@ export function Interfaces({
 			deref.isLoading = true;
 			return deref;
 		});
+		fetch(`${servicesBaseUrl}/graphQL`)
+			.then(response => response.json())
+			.then(json => {
+				const data = json.data;
+				console.debug('data', data);
+			});
 		fetch(`${servicesBaseUrl}/interfaceList`)
 			.then(response => response.json())
 			.then(data => setState((oldState) => {
