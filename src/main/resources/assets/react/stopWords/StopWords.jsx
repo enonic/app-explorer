@@ -1,4 +1,4 @@
-import {Button, Header, Table} from 'semantic-ui-react';
+import {Button, Header, Label, Radio, Segment, Table} from 'semantic-ui-react';
 
 import {DeleteModal} from './DeleteModal';
 import {NewOrEditModal} from './NewOrEditModal';
@@ -9,6 +9,7 @@ export function StopWords(props) {
 		servicesBaseUrl
 	} = props;
 
+	const [showDelete, setShowDelete] = React.useState(false);
 	const [state, setState] = React.useState({
 		stopWordsRes: {
 			count: 0,
@@ -39,6 +40,28 @@ export function StopWords(props) {
 	const {stopWordsRes} = state;
 
 	return <>
+		<Segment basic inverted style={{
+			marginLeft: -14,
+			marginTop: -14,
+			marginRight: -14
+		}}>
+			<Table basic collapsing compact inverted>
+				<Table.Body>
+					<Table.Row verticalAlign='middle'>
+						<Table.Cell collapsing>
+							<Radio
+								checked={showDelete}
+								onChange={(ignored,{checked}) => {
+									setShowDelete(checked);
+								}}
+								toggle
+							/>
+							<Label color='black' size='large'>Show delete</Label>
+						</Table.Cell>
+					</Table.Row>
+				</Table.Body>
+			</Table>
+		</Segment>
 		<Header as='h1' content='Stop words'/>
 		<Table celled collapsing compact selectable singleLine sortable striped>
 			<Table.Header>
@@ -47,7 +70,7 @@ export function StopWords(props) {
 					<Table.HeaderCell>Name</Table.HeaderCell>
 					<Table.HeaderCell>Count</Table.HeaderCell>
 					<Table.HeaderCell>Words</Table.HeaderCell>
-					<Table.HeaderCell>Actions</Table.HeaderCell>
+					{showDelete ? <Table.HeaderCell>Delete</Table.HeaderCell> : null}
 				</Table.Row>
 			</Table.Header>
 			<Table.Body>
@@ -66,16 +89,18 @@ export function StopWords(props) {
 						<Table.Cell collapsing>{displayName}</Table.Cell>
 						<Table.Cell collapsing>{words.length}</Table.Cell>
 						<Table.Cell collapsing>{words.join(', ')}</Table.Cell>
-						<Table.Cell collapsing>
-							<Button.Group>
-								{/* MAYBE copy/duplicate? */}
-								<DeleteModal
-									afterClose={updateStopwords}
-									name={name}
-									servicesBaseUrl={servicesBaseUrl}
-								/>
-							</Button.Group>
-						</Table.Cell>
+						{showDelete
+							? <Table.Cell collapsing>
+								<Button.Group>
+									{/* MAYBE copy/duplicate? */}
+									<DeleteModal
+										afterClose={updateStopwords}
+										name={name}
+										servicesBaseUrl={servicesBaseUrl}
+									/>
+								</Button.Group>
+							</Table.Cell>
+							: null}
 					</Table.Row>;
 				})}
 			</Table.Body>

@@ -35,7 +35,7 @@ export const DeleteApiKeyModal = (props) => {
 		closeOnDimmerClick={false}
 		onClose={doClose}
 		open={state.open}
-		size='large'
+		size='tiny'
 		trigger={<Popup
 			content={`Delete API Key ${_name}`}
 			inverted
@@ -48,8 +48,10 @@ export const DeleteApiKeyModal = (props) => {
 		<Modal.Header>{`Delete API Key ${_name}`}</Modal.Header>
 		<Modal.Content>
 			<Header as='h2'>Do you really want to delete {_name}?</Header>
+		</Modal.Content>
+		<Modal.Actions>
+			<Button onClick={doClose}>Cancel</Button>
 			<Button
-				compact
 				onClick={() => {
 					fetch(`${servicesBaseUrl}/apiKeyDelete?name=${_name}`, {
 						method: 'DELETE'
@@ -58,7 +60,8 @@ export const DeleteApiKeyModal = (props) => {
 						doClose();
 					});
 				}}
-			><Icon color='red' name='trash alternate outline'/>Confirm Delete</Button>
-		</Modal.Content>
+				primary
+			><Icon color='white' name='trash alternate outline'/>Confirm Delete</Button>
+		</Modal.Actions>
 	</Modal>;
 }; // DeleteApiKeyModal

@@ -71,19 +71,17 @@ export function NewOrEditCollectionModal(props) {
 	>{licenseValid || totalNumberOfCollections <= 2 // This means it will be allowed to create collection 3, but not number 4
 			? <>
 				<Modal.Header>{_name ? `Edit collection ${_name}`: 'New collection'}</Modal.Header>
-				<Modal.Content>
-					<Collection
-						collectorComponents={collectorComponents}
-						collectorOptions={collectorOptions}
-						contentTypeOptions={contentTypeOptions}
-						fields={fields}
-						initialValues={initialValues}
-						locales={locales}
-						doClose={doClose}
-						servicesBaseUrl={servicesBaseUrl}
-						siteOptions={siteOptions}
-					/>
-				</Modal.Content>
+				<Collection
+					collectorComponents={collectorComponents}
+					collectorOptions={collectorOptions}
+					contentTypeOptions={contentTypeOptions}
+					fields={fields}
+					initialValues={initialValues}
+					locales={locales}
+					doClose={doClose}
+					servicesBaseUrl={servicesBaseUrl}
+					siteOptions={siteOptions}
+				/>
 			</>
 			: <UploadLicense
 				servicesBaseUrl={servicesBaseUrl}

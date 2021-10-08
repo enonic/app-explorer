@@ -39,7 +39,7 @@ export const NewOrEditApiKeyModal = (props) => {
 		closeOnDimmerClick={false}
 		onClose={doClose}
 		open={state.open}
-		size='large'
+		size='small'
 		trigger={_name ? <Popup
 			content={`Edit API Key ${_name}`}
 			inverted
@@ -62,15 +62,13 @@ export const NewOrEditApiKeyModal = (props) => {
 				/></Button>}
 	>
 		<Modal.Header>{_name ? `Edit API Key ${_name}`: 'New API Key'}</Modal.Header>
-		<Modal.Content>
-			<NewOrEditApiKey
-				_name={_name}
-				doClose={doClose}
-				initialValues={initialValues}
-				queryCollectionsGraph={queryCollectionsGraph}
-				queryInterfacesGraph={queryInterfacesGraph}
-				servicesBaseUrl={servicesBaseUrl}
-			/>
-		</Modal.Content>
+		<NewOrEditApiKey
+			_name={_name}
+			doClose={doClose}
+			initialValues={initialValues}
+			queryCollectionsGraph={queryCollectionsGraph}
+			queryInterfacesGraph={queryInterfacesGraph}
+			servicesBaseUrl={servicesBaseUrl}
+		/>
 	</Modal>;
 }; // NewOrEditApiKeyModal

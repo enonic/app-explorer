@@ -62,6 +62,7 @@ export function DeleteModal(props) {
 		closeOnDimmerClick={false}
 		onClose={doClose}
 		open={open}
+		size='small'
 		trigger={<Popup
 			content={popupContent}
 			trigger={<div style={{ display: "inline-block" }}>
@@ -74,11 +75,14 @@ export function DeleteModal(props) {
 			</div>
 			}/>}
 	>
-		<Modal.Header>Delete field {_name}</Modal.Header>
+		<Modal.Header>Delete global field {_name}</Modal.Header>
 		<Modal.Content>
-			<Header as='h2'>Do you really want to delete {_name}?</Header>
+			<Header as='h2'>Do you really want to delete the global field {_name}?</Header>
+		</Modal.Content>
+		<Modal.Actions>
+			<Button onClick={doClose}>Cancel</Button>
 			<Button
-				compact
+				icon
 				onClick={() => {
 					fetch(`${servicesBaseUrl}/graphQL`, {
 						method: 'POST',
@@ -96,8 +100,8 @@ export function DeleteModal(props) {
 						doClose();
 					});
 				}}
-				size='tiny'
-			><Icon color='red' name='trash alternate outline'/>Confirm Delete</Button>
-		</Modal.Content>
+				primary
+			><Icon color='white' name='trash alternate outline'/> Confirm Delete</Button>
+		</Modal.Actions>
 	</Modal>;
 } // DeleteModal

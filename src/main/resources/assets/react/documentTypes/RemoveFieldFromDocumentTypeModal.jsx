@@ -77,7 +77,7 @@ export function RemoveFieldFromDocumentTypeModal({
 		closeOnDimmerClick={false}
 		onClose={doClose}
 		open={open}
-		size='large'
+		size='small'
 		trigger={<Popup
 			content={`Delete field ${name}?`}
 			inverted
@@ -99,15 +99,14 @@ export function RemoveFieldFromDocumentTypeModal({
 
 			<h4>Documents</h4>
 			<p>This field is present in {fieldHasValueInDocumentsTotal} documents!</p>
-			<Button.Group>
-				<DeleteItemButton
-					index={index}
-					negative
-					path={path}
-				><Icon color='white' name='alternate outline trash'/> Remove </DeleteItemButton>
-				<Button.Or/>
-				<Button icon onClick={doClose} positive> Cancel <Icon color='white' name='cancel'/></Button>
-			</Button.Group>
 		</Modal.Content>
+		<Modal.Actions>
+			<Button onClick={doClose}>Cancel</Button>
+			<DeleteItemButton
+				index={index}
+				path={path}
+				primary
+			><Icon color='white' name='alternate outline trash'/> Confirm Remove</DeleteItemButton>
+		</Modal.Actions>
 	</Modal>;
 } // RemoveFieldFromDocumentTypeModal

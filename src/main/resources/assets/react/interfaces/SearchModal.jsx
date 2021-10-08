@@ -42,5 +42,8 @@ export function SearchModal(props) {
 				servicesBaseUrl={servicesBaseUrl}
 			/>
 		</Modal.Content>
+		<Modal.Actions>
+			<Button onClick={doClose} primary>Close</Button>
+		</Modal.Actions>
 	</Modal>;
 } // SearchModal

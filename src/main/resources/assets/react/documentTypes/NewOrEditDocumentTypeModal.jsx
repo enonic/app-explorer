@@ -60,14 +60,12 @@ export function NewOrEditDocumentTypeModal({
 					/></Button>}/>}
 	>
 		<Modal.Header>{header}</Modal.Header>
-		<Modal.Content>
-			<NewOrEditDocumentType
-				_id={_id}
-				collections={collections}
-				interfaces={interfaces}
-				doClose={doClose}
-				servicesBaseUrl={servicesBaseUrl}
-			/>
-		</Modal.Content>
+		<NewOrEditDocumentType
+			_id={_id}
+			collections={collections}
+			interfaces={interfaces}
+			doClose={doClose}
+			servicesBaseUrl={servicesBaseUrl}
+		/>
 	</Modal>;
 } // NewOrEditDocumentTypeModal

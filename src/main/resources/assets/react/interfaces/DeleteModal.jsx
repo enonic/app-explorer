@@ -36,7 +36,7 @@ export function DeleteModal({
 			type='button'
 		><Icon color='red' name='trash alternate outline'/>Delete</Button>}
 	>
-		<Modal.Header>Delete</Modal.Header>
+		<Modal.Header>Delete interface {name}</Modal.Header>
 		<Modal.Content>
 			<Input
 				error={!deleteNameMatches}
@@ -48,8 +48,17 @@ export function DeleteModal({
 				placeholder='Please input name'
 				value={typedInterfaceName}
 			/>
-			{deleteNameMatches ? <Button
-				compact
+			{deleteNameMatches ? null :<Message
+				icon='warning sign'
+				header='Error'
+				content="Name doesn't match!"
+				negative
+			/>}
+		</Modal.Content>
+		<Modal.Actions>
+			<Button onClick={doClose}>Cancel</Button>
+			<Button
+				disabled={!deleteNameMatches}
 				onClick={() => {
 					fetch(`${servicesBaseUrl}/interfaceDelete?name=${name}`, {
 						method: 'POST'
@@ -60,13 +69,8 @@ export function DeleteModal({
 							}
 						});
 				}}
-				type='button'
-			><Icon color='red' name='trash alternate outline'/>Delete</Button> : <Message
-				icon='warning sign'
-				header='Error'
-				content="Name doesn't match!"
-				negative
-			/>}
-		</Modal.Content>
+				primary
+			><Icon color='white' name='trash alternate outline'/>Confirm Delete</Button>
+		</Modal.Actions>
 	</Modal>;
 } // function DeleteModal
