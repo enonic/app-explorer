@@ -21,7 +21,6 @@ import {SearchModal} from './SearchModal';
 		_name
 		#_nodeType
 		_path
-		displayName
 	}
 }`;*/
 
@@ -74,6 +73,7 @@ export function Interfaces({
 				deref.thesauriOptions = data.thesauriOptions;
 				return deref;
 			}));
+
 	}, [servicesBaseUrl]);
 
 	React.useEffect(() => {
@@ -90,6 +90,12 @@ export function Interfaces({
 		stopWordOptions,
 		thesauriOptions
 	} = state;
+
+	const interfaceNamesObj = {};
+	hits.forEach(({_name}) => {
+		interfaceNamesObj[_name] = true;
+	});
+
 	return <>
 		<Segment basic inverted style={{
 			marginLeft: -14,
@@ -183,20 +189,20 @@ export function Interfaces({
 						_id,
 						_name,
 						collections,
-						displayName,
 						fields,
 						stopWords,
 						synonyms
 					} = initialValues;
-					//console.debug({displayName, _name, index});
+					//console.debug({_name, index});
 					return <Table.Row key={index}>
 						<Table.Cell collapsing>
 							<NewOrEditInterfaceModal
-								collectionOptions={collectionOptions}
-								displayName={displayName}
-								fieldsObj={fieldsObj}
-								id={_id}
+								_id={_id}
+								_name={_name}
 								afterClose={() => memoizedUpdateInterfacesCallback()}
+								collectionOptions={collectionOptions}
+								fieldsObj={fieldsObj}
+								interfaceNamesObj={interfaceNamesObj/* Currently not allowed to edit _name anyway */}
 								licenseValid={licenseValid}
 								servicesBaseUrl={servicesBaseUrl}
 								setLicensedTo={setLicensedTo}
@@ -206,7 +212,7 @@ export function Interfaces({
 								total={total}
 							/>
 						</Table.Cell>
-						<Table.Cell collapsing>{displayName}</Table.Cell>
+						<Table.Cell collapsing>{_name}</Table.Cell>
 						{showCollectionCount ? <Table.Cell collapsing>{_name === 'default' ? '∞' : collections.length}</Table.Cell> : null}
 						{showCollections ? <Table.Cell collapsing>{_name === 'default' ? '∞' : collections.join(', ')}</Table.Cell> : null}
 						{showFields ? <Table.Cell collapsing>{fields.map(({name, boost}) => `${name}^${boost}`).join(', ')}</Table.Cell> : null}
@@ -219,14 +225,14 @@ export function Interfaces({
 									servicesBaseUrl={servicesBaseUrl}
 								/>
 								<CopyModal
-									name={_name}
 									afterClose={memoizedUpdateInterfacesCallback}
+									name={_name}
 									servicesBaseUrl={servicesBaseUrl}
 								/>
 								{showDelete ? <DeleteModal
+									afterClose={memoizedUpdateInterfacesCallback}
 									name={_name}
 									disabled={_name === 'default'}
-									afterClose={memoizedUpdateInterfacesCallback}
 									servicesBaseUrl={servicesBaseUrl}
 								/> : null}
 							</Button.Group>
@@ -236,9 +242,10 @@ export function Interfaces({
 			</Table.Body>
 		</Table>
 		<NewOrEditInterfaceModal
+			afterClose={memoizedUpdateInterfacesCallback}
 			collectionOptions={collectionOptions}
 			fieldsObj={fieldsObj}
-			afterClose={memoizedUpdateInterfacesCallback}
+			interfaceNamesObj={interfaceNamesObj}
 			licenseValid={licenseValid}
 			servicesBaseUrl={servicesBaseUrl}
 			setLicensedTo={setLicensedTo}

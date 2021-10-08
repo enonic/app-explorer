@@ -6,14 +6,15 @@ import {UploadLicense} from '../UploadLicense';
 
 export function NewOrEditInterfaceModal(props) {
 	const {
+		_id, // nullable
+		_name,
 		afterClose = () => {},
 		beforeOpen = () => {},
 		collectionOptions,
 		disabled = false,
-		displayName,
 		fieldsObj,
-		id, // nullable
 		//initialValues = {},
+		interfaceNamesObj = {},
 		licenseValid,
 		servicesBaseUrl,
 		setLicensedTo,
@@ -26,7 +27,7 @@ export function NewOrEditInterfaceModal(props) {
 
 	const [open, setOpen] = React.useState(false);
 
-	const header = id ? `Edit interface ${displayName}`: 'New interface';
+	const header = _id ? `Edit interface ${_name}`: 'New interface';
 
 	const doClose = () => {
 		setOpen(false);
@@ -48,7 +49,7 @@ export function NewOrEditInterfaceModal(props) {
 		trigger={<Popup
 			content={header}
 			inverted
-			trigger={id ? <Button
+			trigger={_id ? <Button
 				disabled={disabled}
 				icon
 				onClick={doOpen}
@@ -72,10 +73,11 @@ export function NewOrEditInterfaceModal(props) {
 				<Modal.Header>{header}</Modal.Header>
 				<Modal.Content>
 					<NewOrEditInterface
+						_id={_id}
 						collectionOptions={collectionOptions}
-						fieldsObj={fieldsObj}
-						id={id}
 						doClose={doClose}
+						fieldsObj={fieldsObj}
+						interfaceNamesObj={interfaceNamesObj}
 						servicesBaseUrl={servicesBaseUrl}
 						stopWordOptions={stopWordOptions}
 						thesauriOptions={thesauriOptions}
