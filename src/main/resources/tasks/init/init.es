@@ -118,7 +118,7 @@ export function run() {
 
 		ROLES.forEach(({name, displayName, description}) => {
 			//progress.addItems(1); Already in total
-			progress.setInfo(`Checking for role ${displayName}...`).report().debug();
+			progress.setInfo(`Checking for role ${displayName}...`).report();//.debug();
 			const principal = getPrincipal(`role:${name}`);
 			//log.debug(`principal:${toStr(principal)}`);
 			progress.finishItem();
@@ -137,7 +137,7 @@ export function run() {
 
 		USERS.forEach(({name, displayName, idProvider, roles = []}) => {
 			//progress.addItems(1); Already in total
-			progress.setInfo(`Checking for role ${displayName}...`).report().debug();
+			progress.setInfo(`Checking for role ${displayName}...`).report();//.debug();
 			const principal = getPrincipal(`user:${idProvider}:${name}`);
 			//log.debug(`principal:${toStr(principal)}`);
 			progress.finishItem();
@@ -157,7 +157,7 @@ export function run() {
 
 		REPOSITORIES.forEach(({id, rootPermissions}) => {
 			//progress.addItems(1); Already in total
-			progress.setInfo(`Checking for repository ${id}...`).report().debug();
+			progress.setInfo(`Checking for repository ${id}...`).report();//.debug();
 			const repo = getRepo(id);
 			//log.debug(`repo:${toStr(repo)}`);
 			progress.finishItem();
@@ -1153,7 +1153,7 @@ export function run() {
 		}
 		//──────────────────────────────────────────────────────────────────────
 
-		progress.setInfo('Initialization complete :)').report().logInfo();
+		progress.setInfo('Initialization complete :)').report().debug();
 		const event = {
 			type: EVENT_INIT_COMPLETE,
 
