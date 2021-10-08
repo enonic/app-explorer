@@ -55,3 +55,7 @@ export const GQL_UNION_TYPE_ANY_NODE = 'AnyNode';
 
 // Mutation field names
 export const GQL_MUTATION_INTERFACE_CREATE_NAME = 'createInterface';
+
+// Query field names
+
+export const GQL_QUERY_INTERFACE_GET_NAME = 'getInterface';

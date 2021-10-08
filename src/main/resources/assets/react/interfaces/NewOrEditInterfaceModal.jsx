@@ -10,7 +10,7 @@ export function NewOrEditInterfaceModal(props) {
 		_name,
 		afterClose = () => {},
 		beforeOpen = () => {},
-		collectionOptions,
+		collectionOptions = [],
 		disabled = false,
 		fieldsObj,
 		//initialValues = {},

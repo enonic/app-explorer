@@ -7,7 +7,7 @@ import {
 	PRINCIPAL_EXPLORER_READ,
 	RT_JSON
 } from '/lib/explorer/model/2/constants';
-import {query as queryCollections} from '/lib/explorer/collection/query';
+//import {query as queryCollections} from '/lib/explorer/collection/query';
 import {getFields} from '/lib/explorer/field/getFields';
 import {query as queryInterfaces} from '/lib/explorer/interface/query';
 import {connect} from '/lib/explorer/repo/connect';
@@ -107,13 +107,13 @@ export function get() {
 
 	return {
 		body: {
-			collectionOptions: queryCollections({connection}).hits.map(({
+			/*collectionOptions: queryCollections({connection}).hits.map(({
 				_name: key
 			}) => ({
 				key,
 				text: key,
 				value: key
-			})),
+			})),*/
 			fieldsObj,
 			interfaces,
 			stopWordOptions,

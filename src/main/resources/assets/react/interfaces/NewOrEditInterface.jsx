@@ -5,18 +5,19 @@ import {Input} from 'semantic-ui-react-form/inputs/Input';
 import {ResetButton} from 'semantic-ui-react-form/buttons/ResetButton';
 import {SubmitButton} from 'semantic-ui-react-form/buttons/SubmitButton';
 
-import {FieldSelector} from './FieldSelector';
 import {DEFAULT_INTERFACE_FIELDS} from '../../../constants';
+import {getInterface} from '../../../services/graphQL/queries/getInterface';
 import {mustStartWithALowercaseLetter} from '../utils/mustStartWithALowercaseLetter.mjs';
 import {notDoubleUnderscore} from '../utils/notDoubleUnderscore.mjs';
 import {onlyLettersDigitsAndUnderscores} from '../utils/onlyLettersDigitsAndUnderscores.mjs';
 import {required} from '../utils/required.mjs';
+import {FieldSelector} from './FieldSelector';
 
 
 export function NewOrEditInterface(props) {
 	const {
 		_id, // nullable
-		collectionOptions,
+		collectionOptions = [],
 		doClose = () => {},
 		fieldsObj,
 		interfaceNamesObj = {},
@@ -24,6 +25,7 @@ export function NewOrEditInterface(props) {
 		stopWordOptions,
 		thesauriOptions
 	} = props;
+	//console.debug('NewOrEditInterface collectionOptions', collectionOptions);
 	//console.debug('NewOrEditInterface stopWordOptions', stopWordOptions);
 	//console.debug('NewOrEditInterface thesauriOptions', thesauriOptions);
 
@@ -31,7 +33,7 @@ export function NewOrEditInterface(props) {
 	const [state, setState] = React.useState({
 		initialValues: {
 			_name: '',
-			collections: [],
+			collectionIds: [],
 			fields: DEFAULT_INTERFACE_FIELDS,
 			stopWords: [],
 			synonyms: []
@@ -41,13 +43,24 @@ export function NewOrEditInterface(props) {
 
 	React.useEffect(() => {
 		if (!_id) {return;}
-		fetch(`${servicesBaseUrl}/interfaceGet?id=${_id}`)
+		fetch(`${servicesBaseUrl}/graphQL`, {
+			method: 'POST',
+			headers: {
+				'Content-Type':	'application/json'
+			},
+			body: JSON.stringify({
+				query: `{
+	${getInterface({_id})}
+}`
+			})
+		})
 			.then(response => response.json())
 			.then(data => {
+				//console.debug('data', data);
 				setState(prev => {
 					const deref = JSON.parse(JSON.stringify(prev));
 					deref.isLoading = false;
-					deref.initialValues = data;
+					deref.initialValues = data.data.getInterface;
 					return deref;
 				});
 			});
@@ -120,7 +133,7 @@ export function NewOrEditInterface(props) {
 					disabled={disabled}
 					multiple={true}
 					options={collectionOptions}
-					path='collections'
+					path='collectionIds'
 					placeholder='Please select one or more collections...'
 					selection
 				/>

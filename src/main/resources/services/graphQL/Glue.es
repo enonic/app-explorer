@@ -156,6 +156,28 @@ export class Glue {
 		return this.#mutations[name];
 	}
 
+	addQuery({
+		args = {},
+		name,
+		resolve,
+		type
+	}) {
+		//log.debug(`addEnumType({name:${name}})`);
+		if(this.#queries[name]) {
+			throw new Error(`Enum type ${name} already defined!`);
+		}
+		if(this.#uniqueFieldNames[name]) {
+			throw new Error(`Name ${name} already used as ${this.#uniqueFieldNames[name]}!`);
+		}
+		this.#uniqueFieldNames[name] = 'query';
+		this.#queries[name] = {
+			args,
+			resolve,
+			type
+		};
+		return this.#queries[name];
+	}
+
 	addScalarType({
 		name,
 		type
@@ -276,6 +298,10 @@ export class Glue {
 
 	getMutations() {
 		return this.#mutations;
+	}
+
+	getQueries() {
+		return this.#queries;
 	}
 
 	getObjectType(name) {

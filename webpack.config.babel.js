@@ -129,7 +129,6 @@ const SS_FILES = [
 	'services/interfaceCreate/interfaceCreate',
 	'services/interfaceDelete/interfaceDelete',
 	'services/interfaceExists/interfaceExists',
-	'services/interfaceGet/interfaceGet',
 	'services/interfaceList/interfaceList',
 	'services/interfaceModify/interfaceModify',
 	'services/longPolling/longPolling',

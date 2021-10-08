@@ -42,6 +42,7 @@ import {generateFieldsField} from './field/generateFieldsField';
 
 import {addInterfaceTypes as addExplorerInterfaceTypes} from './interface/addInterfaceTypes';
 import {addMutationInterfaceCreate} from './interface/addMutationInterfaceCreate';
+import {addQueryInterfaceGet} from './interface/addQueryInterfaceGet';
 import {generateQueryInterfacesField} from './interface/generateQueryInterfacesField';
 
 import {generateScheduledJobsListField} from './scheduler/generateScheduledJobsListField';
@@ -173,6 +174,7 @@ const queryCollectors = generateQueryCollectorsField({glue});
 
 addExplorerInterfaceTypes({glue});
 addMutationInterfaceCreate({glue});
+addQueryInterfaceGet({glue});
 const queryInterfaces = generateQueryInterfacesField({glue});
 
 const queryJournals = generateQueryJournalsField({glue});
@@ -213,6 +215,7 @@ const mutation = glue.schemaGenerator.createObjectType({
 const query = glue.schemaGenerator.createObjectType({
 	name: 'Query',
 	fields: {
+		...glue.getQueries(),
 		getContentTypes: getContentTypesField,
 		getLicense,
 		getLocales,
