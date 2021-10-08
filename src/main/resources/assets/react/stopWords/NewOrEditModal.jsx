@@ -69,28 +69,28 @@ export function NewOrEditModal(props) {
 		}
 	>
 		<Modal.Header>{header}</Modal.Header>
-		<Modal.Content>
-			<EnonicForm
-				initialValues={{
-					displayName,
-					name,
-					words: JSON.parse(JSON.stringify(words)) // deref from props
-				}}
-				onSubmit={({
-					name: submittedName,
-					displayName: submittedDisplayName,
-					words: submittedWords
-				}) => {
-					//console.debug({servicesBaseUrl, editMode, name, displayName, words});
-					fetch(`${servicesBaseUrl}/stopWordsCreateOrUpdate?mode=${editMode ? 'update' : 'create'}&name=${submittedName}&displayName=${submittedDisplayName}&${submittedWords.map(w => `words=${w}`).join('&')}`, {
-						method: 'POST'
-					})
-						.then((/*response*/) => {
-							doClose();
-							//if (response.status === 200) {}
-						});
-				}}
-			>
+		<EnonicForm
+			initialValues={{
+				displayName,
+				name,
+				words: JSON.parse(JSON.stringify(words)) // deref from props
+			}}
+			onSubmit={({
+				name: submittedName,
+				displayName: submittedDisplayName,
+				words: submittedWords
+			}) => {
+				//console.debug({servicesBaseUrl, editMode, name, displayName, words});
+				fetch(`${servicesBaseUrl}/stopWordsCreateOrUpdate?mode=${editMode ? 'update' : 'create'}&name=${submittedName}&displayName=${submittedDisplayName}&${submittedWords.map(w => `words=${w}`).join('&')}`, {
+					method: 'POST'
+				})
+					.then((/*response*/) => {
+						doClose();
+						//if (response.status === 200) {}
+					});
+			}}
+		>
+			<Modal.Content>
 				<Form as='div'>
 					{editMode ? null : <Form.Field><EnonicInput
 						fluid
@@ -188,12 +188,13 @@ export function NewOrEditModal(props) {
 							}}
 						/>
 					</Form.Field>
-					<Form.Field>
-						<SubmitButton/>
-						<ResetButton/>
-					</Form.Field>
 				</Form>
-			</EnonicForm>
-		</Modal.Content>
+			</Modal.Content>
+			<Modal.Actions>
+				<Button onClick={doClose}>Cancel</Button>
+				<ResetButton secondary/>
+				<SubmitButton primary><Icon name='save'/>Save</SubmitButton>
+			</Modal.Actions>
+		</EnonicForm>
 	</Modal>;
 } // NewOrEditModal

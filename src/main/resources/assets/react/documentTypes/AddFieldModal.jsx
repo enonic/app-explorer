@@ -1,9 +1,16 @@
 import {VALUE_TYPE_STRING} from '@enonic/js-utils';
 import getIn from 'get-value';
-import {Dropdown, Input, Message, Modal, Segment} from 'semantic-ui-react';
+import {Dropdown, Form, Input, Message, Modal, Radio, Segment} from 'semantic-ui-react';
 
 import {setValue} from 'semantic-ui-react-form';
 import {getEnonicContext} from 'semantic-ui-react-form/Context';
+
+import {mustStartWithALowercaseLetter} from '../utils/mustStartWithALowercaseLetter';
+import {notDocumentMetaData} from '../utils/notDocumentMetaData';
+import {notDoubleDot} from '../utils/notDoubleDot';
+import {onlyLettersDigitsUnderscoresAndDots} from '../utils/onlyLettersDigitsUnderscoresAndDots';
+import {notDoubleUnderscore} from '../utils/notDoubleUnderscore';
+import {required} from '../utils/required.mjs';
 
 
 export const AddFieldModal = ({
@@ -13,8 +20,6 @@ export const AddFieldModal = ({
 	local = true, // false means global
 	open
 }) => {
-	const confirmButton = `Add ${local ? 'loc' : 'glob'}al field`;
-
 	const [context, dispatch] = getEnonicContext();
 
 	const fields = getIn(context.values, 'fields');
@@ -37,18 +42,28 @@ export const AddFieldModal = ({
 	//console.debug('selectedFields', selectedFields);
 	//console.debug('usedNames', usedNames);
 
+	const [boolLocal, setBoolLocal] = React.useState(local);
 	const [fieldId, setFieldId] = React.useState('');
 	const [name, setName] = React.useState('');
 
-	const msg = usedNames[name] ? <Message
-		content={`${name} already added, please input another name.`}
+	const errorMsg = mustStartWithALowercaseLetter(name)
+		|| onlyLettersDigitsUnderscoresAndDots(name)
+		|| notDoubleUnderscore(name)
+		|| notDoubleDot(name)
+		|| notDocumentMetaData(name)
+		|| (usedNames[name] ? `${name} already added, please input another name.` : ''); // '' = falsy
+
+	const msg =  errorMsg ? <Message
+		content={errorMsg}
 		icon='warning'
 		negative
 	/> : null;
 
+	const confirmButton = `Add ${boolLocal ? 'loc' : 'glob'}al field`;
+
 	let disabled;
-	if (local) {
-		disabled = (!name || usedNames[name]);
+	if (boolLocal) {
+		disabled = !name || errorMsg;
 	} else {
 		disabled = !fieldId;
 	}
@@ -56,7 +71,7 @@ export const AddFieldModal = ({
 	const onConfirm = () => {
 		if (!disabled) {
 			doClose();
-			local
+			boolLocal
 				? dispatch(setValue({path: `properties.${properties.length}`, value: {
 					active: true,
 					enabled: true,
@@ -88,32 +103,62 @@ export const AddFieldModal = ({
 		closeIcon
 		closeOnDimmerClick={false}
 		content={<Segment basic>
-			{local
-				? <>
-					<Input
-						fluid
-						onChange={(event, {value: newValue}) => {
-							setName(newValue);
-						}}
-						onKeyUp={({code}) => {
-							if(code === 'Enter') {
-								onConfirm();
-							}
-						}}
-						placeholder='Please input a local field name'
-					/>
-					{msg}
-				</>
-				: <Dropdown
-					onChange={(ignoredEvent,{value: newValue}) => {
-						setFieldId(newValue);
+			<Form>
+				<Form.Field>Local <Radio
+					checked={!boolLocal}
+					onChange={(ignoredEvent,{checked}) => {
+						setBoolLocal(!checked);
 					}}
-					options={globalFieldOptions.filter(({key: k}) => !selectedFields[k])}
-					search
-					selection
-					placeholder='Please select a global field'
-				/>
-			}
+					toggle
+				/> Global</Form.Field>
+				{/*<Form.Field>
+					<Dropdown
+						onChange={(ignoredEvent,{value: newValue}) => {
+							setBoolLocal(newValue);
+						}}
+						options={[{
+							key: true,
+							text: 'local',
+							value: true
+						},{
+							key: false,
+							text: 'global',
+							value: false
+						}]}
+						selection
+						value={boolLocal}
+					/>
+				</Form.Field>
+				*/}
+				<Form.Field>
+					{boolLocal
+						? <>
+							<Input
+								fluid
+								onChange={(event, {value: newValue}) => {
+									setName(newValue);
+								}}
+								onKeyUp={({code}) => {
+									if(code === 'Enter') {
+										onConfirm();
+									}
+								}}
+								placeholder='Please input a local field name'
+							/>
+							{msg}
+						</>
+						: <Dropdown
+							onChange={(ignoredEvent,{value: newValue}) => {
+								setFieldId(newValue);
+							}}
+							options={globalFieldOptions.filter(({key: k}) => !selectedFields[k])}
+							search
+							selection
+							placeholder='Please select a global field'
+						/>
+					}
+				</Form.Field>
+			</Form>
 		</Segment>}
 		header={confirmButton}
 		onClose={doClose}

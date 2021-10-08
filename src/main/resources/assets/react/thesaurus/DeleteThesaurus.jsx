@@ -50,8 +50,10 @@ export function DeleteThesaurus(props) {
 		<Modal.Header>Delete thesaurus {name}</Modal.Header>
 		<Modal.Content>
 			<Header as='h2'>Do you really want to delete {name}?</Header>
+		</Modal.Content>
+		<Modal.Actions>
+			<Button onClick={doClose}>Cancel</Button>
 			<Button
-				compact
 				onClick={() => {
 					fetch(`${servicesBaseUrl}/graphQL`, {
 						method: 'POST',
@@ -68,8 +70,8 @@ export function DeleteThesaurus(props) {
 						if (response.status === 200) {doClose();}
 					});
 				}}
-				size='tiny'
-			><Icon color='red' name='trash alternate outline'/>Confirm Delete</Button>
-		</Modal.Content>
+				primary
+			><Icon color='white' name='trash alternate outline'/>Confirm Delete</Button>
+		</Modal.Actions>
 	</Modal>;
 } // DeleteThesaurus

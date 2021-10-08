@@ -38,20 +38,22 @@ export function DeleteModal(props) {
 		<Modal.Header>Delete {name}</Modal.Header>
 		<Modal.Content>
 			<Header as='h2'>Do you really want to delete {name}?</Header>
-			<Form>
-				<Button
-					onClick={() => {
-						fetch(`${servicesBaseUrl}/stopWordsDelete?name=${name}`, {
-							method: 'DELETE'
-						})
-							.then((/*response*/) => {
-								//if (response.status === 200) {
-								doClose();
-								//}
-							});
-					}}
-				><Icon color='red' name='trash alternate outline'/>Confirm Delete</Button>
-			</Form>
 		</Modal.Content>
+		<Modal.Actions>
+			<Button onClick={doClose}>Cancel</Button>
+			<Button
+				onClick={() => {
+					fetch(`${servicesBaseUrl}/stopWordsDelete?name=${name}`, {
+						method: 'DELETE'
+					})
+						.then((/*response*/) => {
+							//if (response.status === 200) {
+							doClose();
+							//}
+						});
+				}}
+				primary
+			><Icon color='white' name='trash alternate outline'/>Confirm Delete</Button>
+		</Modal.Actions>
 	</Modal>;
 } // DeleteModal

@@ -1,7 +1,10 @@
 import {
+	Button,
 	Form,
 	Header,
-	Label
+	Icon,
+	Label,
+	Modal
 } from 'semantic-ui-react';
 import {
 	Form as EnonicForm,
@@ -73,52 +76,55 @@ export const NewOrEditApiKey = (props) => {
 			});
 		}}
 	>
-		<Form as='div'>
-			{_name
-				? null
-				: <Form.Field>
+		<Modal.Content>
+			<Form as='div'>
+				{_name
+					? null
+					: <Form.Field>
+						<EnonicInput
+							fluid
+							label='Name'
+							path='name'
+						/>
+					</Form.Field>
+				}
+				<Form.Field>
 					<EnonicInput
 						fluid
-						label='Name'
-						path='name'
+						path='key'
+						placeholder={_name ? 'If you type anything here, it will overwrite the previous key on save' : 'Key is one way hashed on save'}
+					>
+						<Label content='Key' size='big'/>
+						<input/>
+						<GenerateKeyButton/>
+					</EnonicInput>
+				</Form.Field>
+				<Header as='h2' content='Collections (read/write)' dividing id='collections'/>
+				<Form.Field>
+					<Dropdown
+						multiple={true}
+						options={collectionOptions}
+						path='collections'
+						placeholder='Please select one or more collections...'
+						selection
 					/>
 				</Form.Field>
-			}
-			<Form.Field>
-				<EnonicInput
-					fluid
-					path='key'
-					placeholder={_name ? 'If you type anything here, it will overwrite the previous key on save' : 'Key is one way hashed on save'}
-				>
-					<Label content='Key' size='big'/>
-					<input/>
-					<GenerateKeyButton/>
-				</EnonicInput>
-			</Form.Field>
-			<Header as='h2' content='Collections (read/write)' dividing id='collections'/>
-			<Form.Field>
-				<Dropdown
-					multiple={true}
-					options={collectionOptions}
-					path='collections'
-					placeholder='Please select one or more collections...'
-					selection
-				/>
-			</Form.Field>
-			<Header as='h2' content='Interfaces (read)' dividing id='interfaces'/>
-			<Form.Field>
-				<Dropdown
-					multiple={true}
-					options={interfaceOptions}
-					path='interfaces'
-					placeholder='Please select one or more interfaces...'
-					selection
-				/>
-			</Form.Field>
-			<Form.Field>
-				<SubmitButton/>
-				<ResetButton/>
-			</Form.Field>
-		</Form>
+				<Header as='h2' content='Interfaces (read)' dividing id='interfaces'/>
+				<Form.Field>
+					<Dropdown
+						multiple={true}
+						options={interfaceOptions}
+						path='interfaces'
+						placeholder='Please select one or more interfaces...'
+						selection
+					/>
+				</Form.Field>
+			</Form>
+		</Modal.Content>
+		<Modal.Actions>
+			<Button onClick={doClose}>Cancel</Button>
+			<ResetButton secondary/>
+			<SubmitButton primary><Icon name='save'/>Save</SubmitButton>
+		</Modal.Actions>
 	</EnonicForm>;
 }; // NewOrEditApiKey

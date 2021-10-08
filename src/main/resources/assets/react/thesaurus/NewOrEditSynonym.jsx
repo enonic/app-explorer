@@ -117,45 +117,45 @@ export function NewOrEditSynonym(props) {
 		}
 	>
 		<Modal.Header>{_id ? `Edit synonym ${_id}` : `New synonym`}</Modal.Header>
-		<Modal.Content>
-			<EnonicForm
-				initialValues={{
-					from,
-					to
-				}}
-				onSubmit={({
-					from,
-					to
-				}) => {
-					//console.debug({from, thesaurusId, to});
-					fetch(`${servicesBaseUrl}/graphQL`, {
-						method: 'POST',
-						headers: {
-							'Content-Type':	'application/json'
-						},
-						body: JSON.stringify({
-							query: _id ? GQL_MUTATION_UPDATE_SYNONYM : GQL_MUTATION_CREATE_SYNONYM,
-							variables: {
-								_id,
-								from,
-								thesaurusId,
-								to
-							}
-						})
-					}).then((/*response*/) => {
-						//if (response.status === 200) {doClose();}
-						doClose();
-					});
-				}}
-			>
-				{/*schema={{
-					from: (array) => everyItemRequired(array),
-					 //[(value) => required(value)],
-					 //(array) => atLeastOneValue(array),
-					to: (array) => everyItemRequired(array)
-					//[(value) => required(value)]
-					//(array) => atLeastOneValue(array)
-				}}*/}
+		<EnonicForm
+			initialValues={{
+				from,
+				to
+			}}
+			onSubmit={({
+				from,
+				to
+			}) => {
+				//console.debug({from, thesaurusId, to});
+				fetch(`${servicesBaseUrl}/graphQL`, {
+					method: 'POST',
+					headers: {
+						'Content-Type':	'application/json'
+					},
+					body: JSON.stringify({
+						query: _id ? GQL_MUTATION_UPDATE_SYNONYM : GQL_MUTATION_CREATE_SYNONYM,
+						variables: {
+							_id,
+							from,
+							thesaurusId,
+							to
+						}
+					})
+				}).then((/*response*/) => {
+					//if (response.status === 200) {doClose();}
+					doClose();
+				});
+			}}
+		>
+			{/*schema={{
+				from: (array) => everyItemRequired(array),
+				 //[(value) => required(value)],
+				 //(array) => atLeastOneValue(array),
+				to: (array) => everyItemRequired(array)
+				//[(value) => required(value)]
+				//(array) => atLeastOneValue(array)
+			}}*/}
+			<Modal.Content>
 				<Header as='h2'>Languages</Header>
 				<List
 					path={PATH_LANGUAGES}
@@ -466,12 +466,12 @@ export function NewOrEditSynonym(props) {
 						<SortButton path='to'/>
 					</>}
 				/>
-				<div style={{marginTop: 14}}>
-					<SubmitButton/>
-					{/*<ValidateFormButton/>*/}
-					<ResetButton/>
-				</div>
-			</EnonicForm>
-		</Modal.Content>
+			</Modal.Content>
+			<Modal.Actions>
+				<Button onClick={doClose}>Cancel</Button>
+				<ResetButton secondary/>
+				<SubmitButton primary><Icon name='save'/>Save</SubmitButton>
+			</Modal.Actions>
+		</EnonicForm>
 	</Modal>;
 } // NewOrEditSynonym

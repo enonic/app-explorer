@@ -1,4 +1,12 @@
-import {Form, Header, Label, Segment} from 'semantic-ui-react';
+import {
+	Button,
+	Form,
+	Header,
+	Icon,
+	//Label,
+	Modal,
+	Segment
+} from 'semantic-ui-react';
 
 import {
 	Form as EnonicForm,
@@ -130,35 +138,44 @@ export function Collection(props) {
 		}}
 		schema={SCHEMA}
 	>
-		<Segment color='black'>
-			<Header as='h1' dividing content='Collection' id='collection'/>
-			<Input
-				fluid
-				label='Name'
-				path='_name'
-			/>
-			<Form.Field>
-				<Label content='Language' size='large'/>
-				<LanguageDropdown locales={locales}/>
-			</Form.Field>
-			<Header as='h2' dividing content='Collector'/>
-			<CollectorSelector
-				options={collectorOptions}
-			/>
-			<DocumentTypeSelector
-				servicesBaseUrl={servicesBaseUrl}
-			/>
-		</Segment>
-		<CollectorOptions
-			collectorComponents={collectorComponents}
-			contentTypeOptions={contentTypeOptions}
-			fields={fields}
-			siteOptions={siteOptions}
-		/>
-		<SchedulingSegment />
-		<Form.Field>
-			<SubmitButton/>
-			<ResetButton/>
-		</Form.Field>
+		<Modal.Content>
+			<Form>
+				<Segment color='black'>
+					<Header as='h1' dividing content='Collection' id='collection'/>
+					<Form.Field>
+						<Input
+							fluid
+							label='Name'
+							path='_name'
+						/>
+					</Form.Field>
+					<Form.Field>
+						{/*<Label content='Language' size='large'/>*/}
+						<LanguageDropdown locales={locales}/>
+					</Form.Field>
+					<Header as='h2' dividing content='Collector'/>
+					<CollectorSelector
+						options={collectorOptions}
+					/>
+					<DocumentTypeSelector
+						servicesBaseUrl={servicesBaseUrl}
+					/>
+				</Segment>
+				<CollectorOptions
+					collectorComponents={collectorComponents}
+					contentTypeOptions={contentTypeOptions}
+					fields={fields}
+					siteOptions={siteOptions}
+				/>
+				<SchedulingSegment />
+			</Form>
+		</Modal.Content>
+		<Modal.Actions>
+			<Button onClick={doClose}>Cancel</Button>
+			{/*<VisitAllButton/>*/}
+			{/*<ValidateFormButton/>*/}
+			<ResetButton secondary/>
+			<SubmitButton primary><Icon name='save'/>Save</SubmitButton>
+		</Modal.Actions>
 	</EnonicForm>;
 } // function Collection

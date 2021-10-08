@@ -8,7 +8,7 @@ import {ResetButton} from 'semantic-ui-react-form/buttons/ResetButton';
 import {SubmitButton} from 'semantic-ui-react-form/buttons/SubmitButton';
 
 import {LanguageDropdown} from '../collection/LanguageDropdown';
-import {EditSynonyms} from './EditSynonyms';
+//import {EditSynonyms} from './EditSynonyms';
 import {UploadLicense} from '../UploadLicense';
 
 
@@ -102,7 +102,7 @@ export function NewOrEditThesaurus(props) {
 			trigger={<Button
 				icon
 				onClick={doOpen}
-			><Icon color='blue' name='edit'/></Button>}
+			><Icon color='blue' name='options'/></Button>}
 		/>
 			: <Button
 				circular
@@ -120,46 +120,46 @@ export function NewOrEditThesaurus(props) {
 	>{licenseValid
 			? <>
 				<Modal.Header>{_id ? `Edit thesaurus ${_name}` : 'New thesaurus'}</Modal.Header>
-				<Modal.Content>
-					<EnonicForm
-						initialValues={{
-							language,
-							_name
-						}}
-						onSubmit={(values) => {
-							//console.debug('onSubmit values', values);
-							const {
-								_name: newName,
-								language: newLanguage
-							} = values;
-							//console.debug('onSubmit newName', newName);
-							//console.debug('onSubmit newLanguage', newLanguage);
-							fetch(`${servicesBaseUrl}/graphQL`, {
-								method: 'POST',
-								headers: {
-									'Content-Type':	'application/json'
-								},
-								body: JSON.stringify({
-									query: _id ? GQL_MUTATION_THESAURUS_UPDATE : GQL_MUTATION_THESAURUS_CREATE,
-									variables: {
-										_id,
-										_name: newName, // Support rename...
-										language: newLanguage
-									}
-								})
-							}).then((response) => {
-								if (response.status === 200) {doClose();}
-								//doClose();
-							});
-						}}
-						schema={{
-							language: {
-								from: (value) => required(value),
-								to: (value) => required(value)
+				<EnonicForm
+					initialValues={{
+						language,
+						_name
+					}}
+					onSubmit={(values) => {
+						//console.debug('onSubmit values', values);
+						const {
+							_name: newName,
+							language: newLanguage
+						} = values;
+						//console.debug('onSubmit newName', newName);
+						//console.debug('onSubmit newLanguage', newLanguage);
+						fetch(`${servicesBaseUrl}/graphQL`, {
+							method: 'POST',
+							headers: {
+								'Content-Type':	'application/json'
 							},
-							_name: (value) => required(value)
-						}}
-					>
+							body: JSON.stringify({
+								query: _id ? GQL_MUTATION_THESAURUS_UPDATE : GQL_MUTATION_THESAURUS_CREATE,
+								variables: {
+									_id,
+									_name: newName, // Support rename...
+									language: newLanguage
+								}
+							})
+						}).then((response) => {
+							if (response.status === 200) {doClose();}
+							//doClose();
+						});
+					}}
+					schema={{
+						language: {
+							from: (value) => required(value),
+							to: (value) => required(value)
+						},
+						_name: (value) => required(value)
+					}}
+				>
+					<Modal.Content>
 						<Form as='div'>
 							{!_id && <Form.Field>
 								<EnonicInput
@@ -176,22 +176,23 @@ export function NewOrEditThesaurus(props) {
 								<Label content='To' size='large'/>
 								<LanguageDropdown locales={locales} parentPath='language' name='to'/>
 							</Form.Field>
-							<Form.Field>
-								<SubmitButton/>
-								<ResetButton/>
-							</Form.Field>
 						</Form>
-					</EnonicForm>
-					{_id && <>
-						<Header as='h2' content='Synonyms'/>
-						<EditSynonyms
-							locales={locales}
-							servicesBaseUrl={servicesBaseUrl}
-							thesaurusId={_id}
-							thesaurusName={_name}
-						/>
-					</>}
-				</Modal.Content>
+						{/*_id && <>
+							<Header as='h2' content='Synonyms'/>
+							<EditSynonyms
+								locales={locales}
+								servicesBaseUrl={servicesBaseUrl}
+								thesaurusId={_id}
+								thesaurusName={_name}
+							/>
+						</>*/}
+					</Modal.Content>
+					<Modal.Actions>
+						<Button onClick={doClose}>Cancel</Button>
+						<ResetButton secondary/>
+						<SubmitButton primary><Icon name='save'/>Save</SubmitButton>
+					</Modal.Actions>
+				</EnonicForm>
 			</>
 			: <UploadLicense
 				servicesBaseUrl={servicesBaseUrl}

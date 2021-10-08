@@ -134,13 +134,15 @@ export function DeleteSynonym(props) {
 					</Table.Row>)}
 				</Table.Body>
 			</Table>
+		</Modal.Content>
+		<Modal.Actions>
+			<Button onClick={doClose}>Cancel</Button>
 			<Button
-				compact
 				disabled={state.buttonDisabled}
 				loading={state.buttonLoading}
 				onClick={state.buttonOnClick}
-				size='tiny'
-			><Icon color='red' name={state.buttonIcon}/>{state.buttonText}</Button>
-		</Modal.Content>
+				primary
+			><Icon color='white' name={state.buttonIcon}/>{state.buttonText}</Button>
+		</Modal.Actions>
 	</Modal>;
 } // DeleteSynonym

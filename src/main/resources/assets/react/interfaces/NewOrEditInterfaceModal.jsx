@@ -71,18 +71,16 @@ export function NewOrEditInterfaceModal(props) {
 	>{licenseValid || total <= 1 // This means it will be allowed to create interface number 2, but not number 3
 			? <>
 				<Modal.Header>{header}</Modal.Header>
-				<Modal.Content>
-					<NewOrEditInterface
-						_id={_id}
-						collectionOptions={collectionOptions}
-						doClose={doClose}
-						fieldsObj={fieldsObj}
-						interfaceNamesObj={interfaceNamesObj}
-						servicesBaseUrl={servicesBaseUrl}
-						stopWordOptions={stopWordOptions}
-						thesauriOptions={thesauriOptions}
-					/>
-				</Modal.Content>
+				<NewOrEditInterface
+					_id={_id}
+					collectionOptions={collectionOptions}
+					doClose={doClose}
+					fieldsObj={fieldsObj}
+					interfaceNamesObj={interfaceNamesObj}
+					servicesBaseUrl={servicesBaseUrl}
+					stopWordOptions={stopWordOptions}
+					thesauriOptions={thesauriOptions}
+				/>
 			</>
 			: <UploadLicense
 				servicesBaseUrl={servicesBaseUrl}

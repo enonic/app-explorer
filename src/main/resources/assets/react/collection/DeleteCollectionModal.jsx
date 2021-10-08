@@ -29,6 +29,7 @@ export function DeleteCollectionModal(props) {
 		closeOnDimmerClick={false}
 		onClose={doClose}
 		open={state.open}
+		size='small'
 		trigger={<Popup
 			content={`Delete collection ${_name}`}
 			inverted
@@ -40,8 +41,10 @@ export function DeleteCollectionModal(props) {
 		<Modal.Header>Delete collection {_name}</Modal.Header>
 		<Modal.Content>
 			<Header as='h2'>Do you really want to delete {_name}?</Header>
+		</Modal.Content>
+		<Modal.Actions>
+			<Button onClick={doClose}>Cancel</Button>
 			<Button
-				compact
 				onClick={() => {
 					fetch(`${servicesBaseUrl}/collectionDelete?name=${_name}`, {
 						method: 'DELETE'
@@ -50,7 +53,8 @@ export function DeleteCollectionModal(props) {
 						doClose();
 					});
 				}}
-			><Icon color='red' name='trash alternate outline'/>Confirm Delete</Button>
-		</Modal.Content>
+				primary
+			><Icon color='white' name='trash alternate outline'/>Confirm Delete</Button>
+		</Modal.Actions>
 	</Modal>;
 } // DeleteCollectionModal

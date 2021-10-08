@@ -1,4 +1,11 @@
-import {Form, Header, Loader} from 'semantic-ui-react';
+import {
+	Button,
+	Form,
+	Header,
+	Icon,
+	Loader,
+	Modal
+} from 'semantic-ui-react';
 import {Form as EnonicForm} from 'semantic-ui-react-form/Form';
 import {Dropdown} from 'semantic-ui-react-form/inputs/Dropdown';
 import {Input} from 'semantic-ui-react-form/inputs/Input';
@@ -117,58 +124,61 @@ export function NewOrEditInterface(props) {
 		}}
 		schema={schema}
 	>
-		<Form as='div'>
-			<Form.Field>
-				<Input
+		<Modal.Content>
+			<Form as='div'>
+				<Form.Field>
+					<Input
+						disabled={disabled}
+						fluid
+						label={{basic: true, content: 'Name'}}
+						path='_name'
+						placeholder='Please input name'
+					/>
+				</Form.Field>
+				<Header as='h2' content='Collection(s)' disabled={disabled} dividing id='collections'/>
+				<Form.Field>
+					<Dropdown
+						disabled={disabled}
+						multiple={true}
+						options={collectionOptions}
+						path='collectionIds'
+						placeholder='Please select one or more collections...'
+						selection
+					/>
+				</Form.Field>
+
+				<Header as='h3' content='Fields' disabled={disabled} dividing id='fields'/>
+				<FieldSelector
+					disabled={disabled}
+					fieldsObj={fieldsObj}
+				/>
+
+				<Header as='h3' content='Synonyms' disabled={disabled} dividing id='synonyms'/>
+				<Form.Field><Dropdown
 					disabled={disabled}
 					fluid
-					label={{basic: true, content: 'Name'}}
-					path='_name'
-					placeholder='Please input name'
-				/>
-			</Form.Field>
-			<Header as='h2' content='Collection(s)' disabled={disabled} dividing id='collections'/>
-			<Form.Field>
+					multiple={true}
+					options={thesauriOptions}
+					path='synonyms'
+					search
+					selection
+				/></Form.Field>
+				<Header as='h3' content='Stop words' disabled={disabled} dividing id='stopwords'/>
 				<Dropdown
 					disabled={disabled}
+					fluid
 					multiple={true}
-					options={collectionOptions}
-					path='collectionIds'
-					placeholder='Please select one or more collections...'
+					options={stopWordOptions}
+					path='stopWords'
+					search
 					selection
 				/>
-			</Form.Field>
-
-			<Header as='h3' content='Fields' disabled={disabled} dividing id='fields'/>
-			<FieldSelector
-				disabled={disabled}
-				fieldsObj={fieldsObj}
-			/>
-
-			<Header as='h3' content='Synonyms' disabled={disabled} dividing id='synonyms'/>
-			<Form.Field><Dropdown
-				disabled={disabled}
-				fluid
-				multiple={true}
-				options={thesauriOptions}
-				path='synonyms'
-				search
-				selection
-			/></Form.Field>
-			<Header as='h3' content='Stop words' disabled={disabled} dividing id='stopwords'/>
-			<Dropdown
-				disabled={disabled}
-				fluid
-				multiple={true}
-				options={stopWordOptions}
-				path='stopWords'
-				search
-				selection
-			/>
-			<Form.Field>
-				<SubmitButton disabled={disabled}/>
-				<ResetButton disabled={disabled}/>
-			</Form.Field>
-		</Form>
+			</Form>
+		</Modal.Content>
+		<Modal.Actions>
+			<Button onClick={doClose}>Cancel</Button>
+			<ResetButton secondary/>
+			<SubmitButton disabled={disabled} primary><Icon name='save'/>Save</SubmitButton>
+		</Modal.Actions>
 	</EnonicForm>;
 } // function NewOrEditInterface

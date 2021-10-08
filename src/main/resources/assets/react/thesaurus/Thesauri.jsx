@@ -139,11 +139,12 @@ export function Thesauri(props) {
 			<Table celled collapsing compact selectable sortable striped attached='top'>
 				<Table.Header>
 					<Table.Row>
-						<Table.HeaderCell>Edit</Table.HeaderCell>
+						<Table.HeaderCell>Options</Table.HeaderCell>
 						<Table.HeaderCell>Name</Table.HeaderCell>
 						<Table.HeaderCell>From Language</Table.HeaderCell>
 						<Table.HeaderCell>To Language</Table.HeaderCell>
 						<Table.HeaderCell>Synonyms</Table.HeaderCell>
+						<Table.HeaderCell>Count</Table.HeaderCell>
 						<Table.HeaderCell>Actions</Table.HeaderCell>
 					</Table.Row>
 				</Table.Header>
@@ -180,6 +181,13 @@ export function Thesauri(props) {
 								<Table.Cell collapsing>{_name}</Table.Cell>
 								<Table.Cell collapsing>{from}</Table.Cell>
 								<Table.Cell collapsing>{to}</Table.Cell>
+								<Table.Cell collapsing><EditSynonymsModal
+									locales={locales}
+									afterClose={fetchOnUpdate}
+									servicesBaseUrl={servicesBaseUrl}
+									thesaurusId={_id}
+									thesaurusName={_name}
+								/></Table.Cell>
 								<Table.Cell collapsing>{synonymsCount}</Table.Cell>
 								<Table.Cell collapsing>
 									<Button.Group>
@@ -222,14 +230,15 @@ export function Thesauri(props) {
 				</Table.Body>
 				<Table.Footer>
 					<Table.Row>
+						<Table.HeaderCell></Table.HeaderCell>
+						<Table.HeaderCell></Table.HeaderCell>
+						<Table.HeaderCell></Table.HeaderCell>
+						<Table.HeaderCell></Table.HeaderCell>
 						<Table.HeaderCell><EditSynonymsModal
 							locales={locales}
 							afterClose={fetchOnUpdate}
 							servicesBaseUrl={servicesBaseUrl}
 						/></Table.HeaderCell>
-						<Table.HeaderCell></Table.HeaderCell>
-						<Table.HeaderCell></Table.HeaderCell>
-						<Table.HeaderCell></Table.HeaderCell>
 						<Table.HeaderCell>{synonymsSum}</Table.HeaderCell>
 						<Table.HeaderCell></Table.HeaderCell>
 					</Table.Row>

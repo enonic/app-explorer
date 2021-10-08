@@ -29,27 +29,24 @@ export function EditSynonymsModal(props) {
 		setOpen(true);
 	};
 
+	const header = `Edit ${thesaurusName || 'all'} synonyms`;
+
 	return <Modal
 		closeIcon
 		closeOnDimmerClick={false}
 		onClose={doClose}
 		open={open}
 		size='fullscreen'
-		trigger={thesaurusId
-			? <Button
+		trigger={<Popup
+			content={header}
+			inverted
+			trigger={<Button
 				icon
 				onClick={doOpen}
-			><Icon color='blue' name='edit'/> Edit synonyms</Button>
-			: <Popup
-				content='Edit all synonyms'
-				inverted
-				trigger={<Button
-					icon
-					onClick={doOpen}
-				><Icon color='blue' name='edit'/></Button>}
-			/>
-		}>
-		<Modal.Header>{thesaurusId ? 'Edit synonyms' : 'Edit all synonyms'}</Modal.Header>
+			><Icon color='blue' name='code branch'/></Button>}
+		/>}
+	>
+		<Modal.Header>{header}</Modal.Header>
 		<Modal.Content>
 			<EditSynonyms
 				locales={locales}
@@ -58,5 +55,8 @@ export function EditSynonymsModal(props) {
 				thesaurusName={thesaurusName}
 			/>
 		</Modal.Content>
+		<Modal.Actions>
+			<Button onClick={doClose} primary>Close</Button>
+		</Modal.Actions>
 	</Modal>;
 } // EditSynonymsModal

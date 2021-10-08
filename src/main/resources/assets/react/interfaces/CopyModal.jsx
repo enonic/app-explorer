@@ -49,7 +49,12 @@ export function CopyModal({
 				header='Error'
 				content='Interface name already in use!'
 				negative
-			/> : <Button
+			/> : null}
+		</Modal.Content>
+		<Modal.Actions>
+			<Button onClick={doClose}>Cancel</Button>
+			<Button
+				disabled={!interfaceTo || interfaceExists}
 				onClick={() => {
 					fetch(`${servicesBaseUrl}/interfaceCopy?from=${name}&to=${interfaceTo}`)
 						.then(response => {
@@ -58,8 +63,8 @@ export function CopyModal({
 							}
 						});
 				}}
-				type='button'
-			><Icon color='green' name='copy'/>Copy</Button>}
-		</Modal.Content>
+				primary
+			><Icon color='white' name='copy'/>Copy</Button>
+		</Modal.Actions>
 	</Modal>;
 } // function CopyModal
