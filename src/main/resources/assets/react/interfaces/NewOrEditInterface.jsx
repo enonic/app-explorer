@@ -13,7 +13,9 @@ import {ResetButton} from 'semantic-ui-react-form/buttons/ResetButton';
 import {SubmitButton} from 'semantic-ui-react-form/buttons/SubmitButton';
 
 import {DEFAULT_INTERFACE_FIELDS} from '../../../constants';
-import {getInterface} from '../../../services/graphQL/queries/getInterface';
+import {fetchInterfaceCreate} from '../../../services/graphQL/fetchers/fetchInterfaceCreate';
+import {fetchInterfaceGet} from '../../../services/graphQL/fetchers/fetchInterfaceGet';
+import {fetchInterfaceUpdate} from '../../../services/graphQL/fetchers/fetchInterfaceUpdate';
 import {mustStartWithALowercaseLetter} from '../utils/mustStartWithALowercaseLetter.mjs';
 import {notDoubleUnderscore} from '../utils/notDoubleUnderscore.mjs';
 import {onlyLettersDigitsAndUnderscores} from '../utils/onlyLettersDigitsAndUnderscores.mjs';
@@ -50,27 +52,21 @@ export function NewOrEditInterface(props) {
 
 	React.useEffect(() => {
 		if (!_id) {return;}
-		fetch(`${servicesBaseUrl}/graphQL`, {
-			method: 'POST',
-			headers: {
-				'Content-Type':	'application/json'
-			},
-			body: JSON.stringify({
-				query: `{
-	${getInterface({_id})}
-}`
-			})
-		})
-			.then(response => response.json())
-			.then(data => {
-				//console.debug('data', data);
-				setState(prev => {
+		fetchInterfaceGet({
+			handleData: (data) => {
+				console.debug('data', data);
+				/*setState(prev => {
 					const deref = JSON.parse(JSON.stringify(prev));
 					deref.isLoading = false;
-					deref.initialValues = data.data.getInterface;
+					deref.initialValues = data.getInterface;
 					return deref;
-				});
-			});
+				});*/
+			},
+			url: `${servicesBaseUrl}/graphQL`,
+			variables: {
+				_id
+			}
+		});
 	}, []);
 
 	const {
@@ -104,23 +100,51 @@ export function NewOrEditInterface(props) {
 	return isLoading ? <Loader active inverted>Loading</Loader> : <EnonicForm
 		initialValues={initialValues}
 		onSubmit={(values) => {
-			//const {_name} = values;
+			const {
+				_name,
+				collectionIds,
+				fields,
+				//stopWordIds,
+				stopWords,
+				//synonymIds
+				synonyms
+			} = values;
 			//console.debug('submit values', values);
-			let url = `${servicesBaseUrl}/interface`;
+			let url = `${servicesBaseUrl}/graphQL`;
 			if (_id) {
-				url = `${url}Modify?id=${_id}`;
+				fetchInterfaceUpdate({
+					handleResponse(response) {
+						if (response.status === 200) { doClose(); }
+					},
+					url,
+					variables: {
+						_id,
+						_name,
+						collectionIds,
+						fields,
+						//stopWordIds,
+						stopWords,
+						//synonymIds
+						synonyms
+					}
+				});
 			} else {
-				url = `${url}Create`;
+				fetchInterfaceCreate({
+					handleResponse(response) {
+						if (response.status === 200) { doClose(); }
+					},
+					url,
+					variables: {
+						_name,
+						collectionIds,
+						fields,
+						//stopWordIds,
+						stopWords,
+						//synonymIds
+						synonyms
+					}
+				});
 			}
-			fetch(url, {
-				method: 'POST',
-				headers: {
-					'Content-Type':	'application/json'
-				},
-				body: JSON.stringify(values)
-			}).then(response => {
-				if (response.status === 200) { doClose(); }
-			});
 		}}
 		schema={schema}
 	>

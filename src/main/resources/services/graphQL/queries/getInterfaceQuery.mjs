@@ -1,4 +1,4 @@
-export const getInterface = ({
+export const getInterfaceQuery = ({
 	_id
 }) => `getInterface(
 	_id: "${_id}"

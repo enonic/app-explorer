@@ -1,18 +1,22 @@
-export const GQL_MUTATION_INTERFACE_CREATE = `mutation InterfaceUpdateMutation(
+export const GQL_MUTATION_INTERFACE_UPDATE = `mutation InterfaceUpdateMutation(
 	$_id: ID!
 	$_name: String!
 	$collectionIds: [ID]
 	$fields: [InterfaceFieldInput]
-	$stopWordIds: [ID]
-	$synonymIds: [ID]
+	#$stopWordIds: [ID]
+	$stopWords: [String]
+	#$synonymIds: [ID]
+	$synonyms: [String]
 ) {
 	updateInterface(
 		_id: $_id
 		_name: $_name
 		collectionIds: $collectionIds
 		fields: $fields
-		stopWordIds: $stopWordIds
-		synonymIds: $synonymIds
+		#stopWordIds: $stopWordIds
+		stopWords: $stopWords
+		#synonymIds: $synonymIds
+		synonyms: $synonyms
 	) {
 		_id
 		_name
@@ -24,8 +28,10 @@ export const GQL_MUTATION_INTERFACE_CREATE = `mutation InterfaceUpdateMutation(
 			fieldId
 			boost
 		}
-		stopWordIds
-		synonymIds
+		#stopWordIds
+		stopWords
+		#synonymIds
+		synonyms
 	} # updateInterface
 }`;
 
