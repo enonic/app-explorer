@@ -2,7 +2,6 @@ import {VALUE_TYPE_STRING} from '@enonic/js-utils';
 import {Button, Form, Icon, Modal, Popup} from 'semantic-ui-react';
 import {Form as EnonicForm} from 'semantic-ui-react-form/Form';
 import {Input} from 'semantic-ui-react-form/inputs/Input';
-
 import {ResetButton} from 'semantic-ui-react-form/buttons/ResetButton';
 import {SubmitButton} from 'semantic-ui-react-form/buttons/SubmitButton';
 //import {ValidateFormButton} from 'semantic-ui-react-form/buttons/ValidateFormButton';
@@ -10,28 +9,13 @@ import {SubmitButton} from 'semantic-ui-react-form/buttons/SubmitButton';
 
 import {GQL_MUTATION_FIELD_CREATE} from '../../../services/graphQL/field/mutationFieldCreate';
 import {GQL_MUTATION_FIELD_UPDATE} from '../../../services/graphQL/field/mutationFieldUpdate';
-
 import {mustStartWithALowercaseLetter} from '../utils/mustStartWithALowercaseLetter';
+import {notDocumentMetaData} from '../utils/notDocumentMetaData';
+import {notDoubleDot} from '../utils/notDoubleDot';
 import {onlyLettersDigitsUnderscoresAndDots} from '../utils/onlyLettersDigitsUnderscoresAndDots';
 import {notDoubleUnderscore} from '../utils/notDoubleUnderscore';
-import {notDoubleDot} from '../utils/notDoubleDot';
-
+import {required} from '../utils/required.mjs';
 import {EditFieldTable} from './EditFieldTable';
-
-
-function notDocumentMetaData(value) {
-	if (value === 'document_metadata') {
-		return "Can't be document_metadata";
-	} else if (value.startsWith('document_metadata.')) {
-		return "Can't start with document_metadata.";
-	}
-	return undefined;
-}
-
-
-function required(value) {
-	return value ? undefined : 'Required!';
-}
 
 
 export function NewOrEditModal(props) {

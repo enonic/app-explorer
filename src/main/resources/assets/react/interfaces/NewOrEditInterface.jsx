@@ -1,23 +1,25 @@
 import {Form, Header, Loader} from 'semantic-ui-react';
-
 import {Form as EnonicForm} from 'semantic-ui-react-form/Form';
 import {Dropdown} from 'semantic-ui-react-form/inputs/Dropdown';
 import {Input} from 'semantic-ui-react-form/inputs/Input';
-
 import {ResetButton} from 'semantic-ui-react-form/buttons/ResetButton';
 import {SubmitButton} from 'semantic-ui-react-form/buttons/SubmitButton';
 
 import {FieldSelector} from './FieldSelector';
-
 import {DEFAULT_INTERFACE_FIELDS} from '../../../constants';
+import {mustStartWithALowercaseLetter} from '../utils/mustStartWithALowercaseLetter.mjs';
+import {notDoubleUnderscore} from '../utils/notDoubleUnderscore.mjs';
+import {onlyLettersDigitsAndUnderscores} from '../utils/onlyLettersDigitsAndUnderscores.mjs';
+import {required} from '../utils/required.mjs';
 
 
 export function NewOrEditInterface(props) {
 	const {
+		_id, // nullable
 		collectionOptions,
 		doClose = () => {},
 		fieldsObj,
-		id, // nullable
+		interfaceNamesObj = {},
 		servicesBaseUrl,
 		stopWordOptions,
 		thesauriOptions
@@ -30,17 +32,16 @@ export function NewOrEditInterface(props) {
 		initialValues: {
 			_name: '',
 			collections: [],
-			displayName: '',
 			fields: DEFAULT_INTERFACE_FIELDS,
 			stopWords: [],
 			synonyms: []
 		},
-		isLoading: !!id
+		isLoading: !!_id
 	});
 
 	React.useEffect(() => {
-		if (!id) {return;}
-		fetch(`${servicesBaseUrl}/interfaceGet?id=${id}`)
+		if (!_id) {return;}
+		fetch(`${servicesBaseUrl}/interfaceGet?id=${_id}`)
 			.then(response => response.json())
 			.then(data => {
 				setState(prev => {
@@ -64,14 +65,30 @@ export function NewOrEditInterface(props) {
 
 	const disabled = _name === 'default';
 
+	function mustBeUnique(v) {
+		console.debug(`mustBeUnique(${v}) interfaceNamesObj:`, interfaceNamesObj, ` interfaceNamesObj[${v}]:`, interfaceNamesObj[v]);
+		if (interfaceNamesObj[v]) {
+			return `Name must be unique: Name '${v}' is already in use!`;
+		}
+	}
+
+	const schema = {};
+	if (!_id) {
+		schema._name = (v) => required(v)
+			|| mustStartWithALowercaseLetter(v)
+			|| onlyLettersDigitsAndUnderscores(v)
+			|| notDoubleUnderscore(v)
+			|| mustBeUnique(v);
+	}
+
 	return isLoading ? <Loader active inverted>Loading</Loader> : <EnonicForm
 		initialValues={initialValues}
 		onSubmit={(values) => {
 			//const {_name} = values;
 			//console.debug('submit values', values);
 			let url = `${servicesBaseUrl}/interface`;
-			if (id) {
-				url = `${url}Modify?id=${id}`;
+			if (_id) {
+				url = `${url}Modify?id=${_id}`;
 			} else {
 				url = `${url}Create`;
 			}
@@ -85,6 +102,7 @@ export function NewOrEditInterface(props) {
 				if (response.status === 200) { doClose(); }
 			});
 		}}
+		schema={schema}
 	>
 		<Form as='div'>
 			<Form.Field>
@@ -92,7 +110,7 @@ export function NewOrEditInterface(props) {
 					disabled={disabled}
 					fluid
 					label={{basic: true, content: 'Name'}}
-					path='displayName'
+					path='_name'
 					placeholder='Please input name'
 				/>
 			</Form.Field>
