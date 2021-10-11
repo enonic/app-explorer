@@ -62,6 +62,7 @@ export function DeleteModal({
 			<Button onClick={doClose}>Cancel</Button>
 			<Button
 				disabled={!deleteNameMatches}
+				icon
 				onClick={() => {
 					fetchInterfaceDelete({
 						handleResponse: (response) => {
@@ -76,7 +77,7 @@ export function DeleteModal({
 					});
 				}}
 				primary
-			><Icon color='white' name='trash alternate outline'/>Confirm Delete</Button>
+			><Icon name='trash alternate outline'/>Confirm Delete</Button>
 		</Modal.Actions>
 	</Modal>;
 } // function DeleteModal

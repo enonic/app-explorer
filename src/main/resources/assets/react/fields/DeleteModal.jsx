@@ -101,7 +101,7 @@ export function DeleteModal(props) {
 					});
 				}}
 				primary
-			><Icon color='white' name='trash alternate outline'/> Confirm Delete</Button>
+			><Icon name='trash alternate outline'/> Confirm Delete</Button>
 		</Modal.Actions>
 	</Modal>;
 } // DeleteModal

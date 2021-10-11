@@ -54,6 +54,7 @@ export function DeleteThesaurus(props) {
 		<Modal.Actions>
 			<Button onClick={doClose}>Cancel</Button>
 			<Button
+				icon
 				onClick={() => {
 					fetch(`${servicesBaseUrl}/graphQL`, {
 						method: 'POST',
@@ -71,7 +72,7 @@ export function DeleteThesaurus(props) {
 					});
 				}}
 				primary
-			><Icon color='white' name='trash alternate outline'/>Confirm Delete</Button>
+			><Icon name='trash alternate outline'/>Confirm Delete</Button>
 		</Modal.Actions>
 	</Modal>;
 } // DeleteThesaurus
