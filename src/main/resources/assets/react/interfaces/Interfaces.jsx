@@ -20,6 +20,10 @@ import {SearchModal} from './SearchModal';
 
  It should NOT be possible to use fields starting with underscore (except _allText)
  It should NOT be possible to use document_metadata fields?
+
+ When you make a new interface and have not added a collection to it yet, there are no fields to select from.
+ As soon as you add a collection, then we can populate the list of fields to select from.
+ Thus we need to keep a list of all collectionId to fieldKeys (via documentType), so we can lookup when needed.
 */
 
 const GQL_COLLECTIONS = `queryCollections(
@@ -28,40 +32,45 @@ const GQL_COLLECTIONS = `queryCollections(
 	hits {
 		_id
 		_name
+		documentTypeId
+	}
+}`;
+
+const GQL_DOCUMENT_TYPES = `queryDocumentTypes {
+	#count
+	#total
+	hits {
+		_id
+		_name
+		fields {
+			active
+			fieldId
+		}
+		properties {
+			active
+			enabled
+			fulltext
+			#includeInAllText
+			#max
+			#min
+			name
+			ngram
+			valueType
+		}
 	}
 }`;
 
 const GQL_FIELDS = `queryFields(
 	includeSystemFields: true
 ) {
-	count
-	total
+	#count
+	#total
 	hits {
 		_id
-		#_name
-		#_nodeType
-		#_path
 		key
 		denyDelete
-		#description
-		#fieldType
 		inResults
-		#max
-		#min
-		#indexConfig {
-		#	decideByType
-		#	enabled
-		#	fulltext
-		#	includeInAllText
-		#	nGram
-		#	path
-		#} # indexConfig
-		#decideByType
 		enabled
-		#fulltext
-		#includeInAllText
-		#nGram
-		#path
 	} # hits
 }`;
 
@@ -78,13 +87,14 @@ const GQL_INTERFACES = `queryInterfaces(
 		collectionIds
 		fields {
 			boost
-			fieldId
-			#name
+			#fieldId
+			name
 		}
-		stopWordIds
+		#stopWordIds
+		stopWords
 		synonymIds
 	}
-	total
+	total # limited without licence
 }`;
 
 const GQL_THESAURI = `queryThesauri {
@@ -96,12 +106,11 @@ const GQL_THESAURI = `queryThesauri {
 
 const GQL_ALL = `{
 	${GQL_COLLECTIONS}
+	${GQL_DOCUMENT_TYPES}
+	${GQL_FIELDS}
+	${GQL_INTERFACES}
 	${GQL_THESAURI}
 }`;
-/*
-${GQL_FIELDS}
-${GQL_INTERFACES}
-*/
 //console.debug('GQL_ALL', GQL_ALL);
 
 export function Interfaces({
@@ -115,9 +124,13 @@ export function Interfaces({
 	//const [boolIsLoadingAnything, setboolIsLoadingAnything] = React.useState(false);
 
 	const [collections, setCollections] = React.useState([]);
+	//const [collectionIdToDocumentTypeIds, setCollectionIdToDocumentTypeIds] = React.useState([]);
+	const [collectionIdToFieldKeys, setCollectionIdToFieldKeys] = React.useState({});
+	//const [documentTypes, setCollections] = React.useState({});
+	const [interfaces, setInterfaces] = React.useState([]);
+	const [interfaceNamesObj, setInterfaceNamesObj] = React.useState({});
+	const [interfacesTotal, setInterfacesTotal] = React.useState(0);
 	const [state, setState] = React.useState({
-		interfaceExists: false,
-		interfaceTo: '',
 		interfaces: {
 			count: 0,
 			hits: [],
@@ -125,6 +138,7 @@ export function Interfaces({
 		}
 	});
 	const [thesauriOptions, setThesauriOptions] = React.useState([]);
+	//const [thesaurusIdToName, setThesaurusIdToName] = React.useState({});
 
 	const [showCollectionCount, setShowCollectionCount] = React.useState(true);
 	const [showCollections, setShowCollections] = React.useState(false);
@@ -149,16 +163,115 @@ export function Interfaces({
 			.then(response => response.json())
 			.then(json => {
 				const data = json.data;
-				//console.debug('data', data);
+				console.debug('data', data);
+
+				const fieldIdToKey = {};
+				data.queryFields.hits.forEach(({_id, key}) => {
+					if (_id) { // This avoids undefined, on system_fields...
+						fieldIdToKey[_id] = key;
+					}
+				});
+				//console.debug('fieldIdToKey', fieldIdToKey);
+
+				const documentTypeIdToFieldKeys = {};
+				data.queryDocumentTypes.hits.forEach(({
+					_id,
+					fields = [],
+					properties = []
+				}) => {
+					const uniqueFieldsObj = {};
+					fields.forEach(({fieldId/*, name*/}) => {
+						const fieldKey = fieldIdToKey[fieldId];
+						if (fieldKey) {
+							uniqueFieldsObj[fieldKey] = true;
+						}
+					});
+					properties.forEach(({name}) => {
+						uniqueFieldsObj[name] = true;
+					});
+					documentTypeIdToFieldKeys[_id] = Object.keys(uniqueFieldsObj);
+				});
+				//console.debug('documentTypeIdToFieldKeys', documentTypeIdToFieldKeys);
+
 				setCollections(data.queryCollections.hits);
-				//setboolIsLoadingGraphQL(false);
+				const collectionIdToDocumentTypeIds = {};
+				const collectionIdToFieldKeys = {};
+				const collectionIdToName = {};
+				data.queryCollections.hits.forEach(({_id, _name, documentTypeId}) => {
+					collectionIdToDocumentTypeIds[_id] = documentTypeId;
+					collectionIdToFieldKeys[_id] = documentTypeIdToFieldKeys[documentTypeId];
+					collectionIdToName[_id] = _name;
+				});
+				//console.debug('collectionIdToDocumentTypeIds', collectionIdToDocumentTypeIds);
+				//console.debug('collectionIdToFieldKeys', collectionIdToFieldKeys);
+				setCollectionIdToFieldKeys(collectionIdToFieldKeys);
+				//setCollectionIdToDocumentTypeIds(collectionIdToDocumentTypeIds);
+
+				const thesaurusIdToName = {};
 				setThesauriOptions(data.queryThesauri.hits.map(({
 					_id, _name
-				}) => ({
-					key: _id,
-					text: _name,
-					value: _id
-				})));
+				}) => {
+					thesaurusIdToName[_id] = _name;
+					return {
+						key: _id,
+						text: _name,
+						value: _id
+					};
+				}));
+				//console.debug('thesaurusIdToName', thesaurusIdToName);
+				//setThesaurusIdToName(thesaurusIdToName);
+
+				const interfacesObj = {};
+				const interfaceNamesObj = {};
+				data.queryInterfaces.hits.forEach(({
+					_id,
+					_name,
+					collectionIds = [],
+					fields = [], // boost, name
+					stopWords = [],
+					synonymIds = []
+				}) => {
+					interfaceNamesObj[_name] = true;
+					/*const boostableFieldsObj = {
+						'_allText': true // NOTE Hardcode
+					};*/
+					const collectionNamesObj = {};
+					collectionIds.forEach((_id) => {
+						/*const fieldKeys = collectionIdToFieldKeys[_id];
+						if (fieldKeys) {
+							fieldKeys.forEach((fieldKey) => {
+								boostableFieldsObj[fieldKey] = true;
+							});
+						}*/
+						const collectionName = collectionIdToName[_id];
+						if (collectionName) {
+							collectionNamesObj[collectionName] = true;
+						}
+					});
+
+					const thesaurusNames = [];
+					synonymIds.forEach((thesaurusId) => {
+						const thesaurusName = thesaurusIdToName[thesaurusId];
+						if (thesaurusName) {
+							thesaurusNames.push(thesaurusName);
+						}
+					});
+
+					interfacesObj[_id] = {
+						_id,
+						_name,
+						//boostableFieldKeys: Object.keys(boostableFieldsObj).sort(),
+						collectionNames: Object.keys(collectionNamesObj).sort(),
+						fields,
+						stopWords,
+						thesaurusNames
+					};
+				});
+				//console.debug('interfaces', interfaces);
+				setInterfaceNamesObj(interfaceNamesObj);
+				setInterfaces(Object.keys(interfacesObj).map((_id) => interfacesObj[_id]).sort((a,b) => (a._name > b._name) ? 1 : -1));
+				setInterfacesTotal(data.queryInterfaces.total);
+				//setboolIsLoadingGraphQL(false);
 			});
 
 		fetch(`${servicesBaseUrl}/interfaceList`)
@@ -168,10 +281,10 @@ export function Interfaces({
 					const deref = JSON.parse(JSON.stringify(oldState));
 					//deref.collectionOptions = data.collectionOptions;
 					//deref.collections = data.collections; // Never been used?
-					deref.fieldsObj = data.fieldsObj;
-					deref.interfaces = data.interfaces;
+					//deref.fieldsObj = data.fieldsObj;
+					//deref.interfaces = data.interfaces;
 					deref.stopWordOptions = data.stopWordOptions;
-					deref.synonyms = data.synonyms;
+					//deref.synonyms = data.synonyms;
 					//deref.thesauriOptions = data.thesauriOptions;
 					return deref;
 				});
@@ -207,19 +320,9 @@ export function Interfaces({
 
 	const {
 		//collectionOptions,
-		fieldsObj,
-		interfaces: {
-			hits,
-			total
-		},
-		stopWordOptions//,
-		//thesauriOptions
+		//fieldsObj,
+		stopWordOptions
 	} = state;
-
-	const interfaceNamesObj = {};
-	hits.forEach(({_name}) => {
-		interfaceNamesObj[_name] = true;
-	});
 
 	return <>
 		<Segment basic inverted style={{
@@ -309,16 +412,15 @@ export function Interfaces({
 				</Table.Row>
 			</Table.Header>
 			<Table.Body>
-				{hits.map((initialValues, index) => {
+				{interfaces.map((initialValues, index) => {
 					const {
 						_id,
 						_name,
-						collectionIds = [],
+						collectionNames = [],
 						fields,
 						stopWords,
 						//stopWordIds = [],
-						synonyms
-						//synonymIds = []
+						thesaurusNames = []
 					} = initialValues;
 					//console.debug({_name, index});
 					return <Table.Row key={index}>
@@ -327,8 +429,8 @@ export function Interfaces({
 								_id={_id}
 								_name={_name}
 								afterClose={() => memoizedUpdateInterfacesCallback()}
+								collectionIdToFieldKeys={collectionIdToFieldKeys}
 								collectionOptions={collectionOptions}
-								fieldsObj={fieldsObj}
 								interfaceNamesObj={interfaceNamesObj/* Currently not allowed to edit _name anyway */}
 								licenseValid={licenseValid}
 								servicesBaseUrl={servicesBaseUrl}
@@ -336,18 +438,18 @@ export function Interfaces({
 								setLicenseValid={setLicenseValid}
 								stopWordOptions={stopWordOptions}
 								thesauriOptions={thesauriOptions}
-								total={total}
+								total={interfacesTotal}
 							/>
 						</Table.Cell>
 						<Table.Cell collapsing>{_name}</Table.Cell>
-						{showCollectionCount ? <Table.Cell collapsing>{_name === 'default' ? '∞' : collectionIds.length}</Table.Cell> : null}
-						{showCollections ? <Table.Cell collapsing>{_name === 'default' ? '∞' : collectionIds.map((cI)=>collectionIdToName[cI]).join(', ')}</Table.Cell> : null}
+						{showCollectionCount ? <Table.Cell collapsing>{_name === 'default' ? '∞' : collectionNames.length}</Table.Cell> : null}
+						{showCollections ? <Table.Cell collapsing>{_name === 'default' ? '∞' : collectionNames.join(', ')}</Table.Cell> : null}
 						{showFields ? <Table.Cell collapsing>{fields.map(({
 							boost,
 							//fieldId,
 							name
 						}) => `${name}^${boost}`).join(', ')}</Table.Cell> : null}
-						{showSynonyms ? <Table.Cell collapsing>{synonyms.join(', ')}</Table.Cell> : null}
+						{showSynonyms ? <Table.Cell collapsing>{thesaurusNames.join(', ')}</Table.Cell> : null}
 						{showStopWords ? <Table.Cell collapsing>{stopWords.join(', ')}</Table.Cell> : null}
 						<Table.Cell collapsing>
 							<Button.Group>
@@ -376,7 +478,7 @@ export function Interfaces({
 		<NewOrEditInterfaceModal
 			afterClose={memoizedUpdateInterfacesCallback}
 			collectionOptions={collectionOptions}
-			fieldsObj={fieldsObj}
+			collectionIdToFieldKeys={collectionIdToFieldKeys}
 			interfaceNamesObj={interfaceNamesObj}
 			licenseValid={licenseValid}
 			servicesBaseUrl={servicesBaseUrl}
@@ -384,7 +486,7 @@ export function Interfaces({
 			setLicenseValid={setLicenseValid}
 			stopWordOptions={stopWordOptions}
 			thesauriOptions={thesauriOptions}
-			total={total}
+			total={interfacesTotal}
 		/>
 	</>;
 } // function Interfaces

@@ -19,18 +19,32 @@ import {DEFAULT_INTERFACE_FIELDS} from '../../../constants';
 export function FieldSelector(props) {
 	const [context/*, dispatch*/] = getEnonicContext();
 	const {
+		collectionIdToFieldKeys = {},
 		disabled = false,
-		fieldsObj,
 		name = 'fields',
 		parentPath,
 		path = parentPath ? `${parentPath}.${name}` : name,
 		value = getIn(context.values, path)//,
 		//...rest
 	} = props;
-	//console.debug('FieldSelector path', path, 'value', value);
+	const collectionIds = getIn(context.values, 'collectionIds') || [];
+	const fieldKeysObj = {
+		_allText: true // NOTE Hardcode
+	};
+	collectionIds.forEach((collectionId) => {
+		const collectionFieldKeys = collectionIdToFieldKeys[collectionId];
+		if (collectionFieldKeys) {
+			collectionFieldKeys.forEach((fieldKey) => {
+				fieldKeysObj[fieldKey] = true;
+			});
+		}
+	});
+	//console.debug('fieldKeysObj', fieldKeysObj);
+	const fieldOptions = Object.keys(fieldKeysObj).sort()
+		.map((key) => ({key, text: key, value: key}));
+	//console.debug('fieldOptions', fieldOptions);
 
-	//console.debug('FieldSelector fieldsObj', fieldsObj);
-	const fieldOptions = Object.keys(fieldsObj).map((f) => ({key: f, text: f, value: f}));
+	//console.debug('FieldSelector path', path, 'value', value);
 
 	// This should not be needed:
 	if(!(value && Array.isArray(value) && value.length)) {

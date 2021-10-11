@@ -21,8 +21,7 @@ export function getInterfaceQuery({
 	}
 	#stopWordIds
 	stopWords
-	#synonymIds
-	synonyms
+	synonymIds
 }`;
 	//console.debug('getInterfaceQuery({_id:', _id, '}) -->', queryStr);
 	return queryStr;
