@@ -29,6 +29,7 @@ const GQL_THESAURI_QUERY = `queryThesauri {
 		_name
 		_nodeType
 		_path
+		#_versionKey
 		description
 		language {
 			from

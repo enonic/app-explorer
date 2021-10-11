@@ -12,7 +12,7 @@ import {getFields} from '/lib/explorer/field/getFields';
 import {query as queryInterfaces} from '/lib/explorer/interface/query';
 import {connect} from '/lib/explorer/repo/connect';
 import {query as getStopWords} from '/lib/explorer/stopWords/query';
-import {query as getThesauri} from '/lib/explorer/thesaurus/query';
+//import {query as getThesauri} from '/lib/explorer/thesaurus/query';
 
 import {DEFAULT_INTERFACE_FIELDS} from '../../constants';
 
@@ -116,12 +116,12 @@ export function get() {
 			})),*/
 			fieldsObj,
 			interfaces,
-			stopWordOptions,
+			stopWordOptions/*,
 			thesauriOptions: getThesauri({connection}).hits.map(({displayName, name}) => ({
 				key: name,
 				text: displayName,
 				value: name
-			}))
+			}))*/
 		},
 		contentType: RT_JSON
 	};

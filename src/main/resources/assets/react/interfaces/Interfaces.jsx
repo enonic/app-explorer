@@ -87,8 +87,16 @@ const GQL_INTERFACES = `queryInterfaces(
 	total
 }`;
 
+const GQL_THESAURI = `queryThesauri {
+	hits {
+		_id
+		_name
+	}
+}`;
+
 const GQL_ALL = `{
 	${GQL_COLLECTIONS}
+	${GQL_THESAURI}
 }`;
 /*
 ${GQL_FIELDS}
@@ -107,7 +115,6 @@ export function Interfaces({
 	//const [boolIsLoadingAnything, setboolIsLoadingAnything] = React.useState(false);
 
 	const [collections, setCollections] = React.useState([]);
-
 	const [state, setState] = React.useState({
 		interfaceExists: false,
 		interfaceTo: '',
@@ -117,6 +124,7 @@ export function Interfaces({
 			total: 0
 		}
 	});
+	const [thesauriOptions, setThesauriOptions] = React.useState([]);
 
 	const [showCollectionCount, setShowCollectionCount] = React.useState(true);
 	const [showCollections, setShowCollections] = React.useState(false);
@@ -144,6 +152,13 @@ export function Interfaces({
 				//console.debug('data', data);
 				setCollections(data.queryCollections.hits);
 				//setboolIsLoadingGraphQL(false);
+				setThesauriOptions(data.queryThesauri.hits.map(({
+					_id, _name
+				}) => ({
+					key: _id,
+					text: _name,
+					value: _id
+				})));
 			});
 
 		fetch(`${servicesBaseUrl}/interfaceList`)
@@ -157,7 +172,7 @@ export function Interfaces({
 					deref.interfaces = data.interfaces;
 					deref.stopWordOptions = data.stopWordOptions;
 					deref.synonyms = data.synonyms;
-					deref.thesauriOptions = data.thesauriOptions;
+					//deref.thesauriOptions = data.thesauriOptions;
 					return deref;
 				});
 				//setboolIsLoadingService(false);
@@ -197,8 +212,8 @@ export function Interfaces({
 			hits,
 			total
 		},
-		stopWordOptions,
-		thesauriOptions
+		stopWordOptions//,
+		//thesauriOptions
 	} = state;
 
 	const interfaceNamesObj = {};
