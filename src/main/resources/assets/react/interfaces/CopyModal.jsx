@@ -55,6 +55,7 @@ export function CopyModal({
 			<Button onClick={doClose}>Cancel</Button>
 			<Button
 				disabled={!interfaceTo || interfaceExists}
+				icon
 				onClick={() => {
 					fetch(`${servicesBaseUrl}/interfaceCopy?from=${name}&to=${interfaceTo}`)
 						.then(response => {
@@ -64,7 +65,7 @@ export function CopyModal({
 						});
 				}}
 				primary
-			><Icon color='white' name='copy'/>Copy</Button>
+			><Icon name='copy'/> Copy</Button>
 		</Modal.Actions>
 	</Modal>;
 } // function CopyModal

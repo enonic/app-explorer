@@ -103,10 +103,11 @@ export function RemoveFieldFromDocumentTypeModal({
 		<Modal.Actions>
 			<Button onClick={doClose}>Cancel</Button>
 			<DeleteItemButton
+				icon
 				index={index}
 				path={path}
 				primary
-			><Icon color='white' name='alternate outline trash'/> Confirm Remove</DeleteItemButton>
+			><Icon name='alternate outline trash'/> Confirm Remove</DeleteItemButton>
 		</Modal.Actions>
 	</Modal>;
 } // RemoveFieldFromDocumentTypeModal

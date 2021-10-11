@@ -42,6 +42,7 @@ export function DeleteModal(props) {
 		<Modal.Actions>
 			<Button onClick={doClose}>Cancel</Button>
 			<Button
+				icon
 				onClick={() => {
 					fetch(`${servicesBaseUrl}/stopWordsDelete?name=${name}`, {
 						method: 'DELETE'
@@ -53,7 +54,7 @@ export function DeleteModal(props) {
 						});
 				}}
 				primary
-			><Icon color='white' name='trash alternate outline'/>Confirm Delete</Button>
+			><Icon name='trash alternate outline'/>Confirm Delete</Button>
 		</Modal.Actions>
 	</Modal>;
 } // DeleteModal

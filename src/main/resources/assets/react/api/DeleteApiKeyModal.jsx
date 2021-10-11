@@ -52,6 +52,7 @@ export const DeleteApiKeyModal = (props) => {
 		<Modal.Actions>
 			<Button onClick={doClose}>Cancel</Button>
 			<Button
+				icon
 				onClick={() => {
 					fetch(`${servicesBaseUrl}/apiKeyDelete?name=${_name}`, {
 						method: 'DELETE'
@@ -61,7 +62,7 @@ export const DeleteApiKeyModal = (props) => {
 					});
 				}}
 				primary
-			><Icon color='white' name='trash alternate outline'/>Confirm Delete</Button>
+			><Icon name='trash alternate outline'/>Confirm Delete</Button>
 		</Modal.Actions>
 	</Modal>;
 }; // DeleteApiKeyModal

@@ -139,10 +139,11 @@ export function DeleteSynonym(props) {
 			<Button onClick={doClose}>Cancel</Button>
 			<Button
 				disabled={state.buttonDisabled}
+				icon
 				loading={state.buttonLoading}
 				onClick={state.buttonOnClick}
 				primary
-			><Icon color='white' name={state.buttonIcon}/>{state.buttonText}</Button>
+			><Icon name={state.buttonIcon}/>{state.buttonText}</Button>
 		</Modal.Actions>
 	</Modal>;
 } // DeleteSynonym

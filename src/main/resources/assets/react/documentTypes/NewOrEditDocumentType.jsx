@@ -640,7 +640,7 @@ export function NewOrEditDocumentType({
 					local: false,
 					open: true
 				});
-			}} secondary><Icon color='white' name='add'/> Add global field</Button>*/}
+			}} secondary><Icon name='add'/> Add global field</Button>*/}
 			<Button onClick={doClose}>Cancel</Button>
 			<ResetButton secondary/>
 			<SubmitButton primary><Icon name='save'/>Save</SubmitButton>
