@@ -1,6 +1,6 @@
 import {Button, Icon, Input, Message, Modal} from 'semantic-ui-react';
 
-import {fetchInterfaceDelete} from '../../../services/graphql/fetchers/fetchInterfaceDelete.mjs';
+import {fetchInterfaceDelete} from '../../../services/graphQL/fetchers/fetchInterfaceDelete.mjs';
 
 
 export function DeleteModal({
