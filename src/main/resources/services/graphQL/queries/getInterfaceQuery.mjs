@@ -1,6 +1,11 @@
-export const getInterfaceQuery = ({
+//import {toStr} from '@enonic/js-utils';
+
+
+export function getInterfaceQuery({
 	_id
-}) => `getInterface(
+}) {
+	//console.debug('getInterfaceQuery({_id:', _id, '})');
+	const queryStr = `getInterface(
 	_id: "${_id}"
 ) {
 	_id
@@ -19,3 +24,6 @@ export const getInterfaceQuery = ({
 	#synonymIds
 	synonyms
 }`;
+	//console.debug('getInterfaceQuery({_id:', _id, '}) -->', queryStr);
+	return queryStr;
+}

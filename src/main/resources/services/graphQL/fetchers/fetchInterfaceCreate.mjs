@@ -2,14 +2,8 @@ import {GQL_MUTATION_INTERFACE_CREATE} from '../mutations/interfaceCreateMutatio
 
 
 export function fetchInterfaceCreate({
-	handleData = (data) => {
-		console.debug('data', data);
-	},
-	handleResponse = (response) => {
-		console.debug('response', response);
-		handleData(response.json().data);
-	},
 	url,
+	//variables,
 	variables: {
 		_name,
 		collectionIds = [],
@@ -18,8 +12,19 @@ export function fetchInterfaceCreate({
 		stopWords = [],
 		//synonymIds = []
 		synonyms = []
-	} = {}
+	} = {},
+	handleData = (data) => {
+		// This will only be called if neither handleResponse nor handleData is passed in...
+		console.debug('fetchInterfaceCreate(',{url, variables:{
+			_name, collectionIds,fields, stopWords,synonyms
+		}},') --> data:', data);
+	},
+	handleResponse = (response) => {
+		//console.debug('fetchInterfaceCreate({url:', url, ', variables:', variables, '}) --> response:', response);
+		handleData(response.json().data);
+	}
 }) {
+	//console.debug('fetchInterfaceCreate({url:', url, ', variables:', variables, '})');
 	fetch(url, {
 		method: 'POST',
 		headers: {

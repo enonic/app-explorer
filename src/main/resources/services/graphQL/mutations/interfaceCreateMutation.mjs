@@ -24,8 +24,8 @@ export const GQL_MUTATION_INTERFACE_CREATE = `mutation InterfaceCreateMutation(
 		collectionIds
 		fields {
 			boost
-			name
 			#fieldId
+			name
 		}
 		#stopWordIds
 		stopWords
