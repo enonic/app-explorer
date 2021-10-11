@@ -1,3 +1,4 @@
+//import {toStr} from '@enonic/js-utils';
 import {
 	Button,
 	Form,
@@ -54,13 +55,13 @@ export function NewOrEditInterface(props) {
 		if (!_id) {return;}
 		fetchInterfaceGet({
 			handleData: (data) => {
-				console.debug('data', data);
-				/*setState(prev => {
+				//console.debug('data', data);
+				setState(prev => {
 					const deref = JSON.parse(JSON.stringify(prev));
 					deref.isLoading = false;
-					deref.initialValues = data.getInterface;
+					deref.initialValues = data.getInterface; // Also includes _nodeType, _path, _versionKey
 					return deref;
-				});*/
+				});
 			},
 			url: `${servicesBaseUrl}/graphQL`,
 			variables: {
@@ -100,6 +101,7 @@ export function NewOrEditInterface(props) {
 	return isLoading ? <Loader active inverted>Loading</Loader> : <EnonicForm
 		initialValues={initialValues}
 		onSubmit={(values) => {
+			//console.debug('submit values', values);
 			const {
 				_name,
 				collectionIds,
@@ -108,43 +110,24 @@ export function NewOrEditInterface(props) {
 				stopWords,
 				//synonymIds
 				synonyms
-			} = values;
-			//console.debug('submit values', values);
+			} = values; // Also includes _nodeType, _path, _versionKey
 			let url = `${servicesBaseUrl}/graphQL`;
-			if (_id) {
-				fetchInterfaceUpdate({
-					handleResponse(response) {
-						if (response.status === 200) { doClose(); }
-					},
-					url,
-					variables: {
-						_id,
-						_name,
-						collectionIds,
-						fields,
-						//stopWordIds,
-						stopWords,
-						//synonymIds
-						synonyms
-					}
-				});
-			} else {
-				fetchInterfaceCreate({
-					handleResponse(response) {
-						if (response.status === 200) { doClose(); }
-					},
-					url,
-					variables: {
-						_name,
-						collectionIds,
-						fields,
-						//stopWordIds,
-						stopWords,
-						//synonymIds
-						synonyms
-					}
-				});
-			}
+			(_id ? fetchInterfaceUpdate : fetchInterfaceCreate)({
+				handleResponse(response) {
+					if (response.status === 200) { doClose(); }
+				},
+				url,
+				variables: {
+					_id,
+					_name,
+					collectionIds,
+					fields,
+					//stopWordIds,
+					stopWords,
+					//synonymIds
+					synonyms
+				}
+			});
 		}}
 		schema={schema}
 	>

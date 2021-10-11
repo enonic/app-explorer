@@ -25,8 +25,9 @@ export const GQL_MUTATION_INTERFACE_UPDATE = `mutation InterfaceUpdateMutation(
 		_versionKey
 		collectionIds
 		fields {
-			fieldId
 			boost
+			#fieldId
+			name
 		}
 		#stopWordIds
 		stopWords

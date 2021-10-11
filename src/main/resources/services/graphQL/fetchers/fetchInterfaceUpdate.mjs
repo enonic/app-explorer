@@ -2,14 +2,8 @@ import {GQL_MUTATION_INTERFACE_UPDATE} from '../mutations/interfaceUpdateMutatio
 
 
 export function fetchInterfaceUpdate({
-	handleData = (data) => {
-		console.debug('data', data);
-	},
-	handleResponse = (response) => {
-		console.debug('response', response);
-		handleData(response.json().data);
-	},
 	url,
+	//variables,
 	variables: {
 		_id,
 		_name,
@@ -19,8 +13,20 @@ export function fetchInterfaceUpdate({
 		stopWords = [],
 		//synonymIds = []
 		synonyms = []
-	} = {}
+	} = {},
+	handleData = (data) => {
+		// This will only be called if neither handleResponse nor handleData is passed in...
+		console.debug('fetchInterfaceUpdate(',{url, variables:{
+			_name, collectionIds,fields, stopWords,synonyms
+		}},') --> data:', data);
+
+	},
+	handleResponse = (response) => {
+		//console.debug('fetchInterfaceUpdate({url:', url, ', variables:', variables, '}) --> response:', response);
+		handleData(response.json().data);
+	}
 }) {
+	//console.debug('fetchInterfaceUpdate({url:', url, ', variables:', variables, '})');
 	fetch(url, {
 		method: 'POST',
 		headers: {
