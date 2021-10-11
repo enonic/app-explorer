@@ -4,8 +4,7 @@ export const GQL_MUTATION_INTERFACE_CREATE = `mutation InterfaceCreateMutation(
 	$fields: [InterfaceFieldInput]
 	#$stopWordIds: [ID]
 	$stopWords: [String]
-	#$synonymIds: [ID]
-	$synonyms: [String]
+	$synonymIds: [ID]
 ) {
 	createInterface(
 		_name: $_name
@@ -13,8 +12,7 @@ export const GQL_MUTATION_INTERFACE_CREATE = `mutation InterfaceCreateMutation(
 		fields: $fields
 		#stopWordIds: $stopWordIds
 		stopWords: $stopWords
-		#synonymIds: $synonymIds
-		synonyms: $synonyms
+		synonymIds: $synonymIds
 	) {
 		_id
 		_name
@@ -29,8 +27,7 @@ export const GQL_MUTATION_INTERFACE_CREATE = `mutation InterfaceCreateMutation(
 		}
 		#stopWordIds
 		stopWords
-		#synonymIds
-		synonyms
+		synonymIds
 	} # createInterface
 }`;
 

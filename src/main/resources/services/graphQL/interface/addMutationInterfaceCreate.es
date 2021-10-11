@@ -13,7 +13,6 @@ import {
 	GraphQLString,
 	list
 } from '/lib/graphql';
-import {reference} from '/lib/xp/value';
 
 import {
 	GQL_INPUT_TYPE_INTERFACE_FIELD_NAME,
@@ -31,8 +30,7 @@ export function addMutationInterfaceCreate({glue}) {
 			fields: list(glue.getInputType(GQL_INPUT_TYPE_INTERFACE_FIELD_NAME)), // null allowed
 			//stopWordIds: list(GraphQLID), // null allowed
 			stopWords: list(GraphQLString), // null allowed
-			//synonymIds: list(GraphQLID) // null allowed
-			synonyms: list(GraphQLString) // null allowed
+			synonymIds: list(GraphQLID) // null allowed
 		},
 		resolve(env) {
 			//log.debug(`env:${toStr(env)}`);
@@ -43,14 +41,13 @@ export function addMutationInterfaceCreate({glue}) {
 					fields = [],
 					//stopWordIds = [],
 					stopWords = [],
-					//synonymIds = []
-					synonyms = []
+					synonymIds = []
 				}
 			} = env;
-			const createdNode = create(interfaceModel({
+			const createdNode = create(interfaceModel({ // Model applies forceArray and reference
 				_name,
-				collectionIds: forceArray(collectionIds).map((collectionId) => reference(collectionId)), // empty array allowed
-				fields: fields.map(({ // empty array allowed
+				collectionIds, // empty array allowed
+				fields: forceArray(fields).map(({ // empty array allowed
 					boost, // undefined allowed
 					//fieldId,
 					name
@@ -60,9 +57,8 @@ export function addMutationInterfaceCreate({glue}) {
 					name
 				})),
 				//stopWordIds: stopWordIds.map((stopWordId) => reference(stopWordId)), // empty array allowed
-				stopWords: forceArray(stopWords),
-				//synonymIds: synonymIds.map((synonymId) => reference(synonymId)) // empty array allowed
-				synonyms: forceArray(synonyms)
+				stopWords,
+				synonymIds // empty array allowed
 			}), {
 				connection: connect({principals: [PRINCIPAL_EXPLORER_WRITE]})
 			});

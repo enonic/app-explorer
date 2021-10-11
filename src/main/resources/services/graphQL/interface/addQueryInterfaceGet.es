@@ -43,7 +43,7 @@ export function addQueryInterfaceGet({glue}) {
 				collectionIds = [], // Just collection names, not collection nodes
 				fields = DEFAULT_INTERFACE_FIELDS,
 				stopWords = [],
-				synonyms = []
+				synonymIds = []
 			} = iFace;
 			// TODO coerseInterfaceType(iFace)
 			return {
@@ -55,7 +55,7 @@ export function addQueryInterfaceGet({glue}) {
 				collectionIds: forceArray(collectionIds),
 				fields: forceArray(fields),
 				stopWords: forceArray(stopWords),
-				synonyms: forceArray(synonyms)
+				synonymIds: forceArray(synonymIds)
 			};
 		},
 		type: glue.getObjectType(GQL_TYPE_INTERFACE_NAME)

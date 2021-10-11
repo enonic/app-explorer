@@ -50,8 +50,7 @@ export function addInterfaceTypes({glue}) {
 			fields: { type: list(glue.getObjectType(GQL_TYPE_INTERFACE_FIELD_NAME)) }, // null allowed
 			//stopWordIds: { type: list(GraphQLID) }, // null allowed
 			stopWords: { type: nonNull(list(GraphQLString)) }, // empty list allowed
-			//synonymIds: { type: list(GraphQLID) } // null allowed
-			synonyms: { type: nonNull(list(GraphQLString)) } // empty list allowed
+			synonymIds: { type: list(GraphQLID) } // null allowed
 		},
 		interfaces: [interfaceNodeType]
 	});

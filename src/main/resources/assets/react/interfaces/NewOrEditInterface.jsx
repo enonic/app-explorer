@@ -27,9 +27,9 @@ import {FieldSelector} from './FieldSelector';
 export function NewOrEditInterface(props) {
 	const {
 		_id, // nullable
+		collectionIdToFieldKeys = {},
 		collectionOptions = [],
 		doClose = () => {},
-		fieldsObj,
 		interfaceNamesObj = {},
 		servicesBaseUrl,
 		stopWordOptions,
@@ -108,8 +108,7 @@ export function NewOrEditInterface(props) {
 				fields,
 				//stopWordIds,
 				stopWords,
-				//synonymIds
-				synonyms
+				synonymIds
 			} = values; // Also includes _nodeType, _path, _versionKey
 			let url = `${servicesBaseUrl}/graphQL`;
 			(_id ? fetchInterfaceUpdate : fetchInterfaceCreate)({
@@ -124,8 +123,7 @@ export function NewOrEditInterface(props) {
 					fields,
 					//stopWordIds,
 					stopWords,
-					//synonymIds
-					synonyms
+					synonymIds
 				}
 			});
 		}}
@@ -150,6 +148,7 @@ export function NewOrEditInterface(props) {
 						options={collectionOptions}
 						path='collectionIds'
 						placeholder='Please select one or more collections...'
+						search
 						selection
 					/>
 				</Form.Field>
@@ -157,7 +156,7 @@ export function NewOrEditInterface(props) {
 				<Header as='h3' content='Fields' disabled={disabled} dividing id='fields'/>
 				<FieldSelector
 					disabled={disabled}
-					fieldsObj={fieldsObj}
+					collectionIdToFieldKeys={collectionIdToFieldKeys}
 				/>
 
 				<Header as='h3' content='Synonyms' disabled={disabled} dividing id='synonyms'/>

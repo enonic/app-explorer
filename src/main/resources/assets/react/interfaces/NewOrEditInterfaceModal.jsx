@@ -10,9 +10,9 @@ export function NewOrEditInterfaceModal(props) {
 		_name,
 		afterClose = () => {},
 		beforeOpen = () => {},
+		collectionIdToFieldKeys = {},
 		collectionOptions = [],
 		disabled = false,
-		fieldsObj,
 		//initialValues = {},
 		interfaceNamesObj = {},
 		licenseValid,
@@ -73,9 +73,9 @@ export function NewOrEditInterfaceModal(props) {
 				<Modal.Header>{header}</Modal.Header>
 				<NewOrEditInterface
 					_id={_id}
+					collectionIdToFieldKeys={collectionIdToFieldKeys}
 					collectionOptions={collectionOptions}
 					doClose={doClose}
-					fieldsObj={fieldsObj}
 					interfaceNamesObj={interfaceNamesObj}
 					servicesBaseUrl={servicesBaseUrl}
 					stopWordOptions={stopWordOptions}

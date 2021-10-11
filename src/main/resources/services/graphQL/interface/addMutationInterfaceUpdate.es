@@ -13,7 +13,6 @@ import {
 	GraphQLString,
 	list
 } from '/lib/graphql';
-//import {reference} from '/lib/xp/value';
 
 import {
 	GQL_INPUT_TYPE_INTERFACE_FIELD_NAME,
@@ -32,8 +31,7 @@ export function addMutationInterfaceUpdate({glue}) {
 			fields: list(glue.getInputType(GQL_INPUT_TYPE_INTERFACE_FIELD_NAME)), // null allowed
 			//stopWordIds: list(GraphQLID), // null allowed
 			stopWords: list(GraphQLString), // null allowed
-			//synonymIds: list(GraphQLID) // null allowed
-			synonyms: list(GraphQLString) // null allowed
+			synonymIds: list(GraphQLID) // null allowed
 		},
 		resolve(env) {
 			//log.debug(`env:${toStr(env)}`);
@@ -45,8 +43,7 @@ export function addMutationInterfaceUpdate({glue}) {
 					fields = [],
 					//stopWordIds = [],
 					stopWords = [],
-					//synonymIds = []
-					synonyms = []
+					synonymIds = []
 				}
 			} = env;
 			const writeConnection = connect({
@@ -67,9 +64,9 @@ export function addMutationInterfaceUpdate({glue}) {
 					throw new Error(`Unable to rename interface from ${origNode._name} to ${_name}!`);
 				}
 			}
-			const modifiedNode = modify(interfaceModel({
+			const modifiedNode = modify(interfaceModel({ // Model applies forceArray and reference
 				_name,
-				collectionIds: forceArray(collectionIds),
+				collectionIds,
 				fields: forceArray(fields).map(({ // empty array allowed
 					boost, // undefined allowed
 					//fieldId,
@@ -79,10 +76,9 @@ export function addMutationInterfaceUpdate({glue}) {
 					//fieldId: reference(fieldId),
 					name
 				})),
-				//stopWordIds: stopWordIds.map((stopWordId) => reference(stopWordId)), // empty array allowed
-				stopWords: forceArray(stopWords),
-				//synonymIds: synonymIds.map((synonymId) => reference(synonymId)) // empty array allowed
-				synonyms: forceArray(synonyms)
+				//stopWordIds, // empty array allowed
+				stopWords,
+				synonymIds // empty array allowed
 			}), {
 				connection: writeConnection
 			});
