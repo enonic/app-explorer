@@ -46,7 +46,7 @@ export function NewOrEditInterface(props) {
 			collectionIds: [],
 			fields: DEFAULT_INTERFACE_FIELDS,
 			stopWords: [],
-			synonyms: []
+			synonymIds: []
 		},
 		isLoading: !!_id
 	});
@@ -165,7 +165,7 @@ export function NewOrEditInterface(props) {
 					fluid
 					multiple={true}
 					options={thesauriOptions}
-					path='synonyms'
+					path='synonymIds'
 					search
 					selection
 				/></Form.Field>
