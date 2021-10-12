@@ -372,12 +372,20 @@ export function Explorer(props) {
 					active={page === 'documentTypes'}
 					onClick={() => setPage('documentTypes')}
 				><Icon name='file' style={iconStyle}/> Document types</Menu.Item>
-				<Menu.Item
-					as='a'
-					href='#fields'
-					active={page === 'fields'}
-					onClick={() => setPage('fields')}
-				><Icon name='list' style={iconStyle}/> Global fields</Menu.Item>
+
+				{[
+					'documentTypes',
+					'fields',
+				].includes(page) &&
+				<Menu.Menu>
+					<Menu.Item
+						as='a'
+						href='#fields'
+						active={page === 'fields'}
+						onClick={() => setPage('fields')}
+					><Icon name='list' style={iconStyle}/> Global fields</Menu.Item>
+				</Menu.Menu>}
+
 				<Menu.Item
 					as='a'
 					href='#stopWords'
