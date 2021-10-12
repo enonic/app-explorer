@@ -16,6 +16,30 @@ import {StopWords} from './stopWords/StopWords';
 import {Thesauri} from './thesaurus/Thesauri';
 import {UploadLicense} from './UploadLicense';
 
+/*const SIDEBAR_WIDTH_NAME_TO_PX = {
+	'very thin': 60,
+	'thin': 150,
+	undefined: 260,
+	'wide': 350,
+	'very wide': 475
+};*/
+//const SIDEBAR_WIDTH = 'very thin';
+const SIDEBAR_WIDTH_PX = 260; // 157
+const PUSHER_WIDTH = `calc(100% - ${SIDEBAR_WIDTH_PX}px)`;
+
+/*const PUSHER_STYLE_SIDEBAR_HIDE = {
+	padding: '54px 14px 14px',
+	transform: 'none',
+	'-webkit-transform': 'none',
+	width: 'auto'
+};
+
+const PUSHER_STYLE_SIDEBAR_SHOW = {
+	padding: '54px 14px 14px',
+	transform: `translate3d(${SIDEBAR_WIDTH_PX}px, 0, 0)`,
+	'-webkit-transform': `translate3d(${SIDEBAR_WIDTH_PX}px, 0, 0)`,
+	width: PUSHER_WIDTH
+};*/
 
 const NODE_MODULES = [{
 	header: 'Classnames',
@@ -113,9 +137,11 @@ export function Explorer(props) {
 	//const [wsStatus, setWsStatus] = React.useState('');
 	const [licenseValid, setLicenseValid] = React.useState(initialLicenseValid);
 	const [licensedTo, setLicensedTo] = React.useState(initialLicensedTo);
+	const [menuIconName, setMenuIconName] = React.useState('close');
 	const [page, setPage] = React.useState('home');
+	//const [pusherStyle, setPusherStyle] = React.useState(PUSHER_STYLE_SIDEBAR_SHOW);
 	const [sideBarVisible, setSideBarVisible] = React.useState(true);
-	const [pusherWidth, setPusherWidth] = React.useState('calc(100% - 260px)');
+	const [pusherWidth, setPusherWidth] = React.useState(PUSHER_WIDTH);
 
 	//const [websocket, setWebsocket] = React.useState(null);
 	//const [queryCollectorsGraph, setQueryCollectorsGraph] = React.useState({});
@@ -236,10 +262,19 @@ export function Explorer(props) {
 		reconnectingWs();*/
 	}, []); // useEffect
 
+	React.useEffect(() => {
+		setMenuIconName(sideBarVisible ? 'close' : 'bars');
+	}, [sideBarVisible]);
+
+	const iconStyle = {
+		float: 'left',
+		margin: '0 7px 0 0'
+	};
+
 	return <>
 		<Menu fixed='top' inverted style={{zIndex: 103}}>
 			<Menu.Item as='a' onClick={() => setSideBarVisible(!sideBarVisible)}>
-				<Icon name='close'/>
+				<Icon name={menuIconName}/>
 			</Menu.Item>
 			<Menu.Item header>Explorer</Menu.Item>
 			<UploadLicenseModal
@@ -250,20 +285,30 @@ export function Explorer(props) {
 				setLicenseValid={setLicenseValid}
 			/>
 		</Menu>
-
 		<Sidebar.Pushable>
 			<Sidebar
 				as={Menu}
 				id='mySidebar'
 				inverted
-				onHidden={() => {
+				onHide={() => {
+					/* avoid race conditions between browser and react state */
+					//setPusherStyle(PUSHER_STYLE_SIDEBAR_HIDE);
 					setPusherWidth('auto');
 				}}
+				onHidden={() => {
+					/* avoid race conditions between browser and react state */
+				}}
 				onShow={() => {
-					setPusherWidth('calc(100% - 260px)');
+					/* avoid race conditions between browser and react state */
+					setPusherWidth(PUSHER_WIDTH);
+					//setPusherStyle(PUSHER_STYLE_SIDEBAR_SHOW);
+				}}
+				onVisible={() => {
+					/* avoid race conditions between browser and react state */
 				}}
 				style={{
-					paddingTop: 40
+					paddingTop: 40//,
+					//width: SIDEBAR_WIDTH_PX
 				}}
 				vertical
 				visible={sideBarVisible}
@@ -273,20 +318,20 @@ export function Explorer(props) {
 					href='#home'
 					active={page === 'home'}
 					onClick={() => setPage('home')}
-				><Icon name='search'/> Home</Menu.Item>
+				><Icon name='search' style={iconStyle}/> Home</Menu.Item>
 
 				{licenseValid && <Menu.Item
 					as='a'
 					href='#api'
 					active={page === 'api'}
 					onClick={() => setPage('api')}
-				><Icon name='plug'/> API</Menu.Item>}
+				><Icon name='plug' style={iconStyle}/> API</Menu.Item>}
 				<Menu.Item
 					as='a'
 					href='#collections'
 					active={page === 'collections'}
 					onClick={() => setPage('collections')}
-				><Icon name='database'/> Collections</Menu.Item>
+				><Icon name='database' style={iconStyle}/> Collections</Menu.Item>
 				{[
 					'collections',
 					'status',
@@ -300,25 +345,25 @@ export function Explorer(props) {
 						href='#status'
 						active={page === 'status'}
 						onClick={() => setPage('status')}
-					><Icon name='cogs'/> Status</Menu.Item>
+					><Icon name='cogs' style={iconStyle}/> Status</Menu.Item>
 					<Menu.Item
 						as='a'
 						href='#journal'
 						active={page === 'journal'}
 						onClick={() => setPage('journal')}
-					><Icon name='newspaper'/> Journal</Menu.Item>
+					><Icon name='newspaper' style={iconStyle}/> Journal</Menu.Item>
 					<Menu.Item
 						as='a'
 						href='#notifications'
 						active={page === 'notifications'}
 						onClick={() => setPage('notifications')}
-					><Icon name='warning'/> Notifications</Menu.Item>
+					><Icon name='warning' style={iconStyle}/> Notifications</Menu.Item>
 					<Menu.Item
 						as='a'
 						href='#schedule'
 						active={page === 'schedule'}
 						onClick={() => setPage('schedule')}
-					><Icon name='calendar'/> Schedule</Menu.Item>
+					><Icon name='calendar' style={iconStyle}/> Schedule</Menu.Item>
 				</Menu.Menu>}
 
 				<Menu.Item
@@ -326,37 +371,37 @@ export function Explorer(props) {
 					href='#documentTypes'
 					active={page === 'documentTypes'}
 					onClick={() => setPage('documentTypes')}
-				><Icon name='file'/> Document types</Menu.Item>
+				><Icon name='file' style={iconStyle}/> Document types</Menu.Item>
 				<Menu.Item
 					as='a'
 					href='#fields'
 					active={page === 'fields'}
 					onClick={() => setPage('fields')}
-				><Icon name='list'/> Global fields</Menu.Item>
+				><Icon name='list' style={iconStyle}/> Global fields</Menu.Item>
 				<Menu.Item
 					as='a'
 					href='#stopWords'
 					active={page === 'stopWords'}
 					onClick={() => setPage('stopWords')}
-				><Icon name='ban'/> StopWords</Menu.Item>
+				><Icon name='ban' style={iconStyle}/> StopWords</Menu.Item>
 				<Menu.Item
 					as='a'
 					href='#synonyms'
 					active={page === 'synonyms'}
 					onClick={() => setPage('synonyms')}
-				><Icon name='code branch'/> Synonyms</Menu.Item>
+				><Icon name='code branch' style={iconStyle}/> Synonyms</Menu.Item>
 				<Menu.Item
 					as='a'
 					href='#interfaces'
 					active={page === 'interfaces'}
 					onClick={() => setPage('interfaces')}
-				><Icon name='plug'/> Interfaces</Menu.Item>
+				><Icon name='plug' style={iconStyle}/> Interfaces</Menu.Item>
 				<Menu.Item
 					as='a'
 					href='#about'
 					active={page === 'about'}
 					onClick={() => setPage('about')}
-				><Icon name='info'/> About</Menu.Item>
+				><Icon name='info' style={iconStyle}/> About</Menu.Item>
 			</Sidebar>
 
 			<Sidebar.Pusher
