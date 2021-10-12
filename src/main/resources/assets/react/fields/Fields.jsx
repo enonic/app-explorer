@@ -31,7 +31,7 @@ export function Fields(props) {
 			total: 0
 		},
 		isLoading: true,
-		showDeleteButton: false,
+		showDeleteButton: true, //false,
 		showDescriptionColumn: false,
 		showIndexConfigColumns: false,
 		showOccurencesColumns: false,
@@ -197,7 +197,7 @@ export function Fields(props) {
 							/>
 							<Label color='black' size='large'>Show index config columns</Label>
 						</Table.Cell>
-						<Table.Cell collapsing>
+						{/*<Table.Cell collapsing>
 							<Radio
 								checked={showDeleteButton}
 								onChange={(ignored,{checked}) => {
@@ -209,7 +209,7 @@ export function Fields(props) {
 								toggle
 							/>
 							<Label color='black' size='large'>Show delete button</Label>
-						</Table.Cell>
+						</Table.Cell>*/}
 					</Table.Row>
 				</Table.Body>
 			</Table>
@@ -419,9 +419,8 @@ export function Fields(props) {
 										: documentsWithFieldTotal
 								}</Table.Cell>
 
-								{showDeleteButton ? <Table.Cell textAlign='center'>
-									<DeleteModal
-										disabled={denyDelete || fieldDocumentTypes.length || fieldCollections.length}
+								{showDeleteButton ? <Table.Cell disabled={denyDelete} textAlign='center'>
+									{denyDelete ? 'n/a' : <DeleteModal
 										_id={_id}
 										_name={_name}
 										afterClose={updateFields}
@@ -458,7 +457,7 @@ export function Fields(props) {
 													</Message>
 										}
 										servicesBaseUrl={servicesBaseUrl}
-									/>
+									/>}
 								</Table.Cell> : null}
 
 							</Table.Row>;
