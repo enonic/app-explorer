@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 import path from 'path';
 //import BrowserSyncPlugin from 'browser-sync-webpack-plugin';
+import CaseSensitivePathsPlugin from 'case-sensitive-paths-webpack-plugin';
 import { CleanWebpackPlugin } from 'clean-webpack-plugin';
 import CopyWebpackPlugin from 'copy-webpack-plugin';
 import {
@@ -149,6 +150,7 @@ const SS_FILES = [
 ];
 
 const SS_PLUGINS = [
+	new CaseSensitivePathsPlugin(),
 	//new ESBuildPlugin(),
 	new webpack.ProvidePlugin({
 		/* ERROR: For some reason this breaks the webcrawl task!
@@ -412,6 +414,7 @@ const STYLE_CONFIG = {
 		path: STYLE_OUTPUT_PATH
 	},
 	plugins: [
+		new CaseSensitivePathsPlugin(),
 		new CleanWebpackPlugin({
 			cleanOnceBeforeBuildPatterns: [STYLE_OUTPUT_PATH],
 			verbose: true
@@ -517,6 +520,7 @@ const CLIENT_JS_CONFIG = {
 		hints: false
 	},
 	plugins: [
+		new CaseSensitivePathsPlugin(),
 		new CopyWebpackPlugin({
 			patterns: [
 				//{ context: NODE_MODULES_CONTEXT, from: 'frappe-gantt/dist/*', to: 'frappe-gantt/[name].[ext]' },
@@ -626,6 +630,7 @@ const CLIENT_ES_CONFIG = {
 		hints: false
 	},
 	plugins: [
+		new CaseSensitivePathsPlugin(),
 		new webpack.ProvidePlugin({
 			Buffer: ['buffer', 'Buffer']
 		}),
