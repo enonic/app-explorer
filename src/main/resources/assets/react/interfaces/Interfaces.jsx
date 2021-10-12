@@ -401,8 +401,8 @@ export function Interfaces({
 						_id,
 						_name,
 						collectionNames = [],
-						fields,
-						stopWords,
+						fields = [],
+						stopWords = [],
 						//stopWordIds = [],
 						thesaurusNames = []
 					} = initialValues;

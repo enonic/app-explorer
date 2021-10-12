@@ -11,13 +11,12 @@ export function fetchInterfaceUpdate({
 		fields = [],
 		//stopWordIds = [],
 		stopWords = [],
-		//synonymIds = []
-		synonyms = []
+		synonymIds = []
 	} = {},
 	handleData = (data) => {
 		// This will only be called if neither handleResponse nor handleData is passed in...
 		console.debug('fetchInterfaceUpdate(',{url, variables:{
-			_name, collectionIds,fields, stopWords,synonyms
+			_name, collectionIds,fields, stopWords,synonymIds
 		}},') --> data:', data);
 
 	},
@@ -41,8 +40,7 @@ export function fetchInterfaceUpdate({
 				fields,
 				//stopWordIds,
 				stopWords,
-				//synonymIds
-				synonyms
+				synonymIds
 			}
 		})
 	})

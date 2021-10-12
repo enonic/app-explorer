@@ -1,13 +1,7 @@
-import {
-	forceArray//,
-	//toStr
-} from '@enonic/js-utils';
+//import {toStr} from '@enonic/js-utils';
 
-import {
-	DEFAULT_INTERFACE_FIELDS,
-	PRINCIPAL_EXPLORER_READ
-} from '/lib/explorer/model/2/constants';
-//import {coerseInterfaceType} from '/lib/explorer/interface/coerseInterfaceType';
+import {PRINCIPAL_EXPLORER_READ} from '/lib/explorer/model/2/constants';
+import {coerseInterfaceType} from '/lib/explorer/interface/coerseInterfaceType';
 import {get as getInterface} from '/lib/explorer/interface/get';
 import {connect} from '/lib/explorer/repo/connect';
 
@@ -34,29 +28,9 @@ export function addQueryInterfaceGet({glue}) {
 				connection: connect({principals: [PRINCIPAL_EXPLORER_READ]}),
 				key: _id
 			});
-			const {
-				//_id,
-				_name,
-				_nodeType,
-				_path,
-				_versionKey,
-				collectionIds = [], // Just collection names, not collection nodes
-				fields = DEFAULT_INTERFACE_FIELDS,
-				stopWords = [],
-				synonymIds = []
-			} = iFace;
-			// TODO coerseInterfaceType(iFace)
-			return {
-				_id,
-				_name,
-				_nodeType,
-				_path,
-				_versionKey,
-				collectionIds: forceArray(collectionIds),
-				fields: forceArray(fields),
-				stopWords: forceArray(stopWords),
-				synonymIds: forceArray(synonymIds)
-			};
+			const rv = coerseInterfaceType(iFace);
+			//log.debug(`rv:${toStr(rv)}`);
+			return rv;
 		},
 		type: glue.getObjectType(GQL_TYPE_INTERFACE_NAME)
 	});
