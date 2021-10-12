@@ -97,6 +97,13 @@ const GQL_INTERFACES = `queryInterfaces(
 	total # limited without licence
 }`;
 
+const GQL_STOP_WORDS = `queryStopWords {
+	hits {
+		_id
+		_name
+	}
+}`;
+
 const GQL_THESAURI = `queryThesauri {
 	hits {
 		_id
@@ -109,6 +116,7 @@ const GQL_ALL = `{
 	${GQL_DOCUMENT_TYPES}
 	${GQL_FIELDS}
 	${GQL_INTERFACES}
+	${GQL_STOP_WORDS}
 	${GQL_THESAURI}
 }`;
 //console.debug('GQL_ALL', GQL_ALL);
@@ -124,21 +132,12 @@ export function Interfaces({
 	//const [boolIsLoadingAnything, setboolIsLoadingAnything] = React.useState(false);
 
 	const [collections, setCollections] = React.useState([]);
-	//const [collectionIdToDocumentTypeIds, setCollectionIdToDocumentTypeIds] = React.useState([]);
 	const [collectionIdToFieldKeys, setCollectionIdToFieldKeys] = React.useState({});
-	//const [documentTypes, setCollections] = React.useState({});
 	const [interfaces, setInterfaces] = React.useState([]);
 	const [interfaceNamesObj, setInterfaceNamesObj] = React.useState({});
 	const [interfacesTotal, setInterfacesTotal] = React.useState(0);
-	const [state, setState] = React.useState({
-		interfaces: {
-			count: 0,
-			hits: [],
-			total: 0
-		}
-	});
+	const [stopWordOptions, setStopWordOptions] = React.useState([]);
 	const [thesauriOptions, setThesauriOptions] = React.useState([]);
-	//const [thesaurusIdToName, setThesaurusIdToName] = React.useState({});
 
 	const [showCollectionCount, setShowCollectionCount] = React.useState(true);
 	const [showCollections, setShowCollections] = React.useState(false);
@@ -163,7 +162,7 @@ export function Interfaces({
 			.then(response => response.json())
 			.then(json => {
 				const data = json.data;
-				console.debug('data', data);
+				//console.debug('data', data);
 
 				const fieldIdToKey = {};
 				data.queryFields.hits.forEach(({_id, key}) => {
@@ -271,26 +270,17 @@ export function Interfaces({
 				setInterfaceNamesObj(interfaceNamesObj);
 				setInterfaces(Object.keys(interfacesObj).map((_id) => interfacesObj[_id]).sort((a,b) => (a._name > b._name) ? 1 : -1));
 				setInterfacesTotal(data.queryInterfaces.total);
+
+				setStopWordOptions(data.queryStopWords.hits.map(({
+					//_id,
+					_name
+				}) => ({
+					key: _name, // TODO _id
+					text: _name,
+					value: _name // TODO _id
+				})));
 				//setboolIsLoadingGraphQL(false);
 			});
-
-		fetch(`${servicesBaseUrl}/interfaceList`)
-			.then(response => response.json())
-			.then(data => {
-				setState((oldState) => {
-					const deref = JSON.parse(JSON.stringify(oldState));
-					//deref.collectionOptions = data.collectionOptions;
-					//deref.collections = data.collections; // Never been used?
-					//deref.fieldsObj = data.fieldsObj;
-					//deref.interfaces = data.interfaces;
-					deref.stopWordOptions = data.stopWordOptions;
-					//deref.synonyms = data.synonyms;
-					//deref.thesauriOptions = data.thesauriOptions;
-					return deref;
-				});
-				//setboolIsLoadingService(false);
-			});
-
 	}, [servicesBaseUrl]);
 
 	React.useEffect(() => {
@@ -317,12 +307,6 @@ export function Interfaces({
 		};
 	});
 	//console.debug('collectionOptions', collectionOptions);
-
-	const {
-		//collectionOptions,
-		//fieldsObj,
-		stopWordOptions
-	} = state;
 
 	return <>
 		<Segment basic inverted style={{

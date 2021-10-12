@@ -128,7 +128,6 @@ const SS_FILES = [
 	'services/graphQL/graphQL',
 	'services/interfaceCopy/interfaceCopy',
 	'services/interfaceExists/interfaceExists',
-	'services/interfaceList/interfaceList',
 	'services/longPolling/longPolling',
 	'services/notifications/notifications',
 	'services/stopWordsCreateOrUpdate/stopWordsCreateOrUpdate',
