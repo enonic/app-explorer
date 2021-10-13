@@ -1,5 +1,5 @@
 import {VALUE_TYPE_STRING} from '@enonic/js-utils';
-import {Button, Form, Icon, Modal, Popup} from 'semantic-ui-react';
+import {Button, Form, Header, Icon, Modal, Popup} from 'semantic-ui-react';
 import {Form as EnonicForm} from 'semantic-ui-react-form/Form';
 import {Input} from 'semantic-ui-react-form/inputs/Input';
 import {ResetButton} from 'semantic-ui-react-form/buttons/ResetButton';
@@ -21,8 +21,9 @@ import {EditFieldTable} from './EditFieldTable';
 export function NewOrEditModal(props) {
 	const {
 		_id, // Props because not allowed to change
+		afterClose = () => {},
+		beforeOpen = () => {},
 		disabled = false,
-		//field,
 		initialValues = {
 			description: '',
 			fieldType: VALUE_TYPE_STRING,
@@ -36,8 +37,6 @@ export function NewOrEditModal(props) {
 			nGram: true, // node._indexConfig.default.nGram uses uppercase G in nGram
 			path: false
 		},
-		afterClose = () => {},
-		beforeOpen = () => {},
 		servicesBaseUrl,
 		usedFieldKeysObj = {}
 	} = props;
@@ -81,7 +80,7 @@ export function NewOrEditModal(props) {
 		closeOnDimmerClick={false}
 		onClose={doClose}
 		open={open}
-		size='large'
+		size='large' // small becomes too narrow for field options table
 		trigger={editMode ? <Popup
 			content={`Edit field ${initialValues.key}`}
 			inverted
@@ -105,7 +104,7 @@ export function NewOrEditModal(props) {
 					name='plus'
 				/></Button>}
 	>
-		<Modal.Header>{editMode ? `Edit field ${initialValues.key}`: 'New field'}</Modal.Header>
+		<Modal.Header><Header as='h1'>{editMode ? 'Edit': 'New'} field</Header></Modal.Header>
 		<EnonicForm
 			initialValues={initialValues}
 			onSubmit={(values) => {
@@ -132,13 +131,13 @@ export function NewOrEditModal(props) {
 		>
 			<Modal.Content>
 				<Form autoComplete='off'>
-					{editMode ? null : <Form.Field>
+					<Form.Field>
 						<Input
+							disabled={editMode}
 							label={{basic: true, content: 'Name'}}
 							path='key'
 						/>
-					</Form.Field>}
-
+					</Form.Field>
 					<Form.Field>
 						<Input
 							label={{basic: true, content: 'Description'}}
@@ -150,8 +149,6 @@ export function NewOrEditModal(props) {
 			</Modal.Content>
 			<Modal.Actions>
 				<Button onClick={doClose}>Cancel</Button>
-				{/*<VisitAllButton/>*/}
-				{/*<ValidateFormButton/>*/}
 				<ResetButton secondary/>
 				<SubmitButton primary><Icon name='save'/>Save</SubmitButton>
 			</Modal.Actions>
