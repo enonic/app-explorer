@@ -30,11 +30,10 @@ export function NewOrEditDocumentTypeModal({
 		setOpen(true);
 	};
 
-	const header = _name ? `Edit document type ${_name}`: 'New document type';
+	const header = _name ? `Document type: ${_name}`: 'New document type';
 	return <Modal
 		closeIcon
 		closeOnDimmerClick={false}
-		defaultOpen={false}
 		onClose={doClose}
 		open={open}
 		size='large'
@@ -59,7 +58,7 @@ export function NewOrEditDocumentTypeModal({
 						name='plus'
 					/></Button>}/>}
 	>
-		<Modal.Header>{header}</Modal.Header>
+		<Modal.Header as='h1' className='ui'>{header}</Modal.Header>
 		<NewOrEditDocumentType
 			_id={_id}
 			collections={collections}
