@@ -268,7 +268,11 @@ export function Interfaces({
 				});
 				//console.debug('interfaces', interfaces);
 				setInterfaceNamesObj(interfaceNamesObj);
-				setInterfaces(Object.keys(interfacesObj).map((_id) => interfacesObj[_id]).sort((a,b) => (a._name > b._name) ? 1 : -1));
+				setInterfaces(
+					Object.keys(interfacesObj)
+						.map((_id) => interfacesObj[_id])
+						.sort((a,b) => (a._name > b._name) ? 1 : -1)
+				);
 				setInterfacesTotal(data.queryInterfaces.total);
 
 				setStopWordOptions(data.queryStopWords.hits.map(({
