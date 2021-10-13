@@ -14,8 +14,6 @@ import {
 import {
 	Button,
 	Dimmer,
-	//Divider,
-	Dropdown,
 	Form,
 	Header,
 	Icon,
@@ -27,10 +25,7 @@ import {
 } from 'semantic-ui-react';
 
 
-//import {DeleteItemButton} from 'semantic-ui-react-form/buttons/DeleteItemButton';
 import {InsertButton} from 'semantic-ui-react-form/buttons/InsertButton';
-//import {MoveDownButton} from 'semantic-ui-react-form/buttons/MoveDownButton';
-//import {MoveUpButton} from 'semantic-ui-react-form/buttons/MoveUpButton';
 import {ResetButton} from 'semantic-ui-react-form/buttons/ResetButton';
 import {SubmitButton} from 'semantic-ui-react-form/buttons/SubmitButton';
 
@@ -389,36 +384,10 @@ export function NewOrEditDocumentType({
 												}</Table.Cell>
 												<Table.Cell collapsing>
 													<Button.Group>
-														{/*<Popup
-															content='Add field'
-															inverted
-															trigger={<InsertButton
-																path={PATH_FIELDS}
-																index={index+1}
-																value={FIELD_DEFAULT}
-															/>}
-														/>
-														<Popup
-															content='Move down'
-															inverted
-															trigger={<MoveDownButton
-																disabled={index + 1 >= fieldsArray.length}
-																path={PATH_FIELDS}
-																index={index}
-															/>}/>
-														<Popup
-															content='Move up'
-															inverted
-															trigger={<MoveUpButton
-																path={PATH_FIELDS}
-																index={index}
-															/>}/>
-														*/}
 														<RemoveFieldFromDocumentTypeModal
 															collections={collections}
 															index={index}
 															interfaces={interfaces}
-															disabled={initialFields[fieldId] && active}
 															name={key}
 															path={PATH_FIELDS}
 															servicesBaseUrl={servicesBaseUrl}
@@ -526,38 +495,10 @@ export function NewOrEditDocumentType({
 										</Table.Cell>
 										<Table.Cell collapsing>
 											<Button.Group>
-												{/*<Popup
-													content='Add local field'
-													inverted
-													trigger={<InsertButton
-														path={PATH_PROPERTIES}
-														index={index+1}
-														value={PROPERTY_DEFAULT}
-													/>}
-												/>
-												<Popup
-													content='Move down'
-													inverted
-													trigger={<MoveDownButton
-														disabled={index + 1 >= propertiesArray.length}
-														path={PATH_PROPERTIES}
-														index={index}
-													/>}
-												/>
-												<Popup
-													content='Move up'
-													inverted
-													trigger={<MoveUpButton
-														path={PATH_PROPERTIES}
-														index={index}
-													/>}
-												/>
-												*/}
 												<RemoveFieldFromDocumentTypeModal
 													collections={collections}
 													index={index}
 													interfaces={interfaces}
-													disabled={initialProperties[name] && active}
 													name={name}
 													path={PATH_PROPERTIES}
 													servicesBaseUrl={servicesBaseUrl}
@@ -571,61 +512,6 @@ export function NewOrEditDocumentType({
 						/>
 					</Table.Body>
 				</Table>
-				{/*
-				<Form.Field>
-					<Button.Group>
-						<Button icon onClick={() => {
-							setFieldModalState({
-								local: true,
-								open: true
-							});
-						}}><Icon color='green' name='add'/> Add local </Button>
-						<Button.Or icon ></Button.Or>
-						<Button icon onClick={() => {
-							setFieldModalState({
-								local: false,
-								open: true
-							});
-						}}> global field <Icon color='green' name='add'/></Button>
-					</Button.Group>
-				</Form.Field>
-				<Form.Field>
-					<Button.Group>
-						<Button icon onClick={() => {
-							setFieldModalState({
-								local: true,
-								open: true
-							});
-						}}><Icon color='green' name='add'/> Add field</Button>
-						<Dropdown
-							button
-							icon='dropdown'
-							className='icon'
-						>
-							<Dropdown.Menu>
-								<Dropdown.Item
-									onClick={(/*syntheticEvent, data*) => {
-										//console.debug('syntheticEvent', syntheticEvent);
-										//console.debug('data', data);
-										setFieldModalState({
-											local: false,
-											open: true
-										});
-									}}
-								>Global</Dropdown.Item>
-								<Dropdown.Item
-									onClick={() => {
-										setFieldModalState({
-											local: true,
-											open: true
-										});
-									}}
-								>Local</Dropdown.Item>
-							</Dropdown.Menu>
-						</Dropdown>
-					</Button.Group>
-				</Form.Field>
-				*/}
 			</Form>
 		</Modal.Content>
 		<Modal.Actions>
@@ -635,12 +521,6 @@ export function NewOrEditDocumentType({
 					open: true
 				});
 			}}><Icon color='green' name='add'/> Add field</Button>
-			{/*<Button icon onClick={() => {
-				setFieldModalState({
-					local: false,
-					open: true
-				});
-			}} secondary><Icon name='add'/> Add global field</Button>*/}
 			<Button onClick={doClose}>Cancel</Button>
 			<ResetButton secondary/>
 			<SubmitButton primary><Icon name='save'/>Save</SubmitButton>
