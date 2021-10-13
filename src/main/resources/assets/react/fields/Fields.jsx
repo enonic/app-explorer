@@ -424,7 +424,16 @@ export function Fields(props) {
 										_id={_id}
 										_name={_name}
 										afterClose={updateFields}
-										popupContent={denyDelete
+										fieldCollections={fieldCollections}
+										fieldDocumentTypes={fieldDocumentTypes}
+										popupContent={<Message
+											icon
+											positive
+										>
+											<Icon name='question' />
+											<Message.Content>{`Delete field ${_name}?`}</Message.Content>
+										</Message>
+										/* denyDelete
 											? <Message
 												error
 												icon
@@ -448,14 +457,8 @@ export function Fields(props) {
 														<Icon name='warning sign' />
 														<Message.Content>You are not allowed to a delete a field that is used in a document type.</Message.Content>
 													</Message>
-													: <Message
-														icon
-														positive
-													>
-														<Icon name='question' />
-														<Message.Content>{`Delete field ${_name}?`}</Message.Content>
-													</Message>
-										}
+													:
+										*/}
 										servicesBaseUrl={servicesBaseUrl}
 									/>}
 								</Table.Cell> : null}
