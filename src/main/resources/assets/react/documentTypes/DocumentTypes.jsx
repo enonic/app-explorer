@@ -235,7 +235,7 @@ export function DocumentTypes({
 					activeFields.forEach(({fieldId}) => {
 						if (globalFieldsObj[fieldId] && globalFieldsObj[fieldId].key) {
 							activeFieldNames.push(globalFieldsObj[fieldId].key);
-						} else {
+						} else if (Object.keys(globalFieldsObj).length) { // No need to report error when globalFieldsObj is not populated yet...
 							console.error(`Unable to find global field name for field id:${fieldId}!`);
 						}
 					});

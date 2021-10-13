@@ -81,7 +81,7 @@ export function RemoveFieldFromDocumentTypeModal({
 		trigger={<Popup
 			content={`Delete field ${name}?`}
 			inverted
-			trigger={<Button disabled={disabled} icon onClick={doOpen}>
+			trigger={<Button disabled={disabled} icon onClick={doOpen} size='mini'>
 				<Icon color='red' name='alternate outline trash'/>
 			</Button>}/>}
 	>

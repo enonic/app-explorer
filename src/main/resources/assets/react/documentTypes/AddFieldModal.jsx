@@ -1,6 +1,10 @@
 import {VALUE_TYPE_STRING} from '@enonic/js-utils';
 import getIn from 'get-value';
-import {Dropdown, Form, Input, Message, Modal, Radio, Segment} from 'semantic-ui-react';
+import {
+	Dropdown, Form, Input, Message, Modal,
+	//Radio,
+	Segment
+} from 'semantic-ui-react';
 
 import {setValue} from 'semantic-ui-react-form';
 import {getEnonicContext} from 'semantic-ui-react-form/Context';
@@ -10,7 +14,7 @@ import {notDocumentMetaData} from '../utils/notDocumentMetaData';
 import {notDoubleDot} from '../utils/notDoubleDot';
 import {onlyLettersDigitsUnderscoresAndDots} from '../utils/onlyLettersDigitsUnderscoresAndDots';
 import {notDoubleUnderscore} from '../utils/notDoubleUnderscore';
-import {required} from '../utils/required.mjs';
+//import {required} from '../utils/required.mjs';
 
 
 export const AddFieldModal = ({
@@ -42,7 +46,7 @@ export const AddFieldModal = ({
 	//console.debug('selectedFields', selectedFields);
 	//console.debug('usedNames', usedNames);
 
-	const [boolLocal, setBoolLocal] = React.useState(local);
+	const [boolLocal/*, setBoolLocal*/] = React.useState(local);
 	const [fieldId, setFieldId] = React.useState('');
 	const [name, setName] = React.useState('');
 
@@ -104,13 +108,13 @@ export const AddFieldModal = ({
 		closeOnDimmerClick={false}
 		content={<Segment basic>
 			<Form>
-				<Form.Field>Local <Radio
+				{/*<Form.Field>Local <Radio
 					checked={!boolLocal}
 					onChange={(ignoredEvent,{checked}) => {
 						setBoolLocal(!checked);
 					}}
 					toggle
-				/> Global</Form.Field>
+				/> Global</Form.Field>*/}
 				{/*<Form.Field>
 					<Dropdown
 						onChange={(ignoredEvent,{value: newValue}) => {
