@@ -1,5 +1,5 @@
 import {VALUE_TYPE_STRING} from '@enonic/js-utils';
-import {Button, Form, Header, Icon, Modal, Popup} from 'semantic-ui-react';
+import {Button, Form, Icon, Modal, Popup} from 'semantic-ui-react';
 import {Form as EnonicForm} from 'semantic-ui-react-form/Form';
 import {Input} from 'semantic-ui-react-form/inputs/Input';
 import {ResetButton} from 'semantic-ui-react-form/buttons/ResetButton';
@@ -104,7 +104,10 @@ export function NewOrEditModal(props) {
 					name='plus'
 				/></Button>}
 	>
-		<Modal.Header><Header as='h1'>{editMode ? 'Edit': 'New'} field</Header></Modal.Header>
+		<Modal.Header
+			as='h1'
+			className='ui' // Too make it appear large
+		>{editMode ? 'Edit': 'New'} field</Modal.Header>
 		<EnonicForm
 			initialValues={initialValues}
 			onSubmit={(values) => {
