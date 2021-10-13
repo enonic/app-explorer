@@ -84,7 +84,7 @@ export const AddFieldModal = ({
 					max: 0,
 					min: 0,
 					name,
-					ngram: true,
+					nGram: true,
 					valueType: VALUE_TYPE_STRING
 				}}))
 				: dispatch(setValue({path: `fields.${fields.length}`, value: {

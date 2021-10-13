@@ -39,8 +39,9 @@ export function generateDocumentTypeTypes({
 			includeInAllText: { type: nonNull(GraphQLBoolean) },
 			max: { type: nonNull(GraphQLInt) },
 			min: { type: nonNull(GraphQLInt) },
-			ngram: { type: nonNull(GraphQLBoolean) },
 			name: { type: glue.getScalarType('_name') },
+			nGram: { type: nonNull(GraphQLBoolean) },
+			path: { type: nonNull(GraphQLBoolean) },
 			valueType: { type: nonNull(glue.addEnumType({
 				name: 'EnumValueTypes',
 				values: [

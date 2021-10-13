@@ -329,7 +329,7 @@ export function DocumentTypes({
 											max,
 											min,
 											key,
-											ngram
+											nGram
 										} = fieldObj;
 										return <Table.Row disabled={true} key={`${index}.${j}`}>
 											<Table.Cell collapsing>{key}</Table.Cell>
@@ -338,7 +338,7 @@ export function DocumentTypes({
 											<Table.Cell collapsing textAlign='center'>{max === 0 ? '∞' : max}</Table.Cell>
 											<Table.Cell collapsing textAlign='center'><Icon color='grey' disabled={true} name={enabled ? 'checkmark' : 'x'} size='large'/></Table.Cell>
 											<Table.Cell collapsing textAlign='center'>{enabled ? <Icon color='grey' disabled={true} name={fulltext ? 'checkmark' : 'x'} size='large'/> : null}</Table.Cell>
-											<Table.Cell collapsing textAlign='center'>{enabled ? <Icon color='grey' disabled={true} name={ngram ? 'checkmark' : 'x'} size='large'/> : null}</Table.Cell>
+											<Table.Cell collapsing textAlign='center'>{enabled ? <Icon color='grey' disabled={true} name={nGram ? 'checkmark' : 'x'} size='large'/> : null}</Table.Cell>
 											<Table.Cell collapsing textAlign='center'>{enabled ? <Icon color='grey' disabled={true} name={includeInAllText ? 'checkmark' : 'x'} size='large'/> : null}</Table.Cell>
 										</Table.Row>;
 									})}
@@ -349,7 +349,7 @@ export function DocumentTypes({
 										max,
 										min,
 										name,
-										ngram,
+										nGram,
 										valueType
 									}, k) => <Table.Row key={`${index}.${k}`}>
 										<Table.Cell collapsing>{name}</Table.Cell>
@@ -362,7 +362,7 @@ export function DocumentTypes({
 											: null
 										}</Table.Cell>
 										<Table.Cell collapsing textAlign='center'>{enabled
-											? ngram ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='grey' name='x' size='large'/>
+											? nGram ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='grey' name='x' size='large'/>
 											: null
 										}</Table.Cell>
 										<Table.Cell collapsing textAlign='center'>{enabled

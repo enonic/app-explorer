@@ -27,7 +27,8 @@ export const GQL_MUTATION_CREATE_DOCUMENT_TYPE = `mutation CreateDocumentTypeMut
 			max
 			min
 			name
-			ngram
+			nGram
+			path
 			valueType
 		}
 	}
@@ -49,7 +50,7 @@ export const GQL_MUTATION_CREATE_DOCUMENT_TYPE = `mutation CreateDocumentTypeMut
 		"max": 1,
 		"min": 1,
 		"name": "myObject.subProperty",
-		"ngram": false,
+		"nGram": false,
 		"valueType": "long"
 	}]
 }

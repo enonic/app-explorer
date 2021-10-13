@@ -31,7 +31,8 @@ export const GQL_MUTATION_UPDATE_DOCUMENT_TYPE = `mutation UpdateDocumentTypeMut
 			max
 			min
 			name
-			ngram
+			nGram
+			path
 			valueType
 		}
 	}
@@ -55,7 +56,7 @@ export const GQL_MUTATION_UPDATE_DOCUMENT_TYPE = `mutation UpdateDocumentTypeMut
 		"max": 2,
 		"min": 3,
 		"name": "myObject.subProperty",
-		"ngram": true,
+		"nGram": true,
 		"valueType": "double"
 	}]
 }
