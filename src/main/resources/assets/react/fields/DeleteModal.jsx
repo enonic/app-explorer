@@ -80,7 +80,10 @@ export function DeleteModal(props) {
 			</div>
 			}/>}
 	>
-		<Modal.Header><Header as='h1'>Delete Global field</Header></Modal.Header>
+		<Modal.Header
+			as='h1'
+			className='ui' // Too make it appear large
+		>Delete Global field</Modal.Header>
 		<Modal.Content>
 			<Header as='h2'>Name: {_name}</Header>
 			{inUse ? <>
