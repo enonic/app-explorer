@@ -19,7 +19,8 @@ export const GQL_QUERY_QUERY_DOCUMENT_TYPES = `query QueryDocumentTypesQuery {
 				max
 				min
 				name
-				ngram
+				nGram
+				path
 				valueType
 			}
 			__referencedBy(

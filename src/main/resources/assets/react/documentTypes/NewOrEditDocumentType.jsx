@@ -1,5 +1,5 @@
 import {
-	VALUE_TYPE_BOOLEAN,
+	/*VALUE_TYPE_BOOLEAN,
 	VALUE_TYPE_DOUBLE,
 	VALUE_TYPE_GEO_POINT,
 	VALUE_TYPE_INSTANT,
@@ -7,7 +7,7 @@ import {
 	VALUE_TYPE_LOCAL_DATE_TIME,
 	VALUE_TYPE_LOCAL_TIME,
 	VALUE_TYPE_LONG,
-	VALUE_TYPE_SET,
+	VALUE_TYPE_SET,*/
 	VALUE_TYPE_STRING
 } from '@enonic/js-utils';
 
@@ -28,7 +28,7 @@ import {ResetButton} from 'semantic-ui-react-form/buttons/ResetButton';
 import {SubmitButton} from 'semantic-ui-react-form/buttons/SubmitButton';
 import {Form as EnonicForm} from 'semantic-ui-react-form/Form';
 import {Checkbox} from 'semantic-ui-react-form/inputs/Checkbox';
-import {Dropdown as EnonicDropdown} from 'semantic-ui-react-form/inputs/Dropdown';
+//import {Dropdown as EnonicDropdown} from 'semantic-ui-react-form/inputs/Dropdown';
 import {Input} from 'semantic-ui-react-form/inputs/Input';
 import {List} from 'semantic-ui-react-form/List';
 
@@ -39,7 +39,8 @@ import {fetchFields} from '../../../services/graphQL/fetchers/fetchFields';
 import {Checkmark} from '../components/Checkmark';
 import {Span} from '../components/Span';
 import {nameValidator} from '../utils/nameValidator';
-import {AddFieldModal} from './AddFieldModal';
+//import {AddFieldModal} from './AddFieldModal';
+import {AddOrEditLocalField} from './AddOrEditLocalField';
 import {GlobalFields} from './GlobalFields';
 import {RemoveFieldFromDocumentTypeModal} from './RemoveFieldFromDocumentTypeModal';
 
@@ -47,7 +48,7 @@ import {RemoveFieldFromDocumentTypeModal} from './RemoveFieldFromDocumentTypeMod
 const PATH_FIELDS = 'fields';
 const PATH_PROPERTIES = 'properties';
 
-const OPTIONS_VALUE_TYPES = [
+/*const OPTIONS_VALUE_TYPES = [
 	VALUE_TYPE_BOOLEAN,
 	VALUE_TYPE_DOUBLE,
 	VALUE_TYPE_GEO_POINT,
@@ -62,7 +63,7 @@ const OPTIONS_VALUE_TYPES = [
 	key,
 	text: key,
 	value: key
-}));
+}));*/
 
 
 const FIELD_DEFAULT = {
@@ -70,7 +71,7 @@ const FIELD_DEFAULT = {
 	fieldId: ''
 };
 
-const PROPERTY_DEFAULT = {
+/*const PROPERTY_DEFAULT = {
 	active: true,
 	enabled: true,
 	fulltext: true,
@@ -78,9 +79,10 @@ const PROPERTY_DEFAULT = {
 	max: 0,
 	min: 0,
 	name: '',
-	ngram: true,
+	nGram: true,
+	path: false,
 	valueType: VALUE_TYPE_STRING
-};
+};*/
 
 
 const SCHEMA = {
@@ -131,10 +133,10 @@ export function NewOrEditDocumentType({
 }) {
 	const [initialValues, setInitialValues] = React.useState(false);
 	const [globalFields, setGlobalFields] = React.useState([]);
-	const [fieldModalState, setFieldModalState] = React.useState({
+	/*const [fieldModalState, setFieldModalState] = React.useState({
 		local: true,
 		open: false
-	});
+	});*/
 	//console.debug(`NewOrEditDocumentType initialValues`, initialValues);
 	//console.debug(`NewOrEditDocumentType globalFields`, globalFields);
 
@@ -154,7 +156,8 @@ export function NewOrEditDocumentType({
 	}
 
 	const GLOBAL_FIELD_OBJ = {};
-	const GLOBAL_FIELD_OPTIONS = globalFields.map(({
+	//const GLOBAL_FIELD_OPTIONS = globalFields.map(({
+	globalFields.forEach(({
 		_id,
 		//decideByType,
 		enabled,
@@ -164,8 +167,8 @@ export function NewOrEditDocumentType({
 		key,
 		max,
 		min,
-		nGram//,
-		//path
+		nGram,
+		path
 	}) => {
 		GLOBAL_FIELD_OBJ[_id] = {
 			//decideByType,
@@ -176,14 +179,14 @@ export function NewOrEditDocumentType({
 			key,
 			max,
 			min,
-			nGram//,
-			//path
+			nGram,
+			path
 		};
-		return {
+		/*return {
 			key: _id,
 			text: key,
 			value: _id
-		};
+		};*/
 	});
 
 	function getDocumentType() {
@@ -311,6 +314,7 @@ export function NewOrEditDocumentType({
 							<Table.Header>
 								<Table.Row>
 									<Table.HeaderCell collapsing>Active</Table.HeaderCell>
+									<Table.HeaderCell collapsing>Edit</Table.HeaderCell>
 									<Table.HeaderCell>Field</Table.HeaderCell>
 									<Table.HeaderCell collapsing>Value type</Table.HeaderCell>
 									<Table.HeaderCell collapsing textAlign='center'>Min</Table.HeaderCell>
@@ -372,6 +376,7 @@ export function NewOrEditDocumentType({
 															toggle
 															value={active}
 														/></Table.Cell>
+														<Table.Cell collapsing></Table.Cell>
 														<Table.Cell disabled={!active} style={{
 															textDecoration: active ? 'none' : 'line-through'
 														}}><Span color='grey'>{key}</Span></Table.Cell>
@@ -429,7 +434,7 @@ export function NewOrEditDocumentType({
 								<List
 									path={PATH_PROPERTIES}
 									render={(propertiesArray) => {
-										if(!propertiesArray.length) {
+										/*if(!propertiesArray.length) {
 											return <Popup
 												content='Add local field'
 												inverted
@@ -439,7 +444,7 @@ export function NewOrEditDocumentType({
 													value={PROPERTY_DEFAULT}
 												><Icon color='green' name='add'/>Add local field</InsertButton>}
 											/>;
-										}
+										}*/
 										return <>{propertiesArray.map(({
 											active,
 											enabled,
@@ -452,6 +457,7 @@ export function NewOrEditDocumentType({
 											path,
 											valueType
 										}, index) => {
+											console.debug('nGram', nGram);
 											const PATH_PROPERTY = `${PATH_PROPERTIES}.${index}`;
 											return <Table.Row key={PATH_PROPERTY}>
 												<Table.Cell collapsing><Checkbox
@@ -460,6 +466,19 @@ export function NewOrEditDocumentType({
 													toggle
 													value={active}
 												/></Table.Cell>
+												<Table.Cell collapsing>
+													<AddOrEditLocalField
+														fulltext={fulltext}
+														globalFieldObj={GLOBAL_FIELD_OBJ}
+														includeInAllText={includeInAllText}
+														max={max}
+														min={min}
+														name={name}
+														nGram={nGram}
+														path={path}
+														valueType={valueType}
+													/>
+												</Table.Cell>
 												<Table.Cell disabled={!active} style={{
 													textDecoration: active ? 'none' : 'line-through'
 												}}>{name}</Table.Cell>
@@ -518,7 +537,7 @@ export function NewOrEditDocumentType({
 												<Table.Cell collapsing textAlign='center'>
 													{active && enabled ? <Checkmark disabled checked={nGram} size='large'/>/*<Checkbox
 														disabled={!active || !enabled}
-														name='ngram'
+														name='nGram'
 														parentPath={PATH_PROPERTY}
 														toggle
 													/>*/ : null}
@@ -550,12 +569,15 @@ export function NewOrEditDocumentType({
 								/>
 							</Table.Body>
 						</Table>
-						<Button icon onClick={() => {
+						<AddOrEditLocalField
+							globalFieldObj={GLOBAL_FIELD_OBJ}
+						/>
+						{/*<Button icon onClick={() => {
 							setFieldModalState({
 								local: true,
 								open: true
 							});
-						}}><Icon color='green' name='add'/> Add field</Button>
+						}}><Icon color='green' name='add'/> Add field</Button>*/}
 					</Tab.Pane>
 				}]}
 				renderActiveOnly={true/*For some reason everything is gone when set to false???*/}
@@ -566,7 +588,7 @@ export function NewOrEditDocumentType({
 			<ResetButton secondary/>
 			<SubmitButton primary><Icon name='save'/>Save</SubmitButton>
 		</Modal.Actions>
-		<AddFieldModal
+		{/*<AddFieldModal
 			doClose={() => setFieldModalState((prev) => ({
 				local: prev.local,
 				open: false
@@ -575,7 +597,7 @@ export function NewOrEditDocumentType({
 			globalFieldOptions={GLOBAL_FIELD_OPTIONS}
 			local={fieldModalState.local}
 			open={fieldModalState.open}
-		/>
+		/>*/}
 	</EnonicForm>
 		: <>
 			<Modal.Content><Segment>

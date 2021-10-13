@@ -17,7 +17,8 @@ export const GQL_QUERY_GET_DOCUMENT_TYPE = `query GetDocumentTypeQuery($_id: ID!
 			max
 			min
 			name
-			ngram
+			nGram
+			path
 			valueType
 		}
 		__referencedBy(
