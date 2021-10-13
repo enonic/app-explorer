@@ -1,16 +1,19 @@
 import {
-	Button, Header, Icon, Modal, Popup
+	Button, Header, Icon, Message, Modal, Popup
 } from 'semantic-ui-react';
 
 import{GQL_MUTATION_FIELD_DELETE} from '../../../services/graphQL/field/mutationFieldDelete';
+
 
 export function DeleteModal(props) {
 	const {
 		_id,
 		_name,
-		disabled,
 		afterClose = () => {},
 		beforeOpen = () => {},
+		disabled = false,
+		fieldCollections = [],
+		fieldDocumentTypes = [],
 		popupContent,
 		servicesBaseUrl
 	} = props;
@@ -57,12 +60,14 @@ export function DeleteModal(props) {
 		setOpen(true);
 	};
 
+	const inUse = fieldDocumentTypes.length || fieldCollections.length;
+
 	return <Modal
 		closeIcon
 		closeOnDimmerClick={false}
 		onClose={doClose}
 		open={open}
-		size='small'
+		size='tiny'
 		trigger={<Popup
 			content={popupContent}
 			trigger={<div style={{ display: "inline-block" }}>
@@ -75,33 +80,61 @@ export function DeleteModal(props) {
 			</div>
 			}/>}
 	>
-		<Modal.Header>Delete global field {_name}</Modal.Header>
+		<Modal.Header><Header as='h1'>Delete Global field</Header></Modal.Header>
 		<Modal.Content>
-			<Header as='h2'>Do you really want to delete the global field {_name}?</Header>
+			<Header as='h2'>Name: {_name}</Header>
+			{inUse ? <>
+				<Header as='h3'>Used in:</Header>
+				{fieldDocumentTypes.length
+					? <>
+						<Header as='h5'>Document types:</Header>
+						<ul>{fieldDocumentTypes.sort().map((dT, i) => <li key={i}>{dT}</li>)}</ul>
+					</>
+					: null}
+				{fieldCollections.length
+					? <>
+						<Header as='h5'>Collections:</Header>
+						<ul>{fieldCollections.sort().map((c, i) => <li key={i}>{c}</li>)}</ul>
+					</>
+					: null}
+				<Message
+					error
+					icon
+				>
+					<Icon name='warning sign' />
+					<Message.Content>You are not allowed to delete a global field that is in use.</Message.Content>
+				</Message>
+			</> : <p>Do you really want to delete the global field {_name}?</p>}
 		</Modal.Content>
 		<Modal.Actions>
-			<Button onClick={doClose}>Cancel</Button>
-			<Button
-				icon
-				onClick={() => {
-					fetch(`${servicesBaseUrl}/graphQL`, {
-						method: 'POST',
-						headers: {
-							'Content-Type':	'application/json'
-						},
-						body: JSON.stringify({
-							query: GQL_MUTATION_FIELD_DELETE,
-							variables: {
-								_id
-							}
-						})
-					}).then((/*response*/) => {
-						//if (response.status === 200) {}
-						doClose();
-					});
-				}}
-				primary
-			><Icon name='trash alternate outline'/> Confirm Delete</Button>
+			{inUse
+				? <Button onClick={() => {setOpen(false);}}>Close</Button>
+				: <>
+					<Button onClick={doClose}>Cancel</Button>
+					<Button
+						icon
+						onClick={() => {
+							fetch(`${servicesBaseUrl}/graphQL`, {
+								method: 'POST',
+								headers: {
+									'Content-Type':	'application/json'
+								},
+								body: JSON.stringify({
+									query: GQL_MUTATION_FIELD_DELETE,
+									variables: {
+										_id
+									}
+								})
+							}).then((/*response*/) => {
+								//if (response.status === 200) {}
+								doClose();
+							});
+						}}
+						primary
+					><Icon name='trash alternate outline'/> Confirm Delete</Button>
+				</>
+			}
+
 		</Modal.Actions>
 	</Modal>;
 } // DeleteModal
