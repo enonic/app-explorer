@@ -51,7 +51,6 @@ import {hasValue} from '/lib/explorer/query/hasValue';
 import {runAsSu} from '/lib/explorer/runAsSu';
 import {getCollectors, createOrModifyJobsFromCollectionNode} from '/lib/explorer/scheduler/createOrModifyJobsFromCollectionNode';
 //import {listExplorerJobs} from '/lib/explorer/scheduler/listExplorerJobs';
-
 import {
 	addMembers,
 	createRole,
@@ -69,6 +68,7 @@ import {
 	//get as getJob,
 	list as listJobs
 } from '/lib/xp/scheduler';
+import {submitTask} from '/lib/xp/task';
 import {reference} from '/lib/xp/value';
 
 import {Progress} from './Progress';
@@ -1269,5 +1269,6 @@ export function run() {
 		};
 		//log.info(`Sending event ${toStr(event)}`);
 		send(event);
+		submitTask({descriptor: 'test'});
 	}); // runAsSu
 } // export function run

@@ -144,6 +144,7 @@ const SS_FILES = [
 	'services/ws/ws',
 	'tasks/init/init',
 	'tasks/reindexCollection/reindexCollection',
+	'tasks/test/test',
 	'tasks/webcrawl/webcrawl',
 	'webapp/webapp'
 ];
