@@ -61,3 +61,4 @@ export const GQL_MUTATION_INTERFACE_UPDATE_NAME = 'updateInterface';
 // Query field names
 
 export const GQL_QUERY_INTERFACE_GET_NAME = 'getInterface';
+export const GQL_QUERY_FIELD_GET_NAME = 'getField';

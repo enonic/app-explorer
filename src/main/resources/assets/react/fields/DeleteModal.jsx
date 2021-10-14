@@ -2,7 +2,7 @@ import {
 	Button, Header, Icon, Message, Modal, Popup
 } from 'semantic-ui-react';
 
-import{GQL_MUTATION_FIELD_DELETE} from '../../../services/graphQL/field/mutationFieldDelete';
+import{GQL_MUTATION_FIELD_DELETE} from '../../../services/graphQL/mutations/fieldDeleteMutation';
 
 
 export function DeleteModal(props) {

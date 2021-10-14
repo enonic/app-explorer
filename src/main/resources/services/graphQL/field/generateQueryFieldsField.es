@@ -1,4 +1,8 @@
-//import {toStr} from '@enonic/js-utils';
+import {
+	isNotSet,
+	isNotTrue//,
+	//toStr
+} from '@enonic/js-utils';
 
 import {coerseFieldType} from '/lib/explorer/field/coerseFieldType';
 import {getFields} from '/lib/explorer/field/getFields';
@@ -27,23 +31,26 @@ export function generateQueryFieldsField({
 			const {args/*, context*/} = env;
 			//log.info(`args:${toStr(args)}`);
 
-			const {
-				fields, // can be undefined
-				includeSystemFields = false
+			let {
+				fields,
+				includeSystemFields // GraphQL passes null, so defaults are bypassed :(
 			} = args;
+			// GraphQL passes null, so defaults are bypassed :(
+			if (isNotSet(fields)) { fields = []; }
+			if (isNotTrue(includeSystemFields)) { includeSystemFields = false; }
 			//log.info(`fields:${toStr(fields)}`);
 
 			const connection = connect({ principals: [PRINCIPAL_EXPLORER_READ] });
 
 			const fieldsRes = getFields({
 				connection,
-				fields, // can be undefined
+				fields,
 				includeSystemFields
 			});
 			//log.debug(`fieldsRes:${toStr(fieldsRes)}`);
 
 			fieldsRes.hits = fieldsRes.hits.map(hit => coerseFieldType(hit));
-			//log.info(`mapped fieldsRes:${toStr(fieldsRes)}`);
+			//log.debug(`mapped fieldsRes:${toStr(fieldsRes)}`);
 
 			// WARNING The context is a global read-only, you can't use it to pass data.
 			//context.hits = fieldsRes.hits.map(({key}) => ({key}));

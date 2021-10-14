@@ -1,4 +1,4 @@
-import {GQL_QUERY_QUERY_FIELDS} from '../queries/fieldsQuery.mjs';
+import {GQL_QUERY_FIELDS_QUERY} from '../queries/fieldsQuery.mjs';
 
 
 export function fetchFields({
@@ -14,7 +14,7 @@ export function fetchFields({
 			'Content-Type':	'application/json'
 		},
 		body: JSON.stringify({
-			query: GQL_QUERY_QUERY_FIELDS,
+			query: GQL_QUERY_FIELDS_QUERY,
 			variables: {
 				includeSystemFields
 			}
