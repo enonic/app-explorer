@@ -1,4 +1,7 @@
-import {VALUE_TYPE_STRING} from '@enonic/js-utils';
+import {
+	INDEX_CONFIG_N_GRAM,
+	VALUE_TYPE_STRING
+} from '@enonic/js-utils';
 import getIn from 'get-value';
 import {
 	Dropdown, Form, Input, Message, Modal,
@@ -84,7 +87,7 @@ export const AddFieldModal = ({
 					max: 0,
 					min: 0,
 					name,
-					nGram: true,
+					[INDEX_CONFIG_N_GRAM]: true,
 					valueType: VALUE_TYPE_STRING
 				}}))
 				: dispatch(setValue({path: `fields.${fields.length}`, value: {

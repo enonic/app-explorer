@@ -1,7 +1,7 @@
 {
   "author": "Christian Andreas Westgaard <cwe@enonic.com>",
   "dependencies": {
-    "@enonic/js-utils": "0.0.3",
+    "@enonic/js-utils": "0.2.0",
     "@enonic/semantic-ui-react-form": "2.4.0",
     "array.prototype.find": "2.1.2",
     "buffer": "6.0.3",

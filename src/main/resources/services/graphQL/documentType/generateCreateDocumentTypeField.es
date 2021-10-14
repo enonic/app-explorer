@@ -1,3 +1,8 @@
+import {
+	isNotFalse,
+	isNull//,
+	//toStr
+} from '@enonic/js-utils';
 import {createDocumentType} from '/lib/explorer/documentType/createDocumentType';
 import {list} from '/lib/graphql';
 
@@ -22,11 +27,15 @@ export function generateCreateDocumentTypeField({
 		resolve({
 			args: {
 				_name,
-				addFields = true,
-				fields = [],
-				properties = []
+				addFields,// = true, // GraphQL sends null so default value is not applied
+				fields,// = [], // GraphQL sends null so default value is not applied
+				properties// = [] // GraphQL sends null so default value is not applied
 			}
 		}) {
+			if (isNotFalse(addFields)) { addFields = true; }
+			if (isNull(fields)) { fields = []; }
+			if (isNull(properties)) { properties = []; }
+			//log.debug(`_name:${_name} addFields:${addFields} fields:${toStr(fields)} properties:${toStr(properties)}`);
 			return createDocumentType({_name, addFields, fields, properties});
 		}, // resolve
 		type: glue.getObjectType(GQL_TYPE_DOCUMENT_TYPE_NAME)

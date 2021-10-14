@@ -1,4 +1,5 @@
 import {
+	INDEX_CONFIG_N_GRAM,
 	VALUE_TYPE_BOOLEAN,
 	VALUE_TYPE_DOUBLE,
 	VALUE_TYPE_GEO_POINT,
@@ -233,7 +234,7 @@ export const AddOrEditLocalField = ({
 						max,
 						min,
 						name,
-						nGram,
+						[INDEX_CONFIG_N_GRAM]: nGram,
 						path,
 						valueType
 					}}));

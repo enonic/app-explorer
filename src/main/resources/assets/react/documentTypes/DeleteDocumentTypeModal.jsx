@@ -1,6 +1,6 @@
 import {Button, Icon, Input, Message, Modal} from 'semantic-ui-react';
 
-import {GQL_MUTATION_DELETE_DOCUMENT_TYPE} from '../../../services/graphQL/documentType/mutationDeleteDocumentType';
+import {GQL_MUTATION_DOCUMENT_TYPE_DELETE} from '../../../services/graphQL/mutations/documentTypeDeleteMutation';
 
 
 export function DeleteDocumentTypeModal({
@@ -67,7 +67,7 @@ export function DeleteDocumentTypeModal({
 							'Content-Type':	'application/json'
 						},
 						body: JSON.stringify({
-							query: GQL_MUTATION_DELETE_DOCUMENT_TYPE,
+							query: GQL_MUTATION_DOCUMENT_TYPE_DELETE,
 							variables: {
 								_id
 							}

@@ -1,7 +1,8 @@
-export const GQL_QUERY_GET_DOCUMENT_TYPE = `query GetDocumentTypeQuery($_id: ID!) {
+export const GQL_QUERY_DOCUMENT_TYPE_GET = `query GetDocumentTypeQuery($_id: ID!) {
 	getDocumentType(_id: $_id) {
 		_id
 		_name
+		_nodeType
 		_path
 		_versionKey
 		addFields

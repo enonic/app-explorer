@@ -32,9 +32,10 @@ import {Checkbox} from 'semantic-ui-react-form/inputs/Checkbox';
 import {Input} from 'semantic-ui-react-form/inputs/Input';
 import {List} from 'semantic-ui-react-form/List';
 
-import {GQL_MUTATION_CREATE_DOCUMENT_TYPE} from '../../../services/graphQL/documentType/mutationCreateDocumentType';
-import {GQL_MUTATION_UPDATE_DOCUMENT_TYPE} from '../../../services/graphQL/documentType/mutationUpdateDocumentType';
-import {GQL_QUERY_GET_DOCUMENT_TYPE} from '../../../services/graphQL/documentType/queryGetDocumentType';
+import {GQL_MUTATION_DOCUMENT_TYPE_CREATE} from '../../../services/graphQL/mutations/documentTypeCreateMutation';
+import {GQL_MUTATION_DOCUMENT_TYPE_UPDATE} from '../../../services/graphQL/mutations/documentTypeUpdateMutation';
+import {GQL_QUERY_DOCUMENT_TYPE_GET} from '../../../services/graphQL/queries/documentTypeGetQuery';
+
 import {fetchFields} from '../../../services/graphQL/fetchers/fetchFields';
 import {Checkmark} from '../components/Checkmark';
 import {Span} from '../components/Span';
@@ -79,7 +80,7 @@ const FIELD_DEFAULT = {
 	max: 0,
 	min: 0,
 	name: '',
-	nGram: true,
+	[INDEX_CONFIG_N_GRAM]: true,
 	path: false,
 	valueType: VALUE_TYPE_STRING
 };*/
@@ -196,7 +197,7 @@ export function NewOrEditDocumentType({
 				'Content-Type':	'application/json'
 			},
 			body: JSON.stringify({
-				query: GQL_QUERY_GET_DOCUMENT_TYPE,
+				query: GQL_QUERY_DOCUMENT_TYPE_GET,
 				variables: {
 					_id
 				}
@@ -257,7 +258,7 @@ export function NewOrEditDocumentType({
 					'Content-Type':	'application/json'
 				},
 				body: JSON.stringify({
-					query: _id ? GQL_MUTATION_UPDATE_DOCUMENT_TYPE : GQL_MUTATION_CREATE_DOCUMENT_TYPE,
+					query: _id ? GQL_MUTATION_DOCUMENT_TYPE_UPDATE : GQL_MUTATION_DOCUMENT_TYPE_CREATE,
 					variables
 				})
 			}).then(response => {
