@@ -1,4 +1,7 @@
-import {VALUE_TYPE_STRING} from '@enonic/js-utils';
+import {
+	INDEX_CONFIG_N_GRAM,
+	VALUE_TYPE_STRING
+} from '@enonic/js-utils';
 import {Button, Form, Icon, Modal, Popup} from 'semantic-ui-react';
 import {Form as EnonicForm} from 'semantic-ui-react-form/Form';
 import {Input} from 'semantic-ui-react-form/inputs/Input';
@@ -34,7 +37,7 @@ export function NewOrEditModal(props) {
 			enabled: true,
 			fulltext: true,
 			includeInAllText: true,
-			nGram: true, // node._indexConfig.default.nGram uses uppercase G in nGram
+			[INDEX_CONFIG_N_GRAM]: true,
 			path: false
 		},
 		servicesBaseUrl,

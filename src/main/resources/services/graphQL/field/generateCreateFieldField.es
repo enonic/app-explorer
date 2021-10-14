@@ -1,10 +1,11 @@
+import {INDEX_CONFIG_N_GRAM} from '@enonic/js-utils';
+
 import {
 	GraphQLBoolean,
 	GraphQLInt,
 	GraphQLString,
 	nonNull
 } from '/lib/graphql';
-
 import {coerseFieldType} from '/lib/explorer/field/coerseFieldType';
 import {createField} from '/lib/explorer/field/createField';
 
@@ -27,7 +28,7 @@ export function generateCreateFieldField({
 			//indexConfig,
 			max: GraphQLInt,
 			min: GraphQLInt,
-			nGram: GraphQLBoolean,
+			[INDEX_CONFIG_N_GRAM]: GraphQLBoolean,
 			path: GraphQLBoolean
 		},
 		resolve({
