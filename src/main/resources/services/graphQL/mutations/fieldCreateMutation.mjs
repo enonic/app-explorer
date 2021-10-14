@@ -1,9 +1,10 @@
-export const GQL_MUTATION_FIELD_UPDATE = `mutation UpdateField(
-	$_id: ID!
-
+export const GQL_MUTATION_FIELD_CREATE = `mutation CreateField(
+	# Required parameters
+	$key: String!
+	# Optional parameters
 	$decideByType: Boolean
-	$enabled: Boolean
 	$description: String
+	$enabled: Boolean
 	$fieldType: String
 	$fulltext: Boolean
 	$includeInAllText: Boolean
@@ -12,12 +13,13 @@ export const GQL_MUTATION_FIELD_UPDATE = `mutation UpdateField(
 	$nGram: Boolean
 	$path: Boolean
 ) {
-	updateField(
-		_id: $_id
-
+	createField(
+		# Required parameters
+		key: $key
+		# Optional parameters
 		decideByType: $decideByType
-		enabled: $enabled
 		description: $description
+		enabled: $enabled
 		fieldType: $fieldType
 		fulltext: $fulltext
 		includeInAllText: $includeInAllText
@@ -30,14 +32,14 @@ export const GQL_MUTATION_FIELD_UPDATE = `mutation UpdateField(
 	  _name
 	  _nodeType
 	  _path
-
-	  key
-
+	  _versionKey
+	  decideByType
 	  denyDelete
 	  description
+	  enabled
 	  fieldType
-	  inResults
-
+	  fulltext
+	  includeInAllText
 	  indexConfig {
 		  decideByType
 		  enabled
@@ -46,10 +48,10 @@ export const GQL_MUTATION_FIELD_UPDATE = `mutation UpdateField(
 		  nGram
 		  path
 	  }
-	  decideByType
-	  enabled
-	  fulltext
-	  includeInAllText
+	  inResults
+	  key
+	  max
+	  min
 	  nGram
 	  path
   }
@@ -58,17 +60,16 @@ export const GQL_MUTATION_FIELD_UPDATE = `mutation UpdateField(
 
 /* Example variables for testing
 {
-	"_id": FIND VALID FIELD ID,
-	"description": "description changed",
+	"key": "a",
+	"decideByType": false,
+	"description": "description",
+	"enabled": false,
 	"fieldType": "long",
-	"max": 2,
-	"min": 2,
-
-	"decideByType": true,
-	"enabled": true,
-	"fulltext": true,
-	"includeInAllText": true,
-	"nGram": true,
-	"path": false
+	"fulltext": false,
+	"includeInAllText": false,
+	"max": 1,
+	"min": 1,
+	"nGram": false,
+	"path": true
 }
 */

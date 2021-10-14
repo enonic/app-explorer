@@ -39,6 +39,7 @@ import {generateQueryApiKeysField} from './apiKey/generateQueryApiKeysField';
 import {generateCollectionFields} from './collection/generateCollectionFields';
 import {generateQueryCollectorsField} from './collector/generateQueryCollectorsField';
 import {generateFieldsField} from './field/generateFieldsField';
+import {addQueryFieldGet} from './field/addQueryFieldGet';
 
 import {addInterfaceTypes as addExplorerInterfaceTypes} from './interface/addInterfaceTypes';
 import {addMutationInterfaceCreate} from './interface/addMutationInterfaceCreate';
@@ -149,6 +150,7 @@ const {
 	queryFieldsField,
 	updateFieldField
 } = generateFieldsField({glue});
+addQueryFieldGet({glue});
 
 const getContentTypesField = generateGetContentTypesField({glue});
 

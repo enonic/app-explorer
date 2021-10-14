@@ -10,8 +10,9 @@ import {SubmitButton} from 'semantic-ui-react-form/buttons/SubmitButton';
 //import {ValidateFormButton} from 'semantic-ui-react-form/buttons/ValidateFormButton';
 //import {VisitAllButton} from 'semantic-ui-react-form/buttons/VisitAllButton';
 
-import {GQL_MUTATION_FIELD_CREATE} from '../../../services/graphQL/field/mutationFieldCreate';
-import {GQL_MUTATION_FIELD_UPDATE} from '../../../services/graphQL/field/mutationFieldUpdate';
+import {GQL_MUTATION_FIELD_CREATE} from '../../../services/graphQL/mutations/fieldCreateMutation';
+import {GQL_MUTATION_FIELD_UPDATE} from '../../../services/graphQL/mutations/fieldUpdateMutation';
+
 import {mustStartWithALowercaseLetter} from '../utils/mustStartWithALowercaseLetter';
 import {notDocumentMetaData} from '../utils/notDocumentMetaData';
 import {notDoubleDot} from '../utils/notDoubleDot';

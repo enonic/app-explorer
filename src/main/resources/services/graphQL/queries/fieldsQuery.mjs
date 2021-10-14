@@ -1,4 +1,4 @@
-export const GQL_QUERY_QUERY_FIELDS = `query QueryFieldsQuery(
+export const GQL_QUERY_FIELDS_QUERY = `query QueryFieldsQuery(
 	$fields: [String]
 	$includeSystemFields: Boolean
 ) {
@@ -13,16 +13,13 @@ export const GQL_QUERY_QUERY_FIELDS = `query QueryFieldsQuery(
 			_name
 			_nodeType
 			_path
-
-			key
-
+			decideByType
 			denyDelete
 			description
+			enabled
 			fieldType
-			inResults
-			max
-			min
-
+			fulltext
+			includeInAllText
 			indexConfig {
 				decideByType
 				enabled
@@ -31,13 +28,12 @@ export const GQL_QUERY_QUERY_FIELDS = `query QueryFieldsQuery(
 				nGram
 				path
 			}
-			decideByType
-			enabled
-			fulltext
-			includeInAllText
+			inResults
+			key
+			max
+			min
 			nGram
 			path
-
 			__referencedBy(
 				filters: {
 					boolean: {
