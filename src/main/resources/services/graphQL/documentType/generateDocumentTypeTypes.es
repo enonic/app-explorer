@@ -1,4 +1,5 @@
 import {
+	INDEX_CONFIG_N_GRAM,
 	VALUE_TYPE_BOOLEAN,
 	VALUE_TYPE_DOUBLE,
 	VALUE_TYPE_GEO_POINT,
@@ -40,7 +41,7 @@ export function generateDocumentTypeTypes({
 			max: { type: nonNull(GraphQLInt) },
 			min: { type: nonNull(GraphQLInt) },
 			name: { type: glue.getScalarType('_name') },
-			nGram: { type: nonNull(GraphQLBoolean) },
+			[INDEX_CONFIG_N_GRAM]: { type: nonNull(GraphQLBoolean) },
 			path: { type: nonNull(GraphQLBoolean) },
 			valueType: { type: nonNull(glue.addEnumType({
 				name: 'EnumValueTypes',

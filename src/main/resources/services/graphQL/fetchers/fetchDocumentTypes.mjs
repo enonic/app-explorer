@@ -1,4 +1,4 @@
-import {GQL_QUERY_QUERY_DOCUMENT_TYPES} from '../queries/documentTypesQuery.mjs';
+import {GQL_QUERY_DOCUMENT_TYPES_QUERY} from '../queries/documentTypesQuery.mjs';
 
 
 export function fetchDocumentTypes({
@@ -11,7 +11,7 @@ export function fetchDocumentTypes({
 			'Content-Type':	'application/json'
 		},
 		body: JSON.stringify({
-			query: GQL_QUERY_QUERY_DOCUMENT_TYPES
+			query: GQL_QUERY_DOCUMENT_TYPES_QUERY
 		})
 	})
 		.then(response => response.json())

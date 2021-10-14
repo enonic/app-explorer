@@ -1,10 +1,11 @@
-//import {toStr} from '@enonic/js-utils';
+import {
+	isNotFalse,
+	isNull//,
+	//toStr
+} from '@enonic/js-utils';
 
 import {updateDocumentType} from '/lib/explorer/documentType/updateDocumentType';
-import {
-	GraphQLID,
-	list
-} from '/lib/graphql';
+import {list} from '/lib/graphql';
 
 import {
 	GQL_INPUT_TYPE_DOCUMENT_TYPE_FIELDS_NAME,
@@ -21,13 +22,31 @@ export function generateUpdateDocumentTypeField({
 		args: {
 			_id: glue.getScalarType('_id'),
 			_name: glue.getScalarType('_name'),
-			_versionKey: GraphQLID,
+			_versionKey: glue.getScalarType('_versionKey'),
 			addFields: GQL_INPUT_TYPE_ADD_FIELDS,
 			fields: list(glue.getInputType(GQL_INPUT_TYPE_DOCUMENT_TYPE_FIELDS_NAME)),
 			properties: list(glue.getInputType(GQL_INPUT_TYPE_DOCUMENT_TYPE_PROPERTIES_NAME))
 		},
-		resolve({args}) {
-			return updateDocumentType(args);
+		resolve({args: {
+			_id,
+			_name,
+			_versionKey,
+			// GraphQL sends null so default values are not applied
+			addFields,
+			fields,
+			properties
+		}}) {
+			if (isNotFalse(addFields)) { addFields = true; }
+			if (isNull(fields)) { fields = []; }
+			if (isNull(properties)) { properties = []; }
+			return updateDocumentType({
+				_id,
+				_name,
+				_versionKey,
+				addFields,
+				fields,
+				properties
+			});
 		},
 		type: glue.getObjectType(GQL_TYPE_DOCUMENT_TYPE_NAME)
 	};

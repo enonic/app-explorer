@@ -1,4 +1,4 @@
-export const GQL_QUERY_QUERY_DOCUMENT_TYPES = `query QueryDocumentTypesQuery {
+export const GQL_QUERY_DOCUMENT_TYPES_QUERY = `query QueryDocumentTypesQuery {
 	queryDocumentTypes {
 		hits {
 			_id
