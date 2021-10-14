@@ -1,4 +1,8 @@
-import {toStr} from '@enonic/js-utils';
+import {
+	QUERY_FUNCTION_FULLTEXT,
+	QUERY_FUNCTION_NGRAM,
+	toStr
+} from '@enonic/js-utils';
 
 import {connect} from '/lib/xp/node';
 
@@ -63,8 +67,8 @@ export function get({
 		query: query
 			.split(' ')
 			.map(word => `(
-				fulltext('_name^7, displayName^5, description^3, _allText^1', '${word}', 'OR')
-				OR ngram('_name^6, displayName^4, description^2, _allText', '${word}', 'OR')
+				${QUERY_FUNCTION_FULLTEXT}('_name^7, displayName^5, description^3, _allText^1', '${word}', 'OR')
+				OR ${QUERY_FUNCTION_NGRAM}('_name^6, displayName^4, description^2, _allText', '${word}', 'OR')
 			)`)
 			.join(' AND ')
 			.replace(/\n\s*/g, ' ')

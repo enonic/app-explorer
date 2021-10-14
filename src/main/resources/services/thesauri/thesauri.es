@@ -1,4 +1,8 @@
-//import {toStr} from '@enonic/js-utils';
+import {
+	QUERY_FUNCTION_FULLTEXT,
+	QUERY_FUNCTION_NGRAM//,
+	//toStr
+} from '@enonic/js-utils';
 
 import {PRINCIPAL_EXPLORER_READ, RT_JSON} from '/lib/explorer/model/2/constants';
 import {connect} from '/lib/explorer/repo/connect';
@@ -27,10 +31,10 @@ export function get({
 
 	const queries = [];
 	if (from) {
-		queries.push(`(fulltext('from^2', '${from}', 'AND') OR ngram('from^1', '${from}', 'AND'))`);
+		queries.push(`(${QUERY_FUNCTION_FULLTEXT}('from^2', '${from}', 'AND') OR ${QUERY_FUNCTION_NGRAM}('from^1', '${from}', 'AND'))`);
 	}
 	if (to) {
-		queries.push(`(fulltext('to^2', '${to}', 'AND') OR ngram('to^1', '${to}', 'AND'))`);
+		queries.push(`(${QUERY_FUNCTION_FULLTEXT}('to^2', '${to}', 'AND') OR ${QUERY_FUNCTION_NGRAM}('to^1', '${to}', 'AND'))`);
 	}
 	const query = queries.length ? `(${queries.join(' OR ')})` : '';
 

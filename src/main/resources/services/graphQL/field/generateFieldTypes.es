@@ -1,4 +1,7 @@
-//import {toStr} from '@enonic/js-utils';
+import {
+	INDEX_CONFIG_N_GRAM//,
+	//toStr
+} from '@enonic/js-utils';
 
 import {
 	GraphQLBoolean,
@@ -25,7 +28,7 @@ export function generateFieldTypes({
 			enabled: { type: GraphQLBoolean },
 			fulltext: { type: GraphQLBoolean },
 			includeInAllText: { type: GraphQLBoolean },
-			nGram: { type: GraphQLBoolean },
+			[INDEX_CONFIG_N_GRAM]: { type: GraphQLBoolean },
 			path: { type: GraphQLBoolean }
 		}
 	});
@@ -50,7 +53,7 @@ export function generateFieldTypes({
 		key: { type: nonNull(GraphQLString) },
 		max: { type: GraphQLInt },
 		min: { type: GraphQLInt },
-		nGram: { type: GraphQLBoolean },
+		[INDEX_CONFIG_N_GRAM]: { type: GraphQLBoolean },
 		path: { type: GraphQLBoolean }
 	};
 

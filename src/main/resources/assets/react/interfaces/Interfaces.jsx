@@ -54,7 +54,7 @@ const GQL_DOCUMENT_TYPES = `queryDocumentTypes {
 			#max
 			#min
 			name
-			ngram
+			nGram
 			valueType
 		}
 	}

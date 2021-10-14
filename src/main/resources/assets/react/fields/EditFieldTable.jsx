@@ -1,4 +1,5 @@
 import {
+	INDEX_CONFIG_N_GRAM,
 	VALUE_TYPE_ANY,
 	VALUE_TYPE_BOOLEAN,
 	VALUE_TYPE_DOUBLE,
@@ -175,7 +176,7 @@ export const EditFieldTable = () => {
 				/></Table.Cell>
 				<Table.Cell collapsing textAlign='center'><EnonicCheckbox
 					disabled={!enabled}
-					name='nGram' // node._indexConfig.default.nGram uses uppercase G in nGram
+					name={INDEX_CONFIG_N_GRAM}
 					toggle
 				/></Table.Cell>
 				<Table.Cell collapsing textAlign='center'><EnonicCheckbox
