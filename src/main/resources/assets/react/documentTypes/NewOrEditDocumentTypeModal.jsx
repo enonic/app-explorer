@@ -37,13 +37,17 @@ export function NewOrEditDocumentTypeModal({
 		onClose={doClose}
 		open={open}
 		size='large'
-		trigger={<Popup
+		trigger={
+			<Popup
 			content={header}
 			inverted
-			trigger={_id ? <Button
+				trigger={_id
+					? <Button
 				icon
 				onClick={doOpen}
-			><Icon color='blue' name='edit'/></Button>
+					>
+						<Icon color='blue' name='edit'/>
+					</Button>
 				: <Button
 					circular
 					color='green'
@@ -54,9 +58,11 @@ export function NewOrEditDocumentTypeModal({
 						bottom: 13.5,
 						position: 'fixed',
 						right: 13.5
-					}}><Icon
-						name='plus'
-					/></Button>}/>}
+						}}>
+						<Icon name='plus'/>
+					</Button>}
+			/>
+		}
 	>
 		<Modal.Header as='h1' className='ui'>{header}</Modal.Header>
 		<NewOrEditDocumentType

@@ -191,6 +191,7 @@ export function NewOrEditDocumentType({
 	});
 
 	function getDocumentType() {
+		//console.debug('getDocumentType() called');
 		fetch(`${servicesBaseUrl}/graphQL`, {
 			method: 'POST',
 			headers: {
@@ -208,7 +209,7 @@ export function NewOrEditDocumentType({
 				//console.debug('data', data);
 				setInitialValues(data.data.getDocumentType);
 			});
-	} // fetchDocumentType
+	}
 
 	React.useEffect(() => {
 		//console.debug('NewOrEditDocumentType useEffect');
