@@ -39,25 +39,25 @@ export function NewOrEditDocumentTypeModal({
 		size='large'
 		trigger={
 			<Popup
-			content={header}
-			inverted
+				content={header}
+				inverted
 				trigger={_id
 					? <Button
-				icon
-				onClick={doOpen}
+						icon
+						onClick={doOpen}
 					>
 						<Icon color='blue' name='edit'/>
 					</Button>
-				: <Button
-					circular
-					color='green'
-					icon
-					onClick={() => doOpen}
-					size='massive'
-					style={{
-						bottom: 13.5,
-						position: 'fixed',
-						right: 13.5
+					: <Button
+						circular
+						color='green'
+						icon
+						onClick={doOpen}
+						size='massive'
+						style={{
+							bottom: 13.5,
+							position: 'fixed',
+							right: 13.5
 						}}>
 						<Icon name='plus'/>
 					</Button>}
