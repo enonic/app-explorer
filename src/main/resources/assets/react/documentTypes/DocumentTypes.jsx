@@ -1,3 +1,4 @@
+import moment from 'moment';
 import {
 	Button,
 	Header,
@@ -19,6 +20,9 @@ import {fetchFields} from '../../../services/graphQL/fetchers/fetchFields.mjs';
 export function DocumentTypes({
 	servicesBaseUrl
 }) {
+	const [updatedAt, setUpdatedAt] = React.useState(new moment());
+	const [durationSinceLastUpdate, setDurationSinceLastUpdate] = React.useState('');
+
 	const [boolPoll, setBoolPoll] = React.useState(true);
 	const [globalFields, setGlobalFields] = React.useState([]);
 	const [documentTypes, setDocumentTypes] = React.useState([]);
@@ -46,6 +50,7 @@ export function DocumentTypes({
 	//console.debug('DocumentTypes globalFieldsObj', globalFieldsObj);
 
 	function queryDocumentTypes() {
+		setUpdatedAt(new moment());
 		fetchFields({
 			handleData: (data) => {
 				setGlobalFields(data.queryFields.hits);
@@ -73,13 +78,24 @@ export function DocumentTypes({
 	// An empty array [] means on mount and unmount. This tells React that your effect doesn’t depend on any values from props or state.
 	// If you pass an empty array ([]), the props and state inside the effect will always have their initial values
 
-	useInterval(() => {
+	/*useInterval(() => {
 		// This will not run when a modal popup is open
 		//console.debug('boolPoll', boolPoll);
 		if (boolPoll) {
 			queryDocumentTypes();
 		}
-	}, 2500);
+	}, 2500);*/
+
+	useInterval(() => {
+		if (updatedAt) {
+			setDurationSinceLastUpdate(
+				moment
+					.duration(updatedAt.diff(new moment()))
+					.humanize()
+			);
+		}
+	}, 1000);
+
 
 	return <>
 		<Segment basic inverted style={{
@@ -155,6 +171,7 @@ export function DocumentTypes({
 			</Table>
 		</Segment>
 		<Header as='h1' content='Document types'/>
+		<Button onClick={queryDocumentTypes}>Last updated: {durationSinceLastUpdate}</Button>
 		<Table celled collapsing compact selectable singleLine striped>
 			<Table.Header>
 				<Table.Row>
