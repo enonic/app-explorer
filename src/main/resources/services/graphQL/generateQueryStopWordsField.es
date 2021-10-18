@@ -10,23 +10,28 @@ import {PRINCIPAL_EXPLORER_READ} from '/lib/explorer/model/2/constants';
 import {connect} from '/lib/explorer/repo/connect';
 import {query} from '/lib/explorer/stopWords/query';
 
+import {
+	GQL_INTERFACE_NODE_NAME,
+	GQL_TYPE_STOP_WORDS_NAME
+} from './constants';
+
 
 export  function generateQueryStopWordsField({
 	glue
 }) {
+	const {
+		fields: interfaceNodeFields,
+		type: interfaceNodeType
+	} = glue.getInterfaceTypeObj(GQL_INTERFACE_NODE_NAME);
 
 	const STOPWORDS_OBJECT_TYPE = glue.addObjectType({
-		name: 'StopWords',
-		//description:
+		name: GQL_TYPE_STOP_WORDS_NAME,
 		fields: {
-			_id: { type: glue.getScalarType('_id') },
-			_name: { type: glue.getScalarType('_name') },
-			_nodeType: { type: GraphQLString }, // TODO nonNull?
-			_path: { type: glue.getScalarType('_path') },
+			...interfaceNodeFields,
 			displayName: { type: nonNull(GraphQLString) },
-			words: { type: list(GraphQLString) }//,
-			//type: { type: nonNull(GraphQLString) }
-		}
+			words: { type: list(GraphQLString) }
+		},
+		interfaces: [interfaceNodeType]
 	}); // STOPWORDS_OBJECT_TYPE
 
 	return {
@@ -42,6 +47,7 @@ export  function generateQueryStopWordsField({
 				name,
 				_nodeType,
 				_path,
+				_versionKey,
 				displayName,
 				words//,
 				//type
@@ -50,6 +56,7 @@ export  function generateQueryStopWordsField({
 				_name: name,
 				_nodeType,
 				_path,
+				_versionKey,
 				displayName,
 				//words: words ? forceArray(words) : null,
 				words//, // Always array
@@ -78,7 +85,9 @@ export  function generateQueryStopWordsField({
 		hits {
 			_id
 			_name
+			_nodeType
 			_path
+			_versionKey
 			displayName
 			words
 			type

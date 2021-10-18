@@ -2,7 +2,9 @@ import {NT_DOCUMENT_TYPE} from '/lib/explorer/documentType/constants';
 import {
 	NT_COLLECTION,
 	NT_FIELD,
-	NT_INTERFACE
+	NT_INTERFACE,
+	NT_STOP_WORDS,
+	NT_THESAURUS
 } from '/lib/explorer/model/2/constants';
 import {reference} from '/lib/graphql';
 
@@ -11,6 +13,8 @@ import {
 	GQL_TYPE_DOCUMENT_TYPE_NAME,
 	GQL_TYPE_FIELD_NODE_NAME,
 	GQL_TYPE_INTERFACE_NAME,
+	GQL_TYPE_STOP_WORDS_NAME,
+	GQL_TYPE_THESAURUS_NAME,
 	GQL_UNION_TYPE_ANY_NODE
 } from './constants';
 
@@ -23,7 +27,9 @@ export function addUnionTypes({glue}) {
 			reference(GQL_TYPE_COLLECTION_NAME),
 			reference(GQL_TYPE_DOCUMENT_TYPE_NAME),
 			reference(GQL_TYPE_FIELD_NODE_NAME),
-			reference(GQL_TYPE_INTERFACE_NAME)
+			reference(GQL_TYPE_INTERFACE_NAME),
+			reference(GQL_TYPE_STOP_WORDS_NAME),
+			reference(GQL_TYPE_THESAURUS_NAME)
 		],
 		typeResolver(node) {
 			// WARNING I believe you cannot use lib-graphql.reference in here!
@@ -40,6 +46,10 @@ export function addUnionTypes({glue}) {
 				return glue.getObjectType(GQL_TYPE_FIELD_NODE_NAME);
 			case NT_INTERFACE:
 				return glue.getObjectType(GQL_TYPE_INTERFACE_NAME);
+			case NT_STOP_WORDS:
+				return glue.getObjectType(GQL_TYPE_STOP_WORDS_NAME);
+			case NT_THESAURUS:
+				return glue.getObjectType(GQL_TYPE_THESAURUS_NAME);
 			default: {
 				const msg = `Unhandeled _nodeType:${_nodeType}!`;
 				log.error(msg);

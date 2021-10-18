@@ -44,6 +44,8 @@ export const GQL_TYPE_NODE_DELETED_NAME = 'NodeDeleted';
 
 export const GQL_TYPE_REFERENCED_BY_NAME = 'ReferencedBy';
 
+export const GQL_TYPE_STOP_WORDS_NAME = 'StopWords';
+
 export const GQL_TYPE_SYNONYM_NAME = 'Synonym';
 export const GQL_TYPE_SYNONYMS_QUERY_RESULT_NAME = 'SynonymsQueryResult';
 

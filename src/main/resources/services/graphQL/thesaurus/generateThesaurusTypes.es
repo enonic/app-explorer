@@ -7,6 +7,7 @@ import {
 
 import {
 	GQL_INPUT_TYPE_THESAURUS_LANGUAGE_NAME,
+	GQL_INTERFACE_NODE_NAME,
 	GQL_TYPE_SYNONYM_NAME,
 	GQL_TYPE_THESAURI_QUERY_HITS,
 	GQL_TYPE_THESAURI_QUERY_RESULT,
@@ -25,13 +26,16 @@ export function generateThesaurusTypes({
 			to: { type: nonNull(GraphQLString)}
 		}
 	});
+
+	const {
+		fields: interfaceNodeFields,
+		type: interfaceNodeType
+	} = glue.getInterfaceTypeObj(GQL_INTERFACE_NODE_NAME);
+
 	glue.addObjectType({
 		name: GQL_TYPE_THESAURUS_NAME,
 		fields: {
-			_id: { type: glue.getScalarType('_id') },
-			_name: { type: glue.getScalarType('_name') },
-			_nodeType: { type: GraphQLString },
-			_path: { type: glue.getScalarType('_path') },
+			...interfaceNodeFields,
 			language: { type: glue.addObjectType({
 				name: GQL_TYPE_THESAURUS_LANGUAGE_NAME,
 				fields: {
@@ -39,7 +43,8 @@ export function generateThesaurusTypes({
 					to: { type: nonNull(GraphQLString)}
 				}
 			})}
-		}
+		},
+		interfaces: [interfaceNodeType]
 	});
 	glue.addObjectType({
 		name: GQL_TYPE_THESAURI_QUERY_RESULT,
