@@ -60,7 +60,7 @@ import {addExplorerRepoNodesGetQuery} from './addExplorerRepoNodesGetQuery';
 import {createObjectTypesUsingUnionTypes} from './createObjectTypesUsingUnionTypes';
 
 
-const {currentTimeMillis} = Java.type('java.lang.System');
+//const {currentTimeMillis} = Java.type('java.lang.System');
 
 const glue = new Glue();
 
@@ -282,11 +282,11 @@ export function post(request) {
 	};
 	//log.info(`context:${toStr(context)}`);
 
-	const before = currentTimeMillis();
+	//const before = currentTimeMillis();
 	const obj = execute(SCHEMA, query, variables, context);
-	const after = currentTimeMillis();
-	const duration = after - before;
-	log.debug(`Duration: ${duration}ms Query:${query}`);
+	//const after = currentTimeMillis();
+	//const duration = after - before;
+	//log.debug(`Duration: ${duration}ms Query:${query}`);
 
 	return {
 		contentType: RT_JSON,

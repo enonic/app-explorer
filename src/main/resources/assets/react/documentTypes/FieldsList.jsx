@@ -26,7 +26,7 @@ export const FieldsList = ({
 	const [context/*, dispatch*/] = getEnonicContext();
 
 	const properties = getIn(context.values, 'properties');
-	console.debug('properties', properties);
+	//console.debug('properties', properties);
 
 	const GLOBAL_FIELD_OBJ = {};
 	//const GLOBAL_FIELD_OPTIONS = globalFields.map(({
@@ -101,7 +101,7 @@ export const FieldsList = ({
 						path,
 						valueType
 					}, index) => {
-						console.debug('nGram', nGram);
+								//console.debug('nGram', nGram);
 						const PATH_PROPERTY = `${PATH_PROPERTIES}.${index}`;
 						return <Table.Row key={PATH_PROPERTY}>
 							<Table.Cell collapsing><Checkbox
