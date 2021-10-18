@@ -26,7 +26,7 @@ export const GQL_QUERY_EXPLORER_REPO_NODES_GET = `query GetExplorerRepoNodesQuer
 				}
 				documentTypeId
 				interfaces
-				language
+				collectionLanguage: language
 			}
 			... on DocumentType {
 				_id
@@ -95,6 +95,26 @@ export const GQL_QUERY_EXPLORER_REPO_NODES_GET = `query GetExplorerRepoNodesQuer
 				synonymIds
 			}
 			#... on Node {} # Have not investigated why this is autocompleted
+			... on StopWords {
+				_id
+				_name
+				_nodeType
+				_path
+				_versionKey
+				displayName
+				words
+			}
+			... on Thesaurus {
+				_id
+				_name
+				_nodeType
+				_path
+				_versionKey
+				thesaurusLanguage: language {
+					from
+					to
+				}
+			}
 		}
 	}
 }`;
@@ -106,7 +126,9 @@ export const GQL_QUERY_EXPLORER_REPO_NODES_GET = `query GetExplorerRepoNodesQuer
 		"com.enonic.app.explorer:collection",
 		"com.enonic.app.explorer:documentType",
 		"com.enonic.app.explorer:field",
-		"com.enonic.app.explorer:interface"
+		"com.enonic.app.explorer:interface",
+		"com.enonic.app.explorer:stop-words",
+		"com.enonic.app.explorer:thesaurus"
 	],
 	"query": "",
 	"start": 0

@@ -9,6 +9,8 @@ import {
 	NT_COLLECTION,
 	NT_FIELD,
 	NT_INTERFACE,
+	NT_STOP_WORDS,
+	NT_THESAURUS,
 	PRINCIPAL_EXPLORER_READ
 } from '/lib/explorer/model/2/constants';
 import {hasValue} from '/lib/explorer/query/hasValue';
@@ -50,7 +52,9 @@ export const addExplorerRepoNodesGetQuery = ({glue}) => {
 				NT_COLLECTION,
 				NT_DOCUMENT_TYPE,
 				NT_FIELD,
-				NT_INTERFACE
+				NT_INTERFACE,
+				NT_STOP_WORDS,
+				NT_THESAURUS
 			];}
 			if (isNotSet(query)) {query = '';}
 			if (isNotSet(start)) {start = 0;}
