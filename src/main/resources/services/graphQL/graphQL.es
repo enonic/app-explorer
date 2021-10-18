@@ -59,6 +59,9 @@ import {addUnionTypes} from './addUnionTypes';
 import {addExplorerRepoNodesGetQuery} from './addExplorerRepoNodesGetQuery';
 import {createObjectTypesUsingUnionTypes} from './createObjectTypesUsingUnionTypes';
 
+
+const {currentTimeMillis} = Java.type('java.lang.System');
+
 const glue = new Glue();
 
 // There is a bit of a chicken and egg problem with
@@ -279,12 +282,17 @@ export function post(request) {
 	};
 	//log.info(`context:${toStr(context)}`);
 
+	const before = currentTimeMillis();
+	const obj = execute(SCHEMA, query, variables, context);
+	const after = currentTimeMillis();
+	const duration = after - before;
+	log.debug(`Duration: ${duration}ms Query:${query}`);
+
 	return {
 		contentType: RT_JSON,
 		body: //JSON.stringify( // TODO This is causeing problems, commenting it out until I can look at all of them.
-			// NOTE This add null values for missing properties,
-			// but also causes default values in deconstruction to fail :(
-			execute(SCHEMA, query, variables, context)
+			// NOTE This add null values for missing properties
+			obj
 		//)
 	};
 } // post
