@@ -9,9 +9,15 @@ import {
 	VALUE_TYPE_LOCAL_TIME,
 	VALUE_TYPE_LONG,
 	VALUE_TYPE_SET,
-	VALUE_TYPE_STRING
+	VALUE_TYPE_STRING//,
+	//toStr
 } from '@enonic/js-utils';
 
+import {
+	coerseDocumentTypeAddFields,
+	coerseDocumentTypeFields,
+	coerseDocumentTypeProperties
+} from '/lib/explorer/documentType/coerseDocumentType';
 import {
 	GraphQLBoolean,
 	GraphQLInt,
@@ -86,18 +92,30 @@ export function generateDocumentTypeTypes({
 			// This appears in source without beeing defined here:
 			//__fieldKey: { type: GraphQLString }, // Passed on from field.referencedBy(documentType)
 
-			addFields: { type: nonNull(GraphQLBoolean) },
-			fields: { type: list(glue.addObjectType({
-				name: 'DocumentTypeFields',
-				fields: {
-					active: { type: nonNull(GraphQLBoolean) },
-					fieldId: { type: glue.getScalarType('_id') }
+			addFields: {
+				type: nonNull(GraphQLBoolean),
+				resolve(env) {
+					//log.debug(`env:${toStr(env)}`);
+					return coerseDocumentTypeAddFields(env.source.addFields);
 				}
-			}))},
-			properties: { type: list(glue.addObjectType({
-				name: 'DocumentTypeProperties',
-				fields: FIELDS_PROPERTY//glue.getFields(GQL_FIELD_DOCUMENT_TYPE_PROPERTY_NAME)
-			}))},
+			},
+			fields: {
+				resolve: (env) => coerseDocumentTypeFields(env.source.fields),
+				type: list(glue.addObjectType({
+					name: 'DocumentTypeFields',
+					fields: {
+						active: { type: nonNull(GraphQLBoolean) },
+						fieldId: { type: glue.getScalarType('_id') }
+					}
+				}))
+			},
+			properties: {
+				resolve: (env) => coerseDocumentTypeProperties(env.source.properties),
+				type: list(glue.addObjectType({
+					name: 'DocumentTypeProperties',
+					fields: FIELDS_PROPERTY//glue.getFields(GQL_FIELD_DOCUMENT_TYPE_PROPERTY_NAME)
+				}))
+			},
 			...interfaceNodeFields//glue.getInterfaceTypeFields(GQL_INTERFACE_NODE_NAME)
 		},
 		interfaces: [

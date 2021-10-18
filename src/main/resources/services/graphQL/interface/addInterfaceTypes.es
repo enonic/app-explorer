@@ -2,6 +2,13 @@
 	//forceArray,
 	toStr
 } from '@enonic/js-utils';*/
+
+import {
+	coerseInterfaceTypeCollectionIds,
+	coerseInterfaceTypeFields,
+	coerseInterfaceTypeStopWords,
+	coerseInterfaceTypeSynonymIds
+} from '/lib/explorer/interface/coerseInterfaceType';
 import {
 	GraphQLID,
 	GraphQLInt,
@@ -46,11 +53,22 @@ export function addInterfaceTypes({glue}) {
 		name: GQL_TYPE_INTERFACE_NAME,
 		fields: {
 			...interfaceNodeFields,
-			collectionIds: { type: list(GraphQLID) }, // null allowed
-			fields: { type: list(glue.getObjectType(GQL_TYPE_INTERFACE_FIELD_NAME)) }, // null allowed
+			collectionIds: {
+				resolve: (env) => coerseInterfaceTypeCollectionIds(env.source.collectionIds),
+				type: list(GraphQLID)
+			}, // null allowed
+			fields: {
+				resolve: (env) => coerseInterfaceTypeFields(env.source.fields),
+				type: list(glue.getObjectType(GQL_TYPE_INTERFACE_FIELD_NAME))
+			}, // null allowed
 			//stopWordIds: { type: list(GraphQLID) }, // null allowed
-			stopWords: { type: nonNull(list(GraphQLString)) }, // empty list allowed
-			synonymIds: { type: list(GraphQLID) } // null allowed
+			stopWords: {
+				resolve: (env) => coerseInterfaceTypeStopWords(env.source.stopWords),
+				type: nonNull(list(GraphQLString)) // empty list allowed
+			},
+			synonymIds: {
+				resolve: (env) => coerseInterfaceTypeSynonymIds(env.source.synonymIds),
+				type: list(GraphQLID) } // null allowed
 		},
 		interfaces: [interfaceNodeType]
 	});
