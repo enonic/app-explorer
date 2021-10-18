@@ -29,6 +29,8 @@ export const GQL_TYPE_COLLECTIONS_QUERY_RESULT = 'CollectionsQueryResult';
 export const GQL_TYPE_DOCUMENT_TYPE_NAME = 'DocumentType';
 export const GQL_TYPE_DOCUMENT_TYPE_QUERY_RESULT_NAME = 'DocumentTypeQueryResult';
 
+export const GQL_TYPE_EXPLORER_QUERY_RESULT_NAME = 'ExplorerQueryResult';
+
 export const GQL_TYPE_FIELD_NODE_NAME = 'FieldNode';
 export const GQL_TYPE_FIELDS_QUERY_RESULT_NAME = 'FieldsQueryResult';
 
@@ -60,5 +62,6 @@ export const GQL_MUTATION_INTERFACE_UPDATE_NAME = 'updateInterface';
 
 // Query field names
 
+export const GQL_QUERY_EXPLORER_REPO_NODES_GET_NAME = 'getExplorerRepoNodes';
 export const GQL_QUERY_INTERFACE_GET_NAME = 'getInterface';
 export const GQL_QUERY_FIELD_GET_NAME = 'getField';

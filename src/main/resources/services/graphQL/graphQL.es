@@ -56,6 +56,7 @@ import {generateThesaurusFields} from './thesaurus/generateThesaurusFields';
 
 import {hasFieldQuery} from './hasFieldQuery';
 import {addUnionTypes} from './addUnionTypes';
+import {addExplorerRepoNodesGetQuery} from './addExplorerRepoNodesGetQuery';
 import {createObjectTypesUsingUnionTypes} from './createObjectTypesUsingUnionTypes';
 
 const glue = new Glue();
@@ -96,6 +97,7 @@ addInputTypes({glue});
 
 // Must be before InterfaceTypes!
 addUnionTypes({glue});
+addExplorerRepoNodesGetQuery({glue});
 
 // Must be after ScalarTypes!
 // Must be after InputTypes
