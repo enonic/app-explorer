@@ -1,75 +1,32 @@
-import {Button, Icon, Modal, Popup} from 'semantic-ui-react';
+import {Modal} from 'semantic-ui-react';
 
 import {NewOrEditDocumentType} from './NewOrEditDocumentType';
 
 export function NewOrEditDocumentTypeModal({
 	_id, // optional
 	_name, // optional
-	afterClose = () => {
-		//console.debug('NewOrEditDocumentTypeModal default afterClose');
-	},
-	beforeOpen = () => {
-		//console.debug('NewOrEditDocumentTypeModal default beforeOpen');
-	},
 	collections = [], // optional
 	interfaces = [], // optional
+	onClose = () => {},
+	onMount = () => {},
+	open = false,
 	servicesBaseUrl
 }) {
 	// TODO get name from id
-	const [open, setOpen] = React.useState(false);
-	const doClose = () => {
-		//console.debug('NewOrEditDocumentTypeModal doClose');
-		setOpen(false);
-		afterClose();
-	};
-
-	// Made doOpen since onOpen doesn't get called consistently.
-	const doOpen = () => {
-		//console.debug('NewOrEditDocumentTypeModal doOpen');
-		beforeOpen();
-		setOpen(true);
-	};
-
-	const header = _name ? `Document type: ${_name}`: 'New document type';
 	return <Modal
 		closeIcon
 		closeOnDimmerClick={false}
-		onClose={doClose}
+		onClose={onClose}
+		onMount={onMount}
 		open={open}
 		size='large'
-		trigger={
-			<Popup
-				content={header}
-				inverted
-				trigger={_id
-					? <Button
-						icon
-						onClick={doOpen}
-					>
-						<Icon color='blue' name='edit'/>
-					</Button>
-					: <Button
-						circular
-						color='green'
-						icon
-						onClick={doOpen}
-						size='massive'
-						style={{
-							bottom: 13.5,
-							position: 'fixed',
-							right: 13.5
-						}}>
-						<Icon name='plus'/>
-					</Button>}
-			/>
-		}
 	>
-		<Modal.Header as='h1' className='ui'>{header}</Modal.Header>
+		<Modal.Header as='h1' className='ui'>{_name ? `Document type: ${_name}`: 'New document type'}</Modal.Header>
 		<NewOrEditDocumentType
 			_id={_id}
 			collections={collections}
 			interfaces={interfaces}
-			doClose={doClose}
+			doClose={onClose}
 			servicesBaseUrl={servicesBaseUrl}
 		/>
 	</Modal>;
