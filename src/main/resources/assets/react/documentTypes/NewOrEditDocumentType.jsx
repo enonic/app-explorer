@@ -69,30 +69,20 @@ export function NewOrEditDocumentType({
 	interfaces = [], // optional
 	servicesBaseUrl
 }) {
-	const [initialValues, setInitialValues] = React.useState(false);
-	const [globalFields, setGlobalFields] = React.useState([]);
 	const [_id, setId] = React.useState(idProp);
+	const [initialValues, setInitialValues] = React.useState(_id ? false : {
+		_name: '',
+		addFields: true,
+		fields: [],
+		properties: []
+	});
+	const [globalFields, setGlobalFields] = React.useState([]);
 	/*const [fieldModalState, setFieldModalState] = React.useState({
 		local: true,
 		open: false
 	});*/
 	//console.debug(`NewOrEditDocumentType initialValues`, initialValues);
 	//console.debug(`NewOrEditDocumentType globalFields`, globalFields);
-
-	const initialFields = {};
-	const initialProperties = {};
-	if (initialValues) {
-		if (initialValues.fields) {
-			initialValues.fields.forEach(({fieldId}) => {
-				initialFields[fieldId] = true;
-			});
-		}
-		if (initialValues.properties) {
-			initialValues.properties.forEach(({name}) => {
-				initialProperties[name] = true;
-			});
-		}
-	}
 
 	function getDocumentType() {
 		//console.debug('getDocumentType() called');
@@ -126,17 +116,30 @@ export function NewOrEditDocumentType({
 				includeSystemFields: false
 			}
 		});
-		if (_id) {
+	}, []);
+
+	React.useEffect(() => {
+		//console.debug('useEffect: initialValues changed');
+		if (_id && !initialValues) {
+			//console.debug('useEffect: _id && initialValues falsy');
 			getDocumentType();
-		} else {
-			setInitialValues({
-				_name: '',
-				addFields: true,
-				fields: [],
-				properties: []
+		}
+	}, [initialValues]); // After first paint and whenever initialValues changes.
+
+	const initialFields = {};
+	const initialProperties = {};
+	if (initialValues) {
+		if (initialValues.fields) {
+			initialValues.fields.forEach(({fieldId}) => {
+				initialFields[fieldId] = true;
 			});
 		}
-	}, []);
+		if (initialValues.properties) {
+			initialValues.properties.forEach(({name}) => {
+				initialProperties[name] = true;
+			});
+		}
+	}
 
 	return initialValues ? <EnonicForm
 		initialValues={initialValues}
@@ -182,13 +185,14 @@ export function NewOrEditDocumentType({
 								fields,
 								properties*/
 							} = json.data.createDocumentType;
-							setInitialValues({ // So reset button doesn't empty all inputs
+							/*setInitialValues({ // So reset button doesn't empty all inputs
 								_name,
 								addFields,
 								fields,
 								properties
-							});
+							});*/
 							setId(_id);
+							setInitialValues(false); // Should unmount the EnonicForm, trigger getDocumentType, and remount Enonicform?
 						});
 					}
 				}
