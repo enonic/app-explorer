@@ -174,7 +174,7 @@ export function NewOrEditDocumentType({
 					} else {
 						//console.debug('response.json()', response.json()); // Promise
 						response.json().then(json => {
-							console.debug('json', json);
+							//console.debug('json', json);
 							const {
 								_id/*,
 								_name,
@@ -251,7 +251,7 @@ export function NewOrEditDocumentType({
 		</Modal.Content>
 		<Modal.Actions>
 			{_id ? <ResetButton floated='left' secondary/> : null}
-			<Button onClick={doClose}>Cancel</Button>
+			<Button onClick={() => doClose()}>Cancel</Button>
 			<SubmitButton color={() => null} primary><Icon name='save'/>Save</SubmitButton>
 		</Modal.Actions>
 	</EnonicForm>
@@ -262,7 +262,7 @@ export function NewOrEditDocumentType({
 				</Dimmer>
 			</Segment></Modal.Content>
 			<Modal.Actions>
-				<Button onClick={doClose}>Cancel</Button>
+				<Button onClick={() => doClose()}>Cancel</Button>
 			</Modal.Actions>
 		</>;
 } // NewOrEditDocumentType

@@ -4,17 +4,19 @@ import {
 	Header,
 	Icon,
 	Label,
+	Popup,
 	Radio,
 	Segment,
 	Table
 } from 'semantic-ui-react';
 
-import {useInterval} from '../utils/useInterval';
-
-import {NewOrEditDocumentTypeModal} from './NewOrEditDocumentTypeModal';
-import {DeleteDocumentTypeModal} from './DeleteDocumentTypeModal';
 import {fetchDocumentTypes} from '../../../services/graphQL/fetchers/fetchDocumentTypes.mjs';
 import {fetchFields} from '../../../services/graphQL/fetchers/fetchFields.mjs';
+import {ButtonEdit} from '../components/ButtonEdit';
+import {ButtonNew} from '../components/ButtonNew';
+import {useInterval} from '../utils/useInterval';
+import {NewOrEditDocumentTypeModal} from './NewOrEditDocumentTypeModal';
+import {DeleteDocumentTypeModal} from './DeleteDocumentTypeModal';
 
 
 export function DocumentTypes({
@@ -26,6 +28,14 @@ export function DocumentTypes({
 	const [boolPoll, setBoolPoll] = React.useState(true);
 	const [globalFields, setGlobalFields] = React.useState([]);
 	const [documentTypes, setDocumentTypes] = React.useState([]);
+
+	const [newOrEditModalState, setNewOrEditModalState] = React.useState({
+		_id: undefined,
+		_name: '',
+		collections: [],
+		interfaces: [],
+		open: false
+	});
 
 	const [showAddFields, setShowAddFields] = React.useState(false);
 	const [showCollections, setShowCollections] = React.useState(false);
@@ -214,7 +224,7 @@ export function DocumentTypes({
 					fields = [],
 					properties = []
 				}, index) => {
-					const collections = {};
+					const collectionsObj = {};
 					const interfaces = [];
 					let documentsInTotal = 0;
 					referencedByCollections.forEach(({
@@ -230,8 +240,8 @@ export function DocumentTypes({
 						}
 					}) => {
 						documentsInTotal += documentsWithNameInCollectionRepoTotal;
-						if (_nodeType === 'com.enonic.app.explorer:collection' && !collections[collectionName]) {
-							collections[collectionName] = {
+						if (_nodeType === 'com.enonic.app.explorer:collection' && !collectionsObj[collectionName]) {
+							collectionsObj[collectionName] = {
 								documentsTotal: documentsWithNameInCollectionRepoTotal
 							};
 							referencedByInterfaces.forEach(({
@@ -244,7 +254,7 @@ export function DocumentTypes({
 							});
 						}
 					}); // forEach referencedByCollections
-					const collectionNames = Object.keys(collections).sort();
+					const collections = Object.keys(collectionsObj).sort();
 
 					const activeFields = fields.filter(({active}) => active);
 
@@ -262,29 +272,26 @@ export function DocumentTypes({
 					const activePropertyNames = activeProperties.map(({name})=>name).sort();
 
 					return <Table.Row key={index}>
-						<Table.Cell collapsing><NewOrEditDocumentTypeModal
-							_id={_id}
-							_name={_name}
-							collections={collectionNames}
-							interfaces={interfaces}
-							afterClose={() => {
-								//console.debug('NewOrEditDocumentTypeModal afterClose');
-								queryDocumentTypes();
-								setBoolPoll(true);
-							}}
-							beforeOpen={() => {
-								//console.debug('NewOrEditDocumentTypeModal beforeOpen');
-								setBoolPoll(false);
-							}}
-							servicesBaseUrl={servicesBaseUrl}
-						/></Table.Cell>
+						<Table.Cell collapsing>
+							<Popup
+								content={`Edit document type: ${_name}`}
+								inverted
+								trigger={<ButtonEdit onClick={() => setNewOrEditModalState({
+									_id,
+									_name,
+									collections,
+									interfaces,
+									open: true
+								})}/>}
+							/>
+						</Table.Cell>
 						<Table.Cell collapsing>{_name}</Table.Cell>
 
 						{showCollections ? <Table.Cell><ul style={{
 							listStyleType: 'none',
 							margin: 0,
 							padding: 0
-						}}>{collectionNames.map((c, i) => <li key={i}>{c}</li>)}</ul></Table.Cell> : null}
+						}}>{collections.map((c, i) => <li key={i}>{c}</li>)}</ul></Table.Cell> : null}
 
 						{showInterfaces ? <Table.Cell><ul style={{
 							listStyleType: 'none',
@@ -414,14 +421,39 @@ export function DocumentTypes({
 				})}
 			</Table.Body>
 		</Table>
+
+		<Popup
+			content='New document type'
+			inverted
+			trigger={<ButtonNew onClick={() => setNewOrEditModalState({
+				_id: undefined,
+				_name: '',
+				collections: [],
+				interfaces: [],
+				open: true
+			})}/>}
+		/>
+
 		<NewOrEditDocumentTypeModal
-			afterClose={() => {
-				//console.debug('NewOrEditDocumentTypeModal afterClose');
+			_id={newOrEditModalState._id}
+			_name={newOrEditModalState._name}
+			collections={newOrEditModalState.collections}
+			interfaces={newOrEditModalState.interfaces}
+			open={newOrEditModalState.open}
+			onClose={() => {
+				//console.debug('NewOrEditDocumentTypeModal onClose');
+				setNewOrEditModalState(prev => ({
+					_id: prev._id,
+					_name: prev._name,
+					collections: prev.collections,
+					interfaces: prev.interfaces,
+					open: false
+				}));
 				queryDocumentTypes();
 				setBoolPoll(true);
 			}}
-			beforeOpen={() => {
-				//console.debug('NewOrEditDocumentTypeModal beforeOpen');
+			onMount={() => {
+				//console.debug('NewOrEditDocumentTypeModal onMount');
 				setBoolPoll(false);
 			}}
 			servicesBaseUrl={servicesBaseUrl}

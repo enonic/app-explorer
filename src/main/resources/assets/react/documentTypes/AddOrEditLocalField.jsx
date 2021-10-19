@@ -65,7 +65,7 @@ export const AddOrEditLocalField = ({
 }) => {
 	//console.debug('propMax', propMax);
 	//console.debug('propMin', propMin);
-	console.debug('propName', propName);
+	//console.debug('propName', propName);
 	//console.debug('propValueType', propValueType);
 
 	const [context, dispatch] = getEnonicContext();
