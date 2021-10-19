@@ -24,6 +24,5 @@ export const ButtonNew = ({
 	icon={icon}
 	onClick={onClick}
 	size={size}
-	style={style}>
-	{children}
-</Button>;
+	style={style}
+>{children}</Button>;

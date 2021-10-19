@@ -1,8 +1,8 @@
 import {Button, Icon} from 'semantic-ui-react';
 
 
-export const ButtonEdit = ({
-	children = <Icon color='blue' name='edit'/>,
+export const ButtonDelete = ({
+	children = <Icon color='red' name='trash alternate outline'/>,
 	icon = true,
 	onClick = () => {},
 	...rest
