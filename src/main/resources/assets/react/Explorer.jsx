@@ -291,19 +291,24 @@ export function Explorer(props) {
 				id='mySidebar'
 				inverted
 				onHide={() => {
+					// NOTE This is called when a Modal dialog is opened/mounted AND ALSO when the Modal dialog is closed.
+					//console.debug('Sidebar onHide');
 					/* avoid race conditions between browser and react state */
 					//setPusherStyle(PUSHER_STYLE_SIDEBAR_HIDE);
-					setPusherWidth('auto');
 				}}
 				onHidden={() => {
+					//console.debug('Sidebar onHidden');
 					/* avoid race conditions between browser and react state */
+					setPusherWidth('auto'); // NOTE #394 This has to be here, and NOT under onHide, to avoid viewport wider than screen and invisible fixed buttons...
 				}}
 				onShow={() => {
+					//console.debug('Sidebar onShow');
 					/* avoid race conditions between browser and react state */
 					setPusherWidth(PUSHER_WIDTH);
 					//setPusherStyle(PUSHER_STYLE_SIDEBAR_SHOW);
 				}}
 				onVisible={() => {
+					//console.debug('Sidebar onVisible');
 					/* avoid race conditions between browser and react state */
 				}}
 				style={{
