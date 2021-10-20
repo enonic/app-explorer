@@ -1,8 +1,9 @@
 import getIn from 'get-value';
 import {
-	//Button,
+	Button,
 	Form,
 	Icon,
+	Popup,
 	Radio,
 	Table
 } from 'semantic-ui-react';
@@ -13,7 +14,7 @@ import {getEnonicContext} from 'semantic-ui-react-form/Context';
 import {ButtonDelete} from '../components/ButtonDelete';
 import {ButtonEdit} from '../components/ButtonEdit';
 import {Checkmark} from '../components/Checkmark';
-//import {Span} from '../components/Span';
+import {Span} from '../components/Span';
 import {AddOrEditLocalField} from './AddOrEditLocalField';
 //import {RemoveFieldFromDocumentTypeModal} from './RemoveFieldFromDocumentTypeModal';
 
@@ -35,7 +36,7 @@ export const FieldsList = ({
 	const GLOBAL_FIELD_OBJ = {};
 	//const GLOBAL_FIELD_OPTIONS = globalFields.map(({
 	globalFields.forEach(({
-		_id,
+		//_id,
 		//decideByType,
 		enabled,
 		fieldType,
@@ -47,13 +48,13 @@ export const FieldsList = ({
 		nGram,
 		path
 	}) => {
-		GLOBAL_FIELD_OBJ[_id] = {
+		GLOBAL_FIELD_OBJ[key] = {
 			//decideByType,
 			enabled,
 			fieldType,
 			fulltext,
 			includeInAllText,
-			key,
+			//key,
 			max,
 			min,
 			nGram,
@@ -96,6 +97,18 @@ export const FieldsList = ({
 		: properties).sort((a,b) => (a.name > b.name) ? 1 : -1);
 	//console.debug('combinedList', combinedList);
 
+	/*const headerCellStyle = {
+		//padding: '.92857143em .6em' // compact='very'
+	};*/
+	const cellStyle = {
+		//padding: '.4em .6em' // compact='very'
+		paddingBottom: 3,
+		paddingTop: 3
+	};
+	const popupStyle = {
+		opacity: .85
+	};
+
 	return <>
 		<Form>
 			<Form.Field>
@@ -110,13 +123,13 @@ export const FieldsList = ({
 			</Form.Field>
 		</Form>
 		{showGlobalFields || combinedList.length
-			? <Table celled compact selectable singleLine striped>
+			? <Table celled compact='very' selectable singleLine striped>
 				<Table.Header>
 					<Table.Row>
 						<Table.HeaderCell collapsing textAlign='center'>Active</Table.HeaderCell>
-						<Table.HeaderCell collapsing>Edit</Table.HeaderCell>
+						<Table.HeaderCell collapsing textAlign='center'>Edit</Table.HeaderCell>
 						<Table.HeaderCell>Field</Table.HeaderCell>
-						<Table.HeaderCell collapsing>Value type</Table.HeaderCell>
+						<Table.HeaderCell>Value type</Table.HeaderCell>
 						<Table.HeaderCell collapsing textAlign='center'>Min</Table.HeaderCell>
 						<Table.HeaderCell collapsing textAlign='center'>Max</Table.HeaderCell>
 						<Table.HeaderCell collapsing textAlign='center'>Indexing</Table.HeaderCell>
@@ -124,7 +137,7 @@ export const FieldsList = ({
 						<Table.HeaderCell collapsing textAlign='center'>Fulltext</Table.HeaderCell>
 						<Table.HeaderCell collapsing textAlign='center'>Ngram</Table.HeaderCell>
 						<Table.HeaderCell collapsing textAlign='center'>Path</Table.HeaderCell>
-						<Table.HeaderCell collapsing>Delete</Table.HeaderCell>
+						<Table.HeaderCell collapsing textAlign='center'>Delete</Table.HeaderCell>
 					</Table.Row>
 				</Table.Header>
 				<Table.Body>{
@@ -141,23 +154,47 @@ export const FieldsList = ({
 						nGram,
 						path
 					}, i) => <Table.Row key={i}>
-						<Table.Cell collapsing textAlign='center'>{global ? null : <Radio
-							checked={active}
-							onChange={(/*ignored,{checked}*/) => {}}
-							toggle
-						/>}</Table.Cell>
-						<Table.Cell collapsing><ButtonEdit onClick={() => {}}/></Table.Cell>
-						<Table.Cell disabled={global}>{name}{global ? <Icon color='grey' name='globe'/> : null}</Table.Cell>
-						{/*<Table.Cell icon={{color:'grey',name:'globe'}}/>*/}
-						<Table.Cell collapsing disabled={global}>{valueType}</Table.Cell>
-						<Table.Cell collapsing disabled={global} textAlign='center'>{min === 0 ? null : min}</Table.Cell>
-						<Table.Cell collapsing disabled={global} textAlign='center'>{max === 0 ? '∞' : max}</Table.Cell>
-						<Table.Cell collapsing textAlign='center'>{active ? <Checkmark disabled checked={enabled} size='large'/> : null}</Table.Cell>
-						<Table.Cell collapsing textAlign='center'>{active && enabled ? <Checkmark disabled checked={includeInAllText} size='large'/>: null}</Table.Cell>
-						<Table.Cell collapsing textAlign='center'>{active && enabled ? <Checkmark disabled checked={fulltext} size='large'/>: null}</Table.Cell>
-						<Table.Cell collapsing textAlign='center'>{active && enabled ? <Checkmark disabled checked={nGram} size='large'/>: null}</Table.Cell>
-						<Table.Cell collapsing textAlign='center'>{active && enabled ? <Checkmark disabled checked={path} size='large'/>: null}</Table.Cell>
-						<Table.Cell collapsing>{global ? null : <ButtonDelete onClick={() => {}}/>}</Table.Cell>
+						<Table.Cell collapsing style={cellStyle} textAlign='center'>
+							{global ? null : <Popup
+								content={`${active ? 'Dea' : 'A'}ctivate local field ${name}`}
+								inverted
+								style={popupStyle}
+								trigger={<Radio
+									checked={active}
+									onChange={(/*ignored,{checked}*/) => {}}
+									toggle
+								/>}
+							/>}
+						</Table.Cell>
+						<Table.Cell collapsing style={cellStyle} textAlign='center'>
+							<Button.Group>
+								<Popup
+									content={global ? `Customize global field ${name}` : `Edit local field ${name}`}
+									inverted
+									style={popupStyle}
+									trigger={<ButtonEdit onClick={() => {}}/>}
+								/>
+							</Button.Group>
+						</Table.Cell>
+						<Table.Cell style={cellStyle}><Span disabled={global}>{name}</Span>{global ? <Icon color='grey' name='globe' style={{
+							float: 'right'
+						}}/> : null}</Table.Cell>
+						<Table.Cell style={cellStyle}><Span disabled={global}>{valueType}</Span></Table.Cell>
+						<Table.Cell collapsing style={cellStyle} textAlign='center'><Span disabled={global}>{min === 0 ? null : min}</Span></Table.Cell>
+						<Table.Cell collapsing style={cellStyle} textAlign='center'><Span disabled={global}>{max === 0 ? '∞' : max}</Span></Table.Cell>
+						<Table.Cell collapsing style={cellStyle} textAlign='center'>{active ? <Checkmark disabled={global} checked={enabled} size='large'/> : null}</Table.Cell>
+						<Table.Cell collapsing style={cellStyle} textAlign='center'>{active && enabled ? <Checkmark disabled={global} checked={includeInAllText} size='large'/>: null}</Table.Cell>
+						<Table.Cell collapsing style={cellStyle} textAlign='center'>{active && enabled ? <Checkmark disabled={global} checked={fulltext} size='large'/>: null}</Table.Cell>
+						<Table.Cell collapsing style={cellStyle} textAlign='center'>{active && enabled ? <Checkmark disabled={global} checked={nGram} size='large'/>: null}</Table.Cell>
+						<Table.Cell collapsing style={cellStyle} textAlign='center'>{active && enabled ? <Checkmark disabled={global} checked={path} size='large'/>: null}</Table.Cell>
+						<Table.Cell collapsing style={cellStyle} textAlign='center'>{global ? null : <Button.Group>
+							<Popup
+								content={GLOBAL_FIELD_OBJ[name] ? `Remove customization of global field ${name}` : `Delete local field ${name}`}
+								inverted
+								style={popupStyle}
+								trigger={<ButtonDelete onClick={() => {}}/>}
+							/>
+						</Button.Group>}</Table.Cell>
 					</Table.Row>)
 				}</Table.Body>
 			</Table> : null}
