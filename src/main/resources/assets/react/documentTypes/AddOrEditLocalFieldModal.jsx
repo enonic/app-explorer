@@ -9,7 +9,8 @@ import {
 	VALUE_TYPE_LOCAL_TIME,
 	VALUE_TYPE_LONG,
 	VALUE_TYPE_SET,
-	VALUE_TYPE_STRING
+	VALUE_TYPE_STRING,
+	isSet,
 } from '@enonic/js-utils';
 import getIn from 'get-value';
 import {
@@ -19,7 +20,6 @@ import {
 	Input,
 	Message,
 	Modal,
-	Popup,
 	Radio,
 	Table
 } from 'semantic-ui-react';
@@ -31,6 +31,7 @@ import {notDocumentMetaData} from '../utils/notDocumentMetaData';
 import {notDoubleDot} from '../utils/notDoubleDot';
 import {onlyLettersDigitsUnderscoresAndDots} from '../utils/onlyLettersDigitsUnderscoresAndDots';
 import {notDoubleUnderscore} from '../utils/notDoubleUnderscore';
+import {required} from '../utils/required';
 
 
 const OPTIONS_VALUE_TYPES = [
@@ -51,18 +52,27 @@ const OPTIONS_VALUE_TYPES = [
 }));
 
 
-export const AddOrEditLocalField = ({
-	enabled: propEnabled = true,
+export const AddOrEditLocalFieldModal = ({
 	globalFieldObj = {},
-	includeInAllText: propIncludeInAllText = true,
-	fulltext: propFulltext = true,
-	max: propMax = 0,
-	min: propMin = 0,
-	name: propName = '',
-	nGram: propNgram = true,
-	path: propPath = false,
-	valueType: propValueType = VALUE_TYPE_STRING
+	onClose = () => {},
+	state: {
+		header,
+		initialValues: {
+			enabled: propEnabled = true,
+			includeInAllText: propIncludeInAllText = true,
+			index: propIndex = null,
+			fulltext: propFulltext = true,
+			max: propMax = 0,
+			min: propMin = 0,
+			name: propName = '',
+			nGram: propNgram = true,
+			path: propPath = false,
+			valueType: propValueType = VALUE_TYPE_STRING
+		} = {},
+		open = false
+	} = {}
 }) => {
+	//console.debug('propIncludeInAllText', propIncludeInAllText);
 	//console.debug('propMax', propMax);
 	//console.debug('propMin', propMin);
 	//console.debug('propName', propName);
@@ -70,23 +80,19 @@ export const AddOrEditLocalField = ({
 
 	const [context, dispatch] = getEnonicContext();
 
-	const fields = getIn(context.values, 'fields');
-	//console.debug('fields', fields);
-
 	const properties = getIn(context.values, 'properties');
 	//console.debug('properties', properties);
 
 	const usedNames = {};
-	fields.forEach(({fieldId}) => {
-		if (globalFieldObj[fieldId] && globalFieldObj[fieldId].key) { // globalFieldObj is {} until fetched
-			usedNames[globalFieldObj[fieldId].key] = true;
-		}
+	Object.keys(globalFieldObj).forEach((name) => {
+		usedNames[name] = true;
 	});
 	properties.forEach(({name}) => {
 		usedNames[name] = true;
 	});
 
-	const [open, setOpen] = React.useState(false);
+	// WARNING: When reusing a single modal component,
+	// component internal state default values are NOT reset when props change!
 	const [enabled, setEnabled] = React.useState(propEnabled);
 	const [fulltext, setFulltext] = React.useState(propFulltext);
 	const [includeInAllText, setIncludeInAllText] = React.useState(propIncludeInAllText);
@@ -97,12 +103,51 @@ export const AddOrEditLocalField = ({
 	const [path, setPath] = React.useState(propPath);
 	const [valueType, setValueType] = React.useState(propValueType);
 
-	const errorMsg = mustStartWithALowercaseLetter(name)
-		|| onlyLettersDigitsUnderscoresAndDots(name)
-		|| notDoubleUnderscore(name)
-		|| notDoubleDot(name)
-		|| notDocumentMetaData(name)
-		|| (usedNames[name] ? `${name} already added, please input another name.` : ''); // '' = falsy
+	const [nameTouched, setNameTouched] = React.useState(false);
+	//console.debug('includeInAllText', includeInAllText);
+	//console.debug('name', name);
+
+	/*
+	Since I'm doing {open ? <AddOrEditLocalFieldModal> : null} outside the
+	component, the component internal state will be totally wiped onClose.
+	Thus there is no need for the following code:
+	React.useEffect(() => {
+		//console.debug('Props changed, updating internal state');
+		setEnabled(propEnabled);
+		setFulltext(propFulltext);
+		setIncludeInAllText(propIncludeInAllText);
+		setMax(propMax);
+		setMin(propMin);
+		setName(propName);
+		setNgram(propNgram);
+		setPath(propPath);
+		setValueType(propValueType);
+		setNameTouched(false);
+	}, [
+		propEnabled,
+		propFulltext,
+		propIncludeInAllText,
+		propMax,
+		propMin,
+		propName,
+		propNgram,
+		propPath,
+		propValueType
+	]);*/
+
+	const errorMsg = propName
+		? undefined
+		: nameTouched
+			? (
+				required(name)
+				|| mustStartWithALowercaseLetter(name)
+				|| onlyLettersDigitsUnderscoresAndDots(name)
+				|| notDoubleUnderscore(name)
+				|| notDoubleDot(name)
+				|| notDocumentMetaData(name)
+				|| (usedNames[name] ? `${name} already added, please input another name.` : '') // '' = falsy
+			)
+			: undefined;
 
 	const msg =  errorMsg ? <Message
 		content={errorMsg}
@@ -110,32 +155,31 @@ export const AddOrEditLocalField = ({
 		negative
 	/> : null;
 
-	const header = `${propName ? 'Edit' : 'Add'} local field`;
-
 	return <Modal
 		closeIcon
 		closeOnDimmerClick={false}
+		onClose={onClose}
 		open={open}
 		size='large' // small is too narrow
-		trigger={<Popup
-			content={header}
-			inverted
-			trigger={<Button
-				icon
-				onClick={() => setOpen(true)}>
-				<Icon
-					color={propName ? 'blue' : 'green'}
-					name={propName ? 'edit' : 'plus'}
-				/>{propName ? '' : ' Add local field'}</Button>}
-		/>}
 	>
 		<Modal.Header as='h1' className='ui'>{header}</Modal.Header>
 		<Modal.Content>
+			<Input
+				disabled={propName}
+				fluid
+				label='Name'
+				onChange={(event, {value: newName}) => {
+					setName(newName);
+					setNameTouched(true);
+				}}
+				placeholder='Please input a local field name'
+				defaultValue={name}
+			/>
+			{msg}
 			<Table celled compact selectable singleLine striped>
 				<Table.Header>
 					<Table.Row>
-						<Table.HeaderCell>Name</Table.HeaderCell>
-						<Table.HeaderCell collapsing>Value type</Table.HeaderCell>
+						<Table.HeaderCell>Value type</Table.HeaderCell>
 						<Table.HeaderCell collapsing textAlign='center'>Min</Table.HeaderCell>
 						<Table.HeaderCell collapsing textAlign='center'>Max</Table.HeaderCell>
 						<Table.HeaderCell collapsing textAlign='center'>Indexing</Table.HeaderCell>
@@ -147,16 +191,7 @@ export const AddOrEditLocalField = ({
 				</Table.Header>
 				<Table.Body>
 					<Table.Row>
-						<Table.Cell>{propName
-							? propName
-							: <Input
-								onChange={(event, {value: newName}) => {
-									setName(newName);
-								}}
-								placeholder='Please input a local field name'
-								value={name}
-							/>}</Table.Cell>
-						<Table.Cell collapsing><Dropdown
+						<Table.Cell><Dropdown
 							onChange={(event, {value: newValueType}) => {
 								setValueType(newValueType);
 							}}
@@ -219,13 +254,12 @@ export const AddOrEditLocalField = ({
 					</Table.Row>
 				</Table.Body>
 			</Table>
-			{msg}
 		</Modal.Content>
 		<Modal.Actions>
-			<Button onClick={() => setOpen(false)}>Cancel</Button>
+			<Button onClick={() => onClose()}>Cancel</Button>
 			<Button disabled={!!errorMsg} onClick={() => {
 				dispatch(setValue({
-					path: `properties.${properties.length}`,
+					path: `properties.${isSet(propIndex) ? propIndex : properties.length}`,
 					value: {
 						active: true,
 						enabled,
@@ -238,8 +272,13 @@ export const AddOrEditLocalField = ({
 						path,
 						valueType
 					}}));
-				setOpen(false);
-			}} primary><Icon name='save'/> Save</Button>
+				onClose();
+			}} primary><Icon name='save'/> {propName
+					? isSet(propIndex)
+						? 'Update'
+						: 'Override'
+					: 'Add'
+				}</Button>
 		</Modal.Actions>
 	</Modal>;
-}; // AddOrEditLocalField
+}; // AddOrEditLocalFieldModal
