@@ -15,7 +15,7 @@ import {ButtonDelete} from '../components/ButtonDelete';
 import {ButtonEdit} from '../components/ButtonEdit';
 import {Checkmark} from '../components/Checkmark';
 import {Span} from '../components/Span';
-import {AddOrEditLocalField} from './AddOrEditLocalField';
+import {AddOrEditLocalFieldModal} from './AddOrEditLocalFieldModal';
 //import {RemoveFieldFromDocumentTypeModal} from './RemoveFieldFromDocumentTypeModal';
 
 
@@ -68,33 +68,69 @@ export const FieldsList = ({
 	});
 
 	const [showGlobalFields, setShowGlobalFields] = React.useState(false);
+	const [addOrEditModalState, setAddOrEditModalState] = React.useState({
+		open: false
+	});
 
-	const combinedList = (showGlobalFields
-		? properties.concat(
-			globalFields.map(({
-				enabled,
-				fieldType,
-				fulltext,
-				includeInAllText,
-				key,
-				max,
-				min,
-				nGram,
-				path
-			})=> ({
-				enabled,
-				fulltext,
-				global: true,
-				includeInAllText,
-				name: key,
-				valueType: fieldType,
-				max,
-				min,
-				nGram,
-				path
-			}))
-		)
-		: properties).sort((a,b) => (a.name > b.name) ? 1 : -1);
+	const combinedObj = {};
+	properties.forEach(({
+		enabled,
+		fulltext,
+		includeInAllText,
+		name: key,
+		valueType: fieldType,
+		max,
+		min,
+		nGram,
+		path
+	}, index) => {
+		combinedObj[key] = {
+			enabled,
+			fulltext,
+			global: false,
+			includeInAllText,
+			index,
+			name: key,
+			valueType: fieldType,
+			max,
+			min,
+			nGram,
+			path
+		};
+	});
+
+	if (showGlobalFields) {
+		globalFields.forEach(({
+			enabled,
+			fieldType,
+			fulltext,
+			includeInAllText,
+			key,
+			max,
+			min,
+			nGram,
+			path
+		}) => {
+			if (!combinedObj[key]) {
+				combinedObj[key] = {
+					enabled,
+					fulltext,
+					global: true,
+					index: null,
+					includeInAllText,
+					name: key,
+					valueType: fieldType,
+					max,
+					min,
+					nGram,
+					path
+				};
+			}
+		}); // globalFields.forEach
+	} // if showGlobalFields
+	//console.debug('combinedObj', combinedObj);
+
+	const combinedList = Object.keys(combinedObj).sort().map((key) => combinedObj[key]);
 	//console.debug('combinedList', combinedList);
 
 	/*const headerCellStyle = {
@@ -147,6 +183,7 @@ export const FieldsList = ({
 						fulltext,
 						global = false,
 						includeInAllText,
+						index = null,
 						name,
 						valueType,
 						max,
@@ -169,10 +206,25 @@ export const FieldsList = ({
 						<Table.Cell collapsing style={cellStyle} textAlign='center'>
 							<Button.Group>
 								<Popup
-									content={global ? `Customize global field ${name}` : `Edit local field ${name}`}
+									content={global ? `Override global field ${name}` : `Edit local field ${name}`}
 									inverted
 									style={popupStyle}
-									trigger={<ButtonEdit onClick={() => {}}/>}
+									trigger={<ButtonEdit onClick={() => setAddOrEditModalState({
+										header: GLOBAL_FIELD_OBJ[name] ? `Override global field ${name}` : `Edit local field ${name}`,
+										initialValues: {
+											enabled,
+											includeInAllText,
+											index,
+											fulltext,
+											max,
+											min,
+											name,
+											nGram,
+											path,
+											valueType
+										},
+										open: true
+									})}/>}
 								/>
 							</Button.Group>
 						</Table.Cell>
@@ -198,8 +250,26 @@ export const FieldsList = ({
 					</Table.Row>)
 				}</Table.Body>
 			</Table> : null}
-		<AddOrEditLocalField
-			globalFieldObj={GLOBAL_FIELD_OBJ}
+		<Popup
+			content='Add local field'
+			inverted
+			style={popupStyle}
+			trigger={<Button
+				icon
+				onClick={() => setAddOrEditModalState({
+					header: 'Add local field',
+					open: true
+				})}><Icon
+					color='green'
+					name='plus'
+				/> Add local field</Button>}
 		/>
+		{addOrEditModalState.open /* This means the component internal state will be totally reset */
+			? <AddOrEditLocalFieldModal
+				globalFieldObj={GLOBAL_FIELD_OBJ}
+				onClose={() => setAddOrEditModalState({open: false})}
+				state={addOrEditModalState}
+			/>
+			: null}
 	</>;
 };
