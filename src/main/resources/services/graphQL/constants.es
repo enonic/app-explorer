@@ -6,7 +6,6 @@ export const GQL_FIELDS_DOCUMENT_TYPE_PROPERTY_NAME = 'DocumentTypePropertyField
 export const GQL_INPUT_TYPE_COLLECTION_COLLECTOR_NAME = 'CollectionCollectorInput';
 export const GQL_INPUT_TYPE_COLLECTION_CRON_NAME = 'CollectionCronInput';
 
-export const GQL_INPUT_TYPE_DOCUMENT_TYPE_FIELDS_NAME = 'DocumentTypeFieldsInput';
 export const GQL_INPUT_TYPE_DOCUMENT_TYPE_PROPERTIES_NAME = 'DocumentTypePropertiesInput';
 
 export const GQL_INPUT_TYPE_FILTERS_NAME = 'Filters';

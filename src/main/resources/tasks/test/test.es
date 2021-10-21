@@ -239,7 +239,6 @@ export function run() {
 		variables: {
 			_name: 'myTestDocumentTypeName'//,
 			//addFields: true
-			//fields: []
 			//properties: []
 		}
 	});
@@ -260,7 +259,6 @@ export function run() {
 				_path: '/documentTypes/myTestDocumentTypeName',
 				_versionKey: createdDocumentTypeVersionKey,
 				addFields: true,
-				fields: [],
 				properties: []
 			}
 		}
@@ -284,7 +282,6 @@ export function run() {
 					_path: '/documentTypes/myTestDocumentTypeName',
 					_versionKey: createdDocumentTypeVersionKey,
 					addFields: true,
-					fields: [],
 					properties: [],
 					__referencedBy: {
 						count: 0,
@@ -305,7 +302,6 @@ export function run() {
 				_name: 'myRenamedTestDocumentTypeName',
 				_versionKey: createdDocumentTypeVersionKey,
 				addFields: false
-				//fields: []
 				//properties: []
 			}
 		});
@@ -326,7 +322,6 @@ export function run() {
 					_path: '/documentTypes/myRenamedTestDocumentTypeName',
 					_versionKey: updatedDocumentTypeVersionKey,
 					addFields: false,
-					fields: [],
 					properties: []
 				}
 			}

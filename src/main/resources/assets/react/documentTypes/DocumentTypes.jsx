@@ -191,20 +191,8 @@ export function DocumentTypes({
 					{showInterfaces ? <Table.HeaderCell>Used in interfaces</Table.HeaderCell> : null}
 					<Table.HeaderCell textAlign='right'>Documents</Table.HeaderCell>
 					{showDocumentsPerCollection ? <Table.HeaderCell>Documents per collection</Table.HeaderCell> : null}
-
 					<Table.HeaderCell textAlign='right'>Field count</Table.HeaderCell>
-					{/*
-						<Table.HeaderCell>Global field count</Table.HeaderCell>
-						<Table.HeaderCell>Local field count</Table.HeaderCell>
-					*/}
-
 					<Table.HeaderCell>Fields</Table.HeaderCell>
-
-					{/*
-						<Table.HeaderCell>Global fields</Table.HeaderCell>
-						<Table.HeaderCell>Local fields</Table.HeaderCell>
-					*/}
-
 					{showAddFields ? <Table.HeaderCell>Add fields</Table.HeaderCell> : null}
 					{showDetails ? <Table.HeaderCell>Details</Table.HeaderCell> : null}
 					{showDeleteButton ?<Table.HeaderCell>Delete</Table.HeaderCell> : null}
@@ -221,7 +209,6 @@ export function DocumentTypes({
 					},
 					//_versionKey, // We get this inside NewOrEditDocumentTypeModal
 					addFields = true,
-					fields = [],
 					properties = []
 				}, index) => {
 					const collectionsObj = {};
@@ -255,19 +242,6 @@ export function DocumentTypes({
 						}
 					}); // forEach referencedByCollections
 					const collections = Object.keys(collectionsObj).sort();
-
-					const activeFields = fields.filter(({active}) => active);
-
-					const activeFieldNames = [];
-					activeFields.forEach(({fieldId}) => {
-						if (globalFieldsObj[fieldId] && globalFieldsObj[fieldId].key) {
-							activeFieldNames.push(globalFieldsObj[fieldId].key);
-						} else if (Object.keys(globalFieldsObj).length) { // No need to report error when globalFieldsObj is not populated yet...
-							console.error(`Unable to find global field name for field id:${fieldId}!`);
-						}
-					});
-					activeFieldNames.sort(); // in_place
-
 					const activeProperties = properties.filter(({active}) => active);
 					const activePropertyNames = activeProperties.map(({name})=>name).sort();
 
@@ -307,22 +281,13 @@ export function DocumentTypes({
 								margin: 0,
 								padding: 0
 							}}>
-								{Object.keys(collections).map((k, i) => <li key={i}>{k}({collections[k].documentsTotal})</li>)}
+								{Object.keys(collectionsObj).map((k, i) => <li key={i}>{k}({collectionsObj[k].documentsTotal})</li>)}
 								<li>Total: {documentsInTotal}</li>
 							</ul>
 						</Table.Cell> : null}
 
-						<Table.Cell collapsing textAlign='right'>{activeFields.length + activeProperties.length}</Table.Cell>
-						{/*
-							<Table.Cell collapsing>{activeFields.length}</Table.Cell>
-							<Table.Cell collapsing>{activeProperties.length}</Table.Cell>
-						*/}
-
-						<Table.Cell collapsing>{activeFieldNames.concat(activePropertyNames).sort().join(', ')}</Table.Cell>
-						{/*
-							<Table.Cell collapsing>{activeFieldNames.join(', ')}</Table.Cell>
-							<Table.Cell collapsing>{activePropertyNames.join(', ')}</Table.Cell>
-						*/}
+						<Table.Cell collapsing textAlign='right'>{activeProperties.length}</Table.Cell>
+						<Table.Cell collapsing>{activePropertyNames.sort().join(', ')}</Table.Cell>
 
 						{showAddFields ? <Table.Cell collapsing>{addFields ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='grey' name='x' size='large'/>}</Table.Cell> : null}
 
@@ -341,31 +306,6 @@ export function DocumentTypes({
 									</Table.Row>
 								</Table.Header>
 								<Table.Body>
-									{activeFields.map(({
-										fieldId
-									}, j) => {
-										const fieldObj = globalFieldsObj[fieldId] || {};
-										const {
-											enabled,
-											fieldType,
-											fulltext,
-											includeInAllText,
-											max,
-											min,
-											key,
-											nGram
-										} = fieldObj;
-										return <Table.Row disabled={true} key={`${index}.${j}`}>
-											<Table.Cell collapsing>{key}</Table.Cell>
-											<Table.Cell collapsing>{fieldType}</Table.Cell>
-											<Table.Cell collapsing textAlign='center'>{min === 0 ? null : min}</Table.Cell>
-											<Table.Cell collapsing textAlign='center'>{max === 0 ? '∞' : max}</Table.Cell>
-											<Table.Cell collapsing textAlign='center'><Icon color='grey' disabled={true} name={enabled ? 'checkmark' : 'x'} size='large'/></Table.Cell>
-											<Table.Cell collapsing textAlign='center'>{enabled ? <Icon color='grey' disabled={true} name={fulltext ? 'checkmark' : 'x'} size='large'/> : null}</Table.Cell>
-											<Table.Cell collapsing textAlign='center'>{enabled ? <Icon color='grey' disabled={true} name={nGram ? 'checkmark' : 'x'} size='large'/> : null}</Table.Cell>
-											<Table.Cell collapsing textAlign='center'>{enabled ? <Icon color='grey' disabled={true} name={includeInAllText ? 'checkmark' : 'x'} size='large'/> : null}</Table.Cell>
-										</Table.Row>;
-									})}
 									{activeProperties.map(({
 										enabled,
 										fulltext,
