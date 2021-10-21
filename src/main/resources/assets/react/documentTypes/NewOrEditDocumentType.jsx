@@ -65,7 +65,7 @@ const SCHEMA = {
 export function NewOrEditDocumentType({
 	doClose = () => {},
 	_id: idProp, // optional
-	collections = [], // optional
+	collectionsArr = [], // optional
 	interfaces = [], // optional
 	servicesBaseUrl
 }) {
@@ -214,7 +214,7 @@ export function NewOrEditDocumentType({
 							},
 							render: () => <Tab.Pane>
 								<FieldsList
-									collections={collections}
+									collectionsArr={collectionsArr}
 									globalFields={globalFields}
 									interfaces={interfaces}
 									servicesBaseUrl={servicesBaseUrl}

@@ -23,7 +23,7 @@ const PATH_PROPERTIES = 'properties';
 
 
 export const FieldsList = ({
-	collections,
+	collectionsArr,
 	globalFields,
 	interfaces,
 	servicesBaseUrl
@@ -280,7 +280,7 @@ export const FieldsList = ({
 			: null}
 		{removeModalState.open
 			? <RemoveFieldFromDocumentTypeModal
-				collections={collections}
+				collectionsArr={collectionsArr}
 				interfaces={interfaces}
 				onClose={() => setRemoveModalState({open: false})}
 				servicesBaseUrl={servicesBaseUrl}
