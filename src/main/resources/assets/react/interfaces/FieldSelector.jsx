@@ -17,34 +17,69 @@ import {DEFAULT_INTERFACE_FIELDS} from '../../../constants';
 
 
 export function FieldSelector(props) {
+
 	const [context/*, dispatch*/] = getEnonicContext();
+	const collectionIds = getIn(context.values, 'collectionIds') || [];
+
 	const {
 		collectionIdToFieldKeys = {},
 		disabled = false,
+		globalFieldsObj = {
+			'_allText': true // TODO Hardcode
+		},
 		name = 'fields',
 		parentPath,
 		path = parentPath ? `${parentPath}.${name}` : name,
 		value = getIn(context.values, path)//,
 		//...rest
 	} = props;
-	const collectionIds = getIn(context.values, 'collectionIds') || [];
-	const fieldKeysObj = {
-		_allText: true // NOTE Hardcode
-	};
+	//console.debug('globalFieldsObj', globalFieldsObj);
+	//console.debug('FieldSelector path', path, 'value', value);
+
+	const fieldKeysObj = {};
+	Object.keys(globalFieldsObj).forEach((k) => {
+		fieldKeysObj[k] = {
+			icon: 'globe'/*,
+			key: k,
+			text: k,
+			value: k*/
+		};
+	});
+	//console.debug('fieldKeysObj', fieldKeysObj);
+
 	collectionIds.forEach((collectionId) => {
+		//console.debug('collectionId', collectionId);
 		const collectionFieldKeys = collectionIdToFieldKeys[collectionId];
+		//console.debug('collectionFieldKeys', collectionFieldKeys);
 		if (collectionFieldKeys) {
 			collectionFieldKeys.forEach((fieldKey) => {
-				fieldKeysObj[fieldKey] = true;
+				//console.debug('fieldKey', fieldKey);
+				fieldKeysObj[fieldKey] = { // This should overwrite global fields
+					icon: (fieldKeysObj[fieldKey]
+						&& (
+							fieldKeysObj[fieldKey].icon === 'globe'
+							|| fieldKeysObj[fieldKey].icon === 'question'
+						)
+					)
+						? 'question'
+						: 'map marker alternate'/*,
+					key: fieldKey,
+					text: fieldKey,
+					value: fieldKey*/
+				};
 			});
 		}
 	});
 	//console.debug('fieldKeysObj', fieldKeysObj);
-	const fieldOptions = Object.keys(fieldKeysObj).sort()
-		.map((key) => ({key, text: key, value: key}));
-	//console.debug('fieldOptions', fieldOptions);
 
-	//console.debug('FieldSelector path', path, 'value', value);
+	const fieldOptions = Object.keys(fieldKeysObj).sort()
+		.map((key) => ({
+			icon: fieldKeysObj[key].icon,
+			key,
+			text: key,
+			value: key
+		}));
+	//console.debug('fieldOptions', fieldOptions);
 
 	// This should not be needed:
 	if(!(value && Array.isArray(value) && value.length)) {
@@ -67,24 +102,34 @@ export function FieldSelector(props) {
 			<Table.Body>
 				<List
 					path={path}
-					render={(fieldsArray) => fieldsArray.map((ignored, index) => {
+					render={(fieldsArray) => fieldsArray.map(({
+						//boost,
+						name
+					}, index) => {
 						const key =`${path}.${index}`;
 						return <Table.Row key={key}>
 							<Table.Cell>
 								<Dropdown
 									disabled={disabled}
+									fluid
 									options={fieldOptions}
 									path={`${key}.name`}
+									placeholder='Please select a field'
+									search
+									selection
 								/>
 							</Table.Cell>
 							<Table.Cell>
-								<Input
-									disabled={disabled}
-									fluid
-									parentPath={key}
-									name='boost'
-									type='number'
-								/>
+								{name
+									? <Input
+										disabled={disabled}
+										fluid
+										parentPath={key}
+										name='boost'
+										type='number'
+									/>
+									: null
+								}
 							</Table.Cell>
 							<Table.Cell collapsing>
 								<Button.Group icon>

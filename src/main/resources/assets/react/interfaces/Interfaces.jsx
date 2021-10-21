@@ -128,6 +128,9 @@ export function Interfaces({
 
 	const [collections, setCollections] = React.useState([]);
 	const [collectionIdToFieldKeys, setCollectionIdToFieldKeys] = React.useState({});
+	const [globalFieldsObj, setGlobalFieldsObj] = React.useState({
+		'_allText': true // TODO: Hardcode
+	});
 	const [interfaces, setInterfaces] = React.useState([]);
 	const [interfaceNamesObj, setInterfaceNamesObj] = React.useState({});
 	const [interfacesTotal, setInterfacesTotal] = React.useState(0);
@@ -159,12 +162,18 @@ export function Interfaces({
 				const data = json.data;
 				//console.debug('data', data);
 
-				const fieldIdToKey = {};
+				//const fieldIdToKey = {};
+				const newGlobalFieldsObj = {
+					'_allText': true
+				};
 				data.queryFields.hits.forEach(({_id, key}) => {
 					if (_id) { // This avoids undefined, on system_fields...
-						fieldIdToKey[_id] = key;
+						//fieldIdToKey[_id] = key;
+						newGlobalFieldsObj[key] = true;
 					}
 				});
+				//console.debug('newGlobalFieldsObj', newGlobalFieldsObj);
+				setGlobalFieldsObj(newGlobalFieldsObj);
 				//console.debug('fieldIdToKey', fieldIdToKey);
 
 				const documentTypeIdToFieldKeys = {};
@@ -407,6 +416,7 @@ export function Interfaces({
 								afterClose={() => memoizedUpdateInterfacesCallback()}
 								collectionIdToFieldKeys={collectionIdToFieldKeys}
 								collectionOptions={collectionOptions}
+								globalFieldsObj={globalFieldsObj}
 								interfaceNamesObj={interfaceNamesObj/* Currently not allowed to edit _name anyway */}
 								licenseValid={licenseValid}
 								servicesBaseUrl={servicesBaseUrl}
@@ -455,6 +465,7 @@ export function Interfaces({
 			afterClose={memoizedUpdateInterfacesCallback}
 			collectionOptions={collectionOptions}
 			collectionIdToFieldKeys={collectionIdToFieldKeys}
+			globalFieldsObj={globalFieldsObj}
 			interfaceNamesObj={interfaceNamesObj}
 			licenseValid={licenseValid}
 			servicesBaseUrl={servicesBaseUrl}
