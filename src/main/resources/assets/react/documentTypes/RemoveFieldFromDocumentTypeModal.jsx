@@ -11,7 +11,7 @@ import {ButtonDelete} from '../components/ButtonDelete';
 
 
 export function RemoveFieldFromDocumentTypeModal({
-	collections = [], // optional
+	collectionsArr = [], // optional
 	interfaces = [],  // optional
 	onClose, // Required!
 	servicesBaseUrl,
@@ -23,7 +23,7 @@ export function RemoveFieldFromDocumentTypeModal({
 		path
 	}
 }) {
-	//console.debug('collections', collections);
+	//console.debug('collectionsArr', collectionsArr);
 	//console.debug('interfaces', interfaces);
 	//console.debug('name', name);
 	const [isLoading, setIsLoading] = React.useState(true);
@@ -48,7 +48,7 @@ export function RemoveFieldFromDocumentTypeModal({
 			},
 			url: `${servicesBaseUrl}/graphQL` ,
 			variables: {
-				collections,
+				collections: collectionsArr,
 				field: name,
 				filters: {
 					boolean: {
@@ -91,7 +91,7 @@ export function RemoveFieldFromDocumentTypeModal({
 			<ul>{interfaces.sort().map((c, i) => <li key={i}>{c}</li>)}</ul>
 
 			<h4>Collections</h4>
-			<ul>{collections.sort().map((c, i) => <li key={i}>{c}</li>)}</ul>
+			<ul>{collectionsArr.sort().map((c, i) => <li key={i}>{c}</li>)}</ul>
 
 			<h4>Documents</h4>
 			<p>This field is present in {isLoading ? <Loader active inline /> : fieldHasValueInDocumentsTotal} documents!</p>

@@ -5,7 +5,7 @@ import {NewOrEditDocumentType} from './NewOrEditDocumentType';
 export function NewOrEditDocumentTypeModal({
 	_id, // optional
 	_name, // optional
-	collections = [], // optional
+	collectionsArr = [], // optional
 	interfaces = [], // optional
 	onClose = () => {},
 	onMount = () => {},
@@ -24,7 +24,7 @@ export function NewOrEditDocumentTypeModal({
 		<Modal.Header as='h1' className='ui'>{_name ? `Document type: ${_name}`: 'New document type'}</Modal.Header>
 		<NewOrEditDocumentType
 			_id={_id}
-			collections={collections}
+			collectionsArr={collectionsArr}
 			interfaces={interfaces}
 			doClose={onClose}
 			servicesBaseUrl={servicesBaseUrl}

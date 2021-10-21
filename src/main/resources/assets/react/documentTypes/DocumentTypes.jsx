@@ -32,7 +32,7 @@ export function DocumentTypes({
 	const [newOrEditModalState, setNewOrEditModalState] = React.useState({
 		_id: undefined,
 		_name: '',
-		collections: [],
+		collectionsArr: [],
 		interfaces: [],
 		open: false
 	});
@@ -241,7 +241,7 @@ export function DocumentTypes({
 							});
 						}
 					}); // forEach referencedByCollections
-					const collections = Object.keys(collectionsObj).sort();
+					const collectionsArr = Object.keys(collectionsObj).sort();
 					const activeProperties = properties.filter(({active}) => active);
 					const activePropertyNames = activeProperties.map(({name})=>name).sort();
 
@@ -253,7 +253,7 @@ export function DocumentTypes({
 								trigger={<ButtonEdit onClick={() => setNewOrEditModalState({
 									_id,
 									_name,
-									collections,
+									collectionsArr,
 									interfaces,
 									open: true
 								})}/>}
@@ -265,7 +265,7 @@ export function DocumentTypes({
 							listStyleType: 'none',
 							margin: 0,
 							padding: 0
-						}}>{collections.map((c, i) => <li key={i}>{c}</li>)}</ul></Table.Cell> : null}
+						}}>{collectionsArr.map((c, i) => <li key={i}>{c}</li>)}</ul></Table.Cell> : null}
 
 						{showInterfaces ? <Table.Cell><ul style={{
 							listStyleType: 'none',
@@ -368,7 +368,7 @@ export function DocumentTypes({
 			trigger={<ButtonNew onClick={() => setNewOrEditModalState({
 				_id: undefined,
 				_name: '',
-				collections: [],
+				collectionsArr: [],
 				interfaces: [],
 				open: true
 			})}/>}
@@ -377,7 +377,7 @@ export function DocumentTypes({
 		<NewOrEditDocumentTypeModal
 			_id={newOrEditModalState._id}
 			_name={newOrEditModalState._name}
-			collections={newOrEditModalState.collections}
+			collectionsArr={newOrEditModalState.collectionsArr}
 			interfaces={newOrEditModalState.interfaces}
 			open={newOrEditModalState.open}
 			onClose={() => {
@@ -385,7 +385,7 @@ export function DocumentTypes({
 				setNewOrEditModalState(prev => ({
 					_id: prev._id,
 					_name: prev._name,
-					collections: prev.collections,
+					collectionsArr: prev.collectionsArr,
 					interfaces: prev.interfaces,
 					open: false
 				}));
