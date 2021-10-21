@@ -12,8 +12,8 @@ export const queryInterfaces = ({
 		_versionKey
 		collectionIds
 		fields {
-			fieldId
 			boost
+			name
 		}
 		stopWordIds
 		synonymIds

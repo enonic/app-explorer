@@ -29,7 +29,6 @@ export function addInterfaceTypes({glue}) {
 	glue.addInputType({
 		name: GQL_INPUT_TYPE_INTERFACE_FIELD_NAME,
 		fields: {
-			//fieldId: { type: nonNull(GraphQLID) },
 			name: { type: nonNull(GraphQLString) },
 			boost: { type: GraphQLInt } // null allowed
 		}
@@ -38,7 +37,6 @@ export function addInterfaceTypes({glue}) {
 	glue.addObjectType({
 		name: GQL_TYPE_INTERFACE_FIELD_NAME,
 		fields: {
-			//fieldId: { type: nonNull(GraphQLID) },
 			name: { type: nonNull(GraphQLString) },
 			boost: { type: GraphQLInt } // null allowed
 		}

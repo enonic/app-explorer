@@ -42,10 +42,6 @@ const GQL_DOCUMENT_TYPES = `queryDocumentTypes {
 	hits {
 		_id
 		_name
-		fields {
-			active
-			fieldId
-		}
 		properties {
 			active
 			enabled
@@ -87,7 +83,6 @@ const GQL_INTERFACES = `queryInterfaces(
 		collectionIds
 		fields {
 			boost
-			#fieldId
 			name
 		}
 		#stopWordIds
@@ -175,16 +170,9 @@ export function Interfaces({
 				const documentTypeIdToFieldKeys = {};
 				data.queryDocumentTypes.hits.forEach(({
 					_id,
-					fields = [],
 					properties = []
 				}) => {
 					const uniqueFieldsObj = {};
-					fields.forEach(({fieldId/*, name*/}) => {
-						const fieldKey = fieldIdToKey[fieldId];
-						if (fieldKey) {
-							uniqueFieldsObj[fieldKey] = true;
-						}
-					});
 					properties.forEach(({name}) => {
 						uniqueFieldsObj[name] = true;
 					});

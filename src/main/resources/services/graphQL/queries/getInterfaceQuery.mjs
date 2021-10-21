@@ -16,7 +16,6 @@ export function getInterfaceQuery({
 	collectionIds
 	fields {
 		boost
-		#fieldId
 		name
 	}
 	#stopWordIds

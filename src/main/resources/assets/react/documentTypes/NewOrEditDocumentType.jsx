@@ -73,7 +73,6 @@ export function NewOrEditDocumentType({
 	const [initialValues, setInitialValues] = React.useState(_id ? false : {
 		_name: '',
 		addFields: true,
-		fields: [],
 		properties: []
 	});
 	const [globalFields, setGlobalFields] = React.useState([]);
@@ -126,14 +125,8 @@ export function NewOrEditDocumentType({
 		}
 	}, [initialValues]); // After first paint and whenever initialValues changes.
 
-	const initialFields = {};
 	const initialProperties = {};
 	if (initialValues) {
-		if (initialValues.fields) {
-			initialValues.fields.forEach(({fieldId}) => {
-				initialFields[fieldId] = true;
-			});
-		}
 		if (initialValues.properties) {
 			initialValues.properties.forEach(({name}) => {
 				initialProperties[name] = true;
@@ -145,13 +138,12 @@ export function NewOrEditDocumentType({
 		initialValues={initialValues}
 		onSubmit={(values) => {
 			//console.debug('submit values', values);
-			const {_name, addFields, fields, properties} = values;
+			const {_name, addFields, properties} = values;
 			//console.debug('submit _name', _name);
 
 			const variables = {
 				_name,
 				addFields,
-				fields,
 				properties
 			};
 			if (_id) {
@@ -182,13 +174,11 @@ export function NewOrEditDocumentType({
 								_id/*,
 								_name,
 								addFields,
-								fields,
 								properties*/
 							} = json.data.createDocumentType;
 							/*setInitialValues({ // So reset button doesn't empty all inputs
 								_name,
 								addFields,
-								fields,
 								properties
 							});*/
 							setId(_id);

@@ -69,11 +69,9 @@ export function addMutationInterfaceUpdate({glue}) {
 				collectionIds,
 				fields: forceArray(fields).map(({ // empty array allowed
 					boost, // undefined allowed
-					//fieldId,
 					name
 				}) => ({
 					boost,
-					//fieldId: reference(fieldId),
 					name
 				})),
 				//stopWordIds, // empty array allowed
