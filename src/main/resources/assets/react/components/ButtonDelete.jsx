@@ -2,7 +2,10 @@ import {Button, Icon} from 'semantic-ui-react';
 
 
 export const ButtonDelete = ({
-	children = <Icon color='red' name='trash alternate outline'/>,
+	content = '',
+	children = content
+		? <><Icon color='red' name='trash alternate outline'/>&nbsp;{content}</>
+		: <Icon color='red' name='trash alternate outline'/>,
 	icon = true,
 	onClick = () => {},
 	...rest

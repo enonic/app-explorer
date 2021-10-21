@@ -16,17 +16,17 @@ import {ButtonEdit} from '../components/ButtonEdit';
 import {Checkmark} from '../components/Checkmark';
 import {Span} from '../components/Span';
 import {AddOrEditLocalFieldModal} from './AddOrEditLocalFieldModal';
-//import {RemoveFieldFromDocumentTypeModal} from './RemoveFieldFromDocumentTypeModal';
+import {RemoveFieldFromDocumentTypeModal} from './RemoveFieldFromDocumentTypeModal';
 
 
-//const PATH_PROPERTIES = 'properties';
+const PATH_PROPERTIES = 'properties';
 
 
 export const FieldsList = ({
-	//collections,
-	globalFields//,
-	//interfaces,
-	//servicesBaseUrl
+	collections,
+	globalFields,
+	interfaces,
+	servicesBaseUrl
 }) => {
 	const [context/*, dispatch*/] = getEnonicContext();
 
@@ -69,6 +69,9 @@ export const FieldsList = ({
 
 	const [showGlobalFields, setShowGlobalFields] = React.useState(false);
 	const [addOrEditModalState, setAddOrEditModalState] = React.useState({
+		open: false
+	});
+	const [removeModalState, setRemoveModalState] = React.useState({
 		open: false
 	});
 
@@ -243,7 +246,13 @@ export const FieldsList = ({
 								content={GLOBAL_FIELD_OBJ[name] ? `Remove customization of global field ${name}` : `Delete local field ${name}`}
 								inverted
 								style={popupStyle}
-								trigger={<ButtonDelete onClick={() => {}}/>}
+								trigger={<ButtonDelete onClick={() => setRemoveModalState({
+									global: !!GLOBAL_FIELD_OBJ[name],
+									index,
+									name,
+									open: true,
+									path: PATH_PROPERTIES
+								})}/>}
 							/>
 						</Button.Group>}</Table.Cell>
 					</Table.Row>)
@@ -269,5 +278,15 @@ export const FieldsList = ({
 				state={addOrEditModalState}
 			/>
 			: null}
+		{removeModalState.open
+			? <RemoveFieldFromDocumentTypeModal
+				collections={collections}
+				interfaces={interfaces}
+				onClose={() => setRemoveModalState({open: false})}
+				servicesBaseUrl={servicesBaseUrl}
+				state={removeModalState}
+			/>
+			: null
+		}
 	</>;
 };
