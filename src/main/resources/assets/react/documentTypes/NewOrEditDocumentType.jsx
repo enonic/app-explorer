@@ -66,7 +66,7 @@ export function NewOrEditDocumentType({
 	doClose = () => {},
 	_id: idProp, // optional
 	collectionsArr = [], // optional
-	interfaces = [], // optional
+	interfacesArr = [], // optional
 	servicesBaseUrl
 }) {
 	const [_id, setId] = React.useState(idProp);
@@ -216,7 +216,7 @@ export function NewOrEditDocumentType({
 								<FieldsList
 									collectionsArr={collectionsArr}
 									globalFields={globalFields}
-									interfaces={interfaces}
+									interfacesArr={interfacesArr}
 									servicesBaseUrl={servicesBaseUrl}
 								/>
 							</Tab.Pane>

@@ -12,7 +12,7 @@ import {ButtonDelete} from '../components/ButtonDelete';
 
 export function RemoveFieldFromDocumentTypeModal({
 	collectionsArr = [], // optional
-	interfaces = [],  // optional
+	interfacesArr = [],  // optional
 	onClose, // Required!
 	servicesBaseUrl,
 	state: {
@@ -24,7 +24,7 @@ export function RemoveFieldFromDocumentTypeModal({
 	}
 }) {
 	//console.debug('collectionsArr', collectionsArr);
-	//console.debug('interfaces', interfaces);
+	//console.debug('interfacesArr', interfacesArr);
 	//console.debug('name', name);
 	const [isLoading, setIsLoading] = React.useState(true);
 	const [fieldHasValueInDocumentsTotal, setFieldHasValueInDocumentsTotal] = React.useState(undefined);
@@ -88,7 +88,7 @@ export function RemoveFieldFromDocumentTypeModal({
 			<p>This documentType is used by the following...</p>
 
 			<h4>Interfaces</h4>
-			<ul>{interfaces.sort().map((c, i) => <li key={i}>{c}</li>)}</ul>
+			<ul>{interfacesArr.sort().map((c, i) => <li key={i}>{c}</li>)}</ul>
 
 			<h4>Collections</h4>
 			<ul>{collectionsArr.sort().map((c, i) => <li key={i}>{c}</li>)}</ul>

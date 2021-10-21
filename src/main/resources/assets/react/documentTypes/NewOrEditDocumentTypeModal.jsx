@@ -6,7 +6,7 @@ export function NewOrEditDocumentTypeModal({
 	_id, // optional
 	_name, // optional
 	collectionsArr = [], // optional
-	interfaces = [], // optional
+	interfacesArr = [], // optional
 	onClose = () => {},
 	onMount = () => {},
 	open = false,
@@ -25,7 +25,7 @@ export function NewOrEditDocumentTypeModal({
 		<NewOrEditDocumentType
 			_id={_id}
 			collectionsArr={collectionsArr}
-			interfaces={interfaces}
+			interfacesArr={interfacesArr}
 			doClose={onClose}
 			servicesBaseUrl={servicesBaseUrl}
 		/>

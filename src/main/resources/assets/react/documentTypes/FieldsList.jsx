@@ -25,7 +25,7 @@ const PATH_PROPERTIES = 'properties';
 export const FieldsList = ({
 	collectionsArr,
 	globalFields,
-	interfaces,
+	interfacesArr,
 	servicesBaseUrl
 }) => {
 	const [context/*, dispatch*/] = getEnonicContext();
@@ -281,7 +281,7 @@ export const FieldsList = ({
 		{removeModalState.open
 			? <RemoveFieldFromDocumentTypeModal
 				collectionsArr={collectionsArr}
-				interfaces={interfaces}
+				interfacesArr={interfacesArr}
 				onClose={() => setRemoveModalState({open: false})}
 				servicesBaseUrl={servicesBaseUrl}
 				state={removeModalState}
