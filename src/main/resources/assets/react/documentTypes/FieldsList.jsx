@@ -210,7 +210,6 @@ export const FieldsList = ({
 									inverted
 									style={popupStyle}
 									trigger={<ButtonEdit onClick={() => setAddOrEditModalState({
-										header: GLOBAL_FIELD_OBJ[name] ? `Override global field ${name}` : `Edit local field ${name}`,
 										initialValues: {
 											enabled,
 											includeInAllText,
@@ -257,7 +256,6 @@ export const FieldsList = ({
 			trigger={<Button
 				icon
 				onClick={() => setAddOrEditModalState({
-					header: 'Add local field',
 					open: true
 				})}><Icon
 					color='green'
