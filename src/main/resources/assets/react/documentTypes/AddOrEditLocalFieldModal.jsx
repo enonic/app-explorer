@@ -10,7 +10,7 @@ import {
 	VALUE_TYPE_LONG,
 	VALUE_TYPE_SET,
 	VALUE_TYPE_STRING,
-	isSet,
+	isSet
 } from '@enonic/js-utils';
 import getIn from 'get-value';
 import {
@@ -56,7 +56,6 @@ export const AddOrEditLocalFieldModal = ({
 	globalFieldObj = {},
 	onClose = () => {},
 	state: {
-		header,
 		initialValues: {
 			enabled: propEnabled = true,
 			includeInAllText: propIncludeInAllText = true,
@@ -84,9 +83,9 @@ export const AddOrEditLocalFieldModal = ({
 	//console.debug('properties', properties);
 
 	const usedNames = {};
-	Object.keys(globalFieldObj).forEach((name) => {
+	/*Object.keys(globalFieldObj).forEach((name) => {
 		usedNames[name] = true;
-	});
+	});*/
 	properties.forEach(({name}) => {
 		usedNames[name] = true;
 	});
@@ -106,6 +105,24 @@ export const AddOrEditLocalFieldModal = ({
 	const [nameTouched, setNameTouched] = React.useState(false);
 	//console.debug('includeInAllText', includeInAllText);
 	//console.debug('name', name);
+
+	const [header, setHeader] = React.useState(/*propName
+		? globalFieldObj[propName]
+			? `Override global field ${propName}`
+			: `Edit local field ${propName}`
+		: 'Add local field'
+	*/);
+
+	React.useEffect(() => {
+		console.debug('globalFieldObj, propName or name changed, updating header');
+		setHeader(propName
+			? globalFieldObj[propName]
+				? `Override global field ${propName}`
+				: `Edit local field ${propName}`
+			: (name && globalFieldObj[name])
+				? `Override global field ${name}`
+				: 'Add local field');
+	}, [globalFieldObj, propName, name]);
 
 	/*
 	Since I'm doing {open ? <AddOrEditLocalFieldModal> : null} outside the
@@ -275,9 +292,11 @@ export const AddOrEditLocalFieldModal = ({
 				onClose();
 			}} primary><Icon name='save'/> {propName
 					? isSet(propIndex)
-						? 'Update'
-						: 'Override'
-					: 'Add'
+						? 'Update local field'
+						: 'Override global field'
+					: globalFieldObj[name]
+						? 'Override global field'
+						: 'Add local field'
 				}</Button>
 		</Modal.Actions>
 	</Modal>;
