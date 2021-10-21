@@ -88,10 +88,17 @@ export function RemoveFieldFromDocumentTypeModal({
 			<p>This documentType is used by the following...</p>
 
 			<h4>Interfaces</h4>
-			<ul>{interfacesArr.sort().map((c, i) => <li key={i}>{c}</li>)}</ul>
+			{interfacesArr.length
+				? <ul>{interfacesArr.sort().map((c, i) => <li key={i}>{c}</li>)}</ul>
+				: 'none'
+			}
+
 
 			<h4>Collections</h4>
-			<ul>{collectionsArr.sort().map((c, i) => <li key={i}>{c}</li>)}</ul>
+			{collectionsArr.length
+				? <ul>{collectionsArr.sort().map((c, i) => <li key={i}>{c}</li>)}</ul>
+				: 'none'
+			}
 
 			<h4>Documents</h4>
 			<p>This field is present in {isLoading ? <Loader active inline /> : fieldHasValueInDocumentsTotal} documents!</p>
