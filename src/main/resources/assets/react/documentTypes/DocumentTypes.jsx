@@ -33,7 +33,7 @@ export function DocumentTypes({
 		_id: undefined,
 		_name: '',
 		collectionsArr: [],
-		interfaces: [],
+		interfacesArr: [],
 		open: false
 	});
 
@@ -212,7 +212,7 @@ export function DocumentTypes({
 					properties = []
 				}, index) => {
 					const collectionsObj = {};
-					const interfaces = [];
+					const interfacesArr = [];
 					let documentsInTotal = 0;
 					referencedByCollections.forEach(({
 						_name: collectionName,
@@ -235,8 +235,8 @@ export function DocumentTypes({
 								_name: interfaceName,
 								_nodeType: interfaceNodeType
 							}) => {
-								if (interfaceNodeType === 'com.enonic.app.explorer:interface' && !interfaces.includes(interfaceName)) {
-									interfaces.push(interfaceName);
+								if (interfaceNodeType === 'com.enonic.app.explorer:interface' && !interfacesArr.includes(interfaceName)) {
+									interfacesArr.push(interfaceName);
 								}
 							});
 						}
@@ -254,7 +254,7 @@ export function DocumentTypes({
 									_id,
 									_name,
 									collectionsArr,
-									interfaces,
+									interfacesArr,
 									open: true
 								})}/>}
 							/>
@@ -271,7 +271,7 @@ export function DocumentTypes({
 							listStyleType: 'none',
 							margin: 0,
 							padding: 0
-						}}>{interfaces.sort().map((c, i) => <li key={i}>{c}</li>)}</ul></Table.Cell> : null}
+						}}>{interfacesArr.sort().map((c, i) => <li key={i}>{c}</li>)}</ul></Table.Cell> : null}
 
 						<Table.Cell collapsing textAlign='right'>{documentsInTotal}</Table.Cell>
 
@@ -369,7 +369,7 @@ export function DocumentTypes({
 				_id: undefined,
 				_name: '',
 				collectionsArr: [],
-				interfaces: [],
+				interfacesArr: [],
 				open: true
 			})}/>}
 		/>
@@ -378,7 +378,7 @@ export function DocumentTypes({
 			_id={newOrEditModalState._id}
 			_name={newOrEditModalState._name}
 			collectionsArr={newOrEditModalState.collectionsArr}
-			interfaces={newOrEditModalState.interfaces}
+			interfacesArr={newOrEditModalState.interfacesArr}
 			open={newOrEditModalState.open}
 			onClose={() => {
 				//console.debug('NewOrEditDocumentTypeModal onClose');
@@ -386,7 +386,7 @@ export function DocumentTypes({
 					_id: prev._id,
 					_name: prev._name,
 					collectionsArr: prev.collectionsArr,
-					interfaces: prev.interfaces,
+					interfacesArr: prev.interfacesArr,
 					open: false
 				}));
 				queryDocumentTypes();
