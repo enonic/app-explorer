@@ -13,8 +13,8 @@ export const GQL_QUERY_INTERFACE = `query InterfaceQuery(
 			_versionKey
 			collectionIds
 			fields {
-				fieldId
 				boost
+				name
 			}
 			stopWordIds
 			synonymIds
