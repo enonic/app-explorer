@@ -13,6 +13,9 @@ export function NewOrEditInterfaceModal(props) {
 		collectionIdToFieldKeys = {},
 		collectionOptions = [],
 		disabled = false,
+		globalFieldsObj = {
+			'_allText': true // TODO: Hardcode
+		},
 		//initialValues = {},
 		interfaceNamesObj = {},
 		licenseValid,
@@ -45,7 +48,7 @@ export function NewOrEditInterfaceModal(props) {
 		closeOnDimmerClick={false}
 		onClose={doClose}
 		open={open}
-		size='large'
+		size='small'
 		trigger={<Popup
 			content={header}
 			inverted
@@ -76,6 +79,7 @@ export function NewOrEditInterfaceModal(props) {
 					collectionIdToFieldKeys={collectionIdToFieldKeys}
 					collectionOptions={collectionOptions}
 					doClose={doClose}
+					globalFieldsObj={globalFieldsObj}
 					interfaceNamesObj={interfaceNamesObj}
 					servicesBaseUrl={servicesBaseUrl}
 					stopWordOptions={stopWordOptions}

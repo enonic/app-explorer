@@ -30,6 +30,9 @@ export function NewOrEditInterface(props) {
 		collectionIdToFieldKeys = {},
 		collectionOptions = [],
 		doClose = () => {},
+		globalFieldsObj = {
+			'_allText': true // TODO Hardcode
+		},
 		interfaceNamesObj = {},
 		servicesBaseUrl,
 		stopWordOptions,
@@ -157,6 +160,7 @@ export function NewOrEditInterface(props) {
 				<FieldSelector
 					disabled={disabled}
 					collectionIdToFieldKeys={collectionIdToFieldKeys}
+					globalFieldsObj={globalFieldsObj}
 				/>
 
 				<Header as='h3' content='Synonyms' disabled={disabled} dividing id='synonyms'/>
