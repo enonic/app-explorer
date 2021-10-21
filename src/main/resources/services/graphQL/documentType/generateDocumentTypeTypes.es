@@ -15,7 +15,6 @@ import {
 
 import {
 	coerseDocumentTypeAddFields,
-	coerseDocumentTypeFields,
 	coerseDocumentTypeProperties
 } from '/lib/explorer/documentType/coerseDocumentType';
 import {
@@ -27,7 +26,6 @@ import {
 
 import {
 	GQL_FIELDS_DOCUMENT_TYPE_PROPERTY_NAME,
-	GQL_INPUT_TYPE_DOCUMENT_TYPE_FIELDS_NAME,
 	GQL_INPUT_TYPE_DOCUMENT_TYPE_PROPERTIES_NAME,
 	GQL_INTERFACE_NODE_NAME,
 	GQL_TYPE_DOCUMENT_TYPE_NAME
@@ -68,14 +66,6 @@ export function generateDocumentTypeTypes({
 	});
 
 	glue.addInputType({
-		name: GQL_INPUT_TYPE_DOCUMENT_TYPE_FIELDS_NAME,
-		fields: {
-			active: { type: nonNull(GraphQLBoolean) },
-			fieldId: { type: glue.getScalarType('_id') }
-		}
-	});
-
-	glue.addInputType({
 		name: GQL_INPUT_TYPE_DOCUMENT_TYPE_PROPERTIES_NAME,
 		fields: FIELDS_PROPERTY
 	});
@@ -98,16 +88,6 @@ export function generateDocumentTypeTypes({
 					//log.debug(`env:${toStr(env)}`);
 					return coerseDocumentTypeAddFields(env.source.addFields);
 				}
-			},
-			fields: {
-				resolve: (env) => coerseDocumentTypeFields(env.source.fields),
-				type: list(glue.addObjectType({
-					name: 'DocumentTypeFields',
-					fields: {
-						active: { type: nonNull(GraphQLBoolean) },
-						fieldId: { type: glue.getScalarType('_id') }
-					}
-				}))
 			},
 			properties: {
 				resolve: (env) => coerseDocumentTypeProperties(env.source.properties),

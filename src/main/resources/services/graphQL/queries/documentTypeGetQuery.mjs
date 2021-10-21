@@ -6,10 +6,6 @@ export const GQL_QUERY_DOCUMENT_TYPE_GET = `query GetDocumentTypeQuery($_id: ID!
 		_path
 		_versionKey
 		addFields
-		fields {
-			active
-			fieldId
-		}
 		properties {
 			active
 			enabled
