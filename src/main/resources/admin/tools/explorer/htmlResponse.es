@@ -233,6 +233,20 @@ services: {}, // Workaround for i18nUrl BUG
 		<link rel="stylesheet" type="text/css" href="${assetUrl({path: 'semantic-ui-css/semantic.css'})}">
 		<link rel="stylesheet" type="text/css" href="${assetUrl({path: 'react-semantic-ui-datepickers/react-semantic-ui-datepickers.css'})}">
 		<title>Explorer</title>
+		<style type="text/css">
+			/*
+				Fix clearable dropdown
+				See https://github.com/fomantic/Fomantic-UI/issues/1259
+
+				Selector has same specificity as
+				.ui.dropdown > .dropdown.icon:before
+				and is placed after semantic.css to win :)
+			*/
+			.ui.dropdown > .clear.icon:before {
+				content: '\\f00d';
+				font-family: Icons;
+			}
+		</style>
 	</head>
 	<body style="background-color: white !important;">
 		<div id="${ID_REACT_EXPLORER_CONTAINER}"/>
