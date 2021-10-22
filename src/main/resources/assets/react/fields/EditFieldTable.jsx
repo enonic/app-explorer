@@ -16,6 +16,7 @@ import {
 import {
 	Input, Popup, Table
 } from 'semantic-ui-react';
+import {setValue} from 'semantic-ui-react-form';
 import {getEnonicContext} from 'semantic-ui-react-form/Context';
 import {Checkbox as EnonicCheckbox} from 'semantic-ui-react-form/inputs/Checkbox';
 import {Dropdown as EnonicDropdown} from 'semantic-ui-react-form/inputs/Dropdown';
@@ -115,7 +116,7 @@ const OPTIONS_VALUE_TYPES = [
 
 
 export const EditFieldTable = () => {
-	const [context/*, dispatch*/] = getEnonicContext();
+	const [context, dispatch] = getEnonicContext();
 	const {
 		//fieldType,
 		min,
@@ -148,6 +149,19 @@ export const EditFieldTable = () => {
 					<Input
 						min={0}
 						name='min'
+						onChange={(event, {value: newMinString}) => {
+							const newMinInt = parseInt(newMinString);
+							if (newMinInt > max && max !== 0) {
+								dispatch(setValue({
+									path: 'max',
+									value: newMinInt
+								}));
+							}
+							dispatch(setValue({
+								path: 'min',
+								value: newMinInt
+							}));
+						}}
 						type='number'
 						value={min}
 					/>
@@ -156,6 +170,19 @@ export const EditFieldTable = () => {
 					<Input
 						min={0}
 						name='max'
+						onChange={(event, {value: newMaxString}) => {
+							const newMaxInt = parseInt(newMaxString);
+							if (newMaxInt !== 0 && newMaxInt < min) {
+								dispatch(setValue({
+									path: 'min',
+									value: newMaxInt
+								}));
+							}
+							dispatch(setValue({
+								path: 'max',
+								value: newMaxInt
+							}));
+						}}
 						type='number'
 						value={max}
 					/>
