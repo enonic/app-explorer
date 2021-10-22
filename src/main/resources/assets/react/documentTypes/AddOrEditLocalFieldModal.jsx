@@ -114,7 +114,7 @@ export const AddOrEditLocalFieldModal = ({
 	*/);
 
 	React.useEffect(() => {
-		console.debug('globalFieldObj, propName or name changed, updating header');
+		//console.debug('globalFieldObj, propName or name changed, updating header');
 		setHeader(propName
 			? globalFieldObj[propName]
 				? `Override global field ${propName}`
