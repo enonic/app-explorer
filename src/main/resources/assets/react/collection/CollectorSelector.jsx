@@ -23,7 +23,7 @@ export function CollectorSelector(props) {
 
 	return <SemanticUiReactDropdown
 		{...rest}
-		clearable
+		clearable={true}
 		fluid
 		onChange={(ignoredEvent,{value: newName}) => {
 			//console.debug('CollectorSelector newName', newName);
