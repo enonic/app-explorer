@@ -67,6 +67,7 @@ export function DocumentTypeSelector(props) {
 	return <>
 		<Header as='h2' dividing content='Document type'/>
 		<Dropdown
+			clearable={true}
 			fluid
 			loading={!documentTypes.length}
 			onChange={(ignoredEvent,{value: newValue}) => {
