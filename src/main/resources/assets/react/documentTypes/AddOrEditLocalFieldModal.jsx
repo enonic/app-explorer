@@ -219,16 +219,24 @@ export const AddOrEditLocalFieldModal = ({
 						/></Table.Cell>
 						<Table.Cell collapsing><Input
 							min={0}
-							onChange={(event, {value: newMin}) => {
-								setMin(newMin);
+							onChange={(event, {value: newMinString}) => {
+								const newMinInt = parseInt(newMinString);
+								if (newMinInt > max && max !== 0) {
+									setMax(newMinInt);
+								}
+								setMin(newMinInt);
 							}}
 							type='number'
 							value={min}
 						/></Table.Cell>
 						<Table.Cell collapsing><Input
 							min={0}
-							onChange={(event, {value: newMax}) => {
-								setMax(newMax);
+							onChange={(event, {value: newMaxString}) => {
+								const newMaxInt = parseInt(newMaxString);
+								if (newMaxInt !== 0 && newMaxInt < min) {
+									setMin(newMaxInt);
+								}
+								setMax(newMaxInt);
 							}}
 							type='number'
 							value={max}
