@@ -1548,10 +1548,10 @@
   resolved "https://registry.yarnpkg.com/@discoveryjs/json-ext/-/json-ext-0.5.2.tgz#8f03a22a04de437254e8ce8cc84ba39689288752"
   integrity sha512-HyYEUDeIj5rRQU2Hk5HTB2uHsbRQpF70nvMhVzi+VJR0X+xNEhjPui4/kBf3VeH/wqD28PT4sVOm8qqLjBrSZg==
 
-"@enonic/js-utils@0.3.1":
-  version "0.3.1"
-  resolved "https://registry.yarnpkg.com/@enonic/js-utils/-/js-utils-0.3.1.tgz#1a67e74552dfe5ac32dc0bd4d80d0695c482375d"
-  integrity sha512-uJ56KolD6tySppS1FEc9kXjXv9FZhDcZ9zAXCDpRbWwzIgCvz6vQFrFOoEAGV9LUiJNUCQHLlHqkTgKwsspXXA==
+"@enonic/js-utils@0.4.0":
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/@enonic/js-utils/-/js-utils-0.4.0.tgz#694687676e96f8d227486c32a810c8e7dfcc81f5"
+  integrity sha512-SOigiXWUV3LJkClnVUSv/TdtoqmPPRM7PQe9qWHlFozICr0KSTDiKbNUqVVHPRIZnd8Ewxr4hbhJ9DLyJply/A==
 
 "@enonic/semantic-ui-react-form@2.4.0":
   version "2.4.0"
@@ -4787,6 +4787,11 @@ is-typedarray@~1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/is-typedarray/-/is-typedarray-1.0.0.tgz#e479c80858df0c1b11ddda6940f96011fcda4a9a"
   integrity sha1-5HnICFjfDBsR3dppQPlgEfzaSpo=
+
+is-uuid@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/is-uuid/-/is-uuid-1.0.2.tgz#ad1898ddf154947c25c8e54966f48604e9caecc4"
+  integrity sha1-rRiY3fFUlHwlyOVJZvSGBOnK7MQ=
 
 is-weakref@^1.0.1:
   version "1.0.1"

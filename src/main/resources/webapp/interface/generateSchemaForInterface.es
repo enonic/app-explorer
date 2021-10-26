@@ -1,23 +1,41 @@
 import {
 	QUERY_OPERATOR_AND,
 	VALUE_TYPE_ANY,
+	VALUE_TYPE_BOOLEAN,
+	VALUE_TYPE_DOUBLE,
+	VALUE_TYPE_GEO_POINT,
+	VALUE_TYPE_INSTANT,
+	VALUE_TYPE_LOCAL_DATE,
+	VALUE_TYPE_LOCAL_DATE_TIME,
+	VALUE_TYPE_LOCAL_TIME,
+	VALUE_TYPE_LONG,
+	VALUE_TYPE_REFERENCE,
 	VALUE_TYPE_SET,
+	VALUE_TYPE_STRING,
 	addQueryFilter,
 	camelize,
-	//forceArray,
+	forceArray,
 	fulltext,
 	//group,
 	or,
+	isBoolean,
+	isDateString,
+	isNumber,
+	isObject,
 	isSet,
+	isString,
 	ngram,
 	toStr,
 	stemmed,
 	ucFirst
 } from '@enonic/js-utils';
+import {v4 as isUuid4} from 'is-uuid';
+
 import {
 	GraphQLBoolean,
 	//GraphQLDouble, // There is no such type
 	GraphQLFloat,
+	GraphQLID,
 	GraphQLInt,
 	GraphQLString,
 	Json as GraphQLJson,
@@ -80,6 +98,26 @@ const {
 } = schemaGenerator;
 //import {DEFAULT_INTERFACE_FIELDS} from '../constants';
 
+//log.debug(`Number.MIN_SAFE_INTEGER:${Number.MIN_SAFE_INTEGER} Number.MAX_SAFE_INTEGER:${Number.MAX_SAFE_INTEGER}`); // Undefined
+//log.debug(`Number.MIN_VALUE:${Number.MIN_VALUE} Number.MAX_VALUE:${Number.MAX_VALUE}`); // Number.MIN_VALUE:5e-324 Number.MAX_VALUE:1.7976931348623157e+308
+const JAVA_MIN_SAFE_INT = -2147483648;
+const JAVA_MAX_SAFE_INT =  2147483647;
+
+const VALUE_TYPE_VARIANTS = [
+	//VALUE_TYPE_ANY,
+	VALUE_TYPE_BOOLEAN,
+	VALUE_TYPE_DOUBLE,
+	VALUE_TYPE_GEO_POINT,
+	VALUE_TYPE_INSTANT,
+	VALUE_TYPE_LOCAL_DATE,
+	VALUE_TYPE_LOCAL_DATE_TIME,
+	VALUE_TYPE_LOCAL_TIME,
+	VALUE_TYPE_LONG,
+	VALUE_TYPE_REFERENCE,
+	//VALUE_TYPE_SET,
+	VALUE_TYPE_STRING
+];
+
 const {
 	GRAPHQL_ENUM_TYPE_AGGREGATION_GEO_DISTANCE_UNIT,
 	GRAPHQL_ENUM_TYPE_HIGHLIGHT_OPTION_ENCODER,
@@ -104,16 +142,56 @@ export function generateSchemaForInterface(interfaceName) {
 		interfaceName
 	});
 	//log.debug(`interfaceNode:${toStr(interfaceNode)}`);
+
 	const {
-		collections,
+		collectionIds,
 		fields = [],// = DEFAULT_INTERFACE_FIELDS, TODO This wont work when fields = [] which filter does
 		stopWords//,
 		//synonyms // TODO
 	} = filterInterface(interfaceNode);
-	//log.debug(`collections:${toStr(collections)}`);
 	//log.debug(`fields:${toStr(fields)}`);
 	//log.debug(`stopWords:${toStr(stopWords)}`);
 	//log.debug(`synonyms:${toStr(synonyms)}`);
+
+	//log.debug(`collectionIds:${toStr(collectionIds)}`);
+
+	const collections = explorerRepoReadConnection.get(collectionIds);
+	//log.debug(`collections:${toStr(collections)}`);
+
+	const collectionIdToDocumentTypeId = {};
+	const documentTypeIds = collections.map(({
+		_id: collectionId,
+		documentTypeId
+	}) => {
+		if (isSet(documentTypeId)) {
+			collectionIdToDocumentTypeId[collectionId] = documentTypeId;
+		}
+		return documentTypeId;
+	})
+		.filter((v, i, a) => isSet(v) && a.indexOf(v) === i);
+	//log.debug(`documentTypeIds:${toStr(documentTypeIds)}`);
+
+	const documentTypes = explorerRepoReadConnection.get(documentTypeIds);
+	//log.debug(`documentTypes:${toStr(documentTypes)}`);
+
+	const allFieldKeys = [];
+
+	const documentTypeIdToName = {};
+	documentTypes.forEach(({
+		_id: documentTypeId,
+		_name: documentTypeName,
+		properties
+	}) => {
+		documentTypeIdToName[documentTypeId] = documentTypeName;
+		if (properties) {
+			forceArray(properties).forEach(({name}) => {
+				if (!allFieldKeys.includes(name)) {
+					allFieldKeys.push(name);
+				}
+			});
+		}
+	});
+	//log.debug(`allFieldKeys:${toStr(allFieldKeys)}`);
 
 	const fieldsRes = getFields({
 		connection: explorerRepoReadConnection,
@@ -122,32 +200,66 @@ export function generateSchemaForInterface(interfaceName) {
 	//log.debug(`fieldsRes:${toStr(fieldsRes)}`);
 	//log.debug(`fieldsRes.hits[0]:${toStr(fieldsRes.hits[0])}`);
 
+	fieldsRes.hits.forEach(({key}) => {
+		if (!allFieldKeys.includes(key)) {
+			allFieldKeys.push(key);
+		}
+	});
+	allFieldKeys.sort();
+	//log.debug(`allFieldKeys:${toStr(allFieldKeys)}`);
+
 	const camelToFieldObj = {};
 	const fieldKeysForAggregations = [];
 	const fieldKeysForFilters = [];
 	const highlightParameterPropertiesFields = {};
 	const interfaceSearchHitsFieldsFromSchema = {};
 	const interfaceSearchHitsHighlightsFields = {};
+	allFieldKeys.forEach((fieldKey) => {
+		const camelizedFieldKey = camelize(fieldKey, /[.-]/g);
+		fieldKeysForAggregations.push(camelizedFieldKey);
+		fieldKeysForFilters.push(camelizedFieldKey);
+		highlightParameterPropertiesFields[camelizedFieldKey] = { type: createInputObjectType({
+			name: `HighlightParameterProperties${ucFirst(camelizedFieldKey)}`,
+			fields: {
+				fragmenter: { type: GRAPHQL_ENUM_TYPE_HIGHLIGHT_OPTION_FRAGMENTER },
+				fragmentSize: { type: GraphQLInt },
+				noMatchSize: { type: GraphQLInt },
+				numberOfFragments: { type: GraphQLInt },
+				order: { type: GRAPHQL_ENUM_TYPE_HIGHLIGHT_OPTION_ORDER },
+				postTag: { type: GraphQLString },
+				preTag: { type: GraphQLString },
+				requireFieldMatch: { type: GraphQLBoolean }
+			}
+		})};
+		VALUE_TYPE_VARIANTS.forEach((vT) => {
+			interfaceSearchHitsFieldsFromSchema[
+				`${camelizedFieldKey}_as_${vT}`
+			] = { type: valueTypeToGraphQLType(vT) };
+		});
+		const type = valueTypeToGraphQLType(VALUE_TYPE_STRING); // TODO There may be several valueTypes...
+		interfaceSearchHitsHighlightsFields[camelizedFieldKey] = { type: list(type) };
+	});
+
 	//log.debug(`fieldsRes.hits:${toStr(fieldsRes.hits)}`);
-	fieldsRes.hits.forEach(({
+	/*fieldsRes.hits.forEach(({
 		fieldType: valueType,
 		inResults,
 		//isSystemField = false,
 		key/*,
 		max, // TODO nonNull list
-		min*/
+		min
 	}) => {
 		if (valueType) {
 			const camelizedFieldKey = camelize(key, /[.-]/g);
 			camelToFieldObj[camelizedFieldKey] = key;
 			//log.debug(`key:${toStr(key)} camelized:${toStr(camelizedFieldKey)}`);
-			if (![VALUE_TYPE_ANY, VALUE_TYPE_SET].includes(valueType)) {
-				fieldKeysForAggregations.push(camelizedFieldKey);
-				fieldKeysForFilters.push(camelizedFieldKey);
+			/*if (![VALUE_TYPE_ANY, VALUE_TYPE_SET].includes(valueType)) {
+				//fieldKeysForAggregations.push(camelizedFieldKey);
+				//fieldKeysForFilters.push(camelizedFieldKey);
 			}
-			log.debug(`key:${toStr(key)} camelized:${toStr(camelizedFieldKey)} inResults:${toStr(inResults)}`);
+			//log.debug(`key:${toStr(key)} camelized:${toStr(camelizedFieldKey)} inResults:${toStr(inResults)}`);
 			if (inResults !== false) {
-				highlightParameterPropertiesFields[camelizedFieldKey] = { type: createInputObjectType({
+				/*highlightParameterPropertiesFields[camelizedFieldKey] = { type: createInputObjectType({
 					name: `HighlightParameterProperties${ucFirst(camelizedFieldKey)}`,
 					fields: {
 						fragmenter: { type: GRAPHQL_ENUM_TYPE_HIGHLIGHT_OPTION_FRAGMENTER },
@@ -160,12 +272,19 @@ export function generateSchemaForInterface(interfaceName) {
 						requireFieldMatch: { type: GraphQLBoolean }
 					}
 				})};
+
+				//interfaceSearchHitsFieldsFromSchema[camelizedFieldKey] = { type };
+				/*VALUE_TYPE_VARIANTS.forEach((vT) => {
+					interfaceSearchHitsFieldsFromSchema[
+						`${camelizedFieldKey}_as_${vT}`
+					] = { type: valueTypeToGraphQLType(vT) };
+				});
+
 				const type = valueTypeToGraphQLType(valueType);
-				interfaceSearchHitsFieldsFromSchema[camelizedFieldKey] = { type };
 				interfaceSearchHitsHighlightsFields[camelizedFieldKey] = { type: list(type) };
 			}
 		}
-	}); // fields.forEach
+	}); // fields.forEach*/
 	//log.debug(`camelToFieldObj:${toStr(camelToFieldObj)}`);
 
 	// Name must be non-null, non-empty and match [_A-Za-z][_0-9A-Za-z]* - was 'GraphQLScalarType{name='String', description='Built-in String', coercing=graphql.Scalars$3@af372a4}'
@@ -240,11 +359,16 @@ export function generateSchemaForInterface(interfaceName) {
 	//──────────────────────────────────────────────────────────────────────────
 
 	const interfaceSearchHitsFields = {
+		_collectionId: { type: nonNull(GraphQLID) },
+		_collectionName: { type: nonNull(GraphQLString) },
+		_documentTypeId: { type: nonNull(GraphQLString) },
+		_documentTypeName: { type: nonNull(GraphQLString) },
 		_highlight: { type: createObjectType({
 			name: 'InterfaceSearchHitsHighlights',
 			fields: interfaceSearchHitsHighlightsFields // This list can't be empty when createObjectType is called?
 		})},
 		_json: { type: GraphQLJson },
+		_repoId: { type: nonNull(GraphQLString) },
 		_score: { type: GraphQLFloat }
 	};
 	//log.debug(`Object.keys(interfaceSearchHitsFieldsFromSchema):${toStr(Object.keys(interfaceSearchHitsFieldsFromSchema))}`);
@@ -340,6 +464,23 @@ export function generateSchemaForInterface(interfaceName) {
 		//log.debug(`searchStringWithoutStopWords:${toStr({searchStringWithoutStopWords})}`);
 		//log.debug(`removedStopWords:${toStr({removedStopWords})}`);
 
+		//`fulltext('${fields.map(({name: field, boost = 1}) => `${field}${boost && boost > 1 ? `^${boost}` : ''}`)}', '${searchStringWithoutStopWords}', 'AND')`,
+		const query = or(fulltext(
+			fields.map(({boost, name: field}) => ({boost: (parseInt(boost)||1) + (fields.length*2), field})),
+			searchStringWithoutStopWords,
+			QUERY_OPERATOR_AND
+		),stemmed(
+			fields.map(({boost, name: field}) => ({boost: (parseInt(boost)||1) + fields.length, field})),
+			searchStringWithoutStopWords,
+			QUERY_OPERATOR_AND,
+			//language // TODO @enonic/js-utils defaults to english, which is why it works
+		),ngram(
+			fields.map(({boost, name: field}) => ({boost, field})),
+			searchStringWithoutStopWords,
+			QUERY_OPERATOR_AND
+		));
+		//log.debug(`query:${toStr({query})}`);
+
 		const queryParams = {
 			aggregations,
 			count,
@@ -348,39 +489,47 @@ export function generateSchemaForInterface(interfaceName) {
 				filters
 			}),
 			highlight,
-			//query: `fulltext('${fields.map(({name: field, boost = 1}) => `${field}${boost && boost > 1 ? `^${boost}` : ''}`)}', '${searchStringWithoutStopWords}', 'AND')`,
-			query: or(fulltext(
-				fields.map(({boost, name: field}) => ({boost: (parseInt(boost)||1) + (fields.length*2), field})),
-				searchStringWithoutStopWords,
-				QUERY_OPERATOR_AND
-			),stemmed(
-				fields.map(({boost, name: field}) => ({boost: (parseInt(boost)||1) + fields.length, field})),
-				searchStringWithoutStopWords,
-				QUERY_OPERATOR_AND,
-				//language // TODO @enonic/js-utils defaults to english, which is why it works
-			),ngram(
-				fields.map(({boost, name: field}) => ({boost, field})),
-				searchStringWithoutStopWords,
-				QUERY_OPERATOR_AND
-			)),
+			query,
 			start
 		};
-		log.debug(`queryParams:${toStr({queryParams})}`);
+		//log.debug(`queryParams:${toStr({queryParams})}`);
 
+		const repoIdObj = {};
 		const multiConnectParams = {
 			principals: [PRINCIPAL_EXPLORER_READ],
-			sources: collections.map(collection => ({
-				repoId: `${COLLECTION_REPO_PREFIX}${collection}`,
-				branch: 'master', // NOTE Hardcoded
-				principals: [PRINCIPAL_EXPLORER_READ]
-			}))
+			sources: collections.map(({
+				_id: collectionId,
+				_name: collectionName
+			}) => {
+				const repoId = `${COLLECTION_REPO_PREFIX}${collectionName}`;
+				repoIdObj[repoId] = {
+					collectionId,
+					collectionName
+				};
+				const documentTypeId = collectionIdToDocumentTypeId[collectionId];
+				if (documentTypeId) {
+					repoIdObj[repoId].documentTypeId = documentTypeId;
+					const documentTypeName = documentTypeIdToName[documentTypeId];
+					if (documentTypeName) {
+						repoIdObj[repoId].documentTypeName = documentTypeName;
+					}
+				} /*else {
+					log.warning(`Unable to find documentTypeId for repoId:${repoId}`);
+				}*/
+				return {
+					repoId,
+					branch: 'master', // NOTE Hardcoded
+					principals: [PRINCIPAL_EXPLORER_READ]
+				};
+			})
 		};
-		log.debug(`multiConnectParams:${toStr(multiConnectParams)}`);
+		//log.debug(`multiConnectParams:${toStr(multiConnectParams)}`);
+		//log.debug(`repoIdObj:${toStr({repoIdObj})}`);
 
 		const multiRepoReadConnection = multiConnect(multiConnectParams);
 
 		const queryRes = multiRepoReadConnection.query(queryParams);
-		log.debug(`queryRes:${toStr(queryRes)}`);
+		//log.debug(`queryRes:${toStr(queryRes)}`);
 
 		function queryResAggregationsObjToArray(obj, localTypes = types) {
 			//log.debug(`obj:${toStr(obj)}`);
@@ -453,36 +602,199 @@ export function generateSchemaForInterface(interfaceName) {
 			repoId,
 			score
 		}) => {
+			//log.debug(`highlight:${toStr(highlight)}`);
+
 			const washedNode = washDocumentNode(connect({
 				branch,
 				principals: [PRINCIPAL_EXPLORER_READ],
 				repoId
 			}).get(id));
+			//log.debug(`washedNode:${toStr(washedNode)}`);
+
 			const json = JSON.stringify(washedNode);
 
-			// NOTE By doing this the frontend developer can't get the full field value and highlight in the same query.
-			// TODO We might not want to do that...
-			const obj = {};
-			Object.keys(highlight).forEach((k) => {
-				//log.debug(`k:${k} highlight[${k}]:${toStr(highlight[k])}`);
-				//const first = forceArray(highlight[k])[0];
-				if (k.includes('._stemmed_')) {
-					// NOTE If multiple languages, the latter will overwrite the first. A single nodes with multiple lanugages is unsupported.
-					const kWithoutStemmed = k.split('._stemmed_')[0];
-					//log.debug(`k:${k} kWithoutStemmed:${kWithoutStemmed}`);
-					obj[kWithoutStemmed] = highlight[k];
-					washedNode[kWithoutStemmed] = highlight[k][0];
-				} else {
-					if(!obj[k]) { // From fulltext
-						obj[k] = highlight[k];
-						washedNode[k] = highlight[k][0];
+			// TODO Traverse...
+			Object.keys(washedNode).forEach((k) => {
+				VALUE_TYPE_VARIANTS.forEach((v) => {
+					let value = washedNode[k];
+					//java.time.OffsetDateTime
+					//log.debug(`k:${k} value:${value} toStr(value):${toStr(value)} typeof value:${typeof value} Object.prototype.toString.call(value):${Object.prototype.toString.call(value)}`);
+					switch (v) {
+					case VALUE_TYPE_BOOLEAN:
+						// WARN  n.g.execution.ExecutionStrategy - Can't serialize value (/search/hits[0]/instant_as_boolean)
+						// : Expected something we can convert to 'java.time.OffsetDateTime' but was 'Boolean'.
+						//value = !!value;
+						if (!isBoolean(value)) {
+							value = null;
+						}
+						break;
+					case VALUE_TYPE_DOUBLE:
+						if (isBoolean(value) || isDateString(value)) {
+							value = null;
+						} else {
+							// language_as_double : Expected type 'Float' but was 'Double'
+							const maybeFloat = parseFloat(value);
+							if (isNaN(maybeFloat)) {
+								value = null;
+								//value = 0.0;
+							} else {
+								value = maybeFloat;
+							}
+						}
+						break;
+					case VALUE_TYPE_GEO_POINT:
+						// '59.9090442,10.7423389' // Enonic always returns this
+						// [59.9090442,10.7423389] // Enonic never returns this...
+						if (Array.isArray(value)) {
+							log.warning(`Enonic XP should never return GeoPoint as Array??? ${toStr(value)}`);
+							if (value.length !== 2) {
+								value = null; // Not GeoPoint
+							} else { // value.length === 2
+								const [lat, lon] = value;
+								const parsedLat = parseFloat(lat);
+								const parsedLon = parseFloat(lon);
+								if (isNumber(parsedLat) && isNumber(parsedLon)) {
+									value = `${parsedLat},${parsedLon}`;
+								} else {
+									value = null; // Not GeoPoint
+								}
+							}
+						} else /* !Array */	if (!isString(value)) {
+							value = null; // Not GeoPoint
+						} else { // isString
+							let [lat, lon] = value.split(',');
+							const parsedLat = parseFloat(lat);
+							const parsedLon = parseFloat(lon);
+							if (isNumber(parsedLat) && isNumber(parsedLon)) {
+								value = `${parsedLat},${parsedLon}`;
+							} else {
+								value = null; // Not GeoPoint
+							}
+						}
+						break;
+					case VALUE_TYPE_INSTANT:
+						if (!isDateString(value)) {
+							value = null;
+						} else {
+							//value = value // date_as_instant : Invalid RFC3339 value : '2021-12-31'. because of : 'Text '2021-12-31' could not be parsed at index 10
+							//value = new Date(Date.parse(value)); // date_as_instant : Expected something we can convert to 'java.time.OffsetDateTime' but was 'Date'
+							value = new Date(Date.parse(value)).toISOString();
+						}
+						break;
+					case VALUE_TYPE_LOCAL_DATE:
+						if (!isDateString(value)) {
+							value = null;
+						} else {
+							value = new Date(Date.parse(value)).toLocaleDateString();
+						}
+						break;
+					case VALUE_TYPE_LOCAL_DATE_TIME:
+						if (!isDateString(value)) {
+							value = null;
+						} else {
+							// Can't serialize value (instant_as_localDateTime) : null graphql.schema.CoercingSerializeException: null
+							// However in Chrome console:
+							//  new Date(Date.parse("2021-12-31T23:59:59Z")).toLocaleString();
+							//    '01/01/2022, 00:59:59'
+							//  new Date(Date.parse("2021-12-31T23:59:59Z")).toLocaleString('nb-NO' ,{ timeZone: 'UTC'});
+							//    '31.12.2021, 23:59:59'
+							//log.debug(`k:${k} value:${value} Date.parse(value):${Date.parse(value)} new Date(Date.parse(value)):${new Date(Date.parse(value))}`);
+							//log.debug(`k:${k} new Date(Date.parse(value)).toLocaleString():${new Date(Date.parse(value)).toLocaleString()}`);
+							// NOTE So the seems to be that GraphQL doesn't like what toLocaleString produces...
+							//value = new Date(Date.parse(value)).toLocaleString();
+							//value = new Date(Date.parse(value)); // Expected something what can convert to 'java.time.LocalDateTime' but was 'Date'
+							//value = new Date(Date.parse(value)).toISOString(); // graphql.schema.CoercingSerializeException: null
+							value = null; // TODO
+						}
+						break;
+					case VALUE_TYPE_LOCAL_TIME:
+						if (!isDateString(value)) {
+							value = null;
+						} else {
+							value = new Date(Date.parse(value)).toLocaleTimeString();
+						}
+						break;
+					case VALUE_TYPE_LONG:
+						if (isBoolean(value) || isDateString(value)) {
+							value = null;
+						} else {
+							//const maybeInt = parseInt(value, 10); // Actually returns Double  // https://github.com/enonic/xp/issues/8462
+							const maybeFloat = parseFloat(value);
+							if (isNaN(maybeFloat) || maybeFloat < JAVA_MIN_SAFE_INT || maybeFloat > JAVA_MAX_SAFE_INT) {
+								value = null;
+							} else {
+								value = maybeFloat|0; // Rounding towards zero
+							}
+						}
+						break;
+					case VALUE_TYPE_REFERENCE:
+						if (!isUuid4(value)) {
+							value = null;
+						}
+						break;
+					case VALUE_TYPE_STRING:
+						if (!isString(value)) {
+							if (Array.isArray(value)) {
+								if (isString(value[0])) {
+									value = value.join(',');
+								} else {
+									value = JSON.stringify(value);
+								}
+							} else if (isObject(value)) { // Includes Date
+								value = JSON.stringify(value);
+							} else { // Boolean, Float, Int, Reference?
+								value = `${value}`; // false stayed false???
+								//value = value.toString(); // false still stayed false???
+								//value = '' + value;
+								//log.debug(`k:${k} value:${value} toStr(value):${toStr(value)} typeof value:${typeof value} Object.prototype.toString.call(value):${Object.prototype.toString.call(value)}`);
+							}
+						}
+						break;
+					default:
+						log.warning(`Unhandeled value type:${v}`);
 					}
-				}
+					washedNode[`${k}_as_${v}`] = value;
+				});
 			});
 
+			// NOTE By doing this the frontend developer can't get the full field value and highlight in the same query.
+			// TODO We might NOT want to do that...
+			const obj = {};
+			if (highlight) {
+				Object.keys(highlight).forEach((k) => {
+					//log.debug(`k:${k} highlight[${k}]:${toStr(highlight[k])}`);
+					//const first = forceArray(highlight[k])[0];
+					if (k.includes('._stemmed_')) {
+						// NOTE If multiple languages, the latter will overwrite the first. A single nodes with multiple lanugages is unsupported.
+						const kWithoutStemmed = k.split('._stemmed_')[0];
+						//log.debug(`k:${k} kWithoutStemmed:${kWithoutStemmed}`);
+						obj[kWithoutStemmed] = highlight[k];
+						washedNode[kWithoutStemmed] = highlight[k][0];
+					} else {
+						if(!obj[k]) { // From fulltext
+							obj[k] = highlight[k];
+							washedNode[k] = highlight[k][0];
+						}
+					}
+				});
+			}
+
+			//log.debug(`repoId:${repoId} repoIdObj[repoId]:${toStr(repoIdObj[repoId])}`);
+			const {
+				collectionId,
+				collectionName,
+				documentTypeId,
+				documentTypeName
+			} = repoIdObj[repoId];
+
 			/* eslint-disable no-underscore-dangle */
+			washedNode._collectionId = collectionId;
+			washedNode._collectionName = collectionName;
+			washedNode._documentTypeId = documentTypeId;
+			washedNode._documentTypeName = documentTypeName; // NOTE This could be used in unionType typeresolver to determine documentType
 			washedNode._highlight = obj;
 			washedNode._json = json;
+			washedNode._repoId = repoId; // Same info in _collection
 			washedNode._score = score;
 			/* eslint-enable no-underscore-dangle */
 			return washedNode;
@@ -490,7 +802,7 @@ export function generateSchemaForInterface(interfaceName) {
 		//log.debug(`queryRes:${toStr(queryRes)}`);
 
 		return queryRes;
-	}
+	} // queryRes.hits.map
 
 	const objectTypeInterfaceSearchHit = createObjectType({
 		name: 'InterfaceSearchHits',
@@ -862,3 +1174,168 @@ export function generateSchemaForInterface(interfaceName) {
 		//subscription:
 	});
 }
+
+/* Example query:
+{
+  search(
+    aggregations: {
+      name: "a"
+      #count:
+      terms: {
+        field: language
+        size: 10
+        minDocCount: 1
+      }
+    }
+    count: 1
+    filters: {
+      exists: {
+        field: location
+      }
+    }
+    highlight: {
+      #encoder: default
+      #fragmenter: simple
+      fragmentSize: 255
+      #noMatchSize: 0
+      #numberOfFragments: 1
+      order: none
+      postTag: "</b>"
+      preTag: "<b>"
+      #requireFieldMatch: true
+      #tagsSchema: styled
+      properties: {
+        text: {}
+      	title: {}
+        uri: {}
+      }
+    }
+    searchString: "whatever"
+    start: 0
+  ) {
+    #aggregations {
+    	#__typename
+      #... on AggregationTerms {
+        #name
+        #buckets {
+          #key
+          #docCount
+        #}
+      #}
+		#}
+    #aggregationsAsJson
+    #count
+    #total
+    hits {
+      #_collectionId
+      #_collectionName
+      #_documentTypeId
+      #_documentTypeName
+      #_highlight {
+        #text
+        #title
+        #uri
+      #}
+      #_json
+      #_repoId
+      #_score
+      available_as_boolean
+      available_as_double
+      available_as_geoPoint
+      available_as_instant
+      available_as_localDate
+      #available_as_localDateTime
+      available_as_localTime
+      available_as_long
+      available_as_reference
+      available_as_string
+      count_as_boolean
+      count_as_double
+      count_as_geoPoint
+      count_as_instant
+      count_as_localDate
+      #count_as_localDateTime
+      count_as_localTime
+      count_as_long
+      count_as_reference
+      count_as_string
+      date_as_boolean
+      date_as_double
+      date_as_geoPoint
+      date_as_instant
+      date_as_localDate
+      #date_as_localDateTime
+      date_as_localTime
+      date_as_long
+      date_as_reference
+      date_as_string
+      datetime_as_boolean
+      datetime_as_double
+      datetime_as_geoPoint
+      datetime_as_instant
+      datetime_as_localDate
+      #datetime_as_localDateTime
+      datetime_as_localTime
+      datetime_as_long
+      datetime_as_reference
+      datetime_as_string
+      time_as_boolean
+      time_as_double
+      time_as_geoPoint
+      time_as_instant
+      time_as_localDate
+      #time_as_localDateTime
+      time_as_localTime
+      time_as_long
+      time_as_reference
+      time_as_string
+      instant_as_boolean
+      instant_as_double
+      instant_as_geoPoint
+      instant_as_instant
+      instant_as_localDate
+      #instant_as_localDateTime
+      instant_as_localTime
+      instant_as_long
+      instant_as_reference
+      instant_as_string
+      price_as_boolean
+      price_as_double
+      price_as_geoPoint
+      price_as_instant
+      price_as_localDate
+      #price_as_localDateTime
+      price_as_localTime
+      price_as_long
+      price_as_reference
+      price_as_string
+      #language
+      language_as_boolean
+      language_as_double
+      language_as_geoPoint
+      language_as_instant
+      language_as_localDate
+      #language_as_localDateTime
+      language_as_localTime
+      language_as_long
+      language_as_reference
+      language_as_string
+      location_as_boolean
+      location_as_double
+      location_as_geoPoint
+      location_as_instant
+      location_as_localDate
+      #location_as_localDateTime
+      location_as_localTime
+      location_as_long
+      location_as_reference
+      location_as_string
+      #informationType
+      #source
+      #text
+      #title
+      #uri
+    }
+  }
+}
+*/
