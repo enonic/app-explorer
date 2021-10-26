@@ -86,3 +86,24 @@ button
 .help-text
 	margin: 3px 0 9px 0
 	color: #888888
+
+div.inverted.segment
+	tr.aligned
+		display: flex
+
+		td.collapsing
+			width: auto
+			display: flex
+			align-items: center
+
+			.toggle.checkbox
+				input:focus ~ label:before,
+				label:hover::before,
+				label:before
+					background-color: white
+
+				label:after
+					background-color: darkgray
+
+				&.checked label:after
+					background-color: white

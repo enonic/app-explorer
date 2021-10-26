@@ -232,6 +232,7 @@ services: {}, // Workaround for i18nUrl BUG
 		<link rel="stylesheet" type="text/css" href="${assetUrl({path: 'nice-react-gantt/style.css'})}">
 		<link rel="stylesheet" type="text/css" href="${assetUrl({path: 'semantic-ui-css/semantic.css'})}">
 		<link rel="stylesheet" type="text/css" href="${assetUrl({path: 'react-semantic-ui-datepickers/react-semantic-ui-datepickers.css'})}">
+		<link rel="stylesheet" type="text/css" href="${assetUrl({path: 'style/bundle.css'})}">
 		<title>Explorer</title>
 	</head>
 	<body style="background-color: white !important;">
