@@ -91,13 +91,13 @@ div.inverted.segment
 			align-items: center
 
 			.toggle.checkbox
-				input:focus ~ label:before,
+				input:focus ~ label::before,
 				label:hover::before,
-				label:before
+				label::before
 					background-color: white
 
-				label:after
+				label::after
 					background-color: darkgray
 
-				&.checked label:after
+				&.checked label::after
 					background-color: white
