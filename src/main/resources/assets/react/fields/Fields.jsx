@@ -130,16 +130,19 @@ export function Fields(props) {
 					<Table.Row verticalAlign='middle'>
 						<Table.Cell collapsing>
 							<Radio
+								label={"Show system fields"}
+								className='inverted'
 								checked={showSystemFields}
 								onChange={(ignored,{checked}) => {
 									updateFields({includeSystemFields: checked});
 								}}
 								toggle
 							/>
-							<Label color='black' size='large'>Show system fields</Label>
 						</Table.Cell>
 						<Table.Cell collapsing>
 							<Radio
+								label={"Show description column"}
+								className='inverted'
 								checked={showDescriptionColumn}
 								onChange={(ignored,{checked}) => {
 									setState(prev => ({
@@ -149,10 +152,11 @@ export function Fields(props) {
 								}}
 								toggle
 							/>
-							<Label color='black' size='large'>Show description column</Label>
 						</Table.Cell>
 						<Table.Cell collapsing>
 							<Radio
+								label={"Show occurences columns"}
+								className='inverted'
 								checked={showOccurencesColumns}
 								onChange={(ignored,{checked}) => {
 									setState(prev => ({
@@ -162,30 +166,33 @@ export function Fields(props) {
 								}}
 								toggle
 							/>
-							<Label color='black' size='large'>Show occurences columns</Label>
 						</Table.Cell>
 						<Table.Cell collapsing>
 							<Radio
+								label={"Show document types"}
+								className='inverted'
 								checked={showDocumentTypes}
 								onChange={(ignored,{checked}) => {
 									setShowDocumentTypes(checked);
 								}}
 								toggle
 							/>
-							<Label color='black' size='large'>Show document types</Label>
 						</Table.Cell>
 						<Table.Cell collapsing>
 							<Radio
+								label={"Show collections"}
+								className='inverted'
 								checked={showCollections}
 								onChange={(ignored,{checked}) => {
 									setShowCollections(checked);
 								}}
 								toggle
 							/>
-							<Label color='black' size='large'>Show collections</Label>
 						</Table.Cell>
 						<Table.Cell collapsing>
 							<Radio
+								label={"Show index config columns"}
+								className='inverted'
 								checked={showIndexConfigColumns}
 								onChange={(ignored,{checked}) => {
 									setState(prev => ({
@@ -195,7 +202,6 @@ export function Fields(props) {
 								}}
 								toggle
 							/>
-							<Label color='black' size='large'>Show index config columns</Label>
 						</Table.Cell>
 						{/*<Table.Cell collapsing>
 							<Radio

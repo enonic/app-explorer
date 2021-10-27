@@ -431,73 +431,80 @@ export function Collections(props) {
 					<Table.Row verticalAlign='middle'>
 						<Table.Cell collapsing>
 							<Radio
+								label={"Show collector"}
+								className='inverted'
 								checked={showCollector}
 								onChange={(ignored,{checked}) => {
 									setShowCollector(checked);
 								}}
 								toggle
 							/>
-							<Label color='black' size='large'>Show collector</Label>
 						</Table.Cell>
 						<Table.Cell collapsing>
 							<Radio
+								label={"Show document count"}
+								className='inverted'
 								checked={showDocumentCount}
 								onChange={(ignored,{checked}) => {
 									setShowDocumentCount(checked);
 								}}
 								toggle
 							/>
-							<Label color='black' size='large'>Show document count</Label>
 						</Table.Cell>
 						<Table.Cell collapsing>
 							<Radio
+								label={"Show language"}
+								className='inverted'
 								checked={showLanguage}
 								onChange={(ignored,{checked}) => {
 									setShowLanguage(checked);
 								}}
 								toggle
 							/>
-							<Label color='black' size='large'>Show language</Label>
 						</Table.Cell>
 						<Table.Cell collapsing>
 							<Radio
+								label={"Show document type"}
+								className='inverted'
 								checked={showDocumentType}
 								onChange={(ignored,{checked}) => {
 									setShowDocumentType(checked);
 								}}
 								toggle
 							/>
-							<Label color='black' size='large'>Show document type</Label>
 						</Table.Cell>
 						<Table.Cell collapsing>
 							<Radio
+								label={"Show interfaces"}
+								className='inverted'
 								checked={showInterfaces}
 								onChange={(ignored,{checked}) => {
 									setShowInterfaces(checked);
 								}}
 								toggle
 							/>
-							<Label color='black' size='large'>Show interfaces</Label>
 						</Table.Cell>
 						<Table.Cell collapsing>
 							<Radio
+								label={"Show schedule"}
+								className='inverted'
 								checked={showSchedule}
 								onChange={(ignored,{checked}) => {
 									setShowSchedule(checked);
 								}}
 								toggle
 							/>
-							<Label color='black' size='large'>Show schedule</Label>
 						</Table.Cell>
 						<Table.Cell collapsing>
 							<Radio
+								label={"Show delete"}
+								className='inverted'
 								checked={showDelete}
 								onChange={(ignored,{checked}) => {
 									setShowDelete(checked);
 								}}
 								toggle
 							/>
-							<Label color='black' size='large'>Show delete</Label>
 						</Table.Cell>
 					</Table.Row>
 				</Table.Body>

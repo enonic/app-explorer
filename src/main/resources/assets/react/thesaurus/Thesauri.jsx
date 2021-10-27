@@ -123,13 +123,14 @@ export function Thesauri(props) {
 					<Table.Row verticalAlign='middle'>
 						<Table.Cell collapsing>
 							<Radio
+								label={"Show delete"}
+								className='inverted'
 								checked={showDelete}
 								onChange={(ignored,{checked}) => {
 									setShowDelete(checked);
 								}}
 								toggle
 							/>
-							<Label color='black' size='large'>Show delete</Label>
 						</Table.Cell>
 					</Table.Row>
 				</Table.Body>
