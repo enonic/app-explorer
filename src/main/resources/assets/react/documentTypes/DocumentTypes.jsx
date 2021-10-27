@@ -18,6 +18,15 @@ import {useInterval} from '../utils/useInterval';
 import {NewOrEditDocumentTypeModal} from './NewOrEditDocumentTypeModal';
 import {DeleteDocumentTypeModal} from './DeleteDocumentTypeModal';
 
+function getDefaultModalState(open = false) {
+	return {
+		_id: undefined,
+		_name: undefined,
+		collectionsArr: [],
+		interfacesArr: [],
+		open
+	};
+}
 
 export function DocumentTypes({
 	servicesBaseUrl
@@ -29,13 +38,8 @@ export function DocumentTypes({
 	const [globalFields, setGlobalFields] = React.useState([]);
 	const [documentTypes, setDocumentTypes] = React.useState([]);
 
-	const [newOrEditModalState, setNewOrEditModalState] = React.useState({
-		_id: undefined,
-		_name: '',
-		collectionsArr: [],
-		interfacesArr: [],
-		open: false
-	});
+	// The modal state should be handled by newOrEditDocumentTypeModal
+	const [newOrEditModalState, setNewOrEditModalState] = React.useState(getDefaultModalState());
 
 	const [showAddFields, setShowAddFields] = React.useState(false);
 	const [showCollections, setShowCollections] = React.useState(false);
@@ -365,13 +369,11 @@ export function DocumentTypes({
 		<Popup
 			content='New document type'
 			inverted
-			trigger={<ButtonNew onClick={() => setNewOrEditModalState({
-				_id: undefined,
-				_name: '',
-				collectionsArr: [],
-				interfacesArr: [],
-				open: true
-			})}/>}
+			trigger={
+				<ButtonNew onClick={() => {
+					return setNewOrEditModalState(getDefaultModalState(true));
+				}}/>
+			}
 		/>
 
 		<NewOrEditDocumentTypeModal
@@ -380,13 +382,10 @@ export function DocumentTypes({
 			collectionsArr={newOrEditModalState.collectionsArr}
 			interfacesArr={newOrEditModalState.interfacesArr}
 			open={newOrEditModalState.open}
+			setModalState={setNewOrEditModalState}
 			onClose={() => {
 				//console.debug('NewOrEditDocumentTypeModal onClose');
-				setNewOrEditModalState(prev => ({
-					_id: prev._id,
-					_name: prev._name,
-					collectionsArr: prev.collectionsArr,
-					interfacesArr: prev.interfacesArr,
+				setNewOrEditModalState(() => ({
 					open: false
 				}));
 				queryDocumentTypes();
