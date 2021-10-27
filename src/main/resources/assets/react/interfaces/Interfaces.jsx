@@ -320,63 +320,69 @@ export function Interfaces({
 					<Table.Row verticalAlign='middle'>
 						<Table.Cell collapsing>
 							<Radio
+								label={"Show collection count"}
+								className='inverted'
 								checked={showCollectionCount}
 								onChange={(ignored,{checked}) => {
 									setShowCollectionCount(checked);
 								}}
 								toggle
 							/>
-							<Label color='black' size='large'>Show collection count</Label>
 						</Table.Cell>
 						<Table.Cell collapsing>
 							<Radio
+								label={"Show collection(s)"}
+								className='inverted'
 								checked={showCollections}
 								onChange={(ignored,{checked}) => {
 									setShowCollections(checked);
 								}}
 								toggle
 							/>
-							<Label color='black' size='large'>Show collection(s)</Label>
 						</Table.Cell>
 						<Table.Cell collapsing>
 							<Radio
+								label={"Show field(s)"}
+								className='inverted'
 								checked={showFields}
 								onChange={(ignored,{checked}) => {
 									setShowFields(checked);
 								}}
 								toggle
 							/>
-							<Label color='black' size='large'>Show field(s)</Label>
 						</Table.Cell>
 						<Table.Cell collapsing>
 							<Radio
+								label={"Show synonyms"}
+								className='inverted'
 								checked={showSynonyms}
 								onChange={(ignored,{checked}) => {
 									setShowSynonyms(checked);
 								}}
 								toggle
 							/>
-							<Label color='black' size='large'>Show synonyms</Label>
 						</Table.Cell>
 						<Table.Cell collapsing>
 							<Radio
+								label={"Show stopwords"}
+								className='inverted'
 								checked={showStopWords}
 								onChange={(ignored,{checked}) => {
 									setShowStopWords(checked);
 								}}
 								toggle
 							/>
-							<Label color='black' size='large'>Show stopwords</Label>
 						</Table.Cell>
 						<Table.Cell collapsing>
 							<Radio
+								label={"Show delete"}
+								className='inverted'
 								checked={showDelete}
 								onChange={(ignored,{checked}) => {
 									setShowDelete(checked);
 								}}
 								toggle
 							/>
-							<Label color='black' size='large'>Show delete</Label>
 						</Table.Cell>
 					</Table.Row>
 				</Table.Body>

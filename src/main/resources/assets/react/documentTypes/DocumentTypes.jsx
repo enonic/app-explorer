@@ -118,63 +118,69 @@ export function DocumentTypes({
 					<Table.Row verticalAlign='middle'>
 						<Table.Cell collapsing>
 							<Radio
+								label={"Show collections"}
+								className='inverted'
 								checked={showCollections}
 								onChange={(ignored,{checked}) => {
 									setShowCollections(checked);
 								}}
 								toggle
 							/>
-							<Label color='black' size='large'>Show collections</Label>
 						</Table.Cell>
 						<Table.Cell collapsing>
 							<Radio
+								label={"Show interfaces"}
+								className='inverted'
 								checked={showInterfaces}
 								onChange={(ignored,{checked}) => {
 									setShowInterfaces(checked);
 								}}
 								toggle
 							/>
-							<Label color='black' size='large'>Show interfaces</Label>
 						</Table.Cell>
 						<Table.Cell collapsing>
 							<Radio
+								label={"Show add fields"}
+								className='inverted'
 								checked={showAddFields}
 								onChange={(ignored,{checked}) => {
 									setShowAddFields(checked);
 								}}
 								toggle
 							/>
-							<Label color='black' size='large'>Show add fields</Label>
 						</Table.Cell>
 						<Table.Cell collapsing>
 							<Radio
+								label={"Show documents per collection"}
+								className='inverted'
 								checked={showDocumentsPerCollection}
 								onChange={(ignored,{checked}) => {
 									setShowDocumentsPerCollection(checked);
 								}}
 								toggle
 							/>
-							<Label color='black' size='large'>Show documents per collection</Label>
 						</Table.Cell>
 						<Table.Cell collapsing>
 							<Radio
+								label={"Show details"}
+								className='inverted'
 								checked={showDetails}
 								onChange={(ignored,{checked}) => {
 									setShowDetails(checked);
 								}}
 								toggle
 							/>
-							<Label color='black' size='large'>Show details</Label>
 						</Table.Cell>
 						<Table.Cell collapsing>
 							<Radio
+								label={"Show delete button"}
+								className='inverted'
 								checked={showDeleteButton}
 								onChange={(ignored,{checked}) => {
 									setShowDeleteButton(checked);
 								}}
 								toggle
 							/>
-							<Label color='black' size='large'>Show delete button</Label>
 						</Table.Cell>
 					</Table.Row>
 				</Table.Body>

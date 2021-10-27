@@ -85,23 +85,25 @@ export const Api = (props) => {
 					<Table.Row verticalAlign='middle'>
 						<Table.Cell collapsing>
 							<Radio
+								label={"Show collection(s)"}
+								className='inverted'
 								checked={showCollections}
 								onChange={(ignored,{checked}) => {
 									setShowCollections(checked);
 								}}
 								toggle
 							/>
-							<Label color='black' size='large'>Show collection(s)</Label>
 						</Table.Cell>
 						<Table.Cell collapsing>
 							<Radio
+								label={"Show interface(s)"}
+								className='inverted'
 								checked={showInterfaces}
 								onChange={(ignored,{checked}) => {
 									setShowInterfaces(checked);
 								}}
 								toggle
 							/>
-							<Label color='black' size='large'>Show interface(s)</Label>
 						</Table.Cell>
 					</Table.Row>
 				</Table.Body>
