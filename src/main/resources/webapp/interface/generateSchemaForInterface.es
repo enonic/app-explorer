@@ -1,6 +1,6 @@
 import {
 	QUERY_OPERATOR_AND,
-	VALUE_TYPE_ANY,
+	//VALUE_TYPE_ANY,
 	VALUE_TYPE_BOOLEAN,
 	VALUE_TYPE_DOUBLE,
 	VALUE_TYPE_GEO_POINT,
@@ -10,7 +10,7 @@ import {
 	VALUE_TYPE_LOCAL_TIME,
 	VALUE_TYPE_LONG,
 	VALUE_TYPE_REFERENCE,
-	VALUE_TYPE_SET,
+	//VALUE_TYPE_SET,
 	VALUE_TYPE_STRING,
 	addQueryFilter,
 	camelize,
@@ -31,6 +31,20 @@ import {
 } from '@enonic/js-utils';
 import {v4 as isUuid4} from 'is-uuid';
 
+import {getFields} from '/lib/explorer/field/getFields';
+import {get as getInterface} from '/lib/explorer/interface/get';
+import {filter as filterInterface} from '/lib/explorer/interface/filter';
+import {hasValue} from '/lib/explorer/query/hasValue';
+import {
+	COLLECTION_REPO_PREFIX,
+	NT_DOCUMENT,
+	PRINCIPAL_EXPLORER_READ
+} from '/lib/explorer/model/2/constants';
+import {removeStopWords} from '/lib/explorer/query/removeStopWords';
+import {wash} from '/lib/explorer/query/wash';
+import {connect} from '/lib/explorer/repo/connect';
+import {multiConnect} from '/lib/explorer/repo/multiConnect';
+import {get as getStopWordsList} from '/lib/explorer/stopWords/get';
 import {
 	GraphQLBoolean,
 	//GraphQLDouble, // There is no such type
@@ -49,21 +63,6 @@ import {
 	decodeCursor,
 	encodeCursor
 } from '/lib/graphql-connection';
-
-import {getFields} from '/lib/explorer/field/getFields';
-import {get as getInterface} from '/lib/explorer/interface/get';
-import {filter as filterInterface} from '/lib/explorer/interface/filter';
-import {hasValue} from '/lib/explorer/query/hasValue';
-import {
-	COLLECTION_REPO_PREFIX,
-	NT_DOCUMENT,
-	PRINCIPAL_EXPLORER_READ
-} from '/lib/explorer/model/2/constants';
-import {removeStopWords} from '/lib/explorer/query/removeStopWords';
-import {wash} from '/lib/explorer/query/wash';
-import {connect} from '/lib/explorer/repo/connect';
-import {multiConnect} from '/lib/explorer/repo/multiConnect';
-import {get as getStopWordsList} from '/lib/explorer/stopWords/get';
 
 
 //import {schemaGenerator} from './schemaGenerator';
@@ -94,6 +93,7 @@ const {
 	createEnumType,
 	createInputObjectType,
 	createObjectType,
+	createUnionType,
 	createSchema
 } = schemaGenerator;
 //import {DEFAULT_INTERFACE_FIELDS} from '../constants';
@@ -137,6 +137,45 @@ const INPUT_OBJECT_TYPE_SUB_AGGREGATIONS_NAME = 'InputObjectTypeSubAggregations'
 
 export function generateSchemaForInterface(interfaceName) {
 	const explorerRepoReadConnection = connect({ principals: [PRINCIPAL_EXPLORER_READ] });
+
+	//──────────────────────────────────────────────────────────────────────────
+	// In order to make a documentTypesUnion supporting GraphQL inline fragments (... on documentType)
+	// I have to make one objectType per documentType and it needs a unqiue name
+	// It needs all global fields, and all documentType local fields
+	//──────────────────────────────────────────────────────────────────────────
+	// 1. Get all global fields, and make a spreadable fields object to reuse and override per docmentType
+	//──────────────────────────────────────────────────────────────────────────
+	const fieldsRes = getFields({
+		connection: explorerRepoReadConnection,
+		includeSystemFields: true
+	});
+	//log.debug(`fieldsRes:${toStr(fieldsRes)}`);
+	//log.debug(`fieldsRes.hits[0]:${toStr(fieldsRes.hits[0])}`);
+	const camelToFieldObj = {};
+	const spreadableGlobalFieldsObj = {};
+	fieldsRes.hits.forEach(({ // TODO traverse
+		fieldType: valueType,
+		inResults,
+		//isSystemField = false,
+		key//,
+		//max, // TODO nonNull list
+		//min
+	}) => {
+		if (valueType) {
+			const camelizedFieldKey = camelize(key, /[.-]/g);
+			camelToFieldObj[camelizedFieldKey] = key;
+			if (inResults !== false) {
+				spreadableGlobalFieldsObj[camelizedFieldKey] = {
+					type: valueTypeToGraphQLType(valueType) // TODO min and max?
+				};
+			}
+		}
+	});
+	//log.debug(`spreadableGlobalFieldsObj:${toStr(spreadableGlobalFieldsObj)}`);
+
+	//──────────────────────────────────────────────────────────────────────────
+	// 2. Get all documentTypes mentioned in the interface collections
+	//──────────────────────────────────────────────────────────────────────────
 	const interfaceNode = getInterface({
 		connection: explorerRepoReadConnection,
 		interfaceName
@@ -174,6 +213,43 @@ export function generateSchemaForInterface(interfaceName) {
 	const documentTypes = explorerRepoReadConnection.get(documentTypeIds);
 	//log.debug(`documentTypes:${toStr(documentTypes)}`);
 
+	//──────────────────────────────────────────────────────────────────────────
+	// 3. Make one objectType per documentType
+	//──────────────────────────────────────────────────────────────────────────
+	function documentTypeNameToGraphQLObjectTypeName(documentTypeName) {
+		return `DocumentType_${documentTypeName}`;
+	}
+
+	const documentTypeObjectTypes = {};
+	documentTypes.forEach(({
+		_name: documentTypeName,
+		properties
+	}) => {
+		const spreadableLocalFieldsObj = {};
+		if (properties) {
+			forceArray(properties).forEach(({ name, valueType }) => {
+				const camelizedFieldKey = camelize(name, /[.-]/g);
+				if (camelToFieldObj[camelizedFieldKey] && camelToFieldObj[camelizedFieldKey] !== name) {
+					throw new Error(`Name collision from camelized:${camelizedFieldKey} to both ${camelToFieldObj[camelizedFieldKey]} and ${name}`);
+				}
+				camelToFieldObj[camelizedFieldKey] = name;
+				spreadableLocalFieldsObj[camelizedFieldKey] = {
+					type: valueTypeToGraphQLType(valueType) // TODO min max?
+				};
+			});
+		}
+		documentTypeObjectTypes[documentTypeName] = createObjectType({
+			name: documentTypeNameToGraphQLObjectTypeName(documentTypeName),
+			fields: {
+				...spreadableGlobalFieldsObj,
+				...spreadableLocalFieldsObj
+			}
+		});
+	}); // documentTypes.forEach
+	//log.debug(`documentTypeObjectTypes:${toStr(documentTypeObjectTypes)}`);
+
+	//──────────────────────────────────────────────────────────────────────────
+
 	const allFieldKeys = [];
 
 	const documentTypeIdToName = {};
@@ -193,12 +269,7 @@ export function generateSchemaForInterface(interfaceName) {
 	});
 	//log.debug(`allFieldKeys:${toStr(allFieldKeys)}`);
 
-	const fieldsRes = getFields({
-		connection: explorerRepoReadConnection,
-		includeSystemFields: true
-	});
-	//log.debug(`fieldsRes:${toStr(fieldsRes)}`);
-	//log.debug(`fieldsRes.hits[0]:${toStr(fieldsRes.hits[0])}`);
+
 
 	fieldsRes.hits.forEach(({key}) => {
 		if (!allFieldKeys.includes(key)) {
@@ -208,7 +279,6 @@ export function generateSchemaForInterface(interfaceName) {
 	allFieldKeys.sort();
 	//log.debug(`allFieldKeys:${toStr(allFieldKeys)}`);
 
-	const camelToFieldObj = {};
 	const fieldKeysForAggregations = [];
 	const fieldKeysForFilters = [];
 	const highlightParameterPropertiesFields = {};
@@ -358,6 +428,11 @@ export function generateSchemaForInterface(interfaceName) {
 
 	//──────────────────────────────────────────────────────────────────────────
 
+	const highlightProperties = createInputObjectType({
+		name: 'HighlightParameterProperties',
+		fields: highlightParameterPropertiesFields
+	});
+
 	const interfaceSearchHitsFields = {
 		_collectionId: { type: nonNull(GraphQLID) },
 		_collectionName: { type: nonNull(GraphQLString) },
@@ -374,11 +449,6 @@ export function generateSchemaForInterface(interfaceName) {
 	//log.debug(`Object.keys(interfaceSearchHitsFieldsFromSchema):${toStr(Object.keys(interfaceSearchHitsFieldsFromSchema))}`);
 	Object.keys(interfaceSearchHitsFieldsFromSchema).forEach((k) => {
 		interfaceSearchHitsFields[k] = interfaceSearchHitsFieldsFromSchema[k];
-	});
-
-	const highlightProperties = createInputObjectType({
-		name: 'HighlightParameterProperties',
-		fields: highlightParameterPropertiesFields
 	});
 
 	function searchResolver(env) {
@@ -809,6 +879,27 @@ export function generateSchemaForInterface(interfaceName) {
 		fields: interfaceSearchHitsFields
 	});
 
+	const documentTypesUnion = createUnionType({
+		name: 'DocumentTypesUnion',
+		/*types: [
+			//reference('InterfaceSearchHits')
+			objectTypeInterfaceSearchHit
+		],*/
+		//types: Object.values(documentTypeObjectTypes), // Object.values is not a function
+		types: Object.keys(documentTypeObjectTypes).map((documentTypeName) => documentTypeObjectTypes[documentTypeName]),
+		// Perhaps this has smaller footprint?
+		//types: Object.keys(documentTypeObjectTypes).map((documentTypeName) => reference(documentTypeNameToGraphQLObjectTypeName(documentTypeName))),
+		typeResolver(node) {
+			//log.debug(`node:${toStr(node)}`);
+			const {
+				//_documentTypeId
+				_documentTypeName
+			} = node;
+			//return objectTypeInterfaceSearchHit;
+			return documentTypeObjectTypes[_documentTypeName]; // eslint-disable-line no-underscore-dangle
+		}
+	});
+
 	//const OBJECT_TYPE_AGGREGATIONS_NAME = 'InterfaceSearchAggregations';
 	const objectTypeInterfaceSearch = createObjectType({
 		name: 'InterfaceSearch',
@@ -816,7 +907,8 @@ export function generateSchemaForInterface(interfaceName) {
 			aggregations: { type: list(OBJECT_TYPE_AGGREGATIONS_UNION) },
 			aggregationsAsJson: { type: GraphQLJson },
 			count: { type: nonNull(GraphQLInt) },
-			hits: { type: list(objectTypeInterfaceSearchHit)},
+			//hits: { type: list(objectTypeInterfaceSearchHit)},
+			hits: { type: list(documentTypesUnion)},
 			total: { type: nonNull(GraphQLInt) }
 		}
 	});
