@@ -30,6 +30,10 @@ import {
 	ucFirst
 } from '@enonic/js-utils';
 import {v4 as isUuid4} from 'is-uuid';
+import 'reflect-metadata';
+//import serialize from 'serialize-javascript';
+import setIn from 'set-value'; // Number.isInteger and Reflect
+import traverse from 'traverse';
 
 import {getFields} from '/lib/explorer/field/getFields';
 import {get as getInterface} from '/lib/explorer/interface/get';
@@ -145,13 +149,92 @@ export function generateSchemaForInterface(interfaceName) {
 	//──────────────────────────────────────────────────────────────────────────
 	// 1. Get all global fields, and make a spreadable fields object to reuse and override per docmentType
 	//──────────────────────────────────────────────────────────────────────────
-	const fieldsRes = getFields({
+	const fieldsRes = getFields({ // Note these are sorted 'key ASC'
 		connection: explorerRepoReadConnection,
 		includeSystemFields: true
 	});
 	//log.debug(`fieldsRes:${toStr(fieldsRes)}`);
 	//log.debug(`fieldsRes.hits[0]:${toStr(fieldsRes.hits[0])}`);
+
+	/*────────────────────────────────────────────────────────────────────────────
+	This document:
+		{
+			person: {
+				age: 30,
+				name: 'John'
+			}
+		}
+
+	Should be covered by this documentType:
+		fields: [
+			//{ key: 'person', valueType: 'Set' } // This entry is optional
+			{ key: 'person.age', valueType: 'String' }
+			{ key: 'person.name', valueType: 'String' }
+		]
+
+	Should end up like this GraphQL schema:
+		fields: {
+			person: {
+				type: ObjectType{
+					name: 'Person',
+					fields: {
+						age: { type String },
+						name: { type String }
+					}
+				}
+			}
+		}
+
+	Using setIn I can make this intermediary:
+		{
+			person: {
+				age: null,
+				name: null
+			}
+		}
+	And then use traverse to build the GraphQL schema?
+	────────────────────────────────────────────────────────────────────────────*/
 	const camelToFieldObj = {};
+	const nestedFieldsObj = {};
+	fieldsRes.hits.forEach(({ // TODO traverse
+		//fieldType: valueType,
+		inResults,
+		//isSystemField = false,
+		key//,
+		//max, // TODO nonNull list
+		//min
+	}) => {
+		const camelizedFieldPath = key.split('.').map((k) => camelize(k, /[-]/g)).join('.');
+		//log.debug(`inResults:${toStr(inResults)} key:${toStr(key)} camelizedFieldPath:${toStr(camelizedFieldPath)}`);
+
+		if (inResults !== false) {
+			setIn(nestedFieldsObj, camelizedFieldPath, true, { merge: true });
+		}
+	});
+	//log.debug(`nestedFieldsObj:${toStr(nestedFieldsObj)}`);
+
+	//──────────────────────────────────────────────────────────────────────────
+	function objToGraphQL(obj) {
+		return traverse(obj).map(function(value) { // Fat arrow destroys this
+			//log.debug(`key:${toStr(this.key)} value:${toStr(value)} isLeaf:${toStr(this.isLeaf)}`);
+			if (this.notRoot) {
+				if (this.isLeaf) {
+					this.update({ type: GraphQLString }, true); // Avoiding infinite loop by setting stopHere=true
+				} else { //notLeaf
+					this.update({
+						type: createObjectType({
+							name: camelize(this.key, /[.]/g), // Must be unique
+							fields: objToGraphQL(value) // Recurse
+						})
+					}, true); // Avoiding infinite loop by setting stopHere=true
+				}
+			}
+		});
+	}
+	//const newObj = objToGraphQL(nestedFieldsObj);
+	//log.debug(`newObj:${toStr(serialize(newObj))}`); // ObjectTypes are not printable... just shows {}
+	//──────────────────────────────────────────────────────────────────────────
+
 	const spreadableGlobalFieldsObj = {};
 	fieldsRes.hits.forEach(({ // TODO traverse
 		fieldType: valueType,
