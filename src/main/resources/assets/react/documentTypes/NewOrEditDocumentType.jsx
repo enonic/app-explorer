@@ -6,7 +6,8 @@ import {
 	Loader,
 	Modal,
 	Segment,
-	Tab
+	Tab,
+	Message
 } from 'semantic-ui-react';
 import {ResetButton} from 'semantic-ui-react-form/buttons/ResetButton';
 import {SubmitButton} from 'semantic-ui-react-form/buttons/SubmitButton';
@@ -17,11 +18,12 @@ import {Input} from 'semantic-ui-react-form/inputs/Input';
 import {GQL_MUTATION_DOCUMENT_TYPE_CREATE} from '../../../services/graphQL/mutations/documentTypeCreateMutation';
 import {GQL_MUTATION_DOCUMENT_TYPE_UPDATE} from '../../../services/graphQL/mutations/documentTypeUpdateMutation';
 import {GQL_QUERY_DOCUMENT_TYPE_GET} from '../../../services/graphQL/queries/documentTypeGetQuery';
+import {GQL_QUERY_DOCUMENT_TYPE_NAMES} from '../../../services/graphQL/queries/documentTypeNames.mjs';
 
 import {fetchFields} from '../../../services/graphQL/fetchers/fetchFields';
 import {nameValidator} from '../utils/nameValidator';
 import {FieldsList} from './FieldsList';
-
+// import {fetchDocumentTypes} from '../../../services/graphQL/fetchers/fetchDocumentTypes.mjs';
 
 const SCHEMA = {
 	_name: (v) => nameValidator(v),
@@ -30,7 +32,8 @@ const SCHEMA = {
 		if (!Array.isArray(properties)) {
 			return 'properties must be an array';
 		}
-		for (var i = 0; i < properties.length; i++) { // Can't return from forEach?
+
+		for (let i = 0; i < properties.length; i++) { // Can't return from forEach?
 			const {name} = properties[i];
 			//console.debug('i', i, 'name', name);
 			if(!name) {
@@ -61,7 +64,6 @@ const SCHEMA = {
 	}
 }; // SCHEMA
 
-
 export function NewOrEditDocumentType({
 	doClose = () => {},
 	_id: idProp, // optional
@@ -77,6 +79,10 @@ export function NewOrEditDocumentType({
 		properties: []
 	});
 	const [globalFields, setGlobalFields] = React.useState([]);
+	// const [nameInput, setNameInput] = React.useState("");
+	const [names, setNames] = React.useState([]);
+	const [error, setError] = React.useState([]);
+	const [nameInput, setNameInput] = React.useState("");
 	/*const [fieldModalState, setFieldModalState] = React.useState({
 		local: true,
 		open: false
@@ -105,6 +111,49 @@ export function NewOrEditDocumentType({
 			});
 	}
 
+	/**
+	 * Gets all the names of existing documentTypes
+	 *
+	 */
+	function getDocumentTypeNames() {
+		fetch(`${servicesBaseUrl}/graphQL`, {
+			method: 'POST',
+			headers: {
+				'Content-Type':	'application/json'
+			},
+			body: JSON.stringify({
+				query: GQL_QUERY_DOCUMENT_TYPE_NAMES
+			})
+		})
+			.then(response => response.json())
+			.then(json => json.data)
+			.then(data => {
+				const hits = data.queryDocumentTypes.hits;
+				const allNames = [];
+				console.debug(JSON.stringify(hits, null, 4));
+				hits.forEach(({_name}) => {
+					allNames.push(_name);
+				});
+				setNames(() =>  {
+					return allNames;
+				});
+			});
+	}
+
+	React.useEffect(() =>{
+		console.debug(names.includes(nameInput));
+		if (names.includes(nameInput)) {
+			setError(
+				<Message negative>
+					<Message.Header>{`The name ${nameInput} is allready taken`}</Message.Header>
+				</Message>
+			);
+		} else {
+			setError(null);
+		}
+		setNameInput(nameInput);
+	}, [nameInput]);
+
 	React.useEffect(() => {
 		//console.debug('NewOrEditDocumentType useEffect');
 		fetchFields({
@@ -116,6 +165,7 @@ export function NewOrEditDocumentType({
 				includeSystemFields: false
 			}
 		});
+		getDocumentTypeNames();
 	}, []);
 
 	React.useEffect(() => {
@@ -228,12 +278,18 @@ export function NewOrEditDocumentType({
 							<Form as='div'>
 								<Form.Field>
 									<Input
+										value={nameInput}
+										onInput={e => {
+											console.debug(e.target.value);
+											return setNameInput(e.target.value);
+										}}
 										fluid
 										label={{basic: true, content: 'Name'}}
 										path='_name'
 										placeholder='Please input an unique name'
 									/>
 								</Form.Field>
+								{error}
 								<Form.Field>
 									<Checkbox
 										label='Add new fields automatically when creating/updating documents?'
@@ -252,7 +308,7 @@ export function NewOrEditDocumentType({
 		<Modal.Actions>
 			{_id ? <ResetButton floated='left' secondary/> : null}
 			<Button onClick={() => doClose()}>Cancel</Button>
-			<SubmitButton color={() => null} primary><Icon name='save'/>Save</SubmitButton>
+			<SubmitButton disable={error ? true : false} color={() => null} primary><Icon name='save'/>Save</SubmitButton>
 		</Modal.Actions>
 	</EnonicForm>
 		: <>
