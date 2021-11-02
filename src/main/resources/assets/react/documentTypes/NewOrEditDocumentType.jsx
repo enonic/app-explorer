@@ -72,6 +72,8 @@ export function NewOrEditDocumentType({
 	servicesBaseUrl,
 	setParentState
 }) {
+	console.debug("FUNCTION");
+
 	const [_id, setId] = React.useState(idProp);
 	const [initialValues, setInitialValues] = React.useState(_id ? false : {
 		_name: '',
@@ -115,8 +117,9 @@ export function NewOrEditDocumentType({
 	 * Gets all the names of existing documentTypes
 	 *
 	 */
-	function getDocumentTypeNames() {
-		fetch(`${servicesBaseUrl}/graphQL`, {
+	async function getDocumentTypeNames() {
+		console.debug("getDocumentTypeNames")
+		const response = await fetch(`${servicesBaseUrl}/graphQL`, {
 			method: 'POST',
 			headers: {
 				'Content-Type':	'application/json'
@@ -124,28 +127,30 @@ export function NewOrEditDocumentType({
 			body: JSON.stringify({
 				query: GQL_QUERY_DOCUMENT_TYPE_NAMES
 			})
-		})
-			.then(response => response.json())
-			.then(json => json.data)
-			.then(data => {
-				const hits = data.queryDocumentTypes.hits;
-				const allNames = [];
-				console.debug(JSON.stringify(hits, null, 4));
-				hits.forEach(({_name}) => {
-					allNames.push(_name);
-				});
-				setNames(() =>  {
-					return allNames;
-				});
-			});
+		});
+		const json = await response.json();
+		const data = await json.data;
+
+		console.debug("Data:", data)
+
+		const hits = data.queryDocumentTypes.hits;
+		console.debug("Hits:", hits);
+
+		const allNames = hits.map(({_name}) => _name);
+		console.debug("Allnames:", allNames);
+
+		setNames(() =>  {
+			console.debug("SettingNames:", allNames);
+			return allNames;
+		});
 	}
 
 	React.useEffect(() =>{
-		console.debug(names.includes(nameInput));
+		console.debug("names.includes(nameInput):", names.includes(nameInput));
 		if (names.includes(nameInput)) {
 			setError(
 				<Message negative>
-					<Message.Header>{`The name ${nameInput} is allready taken`}</Message.Header>
+					<Message.Header>{`The name ${nameInput} is already taken`}</Message.Header>
 				</Message>
 			);
 		} else {
@@ -155,7 +160,7 @@ export function NewOrEditDocumentType({
 	}, [nameInput]);
 
 	React.useEffect(() => {
-		//console.debug('NewOrEditDocumentType useEffect');
+		console.debug('NewOrEditDocumentType useEffect');
 		fetchFields({
 			handleData: (data) => {
 				setGlobalFields(data.queryFields.hits);
@@ -185,132 +190,138 @@ export function NewOrEditDocumentType({
 		}
 	}
 
-	return initialValues ? <EnonicForm
-		initialValues={initialValues}
-		onSubmit={(values) => {
-			//console.debug('submit values', values);
-			const {_name, addFields, properties} = values;
-			//console.debug('submit _name', _name);
+	console.debug("Returning... initialValues:", initialValues)
+	const disabled = error ? true : false;
+	return initialValues
+		? <EnonicForm
+			initialValues={initialValues}
+			onSubmit={(values) => {
+				//console.debug('submit values', values);
+				const {_name, addFields, properties} = values;
+				//console.debug('submit _name', _name);
 
-			const variables = {
-				_name,
-				addFields,
-				properties
-			};
-			if (_id) {
-				variables._id = _id;
-				variables._versionKey = initialValues._versionKey;
-			}
-			//console.debug('submit variables', variables);
-
-			fetch(`${servicesBaseUrl}/graphQL`, {
-				method: 'POST',
-				headers: {
-					'Content-Type':	'application/json'
-				},
-				body: JSON.stringify({
-					query: _id ? GQL_MUTATION_DOCUMENT_TYPE_UPDATE : GQL_MUTATION_DOCUMENT_TYPE_CREATE,
-					variables
-				})
-			}).then(response => {
-				//console.debug('response', response);
-				if (response.status === 200) {
-					if (_id) {
-						doClose();
-					} else {
-						//console.debug('response.json()', response.json()); // Promise
-						response.json().then(json => {
-							//console.debug('json', json);
-							const {
-								_id,
-								_name/*,
-								addFields,
-								properties*/
-							} = json.data.createDocumentType;
-							/*setInitialValues({ // So reset button doesn't empty all inputs
-								_name,
-								addFields,
-								properties
-							});*/
-							setId(_id);
-							setParentState(prevState => {
-								prevState._id = _id;
-								prevState._name = _name;
-								return prevState;
-							});
-							setInitialValues(false); // Should unmount the EnonicForm, trigger getDocumentType, and remount Enonicform?
-						});
-					}
+				const variables = {
+					_name,
+					addFields,
+					properties
+				};
+				if (_id) {
+					variables._id = _id;
+					variables._versionKey = initialValues._versionKey;
 				}
-			});
-		}}
-		schema={SCHEMA}
-	>
-		<Modal.Content>
-			<Tab
-				defaultActiveIndex={0}
-				panes={(() => {
-					const panes = [];
-					if (_id) {
+				//console.debug('submit variables', variables);
+
+				fetch(`${servicesBaseUrl}/graphQL`, {
+					method: 'POST',
+					headers: {
+						'Content-Type':	'application/json'
+					},
+					body: JSON.stringify({
+						query: _id ? GQL_MUTATION_DOCUMENT_TYPE_UPDATE : GQL_MUTATION_DOCUMENT_TYPE_CREATE,
+						variables
+					})
+				}).then(response => {
+					//console.debug('response', response);
+					if (response.status === 200) {
+						if (_id) {
+							doClose();
+						} else {
+							//console.debug('response.json()', response.json()); // Promise
+							response.json().then(json => {
+								//console.debug('json', json);
+								const {
+									_id,
+									_name/*,
+									addFields,
+									properties*/
+								} = json.data.createDocumentType;
+								/*setInitialValues({ // So reset button doesn't empty all inputs
+									_name,
+									addFields,
+									properties
+								});*/
+								setId(_id);
+								setParentState(prevState => {
+									prevState._id = _id;
+									prevState._name = _name;
+									return prevState;
+								});
+								setInitialValues(false); // Should unmount the EnonicForm, trigger getDocumentType, and remount Enonicform?
+							});
+						}
+					}
+				});
+			}}
+			schema={SCHEMA}
+		>
+			<Modal.Content>
+				<Tab
+					defaultActiveIndex={0}
+					panes={(() => {
+						console.debug("Creating panes. Error:", error)
+						const panes = [];
+						if (_id) {
+							panes.push({
+								menuItem: {
+									content: 'Fields',
+									icon: 'list',
+									key: 'fields'
+								},
+								render: () => <Tab.Pane>
+									<FieldsList
+										collectionsArr={collectionsArr}
+										globalFields={globalFields}
+										interfacesArr={interfacesArr}
+										servicesBaseUrl={servicesBaseUrl}
+									/>
+								</Tab.Pane>
+							});
+						} // if _id
 						panes.push({
 							menuItem: {
-								content: 'Fields',
-								icon: 'list',
-								key: 'fields'
+								content: 'Settings',
+								icon: 'setting',
+								key: 'settings'
 							},
 							render: () => <Tab.Pane>
-								<FieldsList
-									collectionsArr={collectionsArr}
-									globalFields={globalFields}
-									interfacesArr={interfacesArr}
-									servicesBaseUrl={servicesBaseUrl}
-								/>
+								<Form as='div'>
+									<Form.Field>
+										<Input
+											value={nameInput}
+											onInput={e => {
+												console.debug("onInput e.target.value:", e.target.value);
+												return setNameInput(e.target.value);
+											}}
+											fluid
+											label={{basic: true, content: 'Name'}}
+											path='_name'
+											placeholder='Please input an unique name'
+										/>
+									</Form.Field>
+									{error}
+									<Form.Field>
+										<Checkbox
+											label='Add new fields automatically when creating/updating documents?'
+											name='addFields'
+											toggle
+										/>
+									</Form.Field>
+								</Form>
 							</Tab.Pane>
 						});
-					} // if _id
-					panes.push({
-						menuItem: {
-							content: 'Settings',
-							icon: 'setting',
-							key: 'settings'
-						},
-						render: () => <Tab.Pane>
-							<Form as='div'>
-								<Form.Field>
-									<Input
-										value={nameInput}
-										onInput={e => {
-											console.debug(e.target.value);
-											return setNameInput(e.target.value);
-										}}
-										fluid
-										label={{basic: true, content: 'Name'}}
-										path='_name'
-										placeholder='Please input an unique name'
-									/>
-								</Form.Field>
-								{error}
-								<Form.Field>
-									<Checkbox
-										label='Add new fields automatically when creating/updating documents?'
-										name='addFields'
-										toggle
-									/>
-								</Form.Field>
-							</Form>
-						</Tab.Pane>
-					});
-					return panes;
-				})()}
-				renderActiveOnly={true/*For some reason everything is gone when set to false???*/}
-			/>
-		</Modal.Content>
-		<Modal.Actions>
-			{_id ? <ResetButton floated='left' secondary/> : null}
-			<Button onClick={() => doClose()}>Cancel</Button>
-			<SubmitButton disable={error ? true : false} color={() => null} primary><Icon name='save'/>Save</SubmitButton>
-		</Modal.Actions>
-	</EnonicForm>
+						console.debug("Returning panes");
+						return panes;
+					})()}
+					renderActiveOnly={true/*For some reason everything is gone when set to false???*/}
+				/>
+			</Modal.Content>
+			<Modal.Actions>
+				{_id ? <ResetButton floated='left' secondary/> : null}
+				<Button onClick={() => doClose()}>Cancel</Button>
+				<SubmitButton disabled={disabled} color={() => null} primary><Icon name='save'/>Save</SubmitButton>
+			</Modal.Actions>
+		</EnonicForm>
+
 		: <>
 			<Modal.Content><Segment>
 				<Dimmer active inverted>
