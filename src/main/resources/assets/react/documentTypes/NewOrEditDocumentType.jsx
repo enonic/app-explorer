@@ -72,8 +72,6 @@ export function NewOrEditDocumentType({
 	servicesBaseUrl,
 	setParentState
 }) {
-	console.debug("FUNCTION");
-
 	const [_id, setId] = React.useState(idProp);
 	const [initialValues, setInitialValues] = React.useState(_id ? false : {
 		_name: '',
@@ -81,7 +79,6 @@ export function NewOrEditDocumentType({
 		properties: []
 	});
 	const [globalFields, setGlobalFields] = React.useState([]);
-	// const [nameInput, setNameInput] = React.useState("");
 	const [names, setNames] = React.useState([]);
 	const [error, setError] = React.useState([]);
 	const [nameInput, setNameInput] = React.useState("");
@@ -89,8 +86,6 @@ export function NewOrEditDocumentType({
 		local: true,
 		open: false
 	});*/
-	//console.debug(`NewOrEditDocumentType initialValues`, initialValues);
-	//console.debug(`NewOrEditDocumentType globalFields`, globalFields);
 
 	function getDocumentType() {
 		//console.debug('getDocumentType() called');
@@ -117,9 +112,8 @@ export function NewOrEditDocumentType({
 	 * Gets all the names of existing documentTypes
 	 *
 	 */
-	async function getDocumentTypeNames() {
-		console.debug("getDocumentTypeNames")
-		const response = await fetch(`${servicesBaseUrl}/graphQL`, {
+	function getDocumentTypeNames() {
+		fetch(`${servicesBaseUrl}/graphQL`, {
 			method: 'POST',
 			headers: {
 				'Content-Type':	'application/json'
@@ -127,26 +121,16 @@ export function NewOrEditDocumentType({
 			body: JSON.stringify({
 				query: GQL_QUERY_DOCUMENT_TYPE_NAMES
 			})
-		});
-		const json = await response.json();
-		const data = await json.data;
-
-		console.debug("Data:", data)
-
-		const hits = data.queryDocumentTypes.hits;
-		console.debug("Hits:", hits);
-
-		const allNames = hits.map(({_name}) => _name);
-		console.debug("Allnames:", allNames);
-
-		setNames(() =>  {
-			console.debug("SettingNames:", allNames);
-			return allNames;
-		});
+		})
+			.then(response => response.json())
+			.then(json => json.data)
+			.then(data => {
+				const allNames = data.queryDocumentTypes.hits.map(({_name}) => _name);
+				setNames(() => allNames);
+			});
 	}
 
 	React.useEffect(() =>{
-		console.debug("names.includes(nameInput):", names.includes(nameInput));
 		if (names.includes(nameInput)) {
 			setError(
 				<Message negative>
@@ -160,7 +144,6 @@ export function NewOrEditDocumentType({
 	}, [nameInput]);
 
 	React.useEffect(() => {
-		console.debug('NewOrEditDocumentType useEffect');
 		fetchFields({
 			handleData: (data) => {
 				setGlobalFields(data.queryFields.hits);
@@ -190,8 +173,8 @@ export function NewOrEditDocumentType({
 		}
 	}
 
-	console.debug("Returning... initialValues:", initialValues)
 	const disabled = error ? true : false;
+
 	return initialValues
 		? <EnonicForm
 			initialValues={initialValues}
@@ -258,7 +241,6 @@ export function NewOrEditDocumentType({
 				<Tab
 					defaultActiveIndex={0}
 					panes={(() => {
-						console.debug("Creating panes. Error:", error)
 						const panes = [];
 						if (_id) {
 							panes.push({
@@ -288,10 +270,7 @@ export function NewOrEditDocumentType({
 									<Form.Field>
 										<Input
 											value={nameInput}
-											onInput={e => {
-												console.debug("onInput e.target.value:", e.target.value);
-												return setNameInput(e.target.value);
-											}}
+											onInput={e => {setNameInput(e.target.value);}}
 											fluid
 											label={{basic: true, content: 'Name'}}
 											path='_name'
@@ -309,7 +288,6 @@ export function NewOrEditDocumentType({
 								</Form>
 							</Tab.Pane>
 						});
-						console.debug("Returning panes");
 						return panes;
 					})()}
 					renderActiveOnly={true/*For some reason everything is gone when set to false???*/}
@@ -321,7 +299,6 @@ export function NewOrEditDocumentType({
 				<SubmitButton disabled={disabled} color={() => null} primary><Icon name='save'/>Save</SubmitButton>
 			</Modal.Actions>
 		</EnonicForm>
-
 		: <>
 			<Modal.Content><Segment>
 				<Dimmer active inverted>
