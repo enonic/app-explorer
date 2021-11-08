@@ -389,7 +389,7 @@ const STYLE_CONFIG = {
 				test: /\.(c|le|sa|sc)ss$/,
 				use: [
 					...STYLE_USE,
-					'less-loader', // compiles Less to CSS
+					// 'less-loader', // compiles Less to CSS
 					'sass-loader' // compiles Sass to CSS
 				]
 			},

@@ -16,6 +16,7 @@ import getIn from 'get-value';
 import {
 	Button,
 	Dropdown,
+	Grid,
 	Icon,
 	Input,
 	Message,
@@ -32,7 +33,6 @@ import {notDoubleDot} from '../utils/notDoubleDot';
 import {onlyLettersDigitsUnderscoresAndDots} from '../utils/onlyLettersDigitsUnderscoresAndDots';
 import {notDoubleUnderscore} from '../utils/notDoubleUnderscore';
 import {required} from '../utils/required';
-
 
 const OPTIONS_VALUE_TYPES = [
 	VALUE_TYPE_BOOLEAN,
@@ -57,6 +57,7 @@ export const AddOrEditLocalFieldModal = ({
 	onClose = () => {},
 	state: {
 		initialValues: {
+			active: propActive = true,
 			enabled: propEnabled = true,
 			includeInAllText: propIncludeInAllText = true,
 			index: propIndex = null,
@@ -101,6 +102,7 @@ export const AddOrEditLocalFieldModal = ({
 	const [nGram, setNgram] = React.useState(propNgram);
 	const [path, setPath] = React.useState(propPath);
 	const [valueType, setValueType] = React.useState(propValueType);
+	const [active, /* setActive */] = React.useState(propActive);
 
 	const [nameTouched, setNameTouched] = React.useState(false);
 	//console.debug('includeInAllText', includeInAllText);
@@ -114,7 +116,6 @@ export const AddOrEditLocalFieldModal = ({
 	*/);
 
 	React.useEffect(() => {
-		//console.debug('globalFieldObj, propName or name changed, updating header');
 		setHeader(propName
 			? globalFieldObj[propName]
 				? `Override global field ${propName}`
@@ -179,7 +180,29 @@ export const AddOrEditLocalFieldModal = ({
 		open={open}
 		size='large' // small is too narrow
 	>
-		<Modal.Header as='h1' className='ui'>{header}</Modal.Header>
+		<Modal.Header as='h1' className='ui'>
+			<Grid columns='equal'>
+				<Grid.Row>
+					<Grid.Column>
+						{header}
+					</Grid.Column>
+					<Grid.Column floated='right'>
+						<Radio
+							className='editFieldActiveButton'
+							label='Active'
+							// labelPosition= {'right'}
+							toggle
+							onChange={()=>{
+								/* Currently ignored */
+								//setActive(!active)
+								console.log('Create active state');
+							}}
+							checked={active}>
+						</Radio>
+					</Grid.Column>
+				</Grid.Row>
+			</Grid>
+		</Modal.Header>
 		<Modal.Content>
 			<Input
 				disabled={propName}
@@ -286,7 +309,7 @@ export const AddOrEditLocalFieldModal = ({
 				dispatch(setValue({
 					path: `properties.${isSet(propIndex) ? propIndex : properties.length}`,
 					value: {
-						active: true,
+						active,
 						enabled,
 						fulltext,
 						includeInAllText,
@@ -296,7 +319,8 @@ export const AddOrEditLocalFieldModal = ({
 						[INDEX_CONFIG_N_GRAM]: nGram,
 						path,
 						valueType
-					}}));
+					}
+				}));
 				onClose();
 			}} primary><Icon name='save'/> {propName
 					? isSet(propIndex)
