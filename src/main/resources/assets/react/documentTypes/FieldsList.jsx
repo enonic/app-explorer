@@ -78,6 +78,7 @@ export const FieldsList = ({
 
 	const combinedObj = {};
 	properties.forEach(({
+		// active,
 		enabled,
 		fulltext,
 		includeInAllText,
@@ -89,6 +90,7 @@ export const FieldsList = ({
 		path
 	}, index) => {
 		combinedObj[key] = {
+			// active,
 			enabled,
 			fulltext,
 			global: false,
@@ -163,10 +165,9 @@ export const FieldsList = ({
 			</Form.Field>
 		</Form>
 		{showGlobalFields || combinedList.length
-			? <Table celled compact='very' selectable singleLine striped>
+			? <Table className='fieldlist' celled compact='very' selectable singleLine striped>
 				<Table.Header>
 					<Table.Row>
-						<Table.HeaderCell collapsing textAlign='center'>Active</Table.HeaderCell>
 						<Table.HeaderCell collapsing textAlign='center'>Edit</Table.HeaderCell>
 						<Table.HeaderCell>Field</Table.HeaderCell>
 						<Table.HeaderCell>Value type</Table.HeaderCell>
@@ -194,19 +195,7 @@ export const FieldsList = ({
 						min,
 						nGram,
 						path
-					}, i) => <Table.Row key={i}>
-						<Table.Cell collapsing style={cellStyle} textAlign='center'>
-							{global ? null : <Popup
-								content={`${active ? 'Dea' : 'A'}ctivate local field ${name}`}
-								inverted
-								style={popupStyle}
-								trigger={<Radio
-									checked={active}
-									onChange={(/*ignored,{checked}*/) => {}}
-									toggle
-								/>}
-							/>}
-						</Table.Cell>
+					}, i) => <Table.Row className={active ? null : 'strikeout'} key={i}>
 						<Table.Cell collapsing style={cellStyle} textAlign='center'>
 							<Button.Group>
 								<Popup
@@ -215,6 +204,7 @@ export const FieldsList = ({
 									style={popupStyle}
 									trigger={<ButtonEdit onClick={() => setAddOrEditModalState({
 										initialValues: {
+											active,
 											enabled,
 											includeInAllText,
 											index,
@@ -231,17 +221,20 @@ export const FieldsList = ({
 								/>
 							</Button.Group>
 						</Table.Cell>
-						<Table.Cell style={cellStyle}><Span disabled={global}>{name}</Span>{global ? <Icon color='grey' name='globe' style={{
-							float: 'right'
-						}}/> : null}</Table.Cell>
+						<Table.Cell className={active ? '' : null} style={cellStyle}>
+							<Span disabled={global}>{name}</Span>
+							{global ? <Icon color='grey' name='globe' style={{
+								float: 'right'
+							}}/> : null}
+						</Table.Cell>
 						<Table.Cell style={cellStyle}><Span disabled={global}>{valueType}</Span></Table.Cell>
 						<Table.Cell collapsing style={cellStyle} textAlign='center'><Span disabled={global}>{min === 0 ? null : min}</Span></Table.Cell>
 						<Table.Cell collapsing style={cellStyle} textAlign='center'><Span disabled={global}>{max === 0 ? '∞' : max}</Span></Table.Cell>
-						<Table.Cell collapsing style={cellStyle} textAlign='center'>{active ? <Checkmark disabled={global} checked={enabled} size='large'/> : null}</Table.Cell>
-						<Table.Cell collapsing style={cellStyle} textAlign='center'>{active && enabled ? <Checkmark disabled={global} checked={includeInAllText} size='large'/>: null}</Table.Cell>
-						<Table.Cell collapsing style={cellStyle} textAlign='center'>{active && enabled ? <Checkmark disabled={global} checked={fulltext} size='large'/>: null}</Table.Cell>
-						<Table.Cell collapsing style={cellStyle} textAlign='center'>{active && enabled ? <Checkmark disabled={global} checked={nGram} size='large'/>: null}</Table.Cell>
-						<Table.Cell collapsing style={cellStyle} textAlign='center'>{active && enabled ? <Checkmark disabled={global} checked={path} size='large'/>: null}</Table.Cell>
+						<Table.Cell collapsing style={cellStyle} textAlign='center'>{<Checkmark disabled={global} checked={enabled} size='large'/>}</Table.Cell>
+						<Table.Cell collapsing style={cellStyle} textAlign='center'>{enabled ? <Checkmark disabled={global} checked={includeInAllText} size='large'/>: null}</Table.Cell>
+						<Table.Cell collapsing style={cellStyle} textAlign='center'>{enabled ? <Checkmark disabled={global} checked={fulltext} size='large'/>: null}</Table.Cell>
+						<Table.Cell collapsing style={cellStyle} textAlign='center'>{enabled ? <Checkmark disabled={global} checked={nGram} size='large'/>: null}</Table.Cell>
+						<Table.Cell collapsing style={cellStyle} textAlign='center'>{enabled ? <Checkmark disabled={global} checked={path} size='large'/>: null}</Table.Cell>
 						<Table.Cell collapsing style={cellStyle} textAlign='center'>{global ? null : <Button.Group>
 							<Popup
 								content={GLOBAL_FIELD_OBJ[name] ? `Remove customization of global field ${name}` : `Delete local field ${name}`}
