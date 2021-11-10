@@ -1,5 +1,6 @@
 import {
 	Button,
+	Icon,
 	Loader,
 	Modal
 } from 'semantic-ui-react';
@@ -7,10 +8,11 @@ import {getEnonicContext} from 'semantic-ui-react-form/Context';
 import {deleteItem} from 'semantic-ui-react-form/actions';
 
 import {fetchHasField} from '../../../services/graphQL/fetchers/fetchHasField';
-import {ButtonDelete} from '../components/ButtonDelete';
+// import {ButtonDelete} from '../components/ButtonDelete';
 
 
 export function RemoveFieldFromDocumentTypeModal({
+	documentTypeName,
 	collectionsArr = [], // optional
 	interfacesArr = [],  // optional
 	onClose, // Required!
@@ -28,7 +30,7 @@ export function RemoveFieldFromDocumentTypeModal({
 	//console.debug('name', name);
 	const [isLoading, setIsLoading] = React.useState(true);
 	const [fieldHasValueInDocumentsTotal, setFieldHasValueInDocumentsTotal] = React.useState(undefined);
-	console.debug('fieldHasValueInDocumentsTotal', fieldHasValueInDocumentsTotal);
+	// console.debug('fieldHasValueInDocumentsTotal', fieldHasValueInDocumentsTotal);
 
 	/*React.useEffect(() => {
 		if(fieldHasValueInDocumentsTotal) {
@@ -77,36 +79,49 @@ export function RemoveFieldFromDocumentTypeModal({
 		size='small'
 	>
 		<Modal.Header>{global
-			? `Remove override of global field ${name}`
-			: `Delete local field ${name}?`}
+			? `Remove ${name} from ${documentTypeName}`
+			: `Delete ${name}?`}
 		</Modal.Header>
 		<Modal.Content>
 			{global ? null : <>
 				<p>If there are any graphql clients out there, which use this local field, deleting it will cause the very next query to throw an error!</p>
 				<p>Deactivating a field is safe, and a better option, unless you are certain the field is not in use...</p>
 			</>}
-			<p>This documentType is used by the following...</p>
+			{interfacesArr.length > 0 || collectionsArr.length > 0 ?
+				<>
+					<p>This documentType is used by the following...</p>
 
-			<h4>Interfaces</h4>
-			{interfacesArr.length
-				? <ul>{interfacesArr.sort().map((c, i) => <li key={i}>{c}</li>)}</ul>
-				: 'none'
-			}
+					<h4>Interfaces</h4>
+					{interfacesArr.length ? (
+						<ul>
+							{interfacesArr.sort().map((c, i) => (
+								<li key={i}>{c}</li>
+							))}
+						</ul>
+					) : "none"}
 
-
-			<h4>Collections</h4>
-			{collectionsArr.length
-				? <ul>{collectionsArr.sort().map((c, i) => <li key={i}>{c}</li>)}</ul>
-				: 'none'
-			}
+					<h4>Collections</h4>
+					{collectionsArr.length ? (
+						<ul>
+							{collectionsArr.sort().map((c, i) => (
+								<li key={i}>{c}</li>
+							))}
+						</ul>
+					) : "none"}
+				</>
+				: null}
 
 			<h4>Documents</h4>
-			<p>This field is present in {isLoading ? <Loader active inline /> : fieldHasValueInDocumentsTotal} documents!</p>
+			{isLoading ?
+				<Loader active inline /> :
+				<p>This field is present in {fieldHasValueInDocumentsTotal} documents!</p>
+			}
 		</Modal.Content>
 		<Modal.Actions>
 			<Button onClick={() => onClose()}>Cancel</Button>
-			<ButtonDelete
-				content={global ? `Confirm remove override of global field ${name}` : `Confirm delete local field ${name}`}
+			<Button
+				icon='true'
+				color='red'
 				disabled={isLoading}
 				onClick={() => {
 					dispatch(deleteItem({
@@ -114,8 +129,10 @@ export function RemoveFieldFromDocumentTypeModal({
 						path
 					}));
 					onClose();
-				}}
-			/>
+				}}>
+				<Icon color='white' name='trash alternate outline'/>
+				{global ? 'Remove': 'Delete'}
+			</Button>
 		</Modal.Actions>
 	</Modal>;
 } // RemoveFieldFromDocumentTypeModal
