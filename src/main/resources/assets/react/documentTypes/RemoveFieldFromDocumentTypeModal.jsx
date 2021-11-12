@@ -17,6 +17,7 @@ export function RemoveFieldFromDocumentTypeModal({
 	interfacesArr = [],  // optional
 	onClose, // Required!
 	servicesBaseUrl,
+	active = true, //Should get its active state from prop
 	state: {
 		global,
 		index,
@@ -44,7 +45,6 @@ export function RemoveFieldFromDocumentTypeModal({
 		setIsLoading(true);
 		fetchHasField({
 			handleData(data) {
-				//console.debug('data', data);
 				setFieldHasValueInDocumentsTotal(data.hasField.total);
 				setIsLoading(false);
 			},
@@ -87,7 +87,7 @@ export function RemoveFieldFromDocumentTypeModal({
 				<p>If there are any graphql clients out there, which use this local field, deleting it will cause the very next query to throw an error!</p>
 				<p>Deactivating a field is safe, and a better option, unless you are certain the field is not in use...</p>
 			</>}
-			{interfacesArr.length > 0 || collectionsArr.length > 0 ?
+			{fieldHasValueInDocumentsTotal > 0 ?
 				<>
 					<p>This documentType is used by the following...</p>
 
@@ -111,13 +111,28 @@ export function RemoveFieldFromDocumentTypeModal({
 				</>
 				: null}
 
-			<h4>Documents</h4>
 			{isLoading ?
-				<Loader active inline /> :
-				<p>This field is present in {fieldHasValueInDocumentsTotal} documents!</p>
+				<Loader active inline /> : <>
+					{fieldHasValueInDocumentsTotal > 0 ? <>
+						<h4>Documents</h4>
+						<p>This field is present in {fieldHasValueInDocumentsTotal} documents!</p>
+					</> : null}
+				</>
 			}
 		</Modal.Content>
 		<Modal.Actions>
+			{active && !global ?
+				<Button
+					color='blue'
+					floated='left'
+					onClick={() => {
+						//TODO Deactivate field here
+						onClose();
+					}}>
+						Deactivate
+				</Button>
+				: null
+			}
 			<Button onClick={() => onClose()}>Cancel</Button>
 			<Button
 				icon='true'
