@@ -183,9 +183,10 @@ export function NewOrEditDocumentType({
 								properties
 							});*/
 							setId(_id);
-							setParentState({
-								_id,
-								_name
+							setParentState(prevState => {
+								prevState._id = _id;
+								prevState._name = _name;
+								return prevState;
 							});
 							setInitialValues(false); // Should unmount the EnonicForm, trigger getDocumentType, and remount Enonicform?
 						});
