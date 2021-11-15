@@ -389,9 +389,14 @@ export function DocumentTypes({
 			interfacesArr={newOrEditModalState.interfacesArr}
 			open={newOrEditModalState.open}
 			setModalState={setNewOrEditModalState}
+			documentTypes={documentTypes}
 			onClose={() => {
 				//console.debug('NewOrEditDocumentTypeModal onClose');
-				setNewOrEditModalState(() => ({
+				setNewOrEditModalState(prev => ({
+					_id: prev._id,
+					_name: prev._name,
+					collectionsArr: prev.collectionsArr,
+					interfacesArr: prev.interfacesArr,
 					open: false
 				}));
 				queryDocumentTypes();

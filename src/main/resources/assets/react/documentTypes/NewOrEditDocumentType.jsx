@@ -7,18 +7,18 @@ import {
 	Modal,
 	Segment,
 	Tab,
-	Message
+	Message,
+	Input as SemanticInput
 } from 'semantic-ui-react';
 import {ResetButton} from 'semantic-ui-react-form/buttons/ResetButton';
 import {SubmitButton} from 'semantic-ui-react-form/buttons/SubmitButton';
 import {Form as EnonicForm} from 'semantic-ui-react-form/Form';
 import {Checkbox} from 'semantic-ui-react-form/inputs/Checkbox';
-import {Input} from 'semantic-ui-react-form/inputs/Input';
+// import {Input} from 'semantic-ui-react-form/inputs/Input';
 
 import {GQL_MUTATION_DOCUMENT_TYPE_CREATE} from '../../../services/graphQL/mutations/documentTypeCreateMutation';
 import {GQL_MUTATION_DOCUMENT_TYPE_UPDATE} from '../../../services/graphQL/mutations/documentTypeUpdateMutation';
 import {GQL_QUERY_DOCUMENT_TYPE_GET} from '../../../services/graphQL/queries/documentTypeGetQuery';
-import {GQL_QUERY_DOCUMENT_TYPE_NAMES} from '../../../services/graphQL/queries/documentTypeNames.mjs';
 
 import {fetchFields} from '../../../services/graphQL/fetchers/fetchFields';
 import {nameValidator} from '../utils/nameValidator';
@@ -70,7 +70,8 @@ export function NewOrEditDocumentType({
 	collectionsArr = [], // optional
 	interfacesArr = [], // optional
 	servicesBaseUrl,
-	setParentState
+	setParentState,
+	documentTypes
 }) {
 	const [_id, setId] = React.useState(idProp);
 	const [initialValues, setInitialValues] = React.useState(_id ? false : {
@@ -79,7 +80,6 @@ export function NewOrEditDocumentType({
 		properties: []
 	});
 	const [globalFields, setGlobalFields] = React.useState([]);
-	const [names, setNames] = React.useState([]);
 	const [error, setError] = React.useState([]);
 	const [nameInput, setNameInput] = React.useState("");
 	/*const [fieldModalState, setFieldModalState] = React.useState({
@@ -108,39 +108,22 @@ export function NewOrEditDocumentType({
 			});
 	}
 
-	/**
-	 * Gets all the names of existing documentTypes
-	 *
-	 */
-	function getDocumentTypeNames() {
-		fetch(`${servicesBaseUrl}/graphQL`, {
-			method: 'POST',
-			headers: {
-				'Content-Type':	'application/json'
-			},
-			body: JSON.stringify({
-				query: GQL_QUERY_DOCUMENT_TYPE_NAMES
-			})
-		})
-			.then(response => response.json())
-			.then(json => json.data)
-			.then(data => {
-				const allNames = data.queryDocumentTypes.hits.map(({_name}) => _name);
-				setNames(() => allNames);
-			});
-	}
-
-	React.useEffect(() =>{
-		if (names.includes(nameInput)) {
-			setError(
-				<Message negative>
-					<Message.Header>{`The name ${nameInput} is already taken`}</Message.Header>
-				</Message>
-			);
-		} else {
-			setError(null);
-		}
+	React.useEffect(() => {
 		setNameInput(nameInput);
+		let errorMessage = null;
+
+		for (let i=0; i<documentTypes.length; i++) {
+			if (documentTypes[i]._name === nameInput) {
+				errorMessage = <Message icon negative>
+					<Icon name="warning"/>
+					<Message.Content>
+						<Message.Header>Name</Message.Header>
+						{`The name ${nameInput} is already taken`}
+					</Message.Content>
+				</Message>;
+			}
+		}
+		setError(errorMessage);
 	}, [nameInput]);
 
 	React.useEffect(() => {
@@ -153,7 +136,6 @@ export function NewOrEditDocumentType({
 				includeSystemFields: false
 			}
 		});
-		getDocumentTypeNames();
 	}, []);
 
 	React.useEffect(() => {
@@ -180,7 +162,8 @@ export function NewOrEditDocumentType({
 			initialValues={initialValues}
 			onSubmit={(values) => {
 				//console.debug('submit values', values);
-				const {_name, addFields, properties} = values;
+				const {addFields, properties} = values;
+				const _name = nameInput;
 				//console.debug('submit _name', _name);
 
 				const variables = {
@@ -268,9 +251,8 @@ export function NewOrEditDocumentType({
 							render: () => <Tab.Pane>
 								<Form as='div'>
 									<Form.Field>
-										<Input
-											value={nameInput}
-											onInput={e => {setNameInput(e.target.value);}}
+										<SemanticInput
+											onChange={e => {setNameInput(e.target.value);}}
 											fluid
 											label={{basic: true, content: 'Name'}}
 											path='_name'
