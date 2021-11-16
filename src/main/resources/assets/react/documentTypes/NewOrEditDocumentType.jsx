@@ -67,7 +67,8 @@ export function NewOrEditDocumentType({
 	_id: idProp, // optional
 	collectionsArr = [], // optional
 	interfacesArr = [], // optional
-	servicesBaseUrl
+	servicesBaseUrl,
+	setParentState
 }) {
 	const [_id, setId] = React.useState(idProp);
 	const [initialValues, setInitialValues] = React.useState(_id ? false : {
@@ -99,7 +100,7 @@ export function NewOrEditDocumentType({
 		})
 			.then(response => response.json())
 			.then(data => {
-				//console.debug('data', data);
+				// console.debug('data', data);
 				setInitialValues(data.data.getDocumentType);
 			});
 	}
@@ -171,8 +172,8 @@ export function NewOrEditDocumentType({
 						response.json().then(json => {
 							//console.debug('json', json);
 							const {
-								_id/*,
-								_name,
+								_id,
+								_name/*,
 								addFields,
 								properties*/
 							} = json.data.createDocumentType;
@@ -182,6 +183,11 @@ export function NewOrEditDocumentType({
 								properties
 							});*/
 							setId(_id);
+							setParentState(prevState => {
+								prevState._id = _id;
+								prevState._name = _name;
+								return prevState;
+							});
 							setInitialValues(false); // Should unmount the EnonicForm, trigger getDocumentType, and remount Enonicform?
 						});
 					}
