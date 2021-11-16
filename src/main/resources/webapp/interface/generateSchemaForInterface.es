@@ -168,28 +168,33 @@ export function generateSchemaForInterface(interfaceName) {
 	Should be covered by this documentType:
 		fields: [
 			//{ key: 'person', valueType: 'Set' } // This entry is optional
-			{ key: 'person.age', valueType: 'String' }
+			{ key: 'person.age', valueType: 'Long' }
 			{ key: 'person.name', valueType: 'String' }
 		]
 
 	Should end up like this GraphQL schema:
 		fields: {
 			person: {
-				type: ObjectType{
+				type: ObjectType({
 					name: 'Person',
 					fields: {
-						age: { type String },
-						name: { type String }
+						age: { type: GraphQLInt },
+						name: { type: GraphQLString }
 					}
-				}
+				})
 			}
 		}
 
 	Using setIn I can make this intermediary:
 		{
 			person: {
-				age: null,
-				name: null
+				_valueType: 'Set',
+				age: {
+					_valueType: 'Long',
+				},
+				name: {
+					_valueType: 'String',
+				}
 			}
 		}
 	And then use traverse to build the GraphQL schema?
@@ -197,18 +202,23 @@ export function generateSchemaForInterface(interfaceName) {
 	const camelToFieldObj = {};
 	const nestedFieldsObj = {};
 	fieldsRes.hits.forEach(({ // TODO traverse
-		//fieldType: valueType,
+		fieldType: valueType,
 		inResults,
 		//isSystemField = false,
-		key//,
-		//max, // TODO nonNull list
-		//min
+		key,
+		max = 0,
+		min = 0
 	}) => {
 		const camelizedFieldPath = key.split('.').map((k) => camelize(k, /[-]/g)).join('.');
 		//log.debug(`inResults:${toStr(inResults)} key:${toStr(key)} camelizedFieldPath:${toStr(camelizedFieldPath)}`);
 
 		if (inResults !== false) {
-			setIn(nestedFieldsObj, camelizedFieldPath, true, { merge: true });
+			setIn(nestedFieldsObj, camelizedFieldPath, {
+				//_isSystemField: isSystemField,
+				_max: max,
+				_min: min,
+				_valueType: valueType
+			}, { merge: true });
 		}
 	});
 	//log.debug(`nestedFieldsObj:${toStr(nestedFieldsObj)}`);
@@ -216,45 +226,42 @@ export function generateSchemaForInterface(interfaceName) {
 	//──────────────────────────────────────────────────────────────────────────
 	function objToGraphQL(obj) {
 		return traverse(obj).map(function(value) { // Fat arrow destroys this
+			//log.debug(`this:${toStr(this)}`); // JSON.stringify got a cyclic data structure
 			//log.debug(`key:${toStr(this.key)} value:${toStr(value)} isLeaf:${toStr(this.isLeaf)}`);
+			// NOTE Because of recursion this.level and this.path is flattened!
+			//log.debug(`this.level:${toStr(this.level)} this.key:${toStr(this.key)} this.path:${toStr(this.path)} this.node:${toStr(this.node)} value:${toStr(value)}`);
 			if (this.notRoot) {
-				if (this.isLeaf) {
-					this.update({ type: GraphQLString }, true); // Avoiding infinite loop by setting stopHere=true
-				} else { //notLeaf
-					this.update({
-						type: createObjectType({
-							name: camelize(this.key, /[.]/g), // Must be unique
-							fields: objToGraphQL(value) // Recurse
-						})
-					}, true); // Avoiding infinite loop by setting stopHere=true
+				if (this.notLeaf) {
+					const {
+						_max = 0,
+						_min = 0,
+						_valueType
+					} = value;
+					if (_valueType) {
+						let type = valueTypeToGraphQLType(_valueType);
+						if (_min > 0) {
+							type = nonNull(type);
+						}
+						if (_max > 1) { // 0 could be list, 1 is NOT list, >1 list
+							type = list(type);
+						}
+						/*if (_min > 0) {
+							type = nonNull(type); // A non null type cannot wrap an existing non null type 'String!'
+						}*/
+						this.update({ type }, true); // Avoiding infinite loop by setting stopHere=true
+					} else {
+						this.update({
+							type: createObjectType({
+								name: camelize(this.key, /[.]/g), // Must be unique
+								fields: objToGraphQL(value) // Recurse NOTE This FLATTENES this.path :(
+							})
+						}, true); // Avoiding infinite loop by setting stopHere=true
+
+					}
 				}
 			}
-		});
-	}
-	//const newObj = objToGraphQL(nestedFieldsObj);
-	//log.debug(`newObj:${toStr(serialize(newObj))}`); // ObjectTypes are not printable... just shows {}
-	//──────────────────────────────────────────────────────────────────────────
-
-	const spreadableGlobalFieldsObj = {};
-	fieldsRes.hits.forEach(({ // TODO traverse
-		fieldType: valueType,
-		inResults,
-		//isSystemField = false,
-		key//,
-		//max, // TODO nonNull list
-		//min
-	}) => {
-		if (valueType) {
-			const camelizedFieldKey = camelize(key, /[.-]/g);
-			camelToFieldObj[camelizedFieldKey] = key;
-			if (inResults !== false) {
-				spreadableGlobalFieldsObj[camelizedFieldKey] = {
-					type: valueTypeToGraphQLType(valueType) // TODO min and max?
-				};
-			}
-		}
-	});
-	//log.debug(`spreadableGlobalFieldsObj:${toStr(spreadableGlobalFieldsObj)}`);
+		}); // traverse
+	} // objToGraphQL
 
 	//──────────────────────────────────────────────────────────────────────────
 	// 2. Get all documentTypes mentioned in the interface collections
@@ -298,6 +305,19 @@ export function generateSchemaForInterface(interfaceName) {
 
 	//──────────────────────────────────────────────────────────────────────────
 	// 3. Make one objectType per documentType
+	//
+	// Global fields can be overridden, let's think about some scenarios:
+	//
+	// Scenario A:
+	//  * Global field person is a Set, with two sub fields name and age
+	//  * Local field person is a String
+	//  Merged documentType should have person as a String. An no mention of name and age.
+	//
+	// Scenario B:
+	//  * Global field person is a String
+	//  * Local field person is a Set with subfields name and age
+	//  Merged documentType should have person as a Set with subfields name and age.
+	//
 	//──────────────────────────────────────────────────────────────────────────
 	function documentTypeNameToGraphQLObjectTypeName(documentTypeName) {
 		return `DocumentType_${documentTypeName}`;
@@ -308,25 +328,36 @@ export function generateSchemaForInterface(interfaceName) {
 		_name: documentTypeName,
 		properties
 	}) => {
-		const spreadableLocalFieldsObj = {};
+		const mergedNestedFieldsObj = JSON.parse(JSON.stringify(nestedFieldsObj)); // deref
+		//log.debug(`documentTypeName:${toStr(documentTypeName)} mergedNestedFieldsObj:${toStr(mergedNestedFieldsObj)}`);
+
 		if (properties) {
-			forceArray(properties).forEach(({ name, valueType }) => {
-				const camelizedFieldKey = camelize(name, /[.-]/g);
+			forceArray(properties).forEach(({
+				max = 0,
+				min = 0,
+				name,
+				valueType = VALUE_TYPE_STRING
+			}) => {
+				const camelizedFieldPath = name.split('.').map((k) => camelize(k, /[-]/g)).join('.');
+				setIn(mergedNestedFieldsObj, camelizedFieldPath, {
+					_max: max,
+					_min: min,
+					_valueType: valueType
+				}, { merge: true });
+
+				//const camelizedFieldKey = camelize(name, /[.-]/g);
+				const camelizedFieldKey = camelizedFieldPath;
 				if (camelToFieldObj[camelizedFieldKey] && camelToFieldObj[camelizedFieldKey] !== name) {
 					throw new Error(`Name collision from camelized:${camelizedFieldKey} to both ${camelToFieldObj[camelizedFieldKey]} and ${name}`);
 				}
 				camelToFieldObj[camelizedFieldKey] = name;
-				spreadableLocalFieldsObj[camelizedFieldKey] = {
-					type: valueTypeToGraphQLType(valueType) // TODO min max?
-				};
-			});
+			}); // properties.forEach
 		}
+		//log.debug(`documentTypeName:${toStr(documentTypeName)} mergedNestedFieldsObj:${toStr(mergedNestedFieldsObj)}`);
+
 		documentTypeObjectTypes[documentTypeName] = createObjectType({
 			name: documentTypeNameToGraphQLObjectTypeName(documentTypeName),
-			fields: {
-				...spreadableGlobalFieldsObj,
-				...spreadableLocalFieldsObj
-			}
+			fields: objToGraphQL(mergedNestedFieldsObj)
 		});
 	}); // documentTypes.forEach
 	//log.debug(`documentTypeObjectTypes:${toStr(documentTypeObjectTypes)}`);
