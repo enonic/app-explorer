@@ -69,6 +69,7 @@ export function RemoveFieldFromDocumentTypeModal({
 	};
 
 	const [context, dispatch] = getEnonicContext(); // eslint-disable-line no-unused-vars
+	const isFieldInUse = fieldHasValueInDocumentsTotal > 0 || interfacesArr.length > 0 || collectionsArr.length > 0;
 
 	return <Modal
 		closeIcon
@@ -87,27 +88,28 @@ export function RemoveFieldFromDocumentTypeModal({
 				<p>If there are any graphql clients out there, which use this local field, deleting it will cause the very next query to throw an error!</p>
 				<p>Deactivating a field is safe, and a better option, unless you are certain the field is not in use...</p>
 			</>}
-			{fieldHasValueInDocumentsTotal > 0 ?
+			{isFieldInUse ?
 				<>
 					<p>This documentType is used by the following...</p>
 
-					<h4>Interfaces</h4>
-					{interfacesArr.length ? (
+					{interfacesArr.length ? <>
+						<h4>Interfaces</h4>
 						<ul>
 							{interfacesArr.sort().map((c, i) => (
 								<li key={i}>{c}</li>
 							))}
 						</ul>
-					) : "none"}
+					</>: null}
 
-					<h4>Collections</h4>
-					{collectionsArr.length ? (
+
+					{collectionsArr.length ? <>
+						<h4>Collections</h4>
 						<ul>
 							{collectionsArr.sort().map((c, i) => (
 								<li key={i}>{c}</li>
 							))}
 						</ul>
-					) : "none"}
+					</> : null}
 				</>
 				: null}
 
