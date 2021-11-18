@@ -23,6 +23,7 @@ const PATH_PROPERTIES = 'properties';
 
 
 export const FieldsList = ({
+	documentTypeName,
 	collectionsArr,
 	globalFields,
 	interfacesArr,
@@ -280,6 +281,7 @@ export const FieldsList = ({
 			: null}
 		{removeModalState.open
 			? <RemoveFieldFromDocumentTypeModal
+				documentTypeName={documentTypeName}
 				collectionsArr={collectionsArr}
 				interfacesArr={interfacesArr}
 				onClose={() => setRemoveModalState({open: false})}
