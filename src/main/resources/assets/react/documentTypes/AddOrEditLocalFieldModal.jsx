@@ -102,7 +102,7 @@ export const AddOrEditLocalFieldModal = ({
 	const [nGram, setNgram] = React.useState(propNgram);
 	const [path, setPath] = React.useState(propPath);
 	const [valueType, setValueType] = React.useState(propValueType);
-	const [active, /* setActive */] = React.useState(propActive);
+	const [active, setActive] = React.useState(propActive);
 
 	const [nameTouched, setNameTouched] = React.useState(false);
 	//console.debug('includeInAllText', includeInAllText);
@@ -193,9 +193,7 @@ export const AddOrEditLocalFieldModal = ({
 							// labelPosition= {'right'}
 							toggle
 							onChange={()=>{
-								/* Currently ignored */
-								//setActive(!active)
-								console.log('Create active state');
+								setActive(!active);
 							}}
 							checked={active}>
 						</Radio>

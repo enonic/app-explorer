@@ -78,7 +78,7 @@ export const FieldsList = ({
 
 	const combinedObj = {};
 	properties.forEach(({
-		// active,
+		active,
 		enabled,
 		fulltext,
 		includeInAllText,
@@ -90,7 +90,7 @@ export const FieldsList = ({
 		path
 	}, index) => {
 		combinedObj[key] = {
-			// active,
+			active,
 			enabled,
 			fulltext,
 			global: false,
@@ -183,7 +183,7 @@ export const FieldsList = ({
 				</Table.Header>
 				<Table.Body>{
 					combinedList.map(({
-						active = true,
+						active,
 						enabled,
 						fulltext,
 						global = false,
