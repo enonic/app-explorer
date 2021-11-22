@@ -12,7 +12,7 @@ function addEnumType({
 	name,
 	values
 }) {
-	log.debug(`addEnumType({ name: ${name} })`);
+	//log.debug(`addEnumType({ name: ${name} })`);
 	if(this.uniqueNames[name]) {
 		throw new Error(`Name ${name} already used as ${this.uniqueNames[name]}!`);
 	}
@@ -34,7 +34,7 @@ function addInputType({
 	fields,
 	name
 }) {
-	log.debug(`addInputType({ name: ${name} })`);
+	//log.debug(`addInputType({ name: ${name} })`);
 	if(this.uniqueNames[name]) {
 		throw new Error(`Name ${name} already used as ${this.uniqueNames[name]}!`);
 	}
@@ -53,6 +53,7 @@ function getInputType(name) {
 
 function addObjectType({
 	fields,
+	interfaces = [],
 	name
 }) {
 	log.debug(`addObjectType({ name: ${name} })`);
@@ -62,6 +63,7 @@ function addObjectType({
 	this.uniqueNames[name] = 'objectType';
 	this.objectTypes[name] = this.schemaGenerator.createObjectType({
 		fields,
+		interfaces,
 		name
 	});
 	return this.objectTypes[name];
@@ -91,11 +93,49 @@ function addUnionType({
 		typeResolver,
 		types
 	};
-	return this.unionTypes[name];
+	return this.unionTypes[name].type;
 }
 
 function getUnionType(name) {
-	return this.unionTypes[name];
+	return this.unionTypes[name].type;
+}
+
+function getUnionTypeResolver(name) {
+	return this.unionTypes[name].typeResolver;
+}
+
+
+function addInterfaceType({
+	fields,
+	name,
+	typeResolver
+}) {
+	if(this.uniqueNames[name]) {
+		throw new Error(`Name ${name} already used as ${this.uniqueNames[name]}!`);
+	}
+	this.uniqueNames[name] = 'interfaceType';
+	this.interfaceTypes[name] = {
+		fields,
+		type: this.schemaGenerator.createInterfaceType({
+			fields,
+			name,
+			typeResolver
+		})//,
+		//typeResolver // NOTE This should be fetched from the unionType instead...
+	};
+	return this.interfaceTypes[name].type;
+}
+
+function getInterfaceType(name) {
+	return this.interfaceTypes[name].type;
+}
+
+function getInterfaceTypeFields(name) {
+	return this.interfaceTypes[name].fields;
+}
+
+function getInterfaceTypeObject(name) {
+	return this.interfaceTypes[name];
 }
 
 
@@ -105,14 +145,20 @@ export function constructGlue({
 	return {
 		addEnumType, // function
 		addInputType, // function
+		addInterfaceType, // function
 		addObjectType, // function
 		addUnionType, // function
 		enumTypes: {},
 		getEnumType, // function
 		getInputType, // function
+		getInterfaceType, // function
+		getInterfaceTypeFields, // function
+		getInterfaceTypeObject, // function
 		getObjectType, // function
 		getUnionType, // function
+		getUnionTypeResolver, // function
 		inputTypes: {},
+		interfaceTypes: {},
 		objectTypes: {},
 		schemaGenerator,
 		unionTypes: {},

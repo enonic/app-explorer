@@ -69,42 +69,44 @@ import {
 } from '/lib/graphql-connection';
 
 import {
+	GQL_ENUM_AGGREGATION_GEO_DISTANCE_UNITS,
 	GQL_ENUM_FIELD_KEYS_FOR_AGGREGATIONS,
-	GQL_ENUM_FIELD_KEYS_FOR_FILTERS,
+	GQL_ENUM_HIGHLIGHT_OPTION_ENCODERS,
+	GQL_ENUM_HIGHLIGHT_OPTION_FRAGMENTERS,
+	GQL_ENUM_HIGHLIGHT_OPTION_ORDERS,
+	GQL_ENUM_HIGHLIGHT_OPTION_TAG_SCHEMAS,
 	GQL_INPUT_OBJECT_TYPE_SUB_AGGREGATIONS_NAME,
+	GQL_INPUT_TYPE_FILTER_EXISTS_WITH_DYNAMIC_FIELDS,
+	GQL_INPUT_TYPE_FILTER_IDS,
+	GQL_INPUT_TYPE_FILTER_HAS_VALUE_WITH_DYNAMIC_FIELDS,
+	GQL_INPUT_TYPE_FILTER_NOT_EXISTS_WITH_DYNAMIC_FIELDS,
+	GQL_INTERFACE_DOCUMENT_NAME,
+	GQL_OBJECT_TYPE_INTERFACE_SEARCH,
+	GQL_OBJECT_TYPE_AGGREGATIONS_UNION_NAME,
+	GQL_UNION_TYPE_DOCUMENT_TYPES,
 	JAVA_MAX_SAFE_INT,
 	JAVA_MIN_SAFE_INT
 } from './constants';
 
 import {constructGlue} from './Glue';
 
-//import {schemaGenerator} from './schemaGenerator';
-
-import {generateEnumTypes} from './enumTypes';
-/*import {
-	GRAPHQL_ENUM_TYPE_AGGREGATION_GEO_DISTANCE_UNIT,
-	GRAPHQL_ENUM_TYPE_HIGHLIGHT_OPTION_ENCODER,
-	GRAPHQL_ENUM_TYPE_HIGHLIGHT_OPTION_FRAGMENTER,
-	GRAPHQL_ENUM_TYPE_HIGHLIGHT_OPTION_ORDER,
-	GRAPHQL_ENUM_TYPE_HIGHLIGHT_OPTION_TAG_SCHEMA
-} from './enumTypes';*/
-
-import {generateInputTypes} from './inputTypes';
-/*import {
-	GRAPHQL_INPUT_TYPE_FILTER_IDS
-} from './inputTypes';*/
-
-import {generateTypes} from './types';
-//import {OBJECT_TYPE_AGGREGATIONS_UNION} from './types';
+import {addStaticEnumTypes} from './addStaticEnumTypes';
+import {addStaticInputTypes} from './addStaticInputTypes';
+import {addStaticObjectTypes} from './addStaticObjectTypes';
+import {addStaticUnionTypes} from './addStaticUnionTypes';
 
 import {valueTypeToGraphQLType} from './valueTypeToGraphQLType';
 import {aggregationQueryTypeToGraphQLType} from './aggregationQueryTypeToGraphQLType';
 import {washDocumentNode} from './washDocumentNode';
 
+import {addDynamicEnumTypes} from './addDynamicEnumTypes';
+import {addDynamicInputTypes} from './addDynamicInputTypes';
+import {addDynamicInterfaceTypes} from './addDynamicInterfaceTypes';
+import {addDynamicUnionTypes} from './addDynamicUnionTypes';
+
+
 const schemaGenerator = newSchemaGenerator();
-const {
-	createSchema
-} = schemaGenerator;
+const {createSchema} = schemaGenerator;
 //import {DEFAULT_INTERFACE_FIELDS} from '../constants';
 
 const VALUE_TYPE_VARIANTS = [
@@ -124,23 +126,30 @@ const VALUE_TYPE_VARIANTS = [
 
 
 export function generateSchemaForInterface(interfaceName) {
-	const glue = constructGlue({
-		schemaGenerator
-	});
+	const glue = constructGlue({schemaGenerator});
 
-	const {
-		GRAPHQL_ENUM_TYPE_AGGREGATION_GEO_DISTANCE_UNIT,
-		GRAPHQL_ENUM_TYPE_HIGHLIGHT_OPTION_ENCODER,
-		GRAPHQL_ENUM_TYPE_HIGHLIGHT_OPTION_FRAGMENTER,
-		GRAPHQL_ENUM_TYPE_HIGHLIGHT_OPTION_ORDER,
-		GRAPHQL_ENUM_TYPE_HIGHLIGHT_OPTION_TAG_SCHEMA
-	} = generateEnumTypes(glue);
+	addStaticEnumTypes(glue);
+	addStaticInputTypes(glue);
 
-	const {
-		GRAPHQL_INPUT_TYPE_FILTER_IDS
-	} = generateInputTypes(glue);
+	const staticHighlightParameterPropertiesFields = {
+		fragmenter: { type: glue.getEnumType(GQL_ENUM_HIGHLIGHT_OPTION_FRAGMENTERS) },
+		fragmentSize: { type: GraphQLInt },
+		noMatchSize: { type: GraphQLInt },
+		numberOfFragments: { type: GraphQLInt },
+		order: { type: glue.getEnumType(GQL_ENUM_HIGHLIGHT_OPTION_ORDERS) },
+		postTag: { type: GraphQLString },
+		preTag: { type: GraphQLString },
+		requireFieldMatch: { type: GraphQLBoolean }
+	};
 
-	const {OBJECT_TYPE_AGGREGATIONS_UNION} = generateTypes(glue);
+	const staticHighlightParameterFields = {
+		encoder: { type: glue.getEnumType(GQL_ENUM_HIGHLIGHT_OPTION_ENCODERS) }, // Global only
+		...staticHighlightParameterPropertiesFields,
+		tagsSchema: { type: glue.getEnumType(GQL_ENUM_HIGHLIGHT_OPTION_TAG_SCHEMAS) } // Global only
+	};
+
+	addStaticObjectTypes(glue); // Must be before addStaticUnionTypes()
+	addStaticUnionTypes(glue); // Must be after addStaticObjectTypes()
 
 	/*function deSerialize(serializedJavascript){
 		return eval('(' + serializedJavascript + ')');
@@ -370,6 +379,7 @@ export function generateSchemaForInterface(interfaceName) {
 	//  Merged documentType should have person as a Set with subfields name and age.
 	//
 	//──────────────────────────────────────────────────────────────────────────
+
 	function documentTypeNameToGraphQLObjectTypeName(documentTypeName) {
 		return `DocumentType_${documentTypeName}`;
 	}
@@ -411,10 +421,25 @@ export function generateSchemaForInterface(interfaceName) {
 			fields: objToGraphQL({
 				documentTypeName,
 				obj: mergedNestedFieldsObj
-			})
+			}),
+			interfaces: [reference(GQL_INTERFACE_DOCUMENT_NAME)] // type Document not found in schema
 		});
 	}); // documentTypes.forEach
 	//log.debug(`documentTypeObjectTypes:${toStr(documentTypeObjectTypes)}`);
+
+	//──────────────────────────────────────────────────────────────────────────
+	// An objectType per documentType will be generated.
+	// Global and "magic" fields will be added to an interfaceType.
+	// The list of objectTypes is used both in the interfaceType and unionType resolvers.
+	// When we define the resolvers we may use a js-reference to an empty object, which later will contain the objectTypes.
+	// When we define the unionType, we can use lib-graphql.reference, but we need to have a list of the objectType names, so we might as well use the objectTypes directly.
+	// Q: Can we use lib-graphql.reference in objectType.interfaces?
+	//──────────────────────────────────────────────────────────────────────────
+
+	addDynamicInterfaceTypes({
+		documentTypeObjectTypes,
+		glue
+	});
 
 	//──────────────────────────────────────────────────────────────────────────
 
@@ -452,22 +477,14 @@ export function generateSchemaForInterface(interfaceName) {
 	const highlightParameterPropertiesFields = {};
 	const interfaceSearchHitsFieldsFromSchema = {};
 	const interfaceSearchHitsHighlightsFields = {};
+
 	allFieldKeys.forEach((fieldKey) => {
 		const camelizedFieldKey = camelize(fieldKey, /[.-]/g);
 		fieldKeysForAggregations.push(camelizedFieldKey);
 		fieldKeysForFilters.push(camelizedFieldKey);
 		highlightParameterPropertiesFields[camelizedFieldKey] = { type: glue.addInputType({
 			name: `HighlightParameterProperties${ucFirst(camelizedFieldKey)}`,
-			fields: {
-				fragmenter: { type: GRAPHQL_ENUM_TYPE_HIGHLIGHT_OPTION_FRAGMENTER },
-				fragmentSize: { type: GraphQLInt },
-				noMatchSize: { type: GraphQLInt },
-				numberOfFragments: { type: GraphQLInt },
-				order: { type: GRAPHQL_ENUM_TYPE_HIGHLIGHT_OPTION_ORDER },
-				postTag: { type: GraphQLString },
-				preTag: { type: GraphQLString },
-				requireFieldMatch: { type: GraphQLBoolean }
-			}
+			fields: staticHighlightParameterPropertiesFields
 		})};
 		VALUE_TYPE_VARIANTS.forEach((vT) => {
 			interfaceSearchHitsFieldsFromSchema[
@@ -531,44 +548,24 @@ export function generateSchemaForInterface(interfaceName) {
 	//log.debug(`enumFieldsValues:${toStr(enumFieldsValues)}`);
 	//log.debug(`highlightParameterPropertiesFields:${toStr(highlightParameterPropertiesFields)}`);
 
-	glue.addEnumType({
-		name: GQL_ENUM_FIELD_KEYS_FOR_AGGREGATIONS,
-		values: fieldKeysForAggregations
+	addDynamicEnumTypes({
+		fieldKeysForAggregations,
+		fieldKeysForFilters,
+		glue
 	});
-	glue.addEnumType({
-		name: GQL_ENUM_FIELD_KEYS_FOR_FILTERS,
-		values: fieldKeysForFilters
+
+	addDynamicInputTypes({
+		glue
 	});
 
 	//──────────────────────────────────────────────────────────────────────────
 	// Filters
 	//──────────────────────────────────────────────────────────────────────────
-	const enumFieldsKeysForFilters = glue.getEnumType(GQL_ENUM_FIELD_KEYS_FOR_FILTERS);
-	const graphqlInputTypeFilterExistsWithDynamicFields = glue.addInputType({
-		name: 'InputTypeFilterExistsWithDynamicFields',
-		fields: {
-			field: {
-				type: nonNull(enumFieldsKeysForFilters)
-			}
-		}
-	});
+	const graphqlInputTypeFilterExistsWithDynamicFields = glue.getInputType(GQL_INPUT_TYPE_FILTER_EXISTS_WITH_DYNAMIC_FIELDS);
+	const graphqlInputTypeFilterHasValueWithDynamicFields = glue.getInputType(GQL_INPUT_TYPE_FILTER_HAS_VALUE_WITH_DYNAMIC_FIELDS);
+	const graphqlInputTypeFilterNotExistsWithDynamicFields = glue.getInputType(GQL_INPUT_TYPE_FILTER_NOT_EXISTS_WITH_DYNAMIC_FIELDS);
 
-	const graphqlInputTypeFilterHasValueWithDynamicFields = glue.addInputType({
-		name: 'InputTypeFilterHasValueWithDynamicFields',
-		fields: {
-			field: { type: nonNull(enumFieldsKeysForFilters) },
-			values: { type: nonNull(list(GraphQLString)) }
-		}
-	});
-
-	const graphqlInputTypeFilterNotExistsWithDynamicFields = glue.addInputType({
-		name: 'InputTypeFilterNotExistsWithDynamicFields',
-		fields: {
-			field: {
-				type: nonNull(enumFieldsKeysForFilters)
-			}
-		}
-	});
+	const GRAPHQL_INPUT_TYPE_FILTER_IDS = glue.getInputType(GQL_INPUT_TYPE_FILTER_IDS);
 
 	const graphqlInputTypeFilterBooleanDynamicFields = {
 		exists: { type: graphqlInputTypeFilterExistsWithDynamicFields },
@@ -1052,32 +1049,19 @@ export function generateSchemaForInterface(interfaceName) {
 		fields: interfaceSearchHitsFields
 	});
 
-	const documentTypesUnion = glue.addUnionType({
-		name: 'DocumentTypesUnion',
-		/*types: [
-			//reference('InterfaceSearchHits')
-			objectTypeInterfaceSearchHit
-		],*/
-		//types: Object.values(documentTypeObjectTypes), // Object.values is not a function
-		types: Object.keys(documentTypeObjectTypes).map((documentTypeName) => documentTypeObjectTypes[documentTypeName]),
-		// Perhaps this has smaller footprint?
-		//types: Object.keys(documentTypeObjectTypes).map((documentTypeName) => reference(documentTypeNameToGraphQLObjectTypeName(documentTypeName))),
-		typeResolver(node) {
-			//log.debug(`node:${toStr(node)}`);
-			const {
-				//_documentTypeId
-				_documentTypeName
-			} = node;
-			//return objectTypeInterfaceSearchHit;
-			return documentTypeObjectTypes[_documentTypeName]; // eslint-disable-line no-underscore-dangle
-		}
-	}).type;
+	addDynamicUnionTypes({
+		documentTypeObjectTypes,
+		glue
+	});
+	const documentTypesUnion = glue.getUnionType(GQL_UNION_TYPE_DOCUMENT_TYPES);
+
+	const GQL_OBJECT_TYPE_AGGREGATIONS_UNION = glue.getUnionType(GQL_OBJECT_TYPE_AGGREGATIONS_UNION_NAME);
 
 	//const OBJECT_TYPE_AGGREGATIONS_NAME = 'InterfaceSearchAggregations';
 	const objectTypeInterfaceSearch = glue.addObjectType({
-		name: 'InterfaceSearch',
+		name: GQL_OBJECT_TYPE_INTERFACE_SEARCH,
 		fields: {
-			aggregations: { type: list(OBJECT_TYPE_AGGREGATIONS_UNION) },
+			aggregations: { type: list(GQL_OBJECT_TYPE_AGGREGATIONS_UNION) },
 			aggregationsAsJson: { type: GraphQLJson },
 			count: { type: nonNull(GraphQLInt) },
 			//hits: { type: list(objectTypeInterfaceSearchHit)},
@@ -1163,7 +1147,7 @@ export function generateSchemaForInterface(interfaceName) {
 				}))
 			},
 			unit: {
-				type: nonNull(GRAPHQL_ENUM_TYPE_AGGREGATION_GEO_DISTANCE_UNIT)
+				type: nonNull(glue.getEnumType(GQL_ENUM_AGGREGATION_GEO_DISTANCE_UNITS))
 			}
 		}
 	});
@@ -1291,16 +1275,7 @@ export function generateSchemaForInterface(interfaceName) {
 	const inputObjectTypeHighlight = glue.addInputType({
 		name: 'HighlightParameter',
 		fields: {
-			encoder: { type: GRAPHQL_ENUM_TYPE_HIGHLIGHT_OPTION_ENCODER }, // Global only
-			fragmenter: { type: GRAPHQL_ENUM_TYPE_HIGHLIGHT_OPTION_FRAGMENTER },
-			fragmentSize: { type: GraphQLInt },
-			noMatchSize: { type: GraphQLInt },
-			numberOfFragments: { type: GraphQLInt },
-			order: { type: GRAPHQL_ENUM_TYPE_HIGHLIGHT_OPTION_ORDER },
-			postTag: { type: GraphQLString },
-			preTag: { type: GraphQLString },
-			requireFieldMatch: { type: GraphQLBoolean },
-			tagsSchema: { type: GRAPHQL_ENUM_TYPE_HIGHLIGHT_OPTION_TAG_SCHEMA }, // Global only
+			...staticHighlightParameterFields,
 			properties: { type: highlightProperties }
 		}
 	});
@@ -1418,7 +1393,7 @@ export function generateSchemaForInterface(interfaceName) {
 									}
 								})
 							},
-							aggregations: { type: list(OBJECT_TYPE_AGGREGATIONS_UNION) },
+							aggregations: { type: list(GQL_OBJECT_TYPE_AGGREGATIONS_UNION) },
 							aggregationsAsJson: { type: GraphQLJson }
 						}
 					})
@@ -1505,97 +1480,6 @@ export function generateSchemaForInterface(interfaceName) {
       #_json
       #_repoId
       #_score
-      available_as_boolean
-      available_as_double
-      available_as_geoPoint
-      available_as_instant
-      available_as_localDate
-      #available_as_localDateTime
-      available_as_localTime
-      available_as_long
-      available_as_reference
-      available_as_string
-      count_as_boolean
-      count_as_double
-      count_as_geoPoint
-      count_as_instant
-      count_as_localDate
-      #count_as_localDateTime
-      count_as_localTime
-      count_as_long
-      count_as_reference
-      count_as_string
-      date_as_boolean
-      date_as_double
-      date_as_geoPoint
-      date_as_instant
-      date_as_localDate
-      #date_as_localDateTime
-      date_as_localTime
-      date_as_long
-      date_as_reference
-      date_as_string
-      datetime_as_boolean
-      datetime_as_double
-      datetime_as_geoPoint
-      datetime_as_instant
-      datetime_as_localDate
-      #datetime_as_localDateTime
-      datetime_as_localTime
-      datetime_as_long
-      datetime_as_reference
-      datetime_as_string
-      time_as_boolean
-      time_as_double
-      time_as_geoPoint
-      time_as_instant
-      time_as_localDate
-      #time_as_localDateTime
-      time_as_localTime
-      time_as_long
-      time_as_reference
-      time_as_string
-      instant_as_boolean
-      instant_as_double
-      instant_as_geoPoint
-      instant_as_instant
-      instant_as_localDate
-      #instant_as_localDateTime
-      instant_as_localTime
-      instant_as_long
-      instant_as_reference
-      instant_as_string
-      price_as_boolean
-      price_as_double
-      price_as_geoPoint
-      price_as_instant
-      price_as_localDate
-      #price_as_localDateTime
-      price_as_localTime
-      price_as_long
-      price_as_reference
-      price_as_string
-      #language
-      language_as_boolean
-      language_as_double
-      language_as_geoPoint
-      language_as_instant
-      language_as_localDate
-      #language_as_localDateTime
-      language_as_localTime
-      language_as_long
-      language_as_reference
-      language_as_string
-      location_as_boolean
-      location_as_double
-      location_as_geoPoint
-      location_as_instant
-      location_as_localDate
-      #location_as_localDateTime
-      location_as_localTime
-      location_as_long
-      location_as_reference
-      location_as_string
       #informationType
       #source
       #text
