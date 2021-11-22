@@ -1,11 +1,16 @@
-//import {schemaGenerator} from './schemaGenerator';
+import {
+	GQL_ENUM_AGGREGATION_GEO_DISTANCE_UNITS,
+	GQL_ENUM_HIGHLIGHT_OPTION_ENCODERS,
+	GQL_ENUM_HIGHLIGHT_OPTION_FRAGMENTERS,
+	GQL_ENUM_HIGHLIGHT_OPTION_ORDERS,
+	GQL_ENUM_HIGHLIGHT_OPTION_TAG_SCHEMAS
+} from './constants';
 
 
-export function generateEnumTypes(schemaGenerator) {
-	const {createEnumType} = schemaGenerator;
+export function generateEnumTypes(glue) {
 	return {
-		GRAPHQL_ENUM_TYPE_AGGREGATION_GEO_DISTANCE_UNIT: createEnumType({
-			name: 'EnumTypeAggregationGeoDistanceUnit',
+		GRAPHQL_ENUM_TYPE_AGGREGATION_GEO_DISTANCE_UNIT: glue.addEnumType({
+			name: GQL_ENUM_AGGREGATION_GEO_DISTANCE_UNITS,
 			values: {
 				'km': 'km',
 				'm': 'm',
@@ -25,29 +30,29 @@ export function generateEnumTypes(schemaGenerator) {
 				nauticalmiles: 'nmi'
 			}
 		}),
-		GRAPHQL_ENUM_TYPE_HIGHLIGHT_OPTION_ENCODER: createEnumType({
-			name: 'EnumTypeHighlightOptionEncoder',
+		GRAPHQL_ENUM_TYPE_HIGHLIGHT_OPTION_ENCODER: glue.addEnumType({
+			name: GQL_ENUM_HIGHLIGHT_OPTION_ENCODERS,
 			values: [
 				'default',
 				'html'
 			]
 		}),
-		GRAPHQL_ENUM_TYPE_HIGHLIGHT_OPTION_FRAGMENTER: createEnumType({
-			name: 'EnumTypeHighlightOptionFragmenter',
+		GRAPHQL_ENUM_TYPE_HIGHLIGHT_OPTION_FRAGMENTER: glue.addEnumType({
+			name: GQL_ENUM_HIGHLIGHT_OPTION_FRAGMENTERS,
 			values: [
 				'simple',
 				'span' // default
 			]
 		}),
-		GRAPHQL_ENUM_TYPE_HIGHLIGHT_OPTION_ORDER: createEnumType({
-			name: 'EnumTypeHighlightOptionOrder',
+		GRAPHQL_ENUM_TYPE_HIGHLIGHT_OPTION_ORDER: glue.addEnumType({
+			name: GQL_ENUM_HIGHLIGHT_OPTION_ORDERS,
 			values: [
 				'none',  // default
 				'score'
 			]
 		}),
-		GRAPHQL_ENUM_TYPE_HIGHLIGHT_OPTION_TAG_SCHEMA: createEnumType({
-			name: 'EnumTypeHighlightOptionTagSchema',
+		GRAPHQL_ENUM_TYPE_HIGHLIGHT_OPTION_TAG_SCHEMA: glue.addEnumType({
+			name: GQL_ENUM_HIGHLIGHT_OPTION_TAG_SCHEMAS,
 			values: [
 				'styled'  // default is undefined
 			]
