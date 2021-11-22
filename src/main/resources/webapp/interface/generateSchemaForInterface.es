@@ -68,6 +68,15 @@ import {
 	encodeCursor
 } from '/lib/graphql-connection';
 
+import {
+	GQL_ENUM_FIELD_KEYS_FOR_AGGREGATIONS,
+	GQL_ENUM_FIELD_KEYS_FOR_FILTERS,
+	GQL_INPUT_OBJECT_TYPE_SUB_AGGREGATIONS_NAME,
+	JAVA_MAX_SAFE_INT,
+	JAVA_MIN_SAFE_INT
+} from './constants';
+
+import {constructGlue} from './Glue';
 
 //import {schemaGenerator} from './schemaGenerator';
 
@@ -94,18 +103,9 @@ import {washDocumentNode} from './washDocumentNode';
 
 const schemaGenerator = newSchemaGenerator();
 const {
-	createEnumType,
-	createInputObjectType,
-	createObjectType,
-	createUnionType,
 	createSchema
 } = schemaGenerator;
 //import {DEFAULT_INTERFACE_FIELDS} from '../constants';
-
-//log.debug(`Number.MIN_SAFE_INTEGER:${Number.MIN_SAFE_INTEGER} Number.MAX_SAFE_INTEGER:${Number.MAX_SAFE_INTEGER}`); // Undefined
-//log.debug(`Number.MIN_VALUE:${Number.MIN_VALUE} Number.MAX_VALUE:${Number.MAX_VALUE}`); // Number.MIN_VALUE:5e-324 Number.MAX_VALUE:1.7976931348623157e+308
-const JAVA_MIN_SAFE_INT = -2147483648;
-const JAVA_MAX_SAFE_INT =  2147483647;
 
 const VALUE_TYPE_VARIANTS = [
 	//VALUE_TYPE_ANY,
@@ -122,24 +122,32 @@ const VALUE_TYPE_VARIANTS = [
 	VALUE_TYPE_STRING
 ];
 
-const {
-	GRAPHQL_ENUM_TYPE_AGGREGATION_GEO_DISTANCE_UNIT,
-	GRAPHQL_ENUM_TYPE_HIGHLIGHT_OPTION_ENCODER,
-	GRAPHQL_ENUM_TYPE_HIGHLIGHT_OPTION_FRAGMENTER,
-	GRAPHQL_ENUM_TYPE_HIGHLIGHT_OPTION_ORDER,
-	GRAPHQL_ENUM_TYPE_HIGHLIGHT_OPTION_TAG_SCHEMA
-} = generateEnumTypes(schemaGenerator);
-
-const {
-	GRAPHQL_INPUT_TYPE_FILTER_IDS
-} = generateInputTypes(schemaGenerator);
-
-const {OBJECT_TYPE_AGGREGATIONS_UNION} = generateTypes(schemaGenerator);
-
-const INPUT_OBJECT_TYPE_SUB_AGGREGATIONS_NAME = 'InputObjectTypeSubAggregations';
-
 
 export function generateSchemaForInterface(interfaceName) {
+	const glue = constructGlue({
+		schemaGenerator
+	});
+
+	const {
+		GRAPHQL_ENUM_TYPE_AGGREGATION_GEO_DISTANCE_UNIT,
+		GRAPHQL_ENUM_TYPE_HIGHLIGHT_OPTION_ENCODER,
+		GRAPHQL_ENUM_TYPE_HIGHLIGHT_OPTION_FRAGMENTER,
+		GRAPHQL_ENUM_TYPE_HIGHLIGHT_OPTION_ORDER,
+		GRAPHQL_ENUM_TYPE_HIGHLIGHT_OPTION_TAG_SCHEMA
+	} = generateEnumTypes(glue);
+
+	const {
+		GRAPHQL_INPUT_TYPE_FILTER_IDS
+	} = generateInputTypes(glue);
+
+	const {OBJECT_TYPE_AGGREGATIONS_UNION} = generateTypes(glue);
+
+	/*function deSerialize(serializedJavascript){
+		return eval('(' + serializedJavascript + ')');
+	}
+
+	const glue = deSerialize(serialize(staticGlue)); // Clone / DeReference*/
+
 	const explorerRepoReadConnection = connect({ principals: [PRINCIPAL_EXPLORER_READ] });
 
 	//──────────────────────────────────────────────────────────────────────────
@@ -200,7 +208,44 @@ export function generateSchemaForInterface(interfaceName) {
 	And then use traverse to build the GraphQL schema?
 	────────────────────────────────────────────────────────────────────────────*/
 	const camelToFieldObj = {};
-	const nestedFieldsObj = {};
+	const nestedFieldsObj = { // NOTE Hardcoded common fields, which are not currently system fields
+		_collectionId: {
+			_max: 1,
+			_min: 1,
+			_valueType: VALUE_TYPE_STRING
+		},
+		_collectionName: {
+			_max: 1,
+			_min: 1,
+			_valueType: VALUE_TYPE_STRING
+		},
+		_documentTypeId: {
+			_max: 1,
+			_min: 1,
+			_valueType: VALUE_TYPE_STRING
+		},
+		_documentTypeName: {
+			_max: 1,
+			_min: 1,
+			_valueType: VALUE_TYPE_STRING
+		},
+		_json: {
+			_max: 1,
+			_min: 1,
+			_valueType: VALUE_TYPE_STRING
+		},
+		//_highlight, // TODO ???
+		_repoId: {
+			_max: 1,
+			_min: 1,
+			_valueType: VALUE_TYPE_STRING
+		},
+		_score: {
+			_max: 1,
+			_min: 1,
+			_valueType: VALUE_TYPE_STRING
+		}
+	};
 	fieldsRes.hits.forEach(({ // TODO traverse
 		fieldType: valueType,
 		inResults,
@@ -224,7 +269,10 @@ export function generateSchemaForInterface(interfaceName) {
 	//log.debug(`nestedFieldsObj:${toStr(nestedFieldsObj)}`);
 
 	//──────────────────────────────────────────────────────────────────────────
-	function objToGraphQL(obj) {
+	function objToGraphQL({
+		documentTypeName,
+		obj
+	}) {
 		return traverse(obj).map(function(value) { // Fat arrow destroys this
 			//log.debug(`this:${toStr(this)}`); // JSON.stringify got a cyclic data structure
 			//log.debug(`key:${toStr(this.key)} value:${toStr(value)} isLeaf:${toStr(this.isLeaf)}`);
@@ -251,9 +299,12 @@ export function generateSchemaForInterface(interfaceName) {
 						this.update({ type }, true); // Avoiding infinite loop by setting stopHere=true
 					} else {
 						this.update({
-							type: createObjectType({
-								name: camelize(this.key, /[.]/g), // Must be unique
-								fields: objToGraphQL(value) // Recurse NOTE This FLATTENES this.path :(
+							type: glue.addObjectType({
+								name: `${documentTypeName}${ucFirst(camelize(this.key, /[.]/g))}`, // Must be unique
+								fields: objToGraphQL({
+									documentTypeName,
+									obj: value
+								}) // Recurse NOTE This FLATTENES this.path :(
 							})
 						}, true); // Avoiding infinite loop by setting stopHere=true
 
@@ -355,9 +406,12 @@ export function generateSchemaForInterface(interfaceName) {
 		}
 		//log.debug(`documentTypeName:${toStr(documentTypeName)} mergedNestedFieldsObj:${toStr(mergedNestedFieldsObj)}`);
 
-		documentTypeObjectTypes[documentTypeName] = createObjectType({
+		documentTypeObjectTypes[documentTypeName] = glue.addObjectType({
 			name: documentTypeNameToGraphQLObjectTypeName(documentTypeName),
-			fields: objToGraphQL(mergedNestedFieldsObj)
+			fields: objToGraphQL({
+				documentTypeName,
+				obj: mergedNestedFieldsObj
+			})
 		});
 	}); // documentTypes.forEach
 	//log.debug(`documentTypeObjectTypes:${toStr(documentTypeObjectTypes)}`);
@@ -402,7 +456,7 @@ export function generateSchemaForInterface(interfaceName) {
 		const camelizedFieldKey = camelize(fieldKey, /[.-]/g);
 		fieldKeysForAggregations.push(camelizedFieldKey);
 		fieldKeysForFilters.push(camelizedFieldKey);
-		highlightParameterPropertiesFields[camelizedFieldKey] = { type: createInputObjectType({
+		highlightParameterPropertiesFields[camelizedFieldKey] = { type: glue.addInputType({
 			name: `HighlightParameterProperties${ucFirst(camelizedFieldKey)}`,
 			fields: {
 				fragmenter: { type: GRAPHQL_ENUM_TYPE_HIGHLIGHT_OPTION_FRAGMENTER },
@@ -443,7 +497,7 @@ export function generateSchemaForInterface(interfaceName) {
 			}
 			//log.debug(`key:${toStr(key)} camelized:${toStr(camelizedFieldKey)} inResults:${toStr(inResults)}`);
 			if (inResults !== false) {
-				/*highlightParameterPropertiesFields[camelizedFieldKey] = { type: createInputObjectType({
+				/*highlightParameterPropertiesFields[camelizedFieldKey] = { type: glue.addInputType({
 					name: `HighlightParameterProperties${ucFirst(camelizedFieldKey)}`,
 					fields: {
 						fragmenter: { type: GRAPHQL_ENUM_TYPE_HIGHLIGHT_OPTION_FRAGMENTER },
@@ -477,19 +531,20 @@ export function generateSchemaForInterface(interfaceName) {
 	//log.debug(`enumFieldsValues:${toStr(enumFieldsValues)}`);
 	//log.debug(`highlightParameterPropertiesFields:${toStr(highlightParameterPropertiesFields)}`);
 
-	const enumFieldsKeysForAggreations = createEnumType({
-		name: 'enumFieldsKeysForAggreations',
+	glue.addEnumType({
+		name: GQL_ENUM_FIELD_KEYS_FOR_AGGREGATIONS,
 		values: fieldKeysForAggregations
 	});
-	const enumFieldsKeysForFilters = createEnumType({
-		name: 'enumFieldsKeysForFilters',
+	glue.addEnumType({
+		name: GQL_ENUM_FIELD_KEYS_FOR_FILTERS,
 		values: fieldKeysForFilters
 	});
 
 	//──────────────────────────────────────────────────────────────────────────
 	// Filters
 	//──────────────────────────────────────────────────────────────────────────
-	const graphqlInputTypeFilterExistsWithDynamicFields = createInputObjectType({
+	const enumFieldsKeysForFilters = glue.getEnumType(GQL_ENUM_FIELD_KEYS_FOR_FILTERS);
+	const graphqlInputTypeFilterExistsWithDynamicFields = glue.addInputType({
 		name: 'InputTypeFilterExistsWithDynamicFields',
 		fields: {
 			field: {
@@ -498,7 +553,7 @@ export function generateSchemaForInterface(interfaceName) {
 		}
 	});
 
-	const graphqlInputTypeFilterHasValueWithDynamicFields = createInputObjectType({
+	const graphqlInputTypeFilterHasValueWithDynamicFields = glue.addInputType({
 		name: 'InputTypeFilterHasValueWithDynamicFields',
 		fields: {
 			field: { type: nonNull(enumFieldsKeysForFilters) },
@@ -506,7 +561,7 @@ export function generateSchemaForInterface(interfaceName) {
 		}
 	});
 
-	const graphqlInputTypeFilterNotExistsWithDynamicFields = createInputObjectType({
+	const graphqlInputTypeFilterNotExistsWithDynamicFields = glue.addInputType({
 		name: 'InputTypeFilterNotExistsWithDynamicFields',
 		fields: {
 			field: {
@@ -522,18 +577,18 @@ export function generateSchemaForInterface(interfaceName) {
 		notExists: { type: graphqlInputTypeFilterNotExistsWithDynamicFields }
 	};
 
-	const graphqlInputTypeFilterBooleanWithDynamicFields = createInputObjectType({
+	const graphqlInputTypeFilterBooleanWithDynamicFields = glue.addInputType({
 		name: 'InputTypeFilterBooleanWithDynamicFields',
 		fields: {
-			must: { type: list(createInputObjectType({
+			must: { type: list(glue.addInputType({
 				name: 'InputTypeFilterBooleanMust',
 				fields: graphqlInputTypeFilterBooleanDynamicFields
 			}))},
-			mustNot: { type: list(createInputObjectType({
+			mustNot: { type: list(glue.addInputType({
 				name: 'InputTypeFilterBooleanMustNot',
 				fields: graphqlInputTypeFilterBooleanDynamicFields
 			}))},
-			should: { type: list(createInputObjectType({
+			should: { type: list(glue.addInputType({
 				name: 'InputTypeFilterBooleanShould',
 				fields: graphqlInputTypeFilterBooleanDynamicFields
 			}))}
@@ -542,7 +597,7 @@ export function generateSchemaForInterface(interfaceName) {
 
 	//──────────────────────────────────────────────────────────────────────────
 
-	const highlightProperties = createInputObjectType({
+	const highlightProperties = glue.addInputType({
 		name: 'HighlightParameterProperties',
 		fields: highlightParameterPropertiesFields
 	});
@@ -552,7 +607,7 @@ export function generateSchemaForInterface(interfaceName) {
 		_collectionName: { type: nonNull(GraphQLString) },
 		_documentTypeId: { type: nonNull(GraphQLString) },
 		_documentTypeName: { type: nonNull(GraphQLString) },
-		_highlight: { type: createObjectType({
+		_highlight: { type: glue.addObjectType({
 			name: 'InterfaceSearchHitsHighlights',
 			fields: interfaceSearchHitsHighlightsFields // This list can't be empty when createObjectType is called?
 		})},
@@ -797,9 +852,13 @@ export function generateSchemaForInterface(interfaceName) {
 
 			const json = JSON.stringify(washedNode);
 
-			// TODO Traverse...
+			// TODO Traverse based on documentType
+
+			// Old way to provide a field once per all valueTypes (cast into that valueType, or null if cast fails)
 			Object.keys(washedNode).forEach((k) => {
+				log.debug(`k:${toStr(k)}`);
 				VALUE_TYPE_VARIANTS.forEach((v) => {
+					log.debug(`v:${toStr(v)}`);
 					let value = washedNode[k];
 					//java.time.OffsetDateTime
 					//log.debug(`k:${k} value:${value} toStr(value):${toStr(value)} typeof value:${typeof value} Object.prototype.toString.call(value):${Object.prototype.toString.call(value)}`);
@@ -830,7 +889,7 @@ export function generateSchemaForInterface(interfaceName) {
 						// '59.9090442,10.7423389' // Enonic always returns this
 						// [59.9090442,10.7423389] // Enonic never returns this...
 						if (Array.isArray(value)) {
-							log.warning(`Enonic XP should never return GeoPoint as Array??? ${toStr(value)}`);
+							log.warning(`Enonic XP should never return GeoPoint as Array??? k:${toStr(k)} v:${toStr(v)} value:${toStr(value)}`);
 							if (value.length !== 2) {
 								value = null; // Not GeoPoint
 							} else { // value.length === 2
@@ -938,8 +997,8 @@ export function generateSchemaForInterface(interfaceName) {
 						log.warning(`Unhandeled value type:${v}`);
 					}
 					washedNode[`${k}_as_${v}`] = value;
-				});
-			});
+				}); // VALUE_TYPE_VARIANTS.forEach
+			}); // Object.keys(washedNode).forEach
 
 			// NOTE By doing this the frontend developer can't get the full field value and highlight in the same query.
 			// TODO We might NOT want to do that...
@@ -988,12 +1047,12 @@ export function generateSchemaForInterface(interfaceName) {
 		return queryRes;
 	} // queryRes.hits.map
 
-	const objectTypeInterfaceSearchHit = createObjectType({
+	const objectTypeInterfaceSearchHit = glue.addObjectType({
 		name: 'InterfaceSearchHits',
 		fields: interfaceSearchHitsFields
 	});
 
-	const documentTypesUnion = createUnionType({
+	const documentTypesUnion = glue.addUnionType({
 		name: 'DocumentTypesUnion',
 		/*types: [
 			//reference('InterfaceSearchHits')
@@ -1012,10 +1071,10 @@ export function generateSchemaForInterface(interfaceName) {
 			//return objectTypeInterfaceSearchHit;
 			return documentTypeObjectTypes[_documentTypeName]; // eslint-disable-line no-underscore-dangle
 		}
-	});
+	}).type;
 
 	//const OBJECT_TYPE_AGGREGATIONS_NAME = 'InterfaceSearchAggregations';
-	const objectTypeInterfaceSearch = createObjectType({
+	const objectTypeInterfaceSearch = glue.addObjectType({
 		name: 'InterfaceSearch',
 		fields: {
 			aggregations: { type: list(OBJECT_TYPE_AGGREGATIONS_UNION) },
@@ -1030,8 +1089,9 @@ export function generateSchemaForInterface(interfaceName) {
 	//──────────────────────────────────────────────────────────────────────────
 	// Dynamic Input Types
 	//──────────────────────────────────────────────────────────────────────────
+	const enumFieldsKeysForAggreations = glue.getEnumType(GQL_ENUM_FIELD_KEYS_FOR_AGGREGATIONS);
 
-	const inputTypeAggregationCount = createInputObjectType({
+	const inputTypeAggregationCount = glue.addInputType({
 		name: 'InputObjectTypeAggregationCount',
 		fields: {
 			field: {
@@ -1039,7 +1099,7 @@ export function generateSchemaForInterface(interfaceName) {
 			}
 		}
 	});
-	const inputTypeAggregationDateHistogram = createInputObjectType({
+	const inputTypeAggregationDateHistogram = glue.addInputType({
 		name: 'InputObjectTypeAggregationDateHistogram',
 		fields: {
 			field: {
@@ -1056,7 +1116,7 @@ export function generateSchemaForInterface(interfaceName) {
 			}
 		}
 	});
-	const inputTypeAggregationDateRange = createInputObjectType({
+	const inputTypeAggregationDateRange = glue.addInputType({
 		name: 'InputObjectTypeAggregationDateRange',
 		fields: {
 			field: {
@@ -1067,7 +1127,7 @@ export function generateSchemaForInterface(interfaceName) {
 				type: GraphQLString
 			},
 			ranges: {
-				type: list(createInputObjectType({
+				type: list(glue.addInputType({
 					name: 'InputObjectTypeAggregationDateRangeRanges',
 					fields: {
 						from: { type: GraphQLString },
@@ -1077,7 +1137,7 @@ export function generateSchemaForInterface(interfaceName) {
 			}
 		}
 	});
-	const inputTypeAggregationGeoDistance = createInputObjectType({
+	const inputTypeAggregationGeoDistance = glue.addInputType({
 		name: 'InputObjectTypeAggregationGeoDistance',
 		fields: {
 			field: {
@@ -1085,7 +1145,7 @@ export function generateSchemaForInterface(interfaceName) {
 				type: nonNull(enumFieldsKeysForAggreations)
 			},
 			origin: {
-				type: createInputObjectType({
+				type: glue.addInputType({
 					name: 'InputObjectTypeAggregationGeoDistanceOrigin',
 					fields: {
 						lat: { type: GraphQLString },
@@ -1094,7 +1154,7 @@ export function generateSchemaForInterface(interfaceName) {
 				})
 			},
 			ranges: {
-				type: list(createInputObjectType({
+				type: list(glue.addInputType({
 					name: 'InputObjectTypeAggregationGeoDistanceRanges',
 					fields: {
 						from: { type: GraphQLFloat },
@@ -1107,7 +1167,7 @@ export function generateSchemaForInterface(interfaceName) {
 			}
 		}
 	});
-	const inputTypeAggregationMax = createInputObjectType({
+	const inputTypeAggregationMax = glue.addInputType({
 		name: 'InputObjectTypeAggregationMax',
 		fields: {
 			field: {
@@ -1116,7 +1176,7 @@ export function generateSchemaForInterface(interfaceName) {
 			}
 		}
 	});
-	const inputTypeAggregationMin = createInputObjectType({
+	const inputTypeAggregationMin = glue.addInputType({
 		name: 'InputObjectTypeAggregationMin',
 		fields: {
 			field: {
@@ -1125,7 +1185,7 @@ export function generateSchemaForInterface(interfaceName) {
 			}
 		}
 	});
-	const inputTypeAggregationRange = createInputObjectType({
+	const inputTypeAggregationRange = glue.addInputType({
 		name: 'InputObjectTypeAggregationRange',
 		fields: {
 			field: {
@@ -1133,7 +1193,7 @@ export function generateSchemaForInterface(interfaceName) {
 				type: nonNull(enumFieldsKeysForAggreations)
 			},
 			ranges: {
-				type: list(createInputObjectType({
+				type: list(glue.addInputType({
 					name: 'InputObjectTypeAggregationRangeRanges',
 					fields: {
 						from: { type: GraphQLFloat },
@@ -1143,7 +1203,7 @@ export function generateSchemaForInterface(interfaceName) {
 			}
 		}
 	});
-	const inputTypeAggregationStats = createInputObjectType({
+	const inputTypeAggregationStats = glue.addInputType({
 		name: 'InputObjectTypeAggregationStats',
 		fields: {
 			field: {
@@ -1152,7 +1212,7 @@ export function generateSchemaForInterface(interfaceName) {
 			}
 		}
 	});
-	const inputTypeAggregationTerms = createInputObjectType({
+	const inputTypeAggregationTerms = glue.addInputType({
 		name: 'InputObjectTypeAggregationTerms',
 		fields: {
 			field: {
@@ -1171,7 +1231,7 @@ export function generateSchemaForInterface(interfaceName) {
 		}
 	});
 
-	const inputObjectTypeAggregations = createInputObjectType({
+	const inputObjectTypeAggregations = glue.addInputType({
 		name: 'InputObjectTypeAggregations',
 		fields: {
 			name: { type: nonNull(GraphQLString) },
@@ -1183,8 +1243,8 @@ export function generateSchemaForInterface(interfaceName) {
 			range: { type: inputTypeAggregationRange },
 			terms: { type: inputTypeAggregationTerms },
 			subAggregations: {
-				type: list(createInputObjectType({
-					name: INPUT_OBJECT_TYPE_SUB_AGGREGATIONS_NAME,
+				type: list(glue.addInputType({
+					name: GQL_INPUT_OBJECT_TYPE_SUB_AGGREGATIONS_NAME,
 					fields: {
 						name: { type: nonNull(GraphQLString) },
 						count: { type: inputTypeAggregationCount },
@@ -1197,7 +1257,7 @@ export function generateSchemaForInterface(interfaceName) {
 						range: { type: inputTypeAggregationRange },
 						terms: { type: inputTypeAggregationTerms },
 						subAggregations: {
-							type: list(reference(INPUT_OBJECT_TYPE_SUB_AGGREGATIONS_NAME))
+							type: list(reference(GQL_INPUT_OBJECT_TYPE_SUB_AGGREGATIONS_NAME))
 						}
 					} // fields
 				}))
@@ -1205,7 +1265,7 @@ export function generateSchemaForInterface(interfaceName) {
 		} // fields
 	});
 
-	const inputObjectTypeFilters = createInputObjectType({
+	const inputObjectTypeFilters = glue.addInputType({
 		name: 'FiltersParameter',
 		fields: {
 			boolean: {
@@ -1228,7 +1288,7 @@ export function generateSchemaForInterface(interfaceName) {
 		}
 	});
 
-	const inputObjectTypeHighlight = createInputObjectType({
+	const inputObjectTypeHighlight = glue.addInputType({
 		name: 'HighlightParameter',
 		fields: {
 			encoder: { type: GRAPHQL_ENUM_TYPE_HIGHLIGHT_OPTION_ENCODER }, // Global only
@@ -1248,7 +1308,7 @@ export function generateSchemaForInterface(interfaceName) {
 	return createSchema({
 		//dictionary:,
 		//mutation:,
-		query: createObjectType({
+		query: glue.addObjectType({
 			name: 'Query',
 			fields: {
 				getSearchConnection: {
@@ -1290,7 +1350,7 @@ export function generateSchemaForInterface(interfaceName) {
 						return res;
 					},
 					//type: createConnectionType(schemaGenerator, objectTypeInterfaceSearch)
-					type: createObjectType({
+					type: glue.addObjectType({
 						name: 'InterfaceSearchConnection',
 						fields: {
 							totalCount: {
@@ -1311,7 +1371,7 @@ export function generateSchemaForInterface(interfaceName) {
 									//log.debug(`edges:${toStr({edges})}`);
 									return edges;
 								},
-								type: list(createObjectType({
+								type: list(glue.addObjectType({
 									name: 'InterfaceSearchConnectionEdge',
 									fields: {
 										cursor: {
@@ -1340,7 +1400,7 @@ export function generateSchemaForInterface(interfaceName) {
 										hasNext: (env.source.start + count) < env.source.total
 									};
 								},
-								type: createObjectType({
+								type: glue.addObjectType({
 									name: 'InterfaceSearchConnectionPageInfo',
 									fields: {
 										endCursor: {

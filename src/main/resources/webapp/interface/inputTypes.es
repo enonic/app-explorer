@@ -3,13 +3,14 @@ import {
 	list,
 	nonNull
 } from '/lib/graphql';
-//import {schemaGenerator} from './schemaGenerator';
 
-export function generateInputTypes(schemaGenerator) {
-	const {createInputObjectType} = schemaGenerator;
+import {GQL_INPUT_TYPE_FILTER_IDS} from './constants';
+
+
+export function generateInputTypes(glue) {
 	return {
-		GRAPHQL_INPUT_TYPE_FILTER_IDS: createInputObjectType({
-			name: 'InputTypeFilterIds',
+		GRAPHQL_INPUT_TYPE_FILTER_IDS: glue.addInputType({
+			name: GQL_INPUT_TYPE_FILTER_IDS,
 			fields: {
 				values: { type: nonNull(list(GraphQLString)) }
 			}
