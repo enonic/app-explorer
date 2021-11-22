@@ -11,7 +11,11 @@ export const GQL_ENUM_HIGHLIGHT_OPTION_TAG_SCHEMAS = 'EnumTypeHighlightOptionTag
 
 export const GQL_INPUT_OBJECT_TYPE_SUB_AGGREGATIONS_NAME = 'InputObjectTypeSubAggregations';
 export const GQL_INPUT_TYPE_FILTER_IDS = 'InputTypeFilterIds';
+export const GQL_INPUT_TYPE_FILTER_EXISTS_WITH_DYNAMIC_FIELDS = 'InputTypeFilterExistsWithDynamicFields';
+export const GQL_INPUT_TYPE_FILTER_HAS_VALUE_WITH_DYNAMIC_FIELDS = 'InputTypeFilterHasValueWithDynamicFields';
+export const GQL_INPUT_TYPE_FILTER_NOT_EXISTS_WITH_DYNAMIC_FIELDS = 'InputTypeFilterNotExistsWithDynamicFields';
 
+export const GQL_INTERFACE_DOCUMENT_NAME = 'Document';
 
 export const GQL_OBJECT_TYPE_AGGREGATION_COUNT_NAME = 'AggregationCount';
 export const GQL_OBJECT_TYPE_AGGREGATION_DATE_HISTOGRAM_NAME = 'AggregationDateHistogram';
@@ -23,6 +27,9 @@ export const GQL_OBJECT_TYPE_AGGREGATION_RANGE_NAME = 'AggregationRange';
 export const GQL_OBJECT_TYPE_AGGREGATION_STATS_NAME = 'AggregationStats';
 export const GQL_OBJECT_TYPE_AGGREGATION_TERMS_NAME = 'AggregationTerms';
 export const GQL_OBJECT_TYPE_AGGREGATIONS_UNION_NAME = 'AggregationsUnion';
+export const GQL_OBJECT_TYPE_INTERFACE_SEARCH = 'InterfaceSearch';
+
+export const GQL_UNION_TYPE_DOCUMENT_TYPES = 'DocumentTypesUnion';
 
 
 //log.debug(`Number.MIN_SAFE_INTEGER:${Number.MIN_SAFE_INTEGER} Number.MAX_SAFE_INTEGER:${Number.MAX_SAFE_INTEGER}`); // Undefined

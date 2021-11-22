@@ -7,15 +7,13 @@ import {
 import {GQL_INPUT_TYPE_FILTER_IDS} from './constants';
 
 
-export function generateInputTypes(glue) {
-	return {
-		GRAPHQL_INPUT_TYPE_FILTER_IDS: glue.addInputType({
-			name: GQL_INPUT_TYPE_FILTER_IDS,
-			fields: {
-				values: { type: nonNull(list(GraphQLString)) }
-			}
-		})
-	};
+export function addStaticInputTypes(glue) {
+	glue.addInputType({
+		name: GQL_INPUT_TYPE_FILTER_IDS,
+		fields: {
+			values: { type: nonNull(list(GraphQLString)) }
+		}
+	});
 }
 
 /*const GRAPHQL_INPUT_TYPE_FILTER_EXISTS = createInputObjectType({

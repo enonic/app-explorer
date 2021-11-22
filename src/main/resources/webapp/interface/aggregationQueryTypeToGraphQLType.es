@@ -21,7 +21,7 @@ import {
 	OBJECT_TYPE_AGGREGATION_RANGE_NAME,
 	OBJECT_TYPE_AGGREGATION_STATS_NAME,
 	OBJECT_TYPE_AGGREGATION_TERMS_NAME
-} from './types';
+} from './constants';
 
 
 export function aggregationQueryTypeToGraphQLType(aggregationQueryType) {
