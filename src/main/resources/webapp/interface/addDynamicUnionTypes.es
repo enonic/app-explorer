@@ -1,15 +1,15 @@
-import {toStr} from '@enonic/js-utils';
+//import {toStr} from '@enonic/js-utils';
 
 import {GQL_UNION_TYPE_DOCUMENT_TYPES} from './constants';
 
 
 export function addDynamicUnionTypes({
-	documentTypeObjectTypes,
+	documentTypeObjectTypes, // Must be already populated, since used in types below
 	glue
 }) {
-	log.debug(`addDynamicUnionTypes({
-		documentTypeObjectTypes: ${toStr(documentTypeObjectTypes)}
-	})`);
+	/*log.debug(`addDynamicUnionTypes({
+		Object.keys(documentTypeObjectTypes): ${toStr(Object.keys(documentTypeObjectTypes))}
+	})`);*/
 	glue.addUnionType({
 		name: GQL_UNION_TYPE_DOCUMENT_TYPES,
 		/*types: [

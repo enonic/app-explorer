@@ -1,3 +1,11 @@
+import hasOwn from 'object.hasown';
+
+
+if (!Object.hasOwn) {
+	hasOwn.shim();
+}
+
+
 /*
 
 Goals:
@@ -56,7 +64,7 @@ function addObjectType({
 	interfaces = [],
 	name
 }) {
-	log.debug(`addObjectType({ name: ${name} })`);
+	//log.debug(`addObjectType({ name: ${name} })`);
 	if(this.uniqueNames[name]) {
 		throw new Error(`Name ${name} already used as ${this.uniqueNames[name]}!`);
 	}
@@ -79,7 +87,7 @@ function addUnionType({
 	typeResolver,
 	types = []
 }) {
-	log.debug(`addUnionType({ name: ${name} })`);
+	//log.debug(`addUnionType({ name: ${name} })`);
 	if(this.uniqueNames[name]) {
 		throw new Error(`Name ${name} already used as ${this.uniqueNames[name]}!`);
 	}
@@ -97,12 +105,18 @@ function addUnionType({
 }
 
 function getUnionType(name) {
+	if (!Object.hasOwn(this.unionTypes, name)) { // true also when property is set to undefined
+		if (this.uniqueNames[name]) {
+			throw new Error(`name:${name} is not an unionType! but ${this.uniqueNames[name]}`);
+		}
+		throw new Error(`name:${name} not found in unionTypes, perhaps you're trying to use it before it's defined?`);
+	}
 	return this.unionTypes[name].type;
 }
 
-function getUnionTypeResolver(name) {
+/*function getUnionTypeResolver(name) {
 	return this.unionTypes[name].typeResolver;
-}
+}*/
 
 
 function addInterfaceType({
@@ -156,7 +170,7 @@ export function constructGlue({
 		getInterfaceTypeObject, // function
 		getObjectType, // function
 		getUnionType, // function
-		getUnionTypeResolver, // function
+		//getUnionTypeResolver, // function
 		inputTypes: {},
 		interfaceTypes: {},
 		objectTypes: {},

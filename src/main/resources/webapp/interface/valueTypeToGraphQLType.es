@@ -17,10 +17,13 @@ import {
 	GraphQLBoolean,
 	GraphQLFloat,
 	GraphQLInt,
+	Json as GraphQLJson,
 	GraphQLString,
 	LocalDateTime as GraphQLLocalDateTime,
 	LocalTime as GraphQLLocalTime
 } from '/lib/graphql';
+
+import {VALUE_TYPE_JSON} from './constants';
 
 
 export function valueTypeToGraphQLType(valueType) {
@@ -32,6 +35,7 @@ export function valueTypeToGraphQLType(valueType) {
 	if(valueType === VALUE_TYPE_LOCAL_DATE) return GraphQLDate;
 	if(valueType === VALUE_TYPE_LOCAL_DATE_TIME) return GraphQLLocalDateTime;
 	if(valueType === VALUE_TYPE_LOCAL_TIME) return GraphQLLocalTime;
+	if(valueType === VALUE_TYPE_JSON) return GraphQLJson; // Only _json thus far
 	return GraphQLString; // The rest are string
 	/*if(valueType === VALUE_TYPE_GEO_POINT) return GraphQLString; // TODO https://github.com/enonic/lib-graphql/issues/95
 	//if(valueType === VALUE_TYPE_ANY) return GraphQLString;

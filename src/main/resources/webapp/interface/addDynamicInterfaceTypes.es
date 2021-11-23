@@ -12,18 +12,18 @@ import {
 	//reference
 } from '/lib/graphql';
 
-import {GQL_INTERFACE_DOCUMENT_NAME} from './constants';
+import {GQL_INTERFACE_TYPE_DOCUMENT} from './constants';
 
 
 export function addDynamicInterfaceTypes({
-	documentTypeObjectTypes,
+	documentTypeObjectTypes, // Just an empty obj, populated later
 	glue
 }) {
 	glue.addInterfaceType({
 		fields: {
 			_json: { type: GraphQLJson }
 		},
-		name: GQL_INTERFACE_DOCUMENT_NAME,
+		name: GQL_INTERFACE_TYPE_DOCUMENT,
 		typeResolver: (node) => {
 			//log.debug(`node:${toStr(node)}`);
 			const {
