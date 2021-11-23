@@ -1,5 +1,4 @@
 import {
-	QUERY_OPERATOR_AND,
 	//VALUE_TYPE_ANY,
 	VALUE_TYPE_BOOLEAN,
 	VALUE_TYPE_DOUBLE,
@@ -12,24 +11,11 @@ import {
 	VALUE_TYPE_REFERENCE,
 	//VALUE_TYPE_SET,
 	VALUE_TYPE_STRING,
-	addQueryFilter,
 	camelize,
 	forceArray,
-	fulltext,
-	//group,
-	or,
-	isBoolean,
-	isDateString,
-	isNumber,
-	isObject,
 	isSet,
-	isString,
-	ngram,
-	toStr,
-	stemmed,
 	ucFirst
 } from '@enonic/js-utils';
-import {v4 as isUuid4} from 'is-uuid';
 import 'reflect-metadata';
 //import serialize from 'serialize-javascript';
 import setIn from 'set-value'; // Number.isInteger and Reflect
@@ -37,17 +23,8 @@ import setIn from 'set-value'; // Number.isInteger and Reflect
 import {getFields} from '/lib/explorer/field/getFields';
 import {get as getInterface} from '/lib/explorer/interface/get';
 import {filter as filterInterface} from '/lib/explorer/interface/filter';
-import {hasValue} from '/lib/explorer/query/hasValue';
-import {
-	COLLECTION_REPO_PREFIX,
-	NT_DOCUMENT,
-	PRINCIPAL_EXPLORER_READ
-} from '/lib/explorer/model/2/constants';
-import {removeStopWords} from '/lib/explorer/query/removeStopWords';
-import {wash} from '/lib/explorer/query/wash';
+import {PRINCIPAL_EXPLORER_READ} from '/lib/explorer/model/2/constants';
 import {connect} from '/lib/explorer/repo/connect';
-import {multiConnect} from '/lib/explorer/repo/multiConnect';
-import {get as getStopWordsList} from '/lib/explorer/stopWords/get';
 import {
 	GraphQLBoolean,
 	GraphQLInt,
@@ -66,12 +43,10 @@ import {
 	GQL_INPUT_TYPE_FILTERS,
 	GQL_INPUT_TYPE_HIGHLIGHT,
 	GQL_INTERFACE_TYPE_DOCUMENT,
+	GQL_OBJECT_TYPE_GLOBAL_FIELD,
 	GQL_OBJECT_TYPE_INTERFACE_SEARCH,
 	GQL_OBJECT_TYPE_INTERFACE_SEARCH_CONNECTION,
 	GQL_OBJECT_TYPE_QUERY,
-	//GQL_UNION_TYPE_DOCUMENT_TYPES,
-	JAVA_MAX_SAFE_INT,
-	JAVA_MIN_SAFE_INT,
 	VALUE_TYPE_JSON
 } from './constants';
 
@@ -82,12 +57,10 @@ import {addStaticInputTypes} from './addStaticInputTypes';
 import {addStaticObjectTypes} from './addStaticObjectTypes';
 import {addStaticUnionTypes} from './addStaticUnionTypes';
 
-import {aggregationsArgToQueryParamAndTypes} from './aggregationsArgToQueryParamAndTypes';
+import {doQuery} from './doQuery';
 import {documentTypeNameToGraphQLObjectTypeName} from './documentTypeNameToGraphQLObjectTypeName';
 import {objToGraphQL} from './objToGraphQL';
-import {queryResAggregationsObjToArray} from './queryResAggregationsObjToArray';
 import {valueTypeToGraphQLType} from './valueTypeToGraphQLType';
-import {washDocumentNode} from './washDocumentNode';
 
 import {addDynamicEnumTypes} from './addDynamicEnumTypes';
 import {addDynamicInputTypes} from './addDynamicInputTypes';
@@ -212,7 +185,7 @@ export function generateSchemaForInterface(interfaceName) {
 		_collectionId: {
 			_max: 1,
 			_min: 1,
-			_valueType: VALUE_TYPE_STRING
+			_valueType: VALUE_TYPE_REFERENCE
 		},
 		_collectionName: {
 			_max: 1,
@@ -222,7 +195,7 @@ export function generateSchemaForInterface(interfaceName) {
 		_documentTypeId: {
 			_max: 1,
 			_min: 1,
-			_valueType: VALUE_TYPE_STRING
+			_valueType: VALUE_TYPE_REFERENCE
 		},
 		_documentTypeName: {
 			_max: 1,
@@ -238,12 +211,12 @@ export function generateSchemaForInterface(interfaceName) {
 		_repoId: {
 			_max: 1,
 			_min: 1,
-			_valueType: VALUE_TYPE_STRING
+			_valueType: VALUE_TYPE_REFERENCE
 		},
 		_score: {
 			_max: 1,
 			_min: 1,
-			_valueType: VALUE_TYPE_STRING
+			_valueType: VALUE_TYPE_DOUBLE
 		}
 	};
 	fieldsRes.hits.forEach(({ // TODO traverse
@@ -338,7 +311,8 @@ export function generateSchemaForInterface(interfaceName) {
 
 	addDynamicInterfaceTypes({
 		documentTypeObjectTypes, // Just an empty obj, populated later
-		glue
+		glue,
+		nestedFieldsObj
 	});
 
 	const interfaceTypeDocument = glue.getInterfaceType(GQL_INTERFACE_TYPE_DOCUMENT);
@@ -387,6 +361,15 @@ export function generateSchemaForInterface(interfaceName) {
 		});
 	}); // documentTypes.forEach
 	//log.debug(`documentTypeObjectTypes:${toStr(documentTypeObjectTypes)}`);
+
+	documentTypeObjectTypes[GQL_OBJECT_TYPE_GLOBAL_FIELD] = glue.addObjectType({
+		name: GQL_OBJECT_TYPE_GLOBAL_FIELD,
+		fields: objToGraphQL({
+			documentTypeName: GQL_OBJECT_TYPE_GLOBAL_FIELD,
+			glue,
+			obj: nestedFieldsObj
+		})
+	});
 
 	//──────────────────────────────────────────────────────────────────────────
 
@@ -508,347 +491,16 @@ export function generateSchemaForInterface(interfaceName) {
 	//──────────────────────────────────────────────────────────────────────────
 
 	function searchResolver(env) {
-		const {
-			args: {
-				aggregations: aggregationsArg = [],
-				count = 10,
-				filters = {},
-				highlight = {},
-				searchString = '',
-				start = 0
-			}
-		} = env;
-		//log.debug(`filters:${toStr(filters)}`);
-		//log.debug(`highlight:${toStr(highlight)}`);
-
-		//log.debug(`aggregationsArg:${toStr(aggregationsArg)}`);
-
-		const [aggregations, types] = aggregationsArgToQueryParamAndTypes({
-			aggregationsArray: aggregationsArg,
-			camelToFieldObj
+		return doQuery({
+			camelToFieldObj,
+			collections,
+			collectionIdToDocumentTypeId,
+			env,
+			documentTypeIdToName,
+			fields,
+			stopWords
 		});
-		//log.debug(`aggregations:${toStr(aggregations)}`);
-		//log.debug(`types:${toStr(types)}`);
-
-		//log.debug(`searchString:${toStr(searchString)}`);
-		const washedSearchString = wash({string: searchString});
-		//log.debug(`washedSearchString:${toStr({washedSearchString})}`);
-
-		// TODO stopWords could be cached:
-		const listOfStopWords = [];
-		if (stopWords && stopWords.length) {
-			//log.debug(`stopWords:${toStr(stopWords)}`);
-			stopWords.forEach((name) => {
-				const {words} = getStopWordsList({ // Not a query
-					connection: explorerRepoReadConnection,
-					name
-				});
-				//log.debug(`words:${toStr(words)}`);
-				words.forEach((word) => {
-					if (!listOfStopWords.includes(word)) {
-						listOfStopWords.push(word);
-					}
-				});
-			});
-		}
-		//log.debug(`listOfStopWords:${toStr({listOfStopWords})}`);
-
-		const removedStopWords = [];
-		const searchStringWithoutStopWords = removeStopWords({
-			removedStopWords,
-			stopWords: listOfStopWords,
-			string: washedSearchString
-		});
-		//log.debug(`searchStringWithoutStopWords:${toStr({searchStringWithoutStopWords})}`);
-		//log.debug(`removedStopWords:${toStr({removedStopWords})}`);
-
-		//`fulltext('${fields.map(({name: field, boost = 1}) => `${field}${boost && boost > 1 ? `^${boost}` : ''}`)}', '${searchStringWithoutStopWords}', 'AND')`,
-		const query = or(fulltext(
-			fields.map(({boost, name: field}) => ({boost: (parseInt(boost)||1) + (fields.length*2), field})),
-			searchStringWithoutStopWords,
-			QUERY_OPERATOR_AND
-		),stemmed(
-			fields.map(({boost, name: field}) => ({boost: (parseInt(boost)||1) + fields.length, field})),
-			searchStringWithoutStopWords,
-			QUERY_OPERATOR_AND,
-			//language // TODO @enonic/js-utils defaults to english, which is why it works
-		),ngram(
-			fields.map(({boost, name: field}) => ({boost, field})),
-			searchStringWithoutStopWords,
-			QUERY_OPERATOR_AND
-		));
-		//log.debug(`query:${toStr({query})}`);
-
-		const queryParams = {
-			aggregations,
-			count,
-			filters: addQueryFilter({
-				filter: hasValue('_nodeType', [NT_DOCUMENT]),
-				filters
-			}),
-			highlight,
-			query,
-			start
-		};
-		//log.debug(`queryParams:${toStr({queryParams})}`);
-
-		const repoIdObj = {};
-		const multiConnectParams = {
-			principals: [PRINCIPAL_EXPLORER_READ],
-			sources: collections.map(({
-				_id: collectionId,
-				_name: collectionName
-			}) => {
-				const repoId = `${COLLECTION_REPO_PREFIX}${collectionName}`;
-				repoIdObj[repoId] = {
-					collectionId,
-					collectionName
-				};
-				const documentTypeId = collectionIdToDocumentTypeId[collectionId];
-				if (documentTypeId) {
-					repoIdObj[repoId].documentTypeId = documentTypeId;
-					const documentTypeName = documentTypeIdToName[documentTypeId];
-					if (documentTypeName) {
-						repoIdObj[repoId].documentTypeName = documentTypeName;
-					}
-				} /*else {
-					log.warning(`Unable to find documentTypeId for repoId:${repoId}`);
-				}*/
-				return {
-					repoId,
-					branch: 'master', // NOTE Hardcoded
-					principals: [PRINCIPAL_EXPLORER_READ]
-				};
-			})
-		};
-		//log.debug(`multiConnectParams:${toStr(multiConnectParams)}`);
-		//log.debug(`repoIdObj:${toStr({repoIdObj})}`);
-
-		const multiRepoReadConnection = multiConnect(multiConnectParams);
-
-		const queryRes = multiRepoReadConnection.query(queryParams);
-		//log.debug(`queryRes:${toStr(queryRes)}`);
-
-		queryRes.aggregations = queryResAggregationsObjToArray({
-			obj:queryRes.aggregations,
-			types
-		});
-		//log.debug(`queryRes.aggregations:${toStr(queryRes.aggregations)}`);
-
-		queryRes.aggregationsAsJson = JSON.stringify(queryRes.aggregations);
-
-		queryRes.hits = queryRes.hits.map(({
-			branch,
-			highlight,
-			id,
-			repoId,
-			score
-		}) => {
-			//log.debug(`highlight:${toStr(highlight)}`);
-
-			const washedNode = washDocumentNode(connect({
-				branch,
-				principals: [PRINCIPAL_EXPLORER_READ],
-				repoId
-			}).get(id));
-			//log.debug(`washedNode:${toStr(washedNode)}`);
-
-			const json = JSON.stringify(washedNode);
-
-			// TODO Traverse based on documentType
-
-			// Old way to provide a field once per all valueTypes (cast into that valueType, or null if cast fails)
-			Object.keys(washedNode).forEach((k) => {
-				//log.debug(`k:${toStr(k)}`);
-				VALUE_TYPE_VARIANTS.forEach((v) => {
-					//log.debug(`v:${toStr(v)}`);
-					let value = washedNode[k];
-					//java.time.OffsetDateTime
-					//log.debug(`k:${k} value:${value} toStr(value):${toStr(value)} typeof value:${typeof value} Object.prototype.toString.call(value):${Object.prototype.toString.call(value)}`);
-					switch (v) {
-					case VALUE_TYPE_BOOLEAN:
-						// WARN  n.g.execution.ExecutionStrategy - Can't serialize value (/search/hits[0]/instant_as_boolean)
-						// : Expected something we can convert to 'java.time.OffsetDateTime' but was 'Boolean'.
-						//value = !!value;
-						if (!isBoolean(value)) {
-							value = null;
-						}
-						break;
-					case VALUE_TYPE_DOUBLE:
-						if (isBoolean(value) || isDateString(value)) {
-							value = null;
-						} else {
-							// language_as_double : Expected type 'Float' but was 'Double'
-							const maybeFloat = parseFloat(value);
-							if (isNaN(maybeFloat)) {
-								value = null;
-								//value = 0.0;
-							} else {
-								value = maybeFloat;
-							}
-						}
-						break;
-					case VALUE_TYPE_GEO_POINT:
-						// '59.9090442,10.7423389' // Enonic always returns this
-						// [59.9090442,10.7423389] // Enonic never returns this...
-						if (Array.isArray(value)) {
-							log.warning(`Enonic XP should never return GeoPoint as Array??? k:${toStr(k)} v:${toStr(v)} value:${toStr(value)}`);
-							if (value.length !== 2) {
-								value = null; // Not GeoPoint
-							} else { // value.length === 2
-								const [lat, lon] = value;
-								const parsedLat = parseFloat(lat);
-								const parsedLon = parseFloat(lon);
-								if (isNumber(parsedLat) && isNumber(parsedLon)) {
-									value = `${parsedLat},${parsedLon}`;
-								} else {
-									value = null; // Not GeoPoint
-								}
-							}
-						} else /* !Array */	if (!isString(value)) {
-							value = null; // Not GeoPoint
-						} else { // isString
-							let [lat, lon] = value.split(',');
-							const parsedLat = parseFloat(lat);
-							const parsedLon = parseFloat(lon);
-							if (isNumber(parsedLat) && isNumber(parsedLon)) {
-								value = `${parsedLat},${parsedLon}`;
-							} else {
-								value = null; // Not GeoPoint
-							}
-						}
-						break;
-					case VALUE_TYPE_INSTANT:
-						if (!isDateString(value)) {
-							value = null;
-						} else {
-							//value = value // date_as_instant : Invalid RFC3339 value : '2021-12-31'. because of : 'Text '2021-12-31' could not be parsed at index 10
-							//value = new Date(Date.parse(value)); // date_as_instant : Expected something we can convert to 'java.time.OffsetDateTime' but was 'Date'
-							value = new Date(Date.parse(value)).toISOString();
-						}
-						break;
-					case VALUE_TYPE_LOCAL_DATE:
-						if (!isDateString(value)) {
-							value = null;
-						} else {
-							value = new Date(Date.parse(value)).toLocaleDateString();
-						}
-						break;
-					case VALUE_TYPE_LOCAL_DATE_TIME:
-						if (!isDateString(value)) {
-							value = null;
-						} else {
-							// Can't serialize value (instant_as_localDateTime) : null graphql.schema.CoercingSerializeException: null
-							// However in Chrome console:
-							//  new Date(Date.parse("2021-12-31T23:59:59Z")).toLocaleString();
-							//    '01/01/2022, 00:59:59'
-							//  new Date(Date.parse("2021-12-31T23:59:59Z")).toLocaleString('nb-NO' ,{ timeZone: 'UTC'});
-							//    '31.12.2021, 23:59:59'
-							//log.debug(`k:${k} value:${value} Date.parse(value):${Date.parse(value)} new Date(Date.parse(value)):${new Date(Date.parse(value))}`);
-							//log.debug(`k:${k} new Date(Date.parse(value)).toLocaleString():${new Date(Date.parse(value)).toLocaleString()}`);
-							// NOTE So the seems to be that GraphQL doesn't like what toLocaleString produces...
-							//value = new Date(Date.parse(value)).toLocaleString();
-							//value = new Date(Date.parse(value)); // Expected something what can convert to 'java.time.LocalDateTime' but was 'Date'
-							//value = new Date(Date.parse(value)).toISOString(); // graphql.schema.CoercingSerializeException: null
-							value = null; // TODO
-						}
-						break;
-					case VALUE_TYPE_LOCAL_TIME:
-						if (!isDateString(value)) {
-							value = null;
-						} else {
-							value = new Date(Date.parse(value)).toLocaleTimeString();
-						}
-						break;
-					case VALUE_TYPE_LONG:
-						if (isBoolean(value) || isDateString(value)) {
-							value = null;
-						} else {
-							//const maybeInt = parseInt(value, 10); // Actually returns Double  // https://github.com/enonic/xp/issues/8462
-							const maybeFloat = parseFloat(value);
-							if (isNaN(maybeFloat) || maybeFloat < JAVA_MIN_SAFE_INT || maybeFloat > JAVA_MAX_SAFE_INT) {
-								value = null;
-							} else {
-								value = maybeFloat|0; // Rounding towards zero
-							}
-						}
-						break;
-					case VALUE_TYPE_REFERENCE:
-						if (!isUuid4(value)) {
-							value = null;
-						}
-						break;
-					case VALUE_TYPE_STRING:
-						if (!isString(value)) {
-							if (Array.isArray(value)) {
-								if (isString(value[0])) {
-									value = value.join(',');
-								} else {
-									value = JSON.stringify(value);
-								}
-							} else if (isObject(value)) { // Includes Date
-								value = JSON.stringify(value);
-							} else { // Boolean, Float, Int, Reference?
-								value = `${value}`; // false stayed false???
-								//value = value.toString(); // false still stayed false???
-								//value = '' + value;
-								//log.debug(`k:${k} value:${value} toStr(value):${toStr(value)} typeof value:${typeof value} Object.prototype.toString.call(value):${Object.prototype.toString.call(value)}`);
-							}
-						}
-						break;
-					default:
-						log.warning(`Unhandeled value type:${v}`);
-					}
-					washedNode[`${k}_as_${v}`] = value;
-				}); // VALUE_TYPE_VARIANTS.forEach
-			}); // Object.keys(washedNode).forEach
-
-			// NOTE By doing this the frontend developer can't get the full field value and highlight in the same query.
-			// TODO We might NOT want to do that...
-			const obj = {};
-			if (highlight) {
-				Object.keys(highlight).forEach((k) => {
-					//log.debug(`k:${k} highlight[${k}]:${toStr(highlight[k])}`);
-					//const first = forceArray(highlight[k])[0];
-					if (k.includes('._stemmed_')) {
-						// NOTE If multiple languages, the latter will overwrite the first. A single nodes with multiple lanugages is unsupported.
-						const kWithoutStemmed = k.split('._stemmed_')[0];
-						//log.debug(`k:${k} kWithoutStemmed:${kWithoutStemmed}`);
-						obj[kWithoutStemmed] = highlight[k];
-						washedNode[kWithoutStemmed] = highlight[k][0];
-					} else {
-						if(!obj[k]) { // From fulltext
-							obj[k] = highlight[k];
-							washedNode[k] = highlight[k][0];
-						}
-					}
-				});
-			} // if (highlight)
-
-			//log.debug(`repoId:${repoId} repoIdObj[repoId]:${toStr(repoIdObj[repoId])}`);
-			const {
-				collectionId,
-				collectionName,
-				documentTypeId,
-				documentTypeName
-			} = repoIdObj[repoId];
-
-			/* eslint-disable no-underscore-dangle */
-			washedNode._collectionId = collectionId;
-			washedNode._collectionName = collectionName;
-			washedNode._documentTypeId = documentTypeId;
-			washedNode._documentTypeName = documentTypeName; // NOTE This could be used in unionType typeresolver to determine documentType
-			washedNode._highlight = obj;
-			washedNode._json = json;
-			washedNode._repoId = repoId; // Same info in _collection
-			washedNode._score = score;
-			/* eslint-enable no-underscore-dangle */
-			return washedNode;
-		}); // queryRes.hits.map
-		//log.debug(`queryRes:${toStr(queryRes)}`);
-
-		return queryRes;
-	} // searchResolver ?
+	} // searchResolver
 
 	// Must be after populating documentTypeObjectTypes
 	// Must be before addDynamicObjectTypes
