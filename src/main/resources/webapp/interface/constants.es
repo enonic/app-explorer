@@ -38,7 +38,7 @@ export const GQL_INPUT_TYPE_HIGHLIGHT = 'InputTypeHighlight';
 export const GQL_INPUT_TYPE_HIGHLIGHT_PROPERTIES = 'InputTypeHighlightProperties';
 
 
-export const GQL_INTERFACE_TYPE_DOCUMENT = 'Document';
+export const GQL_INTERFACE_TYPE_DOCUMENT = 'InterfaceTypeDocument';
 
 
 export const GQL_OBJECT_TYPE_AGGREGATION_COUNT_NAME = 'AggregationCount';
@@ -51,6 +51,7 @@ export const GQL_OBJECT_TYPE_AGGREGATION_RANGE_NAME = 'AggregationRange';
 export const GQL_OBJECT_TYPE_AGGREGATION_STATS_NAME = 'AggregationStats';
 export const GQL_OBJECT_TYPE_AGGREGATION_TERMS_NAME = 'AggregationTerms';
 export const GQL_OBJECT_TYPE_AGGREGATIONS_UNION_NAME = 'AggregationsUnion';
+export const GQL_OBJECT_TYPE_GLOBAL_FIELD = 'GlobalField';
 export const GQL_OBJECT_TYPE_INTERFACE_SEARCH = 'InterfaceSearch';
 export const GQL_OBJECT_TYPE_INTERFACE_SEARCH_CONNECTION = 'InterfaceSearchConnection';
 export const GQL_OBJECT_TYPE_INTERFACE_SEARCH_CONNECTION_EDGE = 'InterfaceSearchConnectionEdge';

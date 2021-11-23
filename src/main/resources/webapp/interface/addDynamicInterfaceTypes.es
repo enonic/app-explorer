@@ -1,10 +1,12 @@
+import {toStr} from '@enonic/js-utils';
+
 import {
 	//GraphQLBoolean,
 	//GraphQLDouble, // There is no such type
-	//GraphQLFloat,
-	//GraphQLID,
+	GraphQLFloat,
+	GraphQLID,
 	//GraphQLInt,
-	//GraphQLString,
+	GraphQLString,
 	Json as GraphQLJson//,
 	//list,
 	//newSchemaGenerator,
@@ -13,19 +15,31 @@ import {
 } from '/lib/graphql';
 
 import {GQL_INTERFACE_TYPE_DOCUMENT} from './constants';
+//import {objToGraphQL} from './objToGraphQL';
 
 
 export function addDynamicInterfaceTypes({
 	documentTypeObjectTypes, // Just an empty obj, populated later
-	glue
+	glue/*,
+	nestedFieldsObj*/
 }) {
 	glue.addInterfaceType({
-		fields: {
-			_json: { type: GraphQLJson }
+		fields: /*objToGraphQL({
+			documentTypeName: GQL_INTERFACE_TYPE_DOCUMENT,
+			glue,
+			obj: nestedFieldsObj
+		})*/{
+			_collectionId: { type: GraphQLID },
+			_collectionName: { type: GraphQLString },
+			_documentTypeId: { type: GraphQLID },
+			_documentTypeName: { type: GraphQLString },
+			_json: { type: GraphQLJson },
+			_repoId: { type: GraphQLID },
+			_score: { type: GraphQLFloat }
 		},
 		name: GQL_INTERFACE_TYPE_DOCUMENT,
 		typeResolver: (node) => {
-			//log.debug(`node:${toStr(node)}`);
+			log.debug(`addInterfaceType name:${GQL_INTERFACE_TYPE_DOCUMENT} typeResolver node:${toStr(node)}`);
 			const {
 				//_documentTypeId
 				_documentTypeName

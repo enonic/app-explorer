@@ -8,6 +8,7 @@ import {
 	VALUE_TYPE_LOCAL_DATE_TIME,
 	VALUE_TYPE_LOCAL_TIME,
 	VALUE_TYPE_LONG,
+	VALUE_TYPE_REFERENCE,
 	//VALUE_TYPE_SET,
 	VALUE_TYPE_STRING
 } from '@enonic/js-utils';
@@ -16,6 +17,7 @@ import {
 	DateTime as GraphQLDateTime,
 	GraphQLBoolean,
 	GraphQLFloat,
+	GraphQLID,
 	GraphQLInt,
 	Json as GraphQLJson,
 	GraphQLString,
@@ -36,6 +38,7 @@ export function valueTypeToGraphQLType(valueType) {
 	if(valueType === VALUE_TYPE_LOCAL_DATE_TIME) return GraphQLLocalDateTime;
 	if(valueType === VALUE_TYPE_LOCAL_TIME) return GraphQLLocalTime;
 	if(valueType === VALUE_TYPE_JSON) return GraphQLJson; // Only _json thus far
+	if(valueType === VALUE_TYPE_REFERENCE) return GraphQLID;
 	return GraphQLString; // The rest are string
 	/*if(valueType === VALUE_TYPE_GEO_POINT) return GraphQLString; // TODO https://github.com/enonic/lib-graphql/issues/95
 	//if(valueType === VALUE_TYPE_ANY) return GraphQLString;
