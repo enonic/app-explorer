@@ -33,7 +33,6 @@ import {v4 as isUuid4} from 'is-uuid';
 import 'reflect-metadata';
 //import serialize from 'serialize-javascript';
 import setIn from 'set-value'; // Number.isInteger and Reflect
-import traverse from 'traverse';
 
 import {getFields} from '/lib/explorer/field/getFields';
 import {get as getInterface} from '/lib/explorer/interface/get';
@@ -51,41 +50,29 @@ import {multiConnect} from '/lib/explorer/repo/multiConnect';
 import {get as getStopWordsList} from '/lib/explorer/stopWords/get';
 import {
 	GraphQLBoolean,
-	//GraphQLDouble, // There is no such type
-	GraphQLFloat,
-	GraphQLID,
 	GraphQLInt,
 	GraphQLString,
-	Json as GraphQLJson,
 	list,
-	newSchemaGenerator,
-	nonNull,
-	reference
+	newSchemaGenerator
 } from '/lib/graphql';
-import {
-	//createConnectionType,
-	decodeCursor,
-	encodeCursor
-} from '/lib/graphql-connection';
+import {decodeCursor} from '/lib/graphql-connection';
 
 import {
-	GQL_ENUM_AGGREGATION_GEO_DISTANCE_UNITS,
-	GQL_ENUM_FIELD_KEYS_FOR_AGGREGATIONS,
 	GQL_ENUM_HIGHLIGHT_OPTION_ENCODERS,
 	GQL_ENUM_HIGHLIGHT_OPTION_FRAGMENTERS,
 	GQL_ENUM_HIGHLIGHT_OPTION_ORDERS,
 	GQL_ENUM_HIGHLIGHT_OPTION_TAG_SCHEMAS,
-	GQL_INPUT_OBJECT_TYPE_SUB_AGGREGATIONS_NAME,
-	GQL_INPUT_TYPE_FILTER_EXISTS_WITH_DYNAMIC_FIELDS,
-	GQL_INPUT_TYPE_FILTER_IDS,
-	GQL_INPUT_TYPE_FILTER_HAS_VALUE_WITH_DYNAMIC_FIELDS,
-	GQL_INPUT_TYPE_FILTER_NOT_EXISTS_WITH_DYNAMIC_FIELDS,
-	GQL_INTERFACE_DOCUMENT_NAME,
+	GQL_INPUT_TYPE_AGGREGATION,
+	GQL_INPUT_TYPE_FILTERS,
+	GQL_INPUT_TYPE_HIGHLIGHT,
+	GQL_INTERFACE_TYPE_DOCUMENT,
 	GQL_OBJECT_TYPE_INTERFACE_SEARCH,
-	GQL_OBJECT_TYPE_AGGREGATIONS_UNION_NAME,
-	GQL_UNION_TYPE_DOCUMENT_TYPES,
+	GQL_OBJECT_TYPE_INTERFACE_SEARCH_CONNECTION,
+	GQL_OBJECT_TYPE_QUERY,
+	//GQL_UNION_TYPE_DOCUMENT_TYPES,
 	JAVA_MAX_SAFE_INT,
-	JAVA_MIN_SAFE_INT
+	JAVA_MIN_SAFE_INT,
+	VALUE_TYPE_JSON
 } from './constants';
 
 import {constructGlue} from './Glue';
@@ -95,13 +82,17 @@ import {addStaticInputTypes} from './addStaticInputTypes';
 import {addStaticObjectTypes} from './addStaticObjectTypes';
 import {addStaticUnionTypes} from './addStaticUnionTypes';
 
+import {aggregationsArgToQueryParamAndTypes} from './aggregationsArgToQueryParamAndTypes';
+import {documentTypeNameToGraphQLObjectTypeName} from './documentTypeNameToGraphQLObjectTypeName';
+import {objToGraphQL} from './objToGraphQL';
+import {queryResAggregationsObjToArray} from './queryResAggregationsObjToArray';
 import {valueTypeToGraphQLType} from './valueTypeToGraphQLType';
-import {aggregationQueryTypeToGraphQLType} from './aggregationQueryTypeToGraphQLType';
 import {washDocumentNode} from './washDocumentNode';
 
 import {addDynamicEnumTypes} from './addDynamicEnumTypes';
 import {addDynamicInputTypes} from './addDynamicInputTypes';
 import {addDynamicInterfaceTypes} from './addDynamicInterfaceTypes';
+import {addDynamicObjectTypes} from './addDynamicObjectTypes';
 import {addDynamicUnionTypes} from './addDynamicUnionTypes';
 
 
@@ -241,7 +232,7 @@ export function generateSchemaForInterface(interfaceName) {
 		_json: {
 			_max: 1,
 			_min: 1,
-			_valueType: VALUE_TYPE_STRING
+			_valueType: VALUE_TYPE_JSON
 		},
 		//_highlight, // TODO ???
 		_repoId: {
@@ -276,52 +267,6 @@ export function generateSchemaForInterface(interfaceName) {
 		}
 	});
 	//log.debug(`nestedFieldsObj:${toStr(nestedFieldsObj)}`);
-
-	//──────────────────────────────────────────────────────────────────────────
-	function objToGraphQL({
-		documentTypeName,
-		obj
-	}) {
-		return traverse(obj).map(function(value) { // Fat arrow destroys this
-			//log.debug(`this:${toStr(this)}`); // JSON.stringify got a cyclic data structure
-			//log.debug(`key:${toStr(this.key)} value:${toStr(value)} isLeaf:${toStr(this.isLeaf)}`);
-			// NOTE Because of recursion this.level and this.path is flattened!
-			//log.debug(`this.level:${toStr(this.level)} this.key:${toStr(this.key)} this.path:${toStr(this.path)} this.node:${toStr(this.node)} value:${toStr(value)}`);
-			if (this.notRoot) {
-				if (this.notLeaf) {
-					const {
-						_max = 0,
-						_min = 0,
-						_valueType
-					} = value;
-					if (_valueType) {
-						let type = valueTypeToGraphQLType(_valueType);
-						if (_min > 0) {
-							type = nonNull(type);
-						}
-						if (_max > 1) { // 0 could be list, 1 is NOT list, >1 list
-							type = list(type);
-						}
-						/*if (_min > 0) {
-							type = nonNull(type); // A non null type cannot wrap an existing non null type 'String!'
-						}*/
-						this.update({ type }, true); // Avoiding infinite loop by setting stopHere=true
-					} else {
-						this.update({
-							type: glue.addObjectType({
-								name: `${documentTypeName}${ucFirst(camelize(this.key, /[.]/g))}`, // Must be unique
-								fields: objToGraphQL({
-									documentTypeName,
-									obj: value
-								}) // Recurse NOTE This FLATTENES this.path :(
-							})
-						}, true); // Avoiding infinite loop by setting stopHere=true
-
-					}
-				}
-			}
-		}); // traverse
-	} // objToGraphQL
 
 	//──────────────────────────────────────────────────────────────────────────
 	// 2. Get all documentTypes mentioned in the interface collections
@@ -380,11 +325,23 @@ export function generateSchemaForInterface(interfaceName) {
 	//
 	//──────────────────────────────────────────────────────────────────────────
 
-	function documentTypeNameToGraphQLObjectTypeName(documentTypeName) {
-		return `DocumentType_${documentTypeName}`;
-	}
+	const documentTypeObjectTypes = {}; // Defined before addDynamicInterfaceTypes, populated after
 
-	const documentTypeObjectTypes = {};
+	//──────────────────────────────────────────────────────────────────────────
+	// An objectType per documentType will be generated.
+	// Global and "magic" fields will be added to an interfaceType.
+	// The list of objectTypes is used both in the interfaceType and unionType resolvers.
+	// When we define the resolvers we may use a js-reference to an empty object, which later will contain the objectTypes.
+	// When we define the unionType, we can use lib-graphql.reference, but we need to have a list of the objectType names, so we might as well use the objectTypes directly.
+	// Q: Can we use lib-graphql.reference in objectType.interfaces?
+	//──────────────────────────────────────────────────────────────────────────
+
+	addDynamicInterfaceTypes({
+		documentTypeObjectTypes, // Just an empty obj, populated later
+		glue
+	});
+
+	const interfaceTypeDocument = glue.getInterfaceType(GQL_INTERFACE_TYPE_DOCUMENT);
 	documentTypes.forEach(({
 		_name: documentTypeName,
 		properties
@@ -420,26 +377,16 @@ export function generateSchemaForInterface(interfaceName) {
 			name: documentTypeNameToGraphQLObjectTypeName(documentTypeName),
 			fields: objToGraphQL({
 				documentTypeName,
+				glue,
 				obj: mergedNestedFieldsObj
 			}),
-			interfaces: [reference(GQL_INTERFACE_DOCUMENT_NAME)] // type Document not found in schema
+			interfaces: [
+				//reference(GQL_INTERFACE_TYPE_DOCUMENT) // Error: type Document not found in schema
+				interfaceTypeDocument
+			]
 		});
 	}); // documentTypes.forEach
 	//log.debug(`documentTypeObjectTypes:${toStr(documentTypeObjectTypes)}`);
-
-	//──────────────────────────────────────────────────────────────────────────
-	// An objectType per documentType will be generated.
-	// Global and "magic" fields will be added to an interfaceType.
-	// The list of objectTypes is used both in the interfaceType and unionType resolvers.
-	// When we define the resolvers we may use a js-reference to an empty object, which later will contain the objectTypes.
-	// When we define the unionType, we can use lib-graphql.reference, but we need to have a list of the objectType names, so we might as well use the objectTypes directly.
-	// Q: Can we use lib-graphql.reference in objectType.interfaces?
-	//──────────────────────────────────────────────────────────────────────────
-
-	addDynamicInterfaceTypes({
-		documentTypeObjectTypes,
-		glue
-	});
 
 	//──────────────────────────────────────────────────────────────────────────
 
@@ -461,8 +408,6 @@ export function generateSchemaForInterface(interfaceName) {
 		}
 	});
 	//log.debug(`allFieldKeys:${toStr(allFieldKeys)}`);
-
-
 
 	fieldsRes.hits.forEach(({key}) => {
 		if (!allFieldKeys.includes(key)) {
@@ -555,67 +500,12 @@ export function generateSchemaForInterface(interfaceName) {
 	});
 
 	addDynamicInputTypes({
-		glue
+		glue,
+		highlightParameterPropertiesFields,
+		staticHighlightParameterFields
 	});
 
 	//──────────────────────────────────────────────────────────────────────────
-	// Filters
-	//──────────────────────────────────────────────────────────────────────────
-	const graphqlInputTypeFilterExistsWithDynamicFields = glue.getInputType(GQL_INPUT_TYPE_FILTER_EXISTS_WITH_DYNAMIC_FIELDS);
-	const graphqlInputTypeFilterHasValueWithDynamicFields = glue.getInputType(GQL_INPUT_TYPE_FILTER_HAS_VALUE_WITH_DYNAMIC_FIELDS);
-	const graphqlInputTypeFilterNotExistsWithDynamicFields = glue.getInputType(GQL_INPUT_TYPE_FILTER_NOT_EXISTS_WITH_DYNAMIC_FIELDS);
-
-	const GRAPHQL_INPUT_TYPE_FILTER_IDS = glue.getInputType(GQL_INPUT_TYPE_FILTER_IDS);
-
-	const graphqlInputTypeFilterBooleanDynamicFields = {
-		exists: { type: graphqlInputTypeFilterExistsWithDynamicFields },
-		hasValue: { type: graphqlInputTypeFilterHasValueWithDynamicFields },
-		ids: { type: GRAPHQL_INPUT_TYPE_FILTER_IDS },
-		notExists: { type: graphqlInputTypeFilterNotExistsWithDynamicFields }
-	};
-
-	const graphqlInputTypeFilterBooleanWithDynamicFields = glue.addInputType({
-		name: 'InputTypeFilterBooleanWithDynamicFields',
-		fields: {
-			must: { type: list(glue.addInputType({
-				name: 'InputTypeFilterBooleanMust',
-				fields: graphqlInputTypeFilterBooleanDynamicFields
-			}))},
-			mustNot: { type: list(glue.addInputType({
-				name: 'InputTypeFilterBooleanMustNot',
-				fields: graphqlInputTypeFilterBooleanDynamicFields
-			}))},
-			should: { type: list(glue.addInputType({
-				name: 'InputTypeFilterBooleanShould',
-				fields: graphqlInputTypeFilterBooleanDynamicFields
-			}))}
-		}
-	});
-
-	//──────────────────────────────────────────────────────────────────────────
-
-	const highlightProperties = glue.addInputType({
-		name: 'HighlightParameterProperties',
-		fields: highlightParameterPropertiesFields
-	});
-
-	const interfaceSearchHitsFields = {
-		_collectionId: { type: nonNull(GraphQLID) },
-		_collectionName: { type: nonNull(GraphQLString) },
-		_documentTypeId: { type: nonNull(GraphQLString) },
-		_documentTypeName: { type: nonNull(GraphQLString) },
-		_highlight: { type: glue.addObjectType({
-			name: 'InterfaceSearchHitsHighlights',
-			fields: interfaceSearchHitsHighlightsFields // This list can't be empty when createObjectType is called?
-		})},
-		_json: { type: GraphQLJson },
-		_repoId: { type: nonNull(GraphQLString) },
-		_score: { type: GraphQLFloat }
-	};
-	//log.debug(`Object.keys(interfaceSearchHitsFieldsFromSchema):${toStr(Object.keys(interfaceSearchHitsFieldsFromSchema))}`);
-	Object.keys(interfaceSearchHitsFieldsFromSchema).forEach((k) => {
-		interfaceSearchHitsFields[k] = interfaceSearchHitsFieldsFromSchema[k];
-	});
 
 	function searchResolver(env) {
 		const {
@@ -633,38 +523,10 @@ export function generateSchemaForInterface(interfaceName) {
 
 		//log.debug(`aggregationsArg:${toStr(aggregationsArg)}`);
 
-		function aggregationsArgToQueryParamAndTypes(aggregationsArray = []) {
-			//log.debug(`aggregationsArray:${toStr(aggregationsArray)}`);
-			const aggregationsObj = {};
-			const typesObj = {};
-			//log.debug(`aggregationsArray:${toStr(aggregationsArray)}`);
-			aggregationsArray.forEach(({
-				name,
-				subAggregations,
-				...rest
-			}) => {
-				//log.debug(`rest:${toStr(rest)}`);
-				/*if (isSet(aggregations[name])) {
-					// TODO Throw GraphQLError
-				}*/
-				typesObj[name] = { type: Object.keys(rest)[0] };
-				if (rest[Object.keys(rest)[0]].field) {
-					// TODO Workaround related to https://github.com/enonic/app-explorer/issues/275
-					rest[Object.keys(rest)[0]].field = camelToFieldObj[rest[Object.keys(rest)[0]].field];
-				}
-				aggregationsObj[name] = rest;
-				if (subAggregations) {
-					[
-						aggregationsObj[name].aggregations,
-						typesObj[name].types
-					] = aggregationsArgToQueryParamAndTypes(
-						subAggregations,
-					); // recurse
-				}
-			});
-			return [aggregationsObj, typesObj];
-		}
-		const [aggregations, types] = aggregationsArgToQueryParamAndTypes(aggregationsArg);
+		const [aggregations, types] = aggregationsArgToQueryParamAndTypes({
+			aggregationsArray: aggregationsArg,
+			camelToFieldObj
+		});
 		//log.debug(`aggregations:${toStr(aggregations)}`);
 		//log.debug(`types:${toStr(types)}`);
 
@@ -767,66 +629,10 @@ export function generateSchemaForInterface(interfaceName) {
 		const queryRes = multiRepoReadConnection.query(queryParams);
 		//log.debug(`queryRes:${toStr(queryRes)}`);
 
-		function queryResAggregationsObjToArray(obj, localTypes = types) {
-			//log.debug(`obj:${toStr(obj)}`);
-			//log.debug(`localTypes:${toStr(localTypes)}`);
-			return Object.keys(obj).map((name) => {
-				//log.debug(`name:${toStr(name)}`);
-				const anAggregation = obj[name];
-				//log.debug(`anAggregation:${toStr(anAggregation)}`);
-				const {
-					//avg, TODO https://github.com/enonic/xp/issues/9003
-					buckets,
-					count,
-					//max,
-					//min,
-					sum,
-					value
-				} = anAggregation;
-				/*log.debug(`avg:${toStr(avg)}`);
-				log.debug(`typeof avg:${toStr(typeof avg)}`);
-				log.debug(`parseFloat(avg):${toStr(parseFloat(avg))}`);
-				log.debug(`typeof parseFloat(avg):${toStr(typeof parseFloat(avg))}`);*/
-				const rAggregation = {
-					count,
-					name,
-					sum,
-					type: aggregationQueryTypeToGraphQLType(localTypes[name].type)
-				};
-				/*if (isSet(avg) && isSet(parseFloat(avg))) {rAggregation.avg = avg;}
-				if (isSet(max) && isSet(parseFloat(max))) {rAggregation.max = max;}
-				if (isSet(min) && isSet(parseFloat(min))) {rAggregation.min = min;}*/
-				if (buckets) {
-					rAggregation.buckets = buckets.map(({
-						docCount,
-						from,
-						key,
-						to,
-						...rest
-					}) => {
-						const rBucket = {
-							docCount,
-							key
-						};
-						if (isSet(from) || isSet(to)) {
-							rAggregation.from = from;
-							rAggregation.to = to;
-						}
-						//log.debug(`rest:${toStr(rest)}`);
-						if (Object.keys(rest).length) {
-							rBucket.subAggregations = queryResAggregationsObjToArray(rest, types[name].types); // Recurse
-						}
-						return rBucket;
-					}); // map buckets
-				} else {
-					if (isSet(value)) {
-						rAggregation.value = value;
-					}
-				} // if buckets
-				return rAggregation;
-			}); // map names
-		}
-		queryRes.aggregations = queryResAggregationsObjToArray(queryRes.aggregations);
+		queryRes.aggregations = queryResAggregationsObjToArray({
+			obj:queryRes.aggregations,
+			types
+		});
 		//log.debug(`queryRes.aggregations:${toStr(queryRes.aggregations)}`);
 
 		queryRes.aggregationsAsJson = JSON.stringify(queryRes.aggregations);
@@ -853,9 +659,9 @@ export function generateSchemaForInterface(interfaceName) {
 
 			// Old way to provide a field once per all valueTypes (cast into that valueType, or null if cast fails)
 			Object.keys(washedNode).forEach((k) => {
-				log.debug(`k:${toStr(k)}`);
+				//log.debug(`k:${toStr(k)}`);
 				VALUE_TYPE_VARIANTS.forEach((v) => {
-					log.debug(`v:${toStr(v)}`);
+					//log.debug(`v:${toStr(v)}`);
 					let value = washedNode[k];
 					//java.time.OffsetDateTime
 					//log.debug(`k:${k} value:${value} toStr(value):${toStr(value)} typeof value:${typeof value} Object.prototype.toString.call(value):${Object.prototype.toString.call(value)}`);
@@ -1017,7 +823,7 @@ export function generateSchemaForInterface(interfaceName) {
 						}
 					}
 				});
-			}
+			} // if (highlight)
 
 			//log.debug(`repoId:${repoId} repoIdObj[repoId]:${toStr(repoIdObj[repoId])}`);
 			const {
@@ -1038,261 +844,43 @@ export function generateSchemaForInterface(interfaceName) {
 			washedNode._score = score;
 			/* eslint-enable no-underscore-dangle */
 			return washedNode;
-		});
+		}); // queryRes.hits.map
 		//log.debug(`queryRes:${toStr(queryRes)}`);
 
 		return queryRes;
-	} // queryRes.hits.map
+	} // searchResolver ?
 
-	const objectTypeInterfaceSearchHit = glue.addObjectType({
-		name: 'InterfaceSearchHits',
-		fields: interfaceSearchHitsFields
-	});
-
+	// Must be after populating documentTypeObjectTypes
+	// Must be before addDynamicObjectTypes
 	addDynamicUnionTypes({
-		documentTypeObjectTypes,
+		documentTypeObjectTypes, // Must be populated already, since used in types inside
 		glue
 	});
-	const documentTypesUnion = glue.getUnionType(GQL_UNION_TYPE_DOCUMENT_TYPES);
 
-	const GQL_OBJECT_TYPE_AGGREGATIONS_UNION = glue.getUnionType(GQL_OBJECT_TYPE_AGGREGATIONS_UNION_NAME);
-
-	//const OBJECT_TYPE_AGGREGATIONS_NAME = 'InterfaceSearchAggregations';
-	const objectTypeInterfaceSearch = glue.addObjectType({
-		name: GQL_OBJECT_TYPE_INTERFACE_SEARCH,
-		fields: {
-			aggregations: { type: list(GQL_OBJECT_TYPE_AGGREGATIONS_UNION) },
-			aggregationsAsJson: { type: GraphQLJson },
-			count: { type: nonNull(GraphQLInt) },
-			//hits: { type: list(objectTypeInterfaceSearchHit)},
-			hits: { type: list(documentTypesUnion)},
-			total: { type: nonNull(GraphQLInt) }
-		}
+	addDynamicObjectTypes({ // Must be after addDynamicUnionTypes
+		glue,
+		interfaceSearchHitsFieldsFromSchema,
+		interfaceSearchHitsHighlightsFields
 	});
 
-	//──────────────────────────────────────────────────────────────────────────
-	// Dynamic Input Types
-	//──────────────────────────────────────────────────────────────────────────
-	const enumFieldsKeysForAggreations = glue.getEnumType(GQL_ENUM_FIELD_KEYS_FOR_AGGREGATIONS);
-
-	const inputTypeAggregationCount = glue.addInputType({
-		name: 'InputObjectTypeAggregationCount',
-		fields: {
-			field: {
-				type: nonNull(enumFieldsKeysForAggreations)
-			}
-		}
-	});
-	const inputTypeAggregationDateHistogram = glue.addInputType({
-		name: 'InputObjectTypeAggregationDateHistogram',
-		fields: {
-			field: {
-				type: nonNull(enumFieldsKeysForAggreations)
-			},
-			format: { // yyyy-MM-dd’T’HH:mm:ss.SSSZ
-				type: GraphQLString
-			},
-			interval: { // y M d H m s
-				type: GraphQLString
-			},
-			minDocCount: {
-				type: GraphQLInt
-			}
-		}
-	});
-	const inputTypeAggregationDateRange = glue.addInputType({
-		name: 'InputObjectTypeAggregationDateRange',
-		fields: {
-			field: {
-				//type: nonNull(GraphQLString)
-				type: nonNull(enumFieldsKeysForAggreations)
-			},
-			format: { // yyyy-MM-dd’T’HH:mm:ss.SSSZ
-				type: GraphQLString
-			},
-			ranges: {
-				type: list(glue.addInputType({
-					name: 'InputObjectTypeAggregationDateRangeRanges',
-					fields: {
-						from: { type: GraphQLString },
-						to: { type: GraphQLString }
-					}
-				}))
-			}
-		}
-	});
-	const inputTypeAggregationGeoDistance = glue.addInputType({
-		name: 'InputObjectTypeAggregationGeoDistance',
-		fields: {
-			field: {
-				//type: nonNull(GraphQLString)
-				type: nonNull(enumFieldsKeysForAggreations)
-			},
-			origin: {
-				type: glue.addInputType({
-					name: 'InputObjectTypeAggregationGeoDistanceOrigin',
-					fields: {
-						lat: { type: GraphQLString },
-						lon: { type: GraphQLString }
-					}
-				})
-			},
-			ranges: {
-				type: list(glue.addInputType({
-					name: 'InputObjectTypeAggregationGeoDistanceRanges',
-					fields: {
-						from: { type: GraphQLFloat },
-						to: { type: GraphQLFloat }
-					}
-				}))
-			},
-			unit: {
-				type: nonNull(glue.getEnumType(GQL_ENUM_AGGREGATION_GEO_DISTANCE_UNITS))
-			}
-		}
-	});
-	const inputTypeAggregationMax = glue.addInputType({
-		name: 'InputObjectTypeAggregationMax',
-		fields: {
-			field: {
-				//type: nonNull(GraphQLString)
-				type: nonNull(enumFieldsKeysForAggreations)
-			}
-		}
-	});
-	const inputTypeAggregationMin = glue.addInputType({
-		name: 'InputObjectTypeAggregationMin',
-		fields: {
-			field: {
-				//type: nonNull(GraphQLString)
-				type: nonNull(enumFieldsKeysForAggreations)
-			}
-		}
-	});
-	const inputTypeAggregationRange = glue.addInputType({
-		name: 'InputObjectTypeAggregationRange',
-		fields: {
-			field: {
-				//type: nonNull(GraphQLString)
-				type: nonNull(enumFieldsKeysForAggreations)
-			},
-			ranges: {
-				type: list(glue.addInputType({
-					name: 'InputObjectTypeAggregationRangeRanges',
-					fields: {
-						from: { type: GraphQLFloat },
-						to: { type: GraphQLFloat }
-					}
-				}))
-			}
-		}
-	});
-	const inputTypeAggregationStats = glue.addInputType({
-		name: 'InputObjectTypeAggregationStats',
-		fields: {
-			field: {
-				//type: nonNull(GraphQLString)
-				type: nonNull(enumFieldsKeysForAggreations)
-			}
-		}
-	});
-	const inputTypeAggregationTerms = glue.addInputType({
-		name: 'InputObjectTypeAggregationTerms',
-		fields: {
-			field: {
-				//type: nonNull(GraphQLString)
-				type: nonNull(enumFieldsKeysForAggreations)
-			},
-			order: {
-				type: GraphQLString
-			},
-			size: {
-				type: GraphQLInt
-			},
-			minDocCount: {
-				type: GraphQLInt
-			}
-		}
-	});
-
-	const inputObjectTypeAggregations = glue.addInputType({
-		name: 'InputObjectTypeAggregations',
-		fields: {
-			name: { type: nonNull(GraphQLString) },
-			count: { type: inputTypeAggregationCount },
-			dateHistogram: { type: inputTypeAggregationDateHistogram },
-			dateRange: { type: inputTypeAggregationDateRange },
-			geoDistance: { type: inputTypeAggregationGeoDistance },
-			// max, min and stats makes no sense on top level
-			range: { type: inputTypeAggregationRange },
-			terms: { type: inputTypeAggregationTerms },
-			subAggregations: {
-				type: list(glue.addInputType({
-					name: GQL_INPUT_OBJECT_TYPE_SUB_AGGREGATIONS_NAME,
-					fields: {
-						name: { type: nonNull(GraphQLString) },
-						count: { type: inputTypeAggregationCount },
-						dateHistogram: { type: inputTypeAggregationDateHistogram },
-						dateRange: { type: inputTypeAggregationDateRange },
-						geoDistance: { type: inputTypeAggregationGeoDistance },
-						max: { type: inputTypeAggregationMax },
-						min: { type: inputTypeAggregationMin },
-						stats: { type: inputTypeAggregationStats },
-						range: { type: inputTypeAggregationRange },
-						terms: { type: inputTypeAggregationTerms },
-						subAggregations: {
-							type: list(reference(GQL_INPUT_OBJECT_TYPE_SUB_AGGREGATIONS_NAME))
-						}
-					} // fields
-				}))
-			}
-		} // fields
-	});
-
-	const inputObjectTypeFilters = glue.addInputType({
-		name: 'FiltersParameter',
-		fields: {
-			boolean: {
-				//type: GRAPHQL_INPUT_TYPE_FILTER_BOOLEAN
-				type: graphqlInputTypeFilterBooleanWithDynamicFields
-			},
-			exists: {
-				//type: GRAPHQL_INPUT_TYPE_FILTER_EXISTS
-				type: graphqlInputTypeFilterExistsWithDynamicFields
-			},
-			hasValue: {
-				//type: GRAPHQL_INPUT_TYPE_FILTER_HAS_VALUE
-				type: graphqlInputTypeFilterHasValueWithDynamicFields
-			},
-			ids: { type: GRAPHQL_INPUT_TYPE_FILTER_IDS },
-			notExists: {
-				//type: GRAPHQL_INPUT_TYPE_FILTER_NOT_EXISTS
-				type: graphqlInputTypeFilterNotExistsWithDynamicFields
-			}
-		}
-	});
-
-	const inputObjectTypeHighlight = glue.addInputType({
-		name: 'HighlightParameter',
-		fields: {
-			...staticHighlightParameterFields,
-			properties: { type: highlightProperties }
-		}
-	});
+	const objectTypeInterfaceSearch = glue.getObjectType(GQL_OBJECT_TYPE_INTERFACE_SEARCH);
+	const inputTypeAggregation = glue.getInputType(GQL_INPUT_TYPE_AGGREGATION);
+	const inputTypeFilters = glue.getInputType(GQL_INPUT_TYPE_FILTERS);
+	const inputTypeHighlight = glue.getInputType(GQL_INPUT_TYPE_HIGHLIGHT);
 
 	return createSchema({
 		//dictionary:,
 		//mutation:,
 		query: glue.addObjectType({
-			name: 'Query',
+			name: GQL_OBJECT_TYPE_QUERY,
 			fields: {
 				getSearchConnection: {
 					args: {
 						after: GraphQLString,
-						aggregations: list(inputObjectTypeAggregations),
-						filters: inputObjectTypeFilters,
+						aggregations: list(inputTypeAggregation),
+						filters: inputTypeFilters,
 						first: GraphQLInt,
-						highlight: inputObjectTypeHighlight,
+						highlight: inputTypeHighlight,
 						searchString: GraphQLString
 					},
 					resolve(env) {
@@ -1325,85 +913,14 @@ export function generateSchemaForInterface(interfaceName) {
 						return res;
 					},
 					//type: createConnectionType(schemaGenerator, objectTypeInterfaceSearch)
-					type: glue.addObjectType({
-						name: 'InterfaceSearchConnection',
-						fields: {
-							totalCount: {
-								resolve: (env) => env.source.total,
-								type: nonNull(GraphQLInt)
-							},
-							edges: {
-								resolve(env) {
-									//log.debug(`edges env:${toStr({env})}`);
-									let hits = env.source.hits;
-									let edges = [];
-									for (let i = 0; i < hits.length; i++) {
-										edges.push({
-											node: hits[i],
-											cursor: env.source.start + i
-										});
-									}
-									//log.debug(`edges:${toStr({edges})}`);
-									return edges;
-								},
-								type: list(glue.addObjectType({
-									name: 'InterfaceSearchConnectionEdge',
-									fields: {
-										cursor: {
-											type: nonNull(GraphQLString),
-											resolve(env) {
-												//log.debug(`cursor env:${toStr({env})}`);
-												return env.source.cursor;
-											}
-										},
-										node: {
-											type: objectTypeInterfaceSearchHit,
-											resolve(env) {
-												//log.debug(`node env:${toStr({env})}`);
-												return env.source.node;
-											}
-										}
-									}
-								}))
-							},
-							pageInfo: {
-								resolve(env) {
-									let count = env.source.hits.length;
-									return {
-										startCursor: env.source.start,
-										endCursor: env.source.start + (count === 0 ? 0 : (count - 1)),
-										hasNext: (env.source.start + count) < env.source.total
-									};
-								},
-								type: glue.addObjectType({
-									name: 'InterfaceSearchConnectionPageInfo',
-									fields: {
-										endCursor: {
-											type: nonNull(GraphQLString),
-											resolve: (env) => encodeCursor(env.source.endCursor)
-										},
-										hasNext: {
-											type: nonNull(GraphQLBoolean),
-											resolve: (env) => env.source.hasNext
-										},
-										startCursor: {
-											type: nonNull(GraphQLString),
-											resolve: (env) => encodeCursor(env.source.startCursor)
-										}
-									}
-								})
-							},
-							aggregations: { type: list(GQL_OBJECT_TYPE_AGGREGATIONS_UNION) },
-							aggregationsAsJson: { type: GraphQLJson }
-						}
-					})
+					type: glue.getObjectType(GQL_OBJECT_TYPE_INTERFACE_SEARCH_CONNECTION)
 				},
 				search: {
 					args: {
-						aggregations: list(inputObjectTypeAggregations),
+						aggregations: list(inputTypeAggregation),
 						count: GraphQLInt,
-						filters: inputObjectTypeFilters,
-						highlight: inputObjectTypeHighlight,
+						filters: inputTypeFilters,
+						highlight: inputTypeHighlight,
 						searchString: GraphQLString,
 						start: GraphQLInt
 					},
