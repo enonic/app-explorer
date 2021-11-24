@@ -32,11 +32,11 @@ import {
 import {
 	GQL_INPUT_FIELDS_HIGHLIGHT_PROPERTIES,
 	GQL_INTERFACE_TYPE_DOCUMENT,
-	GQL_OBJECT_TYPE_GLOBAL_FIELD,
-	VALUE_TYPE_JSON
+	GQL_OBJECT_TYPE_GLOBAL_FIELD
 } from './constants';
 import {constructGlue} from './Glue';
 import {addStaticTypes} from './static/addStaticTypes';
+import {buildGlobalFieldsObj} from './buildGlobalFieldsObj';
 import {documentTypeNameToGraphQLObjectTypeName} from './documentTypeNameToGraphQLObjectTypeName';
 import {objToGraphQL} from './objToGraphQL';
 import {valueTypeToGraphQLType} from './valueTypeToGraphQLType';
@@ -63,17 +63,72 @@ const VALUE_TYPE_VARIANTS = [
 	VALUE_TYPE_STRING
 ];
 
+/*──────────────────────────────────────────────────────────────────────────────
+In order to make a documentTypesUnion supporting GraphQL inline fragments (... on documentType)
+I have to make one objectType per documentType and it needs a unqiue name
+It needs all global fields, and all documentType local fields
+────────────────────────────────────────────────────────────────────────────────
+This document:
+	{
+		person: {
+			age: 30,
+			name: 'John'
+		}
+	}
+
+Should be covered by this documentType:
+	fields: [
+		//{ key: 'person', valueType: 'Set' } // This entry is optional
+		{ key: 'person.age', valueType: 'Long' }
+		{ key: 'person.name', valueType: 'String' }
+	]
+
+Should end up like this GraphQL schema:
+	fields: {
+		person: {
+			type: ObjectType({
+				name: 'Person',
+				fields: {
+					age: { type: GraphQLInt },
+					name: { type: GraphQLString }
+				}
+			})
+		}
+	}
+
+Using setIn I can make this intermediary:
+	{
+		person: {
+			_valueType: 'Set',
+			age: {
+				_valueType: 'Long',
+			},
+			name: {
+				_valueType: 'String',
+			}
+		}
+	}
+And then use traverse to build the GraphQL schema?
+────────────────────────────────────────────────────────────────────────────────
+Global fields can be overridden, let's think about some scenarios:
+
+Scenario A:
+ * Global field person is a Set, with two sub fields name and age
+ * Local field person is a String
+ Merged documentType should have person as a String. An no mention of name and age.
+
+Scenario B:
+ * Global field person is a String
+ * Local field person is a Set with subfields name and age
+ Merged documentType should have person as a Set with subfields name and age.
+────────────────────────────────────────────────────────────────────────────*/
 
 export function generateSchemaForInterface(interfaceName) {
 	const glue = constructGlue({schemaGenerator});
 	addStaticTypes(glue);
 
 	//──────────────────────────────────────────────────────────────────────────
-	// In order to make a documentTypesUnion supporting GraphQL inline fragments (... on documentType)
-	// I have to make one objectType per documentType and it needs a unqiue name
-	// It needs all global fields, and all documentType local fields
-	//──────────────────────────────────────────────────────────────────────────
-	// 1. Get all global fields, and make a spreadable fields object to reuse and override per docmentType
+	// 1. Get all global fields, and make a spreadable fields object to reuse and override per documentType
 	//──────────────────────────────────────────────────────────────────────────
 	const explorerRepoReadConnection = connect({ principals: [PRINCIPAL_EXPLORER_READ] });
 	const fieldsRes = getFields({ // Note these are sorted 'key ASC'
@@ -83,109 +138,8 @@ export function generateSchemaForInterface(interfaceName) {
 	//log.debug(`fieldsRes:${toStr(fieldsRes)}`);
 	//log.debug(`fieldsRes.hits[0]:${toStr(fieldsRes.hits[0])}`);
 
-	/*────────────────────────────────────────────────────────────────────────────
-	This document:
-		{
-			person: {
-				age: 30,
-				name: 'John'
-			}
-		}
-
-	Should be covered by this documentType:
-		fields: [
-			//{ key: 'person', valueType: 'Set' } // This entry is optional
-			{ key: 'person.age', valueType: 'Long' }
-			{ key: 'person.name', valueType: 'String' }
-		]
-
-	Should end up like this GraphQL schema:
-		fields: {
-			person: {
-				type: ObjectType({
-					name: 'Person',
-					fields: {
-						age: { type: GraphQLInt },
-						name: { type: GraphQLString }
-					}
-				})
-			}
-		}
-
-	Using setIn I can make this intermediary:
-		{
-			person: {
-				_valueType: 'Set',
-				age: {
-					_valueType: 'Long',
-				},
-				name: {
-					_valueType: 'String',
-				}
-			}
-		}
-	And then use traverse to build the GraphQL schema?
-	────────────────────────────────────────────────────────────────────────────*/
 	const camelToFieldObj = {};
-	const nestedFieldsObj = { // NOTE Hardcoded common fields, which are not currently system fields
-		_collectionId: {
-			_max: 1,
-			_min: 1,
-			_valueType: VALUE_TYPE_REFERENCE
-		},
-		_collectionName: {
-			_max: 1,
-			_min: 1,
-			_valueType: VALUE_TYPE_STRING
-		},
-		_documentTypeId: {
-			_max: 1,
-			_min: 1,
-			_valueType: VALUE_TYPE_REFERENCE
-		},
-		_documentTypeName: {
-			_max: 1,
-			_min: 1,
-			_valueType: VALUE_TYPE_STRING
-		},
-		_json: {
-			_max: 1,
-			_min: 1,
-			_valueType: VALUE_TYPE_JSON
-		},
-		//_highlight, // TODO ???
-		_repoId: {
-			_max: 1,
-			_min: 1,
-			_valueType: VALUE_TYPE_REFERENCE
-		},
-		_score: {
-			_max: 1,
-			_min: 1,
-			_valueType: VALUE_TYPE_DOUBLE
-		}
-	};
-	fieldsRes.hits.forEach(({ // TODO traverse
-		fieldType: valueType,
-		inResults,
-		//isSystemField = false,
-		key,
-		max = 0,
-		min = 0
-	}) => {
-		const camelizedFieldPath = key.split('.').map((k) => camelize(k, /[-]/g)).join('.');
-		//log.debug(`inResults:${toStr(inResults)} key:${toStr(key)} camelizedFieldPath:${toStr(camelizedFieldPath)}`);
-
-		if (inResults !== false) {
-			setIn(nestedFieldsObj, camelizedFieldPath, {
-				//_isSystemField: isSystemField,
-				_max: max,
-				_min: min,
-				_valueType: valueType
-			}, { merge: true });
-		}
-	});
-	//log.debug(`nestedFieldsObj:${toStr(nestedFieldsObj)}`);
+	const nestedFieldsObj = buildGlobalFieldsObj({fieldsRes});
 
 	//──────────────────────────────────────────────────────────────────────────
 	// 2. Get all documentTypes mentioned in the interface collections
@@ -229,21 +183,7 @@ export function generateSchemaForInterface(interfaceName) {
 
 	//──────────────────────────────────────────────────────────────────────────
 	// 3. Make one objectType per documentType
-	//
-	// Global fields can be overridden, let's think about some scenarios:
-	//
-	// Scenario A:
-	//  * Global field person is a Set, with two sub fields name and age
-	//  * Local field person is a String
-	//  Merged documentType should have person as a String. An no mention of name and age.
-	//
-	// Scenario B:
-	//  * Global field person is a String
-	//  * Local field person is a Set with subfields name and age
-	//  Merged documentType should have person as a Set with subfields name and age.
-	//
 	//──────────────────────────────────────────────────────────────────────────
-
 	const documentTypeObjectTypes = {}; // Defined before addDynamicInterfaceTypes, populated after
 
 	//──────────────────────────────────────────────────────────────────────────
