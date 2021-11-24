@@ -1,5 +1,7 @@
 import hasOwn from 'object.hasown';
 
+import {GQL_OBJECT_TYPE_QUERY} from './constants';
+
 
 if (!Object.hasOwn) {
 	hasOwn.shim();
@@ -153,6 +155,37 @@ function getInterfaceTypeObject(name) {
 }
 
 
+function addQueryField({
+	args = {},
+	name,
+	resolve,// = () => {},
+	type
+}) {
+	if(this.queryFields[name]) {
+		throw new Error(`Name ${name} already added!`);
+	}
+	this.queryFields[name] = {
+		args,
+		resolve,
+		type
+	};
+	return this.queryFields[name];
+}
+
+
+function buildSchema() {
+	return this.schemaGenerator.createSchema({
+		//dictionary:,
+		//mutation:,
+		query: this.addObjectType({
+			name: GQL_OBJECT_TYPE_QUERY,
+			fields: this.queryFields
+		})//,
+		//subscription:
+	});
+}
+
+
 export function constructGlue({
 	schemaGenerator
 }) {
@@ -161,7 +194,9 @@ export function constructGlue({
 		addInputType, // function
 		addInterfaceType, // function
 		addObjectType, // function
+		addQueryField, // function
 		addUnionType, // function
+		buildSchema, // function
 		enumTypes: {},
 		getEnumType, // function
 		getInputType, // function
@@ -174,6 +209,7 @@ export function constructGlue({
 		inputTypes: {},
 		interfaceTypes: {},
 		objectTypes: {},
+		queryFields: {},
 		schemaGenerator,
 		unionTypes: {},
 		uniqueNames: {}
