@@ -1,4 +1,7 @@
-import {isSet} from '@enonic/js-utils';
+import {
+	forceArray,
+	isSet
+} from '@enonic/js-utils';
 
 import {PRINCIPAL_EXPLORER_READ} from '/lib/explorer/model/2/constants';
 import {connect} from '/lib/explorer/repo/connect';
@@ -7,6 +10,7 @@ import {filter as filterInterface} from '/lib/explorer/interface/filter';
 
 
 export function getInterfaceInfo({
+	fieldsRes,
 	interfaceName
 }) {
 	const explorerRepoReadConnection = connect({ principals: [PRINCIPAL_EXPLORER_READ] });
@@ -47,9 +51,38 @@ export function getInterfaceInfo({
 	const documentTypes = explorerRepoReadConnection.get(documentTypeIds);
 	//log.debug(`documentTypes:${toStr(documentTypes)}`);
 
+	const allFieldKeys = [];
+
+	const documentTypeIdToName = {};
+	documentTypes.forEach(({
+		_id: documentTypeId,
+		_name: documentTypeName,
+		properties
+	}) => {
+		documentTypeIdToName[documentTypeId] = documentTypeName;
+		if (properties) {
+			forceArray(properties).forEach(({name}) => {
+				if (!allFieldKeys.includes(name)) {
+					allFieldKeys.push(name);
+				}
+			});
+		}
+	});
+	//log.debug(`allFieldKeys:${toStr(allFieldKeys)}`);
+
+	fieldsRes.hits.forEach(({key}) => {
+		if (!allFieldKeys.includes(key)) {
+			allFieldKeys.push(key);
+		}
+	});
+	allFieldKeys.sort();
+	//log.debug(`allFieldKeys:${toStr(allFieldKeys)}`);
+
 	return {
+		allFieldKeys,
 		collections,
 		collectionIdToDocumentTypeId,
+		documentTypeIdToName,
 		documentTypes,
 		fields,
 		stopWords

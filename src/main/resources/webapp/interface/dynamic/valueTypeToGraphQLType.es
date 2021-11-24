@@ -25,7 +25,7 @@ import {
 	LocalTime as GraphQLLocalTime
 } from '/lib/graphql';
 
-import {VALUE_TYPE_JSON} from './constants';
+import {VALUE_TYPE_JSON} from '../constants';
 
 
 export function valueTypeToGraphQLType(valueType) {
