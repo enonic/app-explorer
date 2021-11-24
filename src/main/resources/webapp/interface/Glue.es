@@ -11,7 +11,7 @@ if (!Object.hasOwn) {
 /*
 
 Goals:
- 1. GraphQL names must be unique
+ 1. GraphQL type names must be unique
  2. Avoid unused names?
  3. Easy access to all types
 
@@ -37,6 +37,22 @@ function addEnumType({
 
 function getEnumType(name) {
 	return this.enumTypes[name];
+}
+
+
+function addInputFields({
+	_name,
+	...rest
+}) {
+	if (this.inputFields[_name]) {
+		throw new Error(`InputFields ${_name} already added!`);
+	}
+	this.inputFields[_name] = rest;
+	return this.inputFields[_name];
+}
+
+function getInputFields(name) {
+	return this.inputFields[name];
 }
 
 
@@ -191,6 +207,7 @@ export function constructGlue({
 }) {
 	return {
 		addEnumType, // function
+		addInputFields, // function
 		addInputType, // function
 		addInterfaceType, // function
 		addObjectType, // function
@@ -199,6 +216,7 @@ export function constructGlue({
 		buildSchema, // function
 		enumTypes: {},
 		getEnumType, // function
+		getInputFields, // function
 		getInputType, // function
 		getInterfaceType, // function
 		getInterfaceTypeFields, // function
@@ -206,6 +224,7 @@ export function constructGlue({
 		getObjectType, // function
 		getUnionType, // function
 		//getUnionTypeResolver, // function
+		inputFields: {},
 		inputTypes: {},
 		interfaceTypes: {},
 		objectTypes: {},

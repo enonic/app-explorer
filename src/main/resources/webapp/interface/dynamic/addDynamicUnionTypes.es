@@ -3,7 +3,7 @@ import {toStr} from '@enonic/js-utils';
 import {
 	GQL_OBJECT_TYPE_GLOBAL_FIELD,
 	GQL_UNION_TYPE_DOCUMENT_TYPES
-} from './constants';
+} from '../constants';
 
 
 export function addDynamicUnionTypes({
@@ -28,7 +28,7 @@ export function addDynamicUnionTypes({
 		// Perhaps this has smaller footprint?
 		//types: Object.keys(documentTypeObjectTypes).map((documentTypeName) => reference(documentTypeNameToGraphQLObjectTypeName(documentTypeName))),
 		typeResolver(node) {
-			log.debug(`addUnionType name:${GQL_UNION_TYPE_DOCUMENT_TYPES} typeResolver node:${toStr(node)}`);
+			//log.debug(`addUnionType name:${GQL_UNION_TYPE_DOCUMENT_TYPES} typeResolver node:${toStr(node)}`);
 			const {
 				//_documentTypeId
 				_documentTypeName

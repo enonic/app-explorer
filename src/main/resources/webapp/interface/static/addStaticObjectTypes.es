@@ -18,7 +18,7 @@ import {
 	GQL_OBJECT_TYPE_AGGREGATION_STATS_NAME,
 	GQL_OBJECT_TYPE_AGGREGATION_TERMS_NAME,
 	GQL_OBJECT_TYPE_AGGREGATIONS_UNION_NAME
-} from './constants';
+} from '../constants';
 
 
 export function addStaticObjectTypes(glue) {

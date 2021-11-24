@@ -4,7 +4,7 @@ import {
 	GQL_ENUM_HIGHLIGHT_OPTION_FRAGMENTERS,
 	GQL_ENUM_HIGHLIGHT_OPTION_ORDERS,
 	GQL_ENUM_HIGHLIGHT_OPTION_TAG_SCHEMAS
-} from './constants';
+} from '../constants';
 
 
 export function addStaticEnumTypes(glue) {
