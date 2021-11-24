@@ -1,5 +1,4 @@
 import {
-	//VALUE_TYPE_ANY,
 	VALUE_TYPE_BOOLEAN,
 	VALUE_TYPE_DOUBLE,
 	VALUE_TYPE_GEO_POINT,
@@ -9,19 +8,16 @@ import {
 	VALUE_TYPE_LOCAL_TIME,
 	VALUE_TYPE_LONG,
 	VALUE_TYPE_REFERENCE,
-	//VALUE_TYPE_SET,
 	VALUE_TYPE_STRING,
 	camelize,
 	forceArray,
-	isSet,
 	ucFirst
 } from '@enonic/js-utils';
 import 'reflect-metadata';
 import setIn from 'set-value'; // Number.isInteger and Reflect
 
 import {getFields} from '/lib/explorer/field/getFields';
-import {get as getInterface} from '/lib/explorer/interface/get';
-import {filter as filterInterface} from '/lib/explorer/interface/filter';
+
 import {PRINCIPAL_EXPLORER_READ} from '/lib/explorer/model/2/constants';
 import {connect} from '/lib/explorer/repo/connect';
 import {
@@ -43,13 +39,13 @@ import {valueTypeToGraphQLType} from './valueTypeToGraphQLType';
 import {addDynamicTypes} from './dynamic/addDynamicTypes';
 import {addDynamicInterfaceTypes} from './dynamic/addDynamicInterfaceTypes';
 import {buildSchema} from './buildSchema';
+import {getInterfaceInfo} from './getInterfaceInfo';
 
 
 const schemaGenerator = newSchemaGenerator();
 //import {DEFAULT_INTERFACE_FIELDS} from '../constants';
 
 const VALUE_TYPE_VARIANTS = [
-	//VALUE_TYPE_ANY,
 	VALUE_TYPE_BOOLEAN,
 	VALUE_TYPE_DOUBLE,
 	VALUE_TYPE_GEO_POINT,
@@ -59,7 +55,6 @@ const VALUE_TYPE_VARIANTS = [
 	VALUE_TYPE_LOCAL_TIME,
 	VALUE_TYPE_LONG,
 	VALUE_TYPE_REFERENCE,
-	//VALUE_TYPE_SET,
 	VALUE_TYPE_STRING
 ];
 
@@ -130,9 +125,8 @@ export function generateSchemaForInterface(interfaceName) {
 	//──────────────────────────────────────────────────────────────────────────
 	// 1. Get all global fields, and make a spreadable fields object to reuse and override per documentType
 	//──────────────────────────────────────────────────────────────────────────
-	const explorerRepoReadConnection = connect({ principals: [PRINCIPAL_EXPLORER_READ] });
 	const fieldsRes = getFields({ // Note these are sorted 'key ASC'
-		connection: explorerRepoReadConnection,
+		connection: connect({ principals: [PRINCIPAL_EXPLORER_READ] }),
 		includeSystemFields: true
 	});
 	//log.debug(`fieldsRes:${toStr(fieldsRes)}`);
@@ -144,42 +138,15 @@ export function generateSchemaForInterface(interfaceName) {
 	//──────────────────────────────────────────────────────────────────────────
 	// 2. Get all documentTypes mentioned in the interface collections
 	//──────────────────────────────────────────────────────────────────────────
-	const interfaceNode = getInterface({
-		connection: explorerRepoReadConnection,
+	const {
+		collections,
+		collectionIdToDocumentTypeId,
+		documentTypes,
+		fields,
+		stopWords
+	} = getInterfaceInfo({
 		interfaceName
 	});
-	//log.debug(`interfaceNode:${toStr(interfaceNode)}`);
-
-	const {
-		collectionIds,
-		fields = [],// = DEFAULT_INTERFACE_FIELDS, TODO This wont work when fields = [] which filter does
-		stopWords//,
-		//synonyms // TODO
-	} = filterInterface(interfaceNode);
-	//log.debug(`fields:${toStr(fields)}`);
-	//log.debug(`stopWords:${toStr(stopWords)}`);
-	//log.debug(`synonyms:${toStr(synonyms)}`);
-
-	//log.debug(`collectionIds:${toStr(collectionIds)}`);
-
-	const collections = explorerRepoReadConnection.get(collectionIds);
-	//log.debug(`collections:${toStr(collections)}`);
-
-	const collectionIdToDocumentTypeId = {};
-	const documentTypeIds = collections.map(({
-		_id: collectionId,
-		documentTypeId
-	}) => {
-		if (isSet(documentTypeId)) {
-			collectionIdToDocumentTypeId[collectionId] = documentTypeId;
-		}
-		return documentTypeId;
-	})
-		.filter((v, i, a) => isSet(v) && a.indexOf(v) === i);
-	//log.debug(`documentTypeIds:${toStr(documentTypeIds)}`);
-
-	const documentTypes = explorerRepoReadConnection.get(documentTypeIds);
-	//log.debug(`documentTypes:${toStr(documentTypes)}`);
 
 	//──────────────────────────────────────────────────────────────────────────
 	// 3. Make one objectType per documentType
