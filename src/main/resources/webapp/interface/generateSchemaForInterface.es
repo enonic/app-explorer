@@ -1,62 +1,21 @@
-import {
-	VALUE_TYPE_BOOLEAN,
-	VALUE_TYPE_DOUBLE,
-	VALUE_TYPE_GEO_POINT,
-	VALUE_TYPE_INSTANT,
-	VALUE_TYPE_LOCAL_DATE,
-	VALUE_TYPE_LOCAL_DATE_TIME,
-	VALUE_TYPE_LOCAL_TIME,
-	VALUE_TYPE_LONG,
-	VALUE_TYPE_REFERENCE,
-	VALUE_TYPE_STRING,
-	camelize,
-	forceArray,
-	ucFirst
-} from '@enonic/js-utils';
-import 'reflect-metadata';
-import setIn from 'set-value'; // Number.isInteger and Reflect
+import 'reflect-metadata'; // Must be imported only once per WebPack Bundle (Required by setIn)
 
 import {getFields} from '/lib/explorer/field/getFields';
 
 import {PRINCIPAL_EXPLORER_READ} from '/lib/explorer/model/2/constants';
 import {connect} from '/lib/explorer/repo/connect';
-import {
-	list,
-	newSchemaGenerator
-} from '/lib/graphql';
+import {newSchemaGenerator} from '/lib/graphql';
 
-import {
-	GQL_INPUT_FIELDS_HIGHLIGHT_PROPERTIES,
-	GQL_INTERFACE_TYPE_DOCUMENT,
-	GQL_OBJECT_TYPE_GLOBAL_FIELD
-} from './constants';
-import {constructGlue} from './Glue';
+import {addDynamicTypes} from './dynamic/addDynamicTypes';
 import {addStaticTypes} from './static/addStaticTypes';
 import {buildGlobalFieldsObj} from './buildGlobalFieldsObj';
-import {documentTypeNameToGraphQLObjectTypeName} from './documentTypeNameToGraphQLObjectTypeName';
-import {objToGraphQL} from './objToGraphQL';
-import {valueTypeToGraphQLType} from './valueTypeToGraphQLType';
-import {addDynamicTypes} from './dynamic/addDynamicTypes';
-import {addDynamicInterfaceTypes} from './dynamic/addDynamicInterfaceTypes';
 import {buildSchema} from './buildSchema';
+import {constructGlue} from './Glue';
 import {getInterfaceInfo} from './getInterfaceInfo';
 
 
 const schemaGenerator = newSchemaGenerator();
 //import {DEFAULT_INTERFACE_FIELDS} from '../constants';
-
-const VALUE_TYPE_VARIANTS = [
-	VALUE_TYPE_BOOLEAN,
-	VALUE_TYPE_DOUBLE,
-	VALUE_TYPE_GEO_POINT,
-	VALUE_TYPE_INSTANT,
-	VALUE_TYPE_LOCAL_DATE,
-	VALUE_TYPE_LOCAL_DATE_TIME,
-	VALUE_TYPE_LOCAL_TIME,
-	VALUE_TYPE_LONG,
-	VALUE_TYPE_REFERENCE,
-	VALUE_TYPE_STRING
-];
 
 /*──────────────────────────────────────────────────────────────────────────────
 In order to make a documentTypesUnion supporting GraphQL inline fragments (... on documentType)
@@ -133,18 +92,21 @@ export function generateSchemaForInterface(interfaceName) {
 	//log.debug(`fieldsRes.hits[0]:${toStr(fieldsRes.hits[0])}`);
 
 	const camelToFieldObj = {};
-	const nestedFieldsObj = buildGlobalFieldsObj({fieldsRes});
+	const globalFieldsObj = buildGlobalFieldsObj({fieldsRes});
 
 	//──────────────────────────────────────────────────────────────────────────
 	// 2. Get all documentTypes mentioned in the interface collections
 	//──────────────────────────────────────────────────────────────────────────
 	const {
+		allFieldKeys,
 		collections,
 		collectionIdToDocumentTypeId,
+		documentTypeIdToName,
 		documentTypes,
 		fields,
 		stopWords
 	} = getInterfaceInfo({
+		fieldsRes,
 		interfaceName
 	});
 
@@ -152,131 +114,6 @@ export function generateSchemaForInterface(interfaceName) {
 	// 3. Make one objectType per documentType
 	//──────────────────────────────────────────────────────────────────────────
 	const documentTypeObjectTypes = {}; // Defined before addDynamicInterfaceTypes, populated after
-
-	//──────────────────────────────────────────────────────────────────────────
-	// An objectType per documentType will be generated.
-	// Global and "magic" fields will be added to an interfaceType.
-	// The list of objectTypes is used both in the interfaceType and unionType resolvers.
-	// When we define the resolvers we may use a js-reference to an empty object, which later will contain the objectTypes.
-	// When we define the unionType, we can use lib-graphql.reference, but we need to have a list of the objectType names, so we might as well use the objectTypes directly.
-	// Q: Can we use lib-graphql.reference in objectType.interfaces?
-	//──────────────────────────────────────────────────────────────────────────
-
-	addDynamicInterfaceTypes({
-		documentTypeObjectTypes, // Just an empty obj, populated later
-		glue,
-		nestedFieldsObj
-	});
-
-	const interfaceTypeDocument = glue.getInterfaceType(GQL_INTERFACE_TYPE_DOCUMENT);
-	documentTypes.forEach(({
-		_name: documentTypeName,
-		properties
-	}) => {
-		const mergedNestedFieldsObj = JSON.parse(JSON.stringify(nestedFieldsObj)); // deref
-		//log.debug(`documentTypeName:${toStr(documentTypeName)} mergedNestedFieldsObj:${toStr(mergedNestedFieldsObj)}`);
-
-		if (properties) {
-			forceArray(properties).forEach(({
-				max = 0,
-				min = 0,
-				name,
-				valueType = VALUE_TYPE_STRING
-			}) => {
-				const camelizedFieldPath = name.split('.').map((k) => camelize(k, /[-]/g)).join('.');
-				setIn(mergedNestedFieldsObj, camelizedFieldPath, {
-					_max: max,
-					_min: min,
-					_valueType: valueType
-				}, { merge: true });
-
-				//const camelizedFieldKey = camelize(name, /[.-]/g);
-				const camelizedFieldKey = camelizedFieldPath;
-				if (camelToFieldObj[camelizedFieldKey] && camelToFieldObj[camelizedFieldKey] !== name) {
-					throw new Error(`Name collision from camelized:${camelizedFieldKey} to both ${camelToFieldObj[camelizedFieldKey]} and ${name}`);
-				}
-				camelToFieldObj[camelizedFieldKey] = name;
-			}); // properties.forEach
-		}
-		//log.debug(`documentTypeName:${toStr(documentTypeName)} mergedNestedFieldsObj:${toStr(mergedNestedFieldsObj)}`);
-
-		documentTypeObjectTypes[documentTypeName] = glue.addObjectType({
-			name: documentTypeNameToGraphQLObjectTypeName(documentTypeName),
-			fields: objToGraphQL({
-				documentTypeName,
-				glue,
-				obj: mergedNestedFieldsObj
-			}),
-			interfaces: [
-				//reference(GQL_INTERFACE_TYPE_DOCUMENT) // Error: type Document not found in schema
-				interfaceTypeDocument
-			]
-		});
-	}); // documentTypes.forEach
-	//log.debug(`documentTypeObjectTypes:${toStr(documentTypeObjectTypes)}`);
-
-	documentTypeObjectTypes[GQL_OBJECT_TYPE_GLOBAL_FIELD] = glue.addObjectType({
-		name: GQL_OBJECT_TYPE_GLOBAL_FIELD,
-		fields: objToGraphQL({
-			documentTypeName: GQL_OBJECT_TYPE_GLOBAL_FIELD,
-			glue,
-			obj: nestedFieldsObj
-		})
-	});
-
-	//──────────────────────────────────────────────────────────────────────────
-
-	const allFieldKeys = [];
-
-	const documentTypeIdToName = {};
-	documentTypes.forEach(({
-		_id: documentTypeId,
-		_name: documentTypeName,
-		properties
-	}) => {
-		documentTypeIdToName[documentTypeId] = documentTypeName;
-		if (properties) {
-			forceArray(properties).forEach(({name}) => {
-				if (!allFieldKeys.includes(name)) {
-					allFieldKeys.push(name);
-				}
-			});
-		}
-	});
-	//log.debug(`allFieldKeys:${toStr(allFieldKeys)}`);
-
-	fieldsRes.hits.forEach(({key}) => {
-		if (!allFieldKeys.includes(key)) {
-			allFieldKeys.push(key);
-		}
-	});
-	allFieldKeys.sort();
-	//log.debug(`allFieldKeys:${toStr(allFieldKeys)}`);
-
-	const fieldKeysForAggregations = [];
-	const fieldKeysForFilters = [];
-	const highlightParameterPropertiesFields = {};
-	const interfaceSearchHitsFieldsFromSchema = {};
-	const interfaceSearchHitsHighlightsFields = {};
-
-	const staticHighlightParameterPropertiesFields = glue.getInputFields(GQL_INPUT_FIELDS_HIGHLIGHT_PROPERTIES);
-
-	allFieldKeys.forEach((fieldKey) => {
-		const camelizedFieldKey = camelize(fieldKey, /[.-]/g);
-		fieldKeysForAggregations.push(camelizedFieldKey);
-		fieldKeysForFilters.push(camelizedFieldKey);
-		highlightParameterPropertiesFields[camelizedFieldKey] = { type: glue.addInputType({
-			name: `InputTypeHighlightProperties${ucFirst(camelizedFieldKey)}`,
-			fields: staticHighlightParameterPropertiesFields
-		})};
-		VALUE_TYPE_VARIANTS.forEach((vT) => {
-			interfaceSearchHitsFieldsFromSchema[
-				`${camelizedFieldKey}_as_${vT}`
-			] = { type: valueTypeToGraphQLType(vT) };
-		});
-		const type = valueTypeToGraphQLType(VALUE_TYPE_STRING); // TODO There may be several valueTypes...
-		interfaceSearchHitsHighlightsFields[camelizedFieldKey] = { type: list(type) };
-	});
 
 	//log.debug(`fieldsRes.hits:${toStr(fieldsRes.hits)}`);
 	/*fieldsRes.hits.forEach(({
@@ -332,13 +169,12 @@ export function generateSchemaForInterface(interfaceName) {
 	//log.debug(`highlightParameterPropertiesFields:${toStr(highlightParameterPropertiesFields)}`);
 
 	addDynamicTypes({
+		allFieldKeys,
+		camelToFieldObj,
 		documentTypeObjectTypes,
-		fieldKeysForAggregations,
-		fieldKeysForFilters,
-		glue,
-		highlightParameterPropertiesFields,
-		interfaceSearchHitsFieldsFromSchema,
-		interfaceSearchHitsHighlightsFields
+		documentTypes,
+		globalFieldsObj,
+		glue
 	});
 
 	return buildSchema({
