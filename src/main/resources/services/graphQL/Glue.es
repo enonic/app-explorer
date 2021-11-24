@@ -164,12 +164,12 @@ export class Glue {
 	}) {
 		//log.debug(`addEnumType({name:${name}})`);
 		if(this.#queries[name]) {
-			throw new Error(`Enum type ${name} already defined!`);
+			throw new Error(`Query ${name} already defined!`);
 		}
-		if(this.#uniqueFieldNames[name]) {
+		/*if(this.#uniqueFieldNames[name]) {
 			throw new Error(`Name ${name} already used as ${this.#uniqueFieldNames[name]}!`);
 		}
-		this.#uniqueFieldNames[name] = 'query';
+		this.#uniqueFieldNames[name] = 'query';*/
 		this.#queries[name] = {
 			args,
 			resolve,

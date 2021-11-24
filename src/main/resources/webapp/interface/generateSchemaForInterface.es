@@ -17,7 +17,6 @@ import {
 	ucFirst
 } from '@enonic/js-utils';
 import 'reflect-metadata';
-//import serialize from 'serialize-javascript';
 import setIn from 'set-value'; // Number.isInteger and Reflect
 
 import {getFields} from '/lib/explorer/field/getFields';
@@ -32,21 +31,14 @@ import {
 	list,
 	newSchemaGenerator
 } from '/lib/graphql';
-import {decodeCursor} from '/lib/graphql-connection';
 
 import {
 	GQL_ENUM_HIGHLIGHT_OPTION_ENCODERS,
 	GQL_ENUM_HIGHLIGHT_OPTION_FRAGMENTERS,
 	GQL_ENUM_HIGHLIGHT_OPTION_ORDERS,
 	GQL_ENUM_HIGHLIGHT_OPTION_TAG_SCHEMAS,
-	GQL_INPUT_TYPE_AGGREGATION,
-	GQL_INPUT_TYPE_FILTERS,
-	GQL_INPUT_TYPE_HIGHLIGHT,
 	GQL_INTERFACE_TYPE_DOCUMENT,
 	GQL_OBJECT_TYPE_GLOBAL_FIELD,
-	GQL_OBJECT_TYPE_INTERFACE_SEARCH,
-	GQL_OBJECT_TYPE_INTERFACE_SEARCH_CONNECTION,
-	GQL_OBJECT_TYPE_QUERY,
 	VALUE_TYPE_JSON
 } from './constants';
 
@@ -57,7 +49,6 @@ import {addStaticInputTypes} from './addStaticInputTypes';
 import {addStaticObjectTypes} from './addStaticObjectTypes';
 import {addStaticUnionTypes} from './addStaticUnionTypes';
 
-import {doQuery} from './doQuery';
 import {documentTypeNameToGraphQLObjectTypeName} from './documentTypeNameToGraphQLObjectTypeName';
 import {objToGraphQL} from './objToGraphQL';
 import {valueTypeToGraphQLType} from './valueTypeToGraphQLType';
@@ -67,10 +58,9 @@ import {addDynamicInputTypes} from './addDynamicInputTypes';
 import {addDynamicInterfaceTypes} from './addDynamicInterfaceTypes';
 import {addDynamicObjectTypes} from './addDynamicObjectTypes';
 import {addDynamicUnionTypes} from './addDynamicUnionTypes';
-
+import {buildSchema} from './buildSchema';
 
 const schemaGenerator = newSchemaGenerator();
-const {createSchema} = schemaGenerator;
 //import {DEFAULT_INTERFACE_FIELDS} from '../constants';
 
 const VALUE_TYPE_VARIANTS = [
@@ -114,12 +104,6 @@ export function generateSchemaForInterface(interfaceName) {
 
 	addStaticObjectTypes(glue); // Must be before addStaticUnionTypes()
 	addStaticUnionTypes(glue); // Must be after addStaticObjectTypes()
-
-	/*function deSerialize(serializedJavascript){
-		return eval('(' + serializedJavascript + ')');
-	}
-
-	const glue = deSerialize(serialize(staticGlue)); // Clone / DeReference*/
 
 	const explorerRepoReadConnection = connect({ principals: [PRINCIPAL_EXPLORER_READ] });
 
@@ -488,20 +472,6 @@ export function generateSchemaForInterface(interfaceName) {
 		staticHighlightParameterFields
 	});
 
-	//──────────────────────────────────────────────────────────────────────────
-
-	function searchResolver(env) {
-		return doQuery({
-			camelToFieldObj,
-			collections,
-			collectionIdToDocumentTypeId,
-			env,
-			documentTypeIdToName,
-			fields,
-			stopWords
-		});
-	} // searchResolver
-
 	// Must be after populating documentTypeObjectTypes
 	// Must be before addDynamicObjectTypes
 	addDynamicUnionTypes({
@@ -515,73 +485,14 @@ export function generateSchemaForInterface(interfaceName) {
 		interfaceSearchHitsHighlightsFields
 	});
 
-	const objectTypeInterfaceSearch = glue.getObjectType(GQL_OBJECT_TYPE_INTERFACE_SEARCH);
-	const inputTypeAggregation = glue.getInputType(GQL_INPUT_TYPE_AGGREGATION);
-	const inputTypeFilters = glue.getInputType(GQL_INPUT_TYPE_FILTERS);
-	const inputTypeHighlight = glue.getInputType(GQL_INPUT_TYPE_HIGHLIGHT);
-
-	return createSchema({
-		//dictionary:,
-		//mutation:,
-		query: glue.addObjectType({
-			name: GQL_OBJECT_TYPE_QUERY,
-			fields: {
-				getSearchConnection: {
-					args: {
-						after: GraphQLString,
-						aggregations: list(inputTypeAggregation),
-						filters: inputTypeFilters,
-						first: GraphQLInt,
-						highlight: inputTypeHighlight,
-						searchString: GraphQLString
-					},
-					resolve(env) {
-						//log.debug(`env:${toStr({env})}`);
-						const {
-							after,// = encodeCursor('0'), // encoded representation of start
-							aggregations,
-							filters,
-							first = 10, // count
-							highlight,
-							searchString
-						} = env.args;
-						//log.debug(`after:${toStr({after})}`);
-						//log.debug(`first:${toStr({first})}`);
-						const start = after ? parseInt(decodeCursor(after)) + 1 : 0;
-						//log.debug(`start:${toStr({start})}`);
-						const res = searchResolver({
-							args: {
-								aggregations,
-								count: first,
-								filters,
-								highlight,
-								searchString,
-								start
-							}
-						});
-						//log.debug(`res:${toStr({res})}`);
-						res.start = start;
-						//log.debug(`res:${toStr({res})}`);
-						return res;
-					},
-					//type: createConnectionType(schemaGenerator, objectTypeInterfaceSearch)
-					type: glue.getObjectType(GQL_OBJECT_TYPE_INTERFACE_SEARCH_CONNECTION)
-				},
-				search: {
-					args: {
-						aggregations: list(inputTypeAggregation),
-						count: GraphQLInt,
-						filters: inputTypeFilters,
-						highlight: inputTypeHighlight,
-						searchString: GraphQLString,
-						start: GraphQLInt
-					},
-					resolve: (env) => searchResolver(env),
-					type: objectTypeInterfaceSearch
-				}
-			}
-		})
-		//subscription:
+	return buildSchema({
+		camelToFieldObj,
+		collections,
+		collectionIdToDocumentTypeId,
+		glue,
+		documentTypeIdToName,
+		fields,
+		stopWords
 	});
 }
 
