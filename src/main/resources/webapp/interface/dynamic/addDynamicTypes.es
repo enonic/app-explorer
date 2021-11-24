@@ -58,11 +58,12 @@ Q: Can we use lib-graphql.reference in objectType.interfaces?
 export function addDynamicTypes({
 	allFieldKeys,
 	camelToFieldObj,
-	documentTypeObjectTypes,
 	documentTypes,
 	globalFieldsObj,
 	glue
 }) {
+	const documentTypeObjectTypes = {}; // Defined before addDynamicInterfaceTypes, populated after
+
 	addDynamicInterfaceTypes({
 		documentTypeObjectTypes, // Just an empty obj, populated later
 		glue,

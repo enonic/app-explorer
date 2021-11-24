@@ -113,8 +113,6 @@ export function generateSchemaForInterface(interfaceName) {
 	//──────────────────────────────────────────────────────────────────────────
 	// 3. Make one objectType per documentType
 	//──────────────────────────────────────────────────────────────────────────
-	const documentTypeObjectTypes = {}; // Defined before addDynamicInterfaceTypes, populated after
-
 	//log.debug(`fieldsRes.hits:${toStr(fieldsRes.hits)}`);
 	/*fieldsRes.hits.forEach(({
 		fieldType: valueType,
@@ -171,7 +169,6 @@ export function generateSchemaForInterface(interfaceName) {
 	addDynamicTypes({
 		allFieldKeys,
 		camelToFieldObj,
-		documentTypeObjectTypes,
 		documentTypes,
 		globalFieldsObj,
 		glue
