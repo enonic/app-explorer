@@ -53,7 +53,7 @@ export function addDynamicInterfaceTypes({
 		},
 		name: GQL_INTERFACE_TYPE_DOCUMENT,
 		typeResolver: (node) => {
-			log.debug(`addInterfaceType name:${GQL_INTERFACE_TYPE_DOCUMENT} typeResolver node:${toStr(node)}`);
+			//log.debug(`addInterfaceType name:${GQL_INTERFACE_TYPE_DOCUMENT} typeResolver node:${toStr(node)}`);
 			const {
 				//_documentTypeId
 				_documentTypeName
