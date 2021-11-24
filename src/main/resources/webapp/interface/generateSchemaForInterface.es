@@ -1,7 +1,7 @@
 import 'reflect-metadata'; // Must be imported only once per WebPack Bundle (Required by setIn)
+import {VALUE_TYPE_STRING} from '@enonic/js-utils';
 
 import {getFields} from '/lib/explorer/field/getFields';
-
 import {PRINCIPAL_EXPLORER_READ} from '/lib/explorer/model/2/constants';
 import {connect} from '/lib/explorer/repo/connect';
 import {newSchemaGenerator} from '/lib/graphql';
@@ -104,11 +104,24 @@ export function generateSchemaForInterface(interfaceName) {
 		documentTypeIdToName,
 		documentTypes,
 		fields,
+		interfaceSearchHitsHighlightsFields,
 		stopWords
 	} = getInterfaceInfo({
 		fieldsRes,
 		interfaceName
 	});
+
+	//──────────────────────────────────────────────────────────────────────────
+	// Add _highlight to globalFields
+	//──────────────────────────────────────────────────────────────────────────
+	/*globalFieldsObj._highlight = {}; // eslint-disable-line no-underscore-dangle
+	Object.keys(interfaceSearchHitsHighlightsFields).forEach((camelizedFieldKey) => {
+		globalFieldsObj._highlight[camelizedFieldKey] = { // eslint-disable-line no-underscore-dangle
+			_max: 0,
+			_min: 0,
+			_valueType: VALUE_TYPE_STRING
+		};
+	});*/
 
 	//──────────────────────────────────────────────────────────────────────────
 	// 3. Make one objectType per documentType
@@ -171,7 +184,8 @@ export function generateSchemaForInterface(interfaceName) {
 		camelToFieldObj,
 		documentTypes,
 		globalFieldsObj,
-		glue
+		glue,
+		interfaceSearchHitsHighlightsFields
 	});
 
 	return buildSchema({

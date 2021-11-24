@@ -87,16 +87,19 @@ function addObjectType({
 		throw new Error(`Name ${name} already used as ${this.uniqueNames[name]}!`);
 	}
 	this.uniqueNames[name] = 'objectType';
-	this.objectTypes[name] = this.schemaGenerator.createObjectType({
-		fields,
+	this.objectTypes[name] = {
 		interfaces,
-		name
-	});
-	return this.objectTypes[name];
+		type: this.schemaGenerator.createObjectType({
+			fields,
+			interfaces,
+			name
+		})
+	};
+	return this.objectTypes[name].type;
 }
 
 function getObjectType(name) {
-	return this.objectTypes[name];
+	return this.objectTypes[name].type;
 }
 
 
@@ -190,8 +193,40 @@ function addQueryField({
 
 
 function buildSchema() {
+	/*
+	 GIVEN that an objectType that implements an interface
+	 AND that objectType is NOT directly added/available in the schema
+	 WHEN a query result includes the interfaceType
+	 THEN GraphQL will throw an error that the objectType is not a valid type
+
+	 This happens because the interfaceType.typeResolver() returns an objectType
+	 that doesn't exist in the schema.
+	 Simply adding the objectType to the dictionary, solves the problem.
+	*/
+	const uniqObjectTypesWithInterfaces = [];
+	Object.keys(this.objectTypes).forEach((k) => {
+		if (
+			this.objectTypes[k].interfaces
+			&& Array.isArray(this.objectTypes[k].interfaces)
+			&& this.objectTypes[k].interfaces.length
+		) {
+			let alreadyAdded = false;
+			uniqObjectTypesWithInterfaces.forEach((obj) => {
+				if (obj === this.objectTypes[k].type) {
+					alreadyAdded = true; // TODO Break
+				}
+			});
+			if (!alreadyAdded) {
+				uniqObjectTypesWithInterfaces.push(this.objectTypes[k].type);
+			}
+		}
+	});
+	//log.debug(`Number of objectTypes:${Object.keys(this.objectTypes).length} Number of objectTypes implementing interfaces:${uniqObjectTypesWithInterfaces.length}`);
+
 	return this.schemaGenerator.createSchema({
-		//dictionary:,
+		//dictionary: Object.keys(this.objectTypes).map((k) => this.objectTypes[k].type), // No need to add all objectTypes...
+		dictionary: uniqObjectTypesWithInterfaces,
+
 		//mutation:,
 		query: this.addObjectType({
 			name: GQL_OBJECT_TYPE_QUERY,

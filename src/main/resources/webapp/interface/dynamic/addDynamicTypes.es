@@ -15,12 +15,11 @@ import {
 } from '@enonic/js-utils';
 import setIn from 'set-value'; // Number.isInteger and Reflect
 
-import {list} from '/lib/graphql';
-
 import {
 	GQL_INPUT_FIELDS_HIGHLIGHT_PROPERTIES,
 	GQL_INTERFACE_TYPE_DOCUMENT,
-	GQL_OBJECT_TYPE_GLOBAL_FIELD
+	GQL_OBJECT_TYPE_GLOBAL_FIELD,
+	GQL_OBJECT_TYPE_INTERFACE_SEARCH_HIT_HIGHLIGHT
 } from '../constants';
 import {documentTypeNameToGraphQLObjectTypeName} from './documentTypeNameToGraphQLObjectTypeName';
 import {objToGraphQL} from './objToGraphQL';
@@ -30,7 +29,7 @@ import {addDynamicEnumTypes} from './addDynamicEnumTypes';
 import {addDynamicInputTypes} from './addDynamicInputTypes';
 import {addDynamicInterfaceTypes} from './addDynamicInterfaceTypes';
 import {addDynamicObjectTypes} from './addDynamicObjectTypes';
-import {addDynamicUnionTypes} from './addDynamicUnionTypes';
+//import {addDynamicUnionTypes} from './addDynamicUnionTypes';
 
 
 const VALUE_TYPE_VARIANTS = [
@@ -60,14 +59,17 @@ export function addDynamicTypes({
 	camelToFieldObj,
 	documentTypes,
 	globalFieldsObj,
-	glue
+	glue,
+	interfaceSearchHitsHighlightsFields
 }) {
 	const documentTypeObjectTypes = {}; // Defined before addDynamicInterfaceTypes, populated after
 
+	// Must be before addDynamicObjectTypes
 	addDynamicInterfaceTypes({
 		documentTypeObjectTypes, // Just an empty obj, populated later
 		glue,
-		globalFieldsObj
+		interfaceSearchHitsHighlightsFields//,
+		//globalFieldsObj
 	});
 
 	const interfaceTypeDocument = glue.getInterfaceType(GQL_INTERFACE_TYPE_DOCUMENT);
@@ -104,11 +106,14 @@ export function addDynamicTypes({
 
 		documentTypeObjectTypes[documentTypeName] = glue.addObjectType({
 			name: documentTypeNameToGraphQLObjectTypeName(documentTypeName),
-			fields: objToGraphQL({
-				documentTypeName,
-				glue,
-				obj: mergedglobalFieldsObj
-			}),
+			fields: {
+				_highlight: { type: glue.getObjectType(GQL_OBJECT_TYPE_INTERFACE_SEARCH_HIT_HIGHLIGHT) },
+				...objToGraphQL({
+					documentTypeName,
+					glue,
+					obj: mergedglobalFieldsObj
+				})
+			},
 			interfaces: [
 				//reference(GQL_INTERFACE_TYPE_DOCUMENT) // Error: type Document not found in schema
 				interfaceTypeDocument
@@ -119,11 +124,17 @@ export function addDynamicTypes({
 
 	documentTypeObjectTypes[GQL_OBJECT_TYPE_GLOBAL_FIELD] = glue.addObjectType({
 		name: GQL_OBJECT_TYPE_GLOBAL_FIELD,
-		fields: objToGraphQL({
-			documentTypeName: GQL_OBJECT_TYPE_GLOBAL_FIELD,
-			glue,
-			obj: globalFieldsObj
-		})
+		fields: {
+			_highlight: { type: glue.getObjectType(GQL_OBJECT_TYPE_INTERFACE_SEARCH_HIT_HIGHLIGHT) },
+			...objToGraphQL({
+				documentTypeName: GQL_OBJECT_TYPE_GLOBAL_FIELD,
+				glue,
+				obj: globalFieldsObj
+			})
+		},
+		interfaces: [
+			interfaceTypeDocument
+		]
 	});
 
 	//──────────────────────────────────────────────────────────────────────────
@@ -132,8 +143,6 @@ export function addDynamicTypes({
 	const fieldKeysForFilters = [];
 	const highlightParameterPropertiesFields = {};
 	const interfaceSearchHitsFieldsFromSchema = {};
-	const interfaceSearchHitsHighlightsFields = {};
-
 	const staticHighlightParameterPropertiesFields = glue.getInputFields(GQL_INPUT_FIELDS_HIGHLIGHT_PROPERTIES);
 
 	allFieldKeys.forEach((fieldKey) => {
@@ -149,8 +158,6 @@ export function addDynamicTypes({
 				`${camelizedFieldKey}_as_${vT}`
 			] = { type: valueTypeToGraphQLType(vT) };
 		});
-		const type = valueTypeToGraphQLType(VALUE_TYPE_STRING); // TODO There may be several valueTypes...
-		interfaceSearchHitsHighlightsFields[camelizedFieldKey] = { type: list(type) };
 	});
 
 	addDynamicEnumTypes({
@@ -166,14 +173,15 @@ export function addDynamicTypes({
 
 	// Must be after populating documentTypeObjectTypes
 	// Must be before addDynamicObjectTypes
-	addDynamicUnionTypes({
+	/*addDynamicUnionTypes({
 		documentTypeObjectTypes, // Must be populated already, since used in types inside
 		glue
-	});
+	});*/
 
-	addDynamicObjectTypes({ // Must be after addDynamicUnionTypes
+	// Must be after addDynamicInterfaceTypes
+	// Must be after addDynamicUnionTypes
+	addDynamicObjectTypes({
 		glue,
-		interfaceSearchHitsFieldsFromSchema,
-		interfaceSearchHitsHighlightsFields
+		interfaceSearchHitsFieldsFromSchema
 	});
 }

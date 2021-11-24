@@ -39,7 +39,6 @@ export function buildGlobalFieldsObj({
 			_min: 1,
 			_valueType: VALUE_TYPE_JSON
 		},
-		//_highlight, // TODO ???
 		_repoId: {
 			_max: 1,
 			_min: 1,
