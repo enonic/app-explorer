@@ -1,4 +1,5 @@
 import {
+	camelize,
 	forceArray,
 	isSet
 } from '@enonic/js-utils';
@@ -7,6 +8,10 @@ import {PRINCIPAL_EXPLORER_READ} from '/lib/explorer/model/2/constants';
 import {connect} from '/lib/explorer/repo/connect';
 import {get as getInterface} from '/lib/explorer/interface/get';
 import {filter as filterInterface} from '/lib/explorer/interface/filter';
+import {
+	GraphQLString,
+	list
+} from '/lib/graphql';
 
 
 export function getInterfaceInfo({
@@ -78,6 +83,12 @@ export function getInterfaceInfo({
 	allFieldKeys.sort();
 	//log.debug(`allFieldKeys:${toStr(allFieldKeys)}`);
 
+	const interfaceSearchHitsHighlightsFields = {};
+	allFieldKeys.forEach((fieldKey) => {
+		const camelizedFieldKey = camelize(fieldKey, /[.-]/g);
+		interfaceSearchHitsHighlightsFields[camelizedFieldKey] = { type: list(GraphQLString) };
+	});
+
 	return {
 		allFieldKeys,
 		collections,
@@ -85,6 +96,7 @@ export function getInterfaceInfo({
 		documentTypeIdToName,
 		documentTypes,
 		fields,
+		interfaceSearchHitsHighlightsFields,
 		stopWords
 	};
 }

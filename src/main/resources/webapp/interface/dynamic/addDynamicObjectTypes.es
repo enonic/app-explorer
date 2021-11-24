@@ -16,32 +16,28 @@ import {
 } from '/lib/graphql-connection';
 
 import {
-	//GQL_INTERFACE_TYPE_DOCUMENT,
+	GQL_INTERFACE_TYPE_DOCUMENT,
 	GQL_OBJECT_TYPE_AGGREGATIONS_UNION_NAME,
 	GQL_OBJECT_TYPE_INTERFACE_SEARCH,
 	GQL_OBJECT_TYPE_INTERFACE_SEARCH_CONNECTION,
 	GQL_OBJECT_TYPE_INTERFACE_SEARCH_CONNECTION_EDGE,
-	GQL_OBJECT_TYPE_INTERFACE_SEARCH_CONNECTION_PAGE_INFO,
+	GQL_OBJECT_TYPE_INTERFACE_SEARCH_CONNECTION_PAGE_INFO//,
 	//GQL_OBJECT_TYPE_INTERFACE_SEARCH_HIT,
-	GQL_OBJECT_TYPE_INTERFACE_SEARCH_HIT_HIGHLIGHT,
-	GQL_UNION_TYPE_DOCUMENT_TYPES
+	//GQL_OBJECT_TYPE_INTERFACE_SEARCH_HIT_HIGHLIGHT//,
+	//GQL_UNION_TYPE_DOCUMENT_TYPES
 } from '../constants';
 
 
 export function addDynamicObjectTypes({
-	glue,
-	interfaceSearchHitsFieldsFromSchema,
-	interfaceSearchHitsHighlightsFields
+	glue//,
+	//interfaceSearchHitsFieldsFromSchema
 }) {
-	const interfaceSearchHitsFields = {
+	/*const interfaceSearchHitsFields = {
 		_collectionId: { type: nonNull(GraphQLID) },
 		_collectionName: { type: nonNull(GraphQLString) },
 		_documentTypeId: { type: nonNull(GraphQLString) },
 		_documentTypeName: { type: nonNull(GraphQLString) },
-		_highlight: { type: glue.addObjectType({
-			name: GQL_OBJECT_TYPE_INTERFACE_SEARCH_HIT_HIGHLIGHT,
-			fields: interfaceSearchHitsHighlightsFields // This list can't be empty when createObjectType is called?
-		})},
+		_highlight: { type: glue.getObjectType(GQL_OBJECT_TYPE_INTERFACE_SEARCH_HIT_HIGHLIGHT) },
 		_json: { type: GraphQLJson },
 		_repoId: { type: nonNull(GraphQLString) },
 		_score: { type: GraphQLFloat }
@@ -51,12 +47,12 @@ export function addDynamicObjectTypes({
 		interfaceSearchHitsFields[k] = interfaceSearchHitsFieldsFromSchema[k];
 	});
 
-	/*const objectTypeInterfaceSearchHit = glue.addObjectType({
+	const objectTypeInterfaceSearchHit = glue.addObjectType({
 		name: GQL_OBJECT_TYPE_INTERFACE_SEARCH_HIT,
 		fields: interfaceSearchHitsFields
 	});*/
-	//const objectTypeInterfaceSearchHit = glue.getUnionType(GQL_INTERFACE_TYPE_DOCUMENT); // Error: name:Document is not an unionType! but interfaceType
-	const objectTypeInterfaceSearchHit = glue.getUnionType(GQL_UNION_TYPE_DOCUMENT_TYPES);
+	const objectTypeInterfaceSearchHit = glue.getInterfaceType(GQL_INTERFACE_TYPE_DOCUMENT);
+	//const objectTypeInterfaceSearchHit = glue.getUnionType(GQL_UNION_TYPE_DOCUMENT_TYPES);
 
 	const GQL_OBJECT_TYPE_AGGREGATIONS_UNION = glue.getUnionType(GQL_OBJECT_TYPE_AGGREGATIONS_UNION_NAME);
 
