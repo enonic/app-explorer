@@ -8,6 +8,8 @@ export const GQL_ENUM_HIGHLIGHT_OPTION_FRAGMENTERS = 'EnumTypeHighlightOptionFra
 export const GQL_ENUM_HIGHLIGHT_OPTION_ORDERS = 'EnumTypeHighlightOptionOrder';
 export const GQL_ENUM_HIGHLIGHT_OPTION_TAG_SCHEMAS = 'EnumTypeHighlightOptionTagSchema';
 
+export const GQL_INPUT_FIELDS_HIGHLIGHT = 'InputFieldsHighlight';
+export const GQL_INPUT_FIELDS_HIGHLIGHT_PROPERTIES = 'InputFieldsHighlightProperties';
 
 export const GQL_INPUT_TYPE_AGGREGATION = 'InputTypeAggregation';
 export const GQL_INPUT_TYPE_AGGREGATION_COUNT = 'InputTypeAggregationCount';

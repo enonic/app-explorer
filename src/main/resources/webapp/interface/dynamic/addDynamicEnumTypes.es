@@ -1,7 +1,7 @@
 import {
 	GQL_ENUM_FIELD_KEYS_FOR_AGGREGATIONS,
 	GQL_ENUM_FIELD_KEYS_FOR_FILTERS
-} from './constants';
+} from '../constants';
 
 
 export function addDynamicEnumTypes({

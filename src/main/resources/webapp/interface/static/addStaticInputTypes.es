@@ -4,7 +4,7 @@ import {
 	nonNull
 } from '/lib/graphql';
 
-import {GQL_INPUT_TYPE_FILTER_IDS} from './constants';
+import {GQL_INPUT_TYPE_FILTER_IDS} from '../constants';
 
 
 export function addStaticInputTypes(glue) {

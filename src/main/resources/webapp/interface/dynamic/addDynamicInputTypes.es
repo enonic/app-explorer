@@ -11,6 +11,7 @@ import {
 	GQL_ENUM_AGGREGATION_GEO_DISTANCE_UNITS,
 	GQL_ENUM_FIELD_KEYS_FOR_AGGREGATIONS,
 	GQL_ENUM_FIELD_KEYS_FOR_FILTERS,
+	GQL_INPUT_FIELDS_HIGHLIGHT,
 	GQL_INPUT_TYPE_AGGREGATION,
 	GQL_INPUT_TYPE_AGGREGATION_COUNT,
 	GQL_INPUT_TYPE_AGGREGATION_DATE_RANGE,
@@ -36,13 +37,12 @@ import {
 	GQL_INPUT_TYPE_HIGHLIGHT,
 	GQL_INPUT_TYPE_HIGHLIGHT_PROPERTIES,
 	GQL_INPUT_TYPE_SUB_AGGREGATION
-} from './constants';
+} from '../constants';
 
 
 export function addDynamicInputTypes({
 	glue,
-	highlightParameterPropertiesFields,
-	staticHighlightParameterFields
+	highlightParameterPropertiesFields
 }) {
 	const enumFieldsKeysForFilters = glue.getEnumType(GQL_ENUM_FIELD_KEYS_FOR_FILTERS);
 
@@ -308,6 +308,8 @@ export function addDynamicInputTypes({
 			}
 		}
 	});
+
+	const staticHighlightParameterFields = glue.getInputFields(GQL_INPUT_FIELDS_HIGHLIGHT);
 
 	glue.addInputType({
 		name: GQL_INPUT_TYPE_HIGHLIGHT,

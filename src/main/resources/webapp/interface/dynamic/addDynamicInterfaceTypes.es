@@ -14,7 +14,7 @@ import {
 	//reference
 } from '/lib/graphql';
 
-import {GQL_INTERFACE_TYPE_DOCUMENT} from './constants';
+import {GQL_INTERFACE_TYPE_DOCUMENT} from '../constants';
 //import {objToGraphQL} from './objToGraphQL';
 
 

@@ -25,40 +25,25 @@ import {filter as filterInterface} from '/lib/explorer/interface/filter';
 import {PRINCIPAL_EXPLORER_READ} from '/lib/explorer/model/2/constants';
 import {connect} from '/lib/explorer/repo/connect';
 import {
-	GraphQLBoolean,
-	GraphQLInt,
-	GraphQLString,
 	list,
 	newSchemaGenerator
 } from '/lib/graphql';
 
 import {
-	GQL_ENUM_HIGHLIGHT_OPTION_ENCODERS,
-	GQL_ENUM_HIGHLIGHT_OPTION_FRAGMENTERS,
-	GQL_ENUM_HIGHLIGHT_OPTION_ORDERS,
-	GQL_ENUM_HIGHLIGHT_OPTION_TAG_SCHEMAS,
+	GQL_INPUT_FIELDS_HIGHLIGHT_PROPERTIES,
 	GQL_INTERFACE_TYPE_DOCUMENT,
 	GQL_OBJECT_TYPE_GLOBAL_FIELD,
 	VALUE_TYPE_JSON
 } from './constants';
-
 import {constructGlue} from './Glue';
-
-import {addStaticEnumTypes} from './addStaticEnumTypes';
-import {addStaticInputTypes} from './addStaticInputTypes';
-import {addStaticObjectTypes} from './addStaticObjectTypes';
-import {addStaticUnionTypes} from './addStaticUnionTypes';
-
+import {addStaticTypes} from './static/addStaticTypes';
 import {documentTypeNameToGraphQLObjectTypeName} from './documentTypeNameToGraphQLObjectTypeName';
 import {objToGraphQL} from './objToGraphQL';
 import {valueTypeToGraphQLType} from './valueTypeToGraphQLType';
-
-import {addDynamicEnumTypes} from './addDynamicEnumTypes';
-import {addDynamicInputTypes} from './addDynamicInputTypes';
-import {addDynamicInterfaceTypes} from './addDynamicInterfaceTypes';
-import {addDynamicObjectTypes} from './addDynamicObjectTypes';
-import {addDynamicUnionTypes} from './addDynamicUnionTypes';
+import {addDynamicTypes} from './dynamic/addDynamicTypes';
+import {addDynamicInterfaceTypes} from './dynamic/addDynamicInterfaceTypes';
 import {buildSchema} from './buildSchema';
+
 
 const schemaGenerator = newSchemaGenerator();
 //import {DEFAULT_INTERFACE_FIELDS} from '../constants';
@@ -81,31 +66,7 @@ const VALUE_TYPE_VARIANTS = [
 
 export function generateSchemaForInterface(interfaceName) {
 	const glue = constructGlue({schemaGenerator});
-
-	addStaticEnumTypes(glue);
-	addStaticInputTypes(glue);
-
-	const staticHighlightParameterPropertiesFields = {
-		fragmenter: { type: glue.getEnumType(GQL_ENUM_HIGHLIGHT_OPTION_FRAGMENTERS) },
-		fragmentSize: { type: GraphQLInt },
-		noMatchSize: { type: GraphQLInt },
-		numberOfFragments: { type: GraphQLInt },
-		order: { type: glue.getEnumType(GQL_ENUM_HIGHLIGHT_OPTION_ORDERS) },
-		postTag: { type: GraphQLString },
-		preTag: { type: GraphQLString },
-		requireFieldMatch: { type: GraphQLBoolean }
-	};
-
-	const staticHighlightParameterFields = {
-		encoder: { type: glue.getEnumType(GQL_ENUM_HIGHLIGHT_OPTION_ENCODERS) }, // Global only
-		...staticHighlightParameterPropertiesFields,
-		tagsSchema: { type: glue.getEnumType(GQL_ENUM_HIGHLIGHT_OPTION_TAG_SCHEMAS) } // Global only
-	};
-
-	addStaticObjectTypes(glue); // Must be before addStaticUnionTypes()
-	addStaticUnionTypes(glue); // Must be after addStaticObjectTypes()
-
-	const explorerRepoReadConnection = connect({ principals: [PRINCIPAL_EXPLORER_READ] });
+	addStaticTypes(glue);
 
 	//──────────────────────────────────────────────────────────────────────────
 	// In order to make a documentTypesUnion supporting GraphQL inline fragments (... on documentType)
@@ -114,6 +75,7 @@ export function generateSchemaForInterface(interfaceName) {
 	//──────────────────────────────────────────────────────────────────────────
 	// 1. Get all global fields, and make a spreadable fields object to reuse and override per docmentType
 	//──────────────────────────────────────────────────────────────────────────
+	const explorerRepoReadConnection = connect({ principals: [PRINCIPAL_EXPLORER_READ] });
 	const fieldsRes = getFields({ // Note these are sorted 'key ASC'
 		connection: explorerRepoReadConnection,
 		includeSystemFields: true
@@ -390,12 +352,14 @@ export function generateSchemaForInterface(interfaceName) {
 	const interfaceSearchHitsFieldsFromSchema = {};
 	const interfaceSearchHitsHighlightsFields = {};
 
+	const staticHighlightParameterPropertiesFields = glue.getInputFields(GQL_INPUT_FIELDS_HIGHLIGHT_PROPERTIES);
+
 	allFieldKeys.forEach((fieldKey) => {
 		const camelizedFieldKey = camelize(fieldKey, /[.-]/g);
 		fieldKeysForAggregations.push(camelizedFieldKey);
 		fieldKeysForFilters.push(camelizedFieldKey);
 		highlightParameterPropertiesFields[camelizedFieldKey] = { type: glue.addInputType({
-			name: `HighlightParameterProperties${ucFirst(camelizedFieldKey)}`,
+			name: `InputTypeHighlightProperties${ucFirst(camelizedFieldKey)}`,
 			fields: staticHighlightParameterPropertiesFields
 		})};
 		VALUE_TYPE_VARIANTS.forEach((vT) => {
@@ -460,27 +424,12 @@ export function generateSchemaForInterface(interfaceName) {
 	//log.debug(`enumFieldsValues:${toStr(enumFieldsValues)}`);
 	//log.debug(`highlightParameterPropertiesFields:${toStr(highlightParameterPropertiesFields)}`);
 
-	addDynamicEnumTypes({
+	addDynamicTypes({
+		documentTypeObjectTypes,
 		fieldKeysForAggregations,
 		fieldKeysForFilters,
-		glue
-	});
-
-	addDynamicInputTypes({
 		glue,
 		highlightParameterPropertiesFields,
-		staticHighlightParameterFields
-	});
-
-	// Must be after populating documentTypeObjectTypes
-	// Must be before addDynamicObjectTypes
-	addDynamicUnionTypes({
-		documentTypeObjectTypes, // Must be populated already, since used in types inside
-		glue
-	});
-
-	addDynamicObjectTypes({ // Must be after addDynamicUnionTypes
-		glue,
 		interfaceSearchHitsFieldsFromSchema,
 		interfaceSearchHitsHighlightsFields
 	});

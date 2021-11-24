@@ -25,7 +25,7 @@ import {
 	//GQL_OBJECT_TYPE_INTERFACE_SEARCH_HIT,
 	GQL_OBJECT_TYPE_INTERFACE_SEARCH_HIT_HIGHLIGHT,
 	GQL_UNION_TYPE_DOCUMENT_TYPES
-} from './constants';
+} from '../constants';
 
 
 export function addDynamicObjectTypes({
