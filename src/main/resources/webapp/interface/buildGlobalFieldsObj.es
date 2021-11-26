@@ -2,7 +2,9 @@ import {
 	VALUE_TYPE_DOUBLE,
 	VALUE_TYPE_REFERENCE,
 	VALUE_TYPE_STRING,
-	camelize
+	camelize,
+	sortKeysRec//,
+	//toStr
 } from '@enonic/js-utils';
 //import 'reflect-metadata'; // Must only be added once to a webpack bundle
 import setIn from 'set-value'; // Number.isInteger and Reflect
@@ -70,6 +72,7 @@ export function buildGlobalFieldsObj({
 			}, { merge: true });
 		}
 	});
-	//log.debug(`nestedFieldsObj:${toStr(nestedFieldsObj)}`);
-	return globalFieldsObj;
+	const sortedGlobalFieldsObj = sortKeysRec(globalFieldsObj);
+	//log.debug(`sortedGlobalFieldsObj:${toStr(sortedGlobalFieldsObj)}`);
+	return sortedGlobalFieldsObj;
 }
