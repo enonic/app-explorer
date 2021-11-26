@@ -11,14 +11,18 @@ import {
 	VALUE_TYPE_STRING,
 	camelize,
 	forceArray,
+	sortKeys,
+	toStr,
 	ucFirst
 } from '@enonic/js-utils';
 import setIn from 'set-value'; // Number.isInteger and Reflect
 
+import {GraphQLString} from '/lib/graphql';
+
 import {
 	GQL_INPUT_FIELDS_HIGHLIGHT_PROPERTIES,
 	GQL_INTERFACE_TYPE_DOCUMENT,
-	GQL_OBJECT_TYPE_GLOBAL_FIELD,
+	//GQL_OBJECT_TYPE_GLOBAL_FIELD,
 	GQL_OBJECT_TYPE_INTERFACE_SEARCH_HIT_HIGHLIGHT
 } from '../constants';
 import {documentTypeNameToGraphQLObjectTypeName} from './documentTypeNameToGraphQLObjectTypeName';
@@ -68,8 +72,8 @@ export function addDynamicTypes({
 	addDynamicInterfaceTypes({
 		documentTypeObjectTypes, // Just an empty obj, populated later
 		glue,
-		interfaceSearchHitsHighlightsFields//,
-		//globalFieldsObj
+		interfaceSearchHitsHighlightsFields,
+		globalFieldsObj
 	});
 
 	const interfaceTypeDocument = glue.getInterfaceType(GQL_INTERFACE_TYPE_DOCUMENT);
@@ -104,16 +108,25 @@ export function addDynamicTypes({
 		}
 		//log.debug(`documentTypeName:${toStr(documentTypeName)} mergedglobalFieldsObj:${toStr(mergedglobalFieldsObj)}`);
 
+		//log.debug(`addDynamicTypes Object.keys(globalFieldsObj):${toStr(Object.keys(globalFieldsObj))}`);
+		const fields = {
+			...objToGraphQL({
+				documentTypeName,
+				glue,
+				obj: mergedglobalFieldsObj
+			}),
+			_highlight: { type: glue.getObjectType(GQL_OBJECT_TYPE_INTERFACE_SEARCH_HIT_HIGHLIGHT) }
+		};
+		Object.keys(globalFieldsObj).map((k) => {
+			//log.debug(`addDynamicTypes k:${toStr(k)}`);
+			fields[`${k}_as_string`] = { type: GraphQLString };
+		});
+		const sortedFields = sortKeys(fields);
+		//log.debug(`addDynamicTypes Object.keys(sortedFields):${toStr(Object.keys(sortedFields))}`);
+
 		documentTypeObjectTypes[documentTypeName] = glue.addObjectType({
 			name: documentTypeNameToGraphQLObjectTypeName(documentTypeName),
-			fields: {
-				_highlight: { type: glue.getObjectType(GQL_OBJECT_TYPE_INTERFACE_SEARCH_HIT_HIGHLIGHT) },
-				...objToGraphQL({
-					documentTypeName,
-					glue,
-					obj: mergedglobalFieldsObj
-				})
-			},
+			fields: sortedFields,
 			interfaces: [
 				//reference(GQL_INTERFACE_TYPE_DOCUMENT) // Error: type Document not found in schema
 				interfaceTypeDocument
@@ -122,6 +135,7 @@ export function addDynamicTypes({
 	}); // documentTypes.forEach
 	//log.debug(`documentTypeObjectTypes:${toStr(documentTypeObjectTypes)}`);
 
+	/* interfaceTypeDocument.typeResolver never resolves to this...
 	documentTypeObjectTypes[GQL_OBJECT_TYPE_GLOBAL_FIELD] = glue.addObjectType({
 		name: GQL_OBJECT_TYPE_GLOBAL_FIELD,
 		fields: {
@@ -135,7 +149,7 @@ export function addDynamicTypes({
 		interfaces: [
 			interfaceTypeDocument
 		]
-	});
+	});*/
 
 	//──────────────────────────────────────────────────────────────────────────
 
