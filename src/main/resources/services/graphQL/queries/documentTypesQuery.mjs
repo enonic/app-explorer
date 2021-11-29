@@ -19,7 +19,7 @@ export const GQL_QUERY_DOCUMENT_TYPES_QUERY = `query QueryDocumentTypesQuery {
 				path
 				valueType
 			}
-			__referencedBy(
+			_referencedBy(
 				filters: {
 					boolean: {
 						must: {
@@ -40,7 +40,7 @@ export const GQL_QUERY_DOCUMENT_TYPES_QUERY = `query QueryDocumentTypesQuery {
 	 					_nodeType
 	 					_path
 	 					#_score
-						__hasField(
+						_hasField(
 						   count: 0
 						   field: "_name"
 						   filters: {
@@ -64,8 +64,8 @@ export const GQL_QUERY_DOCUMENT_TYPES_QUERY = `query QueryDocumentTypesQuery {
 						   #	_versionKey
 						   #}
 						   total
-					   } # __hasField
-					   __referencedBy(
+					   } # _hasField
+					   _referencedBy(
 						   filters: {
 							   boolean: {
 								   must: {
@@ -89,11 +89,11 @@ export const GQL_QUERY_DOCUMENT_TYPES_QUERY = `query QueryDocumentTypesQuery {
 							   }
 						   }
 						   total
-					   } # __referencedBy
+					   } # _referencedBy
 					 } # on Collection
 				}
 				total
-			} # __referencedBy
+			} # _referencedBy
 		}
 	}
 }`;

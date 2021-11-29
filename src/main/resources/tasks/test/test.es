@@ -283,7 +283,7 @@ export function run() {
 					_versionKey: createdDocumentTypeVersionKey,
 					addFields: true,
 					properties: [],
-					__referencedBy: {
+					_referencedBy: {
 						count: 0,
 						hits: [],
 						total: 0

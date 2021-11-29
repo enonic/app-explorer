@@ -18,7 +18,7 @@ export const GQL_QUERY_DOCUMENT_TYPE_GET = `query GetDocumentTypeQuery($_id: ID!
 			path
 			valueType
 		}
-		__referencedBy(
+		_referencedBy(
 			filters: {
 				boolean: {
 					must: {
@@ -44,7 +44,7 @@ export const GQL_QUERY_DOCUMENT_TYPE_GET = `query GetDocumentTypeQuery($_id: ID!
 				}
 			}
 			total
-		} # __referencedBy
+		} # _referencedBy
 	}
 }`;
 

@@ -48,7 +48,7 @@ query QueryReferencedBy(
 			_nodeType
 			_path
 			_score
-			__referencedBy {
+			_referencedBy {
 				count
 				hits {
 					_id
