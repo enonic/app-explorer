@@ -17,7 +17,7 @@ import {
 
 import {GQL_MUTATION_CREATE_COLLECTION} from '../../../services/graphQL/collection/mutationCreateCollection';
 import {GQL_MUTATION_UPDATE_COLLECTION} from '../../../services/graphQL/collection/mutationUpdateCollection';
-import {nameValidator} from '../utils/nameValidator';
+import {repoIdValidator} from '../utils/repoIdValidator';
 
 import {CollectorOptions} from './CollectorOptions';
 import {CollectorSelector} from './CollectorSelector';
@@ -27,7 +27,7 @@ import {DocumentTypeSelector} from './DocumentTypeSelector';
 
 
 const SCHEMA = {
-	_name: (v) => nameValidator(v)
+	_name: (v) => repoIdValidator(v)
 };
 
 
