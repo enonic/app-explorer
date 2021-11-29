@@ -273,7 +273,7 @@ export function Fields(props) {
 						{fieldsRes.hits.map(({
 							_id,
 							_name,
-							__referencedBy: {
+							_referencedBy: {
 								//count,
 								hits: documentTypesReferencingField//,
 								//total
@@ -301,7 +301,7 @@ export function Fields(props) {
 							documentTypesReferencingField.forEach(({
 								_name,
 								_nodeType,
-								__referencedBy: {
+								_referencedBy: {
 									//count,
 									hits: collectionsReferencingDocumentType//,
 									//total
@@ -312,7 +312,7 @@ export function Fields(props) {
 									collectionsReferencingDocumentType.forEach(({
 										_name,
 										_nodeType,
-										__hasField: {
+										_hasField: {
 											total
 										}
 									}) => {

@@ -47,14 +47,14 @@ export function generateCollectionTypes({
 		// This appears in source without beeing defined here:
 		//__fieldKey: { type: GraphQLString }, // Passed on from field.referencedBy(documentType).referencedBy(collection)
 
-		__hasField: { // Specific to 'Collection', not 'AnyNode'
+		_hasField: { // Specific to 'Collection', not 'AnyNode'
 			args: {
 				count: GraphQLInt,
 				field: GraphQLString, // Not nonNull, because field can come from source.__fieldKey
 				filters: glue.getInputType(GQL_INPUT_TYPE_FILTERS_NAME)
 			},
 			resolve: (env) => {
-				//log.debug(`__hasField env:${toStr(env)}`);
+				//log.debug(`_hasField env:${toStr(env)}`);
 				const {
 					args: {
 						count,

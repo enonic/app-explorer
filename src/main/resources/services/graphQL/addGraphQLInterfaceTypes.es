@@ -23,14 +23,14 @@ export function addGraphQLInterfaceTypes({
 			_name: { type: glue.getScalarType('_name') },
 			_nodeType: { type: glue.getScalarType('_nodeType') },
 			_path: { type: glue.getScalarType('_path') },
-			__referencedBy: {
+			_referencedBy: {
 				args: {
 					//filters: reference(GQL_INPUT_TYPE_FILTERS_NAME)
 					// Input types are defined before interfaceTypes, so we can use getInputType here
 					filters: glue.getInputType(GQL_INPUT_TYPE_FILTERS_NAME)
 				},
 				resolve: (env) => {
-					//log.debug(`__referencedBy env:${toStr(env)}`);
+					//log.debug(`_referencedBy env:${toStr(env)}`);
 					const {
 						args: {filters},
 						source: {

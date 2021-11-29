@@ -37,7 +37,7 @@ export const queryFields = ({
 		nGram
 		path
 
-		__referencedBy(
+		_referencedBy(
 			filters: {
 				boolean: {
 					must: {
@@ -58,7 +58,7 @@ export const queryFields = ({
 					_nodeType
 					_path
 					#_score # WHY NOT IMPLEMENTED???
-					__referencedBy(
+					_referencedBy(
 						filters: {
 							boolean: {
 								must: {
@@ -79,7 +79,7 @@ export const queryFields = ({
 								_nodeType
 								_path
 								#_score # WHY NOT IMPLEMENTED???
-								__hasField(
+								_hasField(
 								   count: 0
 								   filters: {
 									   boolean: {
@@ -102,7 +102,7 @@ export const queryFields = ({
 								   #	_versionKey
 								   #}
 								   total
-							   } # __hasField
+							   } # _hasField
 							}
 						}
 						total

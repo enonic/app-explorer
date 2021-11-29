@@ -160,7 +160,7 @@ export function DocumentTypes({
 				{documentTypes.map(({
 					_id,
 					_name,
-					__referencedBy: {
+					_referencedBy: {
 						//count
 						hits: referencedByCollections
 						//total
@@ -175,10 +175,10 @@ export function DocumentTypes({
 					referencedByCollections.forEach(({
 						_name: collectionName,
 						_nodeType,
-						__hasField: {
+						_hasField: {
 							total: documentsWithNameInCollectionRepoTotal
 						},
-						__referencedBy: {
+						_referencedBy: {
 							//count
 							hits: referencedByInterfaces
 							//total

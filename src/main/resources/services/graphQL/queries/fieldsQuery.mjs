@@ -34,7 +34,7 @@ export const GQL_QUERY_FIELDS_QUERY = `query QueryFieldsQuery(
 			min
 			nGram
 			path
-			__referencedBy(
+			_referencedBy(
 				filters: {
 					boolean: {
 						must: {
@@ -55,7 +55,7 @@ export const GQL_QUERY_FIELDS_QUERY = `query QueryFieldsQuery(
 						_nodeType
 						_path
 						#_score # WHY NOT IMPLEMENTED???
-						__referencedBy(
+						_referencedBy(
 							filters: {
 								boolean: {
 									must: {
@@ -76,7 +76,7 @@ export const GQL_QUERY_FIELDS_QUERY = `query QueryFieldsQuery(
 									_nodeType
 									_path
 									#_score # WHY NOT IMPLEMENTED???
-									__hasField(
+									_hasField(
 									   count: 0
 									   filters: {
 										   boolean: {
@@ -99,7 +99,7 @@ export const GQL_QUERY_FIELDS_QUERY = `query QueryFieldsQuery(
 									   #	_versionKey
 									   #}
 									   total
-								   } # __hasField
+								   } # _hasField
 								}
 							}
 							total
