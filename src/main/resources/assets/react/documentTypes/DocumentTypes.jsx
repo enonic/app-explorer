@@ -122,65 +122,15 @@ export function DocumentTypes({
 					<Table.Row verticalAlign='middle'>
 						<Table.Cell collapsing>
 							<Radio
-								label={"Show collections"}
+								label={"All fields"}
 								className='inverted'
 								checked={showCollections}
 								onChange={(ignored,{checked}) => {
 									setShowCollections(checked);
-								}}
-								toggle
-							/>
-						</Table.Cell>
-						<Table.Cell collapsing>
-							<Radio
-								label={"Show interfaces"}
-								className='inverted'
-								checked={showInterfaces}
-								onChange={(ignored,{checked}) => {
 									setShowInterfaces(checked);
-								}}
-								toggle
-							/>
-						</Table.Cell>
-						<Table.Cell collapsing>
-							<Radio
-								label={"Show add fields"}
-								className='inverted'
-								checked={showAddFields}
-								onChange={(ignored,{checked}) => {
 									setShowAddFields(checked);
-								}}
-								toggle
-							/>
-						</Table.Cell>
-						<Table.Cell collapsing>
-							<Radio
-								label={"Show documents per collection"}
-								className='inverted'
-								checked={showDocumentsPerCollection}
-								onChange={(ignored,{checked}) => {
 									setShowDocumentsPerCollection(checked);
-								}}
-								toggle
-							/>
-						</Table.Cell>
-						<Table.Cell collapsing>
-							<Radio
-								label={"Show details"}
-								className='inverted'
-								checked={showDetails}
-								onChange={(ignored,{checked}) => {
 									setShowDetails(checked);
-								}}
-								toggle
-							/>
-						</Table.Cell>
-						<Table.Cell collapsing>
-							<Radio
-								label={"Show delete button"}
-								className='inverted'
-								checked={showDeleteButton}
-								onChange={(ignored,{checked}) => {
 									setShowDeleteButton(checked);
 								}}
 								toggle
@@ -388,7 +338,6 @@ export function DocumentTypes({
 			collectionsArr={newOrEditModalState.collectionsArr}
 			interfacesArr={newOrEditModalState.interfacesArr}
 			open={newOrEditModalState.open}
-			setModalState={setNewOrEditModalState}
 			documentTypes={documentTypes}
 			onClose={() => {
 				//console.debug('NewOrEditDocumentTypeModal onClose');
