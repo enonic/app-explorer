@@ -64,17 +64,64 @@ const SCHEMA = {
 	}
 }; // SCHEMA
 
+/***
+ * Validated if the input document type name is valid
+ * @param value String name of the new document type
+ * @return Object
+ * @return [object.error] possible error of if not valid
+ */
+function validateInput(value) {
+	//console.debug('i', i, 'name', name);
+	if(!value) {
+		return {
+			error: `Required!`
+		};
+	}
+	const startsWithAnythingButLowercaseLetterRegexp = /^[^a-z]/;
+	const startsWithAnythingButLowercaseLetter = value.match(startsWithAnythingButLowercaseLetterRegexp);
+	if (startsWithAnythingButLowercaseLetter) {
+		return {
+			error: `Must start with a lowercase letter. Illegal characters: ${startsWithAnythingButLowercaseLetter.join('')}`
+		};
+	}
+	const regexp =/[^a-zA-Z0-9_.]/g;
+	const matches = value.match(regexp);
+	//console.debug('i', i, 'name', name, 'matches', matches);
+	if (matches) {
+		return {
+			error: `Only letters, digits, underscore and dot is allowed. Illegal characters: ${matches.join('')}`
+		};
+	}
+
+	return {};
+}
+
+/***
+ * Creates an semanic ui react error
+ * @param header string Headline for the error message
+ * @param messsage string The actual error message itself
+ */
+function createErrorMessage(header, message) {
+	return <Message icon negative>
+		<Icon name="warning"/>
+		<Message.Content>
+			<Message.Header>{header}</Message.Header>
+			{message}
+		</Message.Content>
+	</Message>;
+}
+
 export function NewOrEditDocumentType({
 	doClose = () => {},
-	_id: idProp, // optional
+	_id, // optional
 	_name: documentTypeName, // optional
 	collectionsArr = [], // optional
 	interfacesArr = [], // optional
 	servicesBaseUrl,
-	setParentState,
-	documentTypes
+	setModalState,
+	documentTypes,
+	keepOpen
 }) {
-	const [_id, setId] = React.useState(idProp);
 	const [initialValues, setInitialValues] = React.useState(_id ? false : {
 		_name: '',
 		addFields: true,
@@ -82,7 +129,7 @@ export function NewOrEditDocumentType({
 	});
 	const [globalFields, setGlobalFields] = React.useState([]);
 	const [error, setError] = React.useState([]);
-	const [nameInput, setNameInput] = React.useState("");
+	const [nameInput, setNameInput] = React.useState(documentTypeName);
 	/*const [fieldModalState, setFieldModalState] = React.useState({
 		local: true,
 		open: false
@@ -110,22 +157,31 @@ export function NewOrEditDocumentType({
 	}
 
 	React.useEffect(() => {
-		setNameInput(nameInput);
+		let error = false;
 		let errorMessage = null;
 
-		for (let i=0; i<documentTypes.length; i++) {
-			if (documentTypes[i]._name === nameInput) {
-				errorMessage = <Message icon negative>
-					<Icon name="warning"/>
-					<Message.Content>
-						<Message.Header>Name</Message.Header>
-						{`The name ${nameInput} is already taken`}
-					</Message.Content>
-				</Message>;
+		if (_id == undefined) {
+			const valid = validateInput(nameInput);
+			if (valid.error !== undefined) {
+				errorMessage = createErrorMessage('Name', valid.error);
+				error = true;
 			}
+
+			for (let i=0; i<documentTypes.length; i++) {
+				if (documentTypes[i]._name === nameInput) {
+					errorMessage = createErrorMessage('Name', `The name ${nameInput} is already taken`);
+					error = true;
+				}
+			}
+			setError(errorMessage);
+			if (error === false) {
+				setNameInput(nameInput);
+			}
+		} else {
+			// Reset potential errors, so nothing is disabled
+			setError(null);
 		}
-		setError(errorMessage);
-	}, [nameInput]);
+	}, [nameInput, documentTypes]);
 
 	React.useEffect(() => {
 		fetchFields({
@@ -172,6 +228,7 @@ export function NewOrEditDocumentType({
 					addFields,
 					properties
 				};
+
 				if (_id) {
 					variables._id = _id;
 					variables._versionKey = initialValues._versionKey;
@@ -190,30 +247,33 @@ export function NewOrEditDocumentType({
 				}).then(response => {
 					//console.debug('response', response);
 					if (response.status === 200) {
-						if (_id) {
+						if (_id && !keepOpen) {
 							doClose();
 						} else {
 							//console.debug('response.json()', response.json()); // Promise
 							response.json().then(json => {
 								//console.debug('json', json);
-								const {
-									_id,
-									_name/*,
-									addFields,
-									properties*/
-								} = json.data.createDocumentType;
-								/*setInitialValues({ // So reset button doesn't empty all inputs
-									_name,
-									addFields,
-									properties
-								});*/
-								setId(_id);
-								setParentState(prevState => {
-									prevState._id = _id;
-									prevState._name = _name;
-									return prevState;
-								});
-								setInitialValues(false); // Should unmount the EnonicForm, trigger getDocumentType, and remount Enonicform?
+								if (json.errors) {
+									console.error(`Getting the documenttype json`);
+									console.error(json.errors);
+									return;
+								} else {
+									const {
+										_id,
+										_name/*,
+										addFields,
+										properties*/
+									} = json.data.createDocumentType;
+									setModalState(prev => ({
+										_id,
+										_name,
+										collectionsArr: prev.collectionsArr,
+										interfacesArr: prev.interfacesArr,
+										open: true,
+										keepOpen: true
+									}));
+								}
+								// setInitialValues(false); // Should unmount the EnonicForm, trigger getDocumentType, and remount Enonicform?
 							});
 						}
 					}
@@ -254,11 +314,13 @@ export function NewOrEditDocumentType({
 								<Form as='div'>
 									<Form.Field>
 										<SemanticInput
+											disabled={_id ? true : false}
 											onChange={e => {setNameInput(e.target.value);}}
 											fluid
 											label={{basic: true, content: 'Name'}}
 											path='_name'
 											placeholder='Please input an unique name'
+											value={nameInput || ""}
 										/>
 									</Form.Field>
 									{error}
