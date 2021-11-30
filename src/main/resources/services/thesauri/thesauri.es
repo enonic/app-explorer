@@ -3,14 +3,13 @@
 import {PRINCIPAL_EXPLORER_READ, RT_JSON} from '/lib/explorer/model/2/constants';
 import {connect} from '/lib/explorer/repo/connect';
 import {addFilter} from '/lib/explorer/query/addFilter';
-import {hasValue} from '/lib/explorer/query/hasValue';
 import {query as querySynonyms} from '/lib/explorer/synonym/query';
 
 
 export function get({
 	params = {}
 }) {
-	//log.info(`service thesauri get params:${toStr(params)}`);
+	//log.debug(`service thesauri get params:${toStr(params)}`);
 	const {
 		from,
 		to,
@@ -21,6 +20,7 @@ export function get({
 		sort = '_score DESC',
 		thesauri = ''
 	} = params;
+	//log.debug(`service thesauri get thesauri:${toStr(thesauri)}`);
 	const intPerPage = parseInt(perPage, 10);
 	const intPage = parseInt(page, 10);
 	const start = (intPage - 1 ) * intPerPage;
@@ -36,15 +36,24 @@ export function get({
 
 	const filters = {};
 	const thesauriArr = thesauri.split(',');
+	//log.debug(`service thesauri get thesauriArr:${toStr(thesauriArr)}`);
+
 	if(thesauri) {
-		thesauriArr.forEach(thesaurus => {
-			addFilter({
-				clause: 'should',
-				filters,
-				filter: hasValue('_parentPath', `/thesauri/${thesaurus}`)
-			});
+		addFilter({
+			filters,
+			filter: {
+				boolean: {
+					should: [{
+						hasValue: {
+							field: '_parentPath',
+							values: thesauriArr.map((thesaurus) => `/thesauri/${thesaurus}`)
+						}
+					}]
+				}
+			}
 		});
 	}
+	//log.debug(`service thesauri get filters:${toStr(filters)}`);
 
 	const connection = connect({
 		principals: [PRINCIPAL_EXPLORER_READ]
@@ -59,8 +68,11 @@ export function get({
 		start
 	};
 	//log.info(`service thesauri get queryParams:${toStr(queryParams)}`);
+
 	const result = querySynonyms(queryParams);
+	//log.debug(`service thesauri get queryParams.filters:${toStr(queryParams.filters)}`);
 	//log.info(`service thesauri get result:${toStr(result)}`);
+
 	result.page = intPage;
 	result.start = start + 1;
 	result.end = Math.min(start + intPerPage, result.total);
