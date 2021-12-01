@@ -159,6 +159,10 @@ On a development laptop the Explorer admin to is usually available here:
 
 ## Changelog
 
+### 1.5.2
+
+* Fix BUG: Editing thesaurus shows synonyms outside thesaurus #427
+
 ### 1.5.1
 
 * Fix BUG webcrawler collector doesn't handle href="javascript:void(0)"
