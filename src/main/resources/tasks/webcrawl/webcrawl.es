@@ -12,7 +12,10 @@ require('object.getownpropertydescriptors').shim();
 //import 'symbol-es6'; // This does not fix: TypeError: Cannot read property "Symbol" from undefined
 
 require('array.prototype.find').shim();
-import {toStr} from '@enonic/js-utils';
+import {
+	//VALUE_TYPE_STRING,
+	toStr
+} from '@enonic/js-utils';
 import guard from 'robots-txt-guard';
 
 // Cheerio import causes:
@@ -90,17 +93,57 @@ const outerHTML = node => node.clone().wrap('<div>').parent().html();
 
 
 export function run({
-	name, // Collection name
+	collectionId,
 	collectorId,
 	configJson,
-	language
+	language,
+	name // Collection name
 }) {
 	//log.debug(`name:${toStr(name)}`);
 	//log.debug(`collectorId:${toStr(collectorId)}`);
 	//log.debug(`configJson:${toStr(configJson)}`);
 	//log.debug(`language:${toStr(language)}`);
 
-	const collector = new Collector({name, collectorId, configJson, language});
+	const collector = new Collector({
+		collectionId,
+		collectorId,
+		configJson,
+		/*documentTypeObj: {
+			properties: [{
+				enabled: true,
+				fulltext: true,
+				includeInAllText: true,
+				max: 0,
+				min: 0,
+				name: 'text',
+				nGram: true,
+				path: false,
+				valueType: VALUE_TYPE_STRING
+			}, {
+				enabled: true,
+				fulltext: true,
+				includeInAllText: true,
+				max: 0,
+				min: 0,
+				name: 'title',
+				nGram: true,
+				path: false,
+				valueType: VALUE_TYPE_STRING
+			}, {
+				enabled: true,
+				fulltext: true,
+				includeInAllText: true,
+				max: 0,
+				min: 0,
+				name: 'uri',
+				nGram: true,
+				path: false,
+				valueType: VALUE_TYPE_STRING
+			}]
+		},*/
+		language,
+		name
+	});
 	if (!collector.config.baseUri) { throw new Error('Config is missing required parameter baseUri!'); }
 	collector.start();
 
