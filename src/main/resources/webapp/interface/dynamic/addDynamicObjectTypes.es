@@ -37,6 +37,44 @@ export function addDynamicObjectTypes({
 		}
 	});
 
+	const edgeType = glue.addObjectType({
+		name: GQL_OBJECT_TYPE_INTERFACE_SEARCH_CONNECTION_EDGE,
+		fields: {
+			cursor: {
+				type: nonNull(GraphQLString),
+				resolve(env) {
+					//log.debug(`cursor env:${toStr({env})}`);
+					return env.source.cursor;
+				}
+			},
+			node: {
+				type: objectTypeInterfaceSearchHit,
+				resolve(env) {
+					//log.debug(`node env:${toStr({env})}`);
+					return env.source.node;
+				}
+			}
+		}
+	});
+
+	const pageInfoType = glue.addObjectType({
+		name: GQL_OBJECT_TYPE_INTERFACE_SEARCH_CONNECTION_PAGE_INFO,
+		fields: {
+			endCursor: {
+				type: nonNull(GraphQLString),
+				resolve: (env) => encodeCursor(env.source.endCursor)
+			},
+			hasNext: {
+				type: nonNull(GraphQLBoolean),
+				resolve: (env) => env.source.hasNext
+			},
+			startCursor: {
+				type: nonNull(GraphQLString),
+				resolve: (env) => encodeCursor(env.source.startCursor)
+			}
+		}
+	});
+
 	glue.addObjectType({
 		name: GQL_OBJECT_TYPE_INTERFACE_SEARCH_CONNECTION,
 		fields: {
@@ -58,25 +96,7 @@ export function addDynamicObjectTypes({
 					//log.debug(`edges:${toStr({edges})}`);
 					return edges;
 				},
-				type: list(glue.addObjectType({
-					name: GQL_OBJECT_TYPE_INTERFACE_SEARCH_CONNECTION_EDGE,
-					fields: {
-						cursor: {
-							type: nonNull(GraphQLString),
-							resolve(env) {
-								//log.debug(`cursor env:${toStr({env})}`);
-								return env.source.cursor;
-							}
-						},
-						node: {
-							type: objectTypeInterfaceSearchHit,
-							resolve(env) {
-								//log.debug(`node env:${toStr({env})}`);
-								return env.source.node;
-							}
-						}
-					}
-				}))
+				type: list(edgeType)
 			},
 			pageInfo: {
 				resolve(env) {
@@ -87,23 +107,7 @@ export function addDynamicObjectTypes({
 						hasNext: (env.source.start + count) < env.source.total
 					};
 				},
-				type: glue.addObjectType({
-					name: GQL_OBJECT_TYPE_INTERFACE_SEARCH_CONNECTION_PAGE_INFO,
-					fields: {
-						endCursor: {
-							type: nonNull(GraphQLString),
-							resolve: (env) => encodeCursor(env.source.endCursor)
-						},
-						hasNext: {
-							type: nonNull(GraphQLBoolean),
-							resolve: (env) => env.source.hasNext
-						},
-						startCursor: {
-							type: nonNull(GraphQLString),
-							resolve: (env) => encodeCursor(env.source.startCursor)
-						}
-					}
-				})
+				type: pageInfoType
 			},
 			aggregations: { type: list(GQL_OBJECT_TYPE_AGGREGATIONS_UNION) },
 			aggregationsAsJson: { type: GraphQLJson }
