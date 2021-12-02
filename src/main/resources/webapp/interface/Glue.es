@@ -203,29 +203,23 @@ function buildSchema() {
 	 that doesn't exist in the schema.
 	 Simply adding the objectType to the dictionary, solves the problem.
 	*/
-	const uniqObjectTypesWithInterfaces = [];
-	Object.keys(this.objectTypes).forEach((k) => {
+	const objectTypesWithInterfaces = [];
+	const objectTypeNames = Object.keys(this.objectTypes);
+	for (var i = 0; i < objectTypeNames.length; i++) {
+		const objectTypeName = objectTypeNames[i];
 		if (
-			this.objectTypes[k].interfaces
-			&& Array.isArray(this.objectTypes[k].interfaces)
-			&& this.objectTypes[k].interfaces.length
+			this.objectTypes[objectTypeName].interfaces
+			&& Array.isArray(this.objectTypes[objectTypeName].interfaces)
+			&& this.objectTypes[objectTypeName].interfaces.length
 		) {
-			let alreadyAdded = false;
-			uniqObjectTypesWithInterfaces.forEach((obj) => {
-				if (obj === this.objectTypes[k].type) {
-					alreadyAdded = true; // TODO Break
-				}
-			});
-			if (!alreadyAdded) {
-				uniqObjectTypesWithInterfaces.push(this.objectTypes[k].type);
-			}
+			objectTypesWithInterfaces.push(this.objectTypes[objectTypeName].type);
 		}
-	});
-	//log.debug(`Number of objectTypes:${Object.keys(this.objectTypes).length} Number of objectTypes implementing interfaces:${uniqObjectTypesWithInterfaces.length}`);
+	} // for objectTypeNames
+	//log.debug(`Number of objectTypes:${Object.keys(this.objectTypes).length} Number of objectTypes implementing interfaces:${objectTypesWithInterfaces.length}`);
 
 	return this.schemaGenerator.createSchema({
 		//dictionary: Object.keys(this.objectTypes).map((k) => this.objectTypes[k].type), // No need to add all objectTypes...
-		dictionary: uniqObjectTypesWithInterfaces,
+		dictionary: objectTypesWithInterfaces,
 
 		//mutation:,
 		query: this.addObjectType({
