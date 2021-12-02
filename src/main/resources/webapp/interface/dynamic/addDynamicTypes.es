@@ -101,7 +101,7 @@ export function addDynamicTypes({
 
 	// Must be after addDynamicInterfaceTypes
 	addDocumentTypeObjectTypes({
-		camelToFieldObj,
+		camelToFieldObj, // modified within
 		documentTypeObjectTypes, // modified within
 		documentTypes,
 		globalFieldsObj,
