@@ -1,19 +1,13 @@
-
+//import {toStr} from '@enonic/js-utils';
 import {
 	GraphQLBoolean,
-	GraphQLFloat,
-	GraphQLID,
 	GraphQLInt,
 	Json as GraphQLJson,
 	GraphQLString,
 	list,
 	nonNull
 } from '/lib/graphql';
-import {
-	//createConnectionType,
-	//decodeCursor,
-	encodeCursor
-} from '/lib/graphql-connection';
+import {encodeCursor} from '/lib/graphql-connection';
 
 import {
 	GQL_INTERFACE_TYPE_DOCUMENT,
@@ -21,38 +15,14 @@ import {
 	GQL_OBJECT_TYPE_INTERFACE_SEARCH,
 	GQL_OBJECT_TYPE_INTERFACE_SEARCH_CONNECTION,
 	GQL_OBJECT_TYPE_INTERFACE_SEARCH_CONNECTION_EDGE,
-	GQL_OBJECT_TYPE_INTERFACE_SEARCH_CONNECTION_PAGE_INFO//,
-	//GQL_OBJECT_TYPE_INTERFACE_SEARCH_HIT,
-	//GQL_OBJECT_TYPE_INTERFACE_SEARCH_HIT_HIGHLIGHT//,
-	//GQL_UNION_TYPE_DOCUMENT_TYPES
+	GQL_OBJECT_TYPE_INTERFACE_SEARCH_CONNECTION_PAGE_INFO
 } from '../constants';
 
 
 export function addDynamicObjectTypes({
-	glue//,
-	//interfaceSearchHitsFieldsFromSchema
+	glue
 }) {
-	/*const interfaceSearchHitsFields = {
-		_collectionId: { type: nonNull(GraphQLID) },
-		_collectionName: { type: nonNull(GraphQLString) },
-		_documentTypeId: { type: nonNull(GraphQLString) },
-		_documentTypeName: { type: nonNull(GraphQLString) },
-		_highlight: { type: glue.getObjectType(GQL_OBJECT_TYPE_INTERFACE_SEARCH_HIT_HIGHLIGHT) },
-		_json: { type: GraphQLJson },
-		_repoId: { type: nonNull(GraphQLString) },
-		_score: { type: GraphQLFloat }
-	};
-	//log.debug(`Object.keys(interfaceSearchHitsFieldsFromSchema):${toStr(Object.keys(interfaceSearchHitsFieldsFromSchema))}`);
-	Object.keys(interfaceSearchHitsFieldsFromSchema).forEach((k) => {
-		interfaceSearchHitsFields[k] = interfaceSearchHitsFieldsFromSchema[k];
-	});
-
-	const objectTypeInterfaceSearchHit = glue.addObjectType({
-		name: GQL_OBJECT_TYPE_INTERFACE_SEARCH_HIT,
-		fields: interfaceSearchHitsFields
-	});*/
 	const objectTypeInterfaceSearchHit = glue.getInterfaceType(GQL_INTERFACE_TYPE_DOCUMENT);
-	//const objectTypeInterfaceSearchHit = glue.getUnionType(GQL_UNION_TYPE_DOCUMENT_TYPES);
 
 	const GQL_OBJECT_TYPE_AGGREGATIONS_UNION = glue.getUnionType(GQL_OBJECT_TYPE_AGGREGATIONS_UNION_NAME);
 

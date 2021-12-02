@@ -30,12 +30,6 @@ export function addDynamicInterfaceTypes({
 	interfaceSearchHitsHighlightsFields,
 	globalFieldsObj
 }) {
-	/*const highlightFields = {};
-	Object.keys(interfaceSearchHitsHighlightsFields).forEach((camelizedFieldKey) => {
-		highlightFields[camelizedFieldKey] = { // eslint-disable-line no-underscore-dangle
-			type: list(GraphQLString)
-		};
-	});*/
 	//log.debug(`addDynamicInterfaceTypes Object.keys(globalFieldsObj):${toStr(Object.keys(globalFieldsObj))}`);
 	const fields = {
 		_collectionId: { type: GraphQLID },
