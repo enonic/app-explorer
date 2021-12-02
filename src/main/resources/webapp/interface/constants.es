@@ -53,7 +53,6 @@ export const GQL_OBJECT_TYPE_AGGREGATION_RANGE_NAME = 'AggregationRange';
 export const GQL_OBJECT_TYPE_AGGREGATION_STATS_NAME = 'AggregationStats';
 export const GQL_OBJECT_TYPE_AGGREGATION_TERMS_NAME = 'AggregationTerms';
 export const GQL_OBJECT_TYPE_AGGREGATIONS_UNION_NAME = 'AggregationsUnion';
-//export const GQL_OBJECT_TYPE_GLOBAL_FIELD = 'GlobalField';
 export const GQL_OBJECT_TYPE_INTERFACE_SEARCH = 'InterfaceSearch';
 export const GQL_OBJECT_TYPE_INTERFACE_SEARCH_CONNECTION = 'InterfaceSearchConnection';
 export const GQL_OBJECT_TYPE_INTERFACE_SEARCH_CONNECTION_EDGE = 'InterfaceSearchConnectionEdge';
@@ -61,9 +60,6 @@ export const GQL_OBJECT_TYPE_INTERFACE_SEARCH_CONNECTION_PAGE_INFO = 'InterfaceS
 export const GQL_OBJECT_TYPE_INTERFACE_SEARCH_HIT = 'InterfaceSearchHit';
 export const GQL_OBJECT_TYPE_INTERFACE_SEARCH_HIT_HIGHLIGHT = 'InterfaceSearchHitHighlight';
 export const GQL_OBJECT_TYPE_QUERY = 'Query';
-
-
-export const GQL_UNION_TYPE_DOCUMENT_TYPES = 'DocumentTypesUnion';
 
 
 //log.debug(`Number.MIN_SAFE_INTEGER:${Number.MIN_SAFE_INTEGER} Number.MAX_SAFE_INTEGER:${Number.MAX_SAFE_INTEGER}`); // Undefined

@@ -14,10 +14,9 @@ import {getInterfaceInfo} from './getInterfaceInfo';
 
 
 const schemaGenerator = newSchemaGenerator();
-//import {DEFAULT_INTERFACE_FIELDS} from '../constants';
 
 /*──────────────────────────────────────────────────────────────────────────────
-In order to make a documentTypesUnion supporting GraphQL inline fragments (... on documentType)
+In order to make a documentTypesInterface supporting GraphQL inline fragments (... on documentType)
 I have to make one objectType per documentType and it needs a unqiue name
 It needs all global fields, and all documentType local fields
 ────────────────────────────────────────────────────────────────────────────────
@@ -113,59 +112,6 @@ export function generateSchemaForInterface(interfaceName) {
 	//──────────────────────────────────────────────────────────────────────────
 	// 3. Make one objectType per documentType
 	//──────────────────────────────────────────────────────────────────────────
-	//log.debug(`fieldsRes.hits:${toStr(fieldsRes.hits)}`);
-	/*fieldsRes.hits.forEach(({
-		fieldType: valueType,
-		inResults,
-		//isSystemField = false,
-		key/*,
-		max, // TODO nonNull list
-		min
-	}) => {
-		if (valueType) {
-			const camelizedFieldKey = camelize(key, /[.-]/g);
-			camelToFieldObj[camelizedFieldKey] = key;
-			//log.debug(`key:${toStr(key)} camelized:${toStr(camelizedFieldKey)}`);
-			/*if (![VALUE_TYPE_ANY, VALUE_TYPE_SET].includes(valueType)) {
-				//fieldKeysForAggregations.push(camelizedFieldKey);
-				//fieldKeysForFilters.push(camelizedFieldKey);
-			}
-			//log.debug(`key:${toStr(key)} camelized:${toStr(camelizedFieldKey)} inResults:${toStr(inResults)}`);
-			if (inResults !== false) {
-				/*highlightParameterPropertiesFields[camelizedFieldKey] = { type: glue.addInputType({
-					name: `HighlightParameterProperties${ucFirst(camelizedFieldKey)}`,
-					fields: {
-						fragmenter: { type: GRAPHQL_ENUM_TYPE_HIGHLIGHT_OPTION_FRAGMENTER },
-						fragmentSize: { type: GraphQLInt },
-						noMatchSize: { type: GraphQLInt },
-						numberOfFragments: { type: GraphQLInt },
-						order: { type: GRAPHQL_ENUM_TYPE_HIGHLIGHT_OPTION_ORDER },
-						postTag: { type: GraphQLString },
-						preTag: { type: GraphQLString },
-						requireFieldMatch: { type: GraphQLBoolean }
-					}
-				})};
-
-				//interfaceSearchHitsFieldsFromSchema[camelizedFieldKey] = { type };
-				/*VALUE_TYPE_VARIANTS.forEach((vT) => {
-					interfaceSearchHitsFieldsFromSchema[
-						`${camelizedFieldKey}_as_${vT}`
-					] = { type: valueTypeToGraphQLType(vT) };
-				});
-
-				const type = valueTypeToGraphQLType(valueType);
-				interfaceSearchHitsHighlightsFields[camelizedFieldKey] = { type: list(type) };
-			}
-		}
-	}); // fields.forEach*/
-	//log.debug(`camelToFieldObj:${toStr(camelToFieldObj)}`);
-
-	// Name must be non-null, non-empty and match [_A-Za-z][_0-9A-Za-z]* - was 'GraphQLScalarType{name='String', description='Built-in String', coercing=graphql.Scalars$3@af372a4}'
-	//enumFieldsValues.push(GraphQLString);
-
-	//log.debug(`enumFieldsValues:${toStr(enumFieldsValues)}`);
-	//log.debug(`highlightParameterPropertiesFields:${toStr(highlightParameterPropertiesFields)}`);
-
 	addDynamicTypes({
 		allFieldKeys,
 		camelToFieldObj,

@@ -12,7 +12,7 @@ import {
 	camelize,
 	forceArray,
 	sortKeys,
-	toStr,
+	//toStr,
 	ucFirst
 } from '@enonic/js-utils';
 import setIn from 'set-value'; // Number.isInteger and Reflect
@@ -22,7 +22,6 @@ import {GraphQLString} from '/lib/graphql';
 import {
 	GQL_INPUT_FIELDS_HIGHLIGHT_PROPERTIES,
 	GQL_INTERFACE_TYPE_DOCUMENT,
-	//GQL_OBJECT_TYPE_GLOBAL_FIELD,
 	GQL_OBJECT_TYPE_INTERFACE_SEARCH_HIT_HIGHLIGHT
 } from '../constants';
 import {documentTypeNameToGraphQLObjectTypeName} from './documentTypeNameToGraphQLObjectTypeName';
@@ -33,7 +32,6 @@ import {addDynamicEnumTypes} from './addDynamicEnumTypes';
 import {addDynamicInputTypes} from './addDynamicInputTypes';
 import {addDynamicInterfaceTypes} from './addDynamicInterfaceTypes';
 import {addDynamicObjectTypes} from './addDynamicObjectTypes';
-//import {addDynamicUnionTypes} from './addDynamicUnionTypes';
 
 
 const VALUE_TYPE_VARIANTS = [
@@ -52,9 +50,8 @@ const VALUE_TYPE_VARIANTS = [
 /*──────────────────────────────────────────────────────────────────────────────
 An objectType per documentType will be generated.
 Global and "magic" fields will be added to an interfaceType.
-The list of objectTypes is used both in the interfaceType and unionType resolvers.
+The list of objectTypes is used in the interfaceType resolver.
 When we define the resolvers we may use a js-reference to an empty object, which later will contain the objectTypes.
-When we define the unionType, we can use lib-graphql.reference, but we need to have a list of the objectType names, so we might as well use the objectTypes directly.
 Q: Can we use lib-graphql.reference in objectType.interfaces?
 ──────────────────────────────────────────────────────────────────────────────*/
 
@@ -135,22 +132,6 @@ export function addDynamicTypes({
 	}); // documentTypes.forEach
 	//log.debug(`documentTypeObjectTypes:${toStr(documentTypeObjectTypes)}`);
 
-	/* interfaceTypeDocument.typeResolver never resolves to this...
-	documentTypeObjectTypes[GQL_OBJECT_TYPE_GLOBAL_FIELD] = glue.addObjectType({
-		name: GQL_OBJECT_TYPE_GLOBAL_FIELD,
-		fields: {
-			_highlight: { type: glue.getObjectType(GQL_OBJECT_TYPE_INTERFACE_SEARCH_HIT_HIGHLIGHT) },
-			...objToGraphQL({
-				documentTypeName: GQL_OBJECT_TYPE_GLOBAL_FIELD,
-				glue,
-				obj: globalFieldsObj
-			})
-		},
-		interfaces: [
-			interfaceTypeDocument
-		]
-	});*/
-
 	//──────────────────────────────────────────────────────────────────────────
 
 	const fieldKeysForAggregations = [];
@@ -185,15 +166,7 @@ export function addDynamicTypes({
 		highlightParameterPropertiesFields
 	});
 
-	// Must be after populating documentTypeObjectTypes
-	// Must be before addDynamicObjectTypes
-	/*addDynamicUnionTypes({
-		documentTypeObjectTypes, // Must be populated already, since used in types inside
-		glue
-	});*/
-
 	// Must be after addDynamicInterfaceTypes
-	// Must be after addDynamicUnionTypes
 	addDynamicObjectTypes({
 		glue,
 		interfaceSearchHitsFieldsFromSchema
