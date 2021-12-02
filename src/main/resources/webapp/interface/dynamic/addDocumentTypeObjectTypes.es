@@ -27,9 +27,9 @@ export function addDocumentTypeObjectTypes({
 		properties
 	}) => {
 		const mergedglobalFieldsObj = mergeFields({
-			camelToFieldObj,
-			globalFieldsObj,
-			properties
+			camelToFieldObj, // modified
+			globalFieldsObj, // just read
+			properties // just read
 		});
 
 		//log.debug(`addDynamicTypes Object.keys(globalFieldsObj):${toStr(Object.keys(globalFieldsObj))}`);
