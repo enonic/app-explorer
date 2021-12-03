@@ -320,65 +320,15 @@ export function Interfaces({
 					<Table.Row verticalAlign='middle'>
 						<Table.Cell collapsing>
 							<Radio
-								label={"Show collection count"}
-								className='inverted'
-								checked={showCollectionCount}
-								onChange={(ignored,{checked}) => {
-									setShowCollectionCount(checked);
-								}}
-								toggle
-							/>
-						</Table.Cell>
-						<Table.Cell collapsing>
-							<Radio
-								label={"Show collection(s)"}
+								label={"Show all fields"}
 								className='inverted'
 								checked={showCollections}
 								onChange={(ignored,{checked}) => {
+									// setShowCollectionCount(checked);
 									setShowCollections(checked);
-								}}
-								toggle
-							/>
-						</Table.Cell>
-						<Table.Cell collapsing>
-							<Radio
-								label={"Show field(s)"}
-								className='inverted'
-								checked={showFields}
-								onChange={(ignored,{checked}) => {
 									setShowFields(checked);
-								}}
-								toggle
-							/>
-						</Table.Cell>
-						<Table.Cell collapsing>
-							<Radio
-								label={"Show synonyms"}
-								className='inverted'
-								checked={showSynonyms}
-								onChange={(ignored,{checked}) => {
 									setShowSynonyms(checked);
-								}}
-								toggle
-							/>
-						</Table.Cell>
-						<Table.Cell collapsing>
-							<Radio
-								label={"Show stopwords"}
-								className='inverted'
-								checked={showStopWords}
-								onChange={(ignored,{checked}) => {
 									setShowStopWords(checked);
-								}}
-								toggle
-							/>
-						</Table.Cell>
-						<Table.Cell collapsing>
-							<Radio
-								label={"Show delete"}
-								className='inverted'
-								checked={showDelete}
-								onChange={(ignored,{checked}) => {
 									setShowDelete(checked);
 								}}
 								toggle

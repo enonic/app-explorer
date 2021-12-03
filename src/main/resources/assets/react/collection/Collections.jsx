@@ -431,76 +431,16 @@ export function Collections(props) {
 					<Table.Row verticalAlign='middle'>
 						<Table.Cell collapsing>
 							<Radio
-								label={"Show collector"}
+								label={"Show all fields"}
 								className='inverted'
 								checked={showCollector}
 								onChange={(ignored,{checked}) => {
 									setShowCollector(checked);
-								}}
-								toggle
-							/>
-						</Table.Cell>
-						<Table.Cell collapsing>
-							<Radio
-								label={"Show document count"}
-								className='inverted'
-								checked={showDocumentCount}
-								onChange={(ignored,{checked}) => {
-									setShowDocumentCount(checked);
-								}}
-								toggle
-							/>
-						</Table.Cell>
-						<Table.Cell collapsing>
-							<Radio
-								label={"Show language"}
-								className='inverted'
-								checked={showLanguage}
-								onChange={(ignored,{checked}) => {
+									// setShowDocumentCount(checked);
 									setShowLanguage(checked);
-								}}
-								toggle
-							/>
-						</Table.Cell>
-						<Table.Cell collapsing>
-							<Radio
-								label={"Show document type"}
-								className='inverted'
-								checked={showDocumentType}
-								onChange={(ignored,{checked}) => {
 									setShowDocumentType(checked);
-								}}
-								toggle
-							/>
-						</Table.Cell>
-						<Table.Cell collapsing>
-							<Radio
-								label={"Show interfaces"}
-								className='inverted'
-								checked={showInterfaces}
-								onChange={(ignored,{checked}) => {
 									setShowInterfaces(checked);
-								}}
-								toggle
-							/>
-						</Table.Cell>
-						<Table.Cell collapsing>
-							<Radio
-								label={"Show schedule"}
-								className='inverted'
-								checked={showSchedule}
-								onChange={(ignored,{checked}) => {
 									setShowSchedule(checked);
-								}}
-								toggle
-							/>
-						</Table.Cell>
-						<Table.Cell collapsing>
-							<Radio
-								label={"Show delete"}
-								className='inverted'
-								checked={showDelete}
-								onChange={(ignored,{checked}) => {
 									setShowDelete(checked);
 								}}
 								toggle

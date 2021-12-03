@@ -45,8 +45,8 @@ export const Api = (props) => {
 	const [queryInterfacesGraph, setQueryInterfacesGraph] = React.useState({});
 	const [boolPoll, setBoolPoll] = React.useState(true);
 
-	const [showCollections, setShowCollections] = React.useState(true);
-	const [showInterfaces, setShowInterfaces] = React.useState(true);
+	const [showCollections, setShowCollections] = React.useState(false);
+	const [showInterfaces, setShowInterfaces] = React.useState(false);
 
 	const fetchApiKeys = () => {
 		fetch(`${servicesBaseUrl}/graphQL`, {
@@ -85,21 +85,11 @@ export const Api = (props) => {
 					<Table.Row verticalAlign='middle'>
 						<Table.Cell collapsing>
 							<Radio
-								label={"Show collection(s)"}
+								label={"Show all fields"}
 								className='inverted'
 								checked={showCollections}
 								onChange={(ignored,{checked}) => {
 									setShowCollections(checked);
-								}}
-								toggle
-							/>
-						</Table.Cell>
-						<Table.Cell collapsing>
-							<Radio
-								label={"Show interface(s)"}
-								className='inverted'
-								checked={showInterfaces}
-								onChange={(ignored,{checked}) => {
 									setShowInterfaces(checked);
 								}}
 								toggle
