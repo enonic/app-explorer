@@ -122,7 +122,7 @@ export function DocumentTypes({
 					<Table.Row verticalAlign='middle'>
 						<Table.Cell collapsing>
 							<Radio
-								label={"All fields"}
+								label={"Show all fields"}
 								className='inverted'
 								checked={showCollections}
 								onChange={(ignored,{checked}) => {
