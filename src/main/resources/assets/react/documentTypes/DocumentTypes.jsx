@@ -388,7 +388,6 @@ export function DocumentTypes({
 			collectionsArr={newOrEditModalState.collectionsArr}
 			interfacesArr={newOrEditModalState.interfacesArr}
 			open={newOrEditModalState.open}
-			keepOpen={newOrEditModalState.keepOpen}
 			setModalState={setNewOrEditModalState}
 			documentTypes={documentTypes}
 			onClose={() => {

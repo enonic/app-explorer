@@ -11,8 +11,7 @@ export function NewOrEditDocumentTypeModal({
 	onMount = () => {},
 	setModalState,
 	servicesBaseUrl,
-	documentTypes,
-	keepOpen
+	documentTypes
 }) {
 	return <Modal
 		closeIcon
@@ -32,7 +31,6 @@ export function NewOrEditDocumentTypeModal({
 			servicesBaseUrl={servicesBaseUrl}
 			setModalState={setModalState}
 			documentTypes={documentTypes}
-			keepOpen={keepOpen}
 		/>
 	</Modal>;
 } // NewOrEditDocumentTypeModal
