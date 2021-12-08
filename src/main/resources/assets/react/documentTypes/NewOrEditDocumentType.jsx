@@ -7,21 +7,19 @@ import {
 	Modal,
 	Segment,
 	Tab,
-	Message,
-	Radio
+	// Message,
+	Radio,
+	FormField
 } from 'semantic-ui-react';
-// import {ResetButton} from 'semantic-ui-react-form/buttons/ResetButton';
-// import {SubmitButton} from 'semantic-ui-react-form/buttons/SubmitButton';
-// import {Checkbox} from 'semantic-ui-react-form/inputs/Checkbox';
-// import {Input} from 'semantic-ui-react-form/inputs/Input';
 
 import {GQL_MUTATION_DOCUMENT_TYPE_CREATE} from '../../../services/graphQL/mutations/documentTypeCreateMutation';
 import {GQL_MUTATION_DOCUMENT_TYPE_UPDATE} from '../../../services/graphQL/mutations/documentTypeUpdateMutation';
 import {GQL_QUERY_DOCUMENT_TYPE_GET} from '../../../services/graphQL/queries/documentTypeGetQuery';
 
-import {fetchFields} from '../../../services/graphQL/fetchers/fetchFields';
+// import {fetchFields} from '../../../services/graphQL/fetchers/fetchFields';
 import {nameValidator} from '../utils/nameValidator';
-import {FieldsList} from './FieldsList';
+// import {FieldsList} from './FieldsList';
+import DocumentFieldList from './DocumentFieldsList';
 
 /**
  * Validated the name input
@@ -49,7 +47,7 @@ function validateName(value, documentTypes) {
  * @param header string Headline for the error message
  * @param messsage string The actual error message itself
  */
-function createErrorMessage(header, message) {
+/* function createErrorMessage(header, message) {
 	return <Message icon negative>
 		<Icon name="warning"/>
 		<Message.Content>
@@ -57,28 +55,31 @@ function createErrorMessage(header, message) {
 			{message}
 		</Message.Content>
 	</Message>;
-}
-
-const initialState = {
-	_name: '',
-	addFields: true,
-	properties: [],
-	firstInput: true
-};
+} */
 
 export function NewOrEditDocumentType({
 	doClose = () => {},
 	_id, // optional
-	_name: documentTypeName, // optional
+	_name, // optional
 	collectionsArr = [], // optional
 	interfacesArr = [], // optional
 	servicesBaseUrl,
 	setModalState,
 	documentTypes
 }) {
-	const [{_name, addFields, _versionKey, properties, firstInput}, setState] = React.useState(_id ? false : initialState);
-	const [globalFields, setGlobalFields] = React.useState([]);
+	const [state, setState] = React.useState({
+		_id: undefined,
+		addFields: true,
+		_name,
+		_versionKey: undefined,
+		properties: []
+	});
+	// const [versionKey, setVersionKey] = React.useState();
+	// const [globalFields, setGlobalFields] = React.useState([]);
+	const [name, setName] = React.useState('');
 	const [error, setError] = React.useState(null);
+	const [activeInput, setActiveInput] = React.useState(false);
+	const [isLoading, setIsLoading] = React.useState(_id ? true : false);
 
 	function getDocumentType() {
 		fetch(`${servicesBaseUrl}/graphQL`, {
@@ -94,31 +95,31 @@ export function NewOrEditDocumentType({
 			})
 		})
 			.then(response => response.json())
-			.then(data => {
-				console.log(data);
-				//TODO
-				// setState(data.data.getDocumentType);
+			.then(result => {
+				const data = result.data.getDocumentType;
+				setState({...data});
+				setIsLoading(false);
 			});
 	}
 
 	React.useEffect(() => {
-		if (_id === undefined && !firstInput) {
-			const validOrError = validateName(_name, documentTypes);
-			console.debug('Validate name');
+		if (state._id === undefined && activeInput) {
+			const validOrError = validateName(name, documentTypes);
+
 			if (validOrError !== true) {
-				setError(createErrorMessage('Name', validOrError));
+				setError(validOrError);
 			} else {
-				setError(null);
+				setError(false);
 			}
 		} else {
 			// Reset potential errors, so nothing is disabled
-			setError(null);
+			setError(false);
 		}
 	// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [_name, documentTypes]);
+	}, [name]);
 
 	React.useEffect(() => {
-		fetchFields({
+		/*fetchFields({
 			handleData: (data) => {
 				setGlobalFields(data.queryFields.hits);
 			},
@@ -126,53 +127,52 @@ export function NewOrEditDocumentType({
 			variables: {
 				includeSystemFields: false
 			}
-		});
+		}); */
 
 		if (_id) {
 			// Get document type
-			console.log("GetDocumentType");
 			getDocumentType();
 		}
 	}, []); // After first paint only
 
-	if (properties) {
-		properties.forEach(({name}) => {
-			properties[name] = true;
+	if (state.properties) {
+		state.properties.forEach(({name}) => {
+			state.properties[name] = true;
 		});
 	}
 
-
 	let disabled;
-	if (error || !_id) {
-		if (!_id && !firstInput) {
+	if (error || !state._id) {
+		if (!state._id && !activeInput) {
 			disabled == true;
 		} else {
 			disabled = false;
 		}
 	}
 
-	return properties
+	console.debug(state);
+
+	return !isLoading
 		?
 		<>
 			<Modal.Content>
 				<Form
 					id='documentForm'
-					onSubmit={(values) => {
-						//TODO check values
-						console.debug(values);
-						const {addFields, properties} = values;
+					onSubmit={(event) => {
+						event.preventDefault();
 
 						const variables = {
-							_name,
-							addFields,
-							properties
+							_name: name,
+							addFields: state.addFields,
+							properties: state.properties
 						};
 
 						if (_id) {
-							variables._id = _id;
-							variables._versionKey = _versionKey;
+							variables._id = state._id;
+							variables._versionKey = state._versionKey;
 						}
-						//console.debug('submit variables', variables);
+
+						setIsLoading(true);
 
 						fetch(`${servicesBaseUrl}/graphQL`, {
 							method: 'POST',
@@ -184,14 +184,14 @@ export function NewOrEditDocumentType({
 								variables
 							})
 						}).then(response => {
-							//console.debug('response', response);
+
 							if (response.status === 200) {
-								if (_id) {
+								if (state._id) {
 									doClose();
 								} else {
-									//console.debug('response.json()', response.json()); // Promise
+
 									response.json().then(json => {
-										//console.debug('json', json);
+
 										if (json.errors) {
 											console.error(`Getting the documenttype json`);
 											console.error(json.errors);
@@ -199,19 +199,17 @@ export function NewOrEditDocumentType({
 										} else {
 											const {
 												_id,
-												_name/*,
-												addFields,
-												properties*/
+												_name
 											} = json.data.createDocumentType;
+
+											// setState(prev => ({
 											setModalState(prev => ({
+												...prev,
 												_id,
 												_name,
-												collectionsArr: prev.collectionsArr,
-												interfacesArr: prev.interfacesArr,
 												open: true
 											}));
 										}
-										// setInitialValues(false); // Should unmount the EnonicForm, trigger getDocumentType, and remount Enonicform?
 									});
 								}
 							}
@@ -222,7 +220,7 @@ export function NewOrEditDocumentType({
 						defaultActiveIndex={0}
 						panes={(() => {
 							const panes = [];
-							if (_id) {
+							if (state._id) {
 								panes.push({
 									menuItem: {
 										content: 'Fields',
@@ -230,12 +228,12 @@ export function NewOrEditDocumentType({
 										key: 'fields'
 									},
 									render: () => <Tab.Pane>
-										<FieldsList
-											documentTypeName={documentTypeName}
+										<DocumentFieldList
+											documentTypeName={_name}
 											collectionsArr={collectionsArr}
-											globalFields={globalFields}
 											interfacesArr={interfacesArr}
 											servicesBaseUrl={servicesBaseUrl}
+											properties={state.properties}
 										/>
 									</Tab.Pane>
 								});
@@ -249,31 +247,46 @@ export function NewOrEditDocumentType({
 								render: () => <Tab.Pane>
 									<Form as='div'>
 										<Form.Field>
-											<Form.Input
-												fluid
-												disabled={_id ? true : false}
-												onChange={(event, data) => {
-													setInitialValues(prev => {
-														const next = prev;
-														next._name = data.value;
-														if (next.firstInput) {
-															next.firstInput = false;
+											{state._id ?
+												<Form.Input
+													fluid
+													disabled={true}
+													label='Name'
+													value={state._name}
+												/>
+												:
+												<Form.Input
+													fluid
+													onChange={(event, data) => {
+														// setName(data.value);
+														setName(data.value);
+
+														if (!activeInput) {
+															setActiveInput(true);
 														}
-														return next;
-													});
-												}}
-												label='Name'
-												path='_name'
-												placeholder='Please input an unique name'
-												value={_name || ""}
-												error={error}
-											/>
+													}}
+													label='Name'
+													path='_name'
+													placeholder='Please input an unique name'
+													value={name}
+													error={error}
+												/>
+											}
 										</Form.Field>
 										<Form.Field>
 											<Radio
 												label='Add new fields automatically when creating/updating documents?'
 												name='addFields'
+												onChange= {(event, data) => {
+													setState(prev => {
+														return {
+															...prev,
+															addFields: data.checked
+														};
+													});
+												}}
 												toggle
+												checked={state.addFields}
 											/>
 										</Form.Field>
 									</Form>
@@ -295,11 +308,13 @@ export function NewOrEditDocumentType({
 			</Modal.Actions>
 		</>
 		: <>
-			<Modal.Content><Segment>
-				<Dimmer active inverted>
-					<Loader inverted>Loading</Loader>
-				</Dimmer>
-			</Segment></Modal.Content>
+			<Modal.Content>
+				<Segment>
+					<Dimmer active inverted>
+						<Loader inverted>Loading</Loader>
+					</Dimmer>
+				</Segment>
+			</Modal.Content>
 			<Modal.Actions>
 				<Button onClick={() => doClose()}>Cancel</Button>
 			</Modal.Actions>
