@@ -195,7 +195,7 @@ export const FieldsList = ({
 						min,
 						nGram,
 						path
-					}, i) => <Table.Row className={active ? null : 'strikeout'} key={i}>
+					}, i) => <Table.Row className={active || global ? null : 'strikeout'} key={i}>
 						<Table.Cell collapsing style={cellStyle} textAlign='center'>
 							<Button.Group>
 								<Popup
