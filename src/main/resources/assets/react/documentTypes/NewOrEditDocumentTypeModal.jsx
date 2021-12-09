@@ -11,7 +11,7 @@ export function NewOrEditDocumentTypeModal({
 	onMount = () => {},
 	setModalState,
 	servicesBaseUrl,
-	documentTypes
+	documentTypes,
 }) {
 	return <Modal
 		closeIcon
