@@ -64,7 +64,6 @@ export function NewOrEditDocumentType({
 	documentTypes
 }) {
 	const [state, setState] = React.useState({
-		_id: undefined,
 		_name: '',
 		_versionKey: undefined,
 		addFields: true,
@@ -73,14 +72,9 @@ export function NewOrEditDocumentType({
 	const [error, setError] = React.useState([]);
 	const [name, setName] = React.useState('');
 	const [activeInput, setActiveInput] = React.useState(false);
-	const [isLoading, setIsLoading] = React.useState(true);
+	const [isLoading, setIsLoading] = React.useState(_id ? true : false);
 
-	/*const [fieldModalState, setFieldModalState] = React.useState({
-		local: true,
-		open: false
-	});*/
-
-	function getDocumentType() {
+	function getDocumentType(id) {
 		fetch(`${servicesBaseUrl}/graphQL`, {
 			method: 'POST',
 			headers: {
@@ -89,7 +83,7 @@ export function NewOrEditDocumentType({
 			body: JSON.stringify({
 				query: GQL_QUERY_DOCUMENT_TYPE_GET,
 				variables: {
-					_id
+					_id: id
 				}
 			})
 		})
@@ -129,8 +123,7 @@ export function NewOrEditDocumentType({
 		}); */
 
 		if (_id) {
-			// Get document type
-			getDocumentType();
+			getDocumentType(_id);
 		}
 	}, []); // After first paint only
 
@@ -151,152 +144,181 @@ export function NewOrEditDocumentType({
 		disabled = false;
 	}
 
-	console.debug(state);
+	/**
+	 * Creates or updates a document model with a fetch call
+	 * @param {object} data stat that the document will be updated to
+	 * @param {function} success method that will be called when completed
+	 * @param {callback} [failure=function(Print error)] optional method that will be called when something goes wrong
+	 */
+	function createOrUpdateDocument(data, success, failure = error => {
+		console.error(error);
+	}) {
+		const variables = {
+			_name: data._name,
+			addFields: data.addFields,
+			properties: data.properties
+		};
 
-	return isLoading
+		if (_id) {
+			variables._id = _id;
+			variables._versionKey = state._versionKey;
+		}
+
+		fetch(`${servicesBaseUrl}/graphQL`, {
+			method: 'POST',
+			headers: {
+				'Content-Type':	'application/json'
+			},
+			body: JSON.stringify({
+				query: _id ? GQL_MUTATION_DOCUMENT_TYPE_UPDATE : GQL_MUTATION_DOCUMENT_TYPE_CREATE,
+				variables
+			})
+		}).then(response => {
+			if (response.status === 200) {
+				return response.json();
+			} else {
+				throw response;
+			}
+		}).then(response => {
+			success(response);
+		}).catch(error => {
+			failure(error);
+		});
+	}
+
+	/**
+	 * The state handles all form values, so we can call this freely.
+	 */
+	function submitDocumentForm() {
+		setIsLoading(true);
+		// get the currnt name. (even if its allready set in storrage)
+		state._name = _name || name;
+
+		createOrUpdateDocument(state, response => {
+			if (response.errors) {
+				console.error(`Getting the documenttype json`);
+				console.error(response.errors);
+			} else {
+				if (_id) {
+					doClose();
+				} else {
+					const resultDocumentType = response.data.createDocumentType;
+					const updateId = resultDocumentType._id;
+					const updateName = resultDocumentType._name;
+
+					setModalState(prev => ({
+						...prev,
+						_id: updateId,
+						_name: updateName,
+						open: true
+					}));
+					getDocumentType(updateId);
+				}
+			}
+
+		});
+	}
+
+	return !isLoading
 		?
 		<>
 			<Modal.Content>
-				<Form
-					id='documentForm'
-					onSubmit={() => {
-
-						const variables = {
-							_name: name || state._name,
-							addFields: state.addFields,
-							properties: state.properties
-						};
-
+				<Tab
+					defaultActiveIndex={0}
+					panes={(() => {
+						const panes = [];
 						if (_id) {
-							variables._id = _id;
-							variables._versionKey = state._versionKey;
-						}
-
-						setIsLoading(true);
-
-						fetch(`${servicesBaseUrl}/graphQL`, {
-							method: 'POST',
-							headers: {
-								'Content-Type':	'application/json'
-							},
-							body: JSON.stringify({
-								query: _id ? GQL_MUTATION_DOCUMENT_TYPE_UPDATE : GQL_MUTATION_DOCUMENT_TYPE_CREATE,
-								variables
-							})
-						}).then(response => {
-
-							if (response.status === 200) {
-								if (state._id) {
-									doClose();
-								} else {
-
-									response.json().then(json => {
-
-										if (json.errors) {
-											console.error(`Getting the documenttype json`);
-											console.error(json.errors);
-											return;
-										} else {
-											const {
-												_id,
-												_name
-											} = json.data.createDocumentType;
-
-											setModalState(prev => ({
-												...prev,
-												_id,
-												_name,
-												open: true
-											}));
-										}
-									});
-								}
-							}
-						});
-					}}
-				>
-					<Tab
-						defaultActiveIndex={0}
-						panes={(() => {
-							const panes = [];
-							if (state._id) {
-								panes.push({
-									menuItem: {
-										content: 'Fields',
-										icon: 'list',
-										key: 'fields'
-									},
-									render: () => <Tab.Pane>
-										<FieldsList
-											documentTypeName={documentTypes}
-											collectionsArr={collectionsArr}
-											globalFields={[]}
-											interfacesArr={interfacesArr}
-											servicesBaseUrl={servicesBaseUrl}
-											properties={state.properties}
-										/>
-									</Tab.Pane>
-								});
-							} // if _id
 							panes.push({
 								menuItem: {
-									content: 'Settings',
-									icon: 'setting',
-									key: 'settings'
+									content: 'Fields',
+									icon: 'list',
+									key: 'fields'
 								},
 								render: () => <Tab.Pane>
-									<Form as='div'>
-										<Form.Field>
-											{ _id ?
-												<Form.Input
-													fluid
-													label="Name"
-													disabled={true}
-													value={_name}
-												/>
-												:
-												<Form.Input
-													fluid
-													onChange={(event, data) => {
-														// setName(data.value);
-														setName(data.value);
+									<FieldsList
+										collectionsArr={collectionsArr}
+										interfacesArr={interfacesArr}
+										servicesBaseUrl={servicesBaseUrl}
+										properties={state.properties}
+										updateOrDeleteProperties={function(newValues, index) {
+											// Uncomment if we actually want to submit the value in addOrEditLocalFieldModal
+											// createOrUpdateDocument(state, () => {
+											setState(prev => {
+												let next = prev;
+												if (newValues == null) {
+													delete(next.properties[index]);
+												} else {
+													next.properties[index] = {...newValues};
+												}
 
-														if (!activeInput) {
-															setActiveInput(true);
-														}
-													}}
-													label='Name'
-													path='_name'
-													placeholder='Please input an unique name'
-													value={name}
-													error={error}
-												/>
-											}
-										</Form.Field>
-										<Form.Field>
-											<Radio
-												label='Add new fields automatically when creating/updating documents?'
-												name='addFields'
-												onChange= {(event, data) => {
-													setState(prev => {
-														return {
-															...prev,
-															addFields: data.checked
-														};
-													});
-												}}
-												toggle
-												checked={state.addFields}
-											/>
-										</Form.Field>
-									</Form>
+												return {
+													...next
+												};
+											});
+											// });
+										}}
+									/>
 								</Tab.Pane>
 							});
-							return panes;
-						})()}
-						renderActiveOnly={true/*For some reason everything is gone when set to false???*/}
-					/>
-				</Form>
+						} // if _id
+						panes.push({
+							menuItem: {
+								content: 'Settings',
+								icon: 'setting',
+								key: 'settings'
+							},
+							render: () => <Tab.Pane>
+								<Form>
+									<Form.Field>
+										{ _id ?
+											<Form.Input
+												fluid
+												label="Name"
+												disabled={true}
+												value={_name}
+											/>
+											:
+											<Form.Input
+												fluid
+												onChange={(event, data) => {
+													// setName(data.value);
+													setName(data.value);
+
+													if (!activeInput) {
+														setActiveInput(true);
+													}
+												}}
+												label='Name'
+												path='_name'
+												placeholder='Please input an unique name'
+												value={name}
+												error={error}
+											/>
+										}
+									</Form.Field>
+									<Form.Field>
+										<Radio
+											label='Add new fields automatically when creating/updating documents?'
+											name='addFields'
+											onChange= {(event, data) => {
+												setState(prev => {
+													return {
+														...prev,
+														addFields: data.checked
+													};
+												});
+											}}
+											toggle
+											checked={state.addFields}
+										/>
+									</Form.Field>
+								</Form>
+							</Tab.Pane>
+						});
+						return panes;
+					})()}
+					renderActiveOnly={true/*For some reason everything is gone when set to false???*/}
+				/>
 			</Modal.Content>
 			<Modal.Actions>
 				{
@@ -304,7 +326,9 @@ export function NewOrEditDocumentType({
 					/* {_id ? <ResetButton floated='left' secondary/> : null} */
 				}
 				<Button onClick={() => doClose()}>Cancel</Button>
-				<Button form="documentForm" type="submit" disabled={disabled} color={() => null} primary><Icon name='save'/>Save</Button>
+				<Button disabled={disabled} color={() => null} onClick={()=>{submitDocumentForm();}} primary>
+					<Icon name='save'/>Save
+				</Button>
 			</Modal.Actions>
 		</>
 		: <>
