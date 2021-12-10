@@ -392,13 +392,7 @@ export function DocumentTypes({
 			documentTypes={documentTypes}
 			onClose={() => {
 				//console.debug('NewOrEditDocumentTypeModal onClose');
-				setNewOrEditModalState(prev => ({
-					_id: prev._id,
-					_name: prev._name,
-					collectionsArr: prev.collectionsArr,
-					interfacesArr: prev.interfacesArr,
-					open: false
-				}));
+				setNewOrEditModalState(getDefaultModalState(false));
 				queryDocumentTypes();
 				setBoolPoll(true);
 			}}

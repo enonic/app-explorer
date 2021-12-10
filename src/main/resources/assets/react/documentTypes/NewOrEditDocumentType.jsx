@@ -8,8 +8,7 @@ import {
 	Segment,
 	Tab,
 	// Message,
-	Radio,
-	FormField
+	Radio
 } from 'semantic-ui-react';
 
 import {GQL_MUTATION_DOCUMENT_TYPE_CREATE} from '../../../services/graphQL/mutations/documentTypeCreateMutation';
@@ -18,8 +17,7 @@ import {GQL_QUERY_DOCUMENT_TYPE_GET} from '../../../services/graphQL/queries/doc
 
 // import {fetchFields} from '../../../services/graphQL/fetchers/fetchFields';
 import {nameValidator} from '../utils/nameValidator';
-// import {FieldsList} from './FieldsList';
-import DocumentFieldList from './DocumentFieldsList';
+import {FieldsList} from './FieldsList';
 
 /**
  * Validated the name input
@@ -37,8 +35,6 @@ function validateName(value, documentTypes) {
 				return `The name ${value} is already taken`;
 			}
 		}
-
-		return true;
 	}
 }
 
@@ -69,17 +65,20 @@ export function NewOrEditDocumentType({
 }) {
 	const [state, setState] = React.useState({
 		_id: undefined,
-		addFields: true,
-		_name,
+		_name: '',
 		_versionKey: undefined,
+		addFields: true,
 		properties: []
 	});
-	// const [versionKey, setVersionKey] = React.useState();
-	// const [globalFields, setGlobalFields] = React.useState([]);
+	const [error, setError] = React.useState([]);
 	const [name, setName] = React.useState('');
-	const [error, setError] = React.useState(null);
 	const [activeInput, setActiveInput] = React.useState(false);
-	const [isLoading, setIsLoading] = React.useState(_id ? true : false);
+	const [isLoading, setIsLoading] = React.useState(true);
+
+	/*const [fieldModalState, setFieldModalState] = React.useState({
+		local: true,
+		open: false
+	});*/
 
 	function getDocumentType() {
 		fetch(`${servicesBaseUrl}/graphQL`, {
@@ -103,10 +102,10 @@ export function NewOrEditDocumentType({
 	}
 
 	React.useEffect(() => {
-		if (state._id === undefined && activeInput) {
+		if (!_id && activeInput) {
 			const validOrError = validateName(name, documentTypes);
 
-			if (validOrError !== true) {
+			if (validOrError) {
 				setError(validOrError);
 			} else {
 				setError(false);
@@ -142,33 +141,34 @@ export function NewOrEditDocumentType({
 	}
 
 	let disabled;
-	if (error || !state._id) {
-		if (!state._id && !activeInput) {
-			disabled == true;
+	if (!_id) {
+		if (!activeInput || error) {
+			disabled = true;
 		} else {
 			disabled = false;
 		}
+	} else {
+		disabled = false;
 	}
 
 	console.debug(state);
 
-	return !isLoading
+	return isLoading
 		?
 		<>
 			<Modal.Content>
 				<Form
 					id='documentForm'
-					onSubmit={(event) => {
-						event.preventDefault();
+					onSubmit={() => {
 
 						const variables = {
-							_name: name,
+							_name: name || state._name,
 							addFields: state.addFields,
 							properties: state.properties
 						};
 
 						if (_id) {
-							variables._id = state._id;
+							variables._id = _id;
 							variables._versionKey = state._versionKey;
 						}
 
@@ -202,7 +202,6 @@ export function NewOrEditDocumentType({
 												_name
 											} = json.data.createDocumentType;
 
-											// setState(prev => ({
 											setModalState(prev => ({
 												...prev,
 												_id,
@@ -228,9 +227,10 @@ export function NewOrEditDocumentType({
 										key: 'fields'
 									},
 									render: () => <Tab.Pane>
-										<DocumentFieldList
-											documentTypeName={_name}
+										<FieldsList
+											documentTypeName={documentTypes}
 											collectionsArr={collectionsArr}
+											globalFields={[]}
 											interfacesArr={interfacesArr}
 											servicesBaseUrl={servicesBaseUrl}
 											properties={state.properties}
@@ -247,12 +247,12 @@ export function NewOrEditDocumentType({
 								render: () => <Tab.Pane>
 									<Form as='div'>
 										<Form.Field>
-											{state._id ?
+											{ _id ?
 												<Form.Input
 													fluid
+													label="Name"
 													disabled={true}
-													label='Name'
-													value={state._name}
+													value={_name}
 												/>
 												:
 												<Form.Input
