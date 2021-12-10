@@ -392,7 +392,7 @@ export function DocumentTypes({
 			documentTypes={documentTypes}
 			onClose={() => {
 				//console.debug('NewOrEditDocumentTypeModal onClose');
-				setNewOrEditModalState(getDefaultModalState(false));
+				setNewOrEditModalState({ open: false });
 				queryDocumentTypes();
 				setBoolPoll(true);
 			}}

@@ -12,7 +12,6 @@ import {
 	VALUE_TYPE_STRING,
 	isSet
 } from '@enonic/js-utils';
-import getIn from 'get-value';
 import {
 	Button,
 	Dropdown,
@@ -24,8 +23,6 @@ import {
 	Radio,
 	Table
 } from 'semantic-ui-react';
-import {setValue} from 'semantic-ui-react-form';
-import {getEnonicContext} from 'semantic-ui-react-form/Context';
 
 import {mustStartWithALowercaseLetter} from '../utils/mustStartWithALowercaseLetter';
 import {notDocumentMetaData} from '../utils/notDocumentMetaData';
@@ -53,10 +50,11 @@ const OPTIONS_VALUE_TYPES = [
 
 
 export const AddOrEditLocalFieldModal = ({
-	globalFieldObj = {},
+	properties,
+	updateOrDeleteProperties,
 	onClose = () => {},
-	state: {
-		initialValues: {
+	modalState: {
+		state: {
 			active: propActive = true,
 			enabled: propEnabled = true,
 			includeInAllText: propIncludeInAllText = true,
@@ -69,24 +67,11 @@ export const AddOrEditLocalFieldModal = ({
 			path: propPath = false,
 			valueType: propValueType = VALUE_TYPE_STRING
 		} = {},
-		open = false
+		open: openProp = false
 	} = {}
 }) => {
-	//console.debug('propIncludeInAllText', propIncludeInAllText);
-	//console.debug('propMax', propMax);
-	//console.debug('propMin', propMin);
-	//console.debug('propName', propName);
-	//console.debug('propValueType', propValueType);
-
-	const [context, dispatch] = getEnonicContext();
-
-	const properties = getIn(context.values, 'properties');
-	//console.debug('properties', properties);
 
 	const usedNames = {};
-	/*Object.keys(globalFieldObj).forEach((name) => {
-		usedNames[name] = true;
-	});*/
 	properties.forEach(({name}) => {
 		usedNames[name] = true;
 	});
@@ -105,8 +90,6 @@ export const AddOrEditLocalFieldModal = ({
 	const [active, setActive] = React.useState(propActive);
 
 	const [nameTouched, setNameTouched] = React.useState(false);
-	//console.debug('includeInAllText', includeInAllText);
-	//console.debug('name', name);
 
 	const [header, setHeader] = React.useState(/*propName
 		? globalFieldObj[propName]
@@ -116,14 +99,8 @@ export const AddOrEditLocalFieldModal = ({
 	*/);
 
 	React.useEffect(() => {
-		setHeader(propName
-			? globalFieldObj[propName]
-				? `Override global field ${propName}`
-				: `Edit local field ${propName}`
-			: (name && globalFieldObj[name])
-				? `Override global field ${name}`
-				: 'Add local field');
-	}, [globalFieldObj, propName, name]);
+		setHeader(propName || name ? `Edit field ${propName || name}` : `Add field`);
+	}, [propName, name]);
 
 	/*
 	Since I'm doing {open ? <AddOrEditLocalFieldModal> : null} outside the
@@ -177,7 +154,7 @@ export const AddOrEditLocalFieldModal = ({
 		closeIcon
 		closeOnDimmerClick={false}
 		onClose={onClose}
-		open={open}
+		open={openProp}
 		size='large' // small is too narrow
 	>
 		<Modal.Header as='h1' className='ui'>
@@ -304,30 +281,23 @@ export const AddOrEditLocalFieldModal = ({
 		<Modal.Actions>
 			<Button onClick={() => onClose()}>Cancel</Button>
 			<Button disabled={!!errorMsg} onClick={() => {
-				dispatch(setValue({
-					path: `properties.${isSet(propIndex) ? propIndex : properties.length}`,
-					value: {
-						active,
-						enabled,
-						fulltext,
-						includeInAllText,
-						max,
-						min,
-						name,
-						[INDEX_CONFIG_N_GRAM]: nGram,
-						path,
-						valueType
-					}
-				}));
+				updateOrDeleteProperties({
+					active,
+					enabled,
+					fulltext,
+					includeInAllText,
+					max,
+					min,
+					name,
+					[INDEX_CONFIG_N_GRAM]: nGram,
+					path,
+					valueType
+				}, isSet(propIndex) ? propIndex : properties.length);
 				onClose();
-			}} primary><Icon name='save'/> {propName
-					? isSet(propIndex)
-						? 'Update local field'
-						: 'Override global field'
-					: globalFieldObj[name]
-						? 'Override global field'
-						: 'Add local field'
-				}</Button>
+			}} primary>
+				<Icon name='save'/>
+				{propName ? 'Update field': 'Add field'}
+			</Button>
 		</Modal.Actions>
 	</Modal>;
 }; // AddOrEditLocalFieldModal
