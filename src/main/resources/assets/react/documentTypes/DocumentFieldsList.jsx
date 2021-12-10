@@ -1,33 +1,30 @@
 import {
 	Button,
-	Form,
+	// Form,
 	Icon,
 	Popup,
-	Radio,
+	// Radio,
 	Table
 } from 'semantic-ui-react';
 // import {getEnonicContext} from 'semantic-ui-react-form/Context';
 //import {Checkbox} from 'semantic-ui-react-form/inputs/Checkbox';
 //import {List} from 'semantic-ui-react-form/List';
 
-import {ButtonDelete} from '../components/ButtonDelete';
+// import {ButtonDelete} from '../components/ButtonDelete';
 import {ButtonEdit} from '../components/ButtonEdit';
 import {Checkmark} from '../components/Checkmark';
 import {Span} from '../components/Span';
 import {AddOrEditLocalFieldModal} from './AddOrEditLocalFieldModal';
 import {RemoveFieldFromDocumentTypeModal} from './RemoveFieldFromDocumentTypeModal';
 
-export const FieldsList = ({
+export const DocumentFieldList = ({
 	documentTypeName,
 	collectionsArr,
 	interfacesArr,
 	servicesBaseUrl,
 	properties
 }) => {
-	// const [context/*, dispatch*/] = getEnonicContext();
-	//console.debug('properties', properties);
 
-	const [showGlobalFields, setShowGlobalFields] = React.useState(false);
 	const [addOrEditModalState, setAddOrEditModalState] = React.useState({
 		open: false
 	});
@@ -35,9 +32,8 @@ export const FieldsList = ({
 		open: false
 	});
 
-	const combinedObj = {};
-	properties.forEach(({
-		active,
+	/** Properties index
+	 * 	active,
 		enabled,
 		fulltext,
 		includeInAllText,
@@ -47,27 +43,7 @@ export const FieldsList = ({
 		min,
 		nGram,
 		path
-	}, index) => {
-		combinedObj[key] = {
-			active,
-			enabled,
-			fulltext,
-			global: false,
-			includeInAllText,
-			index,
-			name: key,
-			valueType: fieldType,
-			max,
-			min,
-			nGram,
-			path
-		};
-	});
-
-	//console.debug('combinedObj', combinedObj);
-
-	const combinedList = Object.keys(combinedObj).sort().map((key) => combinedObj[key]);
-	//console.debug('combinedList', combinedList);
+	 */
 
 	/*const headerCellStyle = {
 		//padding: '.92857143em .6em' // compact='very'
@@ -82,19 +58,7 @@ export const FieldsList = ({
 	};
 
 	return <>
-		<Form>
-			<Form.Field>
-				<Radio
-					checked={showGlobalFields}
-					label='Show Global Fields'
-					onChange={(ignored,{checked}) => {
-						setShowGlobalFields(checked);
-					}}
-					toggle
-				/>
-			</Form.Field>
-		</Form>
-		{showGlobalFields || combinedList.length
+		{properties.length
 			? <Table className='fieldlist' celled compact='very' selectable singleLine striped>
 				<Table.Header>
 					<Table.Row>
@@ -112,7 +76,7 @@ export const FieldsList = ({
 					</Table.Row>
 				</Table.Header>
 				<Table.Body>{
-					combinedList.map(({
+					properties.map(({
 						active,
 						enabled,
 						fulltext,
