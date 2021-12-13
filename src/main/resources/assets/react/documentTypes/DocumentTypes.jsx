@@ -44,7 +44,6 @@ export function DocumentTypes({
 	const [showAddFields, setShowAddFields] = React.useState(false);
 	const [showCollections, setShowCollections] = React.useState(false);
 	const [showDocumentsPerCollection, setShowDocumentsPerCollection] = React.useState(false);
-	const [showDeleteButton, setShowDeleteButton] = React.useState(false);
 	const [showDetails, setShowDetails] = React.useState(false);
 	const [showInterfaces, setShowInterfaces] = React.useState(false);
 	//console.debug('DocumentTypes documentTypes', documentTypes);
@@ -131,7 +130,6 @@ export function DocumentTypes({
 									setShowAddFields(checked);
 									setShowDocumentsPerCollection(checked);
 									setShowDetails(checked);
-									setShowDeleteButton(checked);
 								}}
 								toggle
 							/>
@@ -155,7 +153,7 @@ export function DocumentTypes({
 					<Table.HeaderCell>Fields</Table.HeaderCell>
 					{showAddFields ? <Table.HeaderCell>Add fields</Table.HeaderCell> : null}
 					{showDetails ? <Table.HeaderCell>Details</Table.HeaderCell> : null}
-					{showDeleteButton ?<Table.HeaderCell>Delete</Table.HeaderCell> : null}
+					<Table.HeaderCell>Delete</Table.HeaderCell>
 				</Table.Row>
 			</Table.Header>
 			<Table.Body>
@@ -298,11 +296,12 @@ export function DocumentTypes({
 							</Table>
 						</Table.Cell> : null}
 
-						{showDeleteButton ?<Table.Cell collapsing>
+						<Table.Cell collapsing>
 							<Button.Group>
 								<DeleteDocumentTypeModal
 									_id={_id}
 									_name={_name}
+									collectionsArr={collectionsArr}
 									afterClose={() => {
 										//console.debug('DeleteDocumentTypeModal afterClose');
 										queryDocumentTypes();
@@ -315,8 +314,7 @@ export function DocumentTypes({
 									servicesBaseUrl={servicesBaseUrl}
 								/>
 							</Button.Group>
-						</Table.Cell> : null}
-
+						</Table.Cell>
 					</Table.Row>;
 				})}
 			</Table.Body>
