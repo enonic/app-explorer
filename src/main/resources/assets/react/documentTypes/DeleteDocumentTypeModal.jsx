@@ -6,6 +6,7 @@ import {GQL_MUTATION_DOCUMENT_TYPE_DELETE} from '../../../services/graphQL/mutat
 export function DeleteDocumentTypeModal({
 	_id,
 	_name,
+	collectionsArr,
 	afterClose = () => {
 		//console.debug('DeleteDocumentTypeModal default afterClose');
 	},
@@ -48,44 +49,62 @@ export function DeleteDocumentTypeModal({
 	>
 		<Modal.Header>Delete document type {_name}</Modal.Header>
 		<Modal.Content>
-			<Input
-				error={!deleteNameMatches}
-				onChange={(event, {value}) => {
-					//console.debug({name, value});
-					setDeleteNameMatches(_name === value);
-					setTypedDocumentTypeName(value);
-				}}
-				placeholder='Please input name'
-				value={typedDocumentTypeName}
-			/>
-			{deleteNameMatches ? <Button
-				compact
-				onClick={() => {
-					fetch(`${servicesBaseUrl}/graphQL`, {
-						method: 'POST',
-						headers: {
-							'Content-Type':	'application/json'
-						},
-						body: JSON.stringify({
-							query: GQL_MUTATION_DOCUMENT_TYPE_DELETE,
-							variables: {
-								_id
-							}
-						})
-					})
-						.then(response => {
-							if (response.status === 200) {
-								doClose();
-							}
-						});
-				}}
-				type='button'
-			><Icon color='red' name='trash alternate outline'/>Delete</Button> : <Message
-				icon='warning sign'
-				header='Error'
-				content="Name doesn't match!"
-				negative
-			/>}
+			{collectionsArr.length ?
+				<Message icon negative>
+					<Icon name="warning sign"/>
+					<Message.Content>
+						<Message.Header>Cant delete document type</Message.Header>
+						<p>The document type is used in the following collections:</p>
+						<>
+							{collectionsArr.sort().map((c, i) => (
+								<div key={i}>{c}</div>
+							))}
+						</>
+					</Message.Content>
+				</Message>
+				:
+				<>
+					<Input
+						error={!deleteNameMatches}
+						onChange={(event, {value}) => {
+							setDeleteNameMatches(_name === value);
+							setTypedDocumentTypeName(value);
+						}}
+						placeholder='Please input name'
+						value={typedDocumentTypeName}
+					/>
+					{deleteNameMatches ?
+						<Button
+							compact
+							onClick={() => {
+								fetch(`${servicesBaseUrl}/graphQL`, {
+									method: 'POST',
+									headers: {
+										'Content-Type':	'application/json'
+									},
+									body: JSON.stringify({
+										query: GQL_MUTATION_DOCUMENT_TYPE_DELETE,
+										variables: {
+											_id
+										}
+									})
+								})
+									.then(response => {
+										if (response.status === 200) {
+											doClose();
+										}
+									});
+							}}
+							type='button'
+						><Icon color='red' name='trash alternate outline'/>Delete</Button> : <Message
+							icon='warning sign'
+							header='Error'
+							content="Name doesn't match!"
+							negative
+						/>
+					}
+				</>
+			}
 		</Modal.Content>
 	</Modal>;
 } // DeleteDocumentTypeModal
