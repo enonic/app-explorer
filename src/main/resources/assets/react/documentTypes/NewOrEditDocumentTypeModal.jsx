@@ -3,13 +3,13 @@ import {NewOrEditDocumentType} from "./NewOrEditDocumentType";
 
 export function NewOrEditDocumentTypeModal({
 	_id = undefined, // optional
-	_name = 'New document type', // optional
+	_name = undefined, // optional
 	collectionsArr = [], // optional
 	interfacesArr = [], // optional
 	open = false,
-	setModalState,
 	onClose = () => {},
 	onMount = () => {},
+	setModalState,
 	servicesBaseUrl,
 	documentTypes
 }) {
@@ -29,7 +29,7 @@ export function NewOrEditDocumentTypeModal({
 			interfacesArr={interfacesArr}
 			doClose={onClose}
 			servicesBaseUrl={servicesBaseUrl}
-			setParentState={setModalState}
+			setModalState={setModalState}
 			documentTypes={documentTypes}
 		/>
 	</Modal>;

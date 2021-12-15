@@ -1,3 +1,9 @@
+/***
+ * Validated if the input document type name is valid
+ * @param {String} v String name of the new document type
+ * @return Object
+ * @returns {string | undefined} possible error string or true
+ */
 export function nameValidator(v) {
 	if(!v) {
 		return 'Required!';
