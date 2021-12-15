@@ -399,18 +399,17 @@ export function Collections(props) {
 	});
 
 	return <>
-		<Segment basic inverted style={{
+		<Segment basic style={{
 			marginLeft: -14,
 			marginTop: -14,
 			marginRight: -14
 		}}>
-			<Table basic collapsing compact inverted>
+			<Table basic collapsing compact>
 				<Table.Body>
 					<Table.Row verticalAlign='middle'>
 						<Table.Cell collapsing>
 							<Radio
 								label={"Show all fields"}
-								className='inverted'
 								checked={showCollector}
 								onChange={(ignored,{checked}) => {
 									setShowCollector(checked);

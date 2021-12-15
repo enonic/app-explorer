@@ -272,9 +272,13 @@ export function Explorer(props) {
 	};
 
 	return <>
-		<Menu fixed='top' inverted style={{zIndex: 103}}>
-			<Menu.Item as='a' onClick={() => setSideBarVisible(!sideBarVisible)}>
-				<Icon name={menuIconName}/>
+		<Menu
+			className="admin-ui-gray"
+			inverted
+			fixed='top'
+			style={{zIndex: 103}}>
+			<Menu.Item className="fitMenu" as='a' onClick={() => setSideBarVisible(!sideBarVisible)}>
+				<Icon size={"Large"} name={menuIconName}/>
 			</Menu.Item>
 			<Menu.Item header>Explorer</Menu.Item>
 			<UploadLicenseModal
@@ -289,7 +293,7 @@ export function Explorer(props) {
 			<Sidebar
 				as={Menu}
 				id='mySidebar'
-				inverted
+				// inverted
 				onHide={() => {
 					// NOTE This is called when a Modal dialog is opened/mounted AND ALSO when the Modal dialog is closed.
 					//console.debug('Sidebar onHide');
