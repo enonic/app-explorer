@@ -16,6 +16,7 @@ import {query as queryCollections} from '/lib/explorer/collection/query';
 import {ignoreErrors} from '/lib/explorer/ignoreErrors';
 import {
 	APP_EXPLORER,
+	FOLDERS,
 	NT_COLLECTION,
 	//NT_DOCUMENT,
 	NT_INTERFACE,
@@ -23,14 +24,15 @@ import {
 	NT_THESAURUS,
 	PATH_FIELDS,
 	PRINCIPAL_EXPLORER_WRITE,
-	READWRITE_FIELDS,
 	REPO_ID_EXPLORER,
 	ROOT_PERMISSION_SYSTEM_ADMIN,
-	ROOT_PERMISSION_EXPLORER_READ,
+	ROOT_PERMISSION_EXPLORER_READ
+} from '/lib/explorer/index';
+import {
+	READWRITE_FIELDS,
 	SYSTEM_FIELDS
 } from '/lib/explorer/model/2/constants';
 import {
-	FOLDERS,
 	ROLES,
 	REPOSITORIES,
 	USERS,

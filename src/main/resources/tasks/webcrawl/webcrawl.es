@@ -99,10 +99,11 @@ export function run({
 	language,
 	name // Collection name
 }) {
-	//log.debug(`name:${toStr(name)}`);
-	//log.debug(`collectorId:${toStr(collectorId)}`);
-	//log.debug(`configJson:${toStr(configJson)}`);
-	//log.debug(`language:${toStr(language)}`);
+	log.debug('webcrawl: collectionId:%s', collectionId);
+	//log.debug('webcrawl: collectorId:%s', collectorId);
+	//log.debug('webcrawl: configJson:%s', configJson);
+	//log.debug('webcrawl: language:%s', language);
+	log.debug('webcrawl: name:%s', name);
 
 	const collector = new Collector({
 		collectionId,
