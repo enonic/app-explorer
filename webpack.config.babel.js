@@ -108,6 +108,7 @@ const SS_EXTERNALS = [
 
 if (BOOL_LOCAL_LIB_EXPLORER) {
 	SS_ALIAS['/lib/explorer'] = path.resolve(__dirname, '../lib-explorer/src/main/resources/lib/explorer/');
+	//SS_ALIAS['/lib/explorer'] = path.resolve(__dirname, '../lib-explorer/build/resources/main/lib/explorer/');
 } else {
 	SS_EXTERNALS.push(/^\/lib\/explorer\//);
 }
@@ -135,7 +136,7 @@ const SS_FILES = [
 	'services/stopWordsList/stopWordsList',
 	'services/journals/journals',
 	'services/listCollectors/listCollectors',
-	'services/search/search',
+	//'services/search/search',
 	'services/thesauri/thesauri',
 	'services/thesaurusExport/thesaurusExport',
 	'services/thesaurusImport/thesaurusImport',

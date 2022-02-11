@@ -6,7 +6,9 @@ import {
 } from '@enonic/js-utils';
 //import {detailedDiff} from 'deep-object-diff';
 import deepEqual from 'fast-deep-equal';
+
 import HumanDiff from 'human-object-diff';
+//import * as HumanDiff from 'human-object-diff'; // This way fails in lib-explorer, so probably here too.
 
 import {execute} from '/lib/graphql';
 
