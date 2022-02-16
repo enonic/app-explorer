@@ -35,7 +35,12 @@ import {generateQueryJournalsField} from './generateQueryJournalsField';
 import {generateQueryStopWordsField} from './generateQueryStopWordsField';
 import {generateReferencedByField} from './generateReferencedByField';
 
+import {addApiKeyTypes} from './apiKey/addApiKeyTypes';
+import {addMutationApiKeyCreate} from './apiKey/addMutationApiKeyCreate';
+import {addMutationApiKeyDelete} from './apiKey/addMutationApiKeyDelete';
+import {addMutationApiKeyUpdate} from './apiKey/addMutationApiKeyUpdate';
 import {generateQueryApiKeysField} from './apiKey/generateQueryApiKeysField';
+
 import {generateCollectionFields} from './collection/generateCollectionFields';
 import {generateQueryCollectorsField} from './collector/generateQueryCollectorsField';
 import {generateFieldsField} from './field/generateFieldsField';
@@ -131,6 +136,10 @@ addObjectTypes({glue});
 
 const referencedBy = generateReferencedByField({glue});
 
+addApiKeyTypes({glue});
+addMutationApiKeyCreate({glue});
+addMutationApiKeyDelete({glue});
+addMutationApiKeyUpdate({glue});
 const queryApiKeysField = generateQueryApiKeysField({glue});
 
 const hasField = hasFieldQuery({glue});
