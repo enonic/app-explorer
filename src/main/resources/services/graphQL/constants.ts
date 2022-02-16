@@ -15,6 +15,8 @@ export const GQL_INPUT_TYPE_INTERFACE_FIELD_NAME = 'InterfaceFieldInput';
 
 export const GQL_INPUT_TYPE_THESAURUS_LANGUAGE_NAME = 'ThesaurusLanguageInput';
 
+export const GQL_TYPE_API_KEY_NAME = 'ApiKey';
+
 // Interface type names
 export const GQL_INTERFACE_NODE_NAME = 'Node';
 export const GQL_INTERFACE_QUERY_RESULT_NAME = 'QueryResult';
@@ -57,6 +59,9 @@ export const GQL_TYPE_THESAURUS_NAME = 'Thesaurus';
 export const GQL_UNION_TYPE_ANY_NODE = 'AnyNode';
 
 // Mutation field names
+export const GQL_MUTATION_API_KEY_CREATE_NAME = 'createApiKey';
+export const GQL_MUTATION_API_KEY_DELETE_NAME = 'deleteApiKey';
+export const GQL_MUTATION_API_KEY_UPDATE_NAME = 'updateApiKey';
 export const GQL_MUTATION_INTERFACE_CREATE_NAME = 'createInterface';
 export const GQL_MUTATION_INTERFACE_DELETE_NAME = 'deleteInterface';
 export const GQL_MUTATION_INTERFACE_UPDATE_NAME = 'updateInterface';

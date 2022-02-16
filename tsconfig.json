@@ -1,0 +1,10 @@
+{
+	"compilerOptions": {
+		"baseUrl": "./",
+		"outDir": "build/tsc",
+		"paths": {
+			"@enonic/js-utils": ["node_modules/@enonic/js-utils/src"],
+			"/lib/explorer/*": ["../lib-explorer/src/main/resources/lib/explorer/*"]
+		}
+	}
+}
