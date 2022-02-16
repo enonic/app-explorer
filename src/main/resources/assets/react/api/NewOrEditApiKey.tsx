@@ -11,8 +11,13 @@ import {
 	Input as EnonicInput,
 	ResetButton,
 	SubmitButton
+	//@ts-ignore
 } from 'semantic-ui-react-form';
+//@ts-ignore
 import {Dropdown} from 'semantic-ui-react-form/inputs/Dropdown';
+
+import {GQL_MUTATION_API_KEY_CREATE} from '../../../services/graphQL/mutations/apiKeyCreateMutation.mjs';
+import {GQL_MUTATION_API_KEY_UPDATE} from '../../../services/graphQL/mutations/apiKeyUpdateMutation.mjs';
 
 import {GenerateKeyButton} from './GenerateKeyButton';
 
@@ -33,6 +38,7 @@ function makeKey({
 export const NewOrEditApiKey = (props) => {
 	//console.debug('props', props);
 	const {
+		_id,
 		_name,
 		doClose,
 		initialValues = {
@@ -62,17 +68,35 @@ export const NewOrEditApiKey = (props) => {
 		initialValues={initialValues}
 		onSubmit={(values) => {
 			//console.debug('submit values', values);
-			if (_name) {
-				values.name = _name;
+			const variables :{
+				_id? :string // update
+				_name? :string // create
+				collections :Array<string>
+				interfaces :Array<string>
+				key? :string
+			} = {
+				collections: values.collections,
+				interfaces: values.interfaces,
+				key: values.key
+			};
+			if (_id) {
+				variables._id = _id;
 			}
-			fetch(`${servicesBaseUrl}/apiKey${_name ? 'Modify' : 'Create'}`, {
+			if (values.name) {
+				variables._name = values.name;
+			}
+			console.debug(variables);
+			fetch(`${servicesBaseUrl}/graphQL`, {
 				method: 'POST',
 				headers: {
 					'Content-Type':	'application/json'
 				},
-				body: JSON.stringify(values)
-			}).then((/*response*/) => {
-				doClose();
+				body: JSON.stringify({
+					query: _name ? GQL_MUTATION_API_KEY_UPDATE : GQL_MUTATION_API_KEY_CREATE,
+					variables
+				})
+			}).then((response) => {
+				if (response.status === 200) { doClose(); }
 			});
 		}}
 	>

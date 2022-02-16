@@ -1,3 +1,4 @@
+import * as React from 'react';
 import {
 	Button,
 	Header,
@@ -7,13 +8,23 @@ import {
 } from 'semantic-ui-react';
 
 
-export const DeleteApiKeyModal = (props) => {
+import {GQL_MUTATION_API_KEY_DELETE} from '../../../services/graphQL/mutations/apiKeyDeleteMutation.mjs';
+
+
+export const DeleteApiKeyModal = (props :{
+	_id :string
+	_name :string
+	servicesBaseUrl :string
+	afterClose? :() => void
+	beforeOpen? :() => void
+}) => {
 	//console.debug('props', props);
 	const {
+		_id,
 		_name,
+		servicesBaseUrl,
 		afterClose = () => {},
-		beforeOpen = () => {},
-		servicesBaseUrl
+		beforeOpen = () => {}
 	} = props;
 	const [state, setState] = React.useState({
 		open: false
@@ -54,11 +65,21 @@ export const DeleteApiKeyModal = (props) => {
 			<Button
 				icon
 				onClick={() => {
-					fetch(`${servicesBaseUrl}/apiKeyDelete?name=${_name}`, {
-						method: 'DELETE'
-					}).then((/*response*/) => {
-						//if (response.status === 200) {}
-						doClose();
+					fetch(`${servicesBaseUrl}/graphQL`, {
+						method: 'POST',
+						headers: {
+							'Content-Type':	'application/json'
+						},
+						body: JSON.stringify({
+							query: GQL_MUTATION_API_KEY_DELETE,
+							variables: {
+								_id
+							}
+						})
+
+					}).then((response) => {
+						if (response.status === 200) {doClose();}
+						//doClose();
 					});
 				}}
 				primary
