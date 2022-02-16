@@ -1,10 +1,39 @@
 {
 	"compilerOptions": {
 		"baseUrl": "./",
+		"declaration": false,
+		"declarationMap": false,
+		"esModuleInterop": true,
+		"inlineSourceMap": false,
+		"inlineSources": false,
+		"jsx": "react-jsx",
+		"listEmittedFiles": false,
+		"listFiles": false,
+		"module": "es6",
+		"moduleResolution": "node",
 		"outDir": "build/tsc",
 		"paths": {
 			"@enonic/js-utils": ["node_modules/@enonic/js-utils/src"],
 			"/lib/explorer/*": ["../lib-explorer/src/main/resources/lib/explorer/*"]
-		}
-	}
+		},
+		"rootDir": "../",
+		"rootDirs": [
+			"src/main/resources",
+			"node_modules",
+			"test"
+		],
+		"target": "es6",
+		"types": [
+			"node",
+			"react"
+		]
+	},
+	"exclude": [
+		"build/**/*",
+		"node_modules/**/*"
+	],
+	"include": [
+		"src/main/resources/**/*.ts",
+		"src/main/resources/**/*.tsx"
+	]
 }

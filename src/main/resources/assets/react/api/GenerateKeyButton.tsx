@@ -3,7 +3,9 @@ import {
 	Icon
 } from 'semantic-ui-react';
 
+//@ts-ignore
 import {setValue} from 'semantic-ui-react-form';
+//@ts-ignore
 import {getEnonicContext} from 'semantic-ui-react-form/Context';
 
 

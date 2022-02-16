@@ -1,6 +1,6 @@
+import * as React from 'react';
 import {
 	Header,
-	Label,
 	Radio,
 	Segment,
 	Table
@@ -10,12 +10,14 @@ import {
 import {DeleteApiKeyModal} from './api/DeleteApiKeyModal';
 import {NewOrEditApiKeyModal} from './api/NewOrEditApiKeyModal';
 
+//@ts-ignore
 import {useInterval} from './utils/useInterval';
 
 
 const GQL = `{
 	queryApiKeys {
 		hits {
+			_id
 			_name
 			collections
 			interfaces
@@ -34,13 +36,19 @@ const GQL = `{
 }`;
 
 
-export const Api = (props) => {
+export const Api = (props :{
+	servicesBaseUrl :string
+}) => {
 	//console.debug('props', props);
 	const {
 		servicesBaseUrl
 	} = props;
 
-	const [queryApiKeysGraph, setQueryApiKeysGraph] = React.useState({});
+	const [queryApiKeysGraph, setQueryApiKeysGraph] = React.useState({
+		count: 0,
+		hits: [],
+		total: 0
+	});
 	const [queryCollectionsGraph, setQueryCollectionsGraph] = React.useState({});
 	const [queryInterfacesGraph, setQueryInterfacesGraph] = React.useState({});
 	const [boolPoll, setBoolPoll] = React.useState(true);
@@ -112,6 +120,7 @@ export const Api = (props) => {
 			</Table.Header>
 			<Table.Body>
 				{queryApiKeysGraph.hits && queryApiKeysGraph.hits.map(({
+					_id,
 					_name,
 					collections,
 					interfaces
@@ -119,6 +128,7 @@ export const Api = (props) => {
 					return <Table.Row key={_name}>
 						<Table.Cell collapsing>
 							<NewOrEditApiKeyModal
+								_id={_id}
 								_name={_name}
 								initialValues={{
 									_name,
@@ -144,6 +154,7 @@ export const Api = (props) => {
 						{showInterfaces ? <Table.Cell>{interfaces.join(', ')}</Table.Cell> : null}
 						<Table.Cell collapsing>
 							<DeleteApiKeyModal
+								_id={_id}
 								_name={_name}
 								afterClose={() => {
 									//console.debug('DeleteApiKeyModal afterClose');
