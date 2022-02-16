@@ -18,14 +18,15 @@ const DEBUG = false;
 
 export function post({
 	params: {
-		name,
+		id: collectionId,
+		name: collectionName,
 		resume = false
 	}
 }) {
-	DEBUG && log.debug(`name:${name} resume:${resume}`);
+	DEBUG && log.debug('collectionId:%s collectionName:%s resume:%s', collectionId, collectionName, resume);
 
 	const runningTasksWithName = getTasksWithPropertyValue({
-		value: name,
+		value: collectionName,
 		state: 'RUNNING'
 	});
 	DEBUG && log.debug(`runningTasksWithName:${runningTasksWithName}`);
@@ -35,7 +36,7 @@ export function post({
 		DEBUG && log.debug(`alreadyRunningtaskId:${alreadyRunningtaskId}`);
 		return {
 			body: {
-				error: `Already collecting to ${name} under taskId ${alreadyRunningtaskId}!`
+				error: `Already collecting to ${collectionName} under taskId ${alreadyRunningtaskId}!`
 			},
 			contentType: RT_JSON,
 			status: 500
@@ -48,7 +49,7 @@ export function post({
 
 	const collectionNode = getCollection({
 		connection: readConnection,
-		name
+		name: collectionName
 	});
 	DEBUG && log.debug(`collectionNode:${toStr(collectionNode)}`);
 
@@ -97,7 +98,8 @@ export function post({
 	const submitTaskParams = {
 		descriptor: collector.collectorId, // <appname>:<taskname>
 		config: {
-			name, // Collection name
+			//name, // Collection name
+			collectionId,
 			collectorId: collector.collectorId, // <appname>:<taskname>
 			configJson,
 			language
@@ -110,7 +112,7 @@ export function post({
 
 	return {
 		body: {
-			messages: `Started collecting ${name} with taskId ${taskId}`
+			messages: `Started collecting ${collectionName} with taskId ${taskId}`
 		},
 		contentType: RT_JSON,
 		status: 200

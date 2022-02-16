@@ -613,7 +613,7 @@ export function Collections(props) {
 													content={`Start collecting to ${_name}`}
 													inverted
 													trigger={<Button disabled={!boolCollectorSelectedAndInitialized || busy} icon onClick={() => {
-														fetch(`${servicesBaseUrl}/collectionCollect?name=${_name}`, {
+														fetch(`${servicesBaseUrl}/collectionCollect?id=${collectionId}&name=${_name}`, {
 															method: 'POST'
 														}).then(() => {
 															fetchTasks();
