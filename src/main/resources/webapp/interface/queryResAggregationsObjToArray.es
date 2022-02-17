@@ -23,10 +23,10 @@ export function queryResAggregationsObjToArray({
 			sum,
 			value
 		} = anAggregation;
-		/*log.debug(`avg:${toStr(avg)}`);
-		log.debug(`typeof avg:${toStr(typeof avg)}`);
-		log.debug(`parseFloat(avg):${toStr(parseFloat(avg))}`);
-		log.debug(`typeof parseFloat(avg):${toStr(typeof parseFloat(avg))}`);*/
+		//log.debug(`avg:${toStr(avg)}`);
+		//log.debug(`typeof avg:${toStr(typeof avg)}`);
+		//log.debug(`parseFloat(avg):${toStr(parseFloat(avg))}`);
+		//log.debug(`typeof parseFloat(avg):${toStr(typeof parseFloat(avg))}`);
 		const rAggregation = {
 			count,
 			name,

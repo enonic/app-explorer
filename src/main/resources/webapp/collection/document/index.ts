@@ -1,10 +1,17 @@
+import type {GetRequest} from './get';
+import type {PostRequest} from './post';
+import type {RemoveRequest} from './remove';
+
 /*
 mapping.api.host = localhost
 mapping.api.source = /api
 mapping.api.target = /webapp/com.enonic.app.explorer/api
 mapping.api.idProvider.system = default
 */
-import {toStr} from '@enonic/js-utils';
+import {
+	startsWith//,
+	//toStr
+} from '@enonic/js-utils';
 
 import {get} from './get';
 import {post} from './post';
@@ -12,15 +19,21 @@ import {remove} from './remove';
 import {
 	NT_API_KEY,
 	PRINCIPAL_EXPLORER_READ
-} from '/lib/explorer/model/2/constants';
+} from '/lib/explorer/constants';
 import {hash} from '/lib/explorer/string/hash';
 import {connect} from '/lib/explorer/repo/connect';
+import {coerceApiKey} from '../../../services/graphQL/apiKey/coerceApiKey';
+
+
+type AllRequest = GetRequest & PostRequest & RemoveRequest;
 
 
 const AUTH_PREFIX = 'Explorer-Api-Key ';
 
 
-export function all(request) {
+export function all(
+	request :AllRequest
+) {
 	//log.info(`request:${toStr(request)}`);
 
 	const {
@@ -35,7 +48,7 @@ export function all(request) {
 		log.error(`Authorization header missing!`);
 		return {status: 401}; // Unauthorized
 	}
-	if(!authorization.startsWith(AUTH_PREFIX)) {
+	if(!startsWith(authorization, AUTH_PREFIX)) {
 		log.error(`Invalid Authorization header:${authorization}!`);
 		return { status: 401 }; // Unauthorized
 	}
@@ -46,7 +59,7 @@ export function all(request) {
 		return { status: 401 }; // Unauthorized
 	}
 	const hashedApiKey = hash(apiKey);
-	log.debug(`hashedApiKey:${toStr(hashedApiKey)}`);
+	//log.debug(`hashedApiKey:${toStr(hashedApiKey)}`);
 
 	const explorerRepoReadConnection = connect({ principals: [PRINCIPAL_EXPLORER_READ] });
 	const matchingApiKeys = explorerRepoReadConnection.query({
@@ -71,20 +84,21 @@ export function all(request) {
 					}
 				}]
 			}
-		}
+		},
+		query: ''
 	});
-	log.debug(`matchingApiKeys:${toStr(matchingApiKeys)}`);
+	//log.debug(`matchingApiKeys:${toStr(matchingApiKeys)}`);
 	if(matchingApiKeys.total !== 1) {
 		log.error(`Unique apiKey:${apiKey} not found!`);
 		return { status: 401 }; // Unauthorized
 	}
-	const apiKeyNode = explorerRepoReadConnection.get(matchingApiKeys.hits[0].id);
+	const apiKeyNode = coerceApiKey(explorerRepoReadConnection.get(matchingApiKeys.hits[0].id));
 	//log.debug(`apiKeyNode:${toStr(apiKeyNode)}`);
 	const {collections} = apiKeyNode;
-	log.debug(`collections:${toStr(collections)}`);
+	//log.debug(`collections:${toStr(collections)}`);
 
 	if (method === 'GET') {
-		return get(request, collections, apiKey);
+		return get(request, collections/*, apiKey*/);
 	} // method === 'GET'
 
 	if (method === 'POST') {

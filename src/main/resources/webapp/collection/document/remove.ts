@@ -1,4 +1,8 @@
+import type {Request} from '../../../types/Request';
+
+
 import {
+	array,
 	forceArray//,
 	//toStr
 } from '@enonic/js-utils';
@@ -7,12 +11,31 @@ import {
 	COLLECTION_REPO_PREFIX,
 	PRINCIPAL_EXPLORER_READ,
 	PRINCIPAL_EXPLORER_WRITE
-} from '/lib/explorer/model/2/constants';
+} from '/lib/explorer/constants';
 //import {get as getCollection} from '/lib/explorer/collection/get';
 import {connect} from '/lib/explorer/repo/connect';
 
+const {includes: arrayIncludes} = array;
 
-export function remove(request, collections = []) {
+
+export type RemoveRequest = Request<{
+	collection? :string
+	id :string
+}, {
+	collection? :string
+}>
+
+
+export function remove(
+	request :RemoveRequest,
+	collections :Array<string> = []
+) :{
+	body :{
+		message :string
+	} | unknown
+	contentType :string
+	status? :number
+} {
 	const {
 		params: {
 			collection: collectionParam = '',
@@ -52,7 +75,7 @@ export function remove(request, collections = []) {
 		};
 	}
 
-	if (!forceArray(collections).includes(collectionName)) {
+	if (!arrayIncludes(forceArray(collections), collectionName)) {
 		log.error(`No access to collection:${collectionName}!`);
 		return {
 			body: {
@@ -86,7 +109,10 @@ export function remove(request, collections = []) {
 		const getRes = readFromCollectionBranchConnection.get(id);
 		//log.info(`getRes:${toStr(getRes)}`);
 
-		let item = {};
+		let item :{
+			_id? :string
+			error? :string
+		} = {};
 		if (!getRes) { // getRes === null
 			item.error = `Unable to find document with _id = ${id}!`;
 		} else if (Array.isArray(getRes)) { // getRes === [{},{}]

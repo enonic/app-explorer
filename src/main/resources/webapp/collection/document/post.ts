@@ -1,15 +1,24 @@
+import type {RepoConnection} from '/lib/explorer/types.d';
+import type {Request} from '../../../types/Request';
+
 import {
-	forceArray//,
-	//toStr
+	array,
+	forceArray,
+	toStr
 } from '@enonic/js-utils';
 
 import {
+	APP_EXPLORER,
+	BRANCH_ID_EXPLORER,
 	COLLECTION_REPO_PREFIX,
-	PRINCIPAL_EXPLORER_WRITE/*,
+	PATH_COLLECTIONS,
+	PRINCIPAL_EXPLORER_READ,
+	PRINCIPAL_EXPLORER_WRITE,
+	REPO_ID_EXPLORER/*,
 	ROLE_EXPLORER_ADMIN,
 	ROLE_EXPLORER_WRITE,
 	ROLE_SYSTEM_ADMIN*/
-} from '/lib/explorer/model/2/constants';
+} from '/lib/explorer/constants';
 import {USER as EXPLORER_APP_USER} from '/lib/explorer/model/2/users/explorer';
 //import {Document} from '/lib/explorer/model/2/nodeTypes/document';
 //import {get as getCollection} from '/lib/explorer/collection/get';
@@ -22,25 +31,58 @@ import {update} from '/lib/explorer/document/update';
 import {
 	getUser/*,
 	hasRole*/
+	//@ts-ignore
 } from '/lib/xp/auth';
+//@ts-ignore
 import {run} from '/lib/xp/context';
 
+const {includes: arrayIncludes} = array;
 
-function createDocument({
+
+export type PostRequest = Request<{
+	collection? :string
+	partial? :string
+	requireValid? :string
+}, {
+	collection? :string
+}>
+
+
+const COLLECTOR_ID = `${APP_EXPLORER}:documentRestApi`;
+const COLLECTOR_VERSION = app.version;
+
+
+function createDocument<
+	Node extends {
+		_id :string
+		error? :string
+	}
+>({
 	boolRequireValid = true,
+	collectionId,
 	collectionName,
-	connection,
 	idField,
 	responseArray,
 	toPersist
+} :{
+	collectionId :string
+	collectionName :string
+	responseArray :Array<Node>
+	toPersist :Node
+	// Optional
+	boolRequireValid? :boolean
+	idField? :string
 }) {
-	const createdNode = create(toPersist, {
-		boolRequireValid,
+	const createdNode = create({
+		collectionId,
 		collectionName,
-		connection
+		collectorId: COLLECTOR_ID,
+		collectorVersion: COLLECTOR_VERSION,
+		data: toPersist,
+		requireValid: boolRequireValid
 	});
 	if(createdNode) {
-		const responseNode = {};
+		const responseNode = {} as Node;
 		if (idField) {
 			responseNode[idField] = createdNode[idField];
 		} else {
@@ -50,33 +92,52 @@ function createDocument({
 	} else {
 		responseArray.push({
 			error: 'Something went wrong when trying to create the document!'
-		});
+		} as Node);
 	}
 }
 
-function modifyDocument({
+function modifyDocument<
+	Node extends {
+		_id :string
+		error? :string
+	}
+>({
+	collectionId,
+	collectionName,
+	id,
+	responseArray,
+	toPersist,
+	//user
+	// Optional
 	boolPartial = false,
 	boolRequireValid = true,
-	collectionName,
-	connection,
-	id,
-	idField,
-	responseArray,
-	toPersist//,
-	//user
+	idField
+} :{
+	collectionId :string
+	collectionName :string
+	id :string
+	responseArray :Array<Node>
+	toPersist :Node
+	// Optional
+	boolPartial? :boolean
+	boolRequireValid? :boolean
+	idField? :string
 }) {
 	const updatedNode = update({
-		_id: id,
-		...toPersist
-	}, {
-		boolPartial,
-		boolRequireValid,
+		collectionId,
 		collectionName,
-		connection
+		collectorId: COLLECTOR_ID,
+		collectorVersion: COLLECTOR_VERSION,
+		data: {
+			_id: id,
+			...toPersist
+		},
+		partial: boolPartial,
+		requireValid: boolRequireValid
 	});
 	//log.info(`updatedNode:${toStr(updatedNode)}`);
 	if(updatedNode) {
-		const responseNode = {};
+		const responseNode = {} as Node;
 		if (idField) {
 			responseNode[idField] = updatedNode[idField];
 		} else {
@@ -86,12 +147,21 @@ function modifyDocument({
 	} else {
 		responseArray.push({
 			error: 'Something went wrong when trying to modify the document!'
-		});
+		} as Node);
 	}
 }
 
 
-export function post(request, collections = []) {
+export function post(
+	request :PostRequest,
+	collections :Array<string> = []
+) :{
+	body :{
+		message :string
+	}
+	contentType :string
+	status :number
+} {
 	//const user = getUser();
 	//log.info(`user:${toStr(user)}`);
 
@@ -165,7 +235,7 @@ export function post(request, collections = []) {
 		};
 	}
 
-	if (!forceArray(collections).includes(collectionName)) {
+	if (!arrayIncludes(forceArray(collections), collectionName)) {
 		log.error(`No access to collection:${collectionName}!`);
 		return {
 			body: {
@@ -175,6 +245,25 @@ export function post(request, collections = []) {
 			status: 400 // Bad Request
 		};
 	}
+
+	const explorerReadConnection = connect({
+		branch: BRANCH_ID_EXPLORER,
+		principals: [PRINCIPAL_EXPLORER_READ],
+		repoId: REPO_ID_EXPLORER
+	});
+	const collectionPath = `${PATH_COLLECTIONS}/${collectionName}`;
+	const collectionNode = explorerReadConnection.get(collectionPath);
+	if (!collectionNode) {
+		log.error(`Unable to get CollectionNode from collectionPath:${collectionPath}!`);
+		return {
+			body: {
+				message: 'Bad Request'
+			},
+			contentType: 'text/json;charset=utf-8',
+			status: 400 // Bad Request
+		};
+	}
+	const collectionId = collectionNode._id;
 
 	const repoId = `${COLLECTION_REPO_PREFIX}${collectionName}`;
 	//log.info(`repoId:${toStr(repoId)}`);
@@ -201,11 +290,21 @@ export function post(request, collections = []) {
 			login: EXPLORER_APP_USER.name, //USER_EXPLORER_APP_NAME,
 			type: 'user'
 		};
-		//log.info(`user:${toStr(user)}`);
+		log.info('user:%s', toStr(user));
 	}
 
-	return run({
-		//principals: [PRINCIPAL_EXPLORER_WRITE], // This allows any user to write
+	return run({ // Override current users permissions
+		attributes: {},
+		branch: 'master',
+
+		// This allows any user to write in app-explorer, journal and collections.
+		// So even though you are logged into Enonic XP admin with a user that does not have PRINCIPAL_EXPLORER_WRITE:
+		// You may still create/update the documentTypes and  documents.
+		principals: [PRINCIPAL_EXPLORER_WRITE],
+		//principals: [],
+
+		//repository: 'system-repo',
+		repository: REPO_ID_EXPLORER,
 		user
 	}, () => {
 		const writeToCollectionBranchConnection = connect({
@@ -227,8 +326,8 @@ export function post(request, collections = []) {
 						modifyDocument({
 							boolPartial,
 							boolRequireValid,
+							collectionId,
 							collectionName,
-							connection: writeToCollectionBranchConnection,
 							id: toPersist._id,
 							responseArray,
 							toPersist
@@ -236,8 +335,8 @@ export function post(request, collections = []) {
 					} else {
 						createDocument({
 							boolRequireValid,
+							collectionId,
 							collectionName,
-							connection: writeToCollectionBranchConnection,
 							responseArray,
 							toPersist
 						});
@@ -247,8 +346,8 @@ export function post(request, collections = []) {
 						modifyDocument({
 							boolPartial,
 							boolRequireValid,
+							collectionId,
 							collectionName,
-							connection: writeToCollectionBranchConnection,
 							id: `/${toPersist._name}`,
 							responseArray,
 							toPersist
@@ -256,8 +355,8 @@ export function post(request, collections = []) {
 					} else {
 						createDocument({
 							boolRequireValid,
+							collectionId,
 							collectionName,
-							connection: writeToCollectionBranchConnection,
 							responseArray,
 							toPersist
 						});
@@ -267,8 +366,8 @@ export function post(request, collections = []) {
 						modifyDocument({
 							boolPartial,
 							boolRequireValid,
+							collectionId,
 							collectionName,
-							connection: writeToCollectionBranchConnection,
 							id: toPersist._path,
 							responseArray,
 							toPersist
@@ -276,8 +375,8 @@ export function post(request, collections = []) {
 					} else {
 						createDocument({
 							boolRequireValid,
+							collectionId,
 							collectionName,
-							connection: writeToCollectionBranchConnection,
 							responseArray,
 							toPersist
 						});
@@ -285,8 +384,8 @@ export function post(request, collections = []) {
 				} else {
 					createDocument({
 						boolRequireValid,
+						collectionId,
 						collectionName,
-						connection: writeToCollectionBranchConnection,
 						responseArray,
 						toPersist
 					});
