@@ -120,6 +120,7 @@ module.exports = {
 				'_repoId', // fake node property
 				'_score', // fake node property
 				'_selected', // option-set property
+				'_ts' // node property
 				'_versionKey' // node property
 			],
 			allowAfterThis: false,

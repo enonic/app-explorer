@@ -17,6 +17,7 @@ import {ignoreErrors} from '/lib/explorer/ignoreErrors';
 import {
 	APP_EXPLORER,
 	FOLDERS,
+	NT_API_KEY,
 	NT_COLLECTION,
 	//NT_DOCUMENT,
 	NT_INTERFACE,
@@ -57,9 +58,9 @@ import {
 	addMembers,
 	createRole,
 	createUser,
-	getPrincipal/*,
-	findPrincipals,
-	getUser*/
+	getPrincipal,
+	//findPrincipals,
+	getUser
 } from '/lib/xp/auth';
 //import {sanitize} from '/lib/xp/common';
 import {send} from '/lib/xp/event';
@@ -1251,6 +1252,46 @@ export function run() {
 			setModel({
 				connection: writeConnection,
 				version: 12
+			});
+		}
+
+		//──────────────────────────────────────────────────────────────────────
+		// Model 13: Make sure ApiKeys has correct structure
+		//──────────────────────────────────────────────────────────────────────
+		if (isModelLessThan({
+			connection: writeConnection,
+			version: 13
+		})) {
+			progress.addItems(1).setInfo('Finding ApiKeys...').report().logInfo();
+
+			const apiKeysQueryParams = {
+				count: -1,
+				filters: addFilter({
+					filter: hasValue('type', [NT_API_KEY])
+				})
+			};
+			const apiKeyIds = writeConnection.query(apiKeysQueryParams).hits.map(({id}) => id);
+			progress.addItems(apiKeyIds.length);
+			progress.finishItem();
+
+			apiKeyIds.forEach((apiKeyId) => {
+				progress.setInfo(`Making sure ApiKey has correct structure id:${apiKeyId}`).report().logInfo();
+				writeConnection.modify({
+					key: apiKeyId,
+					editor: (apiKeyNode) => {
+						apiKeyNode._nodeType = NT_API_KEY;
+						delete apiKeyNode.type;
+						apiKeyNode.createdTime = apiKeyNode._ts;
+						apiKeyNode.modifiedTime = new Date();
+						apiKeyNode.modifier = getUser().key;
+						return apiKeyNode;
+					}
+				});
+				progress.finishItem();
+			}); // forEach
+			setModel({
+				connection: writeConnection,
+				version: 13
 			});
 		}
 
