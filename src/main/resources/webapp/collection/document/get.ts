@@ -1,4 +1,6 @@
 import type {QueryFilters} from '/lib/explorer/types.d';
+import type {Request} from '../../../types/Request';
+
 
 import {
 	array,
@@ -19,6 +21,19 @@ import {respondWithHtml} from './documentation';
 
 const {includes: arrayIncludes} = array;
 const {startsWith} = string;
+
+
+export type GetRequest = Request<{
+	id :string
+	collection? :string
+	count? :string
+	filters? :string
+	query? :string
+	sort? :string
+	start? :string
+}, {
+	collection :string
+}>
 
 
 function respondWithJson({
@@ -128,24 +143,7 @@ function respondWithJson({
 
 
 export function get(
-	request :{
-		headers :{
-			Accept :string
-		}
-		params :{
-			id :string
-
-			collection? :string
-			count? :string
-			filters? :string
-			query? :string
-			sort? :string
-			start? :string
-		},
-		pathParams :{
-			collection :string
-		}
-	},
+	request :GetRequest,
 	collections :Array<string> = []//,
 	//apiKey :string
 ) {

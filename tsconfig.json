@@ -55,6 +55,7 @@
 		"rootDir": "../",
 		"rootDirs": [
 			"src/main/resources",
+			"../lib-explorer",
 			"node_modules",
 			"test"
 		],
@@ -70,7 +71,8 @@
 	},
 	"exclude": [
 		"build/**/*",
-		"node_modules/**/*"
+		"node_modules/**/*",
+		"../lib-explorer/**/*"
 	],
 	"include": [
 		"src/main/resources/**/*.ts",

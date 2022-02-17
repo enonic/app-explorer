@@ -1,8 +1,12 @@
+import type {Request} from '../../types/Request';
+
+
 import {
 	//RESPONSE_TYPE_JSON,
 	RESPONSE_TYPE_HTML,
 	forceArray,
-	toStr
+	startsWith//,
+	//toStr
 } from '@enonic/js-utils';
 
 import {
@@ -11,12 +15,13 @@ import {
 } from '/lib/explorer/model/2/constants';
 import {connect} from '/lib/explorer/repo/connect';
 import {hash} from '/lib/explorer/string/hash';
+import {coerceApiKey} from '../../services/graphQL/apiKey/coerceApiKey';
 
 
 const AUTH_PREFIX = 'Explorer-Api-Key ';
 
 
-export function listCollections(request) {
+export function listCollections(request :Request) {
 	//log.debug(`request:${toStr(request)}`);
 	const {
 		headers: {
@@ -31,7 +36,7 @@ export function listCollections(request) {
 			status: 401
 		}; // Unauthorized
 	}
-	if(!authorization.startsWith(AUTH_PREFIX)) {
+	if(!startsWith(authorization, AUTH_PREFIX)) {
 		log.error(`Invalid Authorization header:${authorization}!`);
 		return { status: 401 }; // Unauthorized
 	}
@@ -61,14 +66,15 @@ export function listCollections(request) {
 					}
 				}]
 			}
-		}
+		},
+		query: ''
 	});
 	//log.debug(`matchingApiKeys:${toStr(matchingApiKeys)}`);
 	if(matchingApiKeys.total !== 1) {
 		log.error(`Unique apiKey:${apiKey} not found!`);
 		return { status: 401 }; // Unauthorized
 	}
-	const apiKeyNode = explorerRepoReadConnection.get(matchingApiKeys.hits[0].id);
+	const apiKeyNode = coerceApiKey(explorerRepoReadConnection.get(matchingApiKeys.hits[0].id));
 	//log.debug(`apiKeyNode:${toStr(apiKeyNode)}`);
 	const {collections} = apiKeyNode;
 	//log.debug(`collections:${toStr(collections)}`);
@@ -91,14 +97,16 @@ export function listCollections(request) {
 } // listCollections
 
 
-export function collectionResponse(request) {
-	log.debug(`request:${toStr(request)}`);
+export function collectionResponse(request :Request<{}, {
+	collection :string
+}>) {
+	//log.debug(`request:${toStr(request)}`);
 	const {
 		pathParams: {
 			collection
 		}
 	} = request;
-	log.debug(`collection:${toStr(collection)}`);
+	//log.debug(`collection:${toStr(collection)}`);
 	return {
 		body: `<html>
 	<head>
