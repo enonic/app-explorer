@@ -96,7 +96,11 @@ export const Api = (props :{
 								label={"Show all fields"}
 								className='inverted'
 								checked={showCollections}
-								onChange={(ignored,{checked}) => {
+								onChange={(
+									//@ts-ignore
+									ignored,
+									{checked}
+								) => {
 									setShowCollections(checked);
 									setShowInterfaces(checked);
 								}}
