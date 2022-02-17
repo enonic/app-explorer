@@ -1,13 +1,9 @@
 import type {ApiKeyNodeUpdated} from '../../../types/ApiKey';
 
-/*import {
-	//forceArray,
-	toStr
-} from '@enonic/js-utils';*/
+//import {toStr} from '@enonic/js-utils';
 import {
 	GraphQLString,
-	list,
-	nonNull
+	list
 	//@ts-ignore
 } from '/lib/graphql';
 //@ts-ignore
@@ -32,7 +28,7 @@ export function addMutationApiKeyUpdate({glue}) {
 			//_name: glue.getScalarType('_name'),
 			collections: list(GraphQLString), // null allowed
 			interfaces: list(GraphQLString), // null allowed
-			key: nonNull(GraphQLString)
+			key: GraphQLString // Nullable
 		},
 		resolve(env :{
 			args :{
@@ -40,7 +36,7 @@ export function addMutationApiKeyUpdate({glue}) {
 				//_name: string
 				collections? :Array<string>
 				interfaces? :Array<string>
-				key :string
+				key? :string
 			}
 		}) {
 			//log.debug('env:%s', toStr(env));
@@ -53,7 +49,7 @@ export function addMutationApiKeyUpdate({glue}) {
 					key
 				}
 			} = env;
-			log.debug('_id:%s', _id);
+			//log.debug('_id:%s', _id);
 			//log.debug('_name:%s', _name);
 			//log.debug('collections:%s', toStr(collections));
 			//log.debug('interfaces:%s', toStr(interfaces));

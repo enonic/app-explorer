@@ -2,7 +2,7 @@ export const GQL_MUTATION_API_KEY_UPDATE = `mutation ApiKeyUpdateMutation(
 	$_id: ID!
 	$collections: [String]
 	$interfaces: [String]
-	$key: String!
+	$key: String
 ) {
 	updateApiKey(
 		_id: $_id

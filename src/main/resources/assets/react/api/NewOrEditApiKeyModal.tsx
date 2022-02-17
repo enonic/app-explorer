@@ -12,6 +12,7 @@ import {NewOrEditApiKey} from './NewOrEditApiKey';
 export const NewOrEditApiKeyModal = (props) => {
 	//console.debug('props', props);
 	const {
+		_id,
 		_name,
 		afterClose = () => {},
 		beforeOpen = () => {},
@@ -64,6 +65,7 @@ export const NewOrEditApiKeyModal = (props) => {
 	>
 		<Modal.Header>{_name ? `Edit API Key ${_name}`: 'New API Key'}</Modal.Header>
 		<NewOrEditApiKey
+			_id={_id}
 			_name={_name}
 			doClose={doClose}
 			initialValues={initialValues}

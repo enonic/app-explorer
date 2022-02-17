@@ -43,6 +43,7 @@ export const NewOrEditApiKey = (props) => {
 		doClose,
 		initialValues = {
 			collections: [],
+			interfaces: [],
 			key: _name ? '' : makeKey()//,
 			//name: _name
 		},
@@ -57,17 +58,19 @@ export const NewOrEditApiKey = (props) => {
 		text: key,
 		value: key
 	})) : [];
+	//console.debug('collectionOptions', collectionOptions);
 
 	const interfaceOptions = queryInterfacesGraph.hits ? queryInterfacesGraph.hits.map(({_name: key}) => ({
 		key,
 		text: key,
 		value: key
 	})) : [];
+	//console.debug('interfaceOptions', interfaceOptions);
 
 	return <EnonicForm
 		initialValues={initialValues}
 		onSubmit={(values) => {
-			//console.debug('submit values', values);
+			//console.debug('onSubmit values', values);
 			const variables :{
 				_id? :string // update
 				_name? :string // create
@@ -76,23 +79,25 @@ export const NewOrEditApiKey = (props) => {
 				key? :string
 			} = {
 				collections: values.collections,
-				interfaces: values.interfaces,
-				key: values.key
+				interfaces: values.interfaces
 			};
 			if (_id) {
 				variables._id = _id;
 			}
+			if (values.key) {
+				variables.key = values.key;
+			}
 			if (values.name) {
 				variables._name = values.name;
 			}
-			console.debug(variables);
+			//console.debug('onSubmit variables', variables);
 			fetch(`${servicesBaseUrl}/graphQL`, {
 				method: 'POST',
 				headers: {
 					'Content-Type':	'application/json'
 				},
 				body: JSON.stringify({
-					query: _name ? GQL_MUTATION_API_KEY_UPDATE : GQL_MUTATION_API_KEY_CREATE,
+					query: _id ? GQL_MUTATION_API_KEY_UPDATE : GQL_MUTATION_API_KEY_CREATE,
 					variables
 				})
 			}).then((response) => {
