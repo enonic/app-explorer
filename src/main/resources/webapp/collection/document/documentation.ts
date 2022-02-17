@@ -3,7 +3,15 @@ export function respondWithHtml({
 	query,
 	sort,
 	start
-}) {
+} :{
+	count :number|string
+	query :string
+	sort :string
+	start :number|string
+}) :{
+		body :string
+		contentType :string
+} {
 	return {
 		body: `<html>
 	<head>
