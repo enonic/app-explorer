@@ -34,7 +34,6 @@ export const GQL_MUTATION_FIELD_UPDATE = `mutation UpdateField(
 	  _path
 	  _versionKey
 	  decideByType
-	  denyDelete
 	  description
 	  enabled
 	  fieldType

@@ -87,7 +87,6 @@ import {
 const FIELD_TYPE = { // TODO This should not be a system field. Remove in lib-explorer-4.0.0?
 	key: 'type',
 	_name: 'type',
-	denyDelete: true,
 	fieldType: VALUE_TYPE_STRING,
 	indexConfig: 'minimal',
 	max: 1,
@@ -232,7 +231,6 @@ export function run() {
 			progress.addItems(READWRITE_FIELDS.length);
 			READWRITE_FIELDS.forEach(({
 				_name,
-				denyDelete, // TODO remove in 2.0?
 				//displayName,
 				fieldType = 'string',
 				indexConfig = 'type',
@@ -245,7 +243,6 @@ export function run() {
 					_name,
 					_inheritsPermissions: false, // false is the default and the fastest, since it doesn't have to read parent to apply permissions.
 					_permissions: ROOT_PERMISSIONS_EXPLORER,
-					denyDelete, // TODO remove in 2.0?
 					//displayName,
 					fieldType,
 					indexConfig,

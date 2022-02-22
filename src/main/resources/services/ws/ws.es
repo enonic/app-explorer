@@ -77,7 +77,6 @@ const FIELDS_GQL = `queryFields {
 		_id
 		_name
 		_path
-		denyDelete
 		displayName
 		indexConfig
 		fieldType

@@ -15,7 +15,6 @@ export const queryFields = ({
 
 		key
 
-		denyDelete
 		description
 		fieldType
 		max

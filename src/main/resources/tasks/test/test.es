@@ -97,7 +97,6 @@ export function run() {
 			_path: '/fields/mytestfieldkey', // lowercased
 			_versionKey: createdFieldVersionKey,
 			decideByType: true,
-			denyDelete: false,
 			description: 'Description',
 			enabled: true,
 			fieldType: VALUE_TYPE_STRING,
@@ -179,7 +178,6 @@ export function run() {
 					_path: '/fields/mytestfieldkey', // lowercased
 					_versionKey: updatedFieldVersionKey,
 					decideByType: false,
-					denyDelete: false,
 					description: 'Changed description',
 					enabled: false,
 					fieldType: VALUE_TYPE_BOOLEAN,
