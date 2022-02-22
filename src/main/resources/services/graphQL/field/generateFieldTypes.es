@@ -42,7 +42,6 @@ export function generateFieldTypes({
 		...interfaceNodeFields,
 		_name: { type: glue.getScalarType('_name') },
 		decideByType: { type: GraphQLBoolean }, // TODO nonNull?
-		denyDelete: { type: GraphQLBoolean },
 		description: { type: GraphQLString },
 		enabled: { type: GraphQLBoolean }, // TODO nonNull?
 		fieldType: { type: nonNull(GraphQLString) },

@@ -279,7 +279,6 @@ export function Fields(props) {
 								//total
 							},
 
-							denyDelete = false,
 							fieldType = VALUE_TYPE_STRING,
 							key,
 
@@ -327,11 +326,10 @@ export function Fields(props) {
 							//console.debug(`Fields key:${key} fieldCollections:`, fieldCollections);
 							//console.debug(`Fields key:${key} fulltext:`, fulltext);
 
-							return <Table.Row disabled={denyDelete} key={`field[${index}]`}>
+							return <Table.Row key={`field[${index}]`}>
 								<Table.Cell>
 									<NewOrEditModal
 										_id={_id}
-										disabled={denyDelete}
 										field={_name}
 										initialValues={{
 											fieldType,
@@ -352,81 +350,79 @@ export function Fields(props) {
 									/>
 								</Table.Cell>
 
-								<Table.Cell disabled={denyDelete}>{key}</Table.Cell>
+								<Table.Cell>{key}</Table.Cell>
 
-								{showDescriptionColumn ? <Table.Cell disabled={denyDelete}>{description}</Table.Cell> : null}
+								{showDescriptionColumn ? <Table.Cell>{description}</Table.Cell> : null}
 
-								<Table.Cell disabled={denyDelete}>{fieldType === 'any' ? '*' : fieldType}</Table.Cell>
+								<Table.Cell>{fieldType === 'any' ? '*' : fieldType}</Table.Cell>
 
 								{showOccurencesColumns ? <>
-									<Table.Cell disabled={denyDelete} textAlign='center'>{min === 0 ? null : min}</Table.Cell>
-									<Table.Cell disabled={denyDelete} textAlign='center'>{max === 0 ? '∞' : max}</Table.Cell>
+									<Table.Cell textAlign='center'>{min === 0 ? null : min}</Table.Cell>
+									<Table.Cell textAlign='center'>{max === 0 ? '∞' : max}</Table.Cell>
 								</>: null}
 
 								{showIndexConfigColumns ? <>
-									<Table.Cell disabled={denyDelete} textAlign='center'>{enabled
-										? <Icon color={denyDelete ? 'grey' : 'green'} disabled={denyDelete} name='checkmark' size='large'/>
-										: <Icon color='grey' disabled={denyDelete} name='x' size='large'/>}
+									<Table.Cell textAlign='center'>{enabled
+										? <Icon color='green' name='checkmark' size='large'/>
+										: <Icon color='grey' name='x' size='large'/>}
 									</Table.Cell>
 
-									<Table.Cell disabled={denyDelete} textAlign='center'>{enabled
+									<Table.Cell textAlign='center'>{enabled
 										? decideByType
-											? <Icon color={denyDelete ? 'grey' : 'green'} disabled={denyDelete} name='checkmark' size='large'/>
-											: <Icon color='grey' disabled={denyDelete} name='x' size='large'/>
+											? <Icon color='green' name='checkmark' size='large'/>
+											: <Icon color='grey' name='x' size='large'/>
 										: null
 									}</Table.Cell>
 
-									<Table.Cell disabled={denyDelete} textAlign='center'>{enabled
+									<Table.Cell textAlign='center'>{enabled
 										? fulltext
-											? <Icon color={denyDelete ? 'grey' : 'green'} disabled={denyDelete} name='checkmark' size='large'/>
-											: <Icon color='grey' disabled={denyDelete} name='x' size='large'/>
+											? <Icon color='green' name='checkmark' size='large'/>
+											: <Icon color='grey' name='x' size='large'/>
 										: null
 									}</Table.Cell>
 
-									<Table.Cell disabled={denyDelete} textAlign='center'>{enabled
+									<Table.Cell textAlign='center'>{enabled
 										? includeInAllText
-											? <Icon color={denyDelete ? 'grey' : 'green'} disabled={denyDelete} name='checkmark' size='large'/>
-											: <Icon color='grey' disabled={denyDelete} name='x' size='large'/>
+											? <Icon color='green' name='checkmark' size='large'/>
+											: <Icon color='grey' name='x' size='large'/>
 										: null
 									}</Table.Cell>
 
-									<Table.Cell disabled={denyDelete} textAlign='center'>{enabled
+									<Table.Cell textAlign='center'>{enabled
 										? nGram
-											? <Icon color={denyDelete ? 'grey' : 'green'} disabled={denyDelete} name='checkmark' size='large'/>
-											: <Icon color='grey' disabled={denyDelete} name='x' size='large'/>
+											? <Icon color='green' name='checkmark' size='large'/>
+											: <Icon color='grey' name='x' size='large'/>
 										: null
 									}</Table.Cell>
 
-									<Table.Cell disabled={denyDelete} textAlign='center'>{enabled
+									<Table.Cell textAlign='center'>{enabled
 										? path
-											? <Icon color={denyDelete ? 'grey' : 'green'} disabled={denyDelete} name='checkmark' size='large'/>
-											: <Icon color='grey' disabled={denyDelete} name='x' size='large'/>
+											? <Icon color='green' name='checkmark' size='large'/>
+											: <Icon color='grey' name='x' size='large'/>
 										: null
 									}</Table.Cell>
 
 								</> : null}
 
-								{showDocumentTypes ? <Table.Cell disabled={denyDelete} textAlign='center'>{denyDelete ? 'n/a' :<ul style={{
+								{showDocumentTypes ? <Table.Cell textAlign='center'><ul style={{
 									listStyleType: 'none',
 									margin: 0,
 									padding: 0
-								}}>{fieldDocumentTypes.sort().map((dT, i) => <li key={i}>{dT}</li>)}</ul>}</Table.Cell> : null}
+								}>{fieldDocumentTypes.sort().map((dT, i) => <li key={i}>{dT}</li>)}</ul>}</Table.Cell> : null}
 
-								{showCollections ? <Table.Cell disabled={denyDelete} textAlign='center'>{denyDelete ? 'n/a' :<ul style={{
+								{showCollections ? <Table.Cell textAlign='center'><ul style={{
 									listStyleType: 'none',
 									margin: 0,
 									padding: 0
-								}}>{fieldCollections.sort().map((c, i) => <li key={i}>{c}</li>)}</ul>}</Table.Cell> : null}
+								}>{fieldCollections.sort().map((c, i) => <li key={i}>{c}</li>)}</ul>}</Table.Cell> : null}
 
-								<Table.Cell disabled={denyDelete} textAlign='right'>{denyDelete
-									? 'n/a'
-									: documentsWithFieldTotal === 0
-										? null
-										: documentsWithFieldTotal
+								<Table.Cell textAlign='right'>{documentsWithFieldTotal === 0
+									? null
+									: documentsWithFieldTotal
 								}</Table.Cell>
 
-								{showDeleteButton ? <Table.Cell disabled={denyDelete} textAlign='center'>
-									{denyDelete ? 'n/a' : <DeleteModal
+								{showDeleteButton ? <Table.Cell textAlign='center'>
+									{<DeleteModal
 										_id={_id}
 										_name={_name}
 										afterClose={updateFields}
@@ -439,32 +435,7 @@ export function Fields(props) {
 											<Icon name='question' />
 											<Message.Content>{`Delete field ${_name}?`}</Message.Content>
 										</Message>
-										/* denyDelete
-											? <Message
-												error
-												icon
-											>
-												<Icon name='warning sign' />
-												<Message.Content>You are not allowed to delete a system field.</Message.Content>
-											</Message>
-											: fieldCollections.length
-												? <Message
-													error
-													icon
-												>
-													<Icon name='warning sign' />
-													<Message.Content>You are not allowed to a delete a field that is used in a collection.</Message.Content>
-												</Message>
-												: fieldDocumentTypes.length
-													? <Message
-														error
-														icon
-													>
-														<Icon name='warning sign' />
-														<Message.Content>You are not allowed to a delete a field that is used in a document type.</Message.Content>
-													</Message>
-													:
-										*/}
+										}
 										servicesBaseUrl={servicesBaseUrl}
 									/>}
 								</Table.Cell> : null}

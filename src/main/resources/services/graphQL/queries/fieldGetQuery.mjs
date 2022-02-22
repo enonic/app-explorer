@@ -9,7 +9,6 @@ export const GQL_QUERY_FIELD_GET = `query FieldGetQuery(
 		_nodeType
 		_path
 		_versionKey
-		denyDelete
 		description
 		decideByType
 		enabled

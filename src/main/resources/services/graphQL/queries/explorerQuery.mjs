@@ -55,7 +55,6 @@ export const GQL_QUERY_EXPLORER_REPO_NODES_GET = `query GetExplorerRepoNodesQuer
 				_path
 				_versionKey
 				decideByType
-				denyDelete
 				description
 				enabled
 				fieldType

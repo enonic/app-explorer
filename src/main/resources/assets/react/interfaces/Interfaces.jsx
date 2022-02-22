@@ -44,9 +44,6 @@ const GQL_DOCUMENT_TYPES = `queryDocumentTypes {
 			active
 			enabled
 			fulltext
-			#includeInAllText
-			#max
-			#min
 			name
 			nGram
 			valueType
@@ -60,7 +57,6 @@ const GQL_FIELDS = `queryFields(
 	hits {
 		_id
 		key
-		denyDelete
 		enabled
 	} # hits
 }`;
@@ -71,15 +67,11 @@ const GQL_INTERFACES = `queryInterfaces(
 	hits {
 		_id
 		_name
-		#_nodeType
-		#_path
-		#_versionKey
 		collectionIds
 		fields {
 			boost
 			name
 		}
-		#stopWordIds
 		stopWords
 		synonymIds
 	}
