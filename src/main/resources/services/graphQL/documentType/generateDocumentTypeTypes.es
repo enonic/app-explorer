@@ -1,5 +1,6 @@
 import {
 	INDEX_CONFIG_N_GRAM,
+	VALUE_TYPE_ANY,
 	VALUE_TYPE_BOOLEAN,
 	VALUE_TYPE_DOUBLE,
 	VALUE_TYPE_GEO_POINT,
@@ -50,6 +51,7 @@ export function generateDocumentTypeTypes({
 			valueType: { type: nonNull(glue.addEnumType({
 				name: 'EnumValueTypes',
 				values: [
+					VALUE_TYPE_ANY,
 					VALUE_TYPE_BOOLEAN,
 					VALUE_TYPE_DOUBLE,
 					VALUE_TYPE_GEO_POINT,

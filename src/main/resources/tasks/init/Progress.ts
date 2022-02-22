@@ -1,13 +1,20 @@
-import {
-	isObject
-} from '@enonic/js-utils';
+import {isObject} from '@enonic/js-utils';
 
 import {
 	progress as reportProgress//,
 	//sleep
+	//@ts-ignore
 } from '/lib/xp/task';
 
+
+type Info = string | Object;
+
+
 export class Progress {
+	current :number
+	info :string
+	total :number
+
 	constructor({
 		current = 0,
 		info = 'Initializing',
@@ -46,7 +53,7 @@ export class Progress {
 		return rv;
 	}
 
-	setInfo(info) {
+	setInfo(info :Info) {
 		this.info = isObject(info) ? JSON.stringify(info) : info;
 		return this; // chainable
 	}
@@ -60,15 +67,15 @@ export class Progress {
 		return this; // chainable
 	}
 
-	addItems(count) {
+	addItems(count :number) {
 		this.total += count;
 		return this; // chainable
 	}
 
-	finishItem(info) {
+	finishItem(info? :Info) {
 		this.current += 1;
 		if (info) {
-			this.info = info;
+			this.info = isObject(info) ? JSON.stringify(info) : info;
 		}
 		/*if (this.sleepMsAfterItem) {
 			sleep(this.sleepMsAfterItem);

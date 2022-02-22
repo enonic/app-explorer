@@ -20,7 +20,8 @@ import {getUser} from '/lib/xp/auth';
 import {
 	NT_API_KEY,
 	PATH_API_KEYS,
-	PRINCIPAL_EXPLORER_WRITE
+	PRINCIPAL_EXPLORER_WRITE,
+	ROOT_PERMISSIONS_EXPLORER
 } from '/lib/explorer/constants';
 import {connect} from '/lib/explorer/repo/connect';
 import {hash} from '/lib/explorer/string/hash';
@@ -65,10 +66,11 @@ export function addMutationApiKeyCreate({glue}) {
 
 			const apiKeyNodeToCreate :ApiKeyNodeCreateParams = {
 				_indexConfig: {default: 'byType'},
-				_inheritsPermissions: true,
+				_inheritsPermissions: false, // false is the default and the fastest, since it doesn't have to read parent to apply permissions.
 				_name,
 				_nodeType: NT_API_KEY,
 				_parentPath: PATH_API_KEYS as ParentPath,
+				_permissions: ROOT_PERMISSIONS_EXPLORER,
 				collections, // No need to forceArray let Enonic XP do it's thing
 				createdTime: new Date(),
 				creator: getUser().key,

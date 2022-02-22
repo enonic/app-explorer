@@ -26,8 +26,7 @@ import {
 	PATH_FIELDS,
 	PRINCIPAL_EXPLORER_WRITE,
 	REPO_ID_EXPLORER,
-	ROOT_PERMISSION_SYSTEM_ADMIN,
-	ROOT_PERMISSION_EXPLORER_READ
+	ROOT_PERMISSIONS_EXPLORER
 } from '/lib/explorer/index';
 import {
 	READWRITE_FIELDS,
@@ -61,17 +60,22 @@ import {
 	getPrincipal,
 	//findPrincipals,
 	getUser
+	//@ts-ignore
 } from '/lib/xp/auth';
 //import {sanitize} from '/lib/xp/common';
+//@ts-ignore
 import {send} from '/lib/xp/event';
+//@ts-ignore
 import {get as getRepo} from '/lib/xp/repo';
 import {
 	create as createJob,
 	delete as deleteJob,
 	//get as getJob,
 	list as listJobs
+	//@ts-ignore
 } from '/lib/xp/scheduler';
 //import {submitTask} from '/lib/xp/task';
+//@ts-ignore
 import {reference} from '/lib/xp/value';
 
 import {Progress} from './Progress';
@@ -242,11 +246,8 @@ export function run() {
 				progress.setInfo(`Creating default field ${key}...`).report().logInfo();
 				const params = field({
 					_name,
-					_inheritsPermissions: false,
-					_permissions: [
-						ROOT_PERMISSION_SYSTEM_ADMIN,
-						ROOT_PERMISSION_EXPLORER_READ
-					],
+					_inheritsPermissions: false, // false is the default and the fastest, since it doesn't have to read parent to apply permissions.
+					_permissions: ROOT_PERMISSIONS_EXPLORER,
 					denyDelete, // TODO remove in 2.0?
 					denyValues, // TODO remove in 2.0?
 					//displayName,
