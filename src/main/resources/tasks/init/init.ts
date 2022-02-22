@@ -1,7 +1,19 @@
+import type {
+	IndexConfigObject,
+	OneOrMore
+} from '/lib/explorer/types.d';
+import type {CollectionWithCron} from '/lib/explorer/collection/types.d';
+//import type {InterfaceNode} from '/lib/explorer/interface/types.d';
+import type {ScheduledJob} from '/lib/explorer/scheduler/types.d';
+import type {SynonymNode} from '/lib/explorer/synonym/types.d';
+import type {ApiKeyNode} from '../../types/ApiKey.d';
+
+
 import {
 	COLON_SIGN,
 	DOT_SIGN,
 	VALUE_TYPE_STRING,
+	addQueryFilter,
 	dirname,
 	forceArray,
 	uniqueId,
@@ -11,7 +23,6 @@ import {detailedDiff} from 'deep-object-diff';
 import deepEqual from 'fast-deep-equal';
 
 import {get as getCollection} from '/lib/explorer/collection/get';
-import {query as queryCollections} from '/lib/explorer/collection/query';
 //import {getField} from '/lib/explorer/field/getField';
 import {ignoreErrors} from '/lib/explorer/ignoreErrors';
 import {
@@ -25,8 +36,7 @@ import {
 	NT_THESAURUS,
 	PATH_FIELDS,
 	PRINCIPAL_EXPLORER_WRITE,
-	REPO_ID_EXPLORER,
-	ROOT_PERMISSIONS_EXPLORER
+	REPO_ID_EXPLORER
 } from '/lib/explorer/index';
 import {
 	READWRITE_FIELDS,
@@ -48,7 +58,6 @@ import {create} from '/lib/explorer/node/create';
 import {connect} from '/lib/explorer/repo/connect';
 import {init as initRepo} from '/lib/explorer/repo/init';
 import {get as getInterface} from '/lib/explorer/interface/get';
-import {addFilter} from '/lib/explorer/query/addFilter';
 import {hasValue} from '/lib/explorer/query/hasValue';
 import {runAsSu} from '/lib/explorer/runAsSu';
 import {getCollectors, createOrModifyJobsFromCollectionNode} from '/lib/explorer/scheduler/createOrModifyJobsFromCollectionNode';
@@ -83,6 +92,76 @@ import {
 	DEFAULT_INTERFACE,
 	DEFAULT_INTERFACE_NAME
 } from './interfaceDefault';
+
+
+type ApiKeyNodeWithType = ApiKeyNode & {
+	type :string
+}
+
+interface NodeWithType {
+	_id :string
+	_nodeType :string
+	_path :string
+	type :string
+}
+
+interface InterfaceNodeFilter {
+	filter? :'exists'|'hasValue'|'notExists'
+	params? :{
+		field? :string
+	}
+}
+
+interface InterfaceNodeWithFilter {
+	_id :string
+	//_path :string
+	filters: {
+		must?: InterfaceNodeFilter | Array<InterfaceNodeFilter>
+		mustNot?: InterfaceNodeFilter | Array<InterfaceNodeFilter>
+		should?: InterfaceNodeFilter | Array<InterfaceNodeFilter>
+	},
+	query? :string
+}
+
+interface InterfaceNodeWithQuery {
+	_id :string
+	//_path :string
+	query :unknown
+}
+
+interface InterfaceNodeWithResultMappings {
+	_id :string
+	//_path :string
+	resultMappings :unknown
+}
+
+interface InterfaceNodeWithFacets {
+	_id :string
+	//_path :string
+	facets :unknown
+}
+
+interface InterfaceNodeWithPagination {
+	_id :string
+	//_path :string
+	pagination :unknown
+}
+
+interface InterfaceNodeWithThesauri {
+	_id :string
+	//_path :string
+	thesauri :unknown
+}
+
+type InterfaceNodeWithCollections = /*InterfaceNode &*/ {
+	collectionIds? :Array<string>
+	collections? :OneOrMore<string>
+}
+
+type InterfaceNodeWithSynonyms = /*InterfaceNode &*/ {
+	synonymIds? :Array<string>
+	synonyms? :OneOrMore<string>
+}
 
 const FIELD_TYPE = { // TODO This should not be a system field. Remove in lib-explorer-4.0.0?
 	key: 'type',
@@ -233,7 +312,6 @@ export function run() {
 				_name,
 				//displayName,
 				fieldType = 'string',
-				indexConfig = 'type',
 				key, // TODO Dissallow creating fields starting with _ and remove in 2.0?
 				max = 0,
 				min = 0
@@ -241,11 +319,8 @@ export function run() {
 				progress.setInfo(`Creating default field ${key}...`).report().logInfo();
 				const params = field({
 					_name,
-					_inheritsPermissions: false, // false is the default and the fastest, since it doesn't have to read parent to apply permissions.
-					_permissions: ROOT_PERMISSIONS_EXPLORER,
 					//displayName,
 					fieldType,
-					indexConfig,
 					key, // TODO Dissallow creating fields starting with _ and remove in 2.0?
 					max,
 					min
@@ -264,7 +339,7 @@ export function run() {
 			progress.setInfo('Creating notificationsData...').report().logInfo();
 			const notificationsData = Node({
 				_name: 'notifications',
-				emails:[]
+				emails: [] as Array<string>
 			});
 			//log.info(toStr({notificationsData}));
 			ignoreErrors(() => {
@@ -293,27 +368,29 @@ export function run() {
 			// WARNING Does not find nodes there _indexConfig is none!
 			const nodesWithTypeQueryParams = {
 				count: -1,
-				filters: addFilter({
-					filter: { exists: { field: 'type'}},
-					filters: addFilter({
+				filters: addQueryFilter({
+					filter: { exists: { field: 'type' } },
+					filters: addQueryFilter({
 						filter: hasValue('_nodeType', ['default'])
 					})
-				})
+				}),
+				query: ''
 			};
+			//log.info(`nodesWithTypeQueryParams:${toStr(nodesWithTypeQueryParams)}`);
 
 			const nodesWithTypeRes = writeConnection.query(nodesWithTypeQueryParams);
-			nodesWithTypeRes.hits = nodesWithTypeRes.hits
-				.map(hit => writeConnection.get(hit.id))
-				.map(({_id, _nodeType, _path, type}) => ({_id, _nodeType, _path, type}));
 			//log.info(`nodesWithTypeRes:${toStr(nodesWithTypeRes)}`);
-			//log.info(`nodesWithTypeQueryParams:${toStr(nodesWithTypeQueryParams)}`);
+
+			const nodesWithType = nodesWithTypeRes.hits
+				.map(hit => writeConnection.get<NodeWithType>(hit.id))
+				.map(({_id, _nodeType, _path, type}) => ({_id, _nodeType, _path, type}));
 			progress.finishItem();
 
 			progress.addItems(nodesWithTypeRes.total);
-			nodesWithTypeRes.hits.forEach(({_id, _nodeType, _path, type}) => {
+			nodesWithType.forEach(({_id, _nodeType, _path, type}) => {
 				progress.setInfo(`Trying to change _nodeType from ${_nodeType} to ${type} on _path:${_path} _id:${_id}...`).report().logInfo();
 				ignoreErrors(() => {
-					writeConnection.modify({
+					writeConnection.modify<NodeWithType>({
 						key: _id,
 						editor: (node) => {
 							node._nodeType = node.type;
@@ -341,32 +418,42 @@ export function run() {
 			progress.addItems(1).setInfo(`Finding nodes where _nodeType still is default and _indexConfig.default = none...`).report().debug();
 			const nodesWithIndexDefaultNoneQueryParams = {
 				count: -1,
-				filters: addFilter({
+				filters: addQueryFilter({
 					filter: hasValue('_nodeType', ['default'])
-				})
-				/*filters: addFilter({
+				}),
+				/*filters: addQueryFilter({
 					filter: hasValue('_indexConfig.default.enabled', [false]) // Doesn't work
 				}),*/
 				//query: "_indexConfig.default.enabled = 'false'" // Doesn't work
+				query: ''
 			};
+
+			interface NodeWithIndexConfigDefaultIsNone extends NodeWithType {
+				_indexConfig :{
+					default: IndexConfigObject
+				}
+			}
+
 			const nodesWithIndexDefaultNoneRes = writeConnection.query(nodesWithIndexDefaultNoneQueryParams);
-			nodesWithIndexDefaultNoneRes.hits = nodesWithIndexDefaultNoneRes.hits
-				.map(hit => writeConnection.get(hit.id))
+			const nodesWithIndexDefaultNone = nodesWithIndexDefaultNoneRes.hits
+				.map(hit => writeConnection.get<NodeWithIndexConfigDefaultIsNone>(hit.id))
 				.map(({
 					_id, _indexConfig, _nodeType, _path, type
 				}) => ({
 					_id, _indexConfig, _nodeType, _path, type
 				}))
-				.filter(({_indexConfig: {
-					default: {
-						decideByType,
-						enabled,
-						nGram,
-						fulltext,
-						includeInAllText,
-						path
-					} = {}
-				}}) => enabled === false
+				.filter(({
+					_indexConfig: {
+						default: {
+							decideByType,
+							enabled,
+							nGram,
+							fulltext,
+							includeInAllText,
+							path
+						} = {}
+					}
+				}) => enabled === false
 					&& decideByType === false
 					&& nGram === false
 					&& fulltext === false
@@ -378,10 +465,10 @@ export function run() {
 			progress.finishItem();
 
 			progress.addItems(nodesWithIndexDefaultNoneRes.hits.length);
-			nodesWithIndexDefaultNoneRes.hits.forEach(({_id, _nodeType, _path, type}) => {
+			nodesWithIndexDefaultNone.forEach(({_id, _nodeType, _path, type}) => {
 				progress.setInfo(`Trying to change _nodeType from ${_nodeType} to ${type} on _path:${_path} _id:${_id}...`).report().logInfo();
 				ignoreErrors(() => {
-					writeConnection.modify({
+					writeConnection.modify<NodeWithIndexConfigDefaultIsNone>({
 						key: _id,
 						editor: (node) => {
 							node._indexConfig.default.enabled = true;
@@ -429,22 +516,29 @@ export function run() {
 			};
 			//log.debug(`fieldsWithDisplayNameQueryParams:${toStr(fieldsWithDisplayNameQueryParams)}`);
 
+			interface NodeWithDisplayName {
+				_id :string
+				_path :string
+				displayName :string
+			}
+
 			const fieldsWithDisplayNameRes = writeConnection.query(fieldsWithDisplayNameQueryParams);
-			fieldsWithDisplayNameRes.hits = fieldsWithDisplayNameRes.hits
-				.map(hit => writeConnection.get(hit.id))
+			//log.debug(`fieldsWithDisplayNameRes:${toStr(fieldsWithDisplayNameRes)}`);
+
+			const fieldsWithDisplayName = fieldsWithDisplayNameRes.hits
+				.map(hit => writeConnection.get<NodeWithDisplayName>(hit.id))
 				.map(({
 					_id, _path, displayName
 				})=>({
 					_id, _path, displayName
 				}));
-			//log.debug(`fieldsWithDisplayNameRes:${toStr(fieldsWithDisplayNameRes)}`);
 			progress.finishItem();
 
-			progress.addItems(fieldsWithDisplayNameRes.hits.length);
-			fieldsWithDisplayNameRes.hits.forEach(({_id, _path, displayName}) => {
+			progress.addItems(fieldsWithDisplayName.length);
+			fieldsWithDisplayName.forEach(({_id, _path, displayName}) => {
 				progress.setInfo(`Removing displayName:${displayName} from _path:${_path} _id:${_id}...`).report().logInfo();
 				ignoreErrors(() => {
-					writeConnection.modify({
+					writeConnection.modify<NodeWithDisplayName>({
 						key: _id,
 						editor: (node) => {
 							delete node.displayName;
@@ -493,7 +587,7 @@ export function run() {
 			};
 			//log.debug(`allInterfaceNodesQueryParams:${toStr(allInterfaceNodesQueryParams)}`);
 
-			const allInterfaceNodes = writeConnection.query(allInterfaceNodesQueryParams).hits.map(({id}) => writeConnection.get(id));
+			const allInterfaceNodes = writeConnection.query(allInterfaceNodesQueryParams).hits.map(({id}) => writeConnection.get<InterfaceNodeWithFilter>(id));
 			//log.debug(`allInterfaceNodes:${toStr(allInterfaceNodes)}`);
 
 			const SYSTEM_FIELD_KEYS = [...SYSTEM_FIELDS, FIELD_TYPE].map(({key}) => key);
@@ -508,7 +602,7 @@ export function run() {
 					let boolHasFilterOnSystemField = false;
 					['must', 'mustNot', 'should'].forEach((clause) => {
 						if (filters[clause]) {
-							forceArray(filters[clause]).forEach(({
+							forceArray<InterfaceNodeFilter>(filters[clause]).forEach(({
 								filter,
 								params: {
 									field
@@ -524,7 +618,7 @@ export function run() {
 						}
 					}); // foreach clause
 					if (boolHasFilterOnSystemField) {
-						writeConnection.modify({
+						writeConnection.modify<InterfaceNodeWithFilter>({
 							key: _id,
 							editor: (interfaceNode) => {
 								//log.debug(`interfaceNode:${interfaceNode}`);
@@ -532,7 +626,7 @@ export function run() {
 									const filtersToDelete = [];
 									const filtersToKeep = [];
 									if (interfaceNode.filters[clause]) {
-										forceArray(interfaceNode.filters[clause]).forEach((filter = {}) => {
+										forceArray<InterfaceNodeFilter>(interfaceNode.filters[clause]).forEach((filter = {}) => {
 											const {
 												filter: filterFunction,
 												params: {
@@ -609,16 +703,20 @@ export function run() {
 			});
 			//log.debug(`collectors:${toStr({collectors})}`);
 
-			const collectionsWithCron = queryCollections({ // NOTE This is a bad idea as queryCollections code might change over time...
-				connection: writeConnection,
-				filters: addFilter({
+			const collectionsWithCron = writeConnection.query({
+				count: -1,
+				filters: addQueryFilter({
 					filter: {
 						exists: {
 							field: 'cron'
 						}
-					}
-				})
-			}).hits;
+					},
+					filters: addQueryFilter({
+						filter: hasValue('_nodeType', [NT_COLLECTION]),
+					})
+				}),
+				query: ''
+			}).hits.map(({id}) => writeConnection.get<CollectionWithCron>(id));
 			//log.debug(`collectionsWithCron:${toStr(collectionsWithCron)}`); // huge?
 
 			collectionsWithCron.forEach(collectionNode => {
@@ -630,7 +728,7 @@ export function run() {
 					timeZone: 'GMT+02:00' // CEST (Summer Time)
 					//timeZone: 'GMT+01:00' // CET
 				});
-				writeConnection.modify({
+				writeConnection.modify<CollectionWithCron>({
 					key: collectionNode._id,
 					editor: (cNode) => {
 						delete cNode.cron;
@@ -677,13 +775,14 @@ export function run() {
 			progress.addItems(1).setInfo('Finding interfaces which has filters, so they can be removed...').report().logInfo();
 			const interfacesWithFilters = writeConnection.query({
 				count: -1,
-				filters: addFilter({
+				filters: addQueryFilter({
 					filter: { exists: { field: 'filters'}},
-					filters: addFilter({
+					filters: addQueryFilter({
 						filter: hasValue('_nodeType', [NT_INTERFACE])
 					})
-				})
-			}).hits.map(({id}) => writeConnection.get(id));
+				}),
+				query: ''
+			}).hits.map(({id}) => writeConnection.get<InterfaceNodeWithFilter>(id));
 			//log.debug(`interfacesWithFilters:${toStr(interfacesWithFilters)}`);
 			progress.finishItem();
 
@@ -691,7 +790,7 @@ export function run() {
 				progress.addItems(interfacesWithFilters.length);
 				interfacesWithFilters.forEach(({_path}) => {
 					progress.setInfo(`Removing filters from interface _path:${_path}`).report().logInfo();
-					writeConnection.modify({
+					writeConnection.modify<InterfaceNodeWithFilter>({
 						key: _path,
 						editor: (interfaceNode) => {
 							delete interfaceNode.filters;
@@ -706,13 +805,14 @@ export function run() {
 			progress.addItems(1).setInfo('Finding interfaces which has a query, so it can be removed...').report().logInfo();
 			const interfacesWithQuery = writeConnection.query({
 				count: -1,
-				filters: addFilter({
+				filters: addQueryFilter({
 					filter: { exists: { field: 'query'}},
-					filters: addFilter({
+					filters: addQueryFilter({
 						filter: hasValue('_nodeType', [NT_INTERFACE])
 					})
-				})
-			}).hits.map(({id}) => writeConnection.get(id));
+				}),
+				query: ''
+			}).hits.map(({id}) => writeConnection.get<InterfaceNodeWithQuery>(id));
 			//log.debug(`interfacesWithQuery:${toStr(interfacesWithQuery)}`);
 			progress.finishItem();
 
@@ -720,7 +820,7 @@ export function run() {
 				progress.addItems(interfacesWithQuery.length);
 				interfacesWithQuery.forEach(({_path}) => {
 					progress.setInfo(`Removing query from interface _path:${_path}`).report().logInfo();
-					writeConnection.modify({
+					writeConnection.modify<InterfaceNodeWithQuery>({
 						key: _path,
 						editor: (interfaceNode) => {
 							delete interfaceNode.query;
@@ -735,13 +835,14 @@ export function run() {
 			progress.addItems(1).setInfo('Finding interfaces which has resultMappings, so they can be removed...').report().logInfo();
 			const interfacesWithResultMappings = writeConnection.query({
 				count: -1,
-				filters: addFilter({
+				filters: addQueryFilter({
 					filter: { exists: { field: 'resultMappings'}},
-					filters: addFilter({
+					filters: addQueryFilter({
 						filter: hasValue('_nodeType', [NT_INTERFACE])
 					})
-				})
-			}).hits.map(({id}) => writeConnection.get(id));
+				}),
+				query: ''
+			}).hits.map(({id}) => writeConnection.get<InterfaceNodeWithResultMappings>(id));
 			//log.debug(`interfacesWithResultMappings:${toStr(interfacesWithResultMappings)}`);
 			progress.finishItem();
 
@@ -749,7 +850,7 @@ export function run() {
 				progress.addItems(interfacesWithResultMappings.length);
 				interfacesWithResultMappings.forEach(({_path}) => {
 					progress.setInfo(`Removing resultMappings from interface _path:${_path}`).report().logInfo();
-					writeConnection.modify({
+					writeConnection.modify<InterfaceNodeWithResultMappings>({
 						key: _path,
 						editor: (interfaceNode) => {
 							delete interfaceNode.resultMappings;
@@ -764,9 +865,10 @@ export function run() {
 			progress.addItems(1).setInfo('Finding all interfaces so resultMappings can be removed from indexConfig...').report().logInfo();
 			const allInterfaces = writeConnection.query({
 				count: -1,
-				filters: addFilter({
+				filters: addQueryFilter({
 					filter: hasValue('_nodeType', [NT_INTERFACE])
-				})
+				}),
+				query: ''
 			}).hits.map(({id}) => writeConnection.get(id));
 			//log.debug(`allInterfaces:${toStr(allInterfaces)}`);
 			progress.finishItem();
@@ -801,13 +903,14 @@ export function run() {
 			progress.addItems(1).setInfo('Finding interfaces which has facets, so they can be removed...').report().logInfo();
 			const interfacesWithFacets = writeConnection.query({
 				count: -1,
-				filters: addFilter({
+				filters: addQueryFilter({
 					filter: { exists: { field: 'facets'}},
-					filters: addFilter({
+					filters: addQueryFilter({
 						filter: hasValue('_nodeType', [NT_INTERFACE])
 					})
-				})
-			}).hits.map(({id}) => writeConnection.get(id));
+				}),
+				query: ''
+			}).hits.map(({id}) => writeConnection.get<InterfaceNodeWithFacets>(id));
 			//log.debug(`interfacesWithFacets:${toStr(interfacesWithFacets)}`);
 			progress.finishItem();
 
@@ -815,7 +918,7 @@ export function run() {
 				progress.addItems(interfacesWithFacets.length);
 				interfacesWithFacets.forEach(({_path}) => {
 					progress.setInfo(`Removing facets from interface _path:${_path}`).report().logInfo();
-					writeConnection.modify({
+					writeConnection.modify<InterfaceNodeWithFacets>({
 						key: _path,
 						editor: (interfaceNode) => {
 							delete interfaceNode.facets;
@@ -830,13 +933,14 @@ export function run() {
 			progress.addItems(1).setInfo('Finding interfaces which has pagination, so they can be removed...').report().logInfo();
 			const interfacesWithPagination = writeConnection.query({
 				count: -1,
-				filters: addFilter({
+				filters: addQueryFilter({
 					filter: { exists: { field: 'pagination'}},
-					filters: addFilter({
+					filters: addQueryFilter({
 						filter: hasValue('_nodeType', [NT_INTERFACE])
 					})
-				})
-			}).hits.map(({id}) => writeConnection.get(id));
+				}),
+				query: ''
+			}).hits.map(({id}) => writeConnection.get<InterfaceNodeWithPagination>(id));
 			//log.debug(`interfacesWithPagination:${toStr(interfacesWithPagination)}`);
 			progress.finishItem();
 
@@ -844,7 +948,7 @@ export function run() {
 				progress.addItems(interfacesWithPagination.length);
 				interfacesWithPagination.forEach(({_path}) => {
 					progress.setInfo(`Removing pagination from interface _path:${_path}`).report().logInfo();
-					writeConnection.modify({
+					writeConnection.modify<InterfaceNodeWithPagination>({
 						key: _path,
 						editor: (interfaceNode) => {
 							delete interfaceNode.pagination;
@@ -859,13 +963,14 @@ export function run() {
 			progress.addItems(1).setInfo('Finding interfaces which has thesauri, so they can be removed...').report().logInfo();
 			const interfacesWithThesauri = writeConnection.query({
 				count: -1,
-				filters: addFilter({
+				filters: addQueryFilter({
 					filter: { exists: { field: 'thesauri'}},
-					filters: addFilter({
+					filters: addQueryFilter({
 						filter: hasValue('_nodeType', [NT_INTERFACE])
 					})
-				})
-			}).hits.map(({id}) => writeConnection.get(id));
+				}),
+				query: ''
+			}).hits.map(({id}) => writeConnection.get<InterfaceNodeWithThesauri>(id));
 			//log.debug(`interfacesWithThesauri:${toStr(interfacesWithThesauri)}`);
 			progress.finishItem();
 
@@ -873,7 +978,7 @@ export function run() {
 				progress.addItems(interfacesWithThesauri.length);
 				interfacesWithThesauri.forEach(({_path}) => {
 					progress.setInfo(`Removing thesauri from interface _path:${_path}`).report().logInfo();
-					writeConnection.modify({
+					writeConnection.modify<InterfaceNodeWithThesauri>({
 						key: _path,
 						editor: (interfaceNode) => {
 							delete interfaceNode.thesauri;
@@ -889,11 +994,10 @@ export function run() {
 			progress.addItems(1).setInfo('Finding fieldValues so they can be deleted...').report().logInfo();
 			const fieldValueIds = writeConnection.query({
 				count: -1,
-				filters: addFilter({
-					filters: addFilter({
-						filter: hasValue('_nodeType', [NT_FIELD_VALUE])
-					})
-				})
+				filters: addQueryFilter({
+					filter: hasValue('_nodeType', [NT_FIELD_VALUE])
+				}),
+				query: ''
 			}).hits.map(({id}) => id);
 			//log.debug(`fieldValueIds:${toStr(fieldValueIds)}`);
 			progress.finishItem();
@@ -952,14 +1056,15 @@ export function run() {
 			const synonymsWithoutThesaurusReferenceParams = {
 				//count: 2, // DEBUG
 				count: -1,
-				filters: addFilter({
+				filters: addQueryFilter({
 					filter: {
 						notExists: { field: 'thesaurusReference'}
 					},
-					filters: addFilter({
+					filters: addQueryFilter({
 						filter: hasValue('_nodeType', [NT_SYNONYM])
 					})
-				})
+				}),
+				query: ''
 			};
 			//log.debug(`synonymsWithoutThesaurusReferenceParams:${toStr(synonymsWithoutThesaurusReferenceParams)}`);
 			const synonymsWithoutThesaurusReference = writeConnection
@@ -983,7 +1088,7 @@ export function run() {
 				const thesaurusId = thesaurusPathToId[thesaurusPath];
 				//log.debug(`thesaurusId:${toStr(thesaurusId)}`);
 				//const synonymWithoutThesaurusModifyRes =
-				writeConnection.modify({
+				writeConnection.modify<SynonymNode>({
 					key: _id,
 					editor: (node) => {
 						node.thesaurusReference = reference(thesaurusId);
@@ -1011,7 +1116,10 @@ export function run() {
 			connection: writeConnection,
 			version: 10
 		})) {
-			const jobs = listJobs();
+			const jobs = listJobs() as Array<ScheduledJob<{
+				collectionId :string
+				name :string
+			}>>;
 			//log.debug(`jobs:${toStr(jobs)}`);
 
 			jobs.forEach((job) => {
@@ -1082,7 +1190,7 @@ export function run() {
 			progress.addItems(1).setInfo('Finding interfaces with collections...').report().logInfo();
 			const getAllCollectionsQueryParams = {
 				count: -1,
-				filters: addFilter({
+				filters: addQueryFilter({
 					filter: hasValue('_nodeType', [NT_COLLECTION]),
 					filters: {}
 				}),
@@ -1106,14 +1214,15 @@ export function run() {
 
 			const interfacesWithCollectionsQueryParams = {
 				count: -1,
-				filters: addFilter({
+				filters: addQueryFilter({
 					filter: {
 						exists: { field: 'collections'}
 					},
-					filters: addFilter({
+					filters: addQueryFilter({
 						filter: hasValue('_nodeType', [NT_INTERFACE])
 					})
-				})
+				}),
+				query: ''
 			};
 			//log.debug(`interfacesWithCollectionsQueryParams:${toStr(interfacesWithCollectionsQueryParams)}`);
 
@@ -1125,7 +1234,7 @@ export function run() {
 
 			interfaceIds.forEach((interfaceId) => {
 				progress.setInfo(`Converting collections -> collectionIds in interfaceId:${interfaceId}`).report().logInfo();
-				writeConnection.modify({
+				writeConnection.modify<InterfaceNodeWithCollections>({
 					key: interfaceId,
 					editor: (interfaceNode) => {
 						//log.debug(`(in) collectionIdReferences:${toStr(interfaceNode.collectionIds)}`); // Oh, NO! Seems they all come in as nulls???
@@ -1173,7 +1282,7 @@ export function run() {
 
 			const allThesauri = writeConnection.query({
 				count: -1,
-				filters: addFilter({
+				filters: addQueryFilter({
 					filter: hasValue('_nodeType', [NT_THESAURUS]),
 					filters: {}
 				}),
@@ -1191,14 +1300,15 @@ export function run() {
 
 			const interfacesWithSynonymsQueryParams = {
 				count: -1,
-				filters: addFilter({
+				filters: addQueryFilter({
 					filter: {
 						exists: { field: 'synonyms'}
 					},
-					filters: addFilter({
+					filters: addQueryFilter({
 						filter: hasValue('_nodeType', [NT_INTERFACE])
 					})
-				})
+				}),
+				query: ''
 			};
 			//log.debug(`interfacesWithSynonymsQueryParams:${toStr(interfacesWithSynonymsQueryParams)}`);
 
@@ -1210,7 +1320,7 @@ export function run() {
 
 			interfaceIds.forEach((interfaceId) => {
 				progress.setInfo(`Converting synonyms -> synonymIds in interfaceId:${interfaceId}`).report().logInfo();
-				writeConnection.modify({
+				writeConnection.modify<InterfaceNodeWithSynonyms>({
 					key: interfaceId,
 					editor: (interfaceNode) => {
 						//log.debug(`(in) synonymIdReferences:${toStr(interfaceNode.synonymIds)}`); // Oh, NO! Seems they all come in as nulls???
@@ -1259,9 +1369,10 @@ export function run() {
 
 			const apiKeysQueryParams = {
 				count: -1,
-				filters: addFilter({
+				filters: addQueryFilter({
 					filter: hasValue('type', [NT_API_KEY])
-				})
+				}),
+				query: ''
 			};
 			const apiKeyIds = writeConnection.query(apiKeysQueryParams).hits.map(({id}) => id);
 			progress.addItems(apiKeyIds.length);
@@ -1269,7 +1380,7 @@ export function run() {
 
 			apiKeyIds.forEach((apiKeyId) => {
 				progress.setInfo(`Making sure ApiKey has correct structure id:${apiKeyId}`).report().logInfo();
-				writeConnection.modify({
+				writeConnection.modify<ApiKeyNodeWithType>({
 					key: apiKeyId,
 					editor: (apiKeyNode) => {
 						apiKeyNode._nodeType = NT_API_KEY;
