@@ -1,9 +1,17 @@
+import {
+	Collection,
+	CollectionWithCron,
+	CollectionNode
+} from '/lib/explorer/collection/types.d';
+import type {GraphQLField} from '../types.d';
+
 //import {toStr} from '@enonic/js-utils';
 
 import {
 	NT_COLLECTION,
-	PRINCIPAL_EXPLORER_WRITE
-} from '/lib/explorer/model/2/constants';
+	PRINCIPAL_EXPLORER_WRITE,
+	ROOT_PERMISSIONS_EXPLORER
+} from '/lib/explorer/constants';
 import {coerseCollectionType} from '/lib/explorer/collection/coerseCollectionType';
 import {createDocumentType} from '/lib/explorer/documentType/createDocumentType';
 import {exists} from '/lib/explorer/node/exists';
@@ -14,8 +22,11 @@ import {
 	GraphQLID,
 	GraphQLString,
 	list
+	//@ts-ignore
 } from '/lib/graphql';
+//@ts-ignore
 import {getUser} from '/lib/xp/auth';
+//@ts-ignore
 import {reference as referenceValue} from '/lib/xp/value';
 
 import {
@@ -27,7 +38,18 @@ import {
 
 export function generateCreateCollectionField({
 	glue
-}) {
+}) :GraphQLField<
+	{
+		_name :string
+		collector :string
+		cron :string
+		doCollect :string
+		documentTypeId :string
+		language :string
+	},
+	Partial<CollectionWithCron>,
+	Collection
+> {
 	return {
 		args: {
 			_name: glue.getScalarType('_name'),
@@ -55,15 +77,17 @@ export function generateCreateCollectionField({
 
 			const nodeToBeCreated = {
 				_indexConfig: {default: 'byType'},
-				_inheritsPermissions: true,
+				_inheritsPermissions: false, // false is the default and the fastest, since it doesn't have to read parent to apply permissions.
 				_name,
 				_nodeType: NT_COLLECTION,
 				_parentPath: '/collections',
-				_permissions: [],
+				_permissions: ROOT_PERMISSIONS_EXPLORER,
 				creator: getUser().key,
 				createdTime: new Date(),
 				language
-			};
+			} as Partial<Omit<CollectionNode, 'collector'> & {
+				collector :Partial<CollectionNode['collector']>
+			}>;
 			//log.debug(`nodeToBeCreated:${toStr(nodeToBeCreated)}`);
 
 			if (collector) {
@@ -107,17 +131,18 @@ export function generateCreateCollectionField({
 			nodeToBeCreated.documentTypeId = referenceValue(documentTypeId);
 			//log.debug(`nodeToBeCreated:${toStr(nodeToBeCreated)}`);
 
-			const createdNode = writeConnection.create(nodeToBeCreated);
+			const createdNode = writeConnection.create(nodeToBeCreated) as CollectionNode;
 			//log.debug(`createdNode:${toStr(createdNode)}`);
 
 			if (createdNode) {
 				writeConnection.refresh(); // So the data becomes immidiately searchable
-				createdNode.cron = cron;
-				createdNode.doCollect = doCollect;
+				const createdNodeWithCron = JSON.parse(JSON.stringify(createdNode)) as CollectionWithCron;
+				createdNodeWithCron.cron = cron;
+				createdNodeWithCron.doCollect = doCollect;
 				//log.debug(`createdNode:${toStr(createdNode)}`);
 				createOrModifyJobsFromCollectionNode({
 					connection: writeConnection,
-					collectionNode: createdNode,
+					collectionNode: createdNodeWithCron,
 					timeZone: 'GMT+02:00' // CEST (Summer Time)
 					//timeZone: 'GMT+01:00' // CET
 				});

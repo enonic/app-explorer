@@ -33,7 +33,6 @@ export type ApiKeyNodeCreateParams =
 		'_id'
 		|'_childOrder'
 		|'_path'
-		|'_permissions'
 		|'_state'
 		|'_ts'
 		|'_versionKey'
