@@ -72,7 +72,8 @@
 	"exclude": [
 		"build/**/*",
 		"node_modules/**/*",
-		"../lib-explorer/**/*"
+		"../lib-explorer/**/*",
+		"src/main/resources/index.d.ts"
 	],
 	"include": [
 		"src/main/resources/**/*.ts",

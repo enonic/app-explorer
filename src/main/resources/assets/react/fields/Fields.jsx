@@ -408,13 +408,13 @@ export function Fields(props) {
 									listStyleType: 'none',
 									margin: 0,
 									padding: 0
-								}>{fieldDocumentTypes.sort().map((dT, i) => <li key={i}>{dT}</li>)}</ul>}</Table.Cell> : null}
+								}}>{fieldDocumentTypes.sort().map((dT, i) => <li key={i}>{dT}</li>)}</ul>}</Table.Cell> : null}
 
 								{showCollections ? <Table.Cell textAlign='center'><ul style={{
 									listStyleType: 'none',
 									margin: 0,
 									padding: 0
-								}>{fieldCollections.sort().map((c, i) => <li key={i}>{c}</li>)}</ul>}</Table.Cell> : null}
+								}}>{fieldCollections.sort().map((c, i) => <li key={i}>{c}</li>)}</ul>}</Table.Cell> : null}
 
 								<Table.Cell textAlign='right'>{documentsWithFieldTotal === 0
 									? null

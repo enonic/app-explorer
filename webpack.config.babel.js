@@ -48,8 +48,6 @@ const STATS = {
 
 const WEBPACK_CONFIG = [];
 
-const dict = arr => Object.assign(...arr.map(([k, v]) => ({ [k]: v })));
-
 //──────────────────────────────────────────────────────────────────────────────
 // Enonic XP serverside javascript (Explorer admin tool and services)
 //──────────────────────────────────────────────────────────────────────────────
@@ -113,40 +111,6 @@ if (BOOL_LOCAL_LIB_EXPLORER) {
 	SS_EXTERNALS.push(/^\/lib\/explorer\//);
 }
 
-const SS_FILES = [
-	'admin/tools/explorer/explorer',
-	//'lib/fnv', // Not in use
-	'lib/locales',
-	'lib/licensing',
-	'main',
-	'services/collectionCollect/collectionCollect',
-	'services/collectionDelete/collectionDelete',
-	'services/collectionDuplicate/collectionDuplicate',
-	'services/collectorStop/collectorStop',
-	'services/graphQL/graphQL',
-	'services/interfaceCopy/interfaceCopy',
-	'services/interfaceExists/interfaceExists',
-	'services/longPolling/longPolling',
-	'services/notifications/notifications',
-	'services/stopWordsCreateOrUpdate/stopWordsCreateOrUpdate',
-	'services/stopWordsDelete/stopWordsDelete',
-	'services/stopWordsList/stopWordsList',
-	'services/journals/journals',
-	'services/listCollectors/listCollectors',
-	//'services/search/search',
-	'services/thesauri/thesauri',
-	'services/thesaurusExport/thesaurusExport',
-	'services/thesaurusImport/thesaurusImport',
-	'services/uninstallLicense/uninstallLicense',
-	'services/uploadLicense/uploadLicense',
-	'services/ws/ws',
-	'tasks/init/init',
-	'tasks/reindexCollection/reindexCollection',
-	'tasks/test/test',
-	'tasks/webcrawl/webcrawl',
-	'webapp/webapp'
-];
-
 const SS_PLUGINS = [
 	new CaseSensitivePathsPlugin(),
 	//new ESBuildPlugin(),
@@ -199,12 +163,37 @@ if (MODE === 'production') {
 const SS_JS_CONFIG = {
 	context: path.resolve(__dirname, SRC_DIR),
 	devtool: false, // Don't waste time generating sourceMaps
-	entry: dict(
-		SS_FILES.map(k => [
-			k, // name
-			`./${k}.es` // source relative to context
-		])
-	),
+	entry: {
+		'admin/tools/explorer/explorer': './admin/tools/explorer/explorer.es',
+		'lib/locales': './lib/locales.es',
+		'lib/licensing': './lib/licensing.es',
+		'main': './main.es',
+		'services/collectionCollect/collectionCollect': './services/collectionCollect/collectionCollect.es',
+		'services/collectionDelete/collectionDelete': './services/collectionDelete/collectionDelete.es',
+		'services/collectionDuplicate/collectionDuplicate': './services/collectionDuplicate/collectionDuplicate.es',
+		'services/collectorStop/collectorStop': './services/collectorStop/collectorStop.es',
+		'services/graphQL/graphQL': './services/graphQL/graphQL.es',
+		'services/interfaceCopy/interfaceCopy': './services/interfaceCopy/interfaceCopy.es',
+		'services/interfaceExists/interfaceExists': './services/interfaceExists/interfaceExists.es',
+		'services/longPolling/longPolling': './services/longPolling/longPolling.es',
+		'services/notifications/notifications': './services/notifications/notifications.es',
+		'services/stopWordsCreateOrUpdate/stopWordsCreateOrUpdate': './services/stopWordsCreateOrUpdate/stopWordsCreateOrUpdate.es',
+		'services/stopWordsDelete/stopWordsDelete': './services/stopWordsDelete/stopWordsDelete.es',
+		'services/stopWordsList/stopWordsList': './services/stopWordsList/stopWordsList.es',
+		'services/journals/journals': './services/journals/journals.es',
+		'services/listCollectors/listCollectors': './services/listCollectors/listCollectors.es',
+		'services/thesauri/thesauri': './services/thesauri/thesauri.es',
+		'services/thesaurusExport/thesaurusExport': './services/thesaurusExport/thesaurusExport.es',
+		'services/thesaurusImport/thesaurusImport': './services/thesaurusImport/thesaurusImport.es',
+		'services/uninstallLicense/uninstallLicense': './services/uninstallLicense/uninstallLicense.es',
+		'services/uploadLicense/uploadLicense': './services/uploadLicense/uploadLicense.es',
+		'services/ws/ws': './services/ws/ws.es',
+		'tasks/init/init': './tasks/init/init.ts',
+		'tasks/reindexCollection/reindexCollection': './tasks/reindexCollection/reindexCollection.es',
+		'tasks/test/test': './tasks/test/test.es',
+		'tasks/webcrawl/webcrawl': './tasks/webcrawl/webcrawl.es',
+		'webapp/webapp': './webapp/webapp.es'
+	},
 	externals: SS_EXTERNALS,
 	mode: MODE,
 	module: {
