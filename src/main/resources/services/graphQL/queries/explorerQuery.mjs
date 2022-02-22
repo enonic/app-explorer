@@ -69,7 +69,6 @@ export const GQL_QUERY_EXPLORER_REPO_NODES_GET = `query GetExplorerRepoNodesQuer
 					nGram
 					path
 				}
-				inResults
 				key
 				max
 				min

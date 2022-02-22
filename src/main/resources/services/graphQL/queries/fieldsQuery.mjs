@@ -28,7 +28,6 @@ export const GQL_QUERY_FIELDS_QUERY = `query QueryFieldsQuery(
 				nGram
 				path
 			}
-			inResults
 			key
 			max
 			min

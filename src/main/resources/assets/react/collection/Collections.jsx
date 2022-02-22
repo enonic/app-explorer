@@ -48,9 +48,7 @@ const COLLECTIONS_GQL = `queryCollections(
 	hits {
 		_id
 		_name
-		#_nodeType
 		_path
-		#_score
 		collector {
 			name
 			configJson
@@ -66,15 +64,10 @@ const COLLECTORS_GQL = `queryCollectors {
 	total
 	count
 	hits {
-		#_id
-		#_name
-		#_nodeType
-		#_path
 		appName
 		collectTaskName
 		configAssetPath
 		displayName
-		#type
 	}
 }`;
 
@@ -82,17 +75,8 @@ const FIELDS_GQL = `queryFields {
 	total
 	count
 	hits {
-		#_id
 		_name
-		#_nodeType
-		#_path
-		#denyDelete
-		#deny
-		#displayName
-		#indexConfig
-		#inResults
 		key
-		#type
 	}
 }`;
 
@@ -109,20 +93,14 @@ const JOBS_GQL = `listScheduledJobs {
 
 const LOCALES_GQL = `getLocales {
 	country
-	#displayCountry
-	#displayLanguage
 	displayName
-	#displayVariant
-	#language
 	tag
-	#variant
 }`;
 
 const GQL_DOCUMENT_TYPES_QUERY = `queryDocumentTypes {
 	hits {
 		_id
 		_name
-		#_versionKey
 	}
 }`;
 

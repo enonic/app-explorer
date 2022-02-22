@@ -111,7 +111,6 @@ export function run() {
 				nGram: true,
 				path: false
 			},
-			inResults: true,
 			key: 'mytestfieldkey', // NOTE lowercased TODO is that ok when we allow uppercase in gui...
 			max: 0,
 			min: 0,
@@ -194,7 +193,6 @@ export function run() {
 						nGram: false,
 						path: true
 					},
-					inResults: true,
 					key: 'mytestfieldkey', // NOTE lowercased TODO is that ok when we allow uppercase in gui...
 					max: 1,
 					min: 1,

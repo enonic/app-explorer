@@ -18,7 +18,6 @@ export const queryFields = ({
 		denyDelete
 		description
 		fieldType
-		inResults
 		max
 		min
 

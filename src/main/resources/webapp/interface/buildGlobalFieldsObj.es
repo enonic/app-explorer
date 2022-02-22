@@ -54,23 +54,20 @@ export function buildGlobalFieldsObj({
 	};
 	fieldsRes.hits.forEach(({ // TODO traverse
 		fieldType: valueType,
-		inResults,
 		//isSystemField = false,
 		key,
 		max = 0,
 		min = 0
 	}) => {
 		const camelizedFieldPath = key.split('.').map((k) => camelize(k, /[-]/g)).join('.');
-		//log.debug(`inResults:${toStr(inResults)} key:${toStr(key)} camelizedFieldPath:${toStr(camelizedFieldPath)}`);
+		//log.debug(`key:${toStr(key)} camelizedFieldPath:${toStr(camelizedFieldPath)}`);
 
-		if (inResults !== false) {
-			setIn(globalFieldsObj, camelizedFieldPath, {
-				//_isSystemField: isSystemField,
-				_max: max,
-				_min: min,
-				_valueType: valueType
-			}, { merge: true });
-		}
+		setIn(globalFieldsObj, camelizedFieldPath, {
+			//_isSystemField: isSystemField,
+			_max: max,
+			_min: min,
+			_valueType: valueType
+		}, { merge: true });
 	});
 	const sortedGlobalFieldsObj = sortKeysRec(globalFieldsObj);
 	//log.debug(`sortedGlobalFieldsObj:${toStr(sortedGlobalFieldsObj)}`);

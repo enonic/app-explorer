@@ -238,7 +238,6 @@ export function run() {
 				//displayName,
 				fieldType = 'string',
 				indexConfig = 'type',
-				inResults = true, // TODO remove in 2.0?
 				key, // TODO Dissallow creating fields starting with _ and remove in 2.0?
 				max = 0,
 				min = 0
@@ -253,7 +252,6 @@ export function run() {
 					//displayName,
 					fieldType,
 					indexConfig,
-					inResults, // TODO remove in 2.0?
 					key, // TODO Dissallow creating fields starting with _ and remove in 2.0?
 					max,
 					min
