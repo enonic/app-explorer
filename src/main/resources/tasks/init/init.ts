@@ -88,7 +88,6 @@ const FIELD_TYPE = { // TODO This should not be a system field. Remove in lib-ex
 	key: 'type',
 	_name: 'type',
 	denyDelete: true,
-	denyValues: false,
 	fieldType: VALUE_TYPE_STRING,
 	indexConfig: 'minimal',
 	max: 1,
@@ -234,7 +233,6 @@ export function run() {
 			READWRITE_FIELDS.forEach(({
 				_name,
 				denyDelete, // TODO remove in 2.0?
-				denyValues, // TODO remove in 2.0?
 				//displayName,
 				fieldType = 'string',
 				indexConfig = 'type',
@@ -248,7 +246,6 @@ export function run() {
 					_inheritsPermissions: false, // false is the default and the fastest, since it doesn't have to read parent to apply permissions.
 					_permissions: ROOT_PERMISSIONS_EXPLORER,
 					denyDelete, // TODO remove in 2.0?
-					denyValues, // TODO remove in 2.0?
 					//displayName,
 					fieldType,
 					indexConfig,
