@@ -24,7 +24,6 @@ export const GQL_QUERY_FIELD_GET = `query FieldGetQuery(
 			nGram
 			path
 		} #indexConfig
-		inResults
 		key
 		max
 		min

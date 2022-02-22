@@ -49,7 +49,6 @@ export function generateFieldTypes({
 		fulltext: { type: GraphQLBoolean },
 		includeInAllText: { type: GraphQLBoolean }, // TODO nonNull?
 		indexConfig: { type: GQL_TYPE_INDEX_CONFIG_OBJECT }, // NOTE System field _allText doesn't have indexconfig
-		inResults: { type: GraphQLBoolean },
 		key: { type: nonNull(GraphQLString) },
 		max: { type: GraphQLInt },
 		min: { type: GraphQLInt },

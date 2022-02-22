@@ -48,7 +48,6 @@ export const GQL_MUTATION_FIELD_CREATE = `mutation CreateField(
 		  nGram
 		  path
 	  }
-	  inResults
 	  key
 	  max
 	  min

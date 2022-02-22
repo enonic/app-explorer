@@ -37,8 +37,6 @@ const GQL_COLLECTIONS = `queryCollections(
 }`;
 
 const GQL_DOCUMENT_TYPES = `queryDocumentTypes {
-	#count
-	#total
 	hits {
 		_id
 		_name
@@ -59,13 +57,10 @@ const GQL_DOCUMENT_TYPES = `queryDocumentTypes {
 const GQL_FIELDS = `queryFields(
 	includeSystemFields: true
 ) {
-	#count
-	#total
 	hits {
 		_id
 		key
 		denyDelete
-		inResults
 		enabled
 	} # hits
 }`;
@@ -73,7 +68,6 @@ const GQL_FIELDS = `queryFields(
 const GQL_INTERFACES = `queryInterfaces(
 	count: -1
 ) {
-	#count
 	hits {
 		_id
 		_name

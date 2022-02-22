@@ -81,7 +81,6 @@ const FIELDS_GQL = `queryFields {
 		denyValues
 		displayName
 		indexConfig
-		inResults
 		fieldType
 		key
 		type
