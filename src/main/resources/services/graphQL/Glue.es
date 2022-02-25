@@ -1,13 +1,12 @@
-//import {toStr} from '@enonic/js-utils';
-import hasOwn from 'object.hasown';
+import {
+	hasOwnProperty//,
+	//toStr
+} from '@enonic/js-utils';
 
 import {
 	newSchemaGenerator
 } from '/lib/graphql';
 
-if (!Object.hasOwn) {
-	hasOwn.shim();
-}
 
 export class Glue {
 
@@ -221,7 +220,7 @@ export class Glue {
 
 	getFields(name) {
 		//log.debug(`getFields(${name})`);
-		if (!Object.hasOwn(this.#fields, name)) { // true also when property is set to undefined
+		if (!hasOwnProperty(this.#fields, name)) { // true also when property is set to undefined
 			/*if (this.#uniqueNames[name]) {
 				throw new Error(`name:${name} is not an inputType! but ${this.#uniqueNames[name]}`);
 			}*/
@@ -237,7 +236,7 @@ export class Glue {
 
 	getInputType(name) {
 		//log.debug(`getInputType(${name})`);
-		if (!Object.hasOwn(this.#inputTypes, name)) { // true also when property is set to undefined
+		if (!hasOwnProperty(this.#inputTypes, name)) { // true also when property is set to undefined
 			if (this.#uniqueNames[name]) {
 				throw new Error(`name:${name} is not an inputType! but ${this.#uniqueNames[name]}`);
 			}
@@ -253,7 +252,7 @@ export class Glue {
 
 	getInterfaceType(name) {
 		//log.debug(`getInterfaceType(${name})`);
-		if (!Object.hasOwn(this.#interfaceTypes, name)) { // true also when property is set to undefined
+		if (!hasOwnProperty(this.#interfaceTypes, name)) { // true also when property is set to undefined
 			if (this.#uniqueNames[name]) {
 				throw new Error(`name:${name} is not an interfaceType! but ${this.#uniqueNames[name]}`);
 			}
@@ -269,7 +268,7 @@ export class Glue {
 
 	getInterfaceTypeFields(name) {
 		//log.debug(`getInterfaceTypeFields(${name})`);
-		if (!Object.hasOwn(this.#interfaceTypes, name)) { // true also when property is set to undefined
+		if (!hasOwnProperty(this.#interfaceTypes, name)) { // true also when property is set to undefined
 			throw new Error(`interfaceTypes[${name}] not found! Perhaps you're trying to use it before it's defined?`);
 		}
 		const fields = this.#interfaceTypes[name].fields;
@@ -282,7 +281,7 @@ export class Glue {
 
 	getInterfaceTypeObj(name) {
 		//log.debug(`getInterfaceTypeObj(${name})`);
-		if (!Object.hasOwn(this.#interfaceTypes, name)) { // true also when property is set to undefined
+		if (!hasOwnProperty(this.#interfaceTypes, name)) { // true also when property is set to undefined
 			if (this.#uniqueNames[name]) {
 				throw new Error(`name:${name} is not an interfaceType! but ${this.#uniqueNames[name]}`);
 			}
@@ -306,7 +305,7 @@ export class Glue {
 
 	getObjectType(name) {
 		//log.debug(`getobjectType(${name})`);
-		if (!Object.hasOwn(this.#objectTypes, name)) { // true also when property is set to undefined
+		if (!hasOwnProperty(this.#objectTypes, name)) { // true also when property is set to undefined
 			if (this.#uniqueNames[name]) {
 				throw new Error(`name:${name} is not an objectType! but ${this.#uniqueNames[name]}`);
 			}
@@ -326,7 +325,7 @@ export class Glue {
 
 	getScalarType(name) {
 		//log.debug(`getScalarType(${name})`);
-		if (!Object.hasOwn(this.#scalarTypes, name)) { // true also when property is set to undefined
+		if (!hasOwnProperty(this.#scalarTypes, name)) { // true also when property is set to undefined
 			if (this.#uniqueNames[name]) {
 				throw new Error(`name:${name} is not an scalarType! but ${this.#uniqueNames[name]}`);
 			}
@@ -346,7 +345,7 @@ export class Glue {
 
 	getUnionTypeObj(name) {
 		//log.debug(`getUnionTypeObj(${name})`);
-		if (!Object.hasOwn(this.#unionTypes, name)) { // true also when property is set to undefined
+		if (!hasOwnProperty(this.#unionTypes, name)) { // true also when property is set to undefined
 			if (this.#uniqueNames[name]) {
 				throw new Error(`name:${name} is not an unionType! but ${this.#uniqueNames[name]}`);
 			}

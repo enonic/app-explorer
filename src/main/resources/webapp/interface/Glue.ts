@@ -1,11 +1,6 @@
-import hasOwn from 'object.hasown';
+import {hasOwnProperty} from '@enonic/js-utils';
 
 import {GQL_OBJECT_TYPE_QUERY} from './constants';
-
-
-if (!Object.hasOwn) {
-	hasOwn.shim();
-}
 
 
 /*
@@ -126,7 +121,7 @@ function addUnionType({
 }
 
 function getUnionType(name) {
-	if (!Object.hasOwn(this.unionTypes, name)) { // true also when property is set to undefined
+	if (!hasOwnProperty(this.unionTypes, name)) { // true also when property is set to undefined
 		if (this.uniqueNames[name]) {
 			throw new Error(`name:${name} is not an unionType! but ${this.uniqueNames[name]}`);
 		}
@@ -263,3 +258,5 @@ export function constructGlue({
 		uniqueNames: {}
 	};
 }
+
+export type Glue = ReturnType<typeof constructGlue>;

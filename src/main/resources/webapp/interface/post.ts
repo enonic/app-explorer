@@ -1,9 +1,15 @@
+import type {
+	ApiKeyNode,
+	Request
+} from '../../types';
+
+
 import {
-	RESPONSE_TYPE_JSON
+	RESPONSE_TYPE_JSON//,
+	//toStr
 } from '@enonic/js-utils';
-import {
-	execute
-} from '/lib/graphql';
+//@ts-ignore
+import {execute} from '/lib/graphql';
 import {exists as interfaceExists} from '/lib/explorer/interface/exists';
 import {
 	NT_API_KEY,
@@ -15,13 +21,22 @@ import {connect} from '/lib/explorer/repo/connect';
 import {generateSchemaForInterface} from './generateSchemaForInterface';
 
 
+export type InterfaceRequest = Request<{},{
+	interfaceName :string
+}>
+
+
 const AUTHORIZATION_PREFIX = 'Explorer-Api-Key ';
 
 
 function isUnauthorized({
 	interfaceName,
 	request
+} :{
+	interfaceName :string
+	request :Request
 }) {
+	//log.debug('isUnauthorized interfaceName:%s request:%s', interfaceName, toStr(request));
 	const {
 		headers: {
 			'Authorization': authorization // 'Explorer-Api-Key XXXX'
@@ -62,7 +77,8 @@ function isUnauthorized({
 					}
 				}]
 			}
-		}
+		},
+		query: ''
 	});
 	//log.debug(`matchingApiKeys:${toStr(matchingApiKeys)}`);
 	if(matchingApiKeys.total !== 1) {
@@ -77,7 +93,7 @@ function isUnauthorized({
 			status: 401 // Unauthorized
 		};
 	}
-	const apiKeyNode = explorerRepoReadConnection.get(matchingApiKeys.hits[0].id);
+	const apiKeyNode = explorerRepoReadConnection.get<ApiKeyNode>(matchingApiKeys.hits[0].id);
 	//log.debug(`apiKeyNode:${toStr(apiKeyNode)}`);
 	let {interfaces = []} = apiKeyNode;
 	if (!Array.isArray(interfaces)) { interfaces = [interfaces]; }
@@ -106,8 +122,8 @@ function isUnauthorized({
 } // isUnauthorized
 
 
-export function overrideable(request, fn = isUnauthorized) {
-	//log.debug(`request:${toStr(request)}`);
+export function overrideable(request :InterfaceRequest, fn = isUnauthorized) {
+	//log.debug('overrideable request:%s', toStr(request));
 	const {
 		body: bodyJson = '{}',
 		pathParams: {
@@ -140,6 +156,7 @@ export function overrideable(request, fn = isUnauthorized) {
 }
 
 
-export function post(request) {
+export function post(request :InterfaceRequest) {
+	//log.debug('post request:%s', toStr(request));
 	return overrideable(request, isUnauthorized);
 }

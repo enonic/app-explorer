@@ -1,5 +1,11 @@
+import type {DocumentTypeNode} from '/lib/explorer/documentType/types.d';
+import type {CamelToFieldObj} from '../types.d';
+import type {Glue} from '../glue';
+import type {GlobalFieldsObj} from '../buildGlobalFieldsObj';
+
+
 import {
-	VALUE_TYPE_BOOLEAN,
+	/*VALUE_TYPE_BOOLEAN,
 	VALUE_TYPE_DOUBLE,
 	VALUE_TYPE_GEO_POINT,
 	VALUE_TYPE_INSTANT,
@@ -8,14 +14,14 @@ import {
 	VALUE_TYPE_LOCAL_TIME,
 	VALUE_TYPE_LONG,
 	VALUE_TYPE_REFERENCE,
-	VALUE_TYPE_STRING,
+	VALUE_TYPE_STRING,*/
 	camelize,
 	//toStr,
 	ucFirst
 } from '@enonic/js-utils';
 
 import {GQL_INPUT_FIELDS_HIGHLIGHT_PROPERTIES} from '../constants';
-import {valueTypeToGraphQLType} from './valueTypeToGraphQLType';
+//import {valueTypeToGraphQLType} from './valueTypeToGraphQLType';
 
 import {addDocumentTypeObjectTypes} from './addDocumentTypeObjectTypes';
 import {addDynamicEnumTypes} from './addDynamicEnumTypes';
@@ -24,7 +30,7 @@ import {addDynamicInterfaceTypes} from './addDynamicInterfaceTypes';
 import {addDynamicObjectTypes} from './addDynamicObjectTypes';
 
 
-const VALUE_TYPE_VARIANTS = [
+/*const VALUE_TYPE_VARIANTS = [
 	VALUE_TYPE_BOOLEAN,
 	VALUE_TYPE_DOUBLE,
 	VALUE_TYPE_GEO_POINT,
@@ -35,7 +41,7 @@ const VALUE_TYPE_VARIANTS = [
 	VALUE_TYPE_LONG,
 	VALUE_TYPE_REFERENCE,
 	VALUE_TYPE_STRING
-];
+];*/
 
 /*──────────────────────────────────────────────────────────────────────────────
 An objectType per documentType will be generated.
@@ -52,6 +58,15 @@ export function addDynamicTypes({
 	globalFieldsObj,
 	glue,
 	interfaceSearchHitsHighlightsFields
+} :{
+	allFieldKeys :Array<string>
+	camelToFieldObj :CamelToFieldObj
+	documentTypes :Array<DocumentTypeNode>
+	globalFieldsObj :GlobalFieldsObj
+	glue :Glue
+	interfaceSearchHitsHighlightsFields :{
+		[k :string] :any
+	}
 }) {
 	const documentTypeObjectTypes = {}; // Defined before addDynamicInterfaceTypes, populated after
 
@@ -79,11 +94,11 @@ export function addDynamicTypes({
 			name: `InputTypeHighlightProperties${ucFirst(camelizedFieldKey)}`,
 			fields: staticHighlightParameterPropertiesFields
 		})};
-		VALUE_TYPE_VARIANTS.forEach((vT) => {
+		/*VALUE_TYPE_VARIANTS.forEach((vT) => {
 			interfaceSearchHitsFieldsFromSchema[
 				`${camelizedFieldKey}_as_${vT}`
 			] = { type: valueTypeToGraphQLType(vT) };
-		});
+		});*/
 	});
 
 	//──────────────────────────────────────────────────────────────────────────
@@ -110,7 +125,7 @@ export function addDynamicTypes({
 
 	// Must be after addDynamicInterfaceTypes
 	addDynamicObjectTypes({
-		glue,
-		interfaceSearchHitsFieldsFromSchema
+		glue//,
+		//interfaceSearchHitsFieldsFromSchema
 	});
 }

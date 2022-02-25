@@ -1,9 +1,13 @@
 import 'reflect-metadata'; // Must be imported only once per WebPack Bundle (Required by setIn)
-import {VALUE_TYPE_STRING} from '@enonic/js-utils';
+import {
+	//VALUE_TYPE_STRING,
+	toStr
+} from '@enonic/js-utils';
 
 import {getFields} from '/lib/explorer/field/getFields';
 import {PRINCIPAL_EXPLORER_READ} from '/lib/explorer/model/2/constants';
 import {connect} from '/lib/explorer/repo/connect';
+//@ts-ignore
 import {newSchemaGenerator} from '/lib/graphql';
 
 import {addDynamicTypes} from './dynamic/addDynamicTypes';
@@ -76,7 +80,7 @@ Scenario B:
  Merged documentType should have person as a Set with subfields name and age.
 ────────────────────────────────────────────────────────────────────────────*/
 
-export function generateSchemaForInterface(interfaceName) {
+export function generateSchemaForInterface(interfaceName :string) {
 	const glue = constructGlue({schemaGenerator});
 	addStaticTypes(glue);
 
@@ -92,6 +96,7 @@ export function generateSchemaForInterface(interfaceName) {
 
 	const camelToFieldObj = {};
 	const globalFieldsObj = buildGlobalFieldsObj({fieldsRes});
+	//log.debug('generateSchemaForInterface globalFieldsObj:%s', toStr(globalFieldsObj));
 
 	//──────────────────────────────────────────────────────────────────────────
 	// 2. Get all documentTypes mentioned in the interface collections
@@ -109,6 +114,7 @@ export function generateSchemaForInterface(interfaceName) {
 		fieldsRes,
 		interfaceName
 	});
+	//log.debug('generateSchemaForInterface stopWords:%s', toStr(stopWords));
 
 	//──────────────────────────────────────────────────────────────────────────
 	// Add _highlight to globalFields

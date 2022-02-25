@@ -7,6 +7,7 @@ import traverse from 'traverse';
 import {
 	list,
 	nonNull
+	//@ts-ignore
 } from '/lib/graphql';
 
 import {valueTypeToGraphQLType} from './valueTypeToGraphQLType';

@@ -192,7 +192,7 @@ const SS_JS_CONFIG = {
 		'tasks/reindexCollection/reindexCollection': './tasks/reindexCollection/reindexCollection.es',
 		'tasks/test/test': './tasks/test/test.es',
 		'tasks/webcrawl/webcrawl': './tasks/webcrawl/webcrawl.es',
-		'webapp/webapp': './webapp/webapp.es'
+		'webapp/webapp': './webapp/webapp.ts'
 	},
 	externals: SS_EXTERNALS,
 	mode: MODE,

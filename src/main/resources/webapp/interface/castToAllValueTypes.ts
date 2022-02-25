@@ -187,7 +187,7 @@ export function castToAllValueTypes({
 			default:
 				log.warning(`Unhandeled value type:${v}`);
 			}
-			washedNode[`${k}_as_${v}`] = value;
+			//washedNode[`${k}_as_${v}`] = value;
 		}); // VALUE_TYPE_VARIANTS.forEach
 	}); // Object.keys(washedNode).forEach
 }

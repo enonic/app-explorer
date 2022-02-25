@@ -1,8 +1,21 @@
+
+import type {CollectionNode} from '/lib/explorer/collection/types.d';
+import type {InterfaceField} from '/lib/explorer/interface/types.d';
+import type {
+	CamelToFieldObj,
+	SearchConnectionResolverEnv,
+	SearchResolverEnv
+} from './types.d';
+import type {Glue} from './Glue';
+
+
 import {
 	GraphQLInt,
 	GraphQLString,
 	list
+	//@ts-ignore
 } from '/lib/graphql';
+//@ts-ignore
 import {decodeCursor} from '/lib/graphql-connection';
 
 import {
@@ -23,8 +36,20 @@ export function buildSchema({
 	documentTypeIdToName,
 	fields,
 	stopWords
+} :{
+	camelToFieldObj :CamelToFieldObj
+	collections :Array<CollectionNode>
+	collectionIdToDocumentTypeId :{
+		[k :string] :string
+	}
+	documentTypeIdToName :{
+		[k :string] :string
+	}
+	fields :Array<InterfaceField>
+	glue :Glue
+	stopWords :Array<string>
 }) {
-	function searchResolver(env) {
+	function searchResolver(env :SearchResolverEnv) {
 		return doQuery({
 			camelToFieldObj,
 			collections,
@@ -50,7 +75,7 @@ export function buildSchema({
 			searchString: GraphQLString
 		},
 		name: 'getSearchConnection',
-		resolve(env) {
+		resolve(env :SearchConnectionResolverEnv) {
 			//log.debug(`env:${toStr({env})}`);
 			const {
 				after,// = encodeCursor('0'), // encoded representation of start
@@ -75,7 +100,7 @@ export function buildSchema({
 				}
 			});
 			//log.debug(`res:${toStr({res})}`);
-			res.start = start;
+			res.start = start; // TODO Do I use this for anything?
 			//log.debug(`res:${toStr({res})}`);
 			return res;
 		},
@@ -93,7 +118,7 @@ export function buildSchema({
 			start: GraphQLInt
 		},
 		name: 'search',
-		resolve: (env) => searchResolver(env),
+		resolve: (env :SearchResolverEnv) => searchResolver(env),
 		type: glue.getObjectType(GQL_OBJECT_TYPE_INTERFACE_SEARCH)
 	});
 
