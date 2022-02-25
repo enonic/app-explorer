@@ -1,6 +1,17 @@
-import {addQueryFilter} from '@enonic/js-utils';
+import type {RepoConnection} from '/lib/explorer/types.d';
+import type {InterfaceField} from '/lib/explorer/interface/types.d';
+import type {
+	CamelToFieldObj,
+	SearchResolverEnv
+} from './types.d';
 
-import {NT_DOCUMENT} from '/lib/explorer/model/2/constants';
+
+import {
+	addQueryFilter,
+	toStr
+} from '@enonic/js-utils';
+
+import {NT_DOCUMENT} from '/lib/explorer/constants';
 import {hasValue} from '/lib/explorer/query/hasValue';
 import {removeStopWords} from '/lib/explorer/query/removeStopWords';
 import {wash} from '/lib/explorer/query/wash';
@@ -16,7 +27,17 @@ export function buildQueryParams({
 	explorerRepoReadConnection,
 	fields,
 	stopWords
+} :{
+	camelToFieldObj :CamelToFieldObj
+	env :SearchResolverEnv
+	explorerRepoReadConnection :RepoConnection
+	fields :Array<InterfaceField>
+	stopWords? :Array<string>
 }) {
+	//log.debug('buildQueryParams camelToFieldObj:%s', toStr(camelToFieldObj));
+	//log.debug('buildQueryParams env:%s', toStr(env));
+	//log.debug('buildQueryParams fields:%s', toStr(fields));
+	//log.debug('buildQueryParams stopWords:%s', toStr(stopWords));
 	const {
 		args: {
 			aggregations: aggregationsArg = [],
@@ -27,7 +48,7 @@ export function buildQueryParams({
 			start = 0
 		}
 	} = env;
-	//log.debug(`aggregationsArg:${toStr(aggregationsArg)}`);
+	log.debug('buildQueryParams aggregationsArg:%s', toStr(aggregationsArg));
 	//log.debug(`filters:${toStr(filters)}`);
 	//log.debug(`highlight:${toStr(highlight)}`);
 
@@ -73,7 +94,7 @@ export function buildQueryParams({
 		fields,
 		searchStringWithoutStopWords
 	});
-	//log.debug(`query:${toStr({query})}`);
+	//log.debug('buildQueryParams query:%s', toStr(query));
 
 	const queryParams = {
 		aggregations,

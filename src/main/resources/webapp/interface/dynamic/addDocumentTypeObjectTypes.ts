@@ -3,6 +3,7 @@ import {
 	//toStr
 } from '@enonic/js-utils';
 
+//@ts-ignore
 import {GraphQLString} from '/lib/graphql';
 
 import {
@@ -41,10 +42,10 @@ export function addDocumentTypeObjectTypes({
 			}),
 			_highlight: { type: glue.getObjectType(GQL_OBJECT_TYPE_INTERFACE_SEARCH_HIT_HIGHLIGHT) }
 		};
-		Object.keys(globalFieldsObj).map((k) => {
+		/*Object.keys(globalFieldsObj).map((k) => {
 			//log.debug(`addDynamicTypes k:${toStr(k)}`);
 			fields[`${k}_as_string`] = { type: GraphQLString };
-		});
+		});*/
 		const sortedFields = sortKeys(fields);
 		//log.debug(`addDynamicTypes Object.keys(sortedFields):${toStr(Object.keys(sortedFields))}`);
 

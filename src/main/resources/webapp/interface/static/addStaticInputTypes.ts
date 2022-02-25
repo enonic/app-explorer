@@ -2,6 +2,7 @@ import {
 	GraphQLString,
 	list,
 	nonNull
+	//@ts-ignore
 } from '/lib/graphql';
 
 import {GQL_INPUT_TYPE_FILTER_IDS} from '../constants';

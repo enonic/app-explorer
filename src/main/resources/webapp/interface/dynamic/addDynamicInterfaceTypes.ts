@@ -15,6 +15,7 @@ import {
 	//newSchemaGenerator,
 	//nonNull,
 	//reference
+	//@ts-ignore
 } from '/lib/graphql';
 
 import {
@@ -44,10 +45,10 @@ export function addDynamicInterfaceTypes({
 		_repoId: { type: GraphQLID },
 		_score: { type: GraphQLFloat }
 	};
-	Object.keys(globalFieldsObj).map((k) => {
+	/*Object.keys(globalFieldsObj).map((k) => {
 		//log.debug(`addDynamicInterfaceTypes k:${toStr(k)}`);
 		fields[`${k}_as_string`] = { type: GraphQLString };
-	});
+	});*/
 	const sortedFields = sortKeys(fields);
 	//log.debug(`addDynamicInterfaceTypes Object.keys(sortedFields):${toStr(Object.keys(sortedFields))}`);
 

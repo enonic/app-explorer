@@ -23,6 +23,7 @@ import {
 	GraphQLString,
 	LocalDateTime as GraphQLLocalDateTime,
 	LocalTime as GraphQLLocalTime
+	//@ts-ignore
 } from '/lib/graphql';
 
 import {VALUE_TYPE_JSON} from '../constants';

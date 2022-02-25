@@ -5,6 +5,12 @@ mapping.api.target = /webapp/com.enonic.app.explorer/api
 mapping.api.idProvider.system = default
 */
 
+import type {Request} from '../types/Request';
+import type {GetCollectionRequest} from './collection/get';
+import type {AllDocumentRequest} from './collection/document';
+import type {InterfaceRequest} from './interface/post';
+
+
 import '@enonic/nashorn-polyfills';
 
 import {
@@ -12,13 +18,17 @@ import {
 	toStr*/
 } from '@enonic/js-utils';
 
+//@ts-ignore
 import Router from '/lib/router';
 import {
-	collectionResponse,
-	listCollections
+	get as getCollection,
+	list as listCollections
 } from './collection';
 import {all as documentResponse} from './collection/document';
-import {post as interfacePost} from './interface/post';
+import {
+	list as listInterfaces,
+	post as interfacePost
+} from './interface';
 
 
 const router = Router();
@@ -49,15 +59,17 @@ router.all('/api/v1', () => ({
 	<ul>
 		<li><a href="/api">..</a></li>
 		<li><a href="/api/v1/collections">collections</a></li>
+		<li><a href="/api/v1/interfaces">interfaces</a></li>
 	</ul>
 </body>
 </html>`,
 	contentType: RESPONSE_TYPE_HTML
 }));
-router.all('/api/v1/collections', (r) => listCollections(r));
-router.all('/api/v1/collections/{collection}', (r) => collectionResponse(r));
-router.all('/api/v1/collections/{collection}/documents', (r) => documentResponse(r));
-router.post('/api/v1/interface/{interfaceName}', (r) => interfacePost(r));
+router.all('/api/v1/collections', (r :Request) => listCollections(r));
+router.all('/api/v1/collections/{collection}', (r :GetCollectionRequest) => getCollection(r));
+router.all('/api/v1/collections/{collection}/documents', (r :AllDocumentRequest) => documentResponse(r));
+router.all('/api/v1/interfaces', (r :InterfaceRequest) => listInterfaces(r));
+router.post('/api/v1/interface/{interfaceName}', (r :InterfaceRequest) => interfacePost(r));
 
 
-export const all = (r) => router.dispatch(r);
+export const all = (r :Request) => router.dispatch(r);

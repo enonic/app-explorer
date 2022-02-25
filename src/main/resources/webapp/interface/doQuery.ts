@@ -1,4 +1,13 @@
-import {PRINCIPAL_EXPLORER_READ} from '/lib/explorer/model/2/constants';
+import type {CollectionNode} from '/lib/explorer/collection/types.d';
+import type {InterfaceField} from '/lib/explorer/interface/types.d';
+import type {
+	CamelToFieldObj,
+	SearchResolverEnv
+} from './types.d';
+
+
+import {toStr} from '@enonic/js-utils';
+import {PRINCIPAL_EXPLORER_READ} from '/lib/explorer/constants';
 import {connect} from '/lib/explorer/repo/connect';
 
 import {buildQueryParams} from './buildQueryParams';
@@ -15,6 +24,18 @@ export function doQuery({
 	documentTypeIdToName,
 	fields,
 	stopWords
+} :{
+	camelToFieldObj :CamelToFieldObj
+	collections :Array<CollectionNode>
+	collectionIdToDocumentTypeId :{
+		[k :string] :string
+	}
+	documentTypeIdToName :{
+		[k :string] :string
+	}
+	env :SearchResolverEnv
+	fields :Array<InterfaceField>
+	stopWords :Array<string>
 }) {
 	const explorerRepoReadConnection = connect({ principals: [PRINCIPAL_EXPLORER_READ] });
 
@@ -25,7 +46,8 @@ export function doQuery({
 		fields,
 		stopWords
 	});
-	//log.debug(`queryParams:${toStr({queryParams})}`);
+	log.debug('doQuery queryParams:%s', toStr(queryParams));
+	log.debug('doQuery types:%s', toStr(types));
 
 	const repoIdObj = {};
 	const multiRepoReadConnection = connectToCollectionRepos({
@@ -36,13 +58,13 @@ export function doQuery({
 	});
 
 	const queryRes = multiRepoReadConnection.query(queryParams);
-	//log.debug(`queryRes:${toStr(queryRes)}`);
+	log.debug('doQuery queryRes:%s', toStr(queryRes));
 
 	queryRes.aggregations = queryResAggregationsObjToArray({
 		obj: queryRes.aggregations,
 		types
 	});
-	//log.debug(`queryRes.aggregations:${toStr(queryRes.aggregations)}`);
+	log.debug('doQuery queryRes.aggregations:%s', toStr(queryRes.aggregations));
 
 	queryRes.aggregationsAsJson = JSON.stringify(queryRes.aggregations);
 
@@ -64,12 +86,12 @@ export function doQuery({
 
 		const json = JSON.stringify(washedNode);
 
-		Object.keys(washedNode).forEach((k) => {
+		/*Object.keys(washedNode).forEach((k) => {
 			// Cast to string?
 			// Looks like GraphQL does it for me, however
 			// 999999999999999.9 becomes "9.999999999999999E14"
 			washedNode[`${k}_as_string`] = washedNode[k];
-		});
+		});*/
 
 		// NOTE By doing this the frontend developer can't get the full field value and highlight in the same query.
 		// TODO We might NOT want to do that...

@@ -1,3 +1,6 @@
+import type {Glue} from '../glue';
+
+
 //import {toStr} from '@enonic/js-utils';
 import {
 	GraphQLBoolean,
@@ -6,7 +9,9 @@ import {
 	GraphQLString,
 	list,
 	nonNull
+	//@ts-ignore
 } from '/lib/graphql';
+//@ts-ignore
 import {encodeCursor} from '/lib/graphql-connection';
 
 import {
@@ -21,6 +26,8 @@ import {
 
 export function addDynamicObjectTypes({
 	glue
+} :{
+	glue :Glue
 }) {
 	const objectTypeInterfaceSearchHit = glue.getInterfaceType(GQL_INTERFACE_TYPE_DOCUMENT);
 

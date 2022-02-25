@@ -1,15 +1,29 @@
-import {isSet} from '@enonic/js-utils';
+import type {AggregationsResponse} from '/lib/explorer/types.d';
+
+import {AggregationTypesObj} from './types.d';
+
+import {
+	isSet//,
+	//toStr
+} from '@enonic/js-utils';
 
 import {aggregationQueryTypeToGraphQLType} from './aggregationQueryTypeToGraphQLType';
 
 
-export function queryResAggregationsObjToArray({
+export function queryResAggregationsObjToArray<
+	AggregationKey extends string = never
+>({
 	obj,
 	types,
 	localTypes = types
+} :{
+	obj :AggregationsResponse<AggregationKey>
+	types :AggregationTypesObj
+	localTypes? :AggregationTypesObj
 }) {
-	//log.debug(`obj:${toStr(obj)}`);
-	//log.debug(`localTypes:${toStr(localTypes)}`);
+	//log.debug('queryResAggregationsObjToArray obj:%s', toStr(obj));
+	//log.debug('queryResAggregationsObjToArray types:%s', toStr(types));
+	//log.debug('queryResAggregationsObjToArray localTypes:%s', toStr(localTypes));
 	return Object.keys(obj).map((name) => {
 		//log.debug(`name:${toStr(name)}`);
 		const anAggregation = obj[name];
@@ -32,6 +46,21 @@ export function queryResAggregationsObjToArray({
 			name,
 			sum,
 			type: aggregationQueryTypeToGraphQLType(localTypes[name].type)
+		} as {
+			count :number
+			name :string
+			sum :number
+			type :any
+			buckets? :{
+				docCount: number
+				//from? :number | string
+				//to? :number | string
+				key: string
+				subAggregations? :any
+			}
+			from? :number | string
+			to? :number | string
+			value? :number
 		};
 		/*if (isSet(avg) && isSet(parseFloat(avg))) {rAggregation.avg = avg;}
 		if (isSet(max) && isSet(parseFloat(max))) {rAggregation.max = max;}

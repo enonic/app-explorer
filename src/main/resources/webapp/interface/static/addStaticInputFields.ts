@@ -2,6 +2,7 @@ import {
 	GraphQLBoolean,
 	GraphQLInt,
 	GraphQLString
+	//@ts-ignore
 } from '/lib/graphql';
 
 import {

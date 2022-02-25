@@ -1,7 +1,8 @@
+import {toStr} from '@enonic/js-utils';
 import {
 	COLLECTION_REPO_PREFIX,
 	PRINCIPAL_EXPLORER_READ
-} from '/lib/explorer/model/2/constants';
+} from '/lib/explorer/constants';
 import {multiConnect} from '/lib/explorer/repo/multiConnect';
 
 
@@ -11,6 +12,7 @@ export function connectToCollectionRepos({
 	documentTypeIdToName,
 	repoIdObj // modified inside
 }) {
+	//log.debug('connectToCollectionRepos collections:%s', toStr(collections));
 	const multiConnectParams = {
 		principals: [PRINCIPAL_EXPLORER_READ],
 		sources: collections.map(({

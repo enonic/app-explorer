@@ -2,18 +2,17 @@ import {
 	VALUE_TYPE_DOUBLE,
 	VALUE_TYPE_REFERENCE,
 	VALUE_TYPE_STRING,
-	camelize,
+	//camelize,
+	//setIn,
 	sortKeysRec//,
 	//toStr
 } from '@enonic/js-utils';
-//import 'reflect-metadata'; // Must only be added once to a webpack bundle
-import setIn from 'set-value'; // Number.isInteger and Reflect
 
 import {VALUE_TYPE_JSON} from './constants';
 
 
 export function buildGlobalFieldsObj({
-	fieldsRes
+	//fieldsRes
 }) {
 	const globalFieldsObj = { // NOTE Hardcoded common fields, which are not currently system fields
 		_collectionId: {
@@ -52,7 +51,7 @@ export function buildGlobalFieldsObj({
 			_valueType: VALUE_TYPE_DOUBLE
 		}
 	};
-	fieldsRes.hits.forEach(({ // TODO traverse
+	/*fieldsRes.hits.forEach(({ // TODO traverse
 		fieldType: valueType,
 		//isSystemField = false,
 		key,
@@ -68,8 +67,11 @@ export function buildGlobalFieldsObj({
 			_min: min,
 			_valueType: valueType
 		}, { merge: true });
-	});
+	});*/
 	const sortedGlobalFieldsObj = sortKeysRec(globalFieldsObj);
 	//log.debug(`sortedGlobalFieldsObj:${toStr(sortedGlobalFieldsObj)}`);
 	return sortedGlobalFieldsObj;
 }
+
+
+export type GlobalFieldsObj = ReturnType<typeof buildGlobalFieldsObj>;

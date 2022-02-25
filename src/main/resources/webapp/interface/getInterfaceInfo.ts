@@ -1,23 +1,39 @@
+import type {CollectionNode} from '/lib/explorer/collection/types.d';
+import type {DocumentTypeNode} from '/lib/explorer/documentType/types.d';
+import type {Field} from '/lib/explorer/field/types.d';
+
+
 import {
 	camelize,
 	forceArray,
-	isSet
+	isSet//,
+	//toStr
 } from '@enonic/js-utils';
 
-import {PRINCIPAL_EXPLORER_READ} from '/lib/explorer/model/2/constants';
+import {PRINCIPAL_EXPLORER_READ} from '/lib/explorer/constants';
 import {connect} from '/lib/explorer/repo/connect';
 import {get as getInterface} from '/lib/explorer/interface/get';
 import {filter as filterInterface} from '/lib/explorer/interface/filter';
 import {
 	GraphQLString,
 	list
+	//@ts-ignore
 } from '/lib/graphql';
 
 
 export function getInterfaceInfo({
 	fieldsRes,
 	interfaceName
+} :{
+	fieldsRes :{
+		count :number
+		hits: Array<Field>
+		total :number
+	}
+	interfaceName :string
 }) {
+	//log.debug('getInterfaceInfo fieldsRes:%s', toStr(fieldsRes));
+
 	const explorerRepoReadConnection = connect({ principals: [PRINCIPAL_EXPLORER_READ] });
 	const interfaceNode = getInterface({
 		connection: explorerRepoReadConnection,
@@ -31,16 +47,19 @@ export function getInterfaceInfo({
 		stopWords//,
 		//synonyms // TODO
 	} = filterInterface(interfaceNode);
+	//log.debug('getInterfaceInfo collectionIds:%s', toStr(collectionIds));
 	//log.debug(`fields:${toStr(fields)}`);
 	//log.debug(`stopWords:${toStr(stopWords)}`);
 	//log.debug(`synonyms:${toStr(synonyms)}`);
 
 	//log.debug(`collectionIds:${toStr(collectionIds)}`);
 
-	const collections = explorerRepoReadConnection.get(collectionIds);
-	//log.debug(`collections:${toStr(collections)}`);
+	const collections = forceArray(explorerRepoReadConnection.get<CollectionNode>(...collectionIds) as CollectionNode);
+	//log.debug('getInterfaceInfo collections:%s', toStr(collections));
 
-	const collectionIdToDocumentTypeId = {};
+	const collectionIdToDocumentTypeId :{
+		[k :string] :string
+	} = {};
 	const documentTypeIds = collections.map(({
 		_id: collectionId,
 		documentTypeId
@@ -53,12 +72,14 @@ export function getInterfaceInfo({
 		.filter((v, i, a) => isSet(v) && a.indexOf(v) === i);
 	//log.debug(`documentTypeIds:${toStr(documentTypeIds)}`);
 
-	const documentTypes = explorerRepoReadConnection.get(documentTypeIds);
+	const documentTypes = forceArray(explorerRepoReadConnection.get<DocumentTypeNode>(...documentTypeIds) as DocumentTypeNode);
 	//log.debug(`documentTypes:${toStr(documentTypes)}`);
 
-	const allFieldKeys = [];
+	const allFieldKeys :Array<string> = [];
 
-	const documentTypeIdToName = {};
+	const documentTypeIdToName :{
+		[k :string] :string
+	} = {};
 	documentTypes.forEach(({
 		_id: documentTypeId,
 		_name: documentTypeName,
@@ -83,7 +104,9 @@ export function getInterfaceInfo({
 	allFieldKeys.sort();
 	//log.debug(`allFieldKeys:${toStr(allFieldKeys)}`);
 
-	const interfaceSearchHitsHighlightsFields = {};
+	const interfaceSearchHitsHighlightsFields :{
+		[k :string] :any
+	} = {};
 	allFieldKeys.forEach((fieldKey) => {
 		const camelizedFieldKey = camelize(fieldKey, /[.-]/g);
 		interfaceSearchHitsHighlightsFields[camelizedFieldKey] = { type: list(GraphQLString) };
