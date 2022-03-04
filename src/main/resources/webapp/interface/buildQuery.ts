@@ -1,11 +1,17 @@
 import {
 	QUERY_OPERATOR_AND,
-	fulltext,
+	/*fulltext,
 	//group,
 	or,
 	ngram,
-	stemmed
+	stemmed*/
+	storage
 } from '@enonic/js-utils';
+
+const fulltext = storage.query.dsl.fulltext;
+const ngram = storage.query.dsl.ngram;
+const or = storage.query.dsl.or;
+const stemmed = storage.query.dsl.stemmed;
 
 
 export function buildQuery({
