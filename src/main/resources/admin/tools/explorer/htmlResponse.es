@@ -8,6 +8,7 @@ import {isLicenseValid, getIssuedTo} from '/lib/licensing';
 	getLauncherUrl
 } from '/lib/xp/admin';*/
 import {assetUrl, serviceUrl} from '/lib/xp/portal';
+import {getLauncherPath} from '/lib/xp/admin';
 
 import {
 	PRINCIPAL_EXPLORER_READ,
@@ -253,6 +254,7 @@ services: {}, // Workaround for i18nUrl BUG
 		<div id="${ID_REACT_EXPLORER_CONTAINER}"/>
 		<script type="text/javascript" src="${assetUrl({path: 'explorer.js'})}"></script>
 		<script type="text/javascript" src="${assetUrl({path: 'react/Explorer.esm.js'})}"></script>
+		<script type="text/javascript" src="${getLauncherPath()}" data-config-theme="dark" async></script>
 		${Object.keys(collectorsAppToUri).map((a) => `<script type="text/javascript" src="${collectorsAppToUri[a]}"></script>`)
 		.join('\n')}
 		<script type='module' defer>
