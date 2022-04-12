@@ -65,14 +65,14 @@ interface TermsAggregationParams {
 	// Optional
 	minDocCount? :number
 	order? :string // Default to '_term ASC'
-	size :number // Default to 10
+	size? :number // Default to 10
 }
 
 interface ValueCountAggregationParams {
 	field :string
 }
 
-export interface Aggregation {
+export interface GraphQLInterfaceSearchAggregation {
 	name :string
 	count? :ValueCountAggregationParams
 	dateHistogram? :DateHistogramAggregationParams
@@ -83,7 +83,7 @@ export interface Aggregation {
 	range? :RangeAggregationParams
 	stats? :StatsAggregationParams
 	terms? :TermsAggregationParams
-	subAggregations :Array<Aggregation>
+	subAggregations? :Array<GraphQLInterfaceSearchAggregation>
 }
 
 export type AggregationType = 'count'
