@@ -8,6 +8,7 @@ import {
 	storage
 } from '@enonic/js-utils';
 
+const bool = storage.query.dsl.bool;
 const fulltext = storage.query.dsl.fulltext;
 const ngram = storage.query.dsl.ngram;
 const or = storage.query.dsl.or;
@@ -19,7 +20,7 @@ export function buildQuery({
 	searchStringWithoutStopWords
 }) {
 	//`fulltext('${fields.map(({name: field, boost = 1}) => `${field}${boost && boost > 1 ? `^${boost}` : ''}`)}', '${searchStringWithoutStopWords}', 'AND')`,
-	const query = or(fulltext(
+	const query = bool(or(fulltext(
 		fields.map(({boost, name: field}) => ({boost: (parseInt(boost)||1) + (fields.length*2), field})),
 		searchStringWithoutStopWords,
 		QUERY_OPERATOR_AND
@@ -32,7 +33,7 @@ export function buildQuery({
 		fields.map(({boost, name: field}) => ({boost, field})),
 		searchStringWithoutStopWords,
 		QUERY_OPERATOR_AND
-	));
+	)));
 	//log.debug(`query:${toStr({query})}`);
 	return query;
 }
