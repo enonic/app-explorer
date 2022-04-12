@@ -4,12 +4,12 @@ import type {
 } from '/lib/explorer/types.d';
 
 import {
-	Aggregation
+	GraphQLInterfaceSearchAggregation
 } from './types/Aggregation.d';
 
 
 export {
-	Aggregation,
+	GraphQLInterfaceSearchAggregation,
 	AggregationType,
 	AggregationTypesObj
 } from './types/Aggregation.d';
@@ -21,7 +21,7 @@ export interface CamelToFieldObj {
 
 export interface SearchResolverEnv {
 	args :{
-		aggregations? :Aggregation
+		aggregations? :GraphQLInterfaceSearchAggregation
 		count :number
 		//after :string
 		filters? :QueryFilters
@@ -34,7 +34,7 @@ export interface SearchResolverEnv {
 
 export interface SearchConnectionResolverEnv {
 	args :{
-		aggregations? :Aggregation
+		aggregations? :GraphQLInterfaceSearchAggregation
 		after :string
 		filters? :QueryFilters
 		first :number

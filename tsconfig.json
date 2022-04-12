@@ -34,7 +34,7 @@
 		],
 		"listEmittedFiles": false,
 		"listFiles": false,
-		"module": "es6",
+		"module": "commonjs",
 		"moduleResolution": "node",
 		"noEmitOnError": false,
 		"noErrorTruncation": true,
@@ -45,7 +45,9 @@
 		"noUnusedParameters": true,
 		"outDir": "build/tsc",
 		"paths": {
-			"@enonic/js-utils": ["node_modules/@enonic/js-utils/src"],
+			"@enonic/app-explorer/*": ["./src/main/resources/*"],
+			//"@enonic/js-utils": ["node_modules/@enonic/js-utils/src"],
+			"@enonic/js-utils": ["../enonic-js-utils/src"],
 			"/lib/explorer/*": ["../lib-explorer/src/main/resources/lib/explorer/*"]
 		},
 		"preserveWatchOutput": false,
@@ -65,18 +67,21 @@
 		"strictNullChecks": false,
 		"target": "es5",
 		"types": [
+			"mocha",
 			"node",
 			"react"
 		]
 	},
 	"exclude": [
+		"**/*.d.ts",
 		"build/**/*",
 		"node_modules/**/*",
-		"../lib-explorer/**/*",
-		"src/main/resources/index.d.ts"
+		"../enonic-js-utils/**/*",
+		"../lib-explorer/**/*"
 	],
 	"include": [
-		"src/main/resources/**/*.ts",
-		"src/main/resources/**/*.tsx"
+		"./src/main/resources/**/*.ts",
+		"./src/main/resources/**/*.tsx",
+		"./test/**/*.test.ts"
 	]
 }
