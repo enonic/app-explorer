@@ -1,42 +1,29 @@
-import type {
-	IndexConfigObject,
-	OneOrMore
-} from '/lib/explorer/types.d';
+import type {IndexConfigObject} from '/lib/explorer/types.d';
 import type {CollectionWithCron} from '/lib/explorer/collection/types.d';
 //import type {InterfaceNode} from '/lib/explorer/interface/types.d';
-import type {ScheduledJob} from '/lib/explorer/scheduler/types.d';
-import type {SynonymNode} from '/lib/explorer/synonym/types.d';
-import type {ApiKeyNode} from '../../types/ApiKey.d';
+import type {
+	InterfaceNodeFilter,
+	InterfaceNodeWithFilter,
+	NodeWithType
+} from './types.d';
 
 
 import {
-	COLON_SIGN,
-	DOT_SIGN,
 	VALUE_TYPE_STRING,
 	addQueryFilter,
-	dirname,
-	forceArray,
-	uniqueId,
-	toStr
+	forceArray
 } from '@enonic/js-utils';
-import {detailedDiff} from 'deep-object-diff';
-import deepEqual from 'fast-deep-equal';
 
-import {get as getCollection} from '/lib/explorer/collection/get';
 //import {getField} from '/lib/explorer/field/getField';
 import {ignoreErrors} from '/lib/explorer/ignoreErrors';
 import {
 	APP_EXPLORER,
 	FOLDERS,
-	NT_API_KEY,
 	NT_COLLECTION,
 	//NT_DOCUMENT,
 	NT_INTERFACE,
-	NT_SYNONYM,
-	NT_THESAURUS,
 	PATH_FIELDS,
-	PRINCIPAL_EXPLORER_WRITE,
-	REPO_ID_EXPLORER
+	PRINCIPAL_EXPLORER_WRITE
 } from '/lib/explorer/index';
 import {
 	READWRITE_FIELDS,
@@ -47,8 +34,7 @@ import {
 	REPOSITORIES,
 	USERS,
 	field,
-	folder,
-	interfaceModel
+	folder
 } from '/lib/explorer/model/2/index';
 import {isModelLessThan} from '/lib/explorer/model/isModelLessThan';
 import {setModel} from '/lib/explorer/model/setModel';
@@ -57,18 +43,17 @@ import {create} from '/lib/explorer/node/create';
 //import {exists} from '/lib/explorer/node/exists';
 import {connect} from '/lib/explorer/repo/connect';
 import {init as initRepo} from '/lib/explorer/repo/init';
-import {get as getInterface} from '/lib/explorer/interface/get';
 import {hasValue} from '/lib/explorer/query/hasValue';
 import {runAsSu} from '/lib/explorer/runAsSu';
 import {getCollectors, createOrModifyJobsFromCollectionNode} from '/lib/explorer/scheduler/createOrModifyJobsFromCollectionNode';
 //import {listExplorerJobs} from '/lib/explorer/scheduler/listExplorerJobs';
+
 import {
 	addMembers,
 	createRole,
 	createUser,
 	getPrincipal,
-	//findPrincipals,
-	getUser
+	//findPrincipals
 	//@ts-ignore
 } from '/lib/xp/auth';
 //import {sanitize} from '/lib/xp/common';
@@ -76,93 +61,16 @@ import {
 import {send} from '/lib/xp/event';
 //@ts-ignore
 import {get as getRepo} from '/lib/xp/repo';
-import {
-	create as createJob,
-	delete as deleteJob,
-	//get as getJob,
-	list as listJobs
-	//@ts-ignore
-} from '/lib/xp/scheduler';
 //import {submitTask} from '/lib/xp/task';
-//@ts-ignore
-import {reference} from '/lib/xp/value';
 
-import {Progress} from './Progress';
-import {
-	DEFAULT_INTERFACE,
-	DEFAULT_INTERFACE_NAME
-} from './interfaceDefault';
+import {model9} from './model/9';
+import {model10} from './model/10';
+import {model11} from './model/11';
+import {model12} from './model/12';
+import {model13} from './model/13';
 import {model14} from './model/14';
+import {Progress} from './Progress';
 
-
-type ApiKeyNodeWithType = ApiKeyNode & {
-	type :string
-}
-
-interface NodeWithType {
-	_id :string
-	_nodeType :string
-	_path :string
-	type :string
-}
-
-interface InterfaceNodeFilter {
-	filter? :'exists'|'hasValue'|'notExists'
-	params? :{
-		field? :string
-	}
-}
-
-interface InterfaceNodeWithFilter {
-	_id :string
-	//_path :string
-	filters: {
-		must?: InterfaceNodeFilter | Array<InterfaceNodeFilter>
-		mustNot?: InterfaceNodeFilter | Array<InterfaceNodeFilter>
-		should?: InterfaceNodeFilter | Array<InterfaceNodeFilter>
-	},
-	query? :string
-}
-
-interface InterfaceNodeWithQuery {
-	_id :string
-	//_path :string
-	query :unknown
-}
-
-interface InterfaceNodeWithResultMappings {
-	_id :string
-	//_path :string
-	resultMappings :unknown
-}
-
-interface InterfaceNodeWithFacets {
-	_id :string
-	//_path :string
-	facets :unknown
-}
-
-interface InterfaceNodeWithPagination {
-	_id :string
-	//_path :string
-	pagination :unknown
-}
-
-interface InterfaceNodeWithThesauri {
-	_id :string
-	//_path :string
-	thesauri :unknown
-}
-
-type InterfaceNodeWithCollections = /*InterfaceNode &*/ {
-	collectionIds? :Array<string>
-	collections? :OneOrMore<string>
-}
-
-type InterfaceNodeWithSynonyms = /*InterfaceNode &*/ {
-	synonymIds? :Array<string>
-	synonyms? :OneOrMore<string>
-}
 
 const FIELD_TYPE = { // TODO This should not be a system field. Remove in lib-explorer-4.0.0?
 	key: 'type',
@@ -758,652 +666,63 @@ export function run() {
 		log.debug(`explorerJobs:${toStr(explorerJobs)}`);
 		//deleteJob({name:})
 		progress.finishItem();*/
-
-		//──────────────────────────────────────────────────────────────────────
-		// Model 8: Add stemmed query expressions to Default interface (not needed anymore, see 9)
 		//──────────────────────────────────────────────────────────────────────
 
-		//──────────────────────────────────────────────────────────────────────
-		// Model 9:
-		// Remove filters and query from interfaces
-		// ...
-		// Add thesaurusReference to synonym nodes
-		//──────────────────────────────────────────────────────────────────────
 		if (isModelLessThan({
 			connection: writeConnection,
-			version: 9
+			version: 14
 		})) {
-			progress.addItems(1).setInfo('Finding interfaces which has filters, so they can be removed...').report().logInfo();
-			const interfacesWithFilters = writeConnection.query({
-				count: -1,
-				filters: addQueryFilter({
-					filter: { exists: { field: 'filters'}},
-					filters: addQueryFilter({
-						filter: hasValue('_nodeType', [NT_INTERFACE])
-					})
-				}),
-				query: ''
-			}).hits.map(({id}) => writeConnection.get<InterfaceNodeWithFilter>(id));
-			//log.debug(`interfacesWithFilters:${toStr(interfacesWithFilters)}`);
-			progress.finishItem();
-
-			if (interfacesWithFilters) {
-				progress.addItems(interfacesWithFilters.length);
-				interfacesWithFilters.forEach(({_path}) => {
-					progress.setInfo(`Removing filters from interface _path:${_path}`).report().logInfo();
-					writeConnection.modify<InterfaceNodeWithFilter>({
-						key: _path,
-						editor: (interfaceNode) => {
-							delete interfaceNode.filters;
-							//log.debug(`interfaceNode with filters removed:${toStr(interfaceNode)}`);
-							return interfaceNode;
-						}
-					});
-					progress.finishItem();
-				});
-			}
-
-			progress.addItems(1).setInfo('Finding interfaces which has a query, so it can be removed...').report().logInfo();
-			const interfacesWithQuery = writeConnection.query({
-				count: -1,
-				filters: addQueryFilter({
-					filter: { exists: { field: 'query'}},
-					filters: addQueryFilter({
-						filter: hasValue('_nodeType', [NT_INTERFACE])
-					})
-				}),
-				query: ''
-			}).hits.map(({id}) => writeConnection.get<InterfaceNodeWithQuery>(id));
-			//log.debug(`interfacesWithQuery:${toStr(interfacesWithQuery)}`);
-			progress.finishItem();
-
-			if (interfacesWithQuery) {
-				progress.addItems(interfacesWithQuery.length);
-				interfacesWithQuery.forEach(({_path}) => {
-					progress.setInfo(`Removing query from interface _path:${_path}`).report().logInfo();
-					writeConnection.modify<InterfaceNodeWithQuery>({
-						key: _path,
-						editor: (interfaceNode) => {
-							delete interfaceNode.query;
-							//log.debug(`interfaceNode with query removed:${toStr(interfaceNode)}`);
-							return interfaceNode;
-						}
-					});
-					progress.finishItem();
-				});
-			}
-
-			progress.addItems(1).setInfo('Finding interfaces which has resultMappings, so they can be removed...').report().logInfo();
-			const interfacesWithResultMappings = writeConnection.query({
-				count: -1,
-				filters: addQueryFilter({
-					filter: { exists: { field: 'resultMappings'}},
-					filters: addQueryFilter({
-						filter: hasValue('_nodeType', [NT_INTERFACE])
-					})
-				}),
-				query: ''
-			}).hits.map(({id}) => writeConnection.get<InterfaceNodeWithResultMappings>(id));
-			//log.debug(`interfacesWithResultMappings:${toStr(interfacesWithResultMappings)}`);
-			progress.finishItem();
-
-			if (interfacesWithResultMappings) {
-				progress.addItems(interfacesWithResultMappings.length);
-				interfacesWithResultMappings.forEach(({_path}) => {
-					progress.setInfo(`Removing resultMappings from interface _path:${_path}`).report().logInfo();
-					writeConnection.modify<InterfaceNodeWithResultMappings>({
-						key: _path,
-						editor: (interfaceNode) => {
-							delete interfaceNode.resultMappings;
-							log.debug(`interfaceNode with resultMappings removed:${toStr(interfaceNode)}`);
-							return interfaceNode;
-						}
-					});
-					progress.finishItem();
-				});
-			}
-
-			progress.addItems(1).setInfo('Finding all interfaces so resultMappings can be removed from indexConfig...').report().logInfo();
-			const allInterfaces = writeConnection.query({
-				count: -1,
-				filters: addQueryFilter({
-					filter: hasValue('_nodeType', [NT_INTERFACE])
-				}),
-				query: ''
-			}).hits.map(({id}) => writeConnection.get(id));
-			//log.debug(`allInterfaces:${toStr(allInterfaces)}`);
-			progress.finishItem();
-
-			if (allInterfaces) {
-				progress.addItems(allInterfaces.length);
-				allInterfaces.forEach(({_indexConfig = {}, _path}) => {
-					if (_indexConfig.configs) {
-						const hasResultMappingsArray = forceArray(_indexConfig.configs).filter(({path: p}) => p === 'resultMappings*');
-						//log.debug(`hasResultMappingsArray:${toStr(hasResultMappingsArray)}`);
-						if (hasResultMappingsArray.length) {
-							progress.setInfo(`Removing resultMappings from indexConfig of interface _path:${_path}`).report().logInfo();
-							writeConnection.modify({
-								key: _path,
-								editor: (interfaceNode) => {
-									interfaceNode._indexConfig.configs.forEach(({path}, i) => {
-										if (path === 'resultMappings*') {
-											//log.debug(`The index of the indexConfig with path 'resultMapping*' is:${toStr(i)} in inteface with _path:${_path}`);
-											interfaceNode._indexConfig.configs.splice(i, 1);
-										}
-									});
-									//log.debug(`interfaceNode with resultMappings removed from indexConfig:${toStr(interfaceNode)}`);
-									return interfaceNode;
-								}
-							});
-						}
-					}
-					progress.finishItem();
-				});
-			}
-
-			progress.addItems(1).setInfo('Finding interfaces which has facets, so they can be removed...').report().logInfo();
-			const interfacesWithFacets = writeConnection.query({
-				count: -1,
-				filters: addQueryFilter({
-					filter: { exists: { field: 'facets'}},
-					filters: addQueryFilter({
-						filter: hasValue('_nodeType', [NT_INTERFACE])
-					})
-				}),
-				query: ''
-			}).hits.map(({id}) => writeConnection.get<InterfaceNodeWithFacets>(id));
-			//log.debug(`interfacesWithFacets:${toStr(interfacesWithFacets)}`);
-			progress.finishItem();
-
-			if (interfacesWithFacets) {
-				progress.addItems(interfacesWithFacets.length);
-				interfacesWithFacets.forEach(({_path}) => {
-					progress.setInfo(`Removing facets from interface _path:${_path}`).report().logInfo();
-					writeConnection.modify<InterfaceNodeWithFacets>({
-						key: _path,
-						editor: (interfaceNode) => {
-							delete interfaceNode.facets;
-							//log.debug(`interfaceNode with facets removed:${toStr(interfaceNode)}`);
-							return interfaceNode;
-						}
-					});
-					progress.finishItem();
-				});
-			}
-
-			progress.addItems(1).setInfo('Finding interfaces which has pagination, so they can be removed...').report().logInfo();
-			const interfacesWithPagination = writeConnection.query({
-				count: -1,
-				filters: addQueryFilter({
-					filter: { exists: { field: 'pagination'}},
-					filters: addQueryFilter({
-						filter: hasValue('_nodeType', [NT_INTERFACE])
-					})
-				}),
-				query: ''
-			}).hits.map(({id}) => writeConnection.get<InterfaceNodeWithPagination>(id));
-			//log.debug(`interfacesWithPagination:${toStr(interfacesWithPagination)}`);
-			progress.finishItem();
-
-			if (interfacesWithPagination) {
-				progress.addItems(interfacesWithPagination.length);
-				interfacesWithPagination.forEach(({_path}) => {
-					progress.setInfo(`Removing pagination from interface _path:${_path}`).report().logInfo();
-					writeConnection.modify<InterfaceNodeWithPagination>({
-						key: _path,
-						editor: (interfaceNode) => {
-							delete interfaceNode.pagination;
-							//log.debug(`interfaceNode with pagination removed:${toStr(interfaceNode)}`);
-							return interfaceNode;
-						}
-					});
-					progress.finishItem();
-				});
-			}
-
-			progress.addItems(1).setInfo('Finding interfaces which has thesauri, so they can be removed...').report().logInfo();
-			const interfacesWithThesauri = writeConnection.query({
-				count: -1,
-				filters: addQueryFilter({
-					filter: { exists: { field: 'thesauri'}},
-					filters: addQueryFilter({
-						filter: hasValue('_nodeType', [NT_INTERFACE])
-					})
-				}),
-				query: ''
-			}).hits.map(({id}) => writeConnection.get<InterfaceNodeWithThesauri>(id));
-			//log.debug(`interfacesWithThesauri:${toStr(interfacesWithThesauri)}`);
-			progress.finishItem();
-
-			if (interfacesWithThesauri) {
-				progress.addItems(interfacesWithThesauri.length);
-				interfacesWithThesauri.forEach(({_path}) => {
-					progress.setInfo(`Removing thesauri from interface _path:${_path}`).report().logInfo();
-					writeConnection.modify<InterfaceNodeWithThesauri>({
-						key: _path,
-						editor: (interfaceNode) => {
-							delete interfaceNode.thesauri;
-							//log.debug(`interfaceNode with thesauri removed:${toStr(interfaceNode)}`);
-							return interfaceNode;
-						}
-					});
-					progress.finishItem();
-				});
-			}
-
-			const NT_FIELD_VALUE = `${APP_EXPLORER}${COLON_SIGN}field-value`;
-			progress.addItems(1).setInfo('Finding fieldValues so they can be deleted...').report().logInfo();
-			const fieldValueIds = writeConnection.query({
-				count: -1,
-				filters: addQueryFilter({
-					filter: hasValue('_nodeType', [NT_FIELD_VALUE])
-				}),
-				query: ''
-			}).hits.map(({id}) => id);
-			//log.debug(`fieldValueIds:${toStr(fieldValueIds)}`);
-			progress.finishItem();
-
-			if(fieldValueIds.length) {
-				progress.addItems(1).setInfo(`Deleting ${fieldValueIds.length} fieldValues...`).report().logInfo();
-				writeConnection.delete(fieldValueIds);
-				progress.finishItem();
-			}
-
-			progress.addItems(1).setInfo('Creating/updating default interface...').report().logInfo();
-
-			const existingInterfaceNode = getInterface({
-				connection: writeConnection,
-				interfaceName: DEFAULT_INTERFACE_NAME
-			});
-			//log.debug(`existingInterfaceNode:${toStr(existingInterfaceNode)}`);
-
-			const interfaceParams = interfaceModel(DEFAULT_INTERFACE);
-			//log.debug(`interfaceParams:${toStr(interfaceParams)}`);
-
-			if(existingInterfaceNode) {
-				const maybeChangedInterface = JSON.parse(JSON.stringify(existingInterfaceNode));
-				delete interfaceParams._parentPath;
-				Object.keys(interfaceParams).forEach((k) => {
-					maybeChangedInterface[k] = interfaceParams[k];
-				});
-				//log.debug(`maybeChangedInterface:${toStr(maybeChangedInterface)}`);
-
-				if (!deepEqual(existingInterfaceNode, maybeChangedInterface)) {
-					interfaceParams.modifiedTime = new Date();
-					maybeChangedInterface.modifiedTime = interfaceParams.modifiedTime;
-					ignoreErrors(() => {
-						log.info(`Changes detected, updating default interface. Diff:${toStr(detailedDiff(existingInterfaceNode, maybeChangedInterface))}`);
-						writeConnection.modify({
-							key: existingInterfaceNode._id,
-							editor: (node) => {
-								Object.keys(interfaceParams).forEach((k) => {
-									node[k] = interfaceParams[k];
-								});
-								return node;
-							}
-						});
-					});
-				}
-			} else {
-				ignoreErrors(() => {
-					create(interfaceParams, {
-						connection: writeConnection
-					}); // Should contain _parentPath
-				});
-			}
-			progress.finishItem();
-
-			progress.addItems(1).setInfo('Finding synonyms without thesaurusReference...').report().logInfo();
-			const synonymsWithoutThesaurusReferenceParams = {
-				//count: 2, // DEBUG
-				count: -1,
-				filters: addQueryFilter({
-					filter: {
-						notExists: { field: 'thesaurusReference'}
-					},
-					filters: addQueryFilter({
-						filter: hasValue('_nodeType', [NT_SYNONYM])
-					})
-				}),
-				query: ''
-			};
-			//log.debug(`synonymsWithoutThesaurusReferenceParams:${toStr(synonymsWithoutThesaurusReferenceParams)}`);
-			const synonymsWithoutThesaurusReference = writeConnection
-				.query(synonymsWithoutThesaurusReferenceParams)
-				.hits.map(({id}) => writeConnection.get(id));
-			//log.debug(`synonymsWithoutThesaurusReference:${toStr(synonymsWithoutThesaurusReference)}`);
-
-			const thesaurusPathToId = {};
-
-			progress.addItems(synonymsWithoutThesaurusReference.length);
-			synonymsWithoutThesaurusReference.forEach(({_id, _path}) => {
-				progress.addItems(1).setInfo(`Adding thesaurusReference to synonym _id:${_id}`).report().logInfo();
-				const thesaurusPath = dirname(_path); //_path.match(/[^/]+/g)[1];
-				//log.debug(`thesaurusPath:${toStr(thesaurusPath)}`);
-				if (!thesaurusPathToId[thesaurusPath]) {
-					const thesaurusNode = writeConnection.get(thesaurusPath);
-					//log.debug(`thesaurusNode:${toStr(thesaurusNode)}`);
-					thesaurusPathToId[thesaurusPath] = thesaurusNode._id;
-					//log.debug(`thesaurusPathToId:${toStr(thesaurusPathToId)}`);
-				}
-				const thesaurusId = thesaurusPathToId[thesaurusPath];
-				//log.debug(`thesaurusId:${toStr(thesaurusId)}`);
-				//const synonymWithoutThesaurusModifyRes =
-				writeConnection.modify<SynonymNode>({
-					key: _id,
-					editor: (node) => {
-						node.thesaurusReference = reference(thesaurusId);
-						return node;
-					}
-				});
-				//log.debug(`synonymWithoutThesaurusModifyRes:${toStr(synonymWithoutThesaurusModifyRes)}`);
-				progress.finishItem();
-			});
-
-			writeConnection.refresh();
-
-			progress.finishItem();
-
-			setModel({
-				connection: writeConnection,
-				version: 9
-			});
-		} // if model < 9
-
-		//──────────────────────────────────────────────────────────────────────
-		// Model 10: Change job name format
-		//──────────────────────────────────────────────────────────────────────
-		if (isModelLessThan({
-			connection: writeConnection,
-			version: 10
-		})) {
-			const jobs = listJobs() as Array<ScheduledJob<{
-				collectionId :string
-				name :string
-			}>>;
-			//log.debug(`jobs:${toStr(jobs)}`);
-
-			jobs.forEach((job) => {
-				//log.debug(`job:${toStr(job)}`);
-				const {
-					name
-				} = job;
-				//log.debug(`name:${toStr(name)}`);
-				/*const fullJob = getJob({name}); // Not needed, list contains everything.
-				log.debug(`fullJob:${toStr(fullJob)}`);*/
-				if (name.startsWith(APP_EXPLORER)) {
-					const {
-						config: {
-							collectionId: collectionIdAlreadyPresent,
-							name: collectionName
-						},
-						descriptor
-					} = job;
-
-					if (!collectionIdAlreadyPresent) {
-						progress.addItems(1).setInfo(`Renaming job ${name}`).report().logInfo();
-
-						const jobPrefix = `${descriptor.replace(':', DOT_SIGN)}${DOT_SIGN}${collectionName}${DOT_SIGN}`;
-						//log.debug(`jobPrefix:${toStr(jobPrefix)}`);
-
-						const jobNumber = name.replace(jobPrefix, '');
-						//log.debug(`jobNumber:${toStr(jobNumber)}`);
-
-						//log.debug(`collectionName:${toStr(collectionName)}`);
-						const collectionNode = getCollection({
-							connection: writeConnection,
-							name: collectionName
-						});
-						//log.debug(`collectionNode:${toStr(collectionNode)}`);
-						const {_id: collectionId} = collectionNode;
-						//log.debug(`collectionId:${toStr(collectionId)}`);
-						job.config.collectionId = collectionId; // Not using reference since this is in another repo.
-						job.name = uniqueId({
-							repoId: REPO_ID_EXPLORER,
-							nodeId: collectionId,
-							versionKey: jobNumber
-						});
-						//log.debug(`job.name:${toStr(job.name)}`);
-						log.debug(`job:${toStr(job)}`);
-						const createdJob = createJob(job);
-						log.debug(`createdJob:${toStr(createdJob)}`);
-						if (createdJob) {
-							const deleteRes = deleteJob({name});
-							log.debug(`deleteRes:${toStr(deleteRes)}`);
-						}
-						progress.finishItem();
-					}
-				} // if (name.startsWith(APP_EXPLORER))
-			}); // jobs.forEach
-
-			setModel({
-				connection: writeConnection,
-				version: 10
-			});
-		}
-		//──────────────────────────────────────────────────────────────────────
-		// Model 11: interface.collections -> interface.collectionIds
-		//──────────────────────────────────────────────────────────────────────
-		if (isModelLessThan({
-			connection: writeConnection,
-			version: 11
-		})) {
-			progress.addItems(1).setInfo('Finding interfaces with collections...').report().logInfo();
-			const getAllCollectionsQueryParams = {
-				count: -1,
-				filters: addQueryFilter({
-					filter: hasValue('_nodeType', [NT_COLLECTION]),
-					filters: {}
-				}),
-				query: ''
-			};
-			//log.debug(`getAllCollectionsQueryParams:${toStr(getAllCollectionsQueryParams)}`);
-
-			const allCollectionsRes = writeConnection.query(getAllCollectionsQueryParams);
-			//log.debug(`allCollectionsRes:${toStr(allCollectionsRes)}`); // HUGE
-
-			const allCollections = allCollectionsRes.hits
-				.map(({id}) => writeConnection.get(id))
-				.map(({_id, _name}) => ({_id, _name}));
-			//log.debug(`allCollections:${toStr(allCollections)}`);
-
-			const collectionNameToIdObj = {};
-			allCollections.forEach(({_id, _name}) => {
-				collectionNameToIdObj[_name] = _id;
-			});
-			//log.debug(`collectionNameToIdObj:${toStr(collectionNameToIdObj)}`);
-
-			const interfacesWithCollectionsQueryParams = {
-				count: -1,
-				filters: addQueryFilter({
-					filter: {
-						exists: { field: 'collections'}
-					},
-					filters: addQueryFilter({
-						filter: hasValue('_nodeType', [NT_INTERFACE])
-					})
-				}),
-				query: ''
-			};
-			//log.debug(`interfacesWithCollectionsQueryParams:${toStr(interfacesWithCollectionsQueryParams)}`);
-
-			const interfaceIds = writeConnection.query(interfacesWithCollectionsQueryParams).hits.map(({id}) => id);
-			//log.debug(`interfaceIds:${toStr(interfaceIds)}`);
-
-			progress.addItems(interfaceIds.length); // .setInfo(`Found ${interfaceIds.length} interfaces with collections.`)
-			progress.finishItem(); // .setInfo('Done finding interfaces with collections.')
-
-			interfaceIds.forEach((interfaceId) => {
-				progress.setInfo(`Converting collections -> collectionIds in interfaceId:${interfaceId}`).report().logInfo();
-				writeConnection.modify<InterfaceNodeWithCollections>({
-					key: interfaceId,
-					editor: (interfaceNode) => {
-						//log.debug(`(in) collectionIdReferences:${toStr(interfaceNode.collectionIds)}`); // Oh, NO! Seems they all come in as nulls???
-						interfaceNode.collectionIds = interfaceNode.collectionIds
-							? forceArray(interfaceNode.collectionIds)
-								.map((collectionIdReference) => `${collectionIdReference}`) // Convert reference to string, so comparisons work
-								.filter((v,i,a)=>a.indexOf(v)==i) // Remove duplicates (NOTE Doesn't work on references)
-							: [];
-						//log.debug(`(before) interfaceNode.collectionIds:${toStr(interfaceNode.collectionIds)}`); // Should be strings
-						interfaceNode.collections && forceArray(interfaceNode.collections).forEach((collectionName) => {
-							const collectionId = collectionNameToIdObj[collectionName];
-							if (collectionId) {
-								if (!interfaceNode.collectionIds.includes(collectionId)) { // NOTE Comparison doesn't work on references
-									interfaceNode.collectionIds.push(collectionId);
-								} else {
-									log.warning(`collectionId:${collectionId} already present in collectionIds`);
-								}
-							} else {
-								log.error(`Unable to find collectionId from collectionName:${collectionName}. Dropped from interface!`);
-							}
-						}); // forEach collectionName
-						//log.debug(`(after) interfaceNode.collectionIds:${toStr(interfaceNode.collectionIds)}`); // Should be strings
-						interfaceNode.collectionIds = interfaceNode.collectionIds.map((collectionId) => reference(collectionId));
-						//log.debug(`(out) collectionIdReferences:${toStr(interfaceNode.collectionIds)}`); // This should report nulls again
-						delete interfaceNode.collections;
-						return interfaceNode;
-					} // editor
-				}); // modify
-				progress.finishItem(); // setInfo(`Done converting collections -> collectionIds in interfaceId:${interfaceId}`)
-			}); // forEach interfaceId
-
-			setModel({
-				connection: writeConnection,
-				version: 11
-			});
-		}
-		//──────────────────────────────────────────────────────────────────────
-		// Model 12: interface.synonyms -> interface.synonymIds
-		//──────────────────────────────────────────────────────────────────────
-		if (isModelLessThan({
-			connection: writeConnection,
-			version: 12
-		})) {
-			progress.addItems(1).setInfo('Finding interfaces with synonyms...').report().logInfo();
-
-			const allThesauri = writeConnection.query({
-				count: -1,
-				filters: addQueryFilter({
-					filter: hasValue('_nodeType', [NT_THESAURUS]),
-					filters: {}
-				}),
-				query: ''
-			}).hits
-				.map(({id}) => writeConnection.get(id))
-				.map(({_id, _name}) => ({_id, _name}));
-			//log.debug(`allThesauri:${toStr(allThesauri)}`);
-
-			const thesauriNameToIdObj = {};
-			allThesauri.forEach(({_id, _name}) => {
-				thesauriNameToIdObj[_name] = _id;
-			});
-			//log.debug(`thesauriNameToIdObj:${toStr(thesauriNameToIdObj)}`);
-
-			const interfacesWithSynonymsQueryParams = {
-				count: -1,
-				filters: addQueryFilter({
-					filter: {
-						exists: { field: 'synonyms'}
-					},
-					filters: addQueryFilter({
-						filter: hasValue('_nodeType', [NT_INTERFACE])
-					})
-				}),
-				query: ''
-			};
-			//log.debug(`interfacesWithSynonymsQueryParams:${toStr(interfacesWithSynonymsQueryParams)}`);
-
-			const interfaceIds = writeConnection.query(interfacesWithSynonymsQueryParams).hits.map(({id}) => id);
-			//log.debug(`interfaceIds:${toStr(interfaceIds)}`);
-
-			progress.addItems(interfaceIds.length); // .setInfo(`Found ${interfaceIds.length} interfaces with synonyms.`)
-			progress.finishItem(); // .setInfo('Done finding interfaces with synonyms.')
-
-			interfaceIds.forEach((interfaceId) => {
-				progress.setInfo(`Converting synonyms -> synonymIds in interfaceId:${interfaceId}`).report().logInfo();
-				writeConnection.modify<InterfaceNodeWithSynonyms>({
-					key: interfaceId,
-					editor: (interfaceNode) => {
-						//log.debug(`(in) synonymIdReferences:${toStr(interfaceNode.synonymIds)}`); // Oh, NO! Seems they all come in as nulls???
-						interfaceNode.synonymIds = interfaceNode.synonymIds
-							? forceArray(interfaceNode.synonymIds)
-								.map((synonymIdReference) => `${synonymIdReference}`) // Convert reference to string, so comparisons work
-								.filter((v,i,a)=>a.indexOf(v)==i) // Remove duplicates (NOTE Doesn't work on references)
-							: [];
-						//log.debug(`(before) interfaceNode.synonymIds:${toStr(interfaceNode.synonymIds)}`); // Should be strings
-						interfaceNode.synonyms && forceArray(interfaceNode.synonyms).forEach((synonymName) => {
-							const synonymId = thesauriNameToIdObj[synonymName];
-							if (synonymId) {
-								if (!interfaceNode.synonymIds.includes(synonymId)) { // NOTE Comparison doesn't work on references
-									interfaceNode.synonymIds.push(synonymId);
-								} else {
-									log.warning(`synonymId:${synonymId} already present in synonymIds`);
-								}
-							} else {
-								log.error(`Unable to find synonymId from synonymName:${synonymName}. Dropped from interface!`);
-							}
-						}); // forEach synonymName
-						//log.debug(`(after) interfaceNode.synonymIds:${toStr(interfaceNode.synonymIds)}`); // Should be strings
-						interfaceNode.synonymIds = interfaceNode.synonymIds.map((synonymId) => reference(synonymId));
-						//log.debug(`(out) synonymIdReferences:${toStr(interfaceNode.synonymIds)}`); // This should report nulls again
-						delete interfaceNode.synonyms;
-						return interfaceNode;
-					} // editor
-				}); // modify
-				progress.finishItem(); // setInfo(`Done converting synonyms -> synonymIds in interfaceId:${interfaceId}`)
-			}); // forEach interfaceId
-
-			setModel({
-				connection: writeConnection,
-				version: 12
-			});
-		}
-
-		//──────────────────────────────────────────────────────────────────────
-		// Model 13: Make sure ApiKeys has correct structure
-		//──────────────────────────────────────────────────────────────────────
-		if (isModelLessThan({
-			connection: writeConnection,
-			version: 13
-		})) {
-			progress.addItems(1).setInfo('Finding ApiKeys...').report().logInfo();
-
-			const apiKeysQueryParams = {
-				count: -1,
-				filters: addQueryFilter({
-					filter: hasValue('type', [NT_API_KEY])
-				}),
-				query: ''
-			};
-			const apiKeyIds = writeConnection.query(apiKeysQueryParams).hits.map(({id}) => id);
-			progress.addItems(apiKeyIds.length);
-			progress.finishItem();
-
-			apiKeyIds.forEach((apiKeyId) => {
-				progress.setInfo(`Making sure ApiKey has correct structure id:${apiKeyId}`).report().logInfo();
-				writeConnection.modify<ApiKeyNodeWithType>({
-					key: apiKeyId,
-					editor: (apiKeyNode) => {
-						apiKeyNode._nodeType = NT_API_KEY;
-						delete apiKeyNode.type;
-						apiKeyNode.createdTime = apiKeyNode._ts;
-						apiKeyNode.modifiedTime = new Date();
-						apiKeyNode.modifier = getUser().key;
-						return apiKeyNode;
-					}
-				});
-				progress.finishItem();
-			}); // forEach
-			setModel({
+			if (isModelLessThan({
 				connection: writeConnection,
 				version: 13
+			})) {
+				if (isModelLessThan({
+					connection: writeConnection,
+					version: 12
+				})) {
+					if (isModelLessThan({
+						connection: writeConnection,
+						version: 11
+					})) {
+						if (isModelLessThan({
+							connection: writeConnection,
+							version: 10
+						})) {
+							if (isModelLessThan({
+								connection: writeConnection,
+								version: 9
+							})) {
+								// Model 8: Add stemmed query expressions to Default interface (not needed anymore, see 9)
+								model9({ // Remove filters and query from interfaces and Add thesaurusReference to synonym nodes
+									progress,
+									writeConnection
+								});
+							} // <9
+							model10({ // Change job name format
+								progress,
+								writeConnection
+							});
+						} // <10
+						model11({ // interface.collections -> interface.collectionIds
+							progress,
+							writeConnection
+						});
+					} // <11
+					model12({ // interface.synonyms -> interface.synonymIds
+						progress,
+						writeConnection
+					});
+				} // <12
+				model13({ // Make sure ApiKeys has correct structure
+					progress,
+					writeConnection
+				});
+			} // <13
+			model14({
+				progress,
+				writeConnection
 			});
-		}
-
-		model14({
-			progress,
-			writeConnection
-		});
+		} // <14
 
 		//──────────────────────────────────────────────────────────────────────
 
