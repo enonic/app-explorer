@@ -12,6 +12,7 @@ import {
 
 import {PRINCIPAL_EXPLORER_READ} from '/lib/explorer/constants';
 import {connect} from '/lib/explorer/repo/connect';
+import {getCollectionIds} from '/lib/explorer/collection/getCollectionIds';
 import {get as getInterface} from '/lib/explorer/interface/get';
 import {filter as filterInterface} from '/lib/explorer/interface/filter';
 import {
@@ -33,26 +34,38 @@ export function getInterfaceInfo({
 	interfaceName :string
 }) {
 	//log.debug('getInterfaceInfo fieldsRes:%s', toStr(fieldsRes));
+	//log.debug(`getInterfaceInfo({interfaceName:%s})`, interfaceName);
 
 	const explorerRepoReadConnection = connect({ principals: [PRINCIPAL_EXPLORER_READ] });
 	const interfaceNode = getInterface({
 		connection: explorerRepoReadConnection,
 		interfaceName
 	});
-	//log.debug(`interfaceNode:${toStr(interfaceNode)}`);
+	//log.debug('getInterfaceInfo() interfaceNode:%s', toStr(interfaceNode));
+
+	const filteredInterfaceNode = filterInterface(interfaceNode);
+	//log.debug('getInterfaceInfo() filteredInterfaceNode:%s', toStr(filteredInterfaceNode));
 
 	const {
-		collectionIds,
 		fields = [],// = DEFAULT_INTERFACE_FIELDS, TODO This wont work when fields = [] which filter does
 		stopWords//,
 		//synonyms // TODO
-	} = filterInterface(interfaceNode);
+	} = filteredInterfaceNode;
 	//log.debug('getInterfaceInfo collectionIds:%s', toStr(collectionIds));
 	//log.debug(`fields:${toStr(fields)}`);
 	//log.debug(`stopWords:${toStr(stopWords)}`);
 	//log.debug(`synonyms:${toStr(synonyms)}`);
 
-	//log.debug(`collectionIds:${toStr(collectionIds)}`);
+	let {
+		collectionIds,
+	} = filteredInterfaceNode;
+	if (interfaceName === 'default' ) {
+		// The default interface has no collectionIds, so get all collectionIds:
+		collectionIds = getCollectionIds({
+			connection: explorerRepoReadConnection
+		});
+	}
+	//log.debug('getInterfaceInfo() collectionIds:%s', toStr(collectionIds));
 
 	const collections = forceArray(explorerRepoReadConnection.get<CollectionNode>(...collectionIds) as CollectionNode);
 	//log.debug('getInterfaceInfo collections:%s', toStr(collections));

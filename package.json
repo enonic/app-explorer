@@ -1,7 +1,7 @@
 {
   "author": "Christian Andreas Westgaard <cwe@enonic.com>",
   "dependencies": {
-    "@enonic/js-utils": "0.34.1",
+    "@enonic/js-utils": "0.34.3",
     "@enonic/semantic-ui-react-form": "2.4.0",
     "array.prototype.find": "2.1.2",
     "buffer": "6.0.3",
@@ -124,9 +124,11 @@
   },
   "scripts": {
     "clean": "rm -r build 2>/dev/null;true",
+    "mocha": "npx mocha",
+    "premocha": "yarn tsc",
     "pretest": "yarn tsc",
     "pretsc": "yarn clean",
-    "test": "npx mocha --config .mocharc.cjs",
+    "test": "npx mocha build/tsc/app-explorer/test/**/*.test.js",
     "tsc": "npx tsc",
     "watch": "node_modules/webpack-cli/bin/cli.js -w --stdin",
     "webpack": "node_modules/webpack-cli/bin/cli.js"

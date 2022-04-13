@@ -100,7 +100,7 @@ export function buildSchema({
 				}
 			});
 			//log.debug(`res:${toStr({res})}`);
-			res.start = start; // TODO Do I use this for anything?
+			//res.start = start; // TODO Do I use this for anything?
 			//log.debug(`res:${toStr({res})}`);
 			return res;
 		},

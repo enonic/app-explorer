@@ -28,8 +28,8 @@ import {
 export function addDynamicInterfaceTypes({
 	documentTypeObjectTypes, // Just an empty obj, populated later
 	glue,
-	interfaceSearchHitsHighlightsFields,
-	globalFieldsObj
+	interfaceSearchHitsHighlightsFields//,
+	//globalFieldsObj
 }) {
 	//log.debug(`addDynamicInterfaceTypes Object.keys(globalFieldsObj):${toStr(Object.keys(globalFieldsObj))}`);
 	const fields = {

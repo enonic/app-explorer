@@ -74,8 +74,8 @@ export function addDynamicTypes({
 	addDynamicInterfaceTypes({
 		documentTypeObjectTypes, // Just an empty obj, populated later
 		glue,
-		interfaceSearchHitsHighlightsFields,
-		globalFieldsObj
+		interfaceSearchHitsHighlightsFields//,
+		//globalFieldsObj
 	});
 
 	//──────────────────────────────────────────────────────────────────────────

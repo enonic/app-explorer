@@ -8,8 +8,8 @@ describe('webapp', () => {
 			it('handles two aggregations and subaggregation', () => {
 				const camelToFieldObj = {};
 				deepStrictEqual(
-					[
-						{ // aggregationsObj
+					{
+						aggregations: {
 							languageTerms: {
 								aggregations: {
 									titleUnderLanguage: {
@@ -30,7 +30,7 @@ describe('webapp', () => {
 								}
 							},
 						},
-						{ // typesObj
+						types: {
 							titleTerms: {
 								type: 'terms'
 							},
@@ -43,8 +43,10 @@ describe('webapp', () => {
 								}
 							}
 						}
-					],
-					aggregationsArgToQueryParamAndTypes({
+					},
+					aggregationsArgToQueryParamAndTypes<
+						'languageTerms'|'titleTerms'|'titleUnderLanguage'
+					>({
 						gqlSearchArgAggregationsArray: [
 							{
 							  name: 'languageTerms',
@@ -73,7 +75,7 @@ describe('webapp', () => {
 						camelToFieldObj
 					})
 				);
-				console.debug('camelToFieldObj', camelToFieldObj);
+				//console.debug('camelToFieldObj', camelToFieldObj); // {}
 			}); // it
 		}); // describe aggregationsArgToQueryParamAndTypes
 	}); // describe interface

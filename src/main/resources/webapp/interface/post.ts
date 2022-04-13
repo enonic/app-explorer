@@ -145,7 +145,7 @@ export function overrideable(request :InterfaceRequest, fn = isUnauthorized) {
 
 	const body = JSON.parse(bodyJson);
 	const {query, variables} = body;
-	//log.debug(`query:${toStr(query)}`);
+	//log.debug('query:%s', query);
 	//log.debug(`variables:${toStr(variables)}`);
 	const context = {};
 	//log.debug(`context:${toStr(context)}`);

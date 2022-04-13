@@ -10,24 +10,25 @@ import {
 import {aggregationQueryTypeToGraphQLType} from './aggregationQueryTypeToGraphQLType';
 
 
+//const log = console; // Use when running tests in node without Enonic XP.
+
+
 export function queryResAggregationsObjToArray<
-	AggregationKey extends string = never
+	AggregationKey extends undefined|string = undefined
 >({
 	obj,
-	types,
-	localTypes = types
+	types
 } :{
 	obj :AggregationsResponse<AggregationKey>
 	types :AggregationTypesObj
-	localTypes? :AggregationTypesObj
 }) {
-	//log.debug('queryResAggregationsObjToArray obj:%s', toStr(obj));
-	//log.debug('queryResAggregationsObjToArray types:%s', toStr(types));
-	//log.debug('queryResAggregationsObjToArray localTypes:%s', toStr(localTypes));
-	return Object.keys(obj).map((name) => {
-		//log.debug(`name:${toStr(name)}`);
+	//log.debug('queryResAggregationsObjToArray() obj:%s', toStr(obj));
+	//log.debug('queryResAggregationsObjToArray() types:%s', toStr(types));
+	const aggregationsArray = Object.keys(obj).map((name) => {
+		//log.debug(`queryResAggregationsObjToArray() name:${toStr(name)}`);
+
 		const anAggregation = obj[name];
-		//log.debug(`anAggregation:${toStr(anAggregation)}`);
+		//log.debug('queryResAggregationsObjToArray() anAggregation:%s', toStr(anAggregation));
 		const {
 			//avg, TODO https://github.com/enonic/xp/issues/9003
 			buckets,
@@ -37,31 +38,33 @@ export function queryResAggregationsObjToArray<
 			sum,
 			value
 		} = anAggregation;
+		//log.debug('queryResAggregationsObjToArray() buckets:%s', toStr(buckets));
+		//log.debug('queryResAggregationsObjToArray() count:%s sum:%s', count, sum);
 		//log.debug(`avg:${toStr(avg)}`);
 		//log.debug(`typeof avg:${toStr(typeof avg)}`);
 		//log.debug(`parseFloat(avg):${toStr(parseFloat(avg))}`);
 		//log.debug(`typeof parseFloat(avg):${toStr(typeof parseFloat(avg))}`);
 		const rAggregation = {
-			count,
 			name,
-			sum,
-			type: aggregationQueryTypeToGraphQLType(localTypes[name].type)
+			type: aggregationQueryTypeToGraphQLType(types[name].type)
 		} as {
-			count :number
+			count? :number
 			name :string
-			sum :number
+			sum? :number
 			type :any
-			buckets? :{
+			buckets? :Array<{
 				docCount: number
 				//from? :number | string
 				//to? :number | string
 				key: string
 				subAggregations? :any
-			}
+			}>
 			from? :number | string
 			to? :number | string
 			value? :number
 		};
+		if (isSet(count)) {rAggregation.count = count;}
+		if (isSet(sum)) {rAggregation.sum = sum;}
 		/*if (isSet(avg) && isSet(parseFloat(avg))) {rAggregation.avg = avg;}
 		if (isSet(max) && isSet(parseFloat(max))) {rAggregation.max = max;}
 		if (isSet(min) && isSet(parseFloat(min))) {rAggregation.min = min;}*/
@@ -73,7 +76,12 @@ export function queryResAggregationsObjToArray<
 				to,
 				...rest
 			}) => {
-				const rBucket = {
+				//log.debug('queryResAggregationsObjToArray docCount:%s from:%s key:%s to:%s rest:%s', docCount, toStr(from), key, toStr(to), toStr(rest));
+				const rBucket :{
+					docCount: number
+					key: string
+					subAggregations? :any
+				} = {
 					docCount,
 					key
 				};
@@ -83,15 +91,20 @@ export function queryResAggregationsObjToArray<
 				}
 				//log.debug(`rest:${toStr(rest)}`);
 				if (Object.keys(rest).length) {
-					rBucket.subAggregations = queryResAggregationsObjToArray(rest, types[name].types); // Recurse
+					rBucket.subAggregations = queryResAggregationsObjToArray({
+						obj: rest,
+						types: types[name].types
+					}); // Recurse
 				}
-				return rBucket;
+				return rBucket; // out of map
 			}); // map buckets
 		} else {
 			if (isSet(value)) {
 				rAggregation.value = value;
 			}
 		} // if buckets
-		return rAggregation;
+		return rAggregation; // out of map
 	}); // map names
+	//log.debug('queryResAggregationsObjToArray -> aggregationsArray:%s', toStr(aggregationsArray));
+	return aggregationsArray; // out of function
 }

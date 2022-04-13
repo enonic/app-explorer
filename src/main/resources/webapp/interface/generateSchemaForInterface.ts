@@ -1,8 +1,8 @@
 import 'reflect-metadata'; // Must be imported only once per WebPack Bundle (Required by setIn)
-import {
+/*import {
 	//VALUE_TYPE_STRING,
 	toStr
-} from '@enonic/js-utils';
+} from '@enonic/js-utils';*/
 
 import {getFields} from '/lib/explorer/field/getFields';
 import {PRINCIPAL_EXPLORER_READ} from '/lib/explorer/model/2/constants';
