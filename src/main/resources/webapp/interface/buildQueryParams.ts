@@ -2,13 +2,13 @@ import type {RepoConnection} from '/lib/explorer/types.d';
 import type {InterfaceField} from '/lib/explorer/interface/types.d';
 import type {
 	CamelToFieldObj,
+	GraphQLInterfaceSearchAggregation,
 	SearchResolverEnv
 } from './types.d';
 
-
 import {
-	addQueryFilter,
-	toStr
+	addQueryFilter//,
+	//toStr
 } from '@enonic/js-utils';
 
 import {NT_DOCUMENT} from '/lib/explorer/constants';
@@ -19,6 +19,7 @@ import {get as getStopWordsList} from '/lib/explorer/stopWords/get';
 
 import {aggregationsArgToQueryParamAndTypes} from './aggregationsArgToQueryParamAndTypes';
 import {buildQuery} from './buildQuery';
+//import {buildQueryDSL} from './buildQueryDSL';
 
 
 export function buildQueryParams({
@@ -48,12 +49,15 @@ export function buildQueryParams({
 			start = 0
 		}
 	} = env;
-	log.debug('buildQueryParams aggregationsArg:%s', toStr(aggregationsArg));
+	//log.debug('buildQueryParams aggregationsArg:%s', toStr(aggregationsArg));
 	//log.debug(`filters:${toStr(filters)}`);
 	//log.debug(`highlight:${toStr(highlight)}`);
 
-	const [aggregations, types] = aggregationsArgToQueryParamAndTypes({
-		aggregationsArray: aggregationsArg,
+	const {
+		aggregations,
+		types
+	} = aggregationsArgToQueryParamAndTypes({
+		gqlSearchArgAggregationsArray: aggregationsArg as Array<GraphQLInterfaceSearchAggregation>,
 		camelToFieldObj
 	});
 	//log.debug(`aggregations:${toStr(aggregations)}`);
@@ -108,5 +112,8 @@ export function buildQueryParams({
 		start
 	};
 	//log.debug(`queryParams:${toStr({queryParams})}`);
-	return [queryParams, types];
+	return {
+		queryParams,
+		types
+	};
 }

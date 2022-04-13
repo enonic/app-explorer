@@ -1,3 +1,8 @@
+import type {
+	MultiRepoNodeQueryHit,
+	MultiRepoNodeQueryResponse
+} from '@enonic/js-utils/src/types/node/multiRepoConnection.d';
+
 import type {CollectionNode} from '/lib/explorer/collection/types.d';
 import type {InterfaceField} from '/lib/explorer/interface/types.d';
 import type {
@@ -6,7 +11,7 @@ import type {
 } from './types.d';
 
 
-import {toStr} from '@enonic/js-utils';
+//import {toStr} from '@enonic/js-utils';
 import {PRINCIPAL_EXPLORER_READ} from '/lib/explorer/constants';
 import {connect} from '/lib/explorer/repo/connect';
 
@@ -39,15 +44,18 @@ export function doQuery({
 }) {
 	const explorerRepoReadConnection = connect({ principals: [PRINCIPAL_EXPLORER_READ] });
 
-	const [queryParams, types] = buildQueryParams({
+	const {
+		queryParams,
+		types
+	} = buildQueryParams({
 		camelToFieldObj,
 		env,
 		explorerRepoReadConnection,
 		fields,
 		stopWords
 	});
-	log.debug('doQuery queryParams:%s', toStr(queryParams));
-	log.debug('doQuery types:%s', toStr(types));
+	//log.debug('doQuery() queryParams:%s', toStr(queryParams));
+	//log.debug('doQuery() types:%s', toStr(types));
 
 	const repoIdObj = {};
 	const multiRepoReadConnection = connectToCollectionRepos({
@@ -56,17 +64,23 @@ export function doQuery({
 		documentTypeIdToName,
 		repoIdObj // modified inside
 	});
+	//log.debug('doQuery() repoIdObj:%s', toStr(repoIdObj));
 
-	const queryRes = multiRepoReadConnection.query(queryParams);
-	log.debug('doQuery queryRes:%s', toStr(queryRes));
+	const queryRes = multiRepoReadConnection.query(queryParams) as Omit<MultiRepoNodeQueryResponse, 'hits'> & {
+		aggregationsAsJson :string
+		hits :Array<MultiRepoNodeQueryHit & {highlight? :Record<string,Array<string>>}>
+	};
+	//log.debug('doQuery() queryRes:%s', toStr(queryRes));
+
+	queryRes.aggregationsAsJson = JSON.stringify(queryRes.aggregations); // Json directly from elastic
 
 	queryRes.aggregations = queryResAggregationsObjToArray({
 		obj: queryRes.aggregations,
 		types
 	});
-	log.debug('doQuery queryRes.aggregations:%s', toStr(queryRes.aggregations));
+	//log.debug('doQuery() queryRes.aggregations:%s', toStr(queryRes.aggregations));
 
-	queryRes.aggregationsAsJson = JSON.stringify(queryRes.aggregations);
+	//queryRes.aggregationsAsJson = JSON.stringify(queryRes.aggregations); // Json from modified structure
 
 	queryRes.hits = queryRes.hits.map(({
 		branch,
@@ -75,7 +89,7 @@ export function doQuery({
 		repoId,
 		score
 	}) => {
-		//log.debug(`highlight:${toStr(highlight)}`);
+		//log.debug('doQuery() repoId:%s branch:%s id:%s score:%s highlight:%s', repoId, branch, id, score, toStr(highlight));
 
 		const washedNode = washDocumentNode(connect({
 			branch,

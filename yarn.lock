@@ -1548,10 +1548,10 @@
   resolved "https://registry.yarnpkg.com/@discoveryjs/json-ext/-/json-ext-0.5.2.tgz#8f03a22a04de437254e8ce8cc84ba39689288752"
   integrity sha512-HyYEUDeIj5rRQU2Hk5HTB2uHsbRQpF70nvMhVzi+VJR0X+xNEhjPui4/kBf3VeH/wqD28PT4sVOm8qqLjBrSZg==
 
-"@enonic/js-utils@0.34.1":
-  version "0.34.1"
-  resolved "https://registry.yarnpkg.com/@enonic/js-utils/-/js-utils-0.34.1.tgz#54c9f3ea825ae7671be4a096cfac12e596bc5417"
-  integrity sha512-l0XHq0cSMeSoKqirY/WdG+QES2qahFvTazKfjer1MNiOhIpcpbwVAgicxLYGTrOTYBfs5lJVFVf4Aje4rPAfzw==
+"@enonic/js-utils@0.34.3":
+  version "0.34.3"
+  resolved "https://registry.yarnpkg.com/@enonic/js-utils/-/js-utils-0.34.3.tgz#f9b3a54b9168e6554ae0a519664fa5bba3f8fb28"
+  integrity sha512-tOd5ZGp5bSq9p46sHEGOTGVIFfH9zV/Hk0UqLGRzn1abrmJaN3n8IdB+HbuR7CYTTPFQhRB2IM0elLfve0jsHA==
 
 "@enonic/semantic-ui-react-form@2.4.0":
   version "2.4.0"
