@@ -278,7 +278,7 @@ export function Explorer(props) {
 			fixed='top'
 			style={{zIndex: 103}}>
 			<Menu.Item className="fitMenu" as='a' onClick={() => setSideBarVisible(!sideBarVisible)}>
-				<Icon size={"Large"} name={menuIconName}/>
+				<Icon size='large' name={menuIconName}/>
 			</Menu.Item>
 			<Menu.Item header>Explorer</Menu.Item>
 			<UploadLicenseModal
