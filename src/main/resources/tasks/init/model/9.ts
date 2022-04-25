@@ -132,7 +132,7 @@ export function model9({
 				key: _path,
 				editor: (interfaceNode) => {
 					delete interfaceNode.resultMappings;
-					log.debug(`interfaceNode with resultMappings removed:${toStr(interfaceNode)}`);
+					//log.debug(`interfaceNode with resultMappings removed:${toStr(interfaceNode)}`);
 					return interfaceNode;
 				}
 			});
