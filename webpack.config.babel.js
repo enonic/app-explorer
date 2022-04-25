@@ -162,7 +162,7 @@ if (MODE === 'production') {
 
 const SS_JS_CONFIG = {
 	context: path.resolve(__dirname, SRC_DIR),
-	devtool: false, // Don't waste time generating sourceMaps
+	devtool: MODE === 'production' ? false : 'eval-source-map', // https://webpack.js.org/configuration/devtool/#devtool
 	entry: {
 		'admin/tools/explorer/explorer': './admin/tools/explorer/explorer.es',
 		'lib/locales': './lib/locales.es',
@@ -365,7 +365,7 @@ const STYLE_USE = [
 
 const STYLE_CONFIG = {
 	context: path.resolve(__dirname, SRC_STYLE_DIR),
-	devtool: false, // Don't waste time generating sourceMaps
+	devtool: MODE === 'production' ? false : 'eval-source-map', // https://webpack.js.org/configuration/devtool/#devtool
 	entry: {
 		'main': './main.sass'
 	},
@@ -443,8 +443,7 @@ const CLIENT_JS_CONFIG = {
 		react: 'React',
 		'react-dom': 'ReactDOM'
 	},
-	devtool: false, // Don't waste time generating sourceMaps
-	//devtool: 'source-map',
+	devtool: MODE === 'production' ? false : 'eval-source-map', // https://webpack.js.org/configuration/devtool/#devtool
 	mode: MODE,
 	module: {
 		rules: [{
@@ -559,7 +558,7 @@ WEBPACK_CONFIG.push(CLIENT_JS_CONFIG);
 const ESBUILD_TARGET = 'es2015';
 const CLIENT_ES_CONFIG = {
 	context: path.join(__dirname, SRC_ASSETS_DIR, 'react'),
-	devtool: false, // Don't waste time generating sourceMaps
+	devtool: MODE === 'production' ? false : 'eval-source-map', // https://webpack.js.org/configuration/devtool/#devtool
 	entry: {
 		'Explorer': './Explorer.jsx',
 		'WebCrawler': './WebCrawler.jsx'
