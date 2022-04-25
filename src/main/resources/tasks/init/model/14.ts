@@ -89,7 +89,7 @@ export function model14({
 		}
 
 		if (modify) {
-			log.debug('modifying nodeId:%s', nodeId);
+			//log.debug('modifying nodeId:%s', nodeId);
 			//log.debug('node:%s', toStr(node));
 			writeConnection.modify({
 				key: nodeId,
