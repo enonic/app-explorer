@@ -10,7 +10,6 @@ export function getInterfaceQuery({
 ) {
 	_id
 	_name
-	_nodeType
 	_path
 	_versionKey
 	collectionIds
