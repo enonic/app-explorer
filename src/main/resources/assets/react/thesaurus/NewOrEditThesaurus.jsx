@@ -13,7 +13,7 @@ import {UploadLicense} from '../UploadLicense';
 
 
 const GQL_MUTATION_THESAURUS_CREATE = `mutation CreateThesaurusMutation(
-  $_name: ID!,
+  $_name: String!,
   $language: ThesaurusLanguageInput!
 ) {
   createThesaurus(
