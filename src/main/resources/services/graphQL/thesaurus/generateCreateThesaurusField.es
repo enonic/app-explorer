@@ -22,7 +22,7 @@ export function generateCreateThesaurusField({
 }) {
 	return {
 		args: {
-			_name: nonNull(GraphQLString),
+			_name: glue.getScalarType('_name'),
 			language: glue.getInputType(GQL_INPUT_TYPE_THESAURUS_LANGUAGE_NAME)
 		},
 		resolve({

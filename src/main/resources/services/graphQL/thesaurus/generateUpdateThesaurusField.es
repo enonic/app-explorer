@@ -18,8 +18,8 @@ export function generateUpdateThesaurusField({
 }) {
 	return {
 		args: {
-			_id: nonNull(GraphQLString),
-			_name: nonNull(GraphQLString),
+			_id: glue.getScalarType('_id'),
+			_name: glue.getScalarType('_name'),
 			language: glue.getInputType(GQL_INPUT_TYPE_THESAURUS_LANGUAGE_NAME)
 		},
 		resolve({
