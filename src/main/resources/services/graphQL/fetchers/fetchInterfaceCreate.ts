@@ -1,6 +1,12 @@
 import {GQL_MUTATION_INTERFACE_CREATE} from '../mutations/interfaceCreateMutation.mjs';
 
 
+type JSONResponse = {
+	data? :unknown
+	errors?: Array<{message: string}>
+}
+
+
 export function fetchInterfaceCreate({
 	url,
 	//variables,
@@ -20,8 +26,19 @@ export function fetchInterfaceCreate({
 	},
 	handleResponse = (response) => {
 		//console.debug('fetchInterfaceCreate({url:', url, ', variables:', variables, '}) --> response:', response);
-		handleData(response.json().data);
+		handleData((response.json() as JSONResponse).data);
 	}
+} :{
+	url :string
+	variables :{
+		_name? :string
+		collectionIds? :Array<string>
+		fields? :Array<string>
+		stopWords? :Array<string>
+		synonymIds? :Array<string>
+	}
+	handleData? :(data :unknown) => void
+	handleResponse? :(response :Response) => void
 }) {
 	//console.debug('fetchInterfaceCreate({url:', url, ', variables:', variables, '})');
 	fetch(url, {

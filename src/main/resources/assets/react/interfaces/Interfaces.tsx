@@ -1,7 +1,13 @@
+import type {
+	InterfaceNamesObj,
+	SetLicensedToFunction,
+	SetLicenseValidFunction
+} from './index.d';
+
+import * as React from 'react';
 import {
 	Button,
 	Header,
-	Label,
 	Radio,
 	Segment,
 	Table
@@ -107,6 +113,11 @@ export function Interfaces({
 	servicesBaseUrl,
 	setLicensedTo,
 	setLicenseValid
+} :{
+	licenseValid :boolean
+	servicesBaseUrl :string
+	setLicensedTo :SetLicensedToFunction
+	setLicenseValid :SetLicenseValidFunction
 }) {
 	//const [boolIsLoadingGraphQL, setboolIsLoadingGraphQL] = React.useState(false);
 	//const [boolIsLoadingService, setboolIsLoadingService] = React.useState(false);
@@ -114,16 +125,16 @@ export function Interfaces({
 
 	const [collections, setCollections] = React.useState([]);
 	const [collectionIdToFieldKeys, setCollectionIdToFieldKeys] = React.useState({});
-	const [globalFieldsObj, setGlobalFieldsObj] = React.useState({
+	const [globalFieldsObj/*, setGlobalFieldsObj*/] = React.useState({
 		'_allText': true // TODO: Hardcode
 	});
 	const [interfaces, setInterfaces] = React.useState([]);
-	const [interfaceNamesObj, setInterfaceNamesObj] = React.useState({});
+	const [interfaceNamesObj, setInterfaceNamesObj] = React.useState({} as InterfaceNamesObj);
 	const [interfacesTotal, setInterfacesTotal] = React.useState(0);
 	const [stopWordOptions, setStopWordOptions] = React.useState([]);
 	const [thesauriOptions, setThesauriOptions] = React.useState([]);
 
-	const [showCollectionCount, setShowCollectionCount] = React.useState(true);
+	const [showCollectionCount/*, setShowCollectionCount*/] = React.useState(true);
 	const [showCollections, setShowCollections] = React.useState(false);
 	const [showFields, setShowFields] = React.useState(false);
 	const [showSynonyms, setShowSynonyms] = React.useState(false);
@@ -149,7 +160,7 @@ export function Interfaces({
 				//console.debug('data', data);
 
 				//const fieldIdToKey = {};
-				const newGlobalFieldsObj = {
+				/*const newGlobalFieldsObj = {
 					'_allText': true
 				};
 				data.queryFields.hits.forEach(({_id, key}) => {
@@ -159,7 +170,7 @@ export function Interfaces({
 					}
 				});
 				//console.debug('newGlobalFieldsObj', newGlobalFieldsObj);
-				setGlobalFieldsObj(newGlobalFieldsObj);
+				setGlobalFieldsObj(newGlobalFieldsObj);*/
 				//console.debug('fieldIdToKey', fieldIdToKey);
 
 				const documentTypeIdToFieldKeys = {};

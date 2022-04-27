@@ -1,10 +1,39 @@
+import type {
+	InterfaceNamesObj,
+	SetLicensedToFunction,
+	SetLicenseValidFunction
+} from './index.d';
+import type {SemanticUi} from '../../../types/SemanticUi.d';
+
+
+import * as React from 'react';
 import {Button, Icon, Modal, Popup} from 'semantic-ui-react';
 
 import {NewOrEditInterface} from './NewOrEditInterface';
 import {UploadLicense} from '../UploadLicense';
 
 
-export function NewOrEditInterfaceModal(props) {
+type NewOrEditInterfaceModalProps = {
+	_id? :string
+	_name? :string
+	afterClose :() => void
+	beforeOpen? :() => void
+	collectionIdToFieldKeys :{}
+	collectionOptions :Array<SemanticUi.Dropdown.Option>
+	disabled? :boolean
+	globalFieldsObj :Record<string, boolean>
+	interfaceNamesObj :InterfaceNamesObj
+	licenseValid :boolean
+	servicesBaseUrl :string
+	setLicensedTo :SetLicensedToFunction
+	setLicenseValid :SetLicenseValidFunction
+	stopWordOptions :Array<SemanticUi.Dropdown.Option>
+	thesauriOptions :Array<SemanticUi.Dropdown.Option>
+	total :number
+}
+
+
+export function NewOrEditInterfaceModal(props :NewOrEditInterfaceModalProps) {
 	const {
 		_id, // nullable
 		_name,

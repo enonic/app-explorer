@@ -1,4 +1,8 @@
+import type {InterfaceNamesObj} from './index.d';
+import type {SemanticUi} from '../../../types/SemanticUi.d';
+
 //import {toStr} from '@enonic/js-utils';
+import * as React from 'react';
 import {
 	Button,
 	Form,
@@ -7,10 +11,16 @@ import {
 	Loader,
 	Modal
 } from 'semantic-ui-react';
+
+//@ts-ignore
 import {Form as EnonicForm} from 'semantic-ui-react-form/Form';
+//@ts-ignore
 import {Dropdown} from 'semantic-ui-react-form/inputs/Dropdown';
+//@ts-ignore
 import {Input} from 'semantic-ui-react-form/inputs/Input';
+//@ts-ignore
 import {ResetButton} from 'semantic-ui-react-form/buttons/ResetButton';
+//@ts-ignore
 import {SubmitButton} from 'semantic-ui-react-form/buttons/SubmitButton';
 
 import {DEFAULT_INTERFACE_FIELDS} from '../../../constants';
@@ -24,7 +34,20 @@ import {required} from '../utils/required.mjs';
 import {FieldSelector} from './FieldSelector';
 
 
-export function NewOrEditInterface(props) {
+type NewOrEditInterfaceProps = {
+	_id? :string
+	collectionIdToFieldKeys :{}
+	collectionOptions :Array<SemanticUi.Dropdown.Option>
+	doClose :() => void
+	globalFieldsObj :Record<string, boolean>
+	interfaceNamesObj :InterfaceNamesObj
+	servicesBaseUrl :string
+	stopWordOptions :Array<SemanticUi.Dropdown.Option>
+	thesauriOptions :Array<SemanticUi.Dropdown.Option>
+}
+
+
+export function NewOrEditInterface(props :NewOrEditInterfaceProps) {
 	const {
 		_id, // nullable
 		collectionIdToFieldKeys = {},
@@ -85,14 +108,17 @@ export function NewOrEditInterface(props) {
 
 	const disabled = _name === 'default';
 
-	function mustBeUnique(v) {
+	function mustBeUnique(v :string) {
 		//console.debug(`mustBeUnique(${v}) interfaceNamesObj:`, interfaceNamesObj, ` interfaceNamesObj[${v}]:`, interfaceNamesObj[v]);
 		if (interfaceNamesObj[v]) {
 			return `Name must be unique: Name '${v}' is already in use!`;
 		}
 	}
 
-	const schema = {};
+	const schema :{
+		_name? :(v :string) => string
+	} = {};
+
 	if (!_id) {
 		schema._name = (v) => required(v)
 			|| mustStartWithALowercaseLetter(v)
@@ -103,7 +129,13 @@ export function NewOrEditInterface(props) {
 
 	return isLoading ? <Loader active inverted>Loading</Loader> : <EnonicForm
 		initialValues={initialValues}
-		onSubmit={(values) => {
+		onSubmit={(values :{
+			_name :string
+			collectionIds :Array<string>
+			fields :Array<string>
+			stopWords :Array<string>
+			synonymIds :Array<string>
+		}) => {
 			//console.debug('submit values', values);
 			const {
 				_name,

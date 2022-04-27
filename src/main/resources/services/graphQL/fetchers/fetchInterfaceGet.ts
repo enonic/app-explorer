@@ -1,6 +1,25 @@
+import type {InterfaceNode} from '/lib/explorer/types/Interface.d';
+
 //import {toStr} from '@enonic/js-utils';
 
 import {getInterfaceQuery} from '../queries/getInterfaceQuery.mjs';
+
+
+type getInterfaceResponse = {
+	getInterface :InterfaceNode/*{
+		_id :string
+		_name :string
+		_path :string
+		_versionKey :string
+		collectionIds :Array<string>
+		fields :Array<{
+			boost :number
+			name :string
+		}>
+		stopWords :Array<string>
+		synonymIds :Array<string>
+	}*/
+}
 
 
 export function fetchInterfaceGet({
@@ -8,7 +27,13 @@ export function fetchInterfaceGet({
 	url,
 	variables: {
 		_id
-	} = {}
+	}
+} :{
+	handleData :(data :getInterfaceResponse) => void
+	url :string
+	variables :{
+		_id :string
+	}
 }) {
 	//console.debug('fetchInterfaceGet({url:', url, ', _id:', _id, '})');
 	fetch(url, {
