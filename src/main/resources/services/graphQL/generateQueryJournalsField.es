@@ -18,8 +18,9 @@ export function generateQueryJournalsField({
 		fields: {
 			_id: { type: glue.getScalarType('_id') },
 			_name: { type: glue.getScalarType('_name') },
-			_nodeType: { type: GraphQLString }, // TODO nonNull?
+			//_nodeType: { type: GraphQLString }, // No point in exposing, always the same
 			_path: { type: glue.getScalarType('_path') },
+			_versionKey: { type: glue.getScalarType('_versionKey') },
 			displayName: { type: nonNull(GraphQLString) },
 			endTime: { type: nonNull(GraphQLString) },
 			errorCount: { type: nonNull(GraphQLInt) },
@@ -64,8 +65,9 @@ export function generateQueryJournalsField({
 			journalsRes.hits = journalsRes.hits.map(({
 				_id,
 				_name,
-				_nodeType,
+				//_nodeType, // No point in exposing, always the same
 				_path,
+				_versionKey,
 				displayName,
 				endTime,
 				errorCount,
@@ -73,13 +75,13 @@ export function generateQueryJournalsField({
 				name,
 				startTime,
 				successCount,
-				successes//,
-				//type
+				successes
 			}) => ({
 				_id,
-				_path,
 				_name,
-				_nodeType,
+				//_nodeType, // No point in exposing, always the same
+				_path,
+				_versionKey,
 				displayName,
 				endTime,
 				errorCount,
@@ -87,8 +89,7 @@ export function generateQueryJournalsField({
 				name,
 				startTime,
 				successCount,
-				successes//,
-				//type
+				successes
 			}));
 			//log.info(`journalsRes:${toStr(journalsRes)}`);
 			return journalsRes;

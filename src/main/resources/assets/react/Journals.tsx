@@ -2,9 +2,10 @@
 //import {hash as fnv} from 'fnv-plus';
 import Uri from 'jsuri';
 import prettyMs from 'pretty-ms';
+import * as React from 'react';
 import {
-	Checkbox, Dimmer, Divider, Dropdown, Form, Header, Icon, Label, Loader,
-	Pagination, Segment, Table
+	Checkbox, Dimmer, Divider, Dropdown, Form, Header, Icon, Loader, Pagination,
+	Segment, Table
 } from 'semantic-ui-react';
 
 
@@ -158,7 +159,7 @@ export function Journals({
 
 	const {
 		aggregations,
-		count,
+		//count,
 		end,
 		page,
 		start,

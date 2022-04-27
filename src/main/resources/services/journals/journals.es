@@ -92,10 +92,14 @@ export function get({
 		sort,
 		start
 	});
+	//log.debug('queryJournalsRes:%s', toStr(result));
+
 	result.page = intPage;
 	result.start = start + 1;
 	result.end = Math.min(start + intPerPage, result.total);
 	result.totalPages = Math.ceil(result.total / intPerPage);
+	//log.debug('queryJournalsRes:%s', toStr(result));
+
 	result.hits = result.hits.map(({
 		name: collection, startTime, endTime, duration,
 		errorCount, successCount//, errors, successes
@@ -103,6 +107,7 @@ export function get({
 		collection, startTime, endTime, duration,
 		errorCount, successCount//, errors, successes
 	}));
+	//log.debug('queryJournalsRes:%s', toStr(result));
 	/*result.aggregations.endTime.buckets = result.aggregations.endTime.buckets.map(({docCount, from, key, to}) => ({
 		docCount,
 		from: from && from.substring(0, 10),
@@ -125,6 +130,7 @@ export function get({
 		filters: {},
 		query
 	});
+	//log.debug('collectionsAggregationQueryResult:%s', toStr(collectionsAggregationQueryResult));
 	result.aggregations.collection = collectionsAggregationQueryResult.aggregations.collection;
 
 	return {
