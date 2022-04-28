@@ -135,7 +135,7 @@ export const FieldsList = ({
 						<Table.Cell collapsing style={cellStyle} textAlign='center'>
 							<Button.Group>
 								<Popup
-									content={`Delete local field ${name}`}
+									content={`Delete field ${name}`}
 									inverted
 									style={popupStyle}
 									trigger={
@@ -176,7 +176,7 @@ export const FieldsList = ({
 				})}><Icon
 					color='green'
 					name='plus'
-				/> Add local field</Button>}
+				/> Add field</Button>}
 		/>
 		{addOrEditModalState.open /* This means the component internal state will be totally reset */
 			? <AddOrEditLocalFieldModal

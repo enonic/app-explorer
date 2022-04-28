@@ -94,8 +94,8 @@ export const AddOrEditLocalFieldModal = ({
 	const [header, setHeader] = React.useState(/*propName
 		? globalFieldObj[propName]
 			? `Override global field ${propName}`
-			: `Edit local field ${propName}`
-		: 'Add local field'
+			: `Edit field ${propName}`
+		: 'Add field'
 	*/);
 
 	React.useEffect(() => {
@@ -187,7 +187,7 @@ export const AddOrEditLocalFieldModal = ({
 					setName(newName);
 					setNameTouched(true);
 				}}
-				placeholder='Please input a local field name'
+				placeholder='Please input a field name'
 				defaultValue={name}
 			/>
 			{msg}

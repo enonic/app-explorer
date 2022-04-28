@@ -81,7 +81,7 @@ export function RemoveFieldFromDocumentTypeModal({
 	>
 		<Modal.Header>{`Delete ${state.name}?`}</Modal.Header>
 		<Modal.Content>
-			<p>If there are any graphql clients out there, which use this local field, deleting it will cause the very next query to throw an error!</p>
+			<p>If there are any graphql clients out there, which use this field, deleting it will cause the very next query to throw an error!</p>
 			<p>Deactivating a field is safe, and a better option, unless you are certain the field is not in use...</p>
 
 			{isFieldInUse ?
