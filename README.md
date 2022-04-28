@@ -2,7 +2,6 @@
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
-
 - [Getting the source](#getting-the-source)
 - [Development](#development)
   - [Production build](#production-build)
@@ -17,6 +16,9 @@
     - [Watching (using Gradle or Node)](#watching-using-gradle-or-node)
     - [Browser sync](#browser-sync)
 - [Admin tool](#admin-tool)
+- [Compatibility](#compatibility)
+- [Changelog](#changelog)
+  - [2.0.0-SNAPSHOT](#200-snapshot)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -47,7 +49,7 @@ $ enonic project gradle clean build deploy
 If you are using SNAPSHOT versions of java libraries you can refresh dependencies like this:
 
 ```sh
-$ enonic project gradle -- clean build deploy --refresh-dependencies
+$ enonic project gradle clean build deploy --refresh-dependencies
 ```
 
 ### Development watch
@@ -107,14 +109,12 @@ avn activated v10.16.0 (avn-nvm v10.16.0)
 You will also have to get the source for these into the parent folder of app-explorer:
 
 - https://github.com/enonic/lib-explorer
-- https://github.com/enonic/lib-explorer-client
-- https://github.com/enonic/lib-explorer-collector
 - https://github.com/enonic/lib-util
 
 
 ##### Webpack development mode
 
-Then you will have to change to development mode in ```webpack.config.babel.js```:
+Then you will have to change to development mode in ```.webpack.constants.js```:
 
 ```javascript
 const MODE = 'development';
@@ -164,51 +164,25 @@ On a development laptop the Explorer admin to is usually available here:
 ### 2.0.0-SNAPSHOT
 
 * ICEBOX: Schema REST API? NO. Schema part of Collector. Just push data, schema will autogenerate...
-* ICEBOX: Could provide default english synonyms
-* ICEBOX: Could provide default english stopwords (stopwords "destroys" stemmed and ngram...)
 
-* MAYBE: GraphQL API for all explorer domain objects (example:collections) list, get, post, delete?
-* MAYBE: GraphQL API for /search/documents?collections=all accessible by api.key
 * MAYBE: Make sure no schedule exist for collections that are somehow deleted?
-* MAYBE: No need for global schema anymore?
+* MAYBE: Stemming in synonyms?
 
-* TODO: Store language (perhaps in document_metadata)
 * TODO: Make link to REST API from GUI?
 * TODO: REST API for /search/documents?collections=all accessible by api.key
-* TODO: Stemming in synonyms
 
 * TODO: dynamic fields (document_metadata.text title uri) _allText?
-* TODO: Allow to setup schema before REST API develper starts working...
-
-search(
-	count, // Use iterators instead
-	start, // Use iterators instead
-	//query=..., Later?
-) {
-	#curations
-}
+* TODO: Allow to setup schema before REST API developer starts working...
 
 * Remove any reference to lib-cron
-* Remove services/cronJobList
-* Schema features
-  * Support multiple Schemas
-  * Each collection must have a schema
-  * IN PROGRESS: Support reindex (manually and when schema changes)
+* DocumentTypes
 * Remove field values
-* Add api/v1/interface/{interfaceName} GraphQL endpoint with search function
-  * Support ApiKey via Authorization HTTP_HEADER
-  * Support aggregations, filters, highlight and searchString parameters
-  * Support aggregations, count and total fields
-  * Support hits field including (_highlight, _json and _score)
-  * Wash searchString and remove stopWords
+* Add Interface GraphQL endpoint with search function
 * Upgrade to lib-graphql:2.0.0
 * Add read Interfaces permission to API Keys Admin GUI
 * Interfaces Admin GUI
   * Add field boosting and synonyms
   * Remove filters, query, resultMappings and facets
-* Remove listener for EVENT_COLLECTOR_UNREGISTER from main
-* Remove unregister from main
-* Remove register from main
 * Require lib-explorer-4.0.0
   * Moved from constants to @enonic/js-utils
     * COLON_SIGN
@@ -218,68 +192,3 @@ search(
     * RT_HTML -> RESPONSE_TYPE_HTML
   * Remove TOOL_PATH from constants
   * Deprecate collection/unregister
-  * Change lib-explorer-3 deprecation warnings into thrown errors:
-    * collection/register
-    * collection/reschedule
-  * Move _nodeType = document from should to must in interface code
-  * Move should _nodeType filter to must in all queries
-  * Remove should type filter from all queries
-* Build system upgrades:
-  * Gradle 6.9
-  * Node 14.17.6
-  * Babel 7.15.5
-  * Core-js 3.15.2
-  * Webpack 5.45.1
-
-### 1.5.0-SNAPSHOT
-
-* TODO: Get this from 1.x branch when 1.5.0 is released to market.
-
-### 1.4.0
-
-* Make it possible to link a thesaurus to none, any or specific language(s)
-* Upgrade to lib-explorer-3.8.0
-  * getSynonyms will now filter on languages
-  * thesaurus/query({thesauri}) make it possible to filter on thesaurus name(s)
-* Upgrade to lib-explorer-3.7.0
-  * Added languages field to thesaurus
-  * getFields({fields}) make it possible to only get some fields
-  * getFieldValues({field}) field can now be an array of fields
-  * hasValue(field, values) now applies forceArray to its second parameter
-* Upgrade to lib-explorer-3.6.0
-  * Generate href for hit tags
-  * Require Enonic XP 7.4.1
-
-### 1.3.0
-
-* Interface data in POST body rather than params.json
-* Make sure fragmentSize and numberOfFragments are integers
-* Make it possible to select highlight fragmenter, numberOfFragments, order, postTag and preTag
-* Upgrade to lib-explorer-3.5.1
-  * Log stacktraces when catching
-* Upgrade to lib-explorer-3.5.0
-  * Work around nashorn issue with trunc and toInt
-  * Improve debugging with explain and logQueryResults parameters
-  * Use highlight fragmenter, numberOfFragments, order, postTag and preTag when searching
-
-### 1.2.0
-
-* Upgrade to lib-explorer-3.1.0
-* Use highlighter provided by Enonic API
-* Require Enonic XP 7.3.2
-
-### 1.1.0
-
-* Require Enonic XP 7.3.1
-* Upgrade to lib-explorer-3.0.7
-* Upgrade to react 6.12
-* Upgrade to semantic-ui-react 1.2.1
-* Expose fields to Collector React Component
-* BUGFIX Too strict GraphQL Schema lead to missing field values
-* Webcrawler collector: Add https:// if no :// in url
-* Make initialization a task and show progress in admin app rather than an error
-* BUGFIX A collector application can't check the license of app-explorer
-
-### 1.0.0
-
-* Initial release

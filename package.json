@@ -124,6 +124,7 @@
   },
   "scripts": {
     "clean": "rm -r build 2>/dev/null;true",
+    "doctoc": "npx doctoc --github README.md",
     "mocha": "npx mocha",
     "premocha": "yarn tsc",
     "pretest": "yarn tsc",
