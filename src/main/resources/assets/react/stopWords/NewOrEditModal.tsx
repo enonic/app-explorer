@@ -1,30 +1,54 @@
+import * as React from 'react';
 import {
 	Button, Form, Header, Icon, Modal, Popup, Table
 } from 'semantic-ui-react';
 
+//@ts-ignore
 import {Form as EnonicForm} from 'semantic-ui-react-form/Form';
+//@ts-ignore
 import {Input as EnonicInput} from 'semantic-ui-react-form/inputs/Input';
+//@ts-ignore
 import {List} from 'semantic-ui-react-form/List';
-
+//@ts-ignore
 import {DeleteItemButton} from 'semantic-ui-react-form/buttons/DeleteItemButton';
+//@ts-ignore
 import {InsertButton} from 'semantic-ui-react-form/buttons/InsertButton';
+//@ts-ignore
 import {MoveDownButton} from 'semantic-ui-react-form/buttons/MoveDownButton';
+//@ts-ignore
 import {MoveUpButton} from 'semantic-ui-react-form/buttons/MoveUpButton';
+//@ts-ignore
 import {SortButton} from 'semantic-ui-react-form/buttons/SortButton';
-
+//@ts-ignore
 import {ResetButton} from 'semantic-ui-react-form/buttons/ResetButton';
+//@ts-ignore
 import {SubmitButton} from 'semantic-ui-react-form/buttons/SubmitButton';
 
 
-export function NewOrEditModal(props) {
+import {fetchStopWordsCreate} from '../../../services/graphQL/fetchers/fetchStopWordsCreate';
+import {fetchStopWordsUpdate} from '../../../services/graphQL/fetchers/fetchStopWordsUpdate';
+
+
+export function NewOrEditModal(props :{
+	// Required
+	servicesBaseUrl :string
+	// Optional
+	afterClose? :()=>void
+	beforeOpen? :()=>void
+	_id? :string
+	_name? :string
+	editMode? :boolean
+	header? :string
+	words? :Array<string>
+}) {
 	//console.debug('NewOrEditModal props', props);
 	const {
 		afterClose = () => {},
 		beforeOpen = () => {},
-		displayName = '',
-		name = '',
-		editMode = !!name,
-		header = editMode ? `Edit ${displayName} stopWords` : 'New stopWords list',
+		_id,
+		_name = '',
+		editMode = !!_name,
+		header = editMode ? `Edit ${_name} stopWords` : 'New stopWords list',
 		servicesBaseUrl,
 		words = ['']
 	} = props;
@@ -71,23 +95,36 @@ export function NewOrEditModal(props) {
 		<Modal.Header>{header}</Modal.Header>
 		<EnonicForm
 			initialValues={{
-				displayName,
-				name,
+				_name,
 				words: JSON.parse(JSON.stringify(words)) // deref from props
 			}}
 			onSubmit={({
-				name: submittedName,
-				displayName: submittedDisplayName,
+				_name: submittedName,
 				words: submittedWords
 			}) => {
-				//console.debug({servicesBaseUrl, editMode, name, displayName, words});
-				fetch(`${servicesBaseUrl}/stopWordsCreateOrUpdate?mode=${editMode ? 'update' : 'create'}&name=${submittedName}&displayName=${submittedDisplayName}&${submittedWords.map(w => `words=${w}`).join('&')}`, {
-					method: 'POST'
-				})
-					.then((/*response*/) => {
-						doClose();
-						//if (response.status === 200) {}
-					});
+				const handleResponse = (/*response*/) => {
+					doClose();
+				};
+				const url = `${servicesBaseUrl}/graphQL`;
+				if (editMode) {
+					fetchStopWordsUpdate({
+						handleResponse,
+						url,
+						variables: {
+							_id,
+							words: submittedWords
+						}
+					})
+				} else {
+					fetchStopWordsCreate({
+						handleResponse,
+						url,
+						variables: {
+							_name :submittedName,
+							words :submittedWords
+						}
+					})
+				}
 			}}
 		>
 			<Modal.Content>
@@ -95,22 +132,14 @@ export function NewOrEditModal(props) {
 					{editMode ? null : <Form.Field><EnonicInput
 						fluid
 						label={{basic: true, content: 'Name'}}
-						path='name'
+						path='_name'
 						placeholder='Please input name'
 					/></Form.Field>}
-					<Form.Field>
-						<EnonicInput
-							fluid
-							label={{basic: true, content: 'Display name'}}
-							path='displayName'
-							placeholder='Please input display name'
-						/>
-					</Form.Field>
 					<Header as='h2'>Stop words</Header>
 					<Form.Field>
 						<List
 							path='words'
-							render={(wordsArray) => {
+							render={(wordsArray :Array<string>) => {
 								//console.debug('NewOrEditModal wordsArray', wordsArray);
 								return <>
 									<Table celled compact selectable singleLine striped>

@@ -1,22 +1,35 @@
-import {Button, Header, Label, Radio, Segment, Table} from 'semantic-ui-react';
+import type {
+	FetchQueryStopWordsData,
+	QueryStopWordsResult
+} from '../../../services/graphQL/fetchers/fetchQueryStopWords';
+
+
+import * as React from 'react';
+import {Button, Header, Radio, Segment, Table} from 'semantic-ui-react';
 
 import {DeleteModal} from './DeleteModal';
 import {NewOrEditModal} from './NewOrEditModal';
+import {fetchQueryStopWords} from '../../../services/graphQL/fetchers/fetchQueryStopWords';
 
 
-export function StopWords(props) {
+export function StopWords(props :{
+	servicesBaseUrl :string
+}) {
 	const {
 		servicesBaseUrl
 	} = props;
 
 	const [showDelete, setShowDelete] = React.useState(false);
 	const [state, setState] = React.useState({
-		stopWordsRes: {
+		queryStopWords: {
 			count: 0,
 			hits: [],
 			total: 0
 		},
 		isLoading: false
+	} as {
+		isLoading :boolean
+		queryStopWords :QueryStopWordsResult
 	});
 
 	function updateStopwords() {
@@ -25,19 +38,20 @@ export function StopWords(props) {
 			deref.isLoading = true;
 			return deref;
 		});
-		fetch(`${servicesBaseUrl}/stopWordsList`)
-			.then(response => response.json())
-			.then(data => setState(prev => {
+		fetchQueryStopWords({
+			handleData: (data :FetchQueryStopWordsData) => setState(prev => {
 				const deref = JSON.parse(JSON.stringify(prev));
-				deref.stopWordsRes = data;
+				deref.queryStopWords = data.queryStopWords;
 				deref.isLoading = false;
 				return deref;
-			}));
+			}),
+			url: `${servicesBaseUrl}/graphQL`
+		});
 	} // updateStopwords
 
 	React.useEffect(() => updateStopwords(), []);
 
-	const {stopWordsRes} = state;
+	const {queryStopWords} = state;
 
 	return <>
 		<Segment basic style={{
@@ -74,19 +88,23 @@ export function StopWords(props) {
 				</Table.Row>
 			</Table.Header>
 			<Table.Body>
-				{stopWordsRes.hits.map(({displayName, name, words}, index) => {
+				{queryStopWords.hits.map(({
+					_id,
+					_name,
+					words
+				}, index) => {
 					const key = `list[${index}]`;
 					return <Table.Row key={key}>
 						<Table.Cell collapsing>
 							<NewOrEditModal
+								_id={_id}
+								_name={_name}
 								afterClose={() => updateStopwords()}
-								displayName={displayName}
-								name={name}
 								servicesBaseUrl={servicesBaseUrl}
 								words={words}
 							/>
 						</Table.Cell>
-						<Table.Cell collapsing>{displayName}</Table.Cell>
+						<Table.Cell collapsing>{_name}</Table.Cell>
 						<Table.Cell collapsing>{words.length}</Table.Cell>
 						<Table.Cell collapsing>{words.join(', ')}</Table.Cell>
 						{showDelete
@@ -94,8 +112,9 @@ export function StopWords(props) {
 								<Button.Group>
 									{/* MAYBE copy/duplicate? */}
 									<DeleteModal
+										_id={_id}
+										_name={_name}
 										afterClose={updateStopwords}
-										name={name}
 										servicesBaseUrl={servicesBaseUrl}
 									/>
 								</Button.Group>

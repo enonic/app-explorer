@@ -46,6 +46,7 @@ export const GQL_TYPE_NODE_DELETED_NAME = 'NodeDeleted';
 export const GQL_TYPE_REFERENCED_BY_NAME = 'ReferencedBy';
 
 export const GQL_TYPE_STOP_WORDS_NAME = 'StopWords';
+export const GQL_TYPE_STOP_WORDS_QUERY_RESULT_NAME = 'StopWordsQueryResult';
 
 export const GQL_TYPE_SYNONYM_NAME = 'Synonym';
 export const GQL_TYPE_SYNONYMS_QUERY_RESULT_NAME = 'SynonymsQueryResult';
@@ -65,6 +66,9 @@ export const GQL_MUTATION_API_KEY_UPDATE_NAME = 'updateApiKey';
 export const GQL_MUTATION_INTERFACE_CREATE_NAME = 'createInterface';
 export const GQL_MUTATION_INTERFACE_DELETE_NAME = 'deleteInterface';
 export const GQL_MUTATION_INTERFACE_UPDATE_NAME = 'updateInterface';
+export const GQL_MUTATION_STOP_WORDS_CREATE_NAME = 'createStopWords';
+export const GQL_MUTATION_STOP_WORDS_DELETE_NAME = 'deleteStopWords';
+export const GQL_MUTATION_STOP_WORDS_UPDATE_NAME = 'updateStopWords';
 
 // Query field names
 

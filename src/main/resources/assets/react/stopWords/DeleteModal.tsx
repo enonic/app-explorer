@@ -1,11 +1,22 @@
-import {Button, Form, Header, Icon, Modal, Popup} from 'semantic-ui-react';
+import * as React from 'react';
+import {Button, Header, Icon, Modal, Popup} from 'semantic-ui-react';
+import {fetchStopWordsDelete} from '../../../services/graphQL/fetchers/fetchStopWordsDelete';
 
 
-export function DeleteModal(props) {
+export function DeleteModal(props :{
+	// Required
+	_id :string
+	_name :string
+	servicesBaseUrl :string
+	// Optional
+	afterClose? :()=>void
+	beforeOpen? :()=>void
+}) {
 	const {
+		_id,
+		_name,
 		afterClose = () => {},
 		beforeOpen = () => {},
-		name,
 		servicesBaseUrl
 	} = props;
 
@@ -28,30 +39,33 @@ export function DeleteModal(props) {
 		onClose={doClose}
 		open={open}
 		trigger={<Popup
-			content={`Open dialog to confirm deletion of stop words list ${name}`}
+			content={`Open dialog to confirm deletion of stop words list ${_name}`}
 			inverted
 			trigger={<Button
 				icon
 				onClick={doOpen}
 			><Icon color='red' name='trash alternate outline'/></Button>}/>}
 	>
-		<Modal.Header>Delete {name}</Modal.Header>
+		<Modal.Header>Delete {_name}</Modal.Header>
 		<Modal.Content>
-			<Header as='h2'>Do you really want to delete {name}?</Header>
+			<Header as='h2'>Do you really want to delete {_name}?</Header>
 		</Modal.Content>
 		<Modal.Actions>
 			<Button onClick={doClose}>Cancel</Button>
 			<Button
 				icon
 				onClick={() => {
-					fetch(`${servicesBaseUrl}/stopWordsDelete?name=${name}`, {
-						method: 'DELETE'
-					})
-						.then((/*response*/) => {
+					fetchStopWordsDelete({
+						handleResponse: (/*response*/) => {
 							//if (response.status === 200) {
 							doClose();
 							//}
-						});
+						},
+						url: `${servicesBaseUrl}/graphQL`,
+						variables: {
+							_id
+						}
+					});
 				}}
 				primary
 			><Icon name='trash alternate outline'/>Confirm Delete</Button>

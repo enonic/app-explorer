@@ -32,7 +32,6 @@ import {generateGetLocalesField} from './generateGetLocalesField';
 import {generateGetSitesField} from './generateGetSitesField';
 import {generateListTasksField} from './generateListTasksField';
 import {generateQueryJournalsField} from './generateQueryJournalsField';
-import {generateQueryStopWordsField} from './generateQueryStopWordsField';
 import {generateReferencedByField} from './generateReferencedByField';
 
 import {addApiKeyTypes} from './apiKey/addApiKeyTypes';
@@ -58,6 +57,13 @@ import {generateSchedulerTypes} from './scheduler/generateSchedulerTypes';
 import {generateDocumentTypeFields} from './documentType/generateDocumentTypeFields';
 import {generateSynonymFields} from './synonym/generateSynonymFields';
 import {generateThesaurusFields} from './thesaurus/generateThesaurusFields';
+
+
+import {addStopWordsTypes} from './stopWords/addStopWordsTypes';
+import {generateQueryStopWordsField} from './stopWords/generateQueryStopWordsField';
+import {addStopWordsCreate} from './stopWords/addStopWordsCreate';
+import {addStopWordsDelete} from './stopWords/addStopWordsDelete';
+import {addStopWordsUpdate} from './stopWords/addStopWordsUpdate';
 
 import {hasFieldQuery} from './hasFieldQuery';
 import {addUnionTypes} from './addUnionTypes';
@@ -198,7 +204,13 @@ addQueryInterfaceGet({glue});
 const queryInterfaces = generateQueryInterfacesField({glue});
 
 const queryJournals = generateQueryJournalsField({glue});
+
+addStopWordsTypes({glue});
+addStopWordsCreate({glue});
+addStopWordsDelete({glue});
+addStopWordsUpdate({glue});
 const queryStopWords = generateQueryStopWordsField({glue});
+
 const queryTasks = generateListTasksField({glue});
 
 const {
