@@ -1,4 +1,4 @@
-import type {SemanticUi} from '../../../types/SemanticUi.d';
+import type {DropdownItemProps} from 'semantic-ui-react/index.d';
 
 
 import getIn from 'get-value';
@@ -12,7 +12,7 @@ import {setValue} from 'semantic-ui-react-form/actions';
 
 export function CollectorSelector(props :{
 	name ?:string
-	options ?:SemanticUi.Dropdown.Options
+	options ?:Array<DropdownItemProps>
 	parentPath ?:string
 	path ?:string
 	placeholder ?:string
@@ -34,10 +34,10 @@ export function CollectorSelector(props :{
 	} = props;
 	//console.debug('CollectorSelector path', path, 'value', value, 'rest', rest);
 
-	const optionsWithANoneOption :SemanticUi.Dropdown.Options = [{
+	const optionsWithANoneOption :Array<DropdownItemProps> = [{
 		key: 'none',
 		text: 'none'
-	}].concat(options);
+	} as DropdownItemProps].concat(options);
 
 	return <SemanticUiReactDropdown
 		{...rest}

@@ -1,4 +1,4 @@
-import type {SemanticUi} from '../../../types/SemanticUi.d';
+import type {DropdownItemProps} from 'semantic-ui-react/index.d';
 import type {
 	CollectionValues,
 	CollectorComponents,
@@ -21,7 +21,7 @@ import {UploadLicense} from '../UploadLicense';
 export function NewOrEditCollectionModal(props :{
 	// Required
 	collectorComponents :CollectorComponents
-	collectorOptions :SemanticUi.Dropdown.Options
+	collectorOptions :Array<DropdownItemProps>
 	contentTypeOptions :ContentTypeOptions
 	fields :Fields
 	initialValues ?:CollectionValues

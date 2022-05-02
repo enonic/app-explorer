@@ -1,5 +1,3 @@
-//import type {SemanticUi} from '../../../types/SemanticUi.d';
-
 export type CollectionValues = {
 	_id ?:string
 	_name :string

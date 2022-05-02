@@ -1,4 +1,4 @@
-import type {SemanticUi} from '../../../types/SemanticUi.d';
+import type {DropdownItemProps} from 'semantic-ui-react/index.d';
 import type {
 	CollectionValues,
 	CollectorComponents,
@@ -46,7 +46,7 @@ const SCHEMA = {
 
 export function Collection(props :{
 	collectorComponents :CollectorComponents
-	collectorOptions :SemanticUi.Dropdown.Options
+	collectorOptions :Array<DropdownItemProps>
 	contentTypeOptions :ContentTypeOptions
 	doClose :() => void
 	fields :Fields

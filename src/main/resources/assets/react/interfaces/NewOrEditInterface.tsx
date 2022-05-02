@@ -1,5 +1,6 @@
+import type {DropdownItemProps} from 'semantic-ui-react/index.d';
 import type {InterfaceNamesObj} from './index.d';
-import type {SemanticUi} from '../../../types/SemanticUi.d';
+
 
 //import {toStr} from '@enonic/js-utils';
 import * as React from 'react';
@@ -37,13 +38,13 @@ import {FieldSelector} from './FieldSelector';
 type NewOrEditInterfaceProps = {
 	_id? :string
 	collectionIdToFieldKeys :{}
-	collectionOptions :SemanticUi.Dropdown.Options
+	collectionOptions :Array<DropdownItemProps>
 	doClose :() => void
 	globalFieldsObj :Record<string, boolean>
 	interfaceNamesObj :InterfaceNamesObj
 	servicesBaseUrl :string
-	stopWordOptions :SemanticUi.Dropdown.Options
-	thesauriOptions :SemanticUi.Dropdown.Options
+	stopWordOptions :Array<DropdownItemProps>
+	thesauriOptions :Array<DropdownItemProps>
 }
 
 

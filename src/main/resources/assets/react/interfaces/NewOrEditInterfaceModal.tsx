@@ -1,4 +1,4 @@
-import type {SemanticUi} from '../../../types/SemanticUi.d';
+import type {DropdownItemProps} from 'semantic-ui-react/index.d';
 import type {
 	SetLicensedToFunction,
 	SetLicenseValidFunction
@@ -19,7 +19,7 @@ type NewOrEditInterfaceModalProps = {
 	afterClose :() => void
 	beforeOpen? :() => void
 	collectionIdToFieldKeys :{}
-	collectionOptions :SemanticUi.Dropdown.Options
+	collectionOptions :Array<DropdownItemProps>
 	disabled? :boolean
 	globalFieldsObj :Record<string, boolean>
 	interfaceNamesObj :InterfaceNamesObj
@@ -27,8 +27,8 @@ type NewOrEditInterfaceModalProps = {
 	servicesBaseUrl :string
 	setLicensedTo :SetLicensedToFunction
 	setLicenseValid :SetLicenseValidFunction
-	stopWordOptions :SemanticUi.Dropdown.Options
-	thesauriOptions :SemanticUi.Dropdown.Options
+	stopWordOptions :Array<DropdownItemProps>
+	thesauriOptions :Array<DropdownItemProps>
 	total :number
 }
 
