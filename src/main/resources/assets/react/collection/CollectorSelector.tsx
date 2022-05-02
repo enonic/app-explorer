@@ -34,7 +34,8 @@ export function CollectorSelector(props :{
 	} = props;
 	//console.debug('CollectorSelector path', path, 'value', value, 'rest', rest);
 
-	const optionsWithANoneOption = [{
+	const optionsWithANoneOption :SemanticUi.Dropdown.Options = [{
+		key: 'none',
 		text: 'none'
 	}].concat(options);
 

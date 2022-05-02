@@ -1,8 +1,8 @@
 export namespace SemanticUi.Dropdown {
 	type Option = {
-		//key :string
+		key :string
 		text :string
-		value :unknown
+		value ?:unknown
 	}
 	type Options = Array<Option>
 }
