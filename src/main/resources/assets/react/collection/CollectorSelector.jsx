@@ -13,6 +13,7 @@ export function CollectorSelector(props) {
 
 	const {
 		name = 'name',
+		options = [],
 		parentPath = 'collector',
 		path = parentPath ? `${parentPath}.${name}` : name,
 		placeholder = 'none',
@@ -20,6 +21,10 @@ export function CollectorSelector(props) {
 		...rest
 	} = props;
 	//console.debug('CollectorSelector path', path, 'value', value, 'rest', rest);
+
+	const optionsWithANoneOption = [{
+		text: 'none'
+	}].concat(options);
 
 	return <SemanticUiReactDropdown
 		{...rest}
@@ -35,6 +40,7 @@ export function CollectorSelector(props) {
 				}
 			}));
 		}}
+		options={optionsWithANoneOption}
 		placeholder={placeholder}
 		selection
 		value={value}
