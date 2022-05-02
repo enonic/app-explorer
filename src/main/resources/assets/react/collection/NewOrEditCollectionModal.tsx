@@ -1,9 +1,43 @@
+import type {SemanticUi} from '../../../types/SemanticUi.d';
+import type {
+	CollectionValues,
+	CollectorComponents,
+	ContentTypeOptions,
+	Fields,
+	Locales,
+	SetLicensedToFunction,
+	SetLicenseValidFunction,
+	SiteOptions
+} from '../index.d';
+
+
+import * as React from 'react';
 import {Button, Icon, Modal, Popup} from 'semantic-ui-react';
 
 import {Collection} from './Collection';
 import {UploadLicense} from '../UploadLicense';
 
-export function NewOrEditCollectionModal(props) {
+
+export function NewOrEditCollectionModal(props :{
+	// Required
+	collectorComponents :CollectorComponents
+	collectorOptions :SemanticUi.Dropdown.Options
+	contentTypeOptions :ContentTypeOptions
+	fields :Fields
+	initialValues ?:CollectionValues
+	licenseValid :boolean
+	locales :Locales
+	servicesBaseUrl :string
+	setLicensedTo :SetLicensedToFunction
+	setLicenseValid :SetLicenseValidFunction
+	siteOptions :SiteOptions
+	totalNumberOfCollections :number
+	// Optional
+	_name ?:string
+	afterClose ?:() => void
+	beforeOpen ?:() => void
+	disabled ?:boolean
+}) {
 	const {
 		afterClose = () => {},
 		beforeOpen = () => {},

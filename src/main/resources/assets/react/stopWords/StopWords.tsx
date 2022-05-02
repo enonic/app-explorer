@@ -66,7 +66,11 @@ export function StopWords(props :{
 							<Radio
 								label={"Show delete"}
 								checked={showDelete}
-								onChange={(ignored,{checked}) => {
+								onChange={(
+									//@ts-ignore
+									ignored,
+									{checked}
+								) => {
 									setShowDelete(checked);
 								}}
 								toggle

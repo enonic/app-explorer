@@ -1,10 +1,25 @@
-import {Header, Segment} from 'semantic-ui-react';
-import getIn from 'get-value';
+import type {
+	CollectorComponents,
+	ContentTypeOptions,
+	Fields,
+	SiteOptions
+} from '../index.d';
 
+
+import getIn from 'get-value';
+import * as React from 'react';
+import {Header, Segment} from 'semantic-ui-react';
+
+//@ts-ignore
 import {getEnonicContext} from 'semantic-ui-react-form/Context';
 
 
-export function CollectorOptions(props) {
+export function CollectorOptions(props :{
+	collectorComponents :CollectorComponents
+	contentTypeOptions :ContentTypeOptions
+	siteOptions :SiteOptions
+	fields :Fields
+}) {
 	//console.debug('CollectorOptions props', props);
 	const {
 		collectorComponents,

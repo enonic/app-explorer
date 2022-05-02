@@ -1,3 +1,6 @@
+import type {CollectorProps} from './index.d';
+
+
 import getIn from 'get-value';
 //import setIn from 'set-value';
 import {Button, Form, Header, Icon, Table} from 'semantic-ui-react';
@@ -15,22 +18,23 @@ import {
 	MoveDownButton,
 	MoveUpButton,
 	SetValueButton
+	//@ts-ignore
 } from 'semantic-ui-react-form';
 
 const DEFAULT_UA = 'Mozilla/5.0 (compatible; Enonic XP Explorer Collector Web crawler/1.0.0)';
 
 
-function required(value) {
+function required(value :string) {
 	return value ? undefined : 'Required!';
 }
 
 const EXCLUDES_PATH = 'excludes';
 
 const SCHEMA = {
-	baseUri: (v) => required(v)
+	baseUri: (v :string) => required(v)
 };
 
-export const Collector = (props) => {
+export const Collector = (props :CollectorProps) => {
 	//console.debug('Collector props', props);
 	const {
 		context,
@@ -103,6 +107,7 @@ export const Collector = (props) => {
 										</Table.Row>
 									</Table.Header>
 									<Table.Body>{excludesArray.map((
+										//@ts-ignore
 										exclude = '',
 										index
 									) => {

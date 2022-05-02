@@ -1,10 +1,13 @@
 import getIn from 'get-value';
+import * as React from 'react';
 import {
 	Dropdown,
 	Header
 } from 'semantic-ui-react';
 
+//@ts-ignore
 import {getEnonicContext} from 'semantic-ui-react-form/Context';
+//@ts-ignore
 import {setValue} from 'semantic-ui-react-form/actions';
 
 
@@ -18,15 +21,23 @@ const GQL_DOCUMENT_TYPE_QUERY = `{
 }`;
 
 
-export function DocumentTypeSelector(props) {
+export function DocumentTypeSelector(props :{
+	servicesBaseUrl :string
+
+	name ?:string
+	parentPath ?:string
+	path ?:string
+	placeholder ?:string
+	value ?:string
+}) {
 	const [context, dispatch] = getEnonicContext();
 
 	const {
+		servicesBaseUrl,
 		name = 'documentTypeId',
 		parentPath,
 		path = parentPath ? `${parentPath}.${name}` : name,
-		placeholder = 'Please select a document type',
-		servicesBaseUrl,
+		placeholder = 'Please select a document type (or leave empty and a new one will automatically be created).',
 		value = getIn(context.values, path)/*,
 		...rest*/
 	} = props;
@@ -70,20 +81,27 @@ export function DocumentTypeSelector(props) {
 			clearable={true}
 			fluid
 			loading={!documentTypes.length}
-			onChange={(ignoredEvent,{value: newValue}) => {
+			onChange={(
+				//@ts-ignore
+				ignoredEvent,
+				{value: newValue}
+			) => {
 				//console.debug('newValue', newValue);
 				dispatch(setValue({
 					path,
 					value: newValue
 				}));
 			}}
-			options={documentTypes.map(({
+			options={[{
+				text: 'Automatically create a new one',
+				value: '_new'
+			}].concat(documentTypes.map(({
 				_id: value,
 				_name: text
 			}) => ({
 				text,
 				value
-			}))}
+			})))}
 			placeholder={placeholder}
 			selection
 			value={value}

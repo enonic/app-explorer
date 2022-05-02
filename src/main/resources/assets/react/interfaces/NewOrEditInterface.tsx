@@ -37,13 +37,13 @@ import {FieldSelector} from './FieldSelector';
 type NewOrEditInterfaceProps = {
 	_id? :string
 	collectionIdToFieldKeys :{}
-	collectionOptions :Array<SemanticUi.Dropdown.Option>
+	collectionOptions :SemanticUi.Dropdown.Options
 	doClose :() => void
 	globalFieldsObj :Record<string, boolean>
 	interfaceNamesObj :InterfaceNamesObj
 	servicesBaseUrl :string
-	stopWordOptions :Array<SemanticUi.Dropdown.Option>
-	thesauriOptions :Array<SemanticUi.Dropdown.Option>
+	stopWordOptions :SemanticUi.Dropdown.Options
+	thesauriOptions :SemanticUi.Dropdown.Options
 }
 
 

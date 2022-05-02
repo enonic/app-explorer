@@ -1,3 +1,12 @@
+import type {
+	CollectorComponents,
+	ContentTypeOptions,
+	SetLicensedToFunction,
+	SetLicenseValidFunction,
+	SiteOptions
+} from '../index.d';
+
+
 import {
 	COLON_SIGN,
 	TASK_STATE_FAILED,
@@ -9,8 +18,9 @@ import {
 } from '@enonic/js-utils';
 
 import {parseExpression as parseCronExpression} from 'cron-parser';
+import * as React from 'react';
 import {
-	Button, Dimmer, Header, Icon, Label, Loader, Popup, Progress, Radio,
+	Button, Dimmer, Header, Icon, Loader, Popup, Progress, Radio,
 	Segment, Table
 } from 'semantic-ui-react';
 import {
@@ -171,7 +181,13 @@ const UPDATE_GQL = `{
 }`;
 
 
-export function Collections(props) {
+export function Collections(props :{
+	collectorComponents :CollectorComponents
+	licenseValid :boolean
+	servicesBaseUrl :string
+	setLicensedTo :SetLicensedToFunction
+	setLicenseValid :SetLicenseValidFunction
+}) {
 	const {
 		collectorComponents,
 		licenseValid,
@@ -183,13 +199,25 @@ export function Collections(props) {
 	const [boolPoll, setBoolPoll] = React.useState(true);
 	const [jobsObj, setJobsObj] = React.useState({});
 	const [locales, setLocales] = React.useState([]);
-	const [queryCollectionsGraph, setQueryCollectionsGraph] = React.useState({});
-	const [queryCollectorsGraph, setQueryCollectorsGraph] = React.useState({});
-	const [queryFieldsGraph, setQueryFieldsGraph] = React.useState({});
+	const [queryCollectionsGraph, setQueryCollectionsGraph] = React.useState({
+		count: 0,
+		hits: [],
+		total: 0
+	});
+	const [queryCollectorsGraph, setQueryCollectorsGraph] = React.useState({
+		count: 0,
+		hits: [],
+		total: 0
+	});
+	const [queryFieldsGraph, setQueryFieldsGraph] = React.useState({
+		count: 0,
+		hits: [],
+		total: 0
+	});
 	const [documentTypes, setDocumentTypes] = React.useState([]);
 	const [showCollector, setShowCollector] = React.useState(false);
 	const [showDelete, setShowDelete] = React.useState(false);
-	const [showDocumentCount, setShowDocumentCount] = React.useState(true);
+	const [showDocumentCount/*, setShowDocumentCount*/] = React.useState(true);
 	const [showLanguage, setShowLanguage] = React.useState(false);
 	const [showInterfaces, setShowInterfaces] = React.useState(false);
 	const [showDocumentType, setShowDocumentType] = React.useState(false);
@@ -283,11 +311,17 @@ export function Collections(props) {
 		perPage: 10,
 		siteOptions: [],
 		sort: '_name ASC'
+	} as {
+		column :string
+		contentTypeOptions :ContentTypeOptions
+		direction: 'ascending'|'descending'
+		isLoading :boolean
+		siteOptions :SiteOptions
 	});
 
 	const {
-		contentTypeOptions,
 		column,
+		contentTypeOptions,
 		direction,
 		isLoading,
 		siteOptions
@@ -411,7 +445,11 @@ export function Collections(props) {
 							<Radio
 								label={"Show all fields"}
 								checked={showCollector}
-								onChange={(ignored,{checked}) => {
+								onChange={(
+									//@ts-ignore
+									ignored,
+									{checked}
+								) => {
 									setShowCollector(checked);
 									// setShowDocumentCount(checked);
 									setShowLanguage(checked);
@@ -489,8 +527,8 @@ export function Collections(props) {
 									collector,
 									cron,
 									doCollect,
-									language,
-									documentTypeId
+									documentTypeId,
+									language
 								}}
 								fields={fieldsObj}
 								locales={locales}
@@ -533,7 +571,7 @@ export function Collections(props) {
 									{showDocumentType ? <Table.Cell collapsing>{shemaIdToName[documentTypeId]}</Table.Cell> : null }
 									{showInterfaces ? <Table.Cell collapsing>{interfaces.map((iface, i) => <p key={i}>
 										{i === 0 ? null : <br/>}
-										<span style={{whitespace: 'nowrap'}}>{iface}</span>
+										<span style={{whiteSpace: 'nowrap'}}>{iface}</span>
 									</p>)}</Table.Cell> : null}
 									{showSchedule ? <Table.Cell>{
 										jobsObj[collectionId]

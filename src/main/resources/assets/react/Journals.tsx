@@ -1,3 +1,6 @@
+import type {PaginationProps} from 'semantic-ui-react/index.d';
+
+
 //import '@babel/runtime';
 //import {hash as fnv} from 'fnv-plus';
 import Uri from 'jsuri';
@@ -45,10 +48,25 @@ export function Journals({
 			}*/
 		},
 		count: 0,
+		end: 0,
 		page: 1,
+		start: 0,
 		total: 0,
 		totalPages: 0,
 		hits: []
+	} as {
+		aggregations :{
+			collection: {
+				buckets :Array<unknown>
+			}
+		}
+		count :number
+		end :number
+		hits :Array<unknown>
+		page :number
+		start :number
+		total :number
+		totalPages :number
 	});
 
 	function search() {
@@ -71,7 +89,11 @@ export function Journals({
 		search();
 	}, [params]); // eslint-disable-line
 
-	function handleCheckboxChange(e, {checked, name}) {
+	function handleCheckboxChange(
+		//@ts-ignore
+		e,
+		{checked, name}
+	) {
 		//console.debug({function: 'handleCheckboxChange', name, checked});
 		if (name === 'showWithoutErrors') {
 			setParams(prevParams => {
@@ -110,7 +132,11 @@ export function Journals({
 		}
 	} // function handleCheckboxChange
 
-	function handleInputChange(e, {name, value}) {
+	function handleInputChange(
+		//@ts-ignore
+		e,
+		{name, value}
+	) {
 		//console.debug({function: 'handleInputChange', name, value});
 		//console.debug({name, value});
 		setParams(prevParams => {
@@ -120,7 +146,12 @@ export function Journals({
 		});
 	}
 
-	function handlePaginationChange(e, {activePage}) {
+	function handlePaginationChange(
+		//@ts-ignore
+		event :React.MouseEvent<HTMLAnchorElement>,
+		data :PaginationProps
+	) {
+		const {activePage} = data;
 		//console.debug({function: 'handlePaginationChange', activePage});
 		setParams(prevParams => {
 			const derefParams = JSON.parse(JSON.stringify(prevParams));

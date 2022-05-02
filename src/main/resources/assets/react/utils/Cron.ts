@@ -58,6 +58,20 @@ time for each task. This allows spreading out tasks over time, rather than
 having all of them start at the same time and compete for resources.
 */
 
+type Minute = number|'*'|','|'-'; // (0-59) * , -
+type Hour = number|'*'|','|'-'; // (0-23) * , -
+type DayOfMonth = number|'*'|','|'-'|'?'|'L'|'W'; // (1-31) * , - ? L W
+
+//type Month = 1|2|3|4|5|6|7|8|9|10|11|12|'*'|','|'-'; // (1-12) * , -
+type Month = number|'*'|','|'-'; // (1-12) * , -
+
+//type DayOfWeek = 0|1|2|3|4|5|6|7|'*'|','|'-'|'?'|'L'|'#'; // (0-7) * , - ? L #
+type DayOfWeek = number|'*'|','|'-'|'?'|'L'|'#'; // (0-7) * , - ? L #
+
+//type CronString = `${Minute} ${Hour} ${DayOfMonth} ${Month} ${DayOfWeek}`;
+type CronString = `${string} ${string} ${string} ${string} ${string}`;
+
+
 const DAY_OF_WEEK_TO_HUMAN = {
 	'*': 'Every day', // 9
 	'0': 'Sunday',    // 6
@@ -71,24 +85,37 @@ const DAY_OF_WEEK_TO_HUMAN = {
 };
 const WIDEST_DAY_OF_WEEK = 9;
 
-function rpad(s, w = 2, z = ' ') {
+function rpad(
+	s :string|number,
+	w = 2,
+	z = ' '
+) {
 	s = s + '';
 	return s.length >= w
 		? s
 		: s + new Array(w - s.length + 1).join(z);
 }
 
-function lpad(s, w = 2, z = ' ') {
+function lpad(
+	s :string|number,
+	w = 2,
+	z = ' '
+) {
 	s = s + '';
 	return s.length >= w ? s : new Array(w - s.length + 1).join(z) + s;
 }
 
-function zeroPad(s, w=2) {
+function zeroPad(
+	s :string|number,
+	w = 2
+) {
 	return lpad(s,w,'0');
 }
 
+
+
 export class Cron {
-	static hourToHuman(hour) {
+	static hourToHuman(hour :'*'|number|Array<number>) {
 		if (
 			hour === '*' ||
 			(
@@ -101,7 +128,7 @@ export class Cron {
 		return Array.isArray(hour) ? hour.map((h) => zeroPad(h)) : zeroPad(hour);
 	}
 
-	static minuteToHuman(minute) {
+	static minuteToHuman(minute :'*'|number|Array<number>) {
 		if (
 			minute === '*' ||
 			(
@@ -114,7 +141,10 @@ export class Cron {
 		return Array.isArray(minute) ? minute.map((h) => zeroPad(h)) : zeroPad(minute);
 	}
 
-	static dayOfWeekToHuman(dayOfWeek, w = WIDEST_DAY_OF_WEEK) {
+	static dayOfWeekToHuman(
+		dayOfWeek :DayOfWeek,
+		w = WIDEST_DAY_OF_WEEK
+	) {
 		//console.debug('w', w, 'dayOfWeek', dayOfWeek);
 		if (Array.isArray(dayOfWeek)) {
 			if (dayOfWeek.length === 1) {
@@ -128,90 +158,90 @@ export class Cron {
 		return rpad(DAY_OF_WEEK_TO_HUMAN[dayOfWeek], w);
 	}
 
-	#minute;
-	#hour;
-	#dayOfMonth;
-	#month;
-	#dayOfWeek;
+	_minute :Minute;
+	_hour :Hour;
+	_dayOfMonth :DayOfMonth;
+	_month :Month;
+	_dayOfWeek :DayOfWeek;
 
-	setMinute(minute) { // (0-59) * , -
-		this.#minute = minute;
+	setMinute(minute :Minute) { // (0-59) * , -
+		this._minute = minute;
 		return this; // Chainable
 	}
 
-	setHour(hour) { // (0-23) * , -
-		this.#hour = hour;
+	setHour(hour :Hour) { // (0-23) * , -
+		this._hour = hour;
 		return this; // Chainable
 	}
 
-	setDayOfMonth(dayOfMonth) { // (1-31) * , - ? L W
-		this.#dayOfMonth = dayOfMonth;
+	setDayOfMonth(dayOfMonth :DayOfMonth) { // (1-31) * , - ? L W
+		this._dayOfMonth = dayOfMonth;
 		return this; // Chainable
 	}
 
-	setMonth(month) { // (1-12) * , -
-		this.#month = month;
+	setMonth(month :Month) { // (1-12) * , -
+		this._month = month;
 		return this; // Chainable
 	}
 
-	setDayOfWeek(dayOfWeek) { // (0-7) * , - ? L #
-		this.#dayOfWeek = dayOfWeek;
+	setDayOfWeek(dayOfWeek :DayOfWeek) { // (0-7) * , - ? L #
+		this._dayOfWeek = dayOfWeek;
 		return this; // Chainable
 	}
 
-	fromString(string) {
+	fromString(string :CronString) {
 		//console.debug('string', string);
 		const fields = string.split(' ');
 		//console.debug('fields', fields);
-		this.setMinute(fields[0]);
-		this.setHour(fields[1]);
-		this.setDayOfMonth(fields[2]);
-		this.setMonth(fields[3]);
-		this.setDayOfWeek(fields[4]);
+		this.setMinute(fields[0] as Minute);
+		this.setHour(fields[1] as Hour);
+		this.setDayOfMonth(fields[2] as DayOfMonth);
+		this.setMonth(fields[3] as Month);
+		this.setDayOfWeek(fields[4] as DayOfWeek);
 		return this; // Chainable
 	} // fromString
 
-	constructor(string) {
+	constructor(string :CronString) {
 		this.fromString(string);
 	} // Chainable by default
 
 	toString() {
 		return [
-			this.#minute,
-			this.#hour,
-			this.#dayOfMonth,
-			this.#month,
-			this.#dayOfWeek
+			this._minute,
+			this._hour,
+			this._dayOfMonth,
+			this._month,
+			this._dayOfWeek
 		].join(' ');
 	} // toString
 
 	toObj() {
 		return {
-			minute: this.#minute,
-			hour: this.#hour,
-			dayOfMonth: this.#dayOfMonth,
-			month: this.#month,
-			dayOfWeek: this.#dayOfWeek
+			minute: this._minute,
+			hour: this._hour,
+			dayOfMonth: this._dayOfMonth,
+			month: this._month,
+			dayOfWeek: this._dayOfWeek
 		};
 	} // toObj
 
 	getMinute() {
-		return this.#minute;
+		return this._minute;
 	}
 
 	getHour() {
-		return this.#hour;
+		return this._hour;
 	}
 
 	getDayOfMonth() {
-		return this.#dayOfMonth;
+		return this._dayOfMonth;
 	}
 
 	getMonth() {
-		return this.#month;
+		return this._month;
 	}
 
 	getDayOfWeek() {
-		return this.#dayOfWeek;
+		return this._dayOfWeek;
 	}
 } // class Cron

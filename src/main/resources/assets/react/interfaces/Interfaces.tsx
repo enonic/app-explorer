@@ -1,8 +1,8 @@
 import type {
-	InterfaceNamesObj,
 	SetLicensedToFunction,
 	SetLicenseValidFunction
-} from './index.d';
+} from '../index.d';
+import type {InterfaceNamesObj} from './index.d';
 
 import * as React from 'react';
 import {
@@ -319,7 +319,11 @@ export function Interfaces({
 							<Radio
 								label={"Show all fields"}
 								checked={showCollections}
-								onChange={(ignored,{checked}) => {
+								onChange={(
+									//@ts-ignore
+									ignored,
+									{checked}
+								) => {
 									// setShowCollectionCount(checked);
 									setShowCollections(checked);
 									setShowFields(checked);

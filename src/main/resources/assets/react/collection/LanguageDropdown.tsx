@@ -1,12 +1,24 @@
+import type {Locales} from '../index.d';
+
 //import {Dropdown as SemanticUiReactDropdown} from 'semantic-ui-react';
 //import {Flag} from 'semantic-ui-react';
+//@ts-ignore
 import {Dropdown} from 'semantic-ui-react-form';
+//@ts-ignore
 import {getEnonicContext} from 'semantic-ui-react-form/Context';
 import getIn from 'get-value';
 
 import {capitalize} from '../utils/capitalize';
 
-export function LanguageDropdown(props) {
+
+export function LanguageDropdown(props :{
+	disabled ?:boolean
+	locales :Locales
+	name ?:string
+	parentPath ?:string
+	path ?:string
+	value ?:string
+}) {
 	//console.debug('LanguageDropdown props', props);
 	const {
 		disabled = false,

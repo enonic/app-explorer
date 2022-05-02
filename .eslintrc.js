@@ -120,7 +120,7 @@ module.exports = {
 				'_repoId', // fake node property
 				'_score', // fake node property
 				'_selected', // option-set property
-				'_ts' // node property
+				'_ts', // node property
 				'_versionKey' // node property
 			],
 			allowAfterThis: false,
@@ -129,7 +129,12 @@ module.exports = {
 		}],
 		'no-unexpected-multiline': 'off',
 		'object-curly-spacing': ['off'],
-		"react/jsx-no-undef": ['error', { "allowGlobals": true }],
+		'react/jsx-no-undef': [
+			'error',
+			{
+				allowGlobals: true
+			}
+		],
 		//'react/jsx-uses-react': 'error',
 		//'react/jsx-uses-vars': 'error',
 		'react/prop-types': 'off',

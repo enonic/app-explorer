@@ -1,7 +1,7 @@
 import {isString} from '@enonic/js-utils';
 
 
-export function repoIdValidator(repoId) {
+export function repoIdValidator(repoId :string) {
 	if(!repoId) {
 		return 'Required!';
 	}

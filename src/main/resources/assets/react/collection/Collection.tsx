@@ -1,3 +1,15 @@
+import type {SemanticUi} from '../../../types/SemanticUi.d';
+import type {
+	CollectionValues,
+	CollectorComponents,
+	ContentTypeOptions,
+	Fields,
+	Locales,
+	SiteOptions
+} from '../index.d';
+
+
+import * as React from 'react';
 import {
 	Button,
 	Form,
@@ -13,6 +25,7 @@ import {
 	Input,
 	ResetButton,
 	SubmitButton
+	//@ts-ignore
 } from 'semantic-ui-react-form';
 
 import {GQL_MUTATION_CREATE_COLLECTION} from '../../../services/graphQL/collection/mutationCreateCollection';
@@ -27,11 +40,21 @@ import {DocumentTypeSelector} from './DocumentTypeSelector';
 
 
 const SCHEMA = {
-	_name: (v) => repoIdValidator(v)
+	_name: (v :string) => repoIdValidator(v)
 };
 
 
-export function Collection(props) {
+export function Collection(props :{
+	collectorComponents :CollectorComponents
+	collectorOptions :SemanticUi.Dropdown.Options
+	contentTypeOptions :ContentTypeOptions
+	doClose :() => void
+	fields :Fields
+	locales :Locales
+	initialValues :CollectionValues
+	servicesBaseUrl :string
+	siteOptions :SiteOptions
+}) {
 	//console.debug('Collection props', props);
 
 	const {
@@ -46,9 +69,10 @@ export function Collection(props) {
 		initialValues = {
 			_name: '',
 			collector: {
+				//config: {}, // CollectorSelector onChange will set this.
+				//configJson: '{}',
 				name: ''//,
 				//taskName: 'collect'//, // TODO
-				//config: null // CollectorSelector onChange will set this.
 			},
 			cron: [{ // Default once a week
 				month: '*',
@@ -59,7 +83,7 @@ export function Collection(props) {
 			}],
 			doCollect: false,
 			language: ''
-		}
+		} as CollectionValues
 	} = props;
 	//console.debug('Collection initialValues', initialValues);
 
@@ -78,7 +102,7 @@ export function Collection(props) {
 		onChange={(/*values*/) => {
 			//console.debug('Collection onChange values', values);
 		}}
-		onSubmit={(values) => {
+		onSubmit={(values :CollectionValues) => {
 			//console.debug('submit values', values);
 
 			const {_id} = initialValues;
@@ -102,13 +126,32 @@ export function Collection(props) {
 			//console.debug('submit doCollect', doCollect);
 			//console.debug('submit documentTypeId', documentTypeId);
 
-			const variables = {
+			const variables :{
+				_id ?:string
+				_name :string
+				collector ?:{
+					configJson ?:string
+					name ?:string
+				}
+				cron :Array<{
+					month :string
+					dayOfMonth :string
+					dayOfWeek :string
+					minute :string
+					hour :string
+				}>
+				doCollect :boolean
+				documentTypeId ?:string
+				language :string
+			} = {
 				_name,
 				cron,
 				doCollect,
-				documentTypeId,
 				language
 			};
+			if (documentTypeId && !documentTypeId.startsWith('_')) {
+				variables.documentTypeId = documentTypeId;
+			}
 			if (collectorName || collectorConfig) {
 				variables.collector = {};
 				if (collectorName) {

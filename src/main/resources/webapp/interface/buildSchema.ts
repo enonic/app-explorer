@@ -1,6 +1,6 @@
 
 import type {CollectionNode} from '/lib/explorer/collection/types.d';
-import type {InterfaceField} from '/lib/explorer/interface/types.d';
+import type {InterfaceField} from '/lib/explorer/types/Interface.d';
 import type {
 	CamelToFieldObj,
 	SearchConnectionResolverEnv,

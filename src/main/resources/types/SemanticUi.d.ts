@@ -4,4 +4,5 @@ export namespace SemanticUi.Dropdown {
 		text :string
 		value :unknown
 	}
+	type Options = Array<Option>
 }
