@@ -134,17 +134,16 @@ export function RemoveFieldFromDocumentTypeModal({
 			}
 			<Button onClick={() => onClose()}>Cancel</Button>
 			<Button
-				icon='true'
+				content='Delete'
+				icon='trash alternate outline'
 				color='red'
 				disabled={isLoading}
 				onClick={() => {
 					// Delete the current field (on save)
 					updateOrDeleteProperties(null, state.index);
 					onClose();
-				}}>
-				<Icon name='trash alternate outline'/>
-				{'Delete'}
-			</Button>
+				}}
+			/>
 		</Modal.Actions>
 	</Modal>;
 } // RemoveFieldFromDocumentTypeModal
