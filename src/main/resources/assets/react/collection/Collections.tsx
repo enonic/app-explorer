@@ -299,6 +299,7 @@ export function Collections(props :{
 			console.debug('taskDescriptor', taskDescriptor);
 		}*/
 	});
+	//console.debug('anyReindexTaskWithoutCollectionId',anyReindexTaskWithoutCollectionId);
 
 	const intInitializedCollectorComponents = Object.keys(collectorComponents).length;
 
@@ -498,16 +499,28 @@ export function Collections(props :{
 						documentTypeId = ''
 					}, index) => {
 						const key = `collection[${index}]`;
+
 						const boolCollectorSelected = !!(collector && collector.name);
-						const boolCollectorSelectedAndInitialized = boolCollectorSelected && collectorComponents[collector.name];
+						//console.debug('boolCollectorSelected', boolCollectorSelected);
+
+						const boolCollectorSelectedAndInitialized = !!(boolCollectorSelected && collectorComponents[collector.name]);
+						//console.debug('boolCollectorSelectedAndInitialized', boolCollectorSelectedAndInitialized);
+
 						const busy = anyReindexTaskWithoutCollectionId
-						|| (
+						|| !!(
 							objCollectionsBeingReindexed[collectionId]
 							&& [TASK_STATE_RUNNING, TASK_STATE_WAITING].includes(objCollectionsBeingReindexed[collectionId].state)
 						);
+						//console.debug('busy', busy);
+
 						const editEnabled = intInitializedCollectorComponents
 							&& (boolCollectorSelectedAndInitialized || !boolCollectorSelected)
 							&& !busy;
+						//console.debug('editEnabled', editEnabled);
+
+						const disabled = !editEnabled;
+						//console.debug('disabled', disabled);
+
 						const cron = jobsObj[collectionId]
 							? jobsObj[collectionId].map(({value}) => {
 								return new Cron(value).toObj();
@@ -519,7 +532,7 @@ export function Collections(props :{
 								collectorOptions={collectorOptions}
 								collectorComponents={collectorComponents}
 								contentTypeOptions={contentTypeOptions}
-								disabled={!editEnabled}
+								disabled={disabled}
 								initialValues={{
 									_id: collectionId,
 									_name,
