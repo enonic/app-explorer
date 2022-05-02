@@ -4,7 +4,7 @@ import {
 
 import {Api} from './Api';
 import {Collections} from './collection/Collections';
-import {Fields} from './fields/Fields';
+//import {Fields} from './fields/Fields';
 import {Interfaces} from './interfaces/Interfaces';
 import {Journals} from './Journals';
 import {Notifications} from './Notifications';
@@ -382,7 +382,7 @@ export function Explorer(props) {
 					onClick={() => setPage('documentTypes')}
 				><Icon name='file' style={iconStyle}/> Document types</Menu.Item>
 
-				{[
+				{/*[
 					'documentTypes',
 					'fields',
 				].includes(page) &&
@@ -393,7 +393,7 @@ export function Explorer(props) {
 						active={page === 'fields'}
 						onClick={() => setPage('fields')}
 					><Icon name='list' style={iconStyle}/> Global fields</Menu.Item>
-				</Menu.Menu>}
+				</Menu.Menu>*/}
 
 				<Menu.Item
 					as='a'
@@ -481,9 +481,9 @@ export function Explorer(props) {
 				{page === 'documentTypes' && <DocumentTypes
 					servicesBaseUrl={servicesBaseUrl}
 				/>}
-				{page === 'fields' && <Fields
+				{/*page === 'fields' && <Fields
 					servicesBaseUrl={servicesBaseUrl}
-				/>}
+				/>*/}
 				{page === 'stopWords' && <StopWords
 					servicesBaseUrl={servicesBaseUrl}
 				/>}
