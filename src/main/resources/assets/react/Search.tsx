@@ -1,7 +1,7 @@
 import getIn from 'get-value';
-import setIn from 'set-value';
-
+import * as React from 'react';
 import {Form} from 'semantic-ui-react';
+import setIn from 'set-value';
 
 import {Hits} from './search/Hits';
 
@@ -46,12 +46,14 @@ const SEARCH_QUERY = `query SearchQuery(
 }`;
 
 
-export function Search(props) {
+export function Search(props :{
+	interfaceName ?:string
+	searchString ?:string
+}) {
 	const {
 		//collectionOptions = [],
 		interfaceName = 'default',
-		//thesaurusOptions = [],
-		servicesBaseUrl
+		//thesaurusOptions = []
 	} = props;
 	//console.debug('Search interfaceName', interfaceName);
 
@@ -89,7 +91,6 @@ export function Search(props) {
 			return;
 		}
 		setLoading(true);
-		//const uri = `${servicesBaseUrl}/search?interface=${interfaceName}&name=searchString&searchString=${ss}`;
 		const uri = `./explorer/api/v1/interface/${interfaceName}`;
 		//console.debug(uri);
 		fetch(uri, {
@@ -137,7 +138,11 @@ export function Search(props) {
 							search(searchString);
 						}
 					}}
-					onChange={(ignored,{value}) => {
+					onChange={(
+						//@ts-ignore
+						ignored,
+						{value}
+					) => {
 						//console.debug('onChange value',value);
 						setSearchString(value);
 						if (boolOnChange) {
@@ -148,7 +153,11 @@ export function Search(props) {
 				<Form.Checkbox
 					checked={boolOnChange}
 					label='On change?'
-					onChange={(ignored,{checked})=>setBoolOnChange(checked)}
+					onChange={(
+						//@ts-ignore
+						ignored,
+						{checked}
+					)=>setBoolOnChange(checked)}
 				/>
 			</Form.Group>
 		</Form>

@@ -453,7 +453,6 @@ export function Explorer(props) {
 					<Search
 						interfaceName='default'
 						searchString=''
-						servicesBaseUrl={servicesBaseUrl}
 					/>
 				</>}
 				{licenseValid && page === 'api' && <Api

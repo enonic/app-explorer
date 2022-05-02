@@ -397,7 +397,6 @@ export function Interfaces({
 							<Button.Group>
 								<SearchModal
 									interfaceName={_name}
-									servicesBaseUrl={servicesBaseUrl}
 								/>
 								<CopyModal
 									afterClose={memoizedUpdateInterfacesCallback}

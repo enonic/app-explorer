@@ -1,14 +1,18 @@
+import * as React from 'react';
 import {Button, Icon, Modal} from 'semantic-ui-react';
 
 import {Search} from '../Search';
 
 
-export function SearchModal(props) {
+export function SearchModal(props :{
+	interfaceName :string
+	afterClose ?:() => void
+	beforeOpen ?:() => void
+}) {
 	const {
 		afterClose = () => {},
 		beforeOpen = () => {},
-		interfaceName,
-		servicesBaseUrl
+		interfaceName
 	} = props;
 	const [open, setOpen] = React.useState(false);
 
@@ -39,7 +43,6 @@ export function SearchModal(props) {
 		<Modal.Content>
 			<Search
 				interfaceName={interfaceName}
-				servicesBaseUrl={servicesBaseUrl}
 			/>
 		</Modal.Content>
 		<Modal.Actions>
