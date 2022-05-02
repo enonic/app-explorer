@@ -45,8 +45,8 @@ export function DocumentTypeSelector(props :{
 	//console.debug('value', value);
 	const {
 		collector: {
-			name: collectorName
-		}
+			name: collectorName = null
+		} = {}
 	} = context.values;
 	//console.debug('collectorName',collectorName);
 
