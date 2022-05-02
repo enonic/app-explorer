@@ -142,7 +142,7 @@ export function RemoveFieldFromDocumentTypeModal({
 					updateOrDeleteProperties(null, state.index);
 					onClose();
 				}}>
-				<Icon color='white' name='trash alternate outline'/>
+				<Icon name='trash alternate outline'/>
 				{'Delete'}
 			</Button>
 		</Modal.Actions>
