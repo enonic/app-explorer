@@ -326,7 +326,7 @@ export function NewOrEditDocumentType({
 					/* {_id ? <ResetButton floated='left' secondary/> : null} */
 				}
 				<Button onClick={() => doClose()}>Cancel</Button>
-				<Button disabled={disabled} color={() => null} onClick={()=>{submitDocumentForm();}} primary>
+				<Button disabled={disabled} onClick={()=>{submitDocumentForm();}} primary>
 					<Icon name='save'/>Save
 				</Button>
 			</Modal.Actions>
