@@ -1,4 +1,4 @@
-import {GQL_MUTATION_INTERFACE_UPDATE} from '../mutations/interfaceUpdateMutation.mjs';
+import {GQL_MUTATION_INTERFACE_UPDATE} from '../mutations/interfaceUpdateMutation';
 
 
 type JSONResponse = {

@@ -28,10 +28,10 @@ import {DEFAULT_INTERFACE_FIELDS} from '../../../constants';
 import {fetchInterfaceCreate} from '../../../services/graphQL/fetchers/fetchInterfaceCreate';
 import {fetchInterfaceGet} from '../../../services/graphQL/fetchers/fetchInterfaceGet';
 import {fetchInterfaceUpdate} from '../../../services/graphQL/fetchers/fetchInterfaceUpdate';
-import {mustStartWithALowercaseLetter} from '../utils/mustStartWithALowercaseLetter.mjs';
-import {notDoubleUnderscore} from '../utils/notDoubleUnderscore.mjs';
-import {onlyLettersDigitsAndUnderscores} from '../utils/onlyLettersDigitsAndUnderscores.mjs';
-import {required} from '../utils/required.mjs';
+import {mustStartWithALowercaseLetter} from '../utils/mustStartWithALowercaseLetter';
+import {notDoubleUnderscore} from '../utils/notDoubleUnderscore';
+import {onlyLettersDigitsAndUnderscores} from '../utils/onlyLettersDigitsAndUnderscores';
+import {required} from '../utils/required';
 import {FieldSelector} from './FieldSelector';
 
 

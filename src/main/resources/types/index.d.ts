@@ -10,3 +10,7 @@ export {
 } from './Application.d';
 export {Log} from './Log.d';
 export {Request} from './Request.d';
+export {
+	AnyObject,
+	EmptyObject
+} from './Utility.d';

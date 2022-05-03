@@ -1,3 +1,6 @@
+import type {Fields} from '/lib/explorer/types/Field.d';
+
+
 import * as React from 'react';
 import {Button, Icon, Modal} from 'semantic-ui-react';
 
@@ -8,12 +11,16 @@ export function SearchModal(props :{
 	interfaceName :string
 	afterClose ?:() => void
 	beforeOpen ?:() => void
+	documentTypesAndFields ?:Record<string,Fields>
 }) {
 	const {
+		interfaceName,
 		afterClose = () => {},
 		beforeOpen = () => {},
-		interfaceName
+		documentTypesAndFields = {}
 	} = props;
+	//console.debug('documentTypesAndFields', documentTypesAndFields);
+
 	const [open, setOpen] = React.useState(false);
 
 	const doClose = () => {
@@ -42,6 +49,7 @@ export function SearchModal(props :{
 		<Modal.Header>Search interface: {interfaceName}</Modal.Header>
 		<Modal.Content>
 			<Search
+				documentTypesAndFields={documentTypesAndFields}
 				interfaceName={interfaceName}
 			/>
 		</Modal.Content>

@@ -1,5 +1,6 @@
 import type {
 	ApiKeyNode,
+	EmptyObject,
 	Request
 } from '../../types';
 
@@ -21,7 +22,7 @@ import {connect} from '/lib/explorer/repo/connect';
 import {generateSchemaForInterface} from './generateSchemaForInterface';
 
 
-export type InterfaceRequest = Request<{},{
+export type InterfaceRequest = Request<EmptyObject,{
 	interfaceName :string
 }>
 

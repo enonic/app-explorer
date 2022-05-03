@@ -2,7 +2,7 @@ import type {InterfaceNode} from '/lib/explorer/types/Interface.d';
 
 //import {toStr} from '@enonic/js-utils';
 
-import {getInterfaceQuery} from '../queries/getInterfaceQuery.mjs';
+import {getInterfaceQuery} from '../queries/getInterfaceQuery';
 
 
 type getInterfaceResponse = {

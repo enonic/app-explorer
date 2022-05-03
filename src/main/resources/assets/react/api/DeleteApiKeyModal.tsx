@@ -8,7 +8,7 @@ import {
 } from 'semantic-ui-react';
 
 
-import {GQL_MUTATION_API_KEY_DELETE} from '../../../services/graphQL/mutations/apiKeyDeleteMutation.mjs';
+import {GQL_MUTATION_API_KEY_DELETE} from '../../../services/graphQL/mutations/apiKeyDeleteMutation';
 
 
 export const DeleteApiKeyModal = (props :{

@@ -28,7 +28,7 @@
 			//"es2020",
 			//"es2021",
 			//"esnext",
-			"dom"//, // Window
+			"dom"//, // Window (also contains print which collides with Nashorn print)
 			//"ScriptHost",
 			//"WebWorker"
 		],
@@ -36,7 +36,7 @@
 		"listFiles": false,
 		"module": "commonjs",
 		"moduleResolution": "node",
-		"noEmitOnError": false,
+		"noEmitOnError": true, // Do not emit compiler output files like JavaScript source code, source-maps or declarations if any errors were reported.
 		"noErrorTruncation": true,
 		"noImplicitAny": false,
 		"noPropertyAccessFromIndexSignature": true,

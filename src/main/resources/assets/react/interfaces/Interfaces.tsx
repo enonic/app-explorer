@@ -156,7 +156,58 @@ export function Interfaces({
 		})
 			.then(response => response.json())
 			.then(json => {
-				const data = json.data;
+				const data = json.data as {
+					queryCollections :{
+						hits :Array<{
+							_id :string
+							_name :string
+							documentTypeId :string
+						}>
+					}
+					queryDocumentTypes :{
+						hits :Array<{
+							_id :string
+							_name :string
+							properties :Array<{
+								active :boolean
+								enabled :boolean
+								fulltext :boolean
+								includeInAllText :boolean
+								max :number
+								min :number
+								name :string
+								nGram :boolean
+								path :boolean
+								valueType :string // TODO?
+							}>
+						}>
+					}
+					queryInterfaces :{
+						hits :Array<{
+							_id :string
+							_name :string
+							collectionIds :Array<string>
+							fields :Array<{
+								boost :number
+								name :string
+							}>
+							stopWords :Array<string>
+							synonymIds :Array<string>
+						}>
+						total :number
+					}
+					queryStopWords :{
+						hits :Array<{
+							_name :string
+						}>
+					}
+					queryThesauri :{
+						hits :Array<{
+							_id :string
+							_name :string
+						}>
+					}
+				};
 				//console.debug('data', data);
 
 				//const fieldIdToKey = {};
@@ -173,16 +224,43 @@ export function Interfaces({
 				setGlobalFieldsObj(newGlobalFieldsObj);*/
 				//console.debug('fieldIdToKey', fieldIdToKey);
 
-				const documentTypeIdToFieldKeys = {};
+				const documentTypeIdToFieldKeys :Record<string,Array<string>> = {};
+				const documentTypeIdToFields :Record<string,Array<{
+					active :boolean
+					enabled :boolean
+					fulltext :boolean
+					includeInAllText :boolean
+					max :number
+					min :number
+					name :string
+					nGram :boolean
+					path :boolean
+					valueType :string // TODO?
+				}>> = {};
+				const documentTypeIdToName :Record<string,string> = {};
 				data.queryDocumentTypes.hits.forEach(({
 					_id,
+					_name,
 					properties = []
 				}) => {
 					const uniqueFieldsObj = {};
-					properties.forEach(({name}) => {
+					properties.forEach(({
+						/*active,
+						enabled,
+						fulltext,
+						includeInAllText,
+						max,
+						min,*/
+						name/*,
+						nGram,
+						path,
+						valueType*/
+					}) => {
 						uniqueFieldsObj[name] = true;
 					});
 					documentTypeIdToFieldKeys[_id] = Object.keys(uniqueFieldsObj);
+					documentTypeIdToFields[_id] = properties;
+					documentTypeIdToName[_id] = _name;
 				});
 				//console.debug('documentTypeIdToFieldKeys', documentTypeIdToFieldKeys);
 
@@ -229,6 +307,7 @@ export function Interfaces({
 						'_allText': true // NOTE Hardcode
 					};*/
 					const collectionNamesObj = {};
+					const documentTypesAndFields = {};
 					collectionIds.forEach((_id) => {
 						/*const fieldKeys = collectionIdToFieldKeys[_id];
 						if (fieldKeys) {
@@ -236,6 +315,11 @@ export function Interfaces({
 								boostableFieldsObj[fieldKey] = true;
 							});
 						}*/
+						const documentTypeId = collectionIdToDocumentTypeIds[_id];
+						if (!documentTypesAndFields[documentTypeId]) {
+							const documentTypeName = documentTypeIdToName[documentTypeId];
+							documentTypesAndFields[documentTypeName] = documentTypeIdToFields[documentTypeId];
+						}
 						const collectionName = collectionIdToName[_id];
 						if (collectionName) {
 							collectionNamesObj[collectionName] = true;
@@ -255,6 +339,7 @@ export function Interfaces({
 						_name,
 						//boostableFieldKeys: Object.keys(boostableFieldsObj).sort(),
 						collectionNames: Object.keys(collectionNamesObj).sort(),
+						documentTypesAndFields,
 						fields,
 						stopWords,
 						thesaurusNames
@@ -358,6 +443,7 @@ export function Interfaces({
 						_id,
 						_name,
 						collectionNames = [],
+						documentTypesAndFields,
 						fields = [],
 						stopWords = [],
 						//stopWordIds = [],
@@ -397,6 +483,7 @@ export function Interfaces({
 							<Button.Group>
 								<SearchModal
 									interfaceName={_name}
+									documentTypesAndFields={documentTypesAndFields}
 								/>
 								<CopyModal
 									afterClose={memoizedUpdateInterfacesCallback}

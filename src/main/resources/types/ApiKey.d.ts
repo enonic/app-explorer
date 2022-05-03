@@ -1,7 +1,7 @@
 import type {
 	ParentPath,
 	RequiredNodeProperties
-} from '/lib/explorer/types.d';
+} from '/lib/explorer/types/index.d';
 
 
 export interface ApiKey {

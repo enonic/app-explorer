@@ -83,6 +83,8 @@
     "@types/mocha": "^9",
     "@types/node": "^17",
     "@types/react": "^17",
+    "@typescript-eslint/eslint-plugin": "^5.22.0",
+    "@typescript-eslint/parser": "^5.22.0",
     "babel-eslint": "^10",
     "babel-loader": "^8",
     "babel-plugin-array-includes": "^2",
@@ -124,13 +126,14 @@
   },
   "scripts": {
     "clean": "rm -r build 2>/dev/null;true",
+    "eslint": "npx eslint src/main/resources/**/*.ts src/main/resources/**/*.tsx",
     "doctoc": "npx doctoc --github README.md",
     "mocha": "npx mocha",
     "premocha": "yarn tsc",
     "pretest": "yarn tsc",
     "pretsc": "yarn clean",
     "test": "npx mocha build/tsc/app-explorer/test/**/*.test.js",
-    "tsc": "npx tsc",
+    "tsc": "npx tsc --pretty",
     "watch": "node_modules/webpack-cli/bin/cli.js -w --stdin",
     "webpack": "node_modules/webpack-cli/bin/cli.js"
   }

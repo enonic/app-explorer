@@ -1,9 +1,41 @@
 module.exports = {
 
+	env: {
+		/*browser - browser global variables.
+		node - Node.js global variables and Node.js scoping.
+		commonjs - CommonJS global variables and CommonJS scoping (use this for browser-only code that uses Browserify/WebPack).
+		shared-node-browser - Globals common to both Node.js and Browser.
+		es6 - enable all ECMAScript 6 features except for modules (this automatically sets the ecmaVersion parser option to 6).
+		es2017 - adds all ECMAScript 2017 globals and automatically sets the ecmaVersion parser option to 8.*/
+		es2020: true/*, // - adds all ECMAScript 2020 globals and automatically sets the ecmaVersion parser option to 11.
+		worker - web workers global variables.
+		amd - defines require() and define() as global variables as per the amd spec.
+		mocha - adds all of the Mocha testing global variables.
+		jasmine - adds all of the Jasmine testing global variables for version 1.3 and 2.0.
+		jest - Jest global variables.
+		phantomjs - PhantomJS global variables.
+		protractor - Protractor global variables.
+		qunit - QUnit global variables.
+		jquery - jQuery global variables.
+		prototypejs - Prototype.js global variables.
+		shelljs - ShellJS global variables.
+		meteor - Meteor global variables.
+		mongo - MongoDB global variables.
+		applescript - AppleScript global variables.
+		nashorn - Java 8 Nashorn global variables.
+		serviceworker - Service Worker global variables.
+		atomtest - Atom test helper globals.
+		embertest - Ember test helper globals.
+		webextensions - WebExtensions globals.
+		greasemonkey - GreaseMonkey globals.*/
+	},
+
 	// https://github.com/airbnb/javascript/blob/master/packages/eslint-config-airbnb-base/rules/style.js
 	extends: [
-		'eslint:recommended',
+		//'eslint:recommended',
 		//'airbnb-base',
+		'plugin:@typescript-eslint/eslint-recommended',
+		'plugin:@typescript-eslint/recommended',
 		'plugin:react/recommended',
 		'plugin:jsx-a11y/recommended',
 		'plugin:react-hooks/recommended'
@@ -53,9 +85,9 @@ module.exports = {
 
 	//parser: 'espree', // default
 	//parser: 'esprima',
-	parser: 'babel-eslint',
+	//parser: 'babel-eslint',
 
-	parserOptions: {
+	/*parserOptions: {
 		allowImportExportEverywhere: false,
 
 		codeFrame: true,
@@ -73,18 +105,50 @@ module.exports = {
 
 		// set to "script" (default) or "module" if your code is in ECMAScript modules.
 		sourceType: 'module' // allow import statements
-	},
+	},*/
+
+	overrides: [{
+		files: [
+			//'**/*.es', // Currently no such files
+			//'**/*.es6', // Currently no such files
+			//'**/*.js', // Currently no such files
+			//'**/*.jsx', // Currently no such files
+			//'**/*.mjs', // Currently no such files
+			'**/*.ts',
+			'**/*.tsx'
+		]
+	}],
 
 	plugins: [
-		'import',
-		'react',
-		'jsx-a11y'
+		///'import',
+		//'react',
+		'jsx-a11y',
+		'@typescript-eslint'
 	],
 
+	root: true,
+
 	rules: { // https://eslint.org/docs/rules
+		'@typescript-eslint/ban-ts-comment': ['error', {
+			'ts-expect-error': false, // 'allow-with-comment'
+			'ts-ignore': false, // 'allow-with-comment'
+			'ts-nocheck': true,
+			'ts-check': true,
+		}],
 		'comma-dangle': ['error', {
+			// never (default) disallows trailing commas
+			// always requires trailing commas
+			// always-multiline requires trailing commas when the last element
+			//  or property is in a different line than the closing ] or } and
+			//  disallows trailing commas when the last element or property is
+			//  on the same line as the closing ] or }
+			// only-multiline allows (but does not require) trailing commas when
+			//  the last element or property is in a different line than the
+			//  closing ] or } and disallows trailing commas when the last
+			//  element or property is on the same line as the closing ] or }
+			// ignore who cares? no body
 			arrays: 'ignore',
-			objects: 'never',
+			objects: 'only-multiline',
 			imports: 'never',
 			exports: 'never',
 			functions: 'ignore'
@@ -107,6 +171,7 @@ module.exports = {
 		'no-tabs': ['off'],
 		'no-underscore-dangle': ['error', {
 			allow: [
+				'__', // Enonic XP Java Bridge
 				'__connection', // My own stupidity
 				'_id', // content-type property
 				'_branchId', // fake node property
@@ -141,7 +206,28 @@ module.exports = {
 		'react/react-in-jsx-scope': 'off', // Since React is a global
 		'react-hooks/rules-of-hooks': 'error',
 		'react-hooks/exhaustive-deps': 'warn',
-		semi: 'error',
+		semi: [
+			'off',
+			// "always" (default) requires semicolons at the end of statements
+			// "never" disallows semicolons as the end of statements (except to
+			//         disambiguate statements beginning with [, (, /, +, or -)
+			'always',
+			{
+				// when "always"
+				omitLastInOneLineBlock: true
+
+				// when "never"
+				// "any" (default) ignores semicolons (or lacking semicolon) at
+				//       the end of statements if the next line starts with
+				//       [, (, /, +, or -.
+				// "always" requires semicolons at the end of statements if the
+				//          next line starts with [, (, /, +, or -.
+				// "never" disallows semicolons as the end of statements if it
+				//         doesn't make ASI hazard even if the next line starts
+				//         with [, (, /, +, or -.
+				//beforeStatementContinuationChars: 'never'
+			}
+		],
 		'spaced-comment': ['off'],
 		strict: 1
 	} // rules

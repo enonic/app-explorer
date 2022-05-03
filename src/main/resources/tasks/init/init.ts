@@ -1,5 +1,5 @@
 import type {IndexConfigObject} from '/lib/explorer/types.d';
-import type {CollectionWithCron} from '/lib/explorer/collection/types.d';
+import type {CollectionWithCron} from '/lib/explorer/types/Collection.d';
 //import type {InterfaceNode} from '/lib/explorer/interface/types.d';
 import type {
 	InterfaceNodeFilter,
@@ -52,7 +52,7 @@ import {
 	addMembers,
 	createRole,
 	createUser,
-	getPrincipal,
+	getPrincipal//,
 	//findPrincipals
 	//@ts-ignore
 } from '/lib/xp/auth';

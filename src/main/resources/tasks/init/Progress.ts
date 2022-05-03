@@ -1,3 +1,6 @@
+import type {AnyObject} from '../../types/index.d';
+
+
 import {isObject} from '@enonic/js-utils';
 
 import {
@@ -7,12 +10,12 @@ import {
 } from '/lib/xp/task';
 
 
-type Info = string | Object;
+//type Info = string | AnyObject;
 
 
-export class Progress {
+export class Progress<Info extends string|AnyObject = string> {
 	current :number
-	info :string
+	info :Info
 	total :number
 
 	constructor({
@@ -20,10 +23,14 @@ export class Progress {
 		info = 'Initializing',
 		//sleepMsAfterItem = 0,
 		total = 1
+	} :{
+		current ?:number
+		info ?:string|AnyObject
+		total ?:number
 	} = {}) {
 		this.current = current;
 
-		this.info = isObject(info) ? JSON.stringify(info) : info;
+		this.info = info as Info;
 		//this.sleepMsAfterItem = sleepMsAfterItem;
 		this.total = total;
 	}
@@ -33,28 +40,26 @@ export class Progress {
 		return this; // chainable
 	}*/
 
+	getInfoString() {
+		return isObject(this.info) ? JSON.stringify(this.info) : this.info;
+	}
+
 	debug() {
-		log.debug(`[${this.current}/${this.total}] ${this.info}`);
+		log.debug(`[${this.current}/${this.total}] ${this.getInfoString()}`);
 		return this; // chainable
 	}
 
 	logInfo() {
-		log.info(`[${this.current}/${this.total}] ${this.info}`);
+		log.info(`[${this.current}/${this.total}] ${this.getInfoString()}`);
 		return this; // chainable
 	}
 
 	getInfo() {
-		let rv = this.info;
-		try {
-			rv = JSON.parse(this.info);
-		} catch (e) {
-			// no-op
-		}
-		return rv;
+		return this.info;
 	}
 
 	setInfo(info :Info) {
-		this.info = isObject(info) ? JSON.stringify(info) : info;
+		this.info = info;
 		return this; // chainable
 	}
 
@@ -75,7 +80,7 @@ export class Progress {
 	finishItem(info? :Info) {
 		this.current += 1;
 		if (info) {
-			this.info = isObject(info) ? JSON.stringify(info) : info;
+			this.info = info;
 		}
 		/*if (this.sleepMsAfterItem) {
 			sleep(this.sleepMsAfterItem);

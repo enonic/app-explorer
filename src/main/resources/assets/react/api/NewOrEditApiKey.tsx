@@ -16,8 +16,8 @@ import {
 //@ts-ignore
 import {Dropdown} from 'semantic-ui-react-form/inputs/Dropdown';
 
-import {GQL_MUTATION_API_KEY_CREATE} from '../../../services/graphQL/mutations/apiKeyCreateMutation.mjs';
-import {GQL_MUTATION_API_KEY_UPDATE} from '../../../services/graphQL/mutations/apiKeyUpdateMutation.mjs';
+import {GQL_MUTATION_API_KEY_CREATE} from '../../../services/graphQL/mutations/apiKeyCreateMutation';
+import {GQL_MUTATION_API_KEY_UPDATE} from '../../../services/graphQL/mutations/apiKeyUpdateMutation';
 
 import {GenerateKeyButton} from './GenerateKeyButton';
 

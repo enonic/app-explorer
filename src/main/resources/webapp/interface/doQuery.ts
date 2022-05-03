@@ -3,7 +3,7 @@ import type {
 	MultiRepoNodeQueryResponse
 } from '@enonic/js-utils/src/types/node/multiRepoConnection.d';
 
-import type {CollectionNode} from '/lib/explorer/collection/types.d';
+import type {CollectionNode} from '/lib/explorer/types/Collection.d';
 import type {InterfaceField} from '/lib/explorer/types/Interface.d';
 import type {
 	CamelToFieldObj,

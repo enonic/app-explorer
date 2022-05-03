@@ -1,5 +1,5 @@
-import type {CollectionNode} from '/lib/explorer/collection/types.d';
-import type {DocumentTypeNode} from '/lib/explorer/documentType/types.d';
+import type {CollectionNode} from '/lib/explorer/types/Collection.d';
+import type {DocumentTypeNode} from '/lib/explorer/types/DocumentType.d';
 import type {Field} from '/lib/explorer/field/types.d';
 
 

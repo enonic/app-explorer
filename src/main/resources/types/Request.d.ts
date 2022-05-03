@@ -1,6 +1,9 @@
+import type {AnyObject} from './Utility.d';
+
+
 export interface Request<
-	Params extends {} = {},
-	PathParams extends {} = {}
+	Params extends AnyObject = AnyObject,
+	PathParams extends AnyObject = AnyObject
 > {
 	body? :string
 	headers? :{
