@@ -1,3 +1,6 @@
+import type {QueryFilters} from '/lib/explorer/types/index.d';
+
+
 import {PRINCIPAL_EXPLORER_READ} from '/lib/explorer/model/2/constants';
 import {connect} from '/lib/explorer/repo/connect';
 import {query as qS} from '/lib/explorer/synonym/query';
@@ -11,6 +14,12 @@ export function querySynonyms({
 	query = '',
 	sort = '_name ASC',
 	start = 0
+} :{
+	count ?:number
+	filters ?:QueryFilters
+	query ?:string
+	sort ?:string
+	start ?:number
 }) {
 	//log.info(`filters:${toStr(filters)}`);
 	const connection = connect({ principals: [PRINCIPAL_EXPLORER_READ] });

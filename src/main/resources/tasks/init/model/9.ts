@@ -1,5 +1,7 @@
-import type {RepoConnection} from '/lib/explorer/types.d';
-import type {SynonymNode} from '/lib/explorer/synonym/types.d';
+import type {
+	RepoConnection,
+	SynonymNode
+} from '/lib/explorer/types/index.d';
 
 import type {
 	InterfaceNodeWithFacets,

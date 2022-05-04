@@ -1,7 +1,7 @@
 import type {
 	OneOrMore,
 	RepoConnection
-} from '/lib/explorer/types.d';
+} from '/lib/explorer/types/index.d';
 
 
 import {

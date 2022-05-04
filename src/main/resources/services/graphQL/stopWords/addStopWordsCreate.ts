@@ -1,6 +1,9 @@
-import type {ParentPath} from '/lib/explorer/types.d';
-import type {IndexConfigTemplate} from '/lib/explorer/types/IndexConfig.d';
-import type {StopwordNode} from '/lib/explorer/types/StopWord.d';
+import type {
+	IndexConfigTemplate,
+	ParentPath,
+	StopwordNode
+} from '/lib/explorer/types/index.d';
+
 
 import {
 	NT_STOP_WORDS,

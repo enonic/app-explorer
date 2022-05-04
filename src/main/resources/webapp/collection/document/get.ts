@@ -1,4 +1,4 @@
-import type {QueryFilters} from '/lib/explorer/types.d';
+import type {QueryFilters} from '/lib/explorer/types/index.d';
 import type {Request} from '../../../types/Request';
 
 

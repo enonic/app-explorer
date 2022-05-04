@@ -2,6 +2,7 @@ import {
 	GraphQLBoolean,
 	GraphQLString,
 	nonNull
+	//@ts-ignore
 } from '/lib/graphql';
 
 import {GQL_TYPE_JOB_NAME} from '../constants';

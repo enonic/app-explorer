@@ -1,5 +1,5 @@
 import type {AggregationsResponseEntry} from '@enonic/js-utils/src/types/node/query/Aggregation.d';
-import type {QueriedSynonym} from '/lib/explorer/synonym/types.d';
+import type {QueriedSynonym} from '/lib/explorer/types/index.d';
 
 
 import {

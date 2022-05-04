@@ -1,7 +1,9 @@
 //import {toStr} from '@enonic/js-utils';
 
 import {APP_EXPLORER} from '/lib/explorer/index';
+//@ts-ignore
 import {list} from '/lib/graphql';
+//@ts-ignore
 import {list as listJobs} from '/lib/xp/scheduler';
 
 

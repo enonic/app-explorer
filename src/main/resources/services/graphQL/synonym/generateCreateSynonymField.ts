@@ -1,3 +1,5 @@
+import type {SynonymNodeCreateParams} from '/lib/explorer/types/index.d';
+
 import {toStr} from '@enonic/js-utils';
 
 import {
@@ -9,6 +11,7 @@ import {get} from '/lib/explorer/node/get';
 import {connect} from '/lib/explorer/repo/connect';
 import {createRandomNamed} from '/lib/explorer/node/createRandomNamed';
 import {coerseSynonymType} from '/lib/explorer/synonym/coerseSynonymType';
+//@ts-ignore
 import {reference as referenceValue} from '/lib/xp/value';
 
 import {GQL_TYPE_SYNONYM_NAME} from '../constants';
@@ -45,7 +48,7 @@ export function generateCreateSynonymField({
 			if (!thesaurusNode) {
 				throw new Error(`Unable to find thesaurus with id:${thesaurusId}!`);
 			}
-			const createRes = createRandomNamed({
+			const createRes = createRandomNamed<SynonymNodeCreateParams>({
 				_indexConfig: {default: 'byType'},
 				_nodeType: NT_SYNONYM,
 				_parentPath: thesaurusNode._path,

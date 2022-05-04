@@ -1,3 +1,6 @@
+import type {SynonymNode} from '/lib/explorer/types/index.d';
+
+
 import {toStr} from '@enonic/js-utils';
 
 import {
@@ -45,7 +48,7 @@ export function generateUpdateSynonymField({
 				principals: [PRINCIPAL_EXPLORER_WRITE]
 			});
 
-			const modifyRes = writeConnection.modify({
+			const modifyRes = writeConnection.modify<SynonymNode>({
 				key: _id,
 				editor: (node) => {
 					//log.debug(`node:${toStr(node)}`);

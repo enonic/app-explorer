@@ -1,5 +1,7 @@
-import type {RepoConnection} from '/lib/explorer/types.d';
-import type {ScheduledJob} from '/lib/explorer/scheduler/types.d';
+import type {
+	RepoConnection,
+	ScheduledJob
+} from '/lib/explorer/types/index.d';
 
 
 import {

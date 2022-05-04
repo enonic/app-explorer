@@ -1,8 +1,12 @@
+import type {Interface} from '/lib/explorer/types/index.d';
+
+
 //import {toStr} from '@enonic/js-utils';
 
 import {
 	GraphQLInt,
 	list
+	//@ts-ignore
 } from '/lib/graphql';
 import {coerseInterfaceType} from '/lib/explorer/interface/coerseInterfaceType';
 import {query} from '/lib/explorer/interface/query';
@@ -21,7 +25,11 @@ export function generateQueryInterfacesField({
 		args: {
 			count: GraphQLInt
 		},
-		resolve: (env) => {
+		resolve: (env :{
+			args :{
+				count ?:number
+			}
+		}) => {
 			//log.info(`env:${toStr(env)}`);
 			const {count = -1} = env.args;
 			const connection = connect({ principals: [PRINCIPAL_EXPLORER_READ] });
@@ -29,9 +37,17 @@ export function generateQueryInterfacesField({
 				connection,
 				count
 			});
-			interfacesRes.hits = interfacesRes.hits
-				.map((interfaceNode) => coerseInterfaceType(interfaceNode));
-			return interfacesRes;
+			const rv :{
+				count :number
+				hits :Array<Interface>
+				total :number
+			} = {
+				count: interfacesRes.count,
+				hits: interfacesRes.hits
+					.map((interfaceNode) => coerseInterfaceType(interfaceNode)),
+				total: interfacesRes.count
+			};
+			return rv;
 		},
 		type: glue.addObjectType({
 			name: 'QueryInterfaces',

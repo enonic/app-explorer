@@ -20,7 +20,8 @@ export function generateDeleteThesaurusField({
 		}) {
 			const writeConnection = connect({ principals: [PRINCIPAL_EXPLORER_WRITE] });
 			const array = writeConnection.delete(_id);
-			if (!array.length === 1 ) {
+			//log.debug('array:%s', toStr(array));
+			if (array.length !== 1 ) {
 				throw new Error(`Something went wrong while trying to delete thesaurus with id:${_id}!`);
 			}
 			writeConnection.refresh();

@@ -4,6 +4,7 @@ import {
 	GraphQLString,
 	list,
 	nonNull
+	//@ts-ignore
 } from '/lib/graphql';
 
 import {

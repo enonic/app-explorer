@@ -1,4 +1,4 @@
-import type {RepoConnection} from '/lib/explorer/types.d';
+import type {RepoConnection} from '/lib/explorer/types/index.d';
 import type {ApiKeyNode} from '../../../types/ApiKey.d';
 
 

@@ -1,5 +1,7 @@
-import type {RepoConnection} from '/lib/explorer/types.d';
-import type {InterfaceField} from '/lib/explorer/types/Interface.d';
+import type {
+	InterfaceField,
+	RepoConnection
+} from '/lib/explorer/types/index.d';
 import type {
 	CamelToFieldObj,
 	GraphQLInterfaceSearchAggregation,

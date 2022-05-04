@@ -7,11 +7,6 @@ import {
 import {thesaurus as thesaurusModel} from '/lib/explorer/model/2/nodeTypes/thesaurus';
 import {connect} from '/lib/explorer/repo/connect';
 import {
-	GraphQLString,
-	nonNull
-} from '/lib/graphql';
-
-import {
 	GQL_INPUT_TYPE_THESAURUS_LANGUAGE_NAME,
 	GQL_TYPE_THESAURUS_NAME
 } from '../constants';

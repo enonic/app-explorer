@@ -14,7 +14,7 @@ import {PRINCIPAL_EXPLORER_READ} from '/lib/explorer/constants';
 import {connect} from '/lib/explorer/repo/connect';
 import {getCollectionIds} from '/lib/explorer/collection/getCollectionIds';
 import {get as getInterface} from '/lib/explorer/interface/get';
-import {filter as filterInterface} from '/lib/explorer/interface/filter';
+import {coerseInterfaceType} from '/lib/explorer/interface/coerseInterfaceType';
 import {
 	GraphQLString,
 	list
@@ -43,7 +43,7 @@ export function getInterfaceInfo({
 	});
 	//log.debug('getInterfaceInfo() interfaceNode:%s', toStr(interfaceNode));
 
-	const filteredInterfaceNode = filterInterface(interfaceNode);
+	const filteredInterfaceNode = coerseInterfaceType(interfaceNode);
 	//log.debug('getInterfaceInfo() filteredInterfaceNode:%s', toStr(filteredInterfaceNode));
 
 	const {
