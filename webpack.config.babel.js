@@ -57,7 +57,7 @@ const SRC_DIR_ABS = path.resolve(__dirname, SRC_DIR);
 const DST_DIR_ABS = path.join(__dirname, DST_DIR);
 
 const SS_ALIAS = {
-	'@enonic/nashorn-polyfills': path.resolve(__dirname, 'src/main/resources/lib/nashorn/index.es'),
+	'@enonic/nashorn-polyfills': path.resolve(__dirname, 'src/main/resources/lib/nashorn/index.ts'),
 	'@enonic/js-utils': BOOL_LOCAL_LIB_EXPLORER
 		? BOOL_LOCAL_JS_UTILS
 			? path.resolve(__dirname, '../enonic-js-utils/dist/cjs/index.js')
@@ -144,7 +144,7 @@ const SS_PLUGINS = [
 		Buffer: ['buffer', 'Buffer'],
 
 		// Not always polyfilled only when identifier global found
-		global: path.resolve(__dirname, 'src/main/resources/lib/nashorn/global.es')
+		global: path.resolve(__dirname, 'src/main/resources/lib/nashorn/global.ts')
 	})
 ];
 
@@ -164,31 +164,31 @@ const SS_JS_CONFIG = {
 	context: path.resolve(__dirname, SRC_DIR),
 	devtool: MODE === 'production' ? false : 'eval-source-map', // https://webpack.js.org/configuration/devtool/#devtool
 	entry: {
-		'admin/tools/explorer/explorer': './admin/tools/explorer/explorer.es',
-		'lib/locales': './lib/locales.es',
-		'lib/licensing': './lib/licensing.es',
-		'main': './main.es',
-		'services/collectionCollect/collectionCollect': './services/collectionCollect/collectionCollect.es',
-		'services/collectionDelete/collectionDelete': './services/collectionDelete/collectionDelete.es',
-		'services/collectionDuplicate/collectionDuplicate': './services/collectionDuplicate/collectionDuplicate.es',
-		'services/collectorStop/collectorStop': './services/collectorStop/collectorStop.es',
-		'services/graphQL/graphQL': './services/graphQL/graphQL.es',
-		'services/interfaceCopy/interfaceCopy': './services/interfaceCopy/interfaceCopy.es',
-		'services/interfaceExists/interfaceExists': './services/interfaceExists/interfaceExists.es',
-		'services/longPolling/longPolling': './services/longPolling/longPolling.es',
-		'services/notifications/notifications': './services/notifications/notifications.es',
-		'services/journals/journals': './services/journals/journals.es',
-		'services/listCollectors/listCollectors': './services/listCollectors/listCollectors.es',
-		'services/thesauri/thesauri': './services/thesauri/thesauri.es',
-		'services/thesaurusExport/thesaurusExport': './services/thesaurusExport/thesaurusExport.es',
-		'services/thesaurusImport/thesaurusImport': './services/thesaurusImport/thesaurusImport.es',
-		'services/uninstallLicense/uninstallLicense': './services/uninstallLicense/uninstallLicense.es',
-		'services/uploadLicense/uploadLicense': './services/uploadLicense/uploadLicense.es',
-		'services/ws/ws': './services/ws/ws.es',
+		'admin/tools/explorer/explorer': './admin/tools/explorer/explorer.ts',
+		'lib/locales': './lib/locales.ts',
+		'lib/licensing': './lib/licensing.ts',
+		'main': './main.ts',
+		'services/collectionCollect/collectionCollect': './services/collectionCollect/collectionCollect.ts',
+		'services/collectionDelete/collectionDelete': './services/collectionDelete/collectionDelete.ts',
+		'services/collectionDuplicate/collectionDuplicate': './services/collectionDuplicate/collectionDuplicate.ts',
+		'services/collectorStop/collectorStop': './services/collectorStop/collectorStop.ts',
+		'services/graphQL/graphQL': './services/graphQL/graphQL.ts',
+		'services/interfaceCopy/interfaceCopy': './services/interfaceCopy/interfaceCopy.ts',
+		'services/interfaceExists/interfaceExists': './services/interfaceExists/interfaceExists.ts',
+		'services/longPolling/longPolling': './services/longPolling/longPolling.ts',
+		'services/notifications/notifications': './services/notifications/notifications.ts',
+		'services/journals/journals': './services/journals/journals.ts',
+		'services/listCollectors/listCollectors': './services/listCollectors/listCollectors.ts',
+		'services/thesauri/thesauri': './services/thesauri/thesauri.ts',
+		'services/thesaurusExport/thesaurusExport': './services/thesaurusExport/thesaurusExport.ts',
+		'services/thesaurusImport/thesaurusImport': './services/thesaurusImport/thesaurusImport.ts',
+		'services/uninstallLicense/uninstallLicense': './services/uninstallLicense/uninstallLicense.ts',
+		'services/uploadLicense/uploadLicense': './services/uploadLicense/uploadLicense.ts',
+		'services/ws/ws': './services/ws/ws.ts',
 		'tasks/init/init': './tasks/init/init.ts',
-		'tasks/reindexCollection/reindexCollection': './tasks/reindexCollection/reindexCollection.es',
-		'tasks/test/test': './tasks/test/test.es',
-		'tasks/webcrawl/webcrawl': './tasks/webcrawl/webcrawl.es',
+		'tasks/reindexCollection/reindexCollection': './tasks/reindexCollection/reindexCollection.ts',
+		'tasks/test/test': './tasks/test/test.ts',
+		'tasks/webcrawl/webcrawl': './tasks/webcrawl/webcrawl.ts',
 		'webapp/webapp': './webapp/webapp.ts'
 	},
 	externals: SS_EXTERNALS,
@@ -435,7 +435,7 @@ const ASSETS_CONTEXT = path.resolve(__dirname, SRC_DIR, 'assets');
 
 const CLIENT_JS_CONFIG = {
 	context: SRC_ASSETS_DIR_ABS,
-	entry: './react/index.jsx',
+	entry: './react/index.tsx',
 	externals: {
 		react: 'React',
 		'react-dom': 'ReactDOM'
@@ -557,7 +557,7 @@ const CLIENT_ES_CONFIG = {
 	context: path.join(__dirname, SRC_ASSETS_DIR, 'react'),
 	devtool: MODE === 'production' ? false : 'eval-source-map', // https://webpack.js.org/configuration/devtool/#devtool
 	entry: {
-		'Explorer': './Explorer.jsx',
+		'Explorer': './Explorer.tsx',
 		'WebCrawler': './WebCrawler.tsx'
 	},
 	externals: {
