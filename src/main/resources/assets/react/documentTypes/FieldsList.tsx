@@ -1,3 +1,4 @@
+import React from 'react';
 import {
 	Button,
 	// Form,
@@ -6,9 +7,8 @@ import {
 	// Radio,
 	Table
 } from 'semantic-ui-react';
-// import {getEnonicContext} from 'semantic-ui-react-form/Context';
-//import {Checkbox} from 'semantic-ui-react-form/inputs/Checkbox';
-//import {List} from 'semantic-ui-react-form/List';
+
+import {VALUE_TYPE_STRING} from '@enonic/js-utils';
 
 // import {ButtonDelete} from '../components/ButtonDelete';
 import {ButtonEdit} from '../components/ButtonEdit';
@@ -16,6 +16,25 @@ import {Checkmark} from '../components/Checkmark';
 import {Span} from '../components/Span';
 import {AddOrEditLocalFieldModal} from './AddOrEditLocalFieldModal';
 import {RemoveFieldFromDocumentTypeModal} from './RemoveFieldFromDocumentTypeModal';
+import { remove } from 'cheerio/lib/api/manipulation';
+
+export interface ModalState {
+	open :boolean,
+	state? :{
+		active :boolean,
+		enabled :boolean,
+		includeInAllText :boolean,
+		index :any,
+		fulltext :boolean,
+		max :number,
+		min :number,
+		name :string,
+		nGram :boolean,
+		path :boolean,
+		valueType :string
+	}
+}
+
 
 export const FieldsList = ({
 	collectionsArr,
@@ -25,11 +44,25 @@ export const FieldsList = ({
 	updateOrDeleteProperties
 }) => {
 
-	const [addOrEditModalState, setAddOrEditModalState] = React.useState({
-		open: false
+	const [addOrEditModalState, setAddOrEditModalState] = React.useState<ModalState>({
+		open: false,
+		state: {
+			active: true,
+			enabled: true,
+			includeInAllText : true,
+			index: null,
+			fulltext: true,
+			max: 0,
+			min: 0,
+			name: '',
+			nGram: true,
+			path: false,
+			valueType: VALUE_TYPE_STRING
+		}
 	});
 	const [removeModalState, setRemoveModalState] = React.useState({
-		open: false
+		...addOrEditModalState,
+		open: false,
 	});
 
 	/** Properties index
@@ -44,12 +77,7 @@ export const FieldsList = ({
 		nGram,
 		path
 	 */
-
-	/*const headerCellStyle = {
-		//padding: '.92857143em .6em' // compact='very'
-	};*/
 	const cellStyle = {
-		//padding: '.4em .6em' // compact='very'
 		paddingBottom: 3,
 		paddingTop: 3
 	};
@@ -88,7 +116,7 @@ export const FieldsList = ({
 						min,
 						nGram,
 						path
-					}, i) => <Table.Row className={active || global ? null : 'strikeout'} key={i}>
+					}, i) => <Table.Row className={active ? null : 'strikeout'} key={i}>
 						<Table.Cell collapsing style={cellStyle} textAlign='center'>
 							<Button.Group>
 								<Popup
@@ -120,9 +148,6 @@ export const FieldsList = ({
 						</Table.Cell>
 						<Table.Cell className={active ? '' : null} style={cellStyle}>
 							<Span>{name}</Span>
-							{/* {global ? <Icon color='grey' name='globe' style={{
-								float: 'right'
-							}}/> : null} */}
 						</Table.Cell>
 						<Table.Cell style={cellStyle}><Span>{valueType}</Span></Table.Cell>
 						<Table.Cell collapsing style={cellStyle} textAlign='center'><Span>{min === 0 ? null : min}</Span></Table.Cell>
@@ -140,22 +165,24 @@ export const FieldsList = ({
 									style={popupStyle}
 									trigger={
 										<Button
-											onClick={() => setRemoveModalState({
-												state: {
-													active,
-													enabled,
-													includeInAllText,
-													index: i,
-													fulltext,
-													max,
-													min,
-													name,
-													nGram,
-													path,
-													valueType
-												},
-												open: true
-											})}
+											onClick={() => {
+												setRemoveModalState({
+													state: {
+														active,
+														enabled,
+														includeInAllText,
+														index: i,
+														fulltext,
+														max,
+														min,
+														name,
+														nGram,
+														path,
+														valueType
+													},
+													open: true
+												});
+											}}
 											icon
 										><Icon color='red' name='trash alternate outline'/></Button>
 									}
@@ -172,6 +199,7 @@ export const FieldsList = ({
 			trigger={<Button
 				icon
 				onClick={() => setAddOrEditModalState({
+					...addOrEditModalState,
 					open: true
 				})}><Icon
 					color='green'
@@ -181,7 +209,10 @@ export const FieldsList = ({
 		{addOrEditModalState.open /* This means the component internal state will be totally reset */
 			? <AddOrEditLocalFieldModal
 				modalState={addOrEditModalState}
-				onClose={() => setAddOrEditModalState({open: false})}
+				onClose={() => setAddOrEditModalState({
+					...addOrEditModalState,
+					open: false
+				})}
 				properties={properties}
 				updateOrDeleteProperties={updateOrDeleteProperties}
 			/>
@@ -191,11 +222,16 @@ export const FieldsList = ({
 				updateOrDeleteProperties={updateOrDeleteProperties}
 				collectionsArr={collectionsArr}
 				interfacesArr={interfacesArr}
-				onClose={() => setRemoveModalState({open: false})}
+				onClose={() => setRemoveModalState({
+					...removeModalState,
+					open: false,
+				})}
 				servicesBaseUrl={servicesBaseUrl}
-				modalState={removeModalState}
+				modalState={{
+					state: removeModalState.state,
+					open: removeModalState.open
+				}}
 			/>
-			: null
-		}
+			: null}
 	</>;
 };

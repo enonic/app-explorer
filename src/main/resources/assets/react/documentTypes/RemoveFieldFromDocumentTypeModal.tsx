@@ -1,3 +1,5 @@
+import { INDEX_CONFIG_N_GRAM, isSet } from '@enonic/js-utils';
+import React from 'react';
 import {
 	Button,
 	Icon,
@@ -16,19 +18,7 @@ export function RemoveFieldFromDocumentTypeModal({
 	onClose, // Required!
 	servicesBaseUrl,
 	modalState: {
-		state: state, /*{
-			active,
-			enabled,
-			includeInAllText,
-			index,
-			fulltext,
-			max,
-			min,
-			name
-			nGram,
-			path,
-			valueType,
-		}*/
+		state: state,
 		open: open
 	}
 }) {
@@ -46,7 +36,7 @@ export function RemoveFieldFromDocumentTypeModal({
 		setIsLoading(true);
 		fetchHasField({
 			handleData(data) {
-				setFieldHasValueInDocumentsTotal(data.hasField.total);
+				setFieldHasValueInDocumentsTotal((data as any).hasField.total);
 				setIsLoading(false);
 			},
 			url: `${servicesBaseUrl}/graphQL` ,
@@ -123,9 +113,14 @@ export function RemoveFieldFromDocumentTypeModal({
 					color='blue'
 					floated='left'
 					onClick={() => {
-						let next = state;
-						next.active = false;
-						updateOrDeleteProperties(state, state.index);
+						let next = Object.assign({}, state);
+						delete next.index;
+
+						updateOrDeleteProperties({
+							...next,
+							active: false,
+						}, state.index);
+
 						onClose();
 					}}>
 						Deactivate

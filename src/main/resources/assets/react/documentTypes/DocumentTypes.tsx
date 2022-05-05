@@ -1,9 +1,9 @@
 import moment from 'moment';
+import React from 'react';
 import {
 	Button,
 	Header,
 	Icon,
-	Label,
 	Popup,
 	Radio,
 	Segment,
@@ -18,6 +18,15 @@ import {useInterval} from '../utils/useInterval';
 import {NewOrEditDocumentTypeModal} from './NewOrEditDocumentTypeModal';
 import {DeleteDocumentTypeModal} from './DeleteDocumentTypeModal';
 
+
+interface DocumentTypeModal {
+	_id? :string,
+	_name? :string,
+	collectionsArr? :Array<string>,
+	interfacesArr? :Array<string>,
+	open :boolean,
+}
+
 function getDefaultModalState(open = false) {
 	return {
 		_id: undefined,
@@ -31,7 +40,7 @@ function getDefaultModalState(open = false) {
 export function DocumentTypes({
 	servicesBaseUrl
 }) {
-	const [updatedAt, setUpdatedAt] = React.useState(new moment());
+	const [updatedAt, setUpdatedAt] = React.useState(moment());
 	const [durationSinceLastUpdate, setDurationSinceLastUpdate] = React.useState('');
 
 	const [boolPoll, setBoolPoll] = React.useState(true);
@@ -39,7 +48,7 @@ export function DocumentTypes({
 	const [documentTypes, setDocumentTypes] = React.useState([]);
 
 	// The modal state should be handled by newOrEditDocumentTypeModal
-	const [newOrEditModalState, setNewOrEditModalState] = React.useState(getDefaultModalState());
+	const [newOrEditModalState, setNewOrEditModalState] = React.useState(getDefaultModalState() as DocumentTypeModal);
 
 	const [showAddFields, setShowAddFields] = React.useState(false);
 	const [showCollections, setShowCollections] = React.useState(false);
@@ -63,10 +72,10 @@ export function DocumentTypes({
 	//console.debug('DocumentTypes globalFieldsObj', globalFieldsObj);
 
 	function queryDocumentTypes() {
-		setUpdatedAt(new moment());
+		setUpdatedAt(moment());
 		fetchFields({
 			handleData: (data) => {
-				setGlobalFields(data.queryFields.hits);
+				setGlobalFields((data as any).queryFields.hits);
 			},
 			url: `${servicesBaseUrl}/graphQL`,
 			variables: {
@@ -75,7 +84,7 @@ export function DocumentTypes({
 		});
 		fetchDocumentTypes({
 			handleData: (data) => {
-				setDocumentTypes(data.queryDocumentTypes.hits);
+				setDocumentTypes((data as any).queryDocumentTypes.hits);
 			},
 			url: `${servicesBaseUrl}/graphQL`
 		});
@@ -103,7 +112,7 @@ export function DocumentTypes({
 		if (updatedAt) {
 			setDurationSinceLastUpdate(
 				moment
-					.duration(updatedAt.diff(new moment()))
+					.duration(updatedAt.diff(moment()))
 					.humanize()
 			);
 		}
@@ -336,14 +345,13 @@ export function DocumentTypes({
 			interfacesArr={newOrEditModalState.interfacesArr}
 			open={newOrEditModalState.open}
 			documentTypes={documentTypes}
+			setModalState={setNewOrEditModalState}
 			onClose={() => {
-				//console.debug('NewOrEditDocumentTypeModal onClose');
 				setNewOrEditModalState({ open: false });
 				queryDocumentTypes();
 				setBoolPoll(true);
 			}}
 			onMount={() => {
-				//console.debug('NewOrEditDocumentTypeModal onMount');
 				setBoolPoll(false);
 			}}
 			servicesBaseUrl={servicesBaseUrl}

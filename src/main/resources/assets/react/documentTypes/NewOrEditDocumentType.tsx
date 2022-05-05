@@ -1,3 +1,4 @@
+import React from 'react';
 import {
 	Button,
 	Dimmer,
@@ -69,7 +70,7 @@ export function NewOrEditDocumentType({
 		addFields: true,
 		properties: []
 	});
-	const [error, setError] = React.useState([]);
+	const [error, setError] = React.useState(false as Boolean | String);
 	const [name, setName] = React.useState('');
 	const [activeInput, setActiveInput] = React.useState(false);
 	const [isLoading, setIsLoading] = React.useState(_id ? true : false);
@@ -157,6 +158,12 @@ export function NewOrEditDocumentType({
 			_name: data._name,
 			addFields: data.addFields,
 			properties: data.properties
+		} as {
+			_name :any,
+			addFields :any,
+			properties :any,
+			_id? :any,
+			_versionKey :any,
 		};
 
 		if (_id) {
