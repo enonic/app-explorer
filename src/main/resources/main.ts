@@ -1,8 +1,15 @@
 import '@enonic/nashorn-polyfills';
 //import {toStr} from '@enonic/js-utils';
 
+//@ts-ignore
 import {isMaster} from '/lib/xp/cluster';
+//@ts-ignore
 import {submitTask} from '/lib/xp/task';
+
+
+declare const __ :{
+	disposer :(fn :() => void) => void
+}
 
 
 //log.info(`Starting ${app.name} ${app.version} isMaster:${isMaster()} config:${toStr(app.config)}`);
