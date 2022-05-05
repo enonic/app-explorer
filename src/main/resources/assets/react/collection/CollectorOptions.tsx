@@ -6,7 +6,7 @@ import type {
 } from '../index.d';
 
 
-import getIn from 'get-value';
+import {getIn} from '@enonic/js-utils';
 import * as React from 'react';
 import {Header, Segment} from 'semantic-ui-react';
 

@@ -42,26 +42,39 @@ const PUSHER_STYLE_SIDEBAR_SHOW = {
 };*/
 
 const NODE_MODULES = [{
-	header: 'Classnames',
+	header: 'Classnames', // app-explorer
 	href: 'https://github.com/JedWatson/classnames/blob/master/LICENSE'
+},{
+	header: 'cron-parser', // app-explorer
+	href: 'https://github.com/harrisiirak/cron-parser/blob/master/LICENSE'
 },{
 	header: 'd3-dsv', // lib-explorer
 	description: 'BSD 3-Clause',
 	href: 'https://github.com/d3/d3-dsv/blob/master/LICENSE'
 },{
-	header: 'deepmerge', // lib-explorer-client
-	href: 'https://github.com/TehShrike/deepmerge/blob/master/license.txt'
+	header: 'deep-object-diff', // lib/app-explorer
+	href: 'https://github.com/mattphillips/deep-object-diff/blob/main/LICENSE'
+},{
+	header:'fast-deep-equal', // lib/app-explorer
+	href: 'https://github.com/epoberezkin/fast-deep-equal/blob/master/LICENSE'
 },{
 	header: 'fnv-plus', // lib-explorer
 	href: 'https://github.com/tjwebb/fnv-plus#license'
 },{
-	header: 'highlight-search-result', // lib-explorer
-	href: 'https://github.com/dominictarr/highlight-search-result/blob/master/LICENSE'
+	header: 'fomantic-ui-css', // app-explorer
+	href: 'https://github.com/fomantic/Fomantic-UI-CSS/blob/master/package.json'
+},{
+	header: 'human-object-diff', // lib-explorer
+	href: 'https://github.com/Spence-S/human-object-diff/blob/master/LICENSE'
+},{
+	header: 'jsdiff', // diff lib/app-explorer
+	href: 'https://github.com/kpdecker/jsdiff/blob/master/LICENSE',
+	description: 'BSD-3-Clause'
 },{
 	header: 'jQuery', // lib-explorer
 	href: 'https://github.com/jquery/jquery/blob/master/LICENSE.txt'
 },{
-	header: 'jsUri',
+	header: 'jsUri', // lib/app-explorer
 	href: 'https://github.com/derek-watson/jsUri/blob/master/LICENSE'
 },{
 	header: 'Moment.js',
@@ -70,8 +83,11 @@ const NODE_MODULES = [{
 	header: 'pretty-ms',
 	href: 'https://github.com/sindresorhus/pretty-ms/blob/master/license'
 },{
-	header: 'React and React-dom',
+	header: 'React and React-DOM',
 	href: 'https://github.com/facebook/react/blob/master/LICENSE'
+},{
+	header: 'RJV react-json-view',
+	href: 'https://github.com/mac-s-g/react-json-view/blob/master/LICENSE'
 },/*{
 	header: 'react-scrollspy',
 	href: 'https://github.com/makotot/react-scrollspy/blob/master/LICENSE'
@@ -82,12 +98,16 @@ const NODE_MODULES = [{
 	header: 'Semantic UI React',
 	href: 'https://github.com/jhudson8/react-semantic-ui/blob/master/LICENSE'
 },{
-	header: 'striptags', // lib-explorer-client
-	href: 'https://github.com/ericnorris/striptags/blob/master/LICENSE'
-},{
 	header: 'traverse',
 	description: 'MIT/X11',
 	href: 'https://github.com/substack/js-traverse/blob/master/LICENSE'
+},{
+	header: 'URI.js', // lib-explorer
+	href: 'https://github.com/garycourt/uri-js/blob/master/LICENSE',
+	description: 'BSD-2-Clause'
+},{
+	header: 'uuid', // lib-explorer
+	href: 'https://github.com/uuidjs/uuid/blob/main/LICENSE.md'
 }];
 
 

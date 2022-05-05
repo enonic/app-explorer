@@ -1,9 +1,27 @@
-import getIn from 'get-value';
+//import type {Fields} from '/lib/explorer/types/Field.d';
+import type {Hit} from './search/Hits';
+
+import {
+	getIn,
+	setIn//,
+	//ucFirst
+} from '@enonic/js-utils';
 import * as React from 'react';
 import {Form} from 'semantic-ui-react';
-import setIn from 'set-value';
+//import traverse from 'traverse';
 
 import {Hits} from './search/Hits';
+
+
+type InterfaceName = string;
+type SearchString = string;
+type CacheKey = `${InterfaceName}.${SearchString}`;
+type SearchResult = {
+	count :number
+	hits :Array<Hit>
+	total :number
+}
+type Cache = Record<CacheKey,SearchResult>;
 
 
 //const forceArray = data => Array.isArray(data) ? data : [data];
@@ -17,44 +35,32 @@ const SEARCH_QUERY = `query SearchQuery(
 		searchString: $searchString
 		count: $count
 		start: $start
-		#filters: {}
-		highlight: {
-			fragmentSize: 255
-			numberOfFragments: 1
-			postTag: "</b>"
-			preTag: "<b>"
-			properties: {
-				title: {}
-				text: {}
-			}
-		}
-		#aggregations: []
 	) {
-		#aggregationsAsJson
 		count
 		total
 		hits {
-			#_highlight {
-			#	title
-			#	text
-			#}
-			title
-			text
-			uri
+			_collectionName
+			_documentTypeName
+			_json
+			_score
 		}
 	}
 }`;
 
 
 export function Search(props :{
-	interfaceName ?:string
-	searchString ?:string
+	//documentTypesAndFields ?:Record<string,Fields>
+	interfaceName ?:InterfaceName
+	searchString ?:SearchString
 }) {
+
 	const {
+		//documentTypesAndFields = [],
 		//collectionOptions = [],
 		interfaceName = 'default',
 		//thesaurusOptions = []
 	} = props;
+	//console.debug('documentTypesAndFields', documentTypesAndFields);
 	//console.debug('Search interfaceName', interfaceName);
 
 	const [boolOnChange, setBoolOnChange] = React.useState(false);
@@ -66,17 +72,17 @@ export function Search(props :{
 	const [searchString, setSearchString] = React.useState(props.searchString || '');
 	//console.debug('Search searchString', searchString);
 
-	const [cache, setCache] = React.useState({});
+	const [cache, setCache] = React.useState({} as Cache);
 	//console.debug('Search cache', cache);
 
 	const [result, setResult] = React.useState({
 		count: 0,
 		hits: [],
 		total: 0
-	});
+	} as SearchResult);
 	//console.debug('Search result', result);
 
-	function search(ss) {
+	function search(ss :string) {
 		if(!ss) {
 			setResult({
 				count: 0,
@@ -85,7 +91,10 @@ export function Search(props :{
 			});
 			return;
 		}
-		const cachedResult = getIn(cache, `${interfaceName}.${ss}`);
+		const cachedResult = getIn(
+			cache,
+			`${interfaceName}.${ss}`
+		) as SearchResult;
 		if (cachedResult) {
 			setResult(cachedResult);
 			return;
@@ -131,7 +140,9 @@ export function Search(props :{
 					fluid
 					icon='search'
 					loading={false}
-					onKeyUp={(event) => {
+					onKeyUp={(event :{
+						which :number
+					}) => {
 						//console.debug('onKeyUp event.which',event.which);
 						if(event.which == 10 || event.which == 13) {
 							//console.debug('onKeyUp searchString',searchString);

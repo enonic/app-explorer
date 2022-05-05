@@ -6,7 +6,7 @@ import type {Locales} from '../index.d';
 import {Dropdown} from 'semantic-ui-react-form';
 //@ts-ignore
 import {getEnonicContext} from 'semantic-ui-react-form/Context';
-import getIn from 'get-value';
+import {getIn} from '@enonic/js-utils';
 
 import {capitalize} from '../utils/capitalize';
 

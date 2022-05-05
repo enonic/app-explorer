@@ -1,7 +1,7 @@
 import type {DropdownItemProps} from 'semantic-ui-react/index.d';
 
 
-import getIn from 'get-value';
+import {getIn} from '@enonic/js-utils';
 import {Dropdown as SemanticUiReactDropdown} from 'semantic-ui-react';
 
 //@ts-ignore

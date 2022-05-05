@@ -1,4 +1,4 @@
-import getIn from 'get-value';
+import {getIn} from '@enonic/js-utils';
 
 import {Button, Header, Segment, Table} from 'semantic-ui-react';
 

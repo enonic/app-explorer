@@ -1,5 +1,5 @@
 //import {toStr} from '@enonic/js-utils';
-//import getIn from 'get-value';
+//import {getIn} from '@enonic/js-utils';
 
 import {
 	GraphQLInt,

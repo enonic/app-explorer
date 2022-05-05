@@ -17,7 +17,7 @@ import {
 	isString,
 	toStr
 } from '@enonic/js-utils';
-import getIn from 'get-value';
+import {getIn} from '@enonic/js-utils';
 import setIn from 'set-value';
 
 import {ValidationError} from '/lib/explorer/document/ValidationError';

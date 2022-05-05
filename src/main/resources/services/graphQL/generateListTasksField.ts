@@ -6,7 +6,7 @@ import {
 	TASK_STATE_WAITING/*,
 	toStr*/
 } from '@enonic/js-utils';
-//import getIn from 'get-value';
+//import {getIn} from '@enonic/js-utils';
 
 import {
 	GraphQLBoolean,
