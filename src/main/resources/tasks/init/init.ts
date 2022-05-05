@@ -70,6 +70,7 @@ import {model12} from './model/12';
 import {model13} from './model/13';
 import {model14} from './model/14';
 import {Progress} from './Progress';
+import {applicationListener} from './applicationListener';
 
 
 const FIELD_TYPE = { // TODO This should not be a system field. Remove in lib-explorer-4.0.0?
@@ -727,6 +728,7 @@ export function run() {
 		//──────────────────────────────────────────────────────────────────────
 
 		progress.setInfo('Initialization complete :)').report().debug();
+		applicationListener();
 		const event = {
 			type: EVENT_INIT_COMPLETE,
 
