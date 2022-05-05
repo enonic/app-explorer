@@ -6,8 +6,8 @@ export const Checkmark = ({
 
 	// remove from rest
 	/* eslint-disable no-unused-vars */
-	color,
-	name,
+	color = null,
+	name = null,
 	/* eslint-enable no-unused-vars */
 
 	...rest // disabled, size

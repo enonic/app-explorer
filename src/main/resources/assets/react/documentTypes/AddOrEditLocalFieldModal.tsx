@@ -30,6 +30,7 @@ import {notDoubleDot} from '../utils/notDoubleDot';
 import {onlyLettersDigitsUnderscoresAndDots} from '../utils/onlyLettersDigitsUnderscoresAndDots';
 import {notDoubleUnderscore} from '../utils/notDoubleUnderscore';
 import {required} from '../utils/required';
+import React from 'react';
 
 const OPTIONS_VALUE_TYPES = [
 	VALUE_TYPE_BOOLEAN,
@@ -91,12 +92,7 @@ export const AddOrEditLocalFieldModal = ({
 
 	const [nameTouched, setNameTouched] = React.useState(false);
 
-	const [header, setHeader] = React.useState(/*propName
-		? globalFieldObj[propName]
-			? `Override global field ${propName}`
-			: `Edit field ${propName}`
-		: 'Add field'
-	*/);
+	const [header, setHeader] = React.useState('');
 
 	React.useEffect(() => {
 		setHeader(propName || name ? `Edit field ${propName || name}` : `Add field`);
@@ -180,7 +176,7 @@ export const AddOrEditLocalFieldModal = ({
 		</Modal.Header>
 		<Modal.Content>
 			<Input
-				disabled={propName}
+				disabled={propName ? true : false}
 				fluid
 				label='Name'
 				onChange={(event, {value: newName}) => {
@@ -208,7 +204,7 @@ export const AddOrEditLocalFieldModal = ({
 					<Table.Row>
 						<Table.Cell><Dropdown
 							onChange={(event, {value: newValueType}) => {
-								setValueType(newValueType);
+								setValueType(newValueType as string);
 							}}
 							options={OPTIONS_VALUE_TYPES}
 							search

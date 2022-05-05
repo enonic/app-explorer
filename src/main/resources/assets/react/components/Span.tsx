@@ -3,7 +3,7 @@ import classNames from 'classnames';
 export const Span = ({
 	color = '',
 	children,
-	disabled,
+	disabled = false,
 	...rest
 }) => <span className={classNames(
 	'ui text',
