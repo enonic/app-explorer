@@ -11,14 +11,14 @@ import {
 	VALUE_TYPE_REFERENCE,
 	VALUE_TYPE_SET,
 	VALUE_TYPE_STRING,
+	getIn,
 	isInt,
 	isObject,
 	isSet,
 	isString,
+	setIn,
 	toStr
 } from '@enonic/js-utils';
-import {getIn} from '@enonic/js-utils';
-import setIn from 'set-value';
 
 import {ValidationError} from '/lib/explorer/document/ValidationError';
 import {

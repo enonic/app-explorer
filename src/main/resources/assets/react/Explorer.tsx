@@ -86,6 +86,9 @@ const NODE_MODULES = [{
 	header: 'React and React-DOM',
 	href: 'https://github.com/facebook/react/blob/master/LICENSE'
 },{
+	header: 'React-gantt-antd', // app-explorer
+	href: 'https://github.com/JSainsburyPLC/react-timelines/blob/master/LICENSE'
+},{
 	header: 'RJV react-json-view',
 	href: 'https://github.com/mac-s-g/react-json-view/blob/master/LICENSE'
 },/*{
@@ -97,6 +100,14 @@ const NODE_MODULES = [{
 },{
 	header: 'Semantic UI React',
 	href: 'https://github.com/jhudson8/react-semantic-ui/blob/master/LICENSE'
+},{
+	header: 'Serialize JavaScript', // app-explorer
+	href: 'https://github.com/yahoo/serialize-javascript/blob/main/LICENSE',
+	description: 'BSD-3-Clause'
+},{
+	header: 'set-in', // app-explorer
+	href: 'https://github.com/ahdinosaur/set-in/blob/master/package.json',
+	description: 'Apache-2.0'
 },{
 	header: 'traverse',
 	description: 'MIT/X11',

@@ -2,7 +2,6 @@ import type {CollectorProps} from './index.d';
 
 
 import {getIn} from '@enonic/js-utils';
-//import setIn from 'set-value';
 import {Button, Form, Header, Icon, Table} from 'semantic-ui-react';
 import {
 	setError,
