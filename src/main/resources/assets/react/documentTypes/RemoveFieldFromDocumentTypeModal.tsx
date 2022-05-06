@@ -113,7 +113,7 @@ export function RemoveFieldFromDocumentTypeModal({
 					color='blue'
 					floated='left'
 					onClick={() => {
-						let next = Object.assign({}, state);
+						const next = Object.assign({}, state);
 						delete next.index;
 
 						updateOrDeleteProperties({

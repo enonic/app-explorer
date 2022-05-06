@@ -16,9 +16,8 @@ import {Checkmark} from '../components/Checkmark';
 import {Span} from '../components/Span';
 import {AddOrEditLocalFieldModal} from './AddOrEditLocalFieldModal';
 import {RemoveFieldFromDocumentTypeModal} from './RemoveFieldFromDocumentTypeModal';
-import { remove } from 'cheerio/lib/api/manipulation';
 
-export interface ModalState {
+export type ModalState = {
 	open :boolean,
 	state? :{
 		active :boolean,

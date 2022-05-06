@@ -53,7 +53,7 @@ const OPTIONS_VALUE_TYPES = [
 export const AddOrEditLocalFieldModal = ({
 	properties,
 	updateOrDeleteProperties,
-	onClose = () => {},
+	onClose = () => { return },
 	modalState: {
 		state: {
 			active: propActive = true,
@@ -203,8 +203,8 @@ export const AddOrEditLocalFieldModal = ({
 				<Table.Body>
 					<Table.Row>
 						<Table.Cell><Dropdown
-							onChange={(event, {value: newValueType}) => {
-								setValueType(newValueType as string);
+							onChange={(event, {value: newValueType}: {value :string}) => {
+								setValueType(newValueType);
 							}}
 							options={OPTIONS_VALUE_TYPES}
 							search
