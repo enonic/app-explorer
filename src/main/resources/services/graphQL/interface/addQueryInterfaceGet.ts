@@ -17,7 +17,11 @@ export function addQueryInterfaceGet({glue}) {
 		args: {
 			_id: glue.getScalarType('_id')
 		},
-		resolve(env) {
+		resolve(env :{
+			args: {
+				_id :string
+			}
+		}) {
 			//log.debug(`env:${toStr(env)}`);
 			const {
 				args: {

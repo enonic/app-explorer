@@ -1,17 +1,12 @@
-import {
-	forceArray//,
-	//toStr
-} from '@enonic/js-utils';
-
 import {coerseInterfaceType} from '/lib/explorer/interface/coerseInterfaceType';
 import {PRINCIPAL_EXPLORER_WRITE} from '/lib/explorer/model/2/constants';
-import {interfaceModel} from '/lib/explorer/model/2/nodeTypes/interface';
-import {modify} from '/lib/explorer/node/modify';
+import {update} from '/lib/explorer/interface/update';
 import {connect} from '/lib/explorer/repo/connect';
 import {
 	GraphQLID,
 	GraphQLString,
 	list
+	//@ts-ignore
 } from '/lib/graphql';
 
 import {
@@ -33,7 +28,19 @@ export function addMutationInterfaceUpdate({glue}) {
 			stopWords: list(GraphQLString), // null allowed
 			synonymIds: list(GraphQLID) // null allowed
 		},
-		resolve(env) {
+		resolve(env :{
+			args :{
+				_id :string
+				_name :string
+				collectionIds ?:Array<string>
+				fields ?:Array<{
+					boost ?:number
+					name :string
+				}>
+				stopWords ?:Array<string>
+				synonymIds ?:Array<string>
+			}
+		}) {
 			//log.debug(`env:${toStr(env)}`);
 			const {
 				args: {
@@ -64,21 +71,15 @@ export function addMutationInterfaceUpdate({glue}) {
 					throw new Error(`Unable to rename interface from ${origNode._name} to ${_name}!`);
 				}
 			}
-			const modifiedNode = modify(interfaceModel({ // Model applies forceArray and reference
-				_name,
+			const modifiedNode = update({ // Model applies forceArray and reference
+				_id,
 				collectionIds,
-				fields: forceArray(fields).map(({ // empty array allowed
-					boost, // undefined allowed
-					name
-				}) => ({
-					boost,
-					name
-				})),
+				fields,
 				//stopWordIds, // empty array allowed
 				stopWords,
 				synonymIds // empty array allowed
-			}), {
-				connection: writeConnection
+			}, {
+				writeConnection
 			});
 			return coerseInterfaceType(modifiedNode);
 		},
