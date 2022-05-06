@@ -27,7 +27,7 @@ interface DocumentTypeModal {
 	open :boolean,
 }
 
-function getDefaultModalState(open = false) {
+function getDefaultModalState(open = false) :DocumentTypeModal {
 	return {
 		_id: undefined,
 		_name: undefined,
@@ -48,7 +48,7 @@ export function DocumentTypes({
 	const [documentTypes, setDocumentTypes] = React.useState([]);
 
 	// The modal state should be handled by newOrEditDocumentTypeModal
-	const [newOrEditModalState, setNewOrEditModalState] = React.useState(getDefaultModalState() as DocumentTypeModal);
+	const [newOrEditModalState, setNewOrEditModalState] = React.useState<DocumentTypeModal>(getDefaultModalState());
 
 	const [showAddFields, setShowAddFields] = React.useState(false);
 	const [showCollections, setShowCollections] = React.useState(false);
