@@ -4,6 +4,7 @@ import type {Field} from '/lib/explorer/field/types.d';
 
 
 import {
+	HIGHLIGHT_FIELD_ALLTEXT,
 	camelize,
 	forceArray,
 	isSet//,
@@ -117,13 +118,17 @@ export function getInterfaceInfo({
 	allFieldKeys.sort();
 	//log.debug(`allFieldKeys:${toStr(allFieldKeys)}`);
 
+	//log.debug('QUERY_FIELD_ALLTEXT:%s', QUERY_FIELD_ALLTEXT);
 	const interfaceSearchHitsHighlightsFields :{
 		[k :string] :any
-	} = {};
+	} = {
+		[HIGHLIGHT_FIELD_ALLTEXT]: { type: list(GraphQLString) }
+	};
 	allFieldKeys.forEach((fieldKey) => {
 		const camelizedFieldKey = camelize(fieldKey, /[.-]/g);
 		interfaceSearchHitsHighlightsFields[camelizedFieldKey] = { type: list(GraphQLString) };
 	});
+	//log.debug(`interfaceSearchHitsHighlightsFields:${toStr(interfaceSearchHitsHighlightsFields)}`);
 
 	return {
 		allFieldKeys,

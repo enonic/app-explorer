@@ -47,6 +47,7 @@ export const Hits = ({
 			hits.map(({
 				_collectionName,
 				_documentTypeName,
+				_highlight,
 				_json,
 				_score
 			}, index) => <List.Item key={index}>
@@ -63,6 +64,15 @@ export const Hits = ({
 						<Table.Row>
 							<Table.Cell><b>Score</b></Table.Cell>
 							<Table.Cell>{_score}</Table.Cell>
+						</Table.Row>
+						<Table.Row>
+							<Table.Cell><b>Hightlight</b></Table.Cell>
+							<Table.Cell><ReactJson
+								enableClipboard={true}
+								displayDataTypes={false}
+								name={null}
+								src={_highlight}
+							/></Table.Cell>
 						</Table.Row>
 						<Table.Row>
 							<Table.Cell><b>JSON</b></Table.Cell>
