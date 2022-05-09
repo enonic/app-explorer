@@ -30,13 +30,13 @@ export function createFromDocumentTypesJson({
 	const resourceJson :string = readText(resource.getStream());
 	//log.debug(`resourcePath:${resourcePath} resourceJson:${resourceJson}`);
 
-	let resourceData;
-	try {
-		resourceData = JSON.parse(resourceJson) as Array<{
+	let resourceData :Array<{
 			_name :string
 			addFields ?:boolean
 			properties ?:DocumentTypeFields
 		}>;
+	try {
+		resourceData = JSON.parse(resourceJson);
 	} catch (e) {
 		log.error(`Something went wrong while parsing resource path:${resourcePath} json:${resourceJson}!`, e);
 	}
@@ -51,6 +51,7 @@ export function createFromDocumentTypesJson({
 			createDocumentType({
 				_name,
 				addFields,
+				managedBy: applicationKey,
 				properties
 			});
 		}
