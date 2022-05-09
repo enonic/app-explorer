@@ -1,3 +1,12 @@
+import type {SemanticICONS} from 'semantic-ui-react/src/generic.d';
+import type {InterfaceField} from '/lib/explorer/types/Interface.d';
+import type {
+	CollectorComponents,
+} from './index.d';
+
+
+import * as gql from 'gql-query-builder';
+import * as React from 'react';
 import {
 	Header, Icon, List, Menu, Modal, Sidebar
 } from 'semantic-ui-react';
@@ -26,6 +35,28 @@ import {UploadLicense} from './UploadLicense';
 //const SIDEBAR_WIDTH = 'very thin';
 const SIDEBAR_WIDTH_PX = 260; // 157
 const PUSHER_WIDTH = `calc(100% - ${SIDEBAR_WIDTH_PX}px)`;
+
+const GQL_BODY_QUERY_INTERFACES_DEFAULT = JSON.stringify(gql.query({
+  operation: 'queryInterfaces',
+  fields: [
+	  {
+		  hits: [
+			  {
+				  fields: [
+					  'name'
+				  ]
+			  },
+		  ]
+	  },
+  ],
+  variables: {
+	  query: {
+		  required: false,
+		  value: "_name = 'default'"
+	  }
+  }
+}));
+//console.debug('GQL_BODY_QUERY_INTERFACES_DEFAULT', GQL_BODY_QUERY_INTERFACES_DEFAULT);
 
 /*const PUSHER_STYLE_SIDEBAR_HIDE = {
 	padding: '54px 14px 14px',
@@ -63,6 +94,9 @@ const NODE_MODULES = [{
 },{
 	header: 'fomantic-ui-css', // app-explorer
 	href: 'https://github.com/fomantic/Fomantic-UI-CSS/blob/master/package.json'
+},{
+	header: 'GraphQL Query Builder', // app-explorer
+	href: 'https://github.com/atulmy/gql-query-builder/blob/master/LICENSE'
 },{
 	header: 'human-object-diff', // lib-explorer
 	href: 'https://github.com/Spence-S/human-object-diff/blob/master/LICENSE'
@@ -153,7 +187,12 @@ const UploadLicenseModal = (props) => {
 }; // UploadLicenseModal
 
 
-export function Explorer(props) {
+export function Explorer(props :{
+	collectorComponents :CollectorComponents
+	licensedTo :string
+	licenseValid :boolean
+	servicesBaseUrl :string
+}) {
 	//console.debug('Explorer props', props);
 	const {
 		collectorComponents,
@@ -168,7 +207,8 @@ export function Explorer(props) {
 	//const [wsStatus, setWsStatus] = React.useState('');
 	const [licenseValid, setLicenseValid] = React.useState(initialLicenseValid);
 	const [licensedTo, setLicensedTo] = React.useState(initialLicensedTo);
-	const [menuIconName, setMenuIconName] = React.useState('close');
+	const [menuIconName, setMenuIconName] = React.useState<SemanticICONS>('close');
+	const [defaultInterfaceFields, setDefaultInterfaceFields] = React.useState<Array<InterfaceField>>([]);
 	const [page, setPage] = React.useState('home');
 	//const [pusherStyle, setPusherStyle] = React.useState(PUSHER_STYLE_SIDEBAR_SHOW);
 	const [sideBarVisible, setSideBarVisible] = React.useState(true);
@@ -180,10 +220,29 @@ export function Explorer(props) {
 	//const [tasks, setTasks] = React.useState([]);
 	//console.debug('Explorer tasks', tasks);
 
+	const memoizedQueryInterfacesDefault = React.useCallback(() => {
+		fetch(`${servicesBaseUrl}/graphQL`, {
+			method: 'POST',
+			headers: {
+				'Content-Type':	'application/json'
+			},
+			body: GQL_BODY_QUERY_INTERFACES_DEFAULT
+		})
+			.then(response => response.json())
+			.then(json => {
+				//console.debug(json);
+				setDefaultInterfaceFields(json.data.queryInterfaces.hits[0].fields);
+			});
+	}, [servicesBaseUrl]); // memoizedQueryInterfacesDefault
+
+	React.useEffect(() => {
+		memoizedQueryInterfacesDefault();
+	}, [memoizedQueryInterfacesDefault]);
+	console.debug('defaultInterfaceFields', defaultInterfaceFields);
+
 	React.useEffect(() => {
 		const hashPage = window.location.hash.substring(1);
 		if (hashPage) { setPage(hashPage); }
-
 		/*const wsUrl = wsBaseUrl + '/ws';
 		//console.debug('wsUrl', wsUrl);
 
@@ -482,6 +541,7 @@ export function Explorer(props) {
 				{page === 'home' && <>
 					<Header as='h1' content='Explorer'/>
 					<Search
+						fields={defaultInterfaceFields}
 						interfaceName='default'
 						searchString=''
 					/>

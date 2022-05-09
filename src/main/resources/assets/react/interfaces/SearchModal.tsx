@@ -1,4 +1,5 @@
-import type {Fields} from '/lib/explorer/types/Field.d';
+//import type {Fields} from '/lib/explorer/types/Field.d';
+import type {InterfaceField} from '/lib/explorer/types/Interface.d';
 
 
 import * as React from 'react';
@@ -11,13 +12,15 @@ export function SearchModal(props :{
 	interfaceName :string
 	afterClose ?:() => void
 	beforeOpen ?:() => void
-	documentTypesAndFields ?:Record<string,Fields>
+	//documentTypesAndFields ?:Record<string,Fields>
+	fields ?:Array<InterfaceField>
 }) {
 	const {
 		interfaceName,
 		afterClose = () => {},
 		beforeOpen = () => {},
-		documentTypesAndFields = {}
+		//documentTypesAndFields = {},
+		fields = []
 	} = props;
 	//console.debug('documentTypesAndFields', documentTypesAndFields);
 
@@ -49,7 +52,7 @@ export function SearchModal(props :{
 		<Modal.Header>Search interface: {interfaceName}</Modal.Header>
 		<Modal.Content>
 			<Search
-				documentTypesAndFields={documentTypesAndFields}
+				fields={fields}
 				interfaceName={interfaceName}
 			/>
 		</Modal.Content>

@@ -13,6 +13,7 @@
     "diff": "^5",
     "fast-deep-equal": "^3",
     "fomantic-ui-css": "2.8.8",
+    "gql-query-builder": "^3.6.0",
     "human-object-diff": "2.0.2",
     "is-uuid": "^1.0.2",
     "jsuri": "^1",
