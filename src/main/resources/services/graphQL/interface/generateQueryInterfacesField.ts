@@ -5,11 +5,12 @@ import type {Interface} from '/lib/explorer/types/index.d';
 
 import {
 	GraphQLInt,
+	GraphQLString,
 	list
 	//@ts-ignore
 } from '/lib/graphql';
 import {coerseInterfaceType} from '/lib/explorer/interface/coerseInterfaceType';
-import {query} from '/lib/explorer/interface/query';
+import {query as queryInterfaces} from '/lib/explorer/interface/query';
 import {PRINCIPAL_EXPLORER_READ} from '/lib/explorer/model/2/constants';
 import {connect} from '/lib/explorer/repo/connect';
 
@@ -23,19 +24,25 @@ export function generateQueryInterfacesField({
 }) {
 	return {
 		args: {
-			count: GraphQLInt
+			count: GraphQLInt,
+			query: GraphQLString
 		},
 		resolve: (env :{
 			args :{
 				count ?:number
+				query ?:string
 			}
 		}) => {
 			//log.info(`env:${toStr(env)}`);
-			const {count = -1} = env.args;
+			const {
+				count = -1,
+				query = ''
+			} = env.args;
 			const connection = connect({ principals: [PRINCIPAL_EXPLORER_READ] });
-			const interfacesRes = query({
+			const interfacesRes = queryInterfaces({
 				connection,
-				count
+				count,
+				query
 			});
 			const rv :{
 				count :number

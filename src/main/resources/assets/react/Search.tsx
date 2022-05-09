@@ -1,11 +1,14 @@
 //import type {Fields} from '/lib/explorer/types/Field.d';
+import type {InterfaceField} from '/lib/explorer/types/Interface.d';
 import type {Hit} from './search/Hits';
+
 
 import {
 	getIn,
 	setIn//,
 	//ucFirst
 } from '@enonic/js-utils';
+import * as gql from 'gql-query-builder';
 import * as React from 'react';
 import {Form} from 'semantic-ui-react';
 //import traverse from 'traverse';
@@ -26,41 +29,10 @@ type Cache = Record<CacheKey,SearchResult>;
 
 //const forceArray = data => Array.isArray(data) ? data : [data];
 
-const SEARCH_QUERY = `query SearchQuery(
-	$searchString: String!
-	$count: Int
-	$start: Int
-) {
-	search(
-		count: $count
-		highlight: {
-			numberOfFragments: 1
-			postTag: "</b>"
-			preTag: "<b>"
-			properties: {
-				_alltext: {}
-			}
-		}
-		searchString: $searchString
-		start: $start
-	) {
-		count
-		total
-		hits {
-			_collectionName
-			_documentTypeName
-			_highlight {
-				_alltext
-			}
-			_json
-			_score
-		}
-	}
-}`;
-
 
 export function Search(props :{
 	//documentTypesAndFields ?:Record<string,Fields>
+	fields ?:Array<InterfaceField>
 	interfaceName ?:InterfaceName
 	searchString ?:SearchString
 }) {
@@ -68,9 +40,11 @@ export function Search(props :{
 	const {
 		//documentTypesAndFields = [],
 		//collectionOptions = [],
+		fields = [],
 		interfaceName = 'default',
 		//thesaurusOptions = []
 	} = props;
+	//console.debug('Search({fields:', fields,'})');
 	//console.debug('documentTypesAndFields', documentTypesAndFields);
 	//console.debug('Search interfaceName', interfaceName);
 
@@ -113,17 +87,63 @@ export function Search(props :{
 		setLoading(true);
 		const uri = `./explorer/api/v1/interface/${interfaceName}`;
 		//console.debug(uri);
+
+		const variables :Record<string, {
+			required ?:boolean
+			type ?:string
+			value :unknown
+		}> = {};
+		const fieldsHits :Array<
+			string
+			|Record<string,Array<string>>
+		> = [
+			'_collectionName',
+			'_documentTypeName',
+		];
+		if (fields.length) {
+			const fieldsHitsHighlight = [];
+			const variablesHighlightProperties = {};
+			for (let i = 0; i < fields.length; i++) {
+				const {name} = fields[i];
+				fieldsHitsHighlight.push(name);
+				variablesHighlightProperties[name] = {};
+			}
+			fieldsHits.push({
+				_highlight: fieldsHitsHighlight
+			});
+			variables['highlight'] = {
+				required: false,
+				type: 'InputTypeHighlight',
+				value: {
+					numberOfFragments: 1,
+					postTag: '</b>',
+					preTag: '<b>',
+					properties: variablesHighlightProperties
+				}
+			}
+		}
+		fieldsHits.push('_json');
+		fieldsHits.push('_score');
+		variables['searchString'] = {
+			required: true,
+			value: 'whatever'
+		};
+		const gqlQuery = gql.query({
+		  operation: 'search',
+		  fields: [
+			  'count',
+			  {
+				  hits: fieldsHits
+			  },
+			  'total'
+		  ],
+		  variables
+	  	});
+		//console.debug('Search() gqlQuery:', gqlQuery);
 		fetch(uri, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				query: SEARCH_QUERY,
-				variables: {
-					//count: 10,
-					searchString: ss//,
-					//start: 0
-				}
-			})
+			body: JSON.stringify(gqlQuery)
 		})
 			.then(response => response.json())
 			.then(aResult => {

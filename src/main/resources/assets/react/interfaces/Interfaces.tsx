@@ -237,10 +237,10 @@ export function Interfaces({
 					path :boolean
 					valueType :string // TODO?
 				}>> = {};
-				const documentTypeIdToName :Record<string,string> = {};
+				//const documentTypeIdToName :Record<string,string> = {};
 				data.queryDocumentTypes.hits.forEach(({
 					_id,
-					_name,
+					//_name,
 					properties = []
 				}) => {
 					const uniqueFieldsObj = {};
@@ -260,16 +260,16 @@ export function Interfaces({
 					});
 					documentTypeIdToFieldKeys[_id] = Object.keys(uniqueFieldsObj);
 					documentTypeIdToFields[_id] = properties;
-					documentTypeIdToName[_id] = _name;
+					//documentTypeIdToName[_id] = _name;
 				});
 				//console.debug('documentTypeIdToFieldKeys', documentTypeIdToFieldKeys);
 
 				setCollections(data.queryCollections.hits);
-				const collectionIdToDocumentTypeIds = {};
+				//const collectionIdToDocumentTypeIds = {};
 				const collectionIdToFieldKeys = {};
 				const collectionIdToName = {};
 				data.queryCollections.hits.forEach(({_id, _name, documentTypeId}) => {
-					collectionIdToDocumentTypeIds[_id] = documentTypeId;
+					//collectionIdToDocumentTypeIds[_id] = documentTypeId;
 					collectionIdToFieldKeys[_id] = documentTypeIdToFieldKeys[documentTypeId];
 					collectionIdToName[_id] = _name;
 				});
@@ -307,7 +307,7 @@ export function Interfaces({
 						'_allText': true // NOTE Hardcode
 					};*/
 					const collectionNamesObj = {};
-					const documentTypesAndFields = {};
+					//const documentTypesAndFields = {};
 					collectionIds.forEach((_id) => {
 						/*const fieldKeys = collectionIdToFieldKeys[_id];
 						if (fieldKeys) {
@@ -315,11 +315,11 @@ export function Interfaces({
 								boostableFieldsObj[fieldKey] = true;
 							});
 						}*/
-						const documentTypeId = collectionIdToDocumentTypeIds[_id];
+						/*const documentTypeId = collectionIdToDocumentTypeIds[_id];
 						if (!documentTypesAndFields[documentTypeId]) {
 							const documentTypeName = documentTypeIdToName[documentTypeId];
 							documentTypesAndFields[documentTypeName] = documentTypeIdToFields[documentTypeId];
-						}
+						}*/
 						const collectionName = collectionIdToName[_id];
 						if (collectionName) {
 							collectionNamesObj[collectionName] = true;
@@ -339,7 +339,7 @@ export function Interfaces({
 						_name,
 						//boostableFieldKeys: Object.keys(boostableFieldsObj).sort(),
 						collectionNames: Object.keys(collectionNamesObj).sort(),
-						documentTypesAndFields,
+						//documentTypesAndFields,
 						fields,
 						stopWords,
 						thesaurusNames
@@ -443,7 +443,7 @@ export function Interfaces({
 						_id,
 						_name,
 						collectionNames = [],
-						documentTypesAndFields,
+						//documentTypesAndFields,
 						fields = [],
 						stopWords = [],
 						//stopWordIds = [],
@@ -483,7 +483,7 @@ export function Interfaces({
 							<Button.Group>
 								<SearchModal
 									interfaceName={_name}
-									documentTypesAndFields={documentTypesAndFields}
+									fields={fields}
 								/>
 								<CopyModal
 									afterClose={memoizedUpdateInterfacesCallback}
