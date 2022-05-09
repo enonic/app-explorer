@@ -238,7 +238,7 @@ export function Explorer(props :{
 	React.useEffect(() => {
 		memoizedQueryInterfacesDefault();
 	}, [memoizedQueryInterfacesDefault]);
-	console.debug('defaultInterfaceFields', defaultInterfaceFields);
+	//console.debug('defaultInterfaceFields', defaultInterfaceFields);
 
 	React.useEffect(() => {
 		const hashPage = window.location.hash.substring(1);
