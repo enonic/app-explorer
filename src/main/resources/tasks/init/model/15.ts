@@ -17,7 +17,7 @@ export function model15({
 	progress :Progress
 	writeConnection :WriteConnection
 }) {
-	progress.addItems(1).setInfo('Updating default interface...').report().logInfo();
+	progress.addItems(1).setInfo('Updating default interface with fields _alltext ...').report().logInfo();
 	const existingInterfaceNode = getInterface({
 		connection: writeConnection,
 		interfaceName: DEFAULT_INTERFACE_NAME
@@ -32,8 +32,8 @@ export function model15({
 		writeConnection
 	});
 	progress.finishItem();
-	/*setModel({
+	setModel({
 		connection: writeConnection,
 		version: 15
-	});*/
+	});
 }
