@@ -5,6 +5,7 @@ import type {GlobalFieldsObj} from '../buildGlobalFieldsObj';
 
 
 import {
+	HIGHLIGHT_FIELD_ALLTEXT,
 	/*VALUE_TYPE_BOOLEAN,
 	VALUE_TYPE_DOUBLE,
 	VALUE_TYPE_GEO_POINT,
@@ -82,9 +83,16 @@ export function addDynamicTypes({
 
 	const fieldKeysForAggregations = [];
 	const fieldKeysForFilters = [];
-	const highlightParameterPropertiesFields = {};
-	const interfaceSearchHitsFieldsFromSchema = {};
 	const staticHighlightParameterPropertiesFields = glue.getInputFields(GQL_INPUT_FIELDS_HIGHLIGHT_PROPERTIES);
+	const highlightParameterPropertiesFields = {
+		[HIGHLIGHT_FIELD_ALLTEXT]: {
+			type: glue.addInputType({
+				name: `InputTypeHighlightProperties${ucFirst(HIGHLIGHT_FIELD_ALLTEXT)}`,
+				fields: staticHighlightParameterPropertiesFields
+			})
+		}
+	};
+	//const interfaceSearchHitsFieldsFromSchema = {};
 
 	allFieldKeys.forEach((fieldKey) => {
 		const camelizedFieldKey = camelize(fieldKey, /[.-]/g);

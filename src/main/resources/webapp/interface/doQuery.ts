@@ -66,6 +66,7 @@ export function doQuery({
 	});
 	//log.debug('doQuery() repoIdObj:%s', toStr(repoIdObj));
 
+	//log.debug('doQuery() queryParams:%s', toStr(queryParams));
 	const queryRes = multiRepoReadConnection.query(queryParams) as Omit<MultiRepoNodeQueryResponse, 'hits'> & {
 		aggregationsAsJson :string
 		hits :Array<MultiRepoNodeQueryHit & {highlight? :Record<string,Array<string>>}>

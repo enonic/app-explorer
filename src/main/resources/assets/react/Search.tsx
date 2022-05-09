@@ -32,8 +32,16 @@ const SEARCH_QUERY = `query SearchQuery(
 	$start: Int
 ) {
 	search(
-		searchString: $searchString
 		count: $count
+		highlight: {
+			numberOfFragments: 1
+			postTag: "</b>"
+			preTag: "<b>"
+			properties: {
+				_alltext: {}
+			}
+		}
+		searchString: $searchString
 		start: $start
 	) {
 		count
@@ -41,6 +49,9 @@ const SEARCH_QUERY = `query SearchQuery(
 		hits {
 			_collectionName
 			_documentTypeName
+			_highlight {
+				_alltext
+			}
 			_json
 			_score
 		}
@@ -163,7 +174,7 @@ export function Search(props :{
 				/>
 				<Form.Checkbox
 					checked={boolOnChange}
-					label='On change?'
+					label='Search on every input change?'
 					onChange={(
 						//@ts-ignore
 						ignored,
