@@ -1,4 +1,7 @@
-import type {DocumentTypeField} from '/lib/explorer/types/index.d';
+import type {
+	DocumentType,
+	DocumentTypeField
+} from '/lib/explorer/types/index.d';
 import type {JSONResponse} from '../../../services/graphQL/fetchers/index.d';
 import type {FetchDocumentTypeCreateData} from '../../../services/graphQL/fetchers/fetchDocumentTypeCreate';
 import type {QueryDocumentTypesHits} from '../../../services/graphQL/fetchers/fetchDocumentTypes';
@@ -10,6 +13,7 @@ import type {
 } from './index.d';
 
 
+import {fold} from '@enonic/js-utils';
 import * as React from 'react';
 import {
 	Button,
@@ -25,8 +29,8 @@ import {
 } from 'semantic-ui-react';
 
 import {fetchDocumentTypeCreate} from '../../../services/graphQL/fetchers/fetchDocumentTypeCreate';
+import {fetchDocumentTypeGet} from '../../../services/graphQL/fetchers/fetchDocumentTypeGet';
 import {fetchDocumentTypeUpdate} from '../../../services/graphQL/fetchers/fetchDocumentTypeUpdate';
-import {GQL_QUERY_DOCUMENT_TYPE_GET} from '../../../services/graphQL/queries/documentTypeGetQuery';
 
 // import {fetchFields} from '../../../services/graphQL/fetchers/fetchFields';
 import {nameValidator} from '../utils/nameValidator';
@@ -39,7 +43,7 @@ import {FieldsList} from './FieldsList';
 function validateName(
 	value :string, // value from an input button
 	documentTypes :QueryDocumentTypesHits
-) :string|undefined {
+) :string|false {
 	const result = nameValidator(value);
 	// NameValidator sets undefined when no error. Object on error
 	if (result) {
@@ -51,7 +55,7 @@ function validateName(
 			}
 		}
 	}
-	return undefined;
+	return false;
 }
 
 
@@ -64,7 +68,7 @@ export function NewOrEditDocumentType({
 	_id,
 	_name,
 	collectionsArr = [],
-	doClose = () => {},
+	doClose = () => {/**/},
 	interfacesArr = [],
 } :{
 	// Required
@@ -84,31 +88,24 @@ export function NewOrEditDocumentType({
 		addFields: true,
 		properties: []
 	});
-	const [error, setError] = React.useState(false as Boolean | String);
+	const [error, setError] = React.useState<string|false>(false);
 	const [name, setName] = React.useState('');
 	const [activeInput, setActiveInput] = React.useState(false);
 	const [isLoading, setIsLoading] = React.useState(_id ? true : false);
 
-	function getDocumentType(id :string) {
-		fetch(`${servicesBaseUrl}/graphQL`, {
-			method: 'POST',
-			headers: {
-				'Content-Type':	'application/json'
-			},
-			body: JSON.stringify({
-				query: GQL_QUERY_DOCUMENT_TYPE_GET,
-				variables: {
-					_id: id
-				}
-			})
-		})
-			.then(response => response.json())
-			.then(result => {
-				const data = result.data.getDocumentType;
-				setState({...data});
-				setIsLoading(false);
-			});
-	}
+	const memoizedFetchDocumentTypeGet = React.useCallback((id :string) => fetchDocumentTypeGet({
+		url: `${servicesBaseUrl}/graphQL`,
+		variables: {
+			_id: id
+		}
+	})
+		.then(data => {
+			const documentType = data.getDocumentType;
+			setState({...documentType});
+			setIsLoading(false);
+		}), [
+		servicesBaseUrl
+	]);
 
 	React.useEffect(() => {
 		if (!_id && activeInput) {
@@ -138,9 +135,12 @@ export function NewOrEditDocumentType({
 		}); */
 
 		if (_id) {
-			getDocumentType(_id);
+			memoizedFetchDocumentTypeGet(_id);
 		}
-	}, []); // After first paint only
+	}, [
+		_id,
+		memoizedFetchDocumentTypeGet
+	]); // After first paint only
 
 	let disabled :boolean;
 	if (!_id) {
@@ -217,7 +217,7 @@ export function NewOrEditDocumentType({
 		state._name = _name || name;
 
 		createOrUpdateDocument(state, (data) => {
-			console.debug('data', data);
+			//console.debug('data', data);
 			if (_id) {
 				doClose();
 			} else {
@@ -231,7 +231,7 @@ export function NewOrEditDocumentType({
 					_name: updateName,
 					open: true
 				}));
-				getDocumentType(updateId);
+				memoizedFetchDocumentTypeGet(updateId);
 			}
 		});
 	} // submitDocumentForm
@@ -265,16 +265,17 @@ export function NewOrEditDocumentType({
 												// Uncomment if we actually want to submit the value in addOrEditLocalFieldModal
 												// createOrUpdateDocument(state, () => {
 												setState(prev => {
-													let next = prev;
+													const next :NewOrEditDocumentTypeState = JSON.parse(JSON.stringify(prev)); // deref, so state gets new object id
 													if (newValues == null) {
 														delete(next.properties[index]);
 													} else {
 														next.properties[index] = {...newValues};
 													}
 
-													return {
+													/*return { // deref, so state gets new object id
 														...next
-													};
+													};*/
+													return next;
 												});
 												// });
 											}
@@ -308,7 +309,7 @@ export function NewOrEditDocumentType({
 													data
 												) => {
 													// setName(data.value);
-													setName(data.value.toLowerCase());
+													setName(fold(data.value.toLowerCase()));
 
 													if (!activeInput) {
 														setActiveInput(true);

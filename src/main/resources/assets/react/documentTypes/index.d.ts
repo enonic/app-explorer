@@ -25,7 +25,7 @@ export type AddOrEditLocalFieldModalState = {
 		active :boolean,
 		enabled :boolean,
 		includeInAllText :boolean,
-		index :any,
+		index :number,
 		fulltext :boolean,
 		max :number,
 		min :number,
