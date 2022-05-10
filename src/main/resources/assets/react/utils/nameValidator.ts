@@ -4,7 +4,7 @@
  * @return Object
  * @returns {string | undefined} possible error string or true
  */
-export function nameValidator(v :string) :string|undefined {
+export function nameValidator(v :string) :string|false {
 	if(!v) {
 		return 'Required!';
 	}
@@ -19,5 +19,5 @@ export function nameValidator(v :string) :string|undefined {
 	if (matches) {
 		return `Only letters, digits and underscore is allowed. Illegal characters: ${matches.join('')}`;
 	}
-	return undefined;
+	return false;
 }
