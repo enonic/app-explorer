@@ -1,6 +1,7 @@
 import type {DocumentTypeFields} from '/lib/explorer/types/index.d';
 
 
+import {fold} from '@enonic/js-utils';
 import {createDocumentType} from '/lib/explorer/documentType/createDocumentType';
 import {exists as documentTypeExists} from '/lib/explorer/documentType/exists';
 //@ts-ignore
@@ -47,9 +48,10 @@ export function createFromDocumentTypesJson({
 		addFields = true,
 		properties = []
 	}) => {
-		if (!documentTypeExists({_name})) {
+		const foldedLowerCaseName = fold(_name.toLowerCase());
+		if (!documentTypeExists({_name: foldedLowerCaseName})) {
 			createDocumentType({
-				_name,
+				_name: foldedLowerCaseName,
 				addFields,
 				managedBy: applicationKey,
 				properties
