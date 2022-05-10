@@ -2,6 +2,7 @@
 
 //import {NT_DOCUMENT_TYPE} from '/lib/explorer/documentType/constants';
 import {NT_FIELD} from '/lib/explorer/model/2/constants';
+//@ts-ignore
 import {reference} from '/lib/graphql';
 
 import {

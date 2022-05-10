@@ -1,4 +1,16 @@
-import React from 'react';
+import type {DocumentTypeField} from '/lib/explorer/types/index.d';
+import type {JSONResponse} from '../../../services/graphQL/fetchers/index.d';
+import type {FetchDocumentTypeCreateData} from '../../../services/graphQL/fetchers/fetchDocumentTypeCreate';
+import type {QueryDocumentTypesHits} from '../../../services/graphQL/fetchers/fetchDocumentTypes';
+import type {FetchDocumentTypeUpdateData} from '../../../services/graphQL/fetchers/fetchDocumentTypeUpdate';
+
+import type {
+	DocumentTypeModal,
+	NewOrEditDocumentTypeState
+} from './index.d';
+
+
+import * as React from 'react';
 import {
 	Button,
 	Dimmer,
@@ -12,20 +24,22 @@ import {
 	Radio
 } from 'semantic-ui-react';
 
-import {GQL_MUTATION_DOCUMENT_TYPE_CREATE} from '../../../services/graphQL/mutations/documentTypeCreateMutation';
-import {GQL_MUTATION_DOCUMENT_TYPE_UPDATE} from '../../../services/graphQL/mutations/documentTypeUpdateMutation';
+import {fetchDocumentTypeCreate} from '../../../services/graphQL/fetchers/fetchDocumentTypeCreate';
+import {fetchDocumentTypeUpdate} from '../../../services/graphQL/fetchers/fetchDocumentTypeUpdate';
 import {GQL_QUERY_DOCUMENT_TYPE_GET} from '../../../services/graphQL/queries/documentTypeGetQuery';
 
 // import {fetchFields} from '../../../services/graphQL/fetchers/fetchFields';
 import {nameValidator} from '../utils/nameValidator';
 import {FieldsList} from './FieldsList';
 
+
 /**
- * Validated the name input
- * @param {String} value from an input button
- * @returns {String | boolean} string with error or true
+ * Validates the name input
  */
-function validateName(value, documentTypes) {
+function validateName(
+	value :string, // value from an input button
+	documentTypes :QueryDocumentTypesHits
+) :string|undefined {
 	const result = nameValidator(value);
 	// NameValidator sets undefined when no error. Object on error
 	if (result) {
@@ -37,34 +51,34 @@ function validateName(value, documentTypes) {
 			}
 		}
 	}
+	return undefined;
 }
 
-/***
- * Creates an semanic ui react error
- * @param header string Headline for the error message
- * @param messsage string The actual error message itself
- */
-/* function createErrorMessage(header, message) {
-	return <Message icon negative>
-		<Icon name="warning"/>
-		<Message.Content>
-			<Message.Header>{header}</Message.Header>
-			{message}
-		</Message.Content>
-	</Message>;
-} */
 
 export function NewOrEditDocumentType({
-	doClose = () => {},
-	_id, // optional
-	_name, // optional
-	collectionsArr = [], // optional
-	interfacesArr = [], // optional
+	// Required
+	documentTypes,
 	servicesBaseUrl,
 	setModalState,
-	documentTypes
+	// Optional
+	_id,
+	_name,
+	collectionsArr = [],
+	doClose = () => {},
+	interfacesArr = [],
+} :{
+	// Required
+	documentTypes :QueryDocumentTypesHits
+	servicesBaseUrl :string
+	setModalState :React.Dispatch<React.SetStateAction<DocumentTypeModal>>
+	// Optional
+	_id ?:string
+	_name ?:string
+	collectionsArr :Array<string>
+	doClose ?:() => void
+	interfacesArr :Array<string>
 }) {
-	const [state, setState] = React.useState({
+	const [state, setState] = React.useState<NewOrEditDocumentTypeState>({
 		_name: '',
 		_versionKey: undefined,
 		addFields: true,
@@ -75,7 +89,7 @@ export function NewOrEditDocumentType({
 	const [activeInput, setActiveInput] = React.useState(false);
 	const [isLoading, setIsLoading] = React.useState(_id ? true : false);
 
-	function getDocumentType(id) {
+	function getDocumentType(id :string) {
 		fetch(`${servicesBaseUrl}/graphQL`, {
 			method: 'POST',
 			headers: {
@@ -128,13 +142,7 @@ export function NewOrEditDocumentType({
 		}
 	}, []); // After first paint only
 
-	if (state.properties) {
-		state.properties.forEach(({name}) => {
-			state.properties[name] = true;
-		});
-	}
-
-	let disabled;
+	let disabled :boolean;
 	if (!_id) {
 		if (!activeInput || error) {
 			disabled = true;
@@ -147,51 +155,58 @@ export function NewOrEditDocumentType({
 
 	/**
 	 * Creates or updates a document model with a fetch call
-	 * @param {object} data stat that the document will be updated to
-	 * @param {function} success method that will be called when completed
-	 * @param {callback} [failure=function(Print error)] optional method that will be called when something goes wrong
 	 */
-	function createOrUpdateDocument(data, success, failure = error => {
-		console.error(error);
-	}) {
-		const variables = {
-			_name: data._name,
-			addFields: data.addFields,
-			properties: data.properties
-		} as {
-			_name :any,
-			addFields :any,
-			properties :any,
-			_id? :any,
-			_versionKey :any,
-		};
-
+	async function createOrUpdateDocument(
+		data :NewOrEditDocumentTypeState, // data state that the document will be updated to
+		success :(data :FetchDocumentTypeCreateData|FetchDocumentTypeUpdateData) => void // success method that will be called when completed
+	) {
 		if (_id) {
-			variables._id = _id;
-			variables._versionKey = state._versionKey;
+			return fetchDocumentTypeUpdate({
+				url: `${servicesBaseUrl}/graphQL`,
+				variables: {
+					_id,
+					_name: data._name,
+					_versionKey: state._versionKey,
+					addFields: data.addFields,
+					properties: data.properties
+				},
+				handleResponse: async (response) => {
+					const {data, errors} = await response.json() as JSONResponse<FetchDocumentTypeUpdateData>;
+					if (response.status === 200) {
+						return data;
+					} else {
+						const error = new Error(errors?.map(e => e.message).join('\n') ?? 'unknown');
+						return Promise.reject(error);
+					}
+				}
+			}).then(data => {
+				success(data);
+			}).catch(error => {
+				console.error('Something went wrong while updating the documentType', error);
+			});
 		}
-
-		fetch(`${servicesBaseUrl}/graphQL`, {
-			method: 'POST',
-			headers: {
-				'Content-Type':	'application/json'
+		return fetchDocumentTypeCreate({
+			url: `${servicesBaseUrl}/graphQL`,
+			variables: {
+				_name: data._name,
+				addFields: data.addFields,
+				properties: data.properties
 			},
-			body: JSON.stringify({
-				query: _id ? GQL_MUTATION_DOCUMENT_TYPE_UPDATE : GQL_MUTATION_DOCUMENT_TYPE_CREATE,
-				variables
-			})
-		}).then(response => {
-			if (response.status === 200) {
-				return response.json();
-			} else {
-				throw response;
+			handleResponse: async (response) => {
+				const {data, errors} = await response.json() as JSONResponse<FetchDocumentTypeCreateData>;
+				if (response.status === 200) {
+					return data;
+				} else {
+					const error = new Error(errors?.map(e => e.message).join('\n') ?? 'unknown');
+					return Promise.reject(error);
+				}
 			}
-		}).then(response => {
-			success(response);
+		}).then(data => {
+			success(data);
 		}).catch(error => {
-			failure(error);
+			console.error('Something went wrong while creating the documentType', error);
 		});
-	}
+	} // createOrUpdateDocument
 
 	/**
 	 * The state handles all form values, so we can call this freely.
@@ -201,30 +216,25 @@ export function NewOrEditDocumentType({
 		// get the currnt name. (even if its allready set in storrage)
 		state._name = _name || name;
 
-		createOrUpdateDocument(state, response => {
-			if (response.errors) {
-				console.error(`Getting the documenttype json`);
-				console.error(response.errors);
+		createOrUpdateDocument(state, (data) => {
+			console.debug('data', data);
+			if (_id) {
+				doClose();
 			} else {
-				if (_id) {
-					doClose();
-				} else {
-					const resultDocumentType = response.data.createDocumentType;
-					const updateId = resultDocumentType._id;
-					const updateName = resultDocumentType._name;
+				const resultDocumentType :DocumentType = (data['createDocumentType'] || data['updateDocumentType']) as DocumentType;
+				const updateId = resultDocumentType._id;
+				const updateName = resultDocumentType._name;
 
-					setModalState(prev => ({
-						...prev,
-						_id: updateId,
-						_name: updateName,
-						open: true
-					}));
-					getDocumentType(updateId);
-				}
+				setModalState(prev => ({
+					...prev,
+					_id: updateId,
+					_name: updateName,
+					open: true
+				}));
+				getDocumentType(updateId);
 			}
-
 		});
-	}
+	} // submitDocumentForm
 
 	return !isLoading
 		?
@@ -247,23 +257,28 @@ export function NewOrEditDocumentType({
 										interfacesArr={interfacesArr}
 										servicesBaseUrl={servicesBaseUrl}
 										properties={state.properties}
-										updateOrDeleteProperties={function(newValues, index) {
-											// Uncomment if we actually want to submit the value in addOrEditLocalFieldModal
-											// createOrUpdateDocument(state, () => {
-											setState(prev => {
-												let next = prev;
-												if (newValues == null) {
-													delete(next.properties[index]);
-												} else {
-													next.properties[index] = {...newValues};
-												}
+										updateOrDeleteProperties={
+											function(
+												newValues :DocumentTypeField,
+												index :number
+											) {
+												// Uncomment if we actually want to submit the value in addOrEditLocalFieldModal
+												// createOrUpdateDocument(state, () => {
+												setState(prev => {
+													let next = prev;
+													if (newValues == null) {
+														delete(next.properties[index]);
+													} else {
+														next.properties[index] = {...newValues};
+													}
 
-												return {
-													...next
-												};
-											});
-											// });
-										}}
+													return {
+														...next
+													};
+												});
+												// });
+											}
+										}
 									/>
 								</Tab.Pane>
 							});
@@ -287,9 +302,13 @@ export function NewOrEditDocumentType({
 											:
 											<Form.Input
 												fluid
-												onChange={(event, data) => {
+												onChange={(
+													//@ts-ignore
+													event,
+													data
+												) => {
 													// setName(data.value);
-													setName(data.value);
+													setName(data.value.toLowerCase());
 
 													if (!activeInput) {
 														setActiveInput(true);
@@ -307,7 +326,11 @@ export function NewOrEditDocumentType({
 										<Radio
 											label='Add new fields automatically when creating/updating documents?'
 											name='addFields'
-											onChange= {(event, data) => {
+											onChange= {(
+												//@ts-ignore
+												event,
+												data
+											) => {
 												setState(prev => {
 													return {
 														...prev,

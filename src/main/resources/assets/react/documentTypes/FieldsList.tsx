@@ -1,4 +1,11 @@
-import React from 'react';
+import type {DocumentTypeFields} from '/lib/explorer/types/index.d';
+import type {
+	AddOrEditLocalFieldModalState,
+	UpdateOrDeletePropertiesFunction
+} from './index.d';
+
+
+import * as React from 'react';
 import {
 	Button,
 	// Form,
@@ -17,23 +24,6 @@ import {Span} from '../components/Span';
 import {AddOrEditLocalFieldModal} from './AddOrEditLocalFieldModal';
 import {RemoveFieldFromDocumentTypeModal} from './RemoveFieldFromDocumentTypeModal';
 
-export type ModalState = {
-	open :boolean,
-	state? :{
-		active :boolean,
-		enabled :boolean,
-		includeInAllText :boolean,
-		index :any,
-		fulltext :boolean,
-		max :number,
-		min :number,
-		name :string,
-		nGram :boolean,
-		path :boolean,
-		valueType :string
-	}
-}
-
 
 export const FieldsList = ({
 	collectionsArr,
@@ -41,9 +31,15 @@ export const FieldsList = ({
 	servicesBaseUrl,
 	properties,
 	updateOrDeleteProperties
+} :{
+	collectionsArr :Array<string>
+	interfacesArr :Array<string>
+	servicesBaseUrl :string
+	properties :DocumentTypeFields
+	updateOrDeleteProperties :UpdateOrDeletePropertiesFunction
 }) => {
 
-	const [addOrEditModalState, setAddOrEditModalState] = React.useState<ModalState>({
+	const [addOrEditModalState, setAddOrEditModalState] = React.useState<AddOrEditLocalFieldModalState>({
 		open: false,
 		state: {
 			active: true,
@@ -115,7 +111,7 @@ export const FieldsList = ({
 						min,
 						nGram,
 						path
-					}, i) => <Table.Row className={active ? null : 'strikeout'} key={i}>
+					}, i :number) => <Table.Row className={active ? null : 'strikeout'} key={i}>
 						<Table.Cell collapsing style={cellStyle} textAlign='center'>
 							<Button.Group>
 								<Popup

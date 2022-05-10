@@ -1,8 +1,12 @@
-import { INDEX_CONFIG_N_GRAM, isSet } from '@enonic/js-utils';
-import React from 'react';
+import type {
+	AddOrEditLocalFieldModalState,
+	UpdateOrDeletePropertiesFunction
+} from './index.d';
+
+
+import * as React from 'react';
 import {
 	Button,
-	Icon,
 	Loader,
 	Modal
 } from 'semantic-ui-react';
@@ -12,15 +16,26 @@ import {fetchHasField} from '../../../services/graphQL/fetchers/fetchHasField';
 
 
 export function RemoveFieldFromDocumentTypeModal({
-	updateOrDeleteProperties,
-	collectionsArr = [], // optional
-	interfacesArr = [],  // optional
-	onClose, // Required!
+	// Required
+	onClose,
 	servicesBaseUrl,
+	updateOrDeleteProperties,
 	modalState: {
 		state: state,
 		open: open
-	}
+	},
+	// Optional
+	collectionsArr = [], // optional
+	interfacesArr = [],  // optional
+} :{
+	// Required
+	onClose :() => void
+	modalState :AddOrEditLocalFieldModalState
+	servicesBaseUrl :string
+	updateOrDeleteProperties :UpdateOrDeletePropertiesFunction
+	// Optional
+	collectionsArr ?:Array<string>
+	interfacesArr ?:Array<string>
 }) {
 	const [isLoading, setIsLoading] = React.useState(true);
 	const [fieldHasValueInDocumentsTotal, setFieldHasValueInDocumentsTotal] = React.useState(undefined);

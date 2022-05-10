@@ -4,7 +4,7 @@
  * @return Object
  * @returns {string | undefined} possible error string or true
  */
-export function nameValidator(v) {
+export function nameValidator(v :string) :string|undefined {
 	if(!v) {
 		return 'Required!';
 	}
