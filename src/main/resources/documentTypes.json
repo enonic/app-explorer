@@ -1,5 +1,5 @@
 [{
-	"_name": "WebPage",
+	"_name": "webpage",
 	"addFields": true,
 	"properties": [{
 		"active": true,
