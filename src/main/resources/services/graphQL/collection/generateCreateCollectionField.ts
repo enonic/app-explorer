@@ -1,8 +1,9 @@
 import {
 	Collection,
+	CollectionNode,
+	CollectionNodeCreateParams,
 	CollectionWithCron,
-	CollectionNode
-} from '/lib/explorer/collection/types.d';
+} from '/lib/explorer/types/index.d';
 import type {GraphQLField} from '../types.d';
 
 //import {toStr} from '@enonic/js-utils';
@@ -75,7 +76,7 @@ export function generateCreateCollectionField({
 			//log.debug(`doCollect:${toStr(doCollect)}`);
 			//log.debug(`documentTypeId:${toStr(documentTypeId)}`);
 
-			const nodeToBeCreated = {
+			const nodeToBeCreated :CollectionNodeCreateParams = {
 				_indexConfig: {default: 'byType'},
 				_inheritsPermissions: false, // false is the default and the fastest, since it doesn't have to read parent to apply permissions.
 				_name,
@@ -85,9 +86,9 @@ export function generateCreateCollectionField({
 				creator: getUser().key,
 				createdTime: new Date(),
 				language
-			} as Partial<Omit<CollectionNode, 'collector'> & {
+			} /*as Partial<Omit<CollectionNode, 'collector'> & {
 				collector :Partial<CollectionNode['collector']>
-			}>;
+			}>;*/
 			//log.debug(`nodeToBeCreated:${toStr(nodeToBeCreated)}`);
 
 			if (collector) {
@@ -95,8 +96,8 @@ export function generateCreateCollectionField({
 					name: collectorName,
 					configJson
 				} = collector;
-				if (collectorName || configJson) {
-					nodeToBeCreated.collector = {};
+				if (collectorName || configJson) { // TODO Can we really have collector config without collector name???
+					nodeToBeCreated.collector = {} as CollectionNodeCreateParams['collector'];
 				}
 				if (collectorName) {
 					nodeToBeCreated.collector.name = collectorName;

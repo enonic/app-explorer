@@ -1,5 +1,9 @@
+import type {QueryDocumentTypesHits} from '../../../services/graphQL/fetchers/fetchDocumentTypes';
+import type {DocumentTypeModal} from './index.d';
+
+
 import moment from 'moment';
-import React from 'react';
+import * as React from 'react';
 import {
 	Button,
 	Header,
@@ -19,14 +23,6 @@ import {NewOrEditDocumentTypeModal} from './NewOrEditDocumentTypeModal';
 import {DeleteDocumentTypeModal} from './DeleteDocumentTypeModal';
 
 
-interface DocumentTypeModal {
-	_id? :string,
-	_name? :string,
-	collectionsArr? :Array<string>,
-	interfacesArr? :Array<string>,
-	open :boolean,
-}
-
 function getDefaultModalState(open = false) :DocumentTypeModal {
 	return {
 		_id: undefined,
@@ -39,13 +35,15 @@ function getDefaultModalState(open = false) :DocumentTypeModal {
 
 export function DocumentTypes({
 	servicesBaseUrl
+} :{
+	servicesBaseUrl :string
 }) {
 	const [updatedAt, setUpdatedAt] = React.useState(moment());
 	const [durationSinceLastUpdate, setDurationSinceLastUpdate] = React.useState('');
 
-	const [boolPoll, setBoolPoll] = React.useState(true);
+	//const [boolPoll, setBoolPoll] = React.useState(true);
 	const [globalFields, setGlobalFields] = React.useState([]);
-	const [documentTypes, setDocumentTypes] = React.useState([]);
+	const [documentTypes, setDocumentTypes] = React.useState<QueryDocumentTypesHits>([]);
 
 	// The modal state should be handled by newOrEditDocumentTypeModal
 	const [newOrEditModalState, setNewOrEditModalState] = React.useState<DocumentTypeModal>(getDefaultModalState());
@@ -132,7 +130,11 @@ export function DocumentTypes({
 							<Radio
 								label={"Show all fields"}
 								checked={showCollections}
-								onChange={(ignored,{checked}) => {
+								onChange={(
+									//@ts-ignore
+									ignored,
+									{checked}
+								) => {
 									setShowCollections(checked);
 									setShowInterfaces(checked);
 									setShowAddFields(checked);
@@ -313,11 +315,11 @@ export function DocumentTypes({
 									afterClose={() => {
 										//console.debug('DeleteDocumentTypeModal afterClose');
 										queryDocumentTypes();
-										setBoolPoll(true);
+										//setBoolPoll(true);
 									}}
 									beforeOpen={() => {
 										//console.debug('DeleteDocumentTypeModal beforeOpen');
-										setBoolPoll(false);
+										//setBoolPoll(false);
 									}}
 									servicesBaseUrl={servicesBaseUrl}
 								/>
@@ -349,10 +351,11 @@ export function DocumentTypes({
 			onClose={() => {
 				setNewOrEditModalState({ open: false });
 				queryDocumentTypes();
-				setBoolPoll(true);
+				//setBoolPoll(true);
 			}}
 			onMount={() => {
-				setBoolPoll(false);
+				//console.debug('NewOrEditDocumentTypeModal onMount');
+				//setBoolPoll(false);
 			}}
 			servicesBaseUrl={servicesBaseUrl}
 		/>

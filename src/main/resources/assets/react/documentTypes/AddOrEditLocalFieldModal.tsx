@@ -1,3 +1,10 @@
+import type {DocumentTypeFields} from '/lib/explorer/types/index.d';
+import type {
+	AddOrEditLocalFieldModalState,
+	UpdateOrDeletePropertiesFunction
+} from './index.d';
+
+
 import {
 	INDEX_CONFIG_N_GRAM,
 	VALUE_TYPE_BOOLEAN,
@@ -12,6 +19,7 @@ import {
 	VALUE_TYPE_STRING,
 	isSet
 } from '@enonic/js-utils';
+import * as React from 'react';
 import {
 	Button,
 	Dropdown,
@@ -30,7 +38,7 @@ import {notDoubleDot} from '../utils/notDoubleDot';
 import {onlyLettersDigitsUnderscoresAndDots} from '../utils/onlyLettersDigitsUnderscoresAndDots';
 import {notDoubleUnderscore} from '../utils/notDoubleUnderscore';
 import {required} from '../utils/required';
-import React from 'react';
+
 
 const OPTIONS_VALUE_TYPES = [
 	VALUE_TYPE_BOOLEAN,
@@ -53,8 +61,8 @@ const OPTIONS_VALUE_TYPES = [
 export const AddOrEditLocalFieldModal = ({
 	properties,
 	updateOrDeleteProperties,
-	onClose = () => { return },
 	modalState: {
+		open: openProp = false,
 		state: {
 			active: propActive = true,
 			enabled: propEnabled = true,
@@ -67,9 +75,14 @@ export const AddOrEditLocalFieldModal = ({
 			nGram: propNgram = true,
 			path: propPath = false,
 			valueType: propValueType = VALUE_TYPE_STRING
-		} = {},
-		open: openProp = false
-	} = {}
+		}
+	},
+	onClose = () => { return },
+} :{
+	modalState :AddOrEditLocalFieldModalState
+	properties :DocumentTypeFields
+	updateOrDeleteProperties :UpdateOrDeletePropertiesFunction
+	onClose ?:() => void
 }) => {
 
 	const usedNames = {};
@@ -179,7 +192,11 @@ export const AddOrEditLocalFieldModal = ({
 				disabled={propName ? true : false}
 				fluid
 				label='Name'
-				onChange={(event, {value: newName}) => {
+				onChange={(
+					//@ts-ignore
+					event,
+					{value: newName}
+				) => {
 					setName(newName);
 					setNameTouched(true);
 				}}
@@ -203,7 +220,11 @@ export const AddOrEditLocalFieldModal = ({
 				<Table.Body>
 					<Table.Row>
 						<Table.Cell><Dropdown
-							onChange={(event, {value: newValueType}: {value :string}) => {
+							onChange={(
+								//@ts-ignore
+								event,
+								{value: newValueType}: {value :string}
+							) => {
 								setValueType(newValueType);
 							}}
 							options={OPTIONS_VALUE_TYPES}
@@ -213,7 +234,11 @@ export const AddOrEditLocalFieldModal = ({
 						/></Table.Cell>
 						<Table.Cell collapsing><Input
 							min={0}
-							onChange={(event, {value: newMinString}) => {
+							onChange={(
+								//@ts-ignore
+								event,
+								{value: newMinString}
+							) => {
 								const newMinInt = parseInt(newMinString);
 								if (newMinInt > max && max !== 0) {
 									setMax(newMinInt);
@@ -225,7 +250,11 @@ export const AddOrEditLocalFieldModal = ({
 						/></Table.Cell>
 						<Table.Cell collapsing><Input
 							min={0}
-							onChange={(event, {value: newMaxString}) => {
+							onChange={(
+								//@ts-ignore
+								event,
+								{value: newMaxString}
+							) => {
 								const newMaxInt = parseInt(newMaxString);
 								if (newMaxInt !== 0 && newMaxInt < min) {
 									setMin(newMaxInt);
@@ -237,35 +266,55 @@ export const AddOrEditLocalFieldModal = ({
 						/></Table.Cell>
 						<Table.Cell collapsing><Radio
 							checked={enabled}
-							onChange={(event, {checked}) => {
+							onChange={(
+								//@ts-ignore
+								event,
+								{checked}
+							) => {
 								setEnabled(checked);
 							}}
 							toggle
 						/></Table.Cell>
 						<Table.Cell collapsing>{enabled ? <Radio
 							checked={includeInAllText}
-							onChange={(event, {checked}) => {
+							onChange={(
+								//@ts-ignore
+								event,
+								{checked}
+							) => {
 								setIncludeInAllText(checked);
 							}}
 							toggle
 						/> : null}</Table.Cell>
 						<Table.Cell collapsing>{enabled ? <Radio
 							checked={fulltext}
-							onChange={(event, {checked}) => {
+							onChange={(
+								//@ts-ignore
+								event,
+								{checked}
+							) => {
 								setFulltext(checked);
 							}}
 							toggle
 						/> : null}</Table.Cell>
 						<Table.Cell collapsing>{enabled ? <Radio
 							checked={nGram}
-							onChange={(event, {checked}) => {
+							onChange={(
+								//@ts-ignore
+								event,
+								{checked}
+							) => {
 								setNgram(checked);
 							}}
 							toggle
 						/> : null}</Table.Cell>
 						<Table.Cell collapsing>{enabled ? <Radio
 							checked={path}
-							onChange={(event, {checked}) => {
+							onChange={(
+								//@ts-ignore
+								event,
+								{checked}
+							) => {
 								setPath(checked);
 							}}
 							toggle

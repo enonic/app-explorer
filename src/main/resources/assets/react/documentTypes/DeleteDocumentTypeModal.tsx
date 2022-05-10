@@ -1,3 +1,4 @@
+import * as React from 'react';
 import {Button, Icon, Input, Message, Modal} from 'semantic-ui-react';
 
 import {GQL_MUTATION_DOCUMENT_TYPE_DELETE} from '../../../services/graphQL/mutations/documentTypeDeleteMutation';
