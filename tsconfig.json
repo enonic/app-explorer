@@ -58,12 +58,11 @@
 		"rootDirs": [
 			"src/main/resources",
 			"../lib-explorer",
-			"node_modules",
+			//"node_modules", // Does not help
 			"test"
 		],
 		"sourceMap": false,
 		"strict": false,
-		"strictFunctionTypes": false,
 		"strictNullChecks": false,
 		"target": "es5",
 		"types": [
@@ -73,6 +72,8 @@
 		]
 	},
 	"exclude": [
+		//"node_modules/@types/node/globals.global.d.ts", // Does not help
+		//"node_modules/semantic-ui-react/dist/commonjs/**/*", // Does not help
 		"**/*.d.ts",
 		"build/**/*",
 		"node_modules/**/*",
