@@ -1,9 +1,10 @@
-import type {QueryDocumentTypesHits} from '../../../services/graphQL/fetchers/fetchDocumentTypes';
-import type {DocumentTypeModal} from './index.d';
+import type {NewOrEditDocumentTypeModalComponentParams} from './index.d';
 
 
+//import * as React from 'react';
 import {Modal} from "semantic-ui-react";
 import {NewOrEditDocumentType} from "./NewOrEditDocumentType";
+
 
 export function NewOrEditDocumentTypeModal({
 	// Required
@@ -13,25 +14,10 @@ export function NewOrEditDocumentTypeModal({
 	// Optional
 	_id = undefined,
 	_name = undefined,
-	collectionsArr = [],
-	interfacesArr = [],
 	open = false,
-	onClose = () => {},
-	onMount = () => {}
-} :{
-	// Required
-	documentTypes :QueryDocumentTypesHits
-	servicesBaseUrl :string
-	setModalState :React.Dispatch<React.SetStateAction<DocumentTypeModal>>
-	// Optional
-	_id ?:string
-	_name ?:string
-	collectionsArr :Array<string>
-	interfacesArr :Array<string>
-	open ?:boolean
-	onClose ?:() => void
-	onMount ?:() => void
-}) {
+	onClose = () => {/**/},
+	onMount = () => {/**/}
+} :NewOrEditDocumentTypeModalComponentParams) {
 	return <Modal
 		closeIcon
 		closeOnDimmerClick={false}
@@ -44,8 +30,6 @@ export function NewOrEditDocumentTypeModal({
 		<NewOrEditDocumentType
 			_id={_id}
 			_name={_name}
-			collectionsArr={collectionsArr}
-			interfacesArr={interfacesArr}
 			doClose={onClose}
 			servicesBaseUrl={servicesBaseUrl}
 			setModalState={setModalState}

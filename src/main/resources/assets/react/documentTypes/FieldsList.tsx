@@ -26,14 +26,14 @@ import {RemoveFieldFromDocumentTypeModal} from './RemoveFieldFromDocumentTypeMod
 
 
 export const FieldsList = ({
-	collectionsArr,
-	interfacesArr,
+	collectionNames,
+	interfaceNames,
 	servicesBaseUrl,
 	properties,
 	updateOrDeleteProperties
 } :{
-	collectionsArr :Array<string>
-	interfacesArr :Array<string>
+	collectionNames :Array<string>
+	interfaceNames :Array<string>
 	servicesBaseUrl :string
 	properties :DocumentTypeFields
 	updateOrDeleteProperties :UpdateOrDeletePropertiesFunction
@@ -215,8 +215,8 @@ export const FieldsList = ({
 		{removeModalState.open
 			? <RemoveFieldFromDocumentTypeModal
 				updateOrDeleteProperties={updateOrDeleteProperties}
-				collectionsArr={collectionsArr}
-				interfacesArr={interfacesArr}
+				collectionNames={collectionNames}
+				interfaceNames={interfaceNames}
 				onClose={() => setRemoveModalState({
 					...removeModalState,
 					open: false,

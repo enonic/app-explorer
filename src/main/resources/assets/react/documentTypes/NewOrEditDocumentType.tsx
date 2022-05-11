@@ -4,11 +4,11 @@ import type {
 } from '/lib/explorer/types/index.d';
 import type {JSONResponse} from '../../../services/graphQL/fetchers/index.d';
 import type {FetchDocumentTypeCreateData} from '../../../services/graphQL/fetchers/fetchDocumentTypeCreate';
-import type {QueryDocumentTypesHits} from '../../../services/graphQL/fetchers/fetchDocumentTypes';
 import type {FetchDocumentTypeUpdateData} from '../../../services/graphQL/fetchers/fetchDocumentTypeUpdate';
 
 import type {
-	DocumentTypeModal,
+	DocumentTypesObj,
+	NewOrEditDocumentTypeComponentParams,
 	NewOrEditDocumentTypeState
 } from './index.d';
 
@@ -42,17 +42,15 @@ import {FieldsList} from './FieldsList';
  */
 function validateName(
 	value :string, // value from an input button
-	documentTypes :QueryDocumentTypesHits
+	documentTypes :DocumentTypesObj
 ) :string|false {
 	const result = nameValidator(value);
 	// NameValidator sets undefined when no error. Object on error
 	if (result) {
 		return result;
 	} else {
-		for (let i=0; i<documentTypes.length; i++) {
-			if (documentTypes[i]._name === value) {
-				return `The name ${value} is already taken`;
-			}
+		if (documentTypes[value]) {
+			return `The name ${value} is already taken`;
 		}
 	}
 	return false;
@@ -67,21 +65,8 @@ export function NewOrEditDocumentType({
 	// Optional
 	_id,
 	_name,
-	collectionsArr = [],
-	doClose = () => {/**/},
-	interfacesArr = [],
-} :{
-	// Required
-	documentTypes :QueryDocumentTypesHits
-	servicesBaseUrl :string
-	setModalState :React.Dispatch<React.SetStateAction<DocumentTypeModal>>
-	// Optional
-	_id ?:string
-	_name ?:string
-	collectionsArr :Array<string>
-	doClose ?:() => void
-	interfacesArr :Array<string>
-}) {
+	doClose = () => {/**/}
+} :NewOrEditDocumentTypeComponentParams) {
 	const [state, setState] = React.useState<NewOrEditDocumentTypeState>({
 		_name: '',
 		_versionKey: undefined,
@@ -253,8 +238,8 @@ export function NewOrEditDocumentType({
 								},
 								render: () => <Tab.Pane>
 									<FieldsList
-										collectionsArr={collectionsArr}
-										interfacesArr={interfacesArr}
+										collectionNames={documentTypes[_name] ? documentTypes[_name].collectionNames || [] : []}
+										interfaceNames={documentTypes[_name] ? documentTypes[_name].interfaceNames || [] : []}
 										servicesBaseUrl={servicesBaseUrl}
 										properties={state.properties}
 										updateOrDeleteProperties={
