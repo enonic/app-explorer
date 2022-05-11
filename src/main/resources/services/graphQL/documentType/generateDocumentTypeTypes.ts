@@ -1,3 +1,6 @@
+import type {DocumentTypeEnv} from './index.d';
+
+
 import {
 	INDEX_CONFIG_N_GRAM,
 	VALUE_TYPE_ANY,
@@ -21,8 +24,10 @@ import {
 import {
 	GraphQLBoolean,
 	GraphQLInt,
+	GraphQLString,
 	nonNull,
 	list
+	//@ts-ignore
 } from '/lib/graphql';
 
 import {
@@ -86,13 +91,19 @@ export function generateDocumentTypeTypes({
 
 			addFields: {
 				type: nonNull(GraphQLBoolean),
-				resolve(env) {
-					//log.debug(`env:${toStr(env)}`);
+				resolve(env :DocumentTypeEnv) {
+					//log.debug('addFields env:%s', toStr(env));
 					return coerseDocumentTypeAddFields(env.source.addFields);
 				}
 			},
+			managedBy: {
+				type: GraphQLString
+			},
 			properties: {
-				resolve: (env) => coerseDocumentTypeProperties(env.source.properties),
+				resolve: (env :DocumentTypeEnv) => {
+					//log.debug('properties env:%s', toStr(env));
+					return coerseDocumentTypeProperties(env.source.properties)
+				},
 				type: list(glue.addObjectType({
 					name: 'DocumentTypeProperties',
 					fields: FIELDS_PROPERTY//glue.getFields(GQL_FIELD_DOCUMENT_TYPE_PROPERTY_NAME)

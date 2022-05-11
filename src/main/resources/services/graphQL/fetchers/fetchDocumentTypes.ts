@@ -39,7 +39,7 @@ export type FetchQueryDocumentTypesData = {
 
 export function fetchDocumentTypes({
 	url,
-	handleData = () => {},
+	handleData = () => {/**/},
 } :{
 	handleData :(data :FetchQueryDocumentTypesData) => void
 	url :string,

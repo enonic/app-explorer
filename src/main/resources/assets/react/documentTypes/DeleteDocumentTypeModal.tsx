@@ -7,7 +7,7 @@ import {GQL_MUTATION_DOCUMENT_TYPE_DELETE} from '../../../services/graphQL/mutat
 export function DeleteDocumentTypeModal({
 	_id,
 	_name,
-	collectionsArr,
+	collectionNames,
 	afterClose = () => {
 		//console.debug('DeleteDocumentTypeModal default afterClose');
 	},
@@ -50,14 +50,14 @@ export function DeleteDocumentTypeModal({
 	>
 		<Modal.Header>Delete document type {_name}</Modal.Header>
 		<Modal.Content>
-			{collectionsArr.length ?
+			{collectionNames.length ?
 				<Message icon negative>
 					<Icon name="warning sign"/>
 					<Message.Content>
 						<Message.Header>Cant delete document type</Message.Header>
 						<p>The document type is used in the following collections:</p>
 						<>
-							{collectionsArr.sort().map((c, i) => (
+							{collectionNames.sort().map((c, i) => (
 								<div key={i}>{c}</div>
 							))}
 						</>

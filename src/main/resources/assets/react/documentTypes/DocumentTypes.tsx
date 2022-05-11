@@ -1,5 +1,8 @@
-import type {QueryDocumentTypesHits} from '../../../services/graphQL/fetchers/fetchDocumentTypes';
-import type {DocumentTypeModal} from './index.d';
+import type {
+	DocumentTypeModal,
+	DocumentTypesComponentParams,
+	DocumentTypesObj
+} from './index.d';
 
 
 import moment from 'moment';
@@ -15,10 +18,12 @@ import {
 } from 'semantic-ui-react';
 
 import {fetchDocumentTypes} from '../../../services/graphQL/fetchers/fetchDocumentTypes';
-import {fetchFields} from '../../../services/graphQL/fetchers/fetchFields';
+//import {fetchFields} from '../../../services/graphQL/fetchers/fetchFields';
 import {ButtonEdit} from '../components/ButtonEdit';
 import {ButtonNew} from '../components/ButtonNew';
 import {useInterval} from '../utils/useInterval';
+import {buildDocumentTypesObj} from './buildDocumentTypesObj';
+import {EditManagedDocumentTypeWarningModal} from './EditManagedDocumentTypeWarningModal';
 import {NewOrEditDocumentTypeModal} from './NewOrEditDocumentTypeModal';
 import {DeleteDocumentTypeModal} from './DeleteDocumentTypeModal';
 
@@ -27,23 +32,23 @@ function getDefaultModalState(open = false) :DocumentTypeModal {
 	return {
 		_id: undefined,
 		_name: undefined,
-		collectionsArr: [],
-		interfacesArr: [],
 		open
 	};
 }
 
 export function DocumentTypes({
 	servicesBaseUrl
-} :{
-	servicesBaseUrl :string
-}) {
+} :DocumentTypesComponentParams) {
 	const [updatedAt, setUpdatedAt] = React.useState(moment());
 	const [durationSinceLastUpdate, setDurationSinceLastUpdate] = React.useState('');
 
 	//const [boolPoll, setBoolPoll] = React.useState(true);
-	const [globalFields, setGlobalFields] = React.useState([]);
-	const [documentTypes, setDocumentTypes] = React.useState<QueryDocumentTypesHits>([]);
+	//const [globalFields, setGlobalFields] = React.useState([]);
+	const [isLoading, setIsLoading] = React.useState(false);
+	const [documentTypes, setDocumentTypes] = React.useState<DocumentTypesObj>({});
+	const [currentDocumentTypeName, setCurrentDocumentTypeName] = React.useState('');
+	const [editManagedDocumentTypeWarningModalOpen, setEditManagedDocumentTypeWarningModalOpen] = React.useState(false);
+
 
 	// The modal state should be handled by newOrEditDocumentTypeModal
 	const [newOrEditModalState, setNewOrEditModalState] = React.useState<DocumentTypeModal>(getDefaultModalState());
@@ -51,11 +56,12 @@ export function DocumentTypes({
 	const [showAddFields, setShowAddFields] = React.useState(false);
 	const [showCollections, setShowCollections] = React.useState(false);
 	const [showDocumentsPerCollection, setShowDocumentsPerCollection] = React.useState(false);
-	const [showDetails, setShowDetails] = React.useState(false);
+	const [showDetails/*, setShowDetails*/] = React.useState(false);
 	const [showInterfaces, setShowInterfaces] = React.useState(false);
+	const [showManagedBy, setShowManagedBy] = React.useState(false);
 	//console.debug('DocumentTypes documentTypes', documentTypes);
 
-	const globalFieldsObj = {};
+	/*const globalFieldsObj = {};
 	globalFields.forEach(({
 		_id, key, fieldType,
 		min, max,
@@ -66,12 +72,11 @@ export function DocumentTypes({
 			min, max,
 			decideByType, enabled, fulltext, includeInAllText, nGram, path
 		};
-	});
+	});*/
 	//console.debug('DocumentTypes globalFieldsObj', globalFieldsObj);
-
-	function queryDocumentTypes() {
-		setUpdatedAt(moment());
-		fetchFields({
+	const memoizedUpdateState = React.useCallback(() => {
+		setIsLoading(true);
+		/*fetchFields({
 			handleData: (data) => {
 				setGlobalFields((data as any).queryFields.hits);
 			},
@@ -79,22 +84,28 @@ export function DocumentTypes({
 			variables: {
 				includeSystemFields: false
 			}
-		});
+		});*/
 		fetchDocumentTypes({
 			handleData: (data) => {
-				setDocumentTypes((data as any).queryDocumentTypes.hits);
+				setDocumentTypes(buildDocumentTypesObj(data.queryDocumentTypes.hits));
+				setUpdatedAt(moment());
+				setIsLoading(false);
 			},
 			url: `${servicesBaseUrl}/graphQL`
 		});
-	} // queryDocumentTypes
+	}, [
+		servicesBaseUrl
+	]);
 
 	React.useEffect(() => {
 		// By default, useEffect() runs both after the first render and after every update.
 		// React guarantees the DOM has been updated by the time it runs the effects.
 		// React defers running useEffect until after the browser has painted, so doing extra work is less of a problem.
 		//console.debug('DocumentTypes useEffect');
-		queryDocumentTypes();
-	}, []); // Only re-run the effect if whatevers inside [] changes
+		memoizedUpdateState();
+	}, [
+		memoizedUpdateState
+	]); // Only re-run the effect if whatevers inside [] changes
 	// An empty array [] means on mount and unmount. This tells React that your effect doesn’t depend on any values from props or state.
 	// If you pass an empty array ([]), the props and state inside the effect will always have their initial values
 
@@ -139,17 +150,24 @@ export function DocumentTypes({
 									setShowInterfaces(checked);
 									setShowAddFields(checked);
 									setShowDocumentsPerCollection(checked);
-									setShowDetails(checked);
+									//setShowDetails(checked);
+									setShowManagedBy(checked);
 								}}
 								toggle
 							/>
+						</Table.Cell>
+						<Table.Cell collapsing>
+							<Button
+								basic
+								color='blue'
+								loading={isLoading}
+								onClick={memoizedUpdateState}>Last updated: {durationSinceLastUpdate}</Button>
 						</Table.Cell>
 					</Table.Row>
 				</Table.Body>
 			</Table>
 		</Segment>
 		<Header as='h1' content='Document types'/>
-		<Button onClick={queryDocumentTypes}>Last updated: {durationSinceLastUpdate}</Button>
 		<Table celled collapsing compact selectable singleLine striped>
 			<Table.Header>
 				<Table.Row>
@@ -162,102 +180,77 @@ export function DocumentTypes({
 					<Table.HeaderCell textAlign='right'>Field count</Table.HeaderCell>
 					<Table.HeaderCell>Fields</Table.HeaderCell>
 					{showAddFields ? <Table.HeaderCell>Add fields</Table.HeaderCell> : null}
+					{showManagedBy ? <Table.HeaderCell>Managed by</Table.HeaderCell> : null}
 					{showDetails ? <Table.HeaderCell>Details</Table.HeaderCell> : null}
 					<Table.HeaderCell>Delete</Table.HeaderCell>
 				</Table.Row>
 			</Table.Header>
 			<Table.Body>
-				{documentTypes.map(({
+				{Object.keys(documentTypes).map((documetTypeName) => documentTypes[documetTypeName]).map(({
 					_id,
 					_name,
-					_referencedBy: {
-						//count
-						hits: referencedByCollections
-						//total
-					},
 					//_versionKey, // We get this inside NewOrEditDocumentTypeModal
+					activeProperties,
+					activePropertyNames,
 					addFields = true,
-					properties = []
+					collectionNames,
+					collections,
+					documentsInTotal,
+					interfaceNames,
+					managedBy = ''
 				}, index) => {
-					const collectionsObj = {};
-					const interfacesArr = [];
-					let documentsInTotal = 0;
-					referencedByCollections.forEach(({
-						_name: collectionName,
-						_nodeType,
-						_hasField: {
-							total: documentsWithNameInCollectionRepoTotal
-						},
-						_referencedBy: {
-							//count
-							hits: referencedByInterfaces
-							//total
-						}
-					}) => {
-						documentsInTotal += documentsWithNameInCollectionRepoTotal;
-						if (_nodeType === 'com.enonic.app.explorer:collection' && !collectionsObj[collectionName]) {
-							collectionsObj[collectionName] = {
-								documentsTotal: documentsWithNameInCollectionRepoTotal
-							};
-							referencedByInterfaces.forEach(({
-								_name: interfaceName,
-								_nodeType: interfaceNodeType
-							}) => {
-								if (interfaceNodeType === 'com.enonic.app.explorer:interface' && !interfacesArr.includes(interfaceName)) {
-									interfacesArr.push(interfaceName);
-								}
-							});
-						}
-					}); // forEach referencedByCollections
-					const collectionsArr = Object.keys(collectionsObj).sort();
-					const activeProperties = properties.filter(({active}) => active);
-					const activePropertyNames = activeProperties.map(({name})=>name).sort();
-
 					return <Table.Row key={index}>
-						<Table.Cell collapsing>
+						<Table.Cell collapsing disabled={isLoading}>
 							<Popup
 								content={`Edit document type: ${_name}`}
 								inverted
-								trigger={<ButtonEdit onClick={() => setNewOrEditModalState({
-									_id,
-									_name,
-									collectionsArr,
-									interfacesArr,
-									open: true
-								})}/>}
+								trigger={<ButtonEdit disabled={isLoading} onClick={() => {
+									setCurrentDocumentTypeName(_name);
+									if (documentTypes[_name] && documentTypes[_name].managedBy) {
+										setEditManagedDocumentTypeWarningModalOpen(true);
+									} else {
+										setNewOrEditModalState({
+											_id,
+											_name,
+											open: true
+										});
+									}
+								}}/>}
 							/>
 						</Table.Cell>
-						<Table.Cell collapsing>{_name}</Table.Cell>
+						<Table.Cell collapsing disabled={isLoading}>{_name}</Table.Cell>
 
-						{showCollections ? <Table.Cell><ul style={{
+						{showCollections ? <Table.Cell disabled={isLoading}><ul style={{
 							listStyleType: 'none',
 							margin: 0,
 							padding: 0
-						}}>{collectionsArr.map((c, i) => <li key={i}>{c}</li>)}</ul></Table.Cell> : null}
+						}}>{collectionNames.map((c, i) => <li key={i}>{c}</li>)}</ul></Table.Cell> : null}
 
-						{showInterfaces ? <Table.Cell><ul style={{
+						{showInterfaces ? <Table.Cell disabled={isLoading}><ul style={{
 							listStyleType: 'none',
 							margin: 0,
 							padding: 0
-						}}>{interfacesArr.sort().map((c, i) => <li key={i}>{c}</li>)}</ul></Table.Cell> : null}
+						}}>{interfaceNames.sort().map((c, i) => <li key={i}>{c}</li>)}</ul></Table.Cell> : null}
 
-						<Table.Cell collapsing textAlign='right'>{documentsInTotal}</Table.Cell>
+						<Table.Cell collapsing disabled={isLoading} textAlign='right'>{documentsInTotal}</Table.Cell>
 
-						{showDocumentsPerCollection ? <Table.Cell collapsing>
+						{showDocumentsPerCollection ? <Table.Cell collapsing disabled={isLoading}>
 							<ul style={{
 								listStyleType: 'none',
 								margin: 0,
 								padding: 0
 							}}>
-								{Object.keys(collectionsObj).map((k, i) => <li key={i}>{k}({collectionsObj[k].documentsTotal})</li>)}
+								{Object.keys(collections).map((k, i) => <li key={i}>{k}({collections[k].documentsTotal})</li>)}
 								<li>Total: {documentsInTotal}</li>
 							</ul>
 						</Table.Cell> : null}
 
-						<Table.Cell collapsing textAlign='right'>{activeProperties.length}</Table.Cell>
-						<Table.Cell collapsing>{activePropertyNames.sort().join(', ')}</Table.Cell>
+						<Table.Cell collapsing disabled={isLoading} textAlign='right'>{activeProperties.length}</Table.Cell>
+						<Table.Cell collapsing disabled={isLoading}>{activePropertyNames.sort().join(', ')}</Table.Cell>
 
-						{showAddFields ? <Table.Cell collapsing>{addFields ? <Icon color='green' name='checkmark' size='large'/> : <Icon color='grey' name='x' size='large'/>}</Table.Cell> : null}
+						{showAddFields ? <Table.Cell collapsing disabled={isLoading}>{addFields ? <Icon color='green' disabled={isLoading} name='checkmark' size='large'/> : <Icon color='grey' disabled={isLoading} name='x' size='large'/>}</Table.Cell> : null}
+
+						{showManagedBy ? <Table.Cell collapsing disabled={isLoading}>{managedBy}</Table.Cell> : null}
 
 						{showDetails ? <Table.Cell collapsing>
 							<Table>
@@ -306,21 +299,22 @@ export function DocumentTypes({
 							</Table>
 						</Table.Cell> : null}
 
-						<Table.Cell collapsing>
+						<Table.Cell collapsing disabled={isLoading}>
 							<Button.Group>
 								<DeleteDocumentTypeModal
 									_id={_id}
 									_name={_name}
-									collectionsArr={collectionsArr}
 									afterClose={() => {
 										//console.debug('DeleteDocumentTypeModal afterClose');
-										queryDocumentTypes();
+										memoizedUpdateState();
 										//setBoolPoll(true);
 									}}
 									beforeOpen={() => {
 										//console.debug('DeleteDocumentTypeModal beforeOpen');
 										//setBoolPoll(false);
 									}}
+									collectionNames={collectionNames}
+									disabled={isLoading}
 									servicesBaseUrl={servicesBaseUrl}
 								/>
 							</Button.Group>
@@ -343,14 +337,12 @@ export function DocumentTypes({
 		<NewOrEditDocumentTypeModal
 			_id={newOrEditModalState._id}
 			_name={newOrEditModalState._name}
-			collectionsArr={newOrEditModalState.collectionsArr}
-			interfacesArr={newOrEditModalState.interfacesArr}
 			open={newOrEditModalState.open}
 			documentTypes={documentTypes}
 			setModalState={setNewOrEditModalState}
 			onClose={() => {
 				setNewOrEditModalState({ open: false });
-				queryDocumentTypes();
+				memoizedUpdateState();
 				//setBoolPoll(true);
 			}}
 			onMount={() => {
@@ -358,6 +350,26 @@ export function DocumentTypes({
 				//setBoolPoll(false);
 			}}
 			servicesBaseUrl={servicesBaseUrl}
+		/>
+
+		<EditManagedDocumentTypeWarningModal
+			documentTypeName={currentDocumentTypeName}
+			managedBy={documentTypes[currentDocumentTypeName] ? documentTypes[currentDocumentTypeName].managedBy : ''}
+			onCancel={() => {
+				setEditManagedDocumentTypeWarningModalOpen(false);
+			}}
+			onClose={() => {
+				setEditManagedDocumentTypeWarningModalOpen(false);
+			}}
+			onConfirm={() => {
+				setNewOrEditModalState({
+					_id: documentTypes[currentDocumentTypeName]._id,
+					_name: currentDocumentTypeName,
+					open: true
+				});
+				setEditManagedDocumentTypeWarningModalOpen(false);
+			}}
+			open={editManagedDocumentTypeWarningModalOpen}
 		/>
 	</>;
 } // DocumentTypes

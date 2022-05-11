@@ -25,8 +25,8 @@ export function RemoveFieldFromDocumentTypeModal({
 		open: open
 	},
 	// Optional
-	collectionsArr = [], // optional
-	interfacesArr = [],  // optional
+	collectionNames = [], // optional
+	interfaceNames = [],  // optional
 } :{
 	// Required
 	onClose :() => void
@@ -34,8 +34,8 @@ export function RemoveFieldFromDocumentTypeModal({
 	servicesBaseUrl :string
 	updateOrDeleteProperties :UpdateOrDeletePropertiesFunction
 	// Optional
-	collectionsArr ?:Array<string>
-	interfacesArr ?:Array<string>
+	collectionNames ?:Array<string>
+	interfaceNames ?:Array<string>
 }) {
 	const [isLoading, setIsLoading] = React.useState(true);
 	const [fieldHasValueInDocumentsTotal, setFieldHasValueInDocumentsTotal] = React.useState(undefined);
@@ -56,7 +56,7 @@ export function RemoveFieldFromDocumentTypeModal({
 			},
 			url: `${servicesBaseUrl}/graphQL` ,
 			variables: {
-				collections: collectionsArr,
+				collections: collectionNames,
 				field: state.name,
 				filters: {
 					boolean: {
@@ -74,7 +74,7 @@ export function RemoveFieldFromDocumentTypeModal({
 		});
 	};
 
-	const isFieldInUse = fieldHasValueInDocumentsTotal > 0 || interfacesArr.length > 0 || collectionsArr.length > 0;
+	const isFieldInUse = fieldHasValueInDocumentsTotal > 0 || interfaceNames.length > 0 || collectionNames.length > 0;
 
 	return <Modal
 		closeIcon
@@ -93,19 +93,19 @@ export function RemoveFieldFromDocumentTypeModal({
 				<>
 					<p>This documentType is used by the following...</p>
 
-					{interfacesArr.length ? <>
+					{interfaceNames.length ? <>
 						<h4>Interfaces</h4>
 						<ul>
-							{interfacesArr.sort().map((c, i) => (
+							{interfaceNames.sort().map((c, i) => (
 								<li key={i}>{c}</li>
 							))}
 						</ul>
 					</>: null}
 
-					{collectionsArr.length ? <>
+					{collectionNames.length ? <>
 						<h4>Collections</h4>
 						<ul>
-							{collectionsArr.sort().map((c, i) => (
+							{collectionNames.sort().map((c, i) => (
 								<li key={i}>{c}</li>
 							))}
 						</ul>

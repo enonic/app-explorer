@@ -1,14 +1,54 @@
 import type {
+	DocumentType,
 	DocumentTypeField,
 	DocumentTypeFields
 } from '/lib/explorer/types/index.d';
 
 
+export type DocumentTypesComponentParams = {
+	servicesBaseUrl :string
+}
+
+export type NewOrEditDocumentTypeModalComponentParams = {
+	// Required
+	documentTypes :DocumentTypesObj
+	servicesBaseUrl :string
+	setModalState :React.Dispatch<React.SetStateAction<DocumentTypeModal>>
+	// Optional
+	_id ?:string
+	_name ?:string
+	open ?:boolean
+	onClose ?:() => void
+	onMount ?:() => void
+}
+
+export type NewOrEditDocumentTypeComponentParams = {
+	// Required
+	documentTypes :DocumentTypesObj
+	servicesBaseUrl :string
+	setModalState :React.Dispatch<React.SetStateAction<DocumentTypeModal>>
+	// Optional
+	_id ?:string
+	_name ?:string
+	doClose ?:() => void
+}
+
+export type DocumentTypesObj = Record<string, Omit<
+	DocumentType, 'properties'
+> & {
+	activeProperties :DocumentType['properties']
+	activePropertyNames :Array<string>
+	collectionNames :Array<string>
+	collections :Record<string,{
+		documentsTotal :number
+	}>
+	documentsInTotal :number
+	interfaceNames :Array<string>
+}>
+
 export type DocumentTypeModal = {
 	_id ?:string
 	_name ?:string
-	collectionsArr ?:Array<string>
-	interfacesArr ?:Array<string>
 	open :boolean
 }
 
