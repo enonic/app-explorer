@@ -14,7 +14,9 @@ import {
 	GraphQLString,
 	list,
 	nonNull
+	//@ts-ignore
 } from '/lib/graphql';
+//@ts-ignore
 import {list as listTasks} from '/lib/xp/task';
 
 import {queryCollectors} from './collector/queryCollectors';

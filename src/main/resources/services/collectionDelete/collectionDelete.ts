@@ -1,14 +1,16 @@
-import {toStr} from '@enonic/js-utils';
-
 import {
-	PRINCIPAL_EXPLORER_WRITE,
-	RT_JSON
-} from '/lib/explorer/model/2/constants';
+	RESPONSE_TYPE_JSON,
+	toStr
+} from '@enonic/js-utils';
+
+import {PRINCIPAL_EXPLORER_WRITE} from '/lib/explorer/model/2/constants';
 import {connect} from '/lib/explorer/repo/connect';
 import {remove} from '/lib/explorer/node/remove';
 import {listExplorerJobsThatStartWithName} from '/lib/explorer/scheduler/listExplorerJobsThatStartWithName';
 
+//@ts-ignore
 import {delete as deleteJob} from '/lib/xp/scheduler';
+//@ts-ignore
 import {executeFunction} from '/lib/xp/task';
 
 
@@ -36,7 +38,7 @@ exports.delete = ({
 			body: {
 				message
 			},
-			contentType: RT_JSON,
+			contentType: RESPONSE_TYPE_JSON,
 			status: 404
 		};
 	}
@@ -71,7 +73,7 @@ exports.delete = ({
 	}
 	return {
 		body,
-		contentType: RT_JSON,
+		contentType: RESPONSE_TYPE_JSON,
 		status
 	};
 };

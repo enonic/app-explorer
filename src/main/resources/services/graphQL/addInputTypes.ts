@@ -3,6 +3,7 @@ import {
 	list,
 	nonNull,
 	reference
+	//@ts-ignore
 } from '/lib/graphql';
 
 import {

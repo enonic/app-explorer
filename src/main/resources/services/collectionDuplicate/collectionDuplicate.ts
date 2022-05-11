@@ -1,9 +1,9 @@
-//import {toStr} from '@enonic/js-utils';
-
 import {
-	PRINCIPAL_EXPLORER_WRITE,
-	RT_JSON
-} from '/lib/explorer/model/2/constants';
+	RESPONSE_TYPE_JSON//,
+	//toStr
+} from '@enonic/js-utils';
+
+import {PRINCIPAL_EXPLORER_WRITE} from '/lib/explorer/model/2/constants';
 import {exists} from '/lib/explorer/collection/exists';
 import {get} from '/lib/explorer/collection/get';
 import {connect} from '/lib/explorer/repo/connect';
@@ -58,7 +58,7 @@ export function post({
 	}
 	return {
 		body,
-		contentType: RT_JSON,
+		contentType: RESPONSE_TYPE_JSON,
 		status
 	};
 }

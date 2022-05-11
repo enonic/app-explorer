@@ -6,6 +6,7 @@ import {
 	GraphQLBoolean,
 	GraphQLInt,
 	GraphQLString
+	//@ts-ignore
 } from '/lib/graphql';
 
 import {GQL_TYPE_FIELD_NODE_NAME} from '../constants';

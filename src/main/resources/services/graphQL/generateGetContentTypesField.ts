@@ -5,7 +5,9 @@ import {
 	GraphQLString,
 	list,
 	nonNull
+	//@ts-ignore
 } from '/lib/graphql';
+//@ts-ignore
 import {getTypes} from '/lib/xp/content';
 
 

@@ -5,6 +5,7 @@ import {
 } from '@enonic/js-utils';
 
 import {updateDocumentType} from '/lib/explorer/documentType/updateDocumentType';
+//@ts-ignore
 import {list} from '/lib/graphql';
 
 import {

@@ -1,13 +1,15 @@
 //import {toStr} from '@enonic/js-utils';
 import serialize from 'serialize-javascript';
-
+//@ts-ignore
 import {isLicenseValid, getIssuedTo} from '/lib/licensing';
 /*import {
 	getBaseUri,
 	getLauncherPath,
 	getLauncherUrl
 } from '/lib/xp/admin';*/
+//@ts-ignore
 import {assetUrl, serviceUrl} from '/lib/xp/portal';
+//@ts-ignore
 import {getLauncherPath} from '/lib/xp/admin';
 
 import {
@@ -16,7 +18,9 @@ import {
 } from '/lib/explorer/model/2/constants';
 import {connect} from '/lib/explorer/repo/connect';
 import {query as queryCollectors} from '/lib/explorer/collector/query';
+//@ts-ignore
 import {get as getRepo} from '/lib/xp/repo';
+//@ts-ignore
 import {list as listTasks} from '/lib/xp/task';
 
 const ID_REACT_EXPLORER_CONTAINER = 'reactExplorerContainer';

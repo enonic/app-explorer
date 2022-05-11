@@ -4,6 +4,7 @@
 import {
 	GraphQLInt,
 	GraphQLString
+	//@ts-ignore
 } from '/lib/graphql';
 
 

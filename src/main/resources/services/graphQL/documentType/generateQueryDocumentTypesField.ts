@@ -11,6 +11,7 @@ import {connect} from '/lib/explorer/repo/connect';
 import {
 	list,
 	reference
+	//@ts-ignore
 } from '/lib/graphql';
 
 import {

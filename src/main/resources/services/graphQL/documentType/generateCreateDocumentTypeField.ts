@@ -4,6 +4,7 @@ import {
 	//toStr
 } from '@enonic/js-utils';
 import {createDocumentType} from '/lib/explorer/documentType/createDocumentType';
+//@ts-ignore
 import {list} from '/lib/graphql';
 
 import {

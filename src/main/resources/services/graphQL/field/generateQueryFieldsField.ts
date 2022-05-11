@@ -12,6 +12,7 @@ import {
 	GraphQLBoolean,
 	GraphQLString,
 	list
+	//@ts-ignore
 } from '/lib/graphql';
 
 import {GQL_TYPE_FIELDS_QUERY_RESULT_NAME} from '../constants';

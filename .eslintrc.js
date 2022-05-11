@@ -188,7 +188,7 @@ module.exports = {
 				'_ts', // node property
 				'_versionKey' // node property
 			],
-			allowAfterThis: false,
+			allowAfterThis: true,
 			allowAfterSuper: false,
 			enforceInMethodNames: false
 		}],
