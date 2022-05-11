@@ -11,13 +11,16 @@
      └───────────────┴─────────────────────────────────────────────┘
 */
 
-//import {toStr} from '@enonic/js-utils';
+import {
+	RESPONSE_TYPE_JSON//,
+	//toStr
+} from '@enonic/js-utils';
 
 import {
 	execute
+	//@ts-ignore
 } from '/lib/graphql';
 
-import {RT_JSON} from '/lib/explorer/model/2/constants';
 
 import {Glue} from './Glue';
 
@@ -310,7 +313,7 @@ export function post(request) {
 	//log.debug(`Duration: ${duration}ms Query:${query}`);
 
 	return {
-		contentType: RT_JSON,
+		contentType: RESPONSE_TYPE_JSON,
 		body: //JSON.stringify( // TODO This is causeing problems, commenting it out until I can look at all of them.
 			// NOTE This add null values for missing properties
 			obj

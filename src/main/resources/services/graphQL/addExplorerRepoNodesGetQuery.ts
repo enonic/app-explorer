@@ -19,6 +19,7 @@ import {
 	GraphQLInt,
 	GraphQLString,
 	list
+	//@ts-ignore
 } from '/lib/graphql';
 
 import {

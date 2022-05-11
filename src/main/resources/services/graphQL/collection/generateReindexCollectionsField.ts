@@ -2,6 +2,7 @@ import {reindexCollections} from '/lib/explorer/collection/reindexCollections';
 import {
 	GraphQLString,
 	list
+	//@ts-ignore
 } from '/lib/graphql';
 
 import {GQL_TYPE_COLLECTION_REINDEX_REPORT} from '../constants';

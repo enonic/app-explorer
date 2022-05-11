@@ -6,6 +6,7 @@ import {
 	NT_STOP_WORDS,
 	NT_THESAURUS
 } from '/lib/explorer/model/2/constants';
+//@ts-ignore
 import {reference} from '/lib/graphql';
 
 import {

@@ -3,6 +3,7 @@ import {
 	GraphQLInt,
 	GraphQLString,
 	nonNull
+	//@ts-ignore
 } from '/lib/graphql';
 
 

@@ -5,6 +5,7 @@ import {
 	GraphQLInt,
 	GraphQLString,
 	nonNull
+	//@ts-ignore
 } from '/lib/graphql';
 import {coerseFieldType} from '/lib/explorer/field/coerseFieldType';
 import {createField} from '/lib/explorer/field/createField';

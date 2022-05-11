@@ -1,12 +1,14 @@
-import {toStr} from '@enonic/js-utils';
+import {
+	RESPONSE_TYPE_JSON,
+	toStr
+} from '@enonic/js-utils';
 
+//@ts-ignore
 import {assetUrl} from '/lib/xp/portal';
+//@ts-ignore
 import {submitTask} from '/lib/xp/task';
 
-import {
-	PRINCIPAL_EXPLORER_READ,
-	RT_JSON
-} from '/lib/explorer/model/2/constants';
+import {PRINCIPAL_EXPLORER_READ} from '/lib/explorer/model/2/constants';
 import {connect} from '/lib/explorer/repo/connect';
 import {get as getCollection} from '/lib/explorer/collection/get';
 import {query as queryCollectors} from '/lib/explorer/collector/query';
@@ -38,7 +40,7 @@ export function post({
 			body: {
 				error: `Already collecting to ${collectionName} under taskId ${alreadyRunningtaskId}!`
 			},
-			contentType: RT_JSON,
+			contentType: RESPONSE_TYPE_JSON,
 			status: 500
 		};
 	}
@@ -114,7 +116,7 @@ export function post({
 		body: {
 			messages: `Started collecting ${collectionName} with taskId ${taskId}`
 		},
-		contentType: RT_JSON,
+		contentType: RESPONSE_TYPE_JSON,
 		status: 200
 	};
 } // post

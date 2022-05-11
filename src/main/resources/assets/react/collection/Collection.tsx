@@ -9,7 +9,7 @@ import type {
 } from '../index.d';
 
 
-import * as React from 'react';
+//import * as React from 'react';
 import {
 	Button,
 	Form,

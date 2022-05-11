@@ -4,7 +4,9 @@ import {
 	GraphQLString,
 	list,
 	nonNull
+	//@ts-ignore
 } from '/lib/graphql';
+//@ts-ignore
 import {getSites as gS} from '/lib/util/content/getSites';
 
 

@@ -1,4 +1,4 @@
-import {toStr} from '@enonic/js-utils';
+//import {toStr} from '@enonic/js-utils';
 
 import {
 	DateTime as GraphQLDateTime,
@@ -9,6 +9,7 @@ import {
 	Json as GraphQLJson,
 	list,
 	nonNull
+	//@ts-ignore
 } from '/lib/graphql';
 
 import {

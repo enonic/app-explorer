@@ -5,6 +5,7 @@ import {
 	GraphQLString,
 	list,
 	nonNull
+	//@ts-ignore
 } from '/lib/graphql';
 import {query} from '/lib/explorer/journal/query';
 

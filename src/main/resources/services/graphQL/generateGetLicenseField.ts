@@ -4,7 +4,9 @@ import {
 	GraphQLBoolean,
 	GraphQLString,
 	nonNull
+	//@ts-ignore
 } from '/lib/graphql';
+//@ts-ignore
 import {validateLicense} from '/lib/license';
 
 

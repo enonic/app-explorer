@@ -3,6 +3,7 @@
 import {
 	GraphQLString,
 	list
+	//@ts-ignore
 } from '/lib/graphql';
 //import {getLocales as importedGetLocales} from '/lib/locales';
 import {getLocales as importedGetLocales} from '../../lib/locales';

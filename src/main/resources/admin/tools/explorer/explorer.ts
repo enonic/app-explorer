@@ -3,7 +3,9 @@
 //──────────────────────────────────────────────────────────────────────────────
 // Enonic XP libs (included in jar via gradle dependencies)
 //──────────────────────────────────────────────────────────────────────────────
+//@ts-ignore
 import newRouter from '/lib/router';
+//@ts-ignore
 import {hasRole} from '/lib/xp/auth';
 
 //──────────────────────────────────────────────────────────────────────────────
@@ -13,7 +15,8 @@ import {
 	ROLE_SYSTEM_ADMIN,
 	ROLE_EXPLORER_ADMIN
 } from '/lib/explorer/model/2/constants';
-import {htmlResponse} from '/admin/tools/explorer/htmlResponse';
+//import {htmlResponse} from '/admin/tools/explorer/htmlResponse';
+import {htmlResponse} from './htmlResponse';
 
 import {overrideable as interfacePost} from '../../../webapp/interface/post';
 

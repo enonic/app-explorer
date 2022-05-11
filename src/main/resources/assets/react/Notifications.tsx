@@ -1,8 +1,10 @@
+import * as React from 'react';
 import {Form, Header} from 'semantic-ui-react';
 import {
 	Form as EnonicForm,
 	ResetButton,
 	SubmitButton
+	//@ts-ignore
 } from 'semantic-ui-react-form';
 
 import {Emails} from './notifications/Emails';
