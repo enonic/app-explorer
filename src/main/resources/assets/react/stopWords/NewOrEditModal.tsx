@@ -1,3 +1,6 @@
+import type {QueriedStopword} from '/lib/explorer/types/StopWord.d';
+
+
 import * as React from 'react';
 import {
 	Button, Form, Header, Icon, Modal, Popup, Table
@@ -27,29 +30,37 @@ import {SubmitButton} from 'semantic-ui-react-form/buttons/SubmitButton';
 
 import {fetchStopWordsCreate} from '../../../services/graphQL/fetchers/fetchStopWordsCreate';
 import {fetchStopWordsUpdate} from '../../../services/graphQL/fetchers/fetchStopWordsUpdate';
+import {mustStartWithALowercaseLetter} from '../utils/mustStartWithALowercaseLetter';
+import {notDoubleUnderscore} from '../utils/notDoubleUnderscore';
+import {onlyLowercaseAsciiLettersDigitsAndUnderscores} from '../utils/onlyLowercaseAsciiLettersDigitsAndUnderscores';
+import {required} from '../utils/required';
 
 
 export function NewOrEditModal(props :{
 	// Required
+	stopWords :Array<QueriedStopword>
 	servicesBaseUrl :string
 	// Optional
-	afterClose? :()=>void
-	beforeOpen? :()=>void
 	_id? :string
 	_name? :string
+	afterClose? :()=>void
+	beforeOpen? :()=>void
 	editMode? :boolean
 	header? :string
 	words? :Array<string>
 }) {
 	//console.debug('NewOrEditModal props', props);
 	const {
-		afterClose = () => {},
-		beforeOpen = () => {},
+		// Required
+		stopWords,
+		servicesBaseUrl,
+		// Optional
 		_id,
 		_name = '',
+		afterClose = () => {/**/},
+		beforeOpen = () => {/**/},
 		editMode = !!_name,
 		header = editMode ? `Edit ${_name} stopWords` : 'New stopWords list',
-		servicesBaseUrl,
 		words = ['']
 	} = props;
 	//console.debug('NewOrEditModal words', words);
@@ -66,6 +77,14 @@ export function NewOrEditModal(props :{
 		beforeOpen();
 		setOpen(true);
 	};
+
+	const stopWordNames = stopWords.map(({_name}) => _name);
+
+	function mustBeUnique(v :string) {
+		if (stopWordNames.includes(v)) {
+			return `Name must be unique: Name '${v}' is already in use!`;
+		}
+	}
 
 	return <Modal
 		closeIcon
@@ -125,6 +144,13 @@ export function NewOrEditModal(props :{
 						}
 					})
 				}
+			}}
+			schema={{
+				_name: (v :string) => _id ? false : required(v)
+					|| mustStartWithALowercaseLetter(v)
+					|| onlyLowercaseAsciiLettersDigitsAndUnderscores(v)
+					|| notDoubleUnderscore(v)
+					|| mustBeUnique(v)
 			}}
 		>
 			<Modal.Content>

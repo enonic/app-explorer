@@ -1,58 +1,24 @@
-import type {
-	FetchQueryStopWordsData,
-	QueryStopWordsResult
-} from '../../../services/graphQL/fetchers/fetchQueryStopWords';
-
-
-import * as React from 'react';
 import {Button, Header, Radio, Segment, Table} from 'semantic-ui-react';
 
 import {DeleteModal} from './DeleteModal';
 import {NewOrEditModal} from './NewOrEditModal';
-import {fetchQueryStopWords} from '../../../services/graphQL/fetchers/fetchQueryStopWords';
+import {useStopWordsState} from './useStopWordsState';
 
 
-export function StopWords(props :{
+export function StopWords({
+	servicesBaseUrl
+} :{
 	servicesBaseUrl :string
 }) {
 	const {
+		//isLoading,
+		memoizedUpdateStopWords,
+		queryStopWords,
+		setShowDelete,
+		showDelete
+	} = useStopWordsState({
 		servicesBaseUrl
-	} = props;
-
-	const [showDelete, setShowDelete] = React.useState(false);
-	const [state, setState] = React.useState({
-		queryStopWords: {
-			count: 0,
-			hits: [],
-			total: 0
-		},
-		isLoading: false
-	} as {
-		isLoading :boolean
-		queryStopWords :QueryStopWordsResult
 	});
-
-	function updateStopwords() {
-		setState(prev => {
-			const deref = JSON.parse(JSON.stringify(prev));
-			deref.isLoading = true;
-			return deref;
-		});
-		fetchQueryStopWords({
-			handleData: (data :FetchQueryStopWordsData) => setState(prev => {
-				const deref = JSON.parse(JSON.stringify(prev));
-				deref.queryStopWords = data.queryStopWords;
-				deref.isLoading = false;
-				return deref;
-			}),
-			url: `${servicesBaseUrl}/graphQL`
-		});
-	} // updateStopwords
-
-	React.useEffect(() => updateStopwords(), []);
-
-	const {queryStopWords} = state;
-
 	return <>
 		<Segment basic style={{
 			marginLeft: -14,
@@ -68,7 +34,7 @@ export function StopWords(props :{
 								checked={showDelete}
 								onChange={(
 									//@ts-ignore
-									ignored,
+									event :unknown,
 									{checked}
 								) => {
 									setShowDelete(checked);
@@ -96,14 +62,15 @@ export function StopWords(props :{
 					_id,
 					_name,
 					words
-				}, index) => {
+				}, index :number) => {
 					const key = `list[${index}]`;
 					return <Table.Row key={key}>
 						<Table.Cell collapsing>
 							<NewOrEditModal
 								_id={_id}
 								_name={_name}
-								afterClose={() => updateStopwords()}
+								afterClose={memoizedUpdateStopWords}
+								stopWords={queryStopWords.hits}
 								servicesBaseUrl={servicesBaseUrl}
 								words={words}
 							/>
@@ -118,7 +85,7 @@ export function StopWords(props :{
 									<DeleteModal
 										_id={_id}
 										_name={_name}
-										afterClose={updateStopwords}
+										afterClose={memoizedUpdateStopWords}
 										servicesBaseUrl={servicesBaseUrl}
 									/>
 								</Button.Group>
@@ -129,7 +96,8 @@ export function StopWords(props :{
 			</Table.Body>
 		</Table>
 		<NewOrEditModal
-			afterClose={updateStopwords}
+			afterClose={memoizedUpdateStopWords}
+			stopWords={queryStopWords.hits}
 			servicesBaseUrl={servicesBaseUrl}
 		/>
 	</>;
