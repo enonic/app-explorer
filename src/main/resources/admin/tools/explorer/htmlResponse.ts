@@ -267,10 +267,8 @@ services: {}, // Workaround for i18nUrl BUG
 			const collectorComponents = {};
 			${Object.keys(collectorsObj).map((collectorId) => `collectorComponents['${collectorId}'] = ${collectorsObj[collectorId].componentPath}`)}
 			propsObj.collectorComponents = collectorComponents;
-			ReactDOM.render(
-				React.createElement(window.LibExplorer.Explorer, propsObj),
-				document.getElementById('${ID_REACT_EXPLORER_CONTAINER}')
-			);
+			const root = ReactDOM.createRoot(document.getElementById('${ID_REACT_EXPLORER_CONTAINER}'));
+			root.render(React.createElement(window.LibExplorer.Explorer, propsObj));
 		</script>
 	</body>
 </html>`,
