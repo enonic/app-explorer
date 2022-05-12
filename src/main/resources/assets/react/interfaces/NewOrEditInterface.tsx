@@ -30,7 +30,7 @@ import {fetchInterfaceGet} from '../../../services/graphQL/fetchers/fetchInterfa
 import {fetchInterfaceUpdate} from '../../../services/graphQL/fetchers/fetchInterfaceUpdate';
 import {mustStartWithALowercaseLetter} from '../utils/mustStartWithALowercaseLetter';
 import {notDoubleUnderscore} from '../utils/notDoubleUnderscore';
-import {onlyLettersDigitsAndUnderscores} from '../utils/onlyLettersDigitsAndUnderscores';
+import {onlyLowercaseAsciiLettersDigitsAndUnderscores} from '../utils/onlyLowercaseAsciiLettersDigitsAndUnderscores';
 import {required} from '../utils/required';
 import {FieldSelector} from './FieldSelector';
 
@@ -53,7 +53,7 @@ export function NewOrEditInterface(props :NewOrEditInterfaceProps) {
 		_id, // nullable
 		collectionIdToFieldKeys = {},
 		collectionOptions = [],
-		doClose = () => {},
+		doClose = () => {/**/},
 		globalFieldsObj = {
 			'_allText': true // TODO Hardcode
 		},
@@ -123,7 +123,7 @@ export function NewOrEditInterface(props :NewOrEditInterfaceProps) {
 	if (!_id) {
 		schema._name = (v) => required(v)
 			|| mustStartWithALowercaseLetter(v)
-			|| onlyLettersDigitsAndUnderscores(v)
+			|| onlyLowercaseAsciiLettersDigitsAndUnderscores(v)
 			|| notDoubleUnderscore(v)
 			|| mustBeUnique(v);
 	}
@@ -146,7 +146,7 @@ export function NewOrEditInterface(props :NewOrEditInterfaceProps) {
 				stopWords,
 				synonymIds
 			} = values; // Also includes _nodeType, _path, _versionKey
-			let url = `${servicesBaseUrl}/graphQL`;
+			const url = `${servicesBaseUrl}/graphQL`;
 			(_id ? fetchInterfaceUpdate : fetchInterfaceCreate)({
 				handleResponse(response) {
 					if (response.status === 200) { doClose(); }
