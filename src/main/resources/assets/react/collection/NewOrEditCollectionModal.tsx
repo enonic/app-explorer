@@ -9,6 +9,7 @@ import type {
 	SetLicenseValidFunction,
 	SiteOptions
 } from '../index.d';
+import type {QueryCollectionsHits} from './index.d';
 
 
 import * as React from 'react';
@@ -20,6 +21,7 @@ import {UploadLicense} from '../UploadLicense';
 
 export function NewOrEditCollectionModal(props :{
 	// Required
+	collections :QueryCollectionsHits
 	collectorComponents :CollectorComponents
 	collectorOptions :Array<DropdownItemProps>
 	contentTypeOptions :ContentTypeOptions
@@ -39,8 +41,9 @@ export function NewOrEditCollectionModal(props :{
 	disabled ?:boolean
 }) {
 	const {
-		afterClose = () => {},
-		beforeOpen = () => {},
+		afterClose = () => {/**/},
+		beforeOpen = () => {/**/},
+		collections,
 		//collectors,
 		collectorComponents,
 		collectorOptions,
@@ -106,6 +109,7 @@ export function NewOrEditCollectionModal(props :{
 			? <>
 				<Modal.Header>{_name ? `Edit collection ${_name}`: 'New collection'}</Modal.Header>
 				<Collection
+					collections={collections}
 					collectorComponents={collectorComponents}
 					collectorOptions={collectorOptions}
 					contentTypeOptions={contentTypeOptions}

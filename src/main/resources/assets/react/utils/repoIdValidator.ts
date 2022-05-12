@@ -20,7 +20,7 @@ export function repoIdValidator(repoId :string) {
 	) {
 		return 'Must start with a lowercase letter a-z!';
 	}
-	for (var i = 1; i < repoId.length; i++) {
+	for (let i = 1; i < repoId.length; i++) {
 		const char = repoId.charAt(i);
 		const code = char.charCodeAt(0);
 		//console.debug(`char:${toStr(char)} charCode:${code}`)
@@ -42,4 +42,5 @@ export function repoIdValidator(repoId :string) {
 			return `Can only contain 1-9 _ a-z!`;
 		}
 	}
+	return false;
 }

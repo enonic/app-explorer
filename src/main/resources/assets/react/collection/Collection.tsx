@@ -7,6 +7,7 @@ import type {
 	Locales,
 	SiteOptions
 } from '../index.d';
+import type {QueryCollectionsHits} from './index.d';
 
 
 //import * as React from 'react';
@@ -39,12 +40,8 @@ import {SchedulingSegment} from './SchedulingSegment';
 import {DocumentTypeSelector} from './DocumentTypeSelector';
 
 
-const SCHEMA = {
-	_name: (v :string) => repoIdValidator(v)
-};
-
-
 export function Collection(props :{
+	collections :QueryCollectionsHits
 	collectorComponents :CollectorComponents
 	collectorOptions :Array<DropdownItemProps>
 	contentTypeOptions :ContentTypeOptions
@@ -58,6 +55,7 @@ export function Collection(props :{
 	//console.debug('Collection props', props);
 
 	const {
+		collections,
 		collectorComponents,
 		collectorOptions,
 		contentTypeOptions,
@@ -90,6 +88,8 @@ export function Collection(props :{
 	if (initialValues.collector && initialValues.collector.configJson) {
 		initialValues.collector.config = JSON.parse(initialValues.collector.configJson);
 	}
+
+	const collectionNames = collections.map(({_name}) => _name);
 
 	return <EnonicForm
 		afterValidate={(/*dereffed*/) => {
@@ -179,7 +179,11 @@ export function Collection(props :{
 				if (response.status === 200) { doClose(); }
 			});
 		}}
-		schema={SCHEMA}
+		schema={{
+			_name: (v :string) => collectionNames.includes(v)
+				? `The name "${v}" is already in use, please input another name."`
+				: repoIdValidator(v)
+		}}
 	>
 		<Modal.Content>
 			<Form>
