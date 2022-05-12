@@ -290,7 +290,7 @@ export function NewOrEditDocumentType({
 												fluid
 												onChange={(
 													//@ts-ignore
-													event,
+													event :unknown,
 													data
 												) => {
 													// setName(data.value);
@@ -314,7 +314,7 @@ export function NewOrEditDocumentType({
 											name='addFields'
 											onChange= {(
 												//@ts-ignore
-												event,
+												event :unknown,
 												data
 											) => {
 												setState(prev => {

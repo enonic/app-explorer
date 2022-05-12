@@ -23,8 +23,8 @@ export const DeleteApiKeyModal = (props :{
 		_id,
 		_name,
 		servicesBaseUrl,
-		afterClose = () => {},
-		beforeOpen = () => {}
+		afterClose = () => {/**/},
+		beforeOpen = () => {/**/}
 	} = props;
 	const [state, setState] = React.useState({
 		open: false

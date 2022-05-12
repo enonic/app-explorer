@@ -4,7 +4,7 @@ import type {
 } from '/lib/explorer/types/index.d';
 
 
-export interface ApiKey {
+export type ApiKey = {
 	_id? :string
 	_name :string
 	//_nodeType :string // Useless info, always the same

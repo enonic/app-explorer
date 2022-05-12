@@ -1,3 +1,6 @@
+import type {QueryApiKeysHits} from './index.d';
+
+
 import * as React from 'react';
 import {
 	Button,
@@ -9,17 +12,31 @@ import {
 import {NewOrEditApiKey} from './NewOrEditApiKey';
 
 
-export const NewOrEditApiKeyModal = (props) => {
+export const NewOrEditApiKeyModal = (props :{
+	// Required
+	apiKeys: QueryApiKeysHits
+	servicesBaseUrl :string
+	// Optional
+	_id ?:string
+	_name ?:string
+	afterClose :() => void
+	beforeOpen :() => void
+	initialValues ?:{
+		collections :Array<string>
+		interfaces :Array<string>
+	}
+}) => {
 	//console.debug('props', props);
 	const {
+		// Required
+		apiKeys,
+		servicesBaseUrl,
+		// Optional
 		_id,
 		_name,
-		afterClose = () => {},
-		beforeOpen = () => {},
-		initialValues,
-		queryCollectionsGraph,
-		queryInterfacesGraph,
-		servicesBaseUrl
+		afterClose = () => {/**/},
+		beforeOpen = () => {/**/},
+		initialValues
 	} = props;
 	const [state, setState] = React.useState({
 		open: false
@@ -67,10 +84,9 @@ export const NewOrEditApiKeyModal = (props) => {
 		<NewOrEditApiKey
 			_id={_id}
 			_name={_name}
+			apiKeys={apiKeys}
 			doClose={doClose}
 			initialValues={initialValues}
-			queryCollectionsGraph={queryCollectionsGraph}
-			queryInterfacesGraph={queryInterfacesGraph}
 			servicesBaseUrl={servicesBaseUrl}
 		/>
 	</Modal>;
