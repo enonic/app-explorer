@@ -1,14 +1,11 @@
 import type {
 	CollectorComponents,
-	ContentTypeOptions,
 	SetLicensedToFunction,
-	SetLicenseValidFunction,
-	SiteOptions
+	SetLicenseValidFunction
 } from '../index.d';
 
 
 import {
-	COLON_SIGN,
 	TASK_STATE_FAILED,
 	//TASK_STATE_FINISHED,
 	TASK_STATE_RUNNING,
@@ -18,7 +15,7 @@ import {
 } from '@enonic/js-utils';
 
 import {parseExpression as parseCronExpression} from 'cron-parser';
-import * as React from 'react';
+//import * as React from 'react';
 import {
 	Button, Dimmer, Header, Icon, Loader, Popup, Progress, Radio,
 	Segment, Table
@@ -28,10 +25,8 @@ import {
 } from './SchedulingSegment';
 import {DeleteCollectionModal} from './DeleteCollectionModal';
 import {NewOrEditCollectionModal} from './NewOrEditCollectionModal';
-import {useInterval} from '../utils/useInterval';
+import {useCollectionsState} from './useCollectionsState';
 import {Cron} from '../utils/Cron';
-
-//import {GQL_QUERY_QUERY_COLLECTIONS} from '../../../services/graphQL/collection/QueryCollectionsQuery';
 
 
 const GQL_MUTATION_COLLECTIONS_REINDEX = `mutation ReindexMutation(
@@ -44,140 +39,6 @@ const GQL_MUTATION_COLLECTIONS_REINDEX = `mutation ReindexMutation(
     documentTypeId
     taskId
   }
-}`;
-
-const COLLECTIONS_GQL = `queryCollections(
-	perPage: -1
-) {
-	total
-	count
-	page
-	pageStart
-	pageEnd
-	pagesTotal
-	hits {
-		_id
-		_name
-		_path
-		collector {
-			name
-			configJson
-		}
-		documentCount
-		interfaces
-		language
-		documentTypeId
-	}
-}`;
-
-const COLLECTORS_GQL = `queryCollectors {
-	total
-	count
-	hits {
-		appName
-		collectTaskName
-		configAssetPath
-		displayName
-	}
-}`;
-
-const FIELDS_GQL = `queryFields {
-	total
-	count
-	hits {
-		_name
-		key
-	}
-}`;
-
-const JOBS_GQL = `listScheduledJobs {
-	collectionId
-	enabled
-	descriptor
-	schedule {
-  		timeZone
-  		type
-  		value
-	}
-}`;
-
-const LOCALES_GQL = `getLocales {
-	country
-	displayName
-	tag
-}`;
-
-const GQL_DOCUMENT_TYPES_QUERY = `queryDocumentTypes {
-	hits {
-		_id
-		_name
-	}
-}`;
-
-/*const GQL_QUERY_TASKS_GET = `query GetTasks(
-  $appName: String
-  $descriptor: String,
-  $onlyRegisteredCollectorTasks: Boolean,
-  $state: EnumTaskStates
-) {
-	queryTasks(
-		appName: $appName
-		name: $descriptor
-		onlyRegisteredCollectorTasks: $onlyRegisteredCollectorTasks
-		state: $state
-	) {
-		application
-		description
-		id
-		name
-		progress {
-			current
-			info # Can be JSON
-			total
-		}
-		startTime
-		state
-		user
-	}
-}`;*/
-
-const TASKS_GQL = `queryTasks {
-	application
-	description
-	id
-	name
-	progress {
-		current
-		info # Can be JSON
-		total
-	}
-	startTime
-	state
-	user
-}`;
-
-/*
-${CONTENT_TYPES_GQL}
-${SITES_GQL}
-*/
-
-const MOUNT_GQL = `{
-	${COLLECTIONS_GQL}
-	${COLLECTORS_GQL}
-	${FIELDS_GQL}
-	${JOBS_GQL}
-	${LOCALES_GQL}
-	${GQL_DOCUMENT_TYPES_QUERY}
-	${TASKS_GQL}
-}`;
-
-const UPDATE_GQL = `{
-	${COLLECTIONS_GQL}
-	${COLLECTORS_GQL}
-	${FIELDS_GQL}
-	${JOBS_GQL}
-	${GQL_DOCUMENT_TYPES_QUERY}
-	${TASKS_GQL}
 }`;
 
 
@@ -196,241 +57,43 @@ export function Collections(props :{
 		setLicenseValid
 	} = props;
 
-	const [boolPoll, setBoolPoll] = React.useState(true);
-	const [jobsObj, setJobsObj] = React.useState({});
-	const [locales, setLocales] = React.useState([]);
-	const [queryCollectionsGraph, setQueryCollectionsGraph] = React.useState({
-		count: 0,
-		hits: [],
-		total: 0
-	});
-	const [queryCollectorsGraph, setQueryCollectorsGraph] = React.useState({
-		count: 0,
-		hits: [],
-		total: 0
-	});
-	const [queryFieldsGraph, setQueryFieldsGraph] = React.useState({
-		count: 0,
-		hits: [],
-		total: 0
-	});
-	const [documentTypes, setDocumentTypes] = React.useState([]);
-	const [showCollector, setShowCollector] = React.useState(false);
-	const [showDelete, setShowDelete] = React.useState(false);
-	const [showDocumentCount/*, setShowDocumentCount*/] = React.useState(true);
-	const [showLanguage, setShowLanguage] = React.useState(false);
-	const [showInterfaces, setShowInterfaces] = React.useState(false);
-	const [showDocumentType, setShowDocumentType] = React.useState(false);
-	const [showSchedule, setShowSchedule] = React.useState(false);
-	const [tasks, setTasks] = React.useState([]);
-
-	const fieldsObj = {};
-	queryFieldsGraph.hits ? queryFieldsGraph.hits.forEach(({
-		//displayName: fieldLabel,
-		key
-	}) => {
-		fieldsObj[key] = {
-			label: key
-		};
-		/*return {
-			key,
-			label: displayName
-		};*/
-	}) : [];
-
-	const collectorsObj = {};
-	let collectorOptions = queryCollectorsGraph.hits
-		? queryCollectorsGraph.hits.map(({
-			appName,
-			collectTaskName,
-			//_name: key,
-			displayName: text
-		}) => {
-			collectorsObj[`${appName}:${collectTaskName}`] = true;
-			return {
-				key: `${appName}:${collectTaskName}`,
-				text,
-				value: `${appName}:${collectTaskName}`
-			};
-		})
-		: [];
-
-	const collectionsTaskState = {};
-	let anyTaskWithoutCollectionName = false;
-	const objCollectionsBeingReindexed = {};
-	let anyReindexTaskWithoutCollectionId = false;
-	tasks.forEach(({
-		name: taskDescriptor,
-		progress: {
-			current,
-			info,
-			total
-		},
-		state // WAITING | RUNNING | FINISHED | FAILED
-	}) => {
-		if (collectorsObj[taskDescriptor]) { // This is a collector task
-			try {
-				const {name} = JSON.parse(info);
-				if (name) {
-					collectionsTaskState[name] = state;
-				} else {
-					anyTaskWithoutCollectionName = true;
-				}
-			} catch (e) {
-				anyTaskWithoutCollectionName = true;
-			}
-		} else if (taskDescriptor === `com.enonic.app.explorer${COLON_SIGN}reindexCollection`) {
-			try {
-				const {collectionId} = JSON.parse(info);
-				if (collectionId) {
-					objCollectionsBeingReindexed[collectionId] = {
-						current,
-						//percent: Math.floor(current / total * 10000)/100, // Keeping two decimals,
-						state,
-						total
-					};
-				} else {
-					anyReindexTaskWithoutCollectionId = true;
-				}
-			} catch (e) {
-				anyReindexTaskWithoutCollectionId = true;
-			}
-		} /*else { // Not collector nor reindex task
-			console.debug('taskDescriptor', taskDescriptor);
-		}*/
-	});
-	//console.debug('anyReindexTaskWithoutCollectionId',anyReindexTaskWithoutCollectionId);
-
-	const intInitializedCollectorComponents = Object.keys(collectorComponents).length;
-
-	const [state/*, setState*/] = React.useState({
-		column: '_name',
-		contentTypeOptions: [],
-		direction: 'ascending',
-		isLoading: false,//true,
-		page: 1,
-		perPage: 10,
-		siteOptions: [],
-		sort: '_name ASC'
-	} as {
-		column :string
-		contentTypeOptions :ContentTypeOptions
-		direction: 'ascending'|'descending'
-		isLoading :boolean
-		siteOptions :SiteOptions
-	});
-
 	const {
+		anyReindexTaskWithoutCollectionId,
+		anyTaskWithoutCollectionName,
+		collectionsTaskState,
+		collectorOptions,
 		column,
 		contentTypeOptions,
 		direction,
+		fieldsObj,
+		intInitializedCollectorComponents,
 		isLoading,
+		jobsObj,
+		locales,
+		memoizedFetchCollections,
+		memoizedFetchOnUpdate,
+		memoizedFetchTasks,
+		objCollectionsBeingReindexed,
+		queryCollectionsGraph,
+		shemaIdToName,
+		setBoolPoll,
+		setShowCollector,
+		setShowDelete,
+		setShowDocumentType,
+		//setShowInterfaces,
+		setShowLanguage,
+		setShowSchedule,
+		showCollector,
+		showDelete,
+		showDocumentCount,
+		showDocumentType,
+		//showInterfaces,
+		showLanguage,
+		showSchedule,
 		siteOptions
-	} = state;
-
-	function setJobsObjFromArr(arr) {
-		const obj={};
-		arr.forEach(({
-			collectionId,
-			//collectionName,
-			enabled,
-			schedule: {
-				type,
-				//timeZone,
-				value
-			}
-		}) => {
-			if (type === 'CRON') {
-				if(obj[collectionId]) {
-					obj[collectionId].push({enabled, value});
-				} else {
-					obj[collectionId] = [{enabled, value}];
-				}
-			}
-		});
-		setJobsObj(obj);
-	} // jobsObjFromArr
-
-	function fetchOnMount() {
-		fetch(`${servicesBaseUrl}/graphQL`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ query: MOUNT_GQL })
-		})
-			.then(res => res.json())
-			.then(res => {
-				if (res && res.data) {
-					setLocales(res.data.getLocales);
-					setQueryCollectionsGraph(res.data.queryCollections);
-					setQueryCollectorsGraph(res.data.queryCollectors);
-					setQueryFieldsGraph(res.data.queryFields);
-					setJobsObjFromArr(res.data.listScheduledJobs);
-					setDocumentTypes(res.data.queryDocumentTypes.hits);
-					setTasks(res.data.queryTasks);
-				} // if
-			}); // then
-	} // fetchOnMount
-
-	function fetchOnUpdate() {
-		fetch(`${servicesBaseUrl}/graphQL`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ query: UPDATE_GQL })
-		})
-			.then(res => res.json())
-			.then(res => {
-				if (res && res.data) {
-					setQueryCollectionsGraph(res.data.queryCollections);
-					setQueryCollectorsGraph(res.data.queryCollectors);
-					setQueryFieldsGraph(res.data.queryFields);
-					setJobsObjFromArr(res.data.listScheduledJobs);
-					setDocumentTypes(res.data.queryDocumentTypes.hits);
-					setTasks(res.data.queryTasks);
-				}
-			});
-	}
-
-	function fetchCollections() {
-		fetch(`${servicesBaseUrl}/graphQL`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ query: `{${COLLECTIONS_GQL}}` })
-		})
-			.then(res => res.json())
-			.then(res => {
-				if (res && res.data && res.data.queryCollections) {
-					setQueryCollectionsGraph(res.data.queryCollections);
-				}
-			});
-	} // fetchCollections
-
-	function fetchTasks() {
-		fetch(`${servicesBaseUrl}/graphQL`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ query: `{${TASKS_GQL}}` })
-			//GQL_QUERY_TASKS_GET
-		})
-			.then(res => res.json())
-			.then(res => {
-				if (res && res.data && res.data.queryTasks) {
-					setTasks(res.data.queryTasks);
-				}
-			});
-	} // fetchTasks
-
-	React.useEffect(() => fetchOnMount(), []); // Only once
-
-	useInterval(() => {
-		// This will continue to run as long as the Collections "tab" is open
-		if (boolPoll) {
-			fetchOnUpdate();
-		}
-	}, 2500);
-
-	const shemaIdToName = {};
-	documentTypes.forEach(({_id, _name}) => {
-		shemaIdToName[_id] = _name;
+	} = useCollectionsState({
+		collectorComponents,
+		servicesBaseUrl
 	});
 
 	return <>
@@ -448,14 +111,14 @@ export function Collections(props :{
 								checked={showCollector}
 								onChange={(
 									//@ts-ignore
-									ignored,
+									event :unknown,
 									{checked}
 								) => {
 									setShowCollector(checked);
 									// setShowDocumentCount(checked);
 									setShowLanguage(checked);
 									setShowDocumentType(checked);
-									setShowInterfaces(checked);
+									//setShowInterfaces(checked);
 									setShowSchedule(checked);
 									setShowDelete(checked);
 								}}
@@ -482,7 +145,7 @@ export function Collections(props :{
 						{showDocumentCount ? <Table.HeaderCell>Documents</Table.HeaderCell> : null}
 						{showLanguage ? <Table.HeaderCell>Language</Table.HeaderCell> : null}
 						{showDocumentType ? <Table.HeaderCell>Document Type</Table.HeaderCell> : null}
-						{showInterfaces ? <Table.HeaderCell>Interfaces</Table.HeaderCell> : null }
+						{/*showInterfaces ? <Table.HeaderCell>Interfaces</Table.HeaderCell> : null*/}
 						{showSchedule ? <Table.HeaderCell>Schedule</Table.HeaderCell> : null }
 						<Table.HeaderCell>Actions</Table.HeaderCell>
 					</Table.Row>
@@ -494,7 +157,7 @@ export function Collections(props :{
 						_path,
 						collector,
 						documentCount,
-						interfaces,
+						//interfaces,
 						language = '',
 						documentTypeId = ''
 					}, index) => {
@@ -529,6 +192,7 @@ export function Collections(props :{
 						const doCollect = jobsObj[collectionId] ? jobsObj[collectionId][0].enabled : false;
 						return <Table.Row key={key}>
 							<Table.Cell collapsing><NewOrEditCollectionModal
+								collections={queryCollectionsGraph.hits}
 								collectorOptions={collectorOptions}
 								collectorComponents={collectorComponents}
 								contentTypeOptions={contentTypeOptions}
@@ -549,7 +213,7 @@ export function Collections(props :{
 								_name={_name}
 								afterClose={() => {
 									//console.debug('NewOrEditCollectionModal afterClose');
-									fetchOnUpdate();
+									memoizedFetchOnUpdate();
 									setBoolPoll(true);
 								}}
 								beforeOpen={() => {
@@ -582,13 +246,13 @@ export function Collections(props :{
 									{showDocumentCount ? <Table.Cell collapsing>{documentCount}</Table.Cell> : null}
 									{showLanguage ? <Table.Cell collapsing>{language}</Table.Cell> : null}
 									{showDocumentType ? <Table.Cell collapsing>{shemaIdToName[documentTypeId]}</Table.Cell> : null }
-									{showInterfaces ? <Table.Cell collapsing>{interfaces.map((iface, i) => <p key={i}>
+									{/*showInterfaces ? <Table.Cell collapsing>{interfaces.map((iface, i :number) => <p key={i}>
 										{i === 0 ? null : <br/>}
 										<span style={{whiteSpace: 'nowrap'}}>{iface}</span>
-									</p>)}</Table.Cell> : null}
+									</p>)}</Table.Cell> : null*/}
 									{showSchedule ? <Table.Cell>{
 										jobsObj[collectionId]
-											? jobsObj[collectionId].map(({enabled, value}, i) => {
+											? jobsObj[collectionId].map(({enabled, value}, i :number) => {
 												const interval = parseCronExpression(value);
 												const fields = JSON.parse(JSON.stringify(interval.fields)); // Fields is immutable
 												return <pre key={`${_name}.cron.${i}`} style={{color:enabled ? 'auto' : 'gray'}}>
@@ -620,7 +284,7 @@ export function Collections(props :{
 														fetch(`${servicesBaseUrl}/collectorStop?collectionName=${_name}`, {
 															method: 'POST'
 														}).then(() => {
-															fetchTasks();
+															memoizedFetchTasks();
 														});
 													}}><Icon color='red' name='stop'/></Button>}/>,
 												FINISHED: <Popup
@@ -644,7 +308,7 @@ export function Collections(props :{
 														fetch(`${servicesBaseUrl}/collectionCollect?id=${collectionId}&name=${_name}`, {
 															method: 'POST'
 														}).then(() => {
-															fetchTasks();
+															memoizedFetchTasks();
 														});
 													}}><Icon color={boolCollectorSelectedAndInitialized ? 'green' : 'grey'} name='cloud download'/></Button>}/>
 										: <Button disabled={true} icon><Icon color='grey' name='cloud download'/></Button>
@@ -701,7 +365,7 @@ export function Collections(props :{
 											fetch(`${servicesBaseUrl}/collectionDuplicate?name=${_name}`, {
 												method: 'POST'
 											}).then(() => {
-												fetchCollections();
+												memoizedFetchCollections();
 											});
 										}}><Icon color='blue' name='copy'/></Button>}/>
 									{showDelete ?<DeleteCollectionModal
@@ -709,7 +373,7 @@ export function Collections(props :{
 										disabled={busy}
 										afterClose={() => {
 											//console.debug('DeleteCollectionModal afterClose');
-											fetchCollections();
+											memoizedFetchCollections();
 											setBoolPoll(true);
 										}}
 										beforeOpen={() => {
@@ -725,6 +389,7 @@ export function Collections(props :{
 				</Table.Body>
 			</Table>
 			<NewOrEditCollectionModal
+				collections={queryCollectionsGraph.hits}
 				collectorOptions={collectorOptions}
 				collectorComponents={collectorComponents}
 				contentTypeOptions={contentTypeOptions}
@@ -734,7 +399,7 @@ export function Collections(props :{
 				locales={locales}
 				afterClose={() => {
 					//console.debug('NewOrEditCollectionModal afterClose');
-					fetchOnUpdate();
+					memoizedFetchOnUpdate();
 					setBoolPoll(true);
 				}}
 				beforeOpen={() => {
