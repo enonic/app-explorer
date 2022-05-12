@@ -22,6 +22,10 @@ import {SubmitButton} from 'semantic-ui-react-form/buttons/SubmitButton';
 import {LanguageDropdown} from '../collection/LanguageDropdown';
 //import {EditSynonyms} from './EditSynonyms';
 import {UploadLicense} from '../UploadLicense';
+import {mustStartWithALowercaseLetter} from '../utils/mustStartWithALowercaseLetter';
+import {notDoubleUnderscore} from '../utils/notDoubleUnderscore';
+import {onlyLowercaseAsciiLettersDigitsAndUnderscores} from '../utils/onlyLowercaseAsciiLettersDigitsAndUnderscores';
+import {required} from '../utils/required';
 
 
 const GQL_MUTATION_THESAURUS_CREATE = `mutation CreateThesaurusMutation(
@@ -65,11 +69,6 @@ const GQL_MUTATION_THESAURUS_UPDATE = `mutation UpdateThesaurusMutation(
 }`;
 
 
-function required(value :string) {
-	return value ? undefined : 'Required!';
-}
-
-
 export function NewOrEditThesaurus(props :{
 	// Required
 	licenseValid :boolean
@@ -77,6 +76,7 @@ export function NewOrEditThesaurus(props :{
 	servicesBaseUrl :string
 	setLicensedTo :SetLicensedToFunction
 	setLicenseValid :SetLicenseValidFunction
+	thesaurusNames :Array<string>
 	// Optional
 	_id ?:string
 	_name ?:string
@@ -94,6 +94,7 @@ export function NewOrEditThesaurus(props :{
 		servicesBaseUrl,
 		setLicensedTo,
 		setLicenseValid,
+		thesaurusNames,
 		// Optional
 		_id,
 		_name = '',
@@ -119,6 +120,12 @@ export function NewOrEditThesaurus(props :{
 	function doClose() {
 		setOpen(false); // This needs to be before unmount.
 		afterClose(); // This could trigger render in parent, and unmount this Component.
+	}
+
+	function mustBeUnique(v :string) {
+		if (thesaurusNames.includes(v)) {
+			return `Name must be unique: Name '${v}' is already in use!`;
+		}
 	}
 
 	return <Modal
@@ -186,7 +193,11 @@ export function NewOrEditThesaurus(props :{
 							from: (value :string) => required(value),
 							to: (value :string) => required(value)
 						},
-						_name: (value :string) => required(value)
+						_name: (v :string) => _id ? false : required(v)
+							|| mustStartWithALowercaseLetter(v)
+							|| onlyLowercaseAsciiLettersDigitsAndUnderscores(v)
+							|| notDoubleUnderscore(v)
+							|| mustBeUnique(v)
 					}}
 				>
 					<Modal.Content>

@@ -1,5 +1,9 @@
+import type {
+	SetLicensedToFunction,
+	SetLicenseValidFunction
+} from '../index.d';
+
 //import {getIn} from '@enonic/js-utils';
-import * as React from 'react';
 import {
 	Button, Dimmer, Header, Icon, Loader, Popup, Radio, Segment, Table
 } from 'semantic-ui-react';
@@ -9,114 +13,32 @@ import {EditSynonymsModal} from './EditSynonymsModal';
 import {NewOrEditThesaurus} from './NewOrEditThesaurus';
 import {DeleteThesaurus} from './DeleteThesaurus';
 import {Import} from './Import';
+import {useThesauriState} from './useThesauriState';
 
 
-const GQL_LOCALES_GET = `getLocales {
-	country
-	#displayCountry
-	#displayLanguage
-	displayName
-	#displayVariant
-	#language
-	tag
-	#variant
-}`;
-
-const GQL_THESAURI_QUERY = `queryThesauri {
-	total
-	count
-	hits {
-		_id
-		_name
-		_nodeType
-		_path
-		#_versionKey
-		description
-		language {
-			from
-			to
-		}
-		synonymsCount
-	}
-}`;
-
-const GQL_ON_MOUNT = `{
-	${GQL_LOCALES_GET}
-	${GQL_THESAURI_QUERY}
-}`;
-
-const GQL_ON_UPDATE = `{
-	${GQL_THESAURI_QUERY}
-}`;
-
-
-export function Thesauri(props) {
-	//console.debug('Thesauri props', props);
+export function Thesauri({
+	licenseValid,
+	servicesBaseUrl,
+	setLicensedTo,
+	setLicenseValid
+} :{
+	licenseValid :boolean
+	servicesBaseUrl :string
+	setLicensedTo :SetLicensedToFunction,
+	setLicenseValid :SetLicenseValidFunction
+}) {
 	const {
-		licenseValid,
-		servicesBaseUrl,
-		setLicensedTo,
-		setLicenseValid
-	} = props;
-	//console.debug('Thesauri licenseValid', licenseValid);
-
-	const [isLoading, setLoading] = React.useState(false);
-	const [locales, setLocales] = React.useState([]);
-	const [showDelete, setShowDelete] = React.useState(false);
-	const [synonymsSum, setSynonymsSum] = React.useState(0);
-	const [thesauriRes, setThesauriRes] = React.useState({
-		count: 0,
-		hits: [],
-		total: 0
-	});
-
-	function fetchOnUpdate() {
-		setLoading(true);
-		fetch(`${servicesBaseUrl}/graphQL`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ query: GQL_ON_UPDATE })
-		})
-			.then(res => res.json())
-			.then(res => {
-				if (res && res.data) {
-					setThesauriRes(res.data.queryThesauri);
-					const sum = res.data.queryThesauri.total ? res.data.queryThesauri.hits
-						.map(({synonymsCount}) => synonymsCount)
-						.reduce((accumulator, currentValue) => accumulator + currentValue) : 0;
-					setSynonymsSum(sum);
-					setLoading(false);
-				} // if
-			}); // then
-	} // fetchOnUpdate
-
-	const memoizedFetchOnMount = React.useCallback(() => {
-		setLoading(true);
-		fetch(`${servicesBaseUrl}/graphQL`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ query: GQL_ON_MOUNT })
-		})
-			.then(res => res.json())
-			.then(res => {
-				if (res && res.data) {
-					setLocales(res.data.getLocales);
-					setThesauriRes(res.data.queryThesauri);
-					const sum = res.data.queryThesauri.total ? res.data.queryThesauri.hits
-						.map(({synonymsCount}) => synonymsCount)
-						.reduce((accumulator, currentValue) => accumulator + currentValue) : 0;
-					setSynonymsSum(sum);
-					setLoading(false);
-				} // if
-			}); // then
-	}, [
+		isLoading,
+		locales,
+		memoizedFetchOnUpdate,
+		setShowDelete,
+		showDelete,
+		synonymsSum,
+		thesauriRes,
+		thesaurusNames
+	} = useThesauriState({
 		servicesBaseUrl
-	]);
-
-	React.useEffect(() => memoizedFetchOnMount(), [
-		memoizedFetchOnMount
-	]);
-
+	});
 	return <>
 		<Segment basic style={{
 			marginLeft: -14,
@@ -131,8 +53,8 @@ export function Thesauri(props) {
 								label={"Show delete"}
 								checked={showDelete}
 								onChange={(
-									//@ts-ignore error TS6133: 'ignored' is declared but its value is never read.
-									ignored,
+									//@ts-ignore error TS6133: 'event' is declared but its value is never read.
+									event :unknown,
 									{checked}
 								) => {
 									setShowDelete(checked);
@@ -181,13 +103,14 @@ export function Thesauri(props) {
 									<NewOrEditThesaurus
 										_id={_id}
 										_name={_name}
-										afterClose={fetchOnUpdate}
+										afterClose={memoizedFetchOnUpdate}
 										language={language}
 										licenseValid={licenseValid}
 										locales={locales}
 										servicesBaseUrl={servicesBaseUrl}
 										setLicensedTo={setLicensedTo}
 										setLicenseValid={setLicenseValid}
+										thesaurusNames={thesaurusNames}
 									/>
 								</Table.Cell>
 								<Table.Cell collapsing>{_name}</Table.Cell>
@@ -195,7 +118,7 @@ export function Thesauri(props) {
 								<Table.Cell collapsing>{to}</Table.Cell>
 								<Table.Cell collapsing><EditSynonymsModal
 									locales={locales}
-									afterClose={fetchOnUpdate}
+									afterClose={memoizedFetchOnUpdate}
 									servicesBaseUrl={servicesBaseUrl}
 									thesaurusId={_id}
 									thesaurusName={_name}
@@ -216,7 +139,7 @@ export function Thesauri(props) {
 										/>*/}
 										<Import
 											name={_name}
-											afterClose={fetchOnUpdate}
+											afterClose={memoizedFetchOnUpdate}
 											servicesBaseUrl={servicesBaseUrl}
 										/>
 										<Popup
@@ -231,7 +154,7 @@ export function Thesauri(props) {
 										{showDelete ? <DeleteThesaurus
 											_id={_id}
 											name={_name}
-											afterClose={fetchOnUpdate}
+											afterClose={memoizedFetchOnUpdate}
 											servicesBaseUrl={servicesBaseUrl}
 										/> : null}
 									</Button.Group>
@@ -248,7 +171,7 @@ export function Thesauri(props) {
 						<Table.HeaderCell></Table.HeaderCell>
 						<Table.HeaderCell><EditSynonymsModal
 							locales={locales}
-							afterClose={fetchOnUpdate}
+							afterClose={memoizedFetchOnUpdate}
 							servicesBaseUrl={servicesBaseUrl}
 						/></Table.HeaderCell>
 						<Table.HeaderCell>{synonymsSum}</Table.HeaderCell>
@@ -262,10 +185,11 @@ export function Thesauri(props) {
 			language={{from: '', to: ''}}
 			licenseValid={licenseValid}
 			locales={locales}
-			afterClose={fetchOnUpdate}
+			afterClose={memoizedFetchOnUpdate}
 			servicesBaseUrl={servicesBaseUrl}
 			setLicensedTo={setLicensedTo}
 			setLicenseValid={setLicenseValid}
+			thesaurusNames={thesaurusNames}
 		/>
 	</>;
 } // Thesauri
