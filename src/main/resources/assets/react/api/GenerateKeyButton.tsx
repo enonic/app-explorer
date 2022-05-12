@@ -15,7 +15,7 @@ function makeKey({
 } = {}) {
 	let result = '';
 	const charactersLength = characters.length;
-	for ( var i = 0; i < length; i++ ) {
+	for (let i = 0; i < length; i++) {
 		result += characters.charAt(Math.floor(Math.random() * charactersLength));
 	}
 	return result;
@@ -23,7 +23,11 @@ function makeKey({
 
 
 export const GenerateKeyButton = () => {
-	const [context, dispatch] = getEnonicContext(); // eslint-disable-line no-unused-vars
+	const [
+		//@ts-ignore
+		context, //eslint-disable-line @typescript-eslint/no-unused-vars
+		dispatch
+	] = getEnonicContext(); // eslint-disable-line no-unused-vars
 	return <Button
 		icon
 		onClick={() => {

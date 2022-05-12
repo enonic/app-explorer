@@ -1,3 +1,7 @@
+import type {QueryApiKeysHits} from './index.d';
+
+
+import {fold} from '@enonic/js-utils';
 import {
 	Button,
 	Form,
@@ -9,7 +13,7 @@ import {
 import {
 	Form as EnonicForm,
 	Input as EnonicInput,
-	ResetButton,
+	//ResetButton,
 	SubmitButton
 	//@ts-ignore
 } from 'semantic-ui-react-form';
@@ -18,8 +22,9 @@ import {Dropdown} from 'semantic-ui-react-form/inputs/Dropdown';
 
 import {GQL_MUTATION_API_KEY_CREATE} from '../../../services/graphQL/mutations/apiKeyCreateMutation';
 import {GQL_MUTATION_API_KEY_UPDATE} from '../../../services/graphQL/mutations/apiKeyUpdateMutation';
-
+import {useNewOrEditApiKeyState} from './useNewOrEditApiKeyState';
 import {GenerateKeyButton} from './GenerateKeyButton';
+import {nameValidator} from '../utils/nameValidator';
 
 
 function makeKey({
@@ -28,44 +33,55 @@ function makeKey({
 } = {}) {
 	let result = '';
 	const charactersLength = characters.length;
-	for ( var i = 0; i < length; i++ ) {
+	for (let i = 0; i < length; i++) {
 		result += characters.charAt(Math.floor(Math.random() * charactersLength));
 	}
 	return result;
 }
 
 
-export const NewOrEditApiKey = (props) => {
+export const NewOrEditApiKey = (props :{
+	// Required
+	apiKeys: QueryApiKeysHits
+	doClose :() => void
+	servicesBaseUrl :string
+	// Optional
+	_id ?:string
+	_name ?:string
+	initialValues ?:{
+		collections :Array<string>
+		interfaces :Array<string>
+	}
+}) => {
 	//console.debug('props', props);
 	const {
+		// Required
+		apiKeys,
+		doClose,
+		servicesBaseUrl,
+		// Optional
 		_id,
 		_name,
-		doClose,
 		initialValues = {
 			collections: [],
 			interfaces: [],
-			key: _name ? '' : makeKey()//,
-			//name: _name
-		},
-		queryCollectionsGraph,
-		queryInterfacesGraph,
-		servicesBaseUrl
+			key: _name ? '' : makeKey()
+		}
 	} = props;
 	//console.debug('initialValues', initialValues);
 
-	const collectionOptions = queryCollectionsGraph.hits ? queryCollectionsGraph.hits.map(({_name: key}) => ({
-		key,
-		text: key,
-		value: key
-	})) : [];
-	//console.debug('collectionOptions', collectionOptions);
-
-	const interfaceOptions = queryInterfacesGraph.hits ? queryInterfacesGraph.hits.map(({_name: key}) => ({
-		key,
-		text: key,
-		value: key
-	})) : [];
-	//console.debug('interfaceOptions', interfaceOptions);
+	const {
+		apiKeyNames,
+		collectionOptions,
+		interfaceOptions,
+		name,
+		nameError,
+		setName,
+		setNameError,
+	} = useNewOrEditApiKeyState({
+		apiKeys,
+		servicesBaseUrl
+	});
 
 	return <EnonicForm
 		initialValues={initialValues}
@@ -87,8 +103,8 @@ export const NewOrEditApiKey = (props) => {
 			if (values.key) {
 				variables.key = values.key;
 			}
-			if (values.name) {
-				variables._name = values.name;
+			if (name) {
+				variables._name = name;
 			}
 			//console.debug('onSubmit variables', variables);
 			fetch(`${servicesBaseUrl}/graphQL`, {
@@ -110,10 +126,27 @@ export const NewOrEditApiKey = (props) => {
 				{_name
 					? null
 					: <Form.Field>
-						<EnonicInput
+						<Form.Input
+							error={nameError}
 							fluid
+							onChange={(
+								//@ts-ignore
+								event :unknown,
+								data :{
+									value :string
+								}
+							) => {
+								// setName(data.value);
+								const newName = fold(data.value.toLowerCase());
+								setName(newName);
+								setNameError(apiKeyNames.includes(newName)
+									? `name "${newName}" already in use, please input another name.`
+									: nameValidator(newName)
+								);
+							}}
 							label='Name'
-							path='name'
+							placeholder='Please input an unique name'
+							value={name}
 						/>
 					</Form.Field>
 				}
@@ -152,8 +185,8 @@ export const NewOrEditApiKey = (props) => {
 		</Modal.Content>
 		<Modal.Actions>
 			<Button onClick={doClose}>Cancel</Button>
-			<ResetButton secondary/>
-			<SubmitButton primary><Icon name='save'/>Save</SubmitButton>
+			{/*<ResetButton secondary/>*/}
+			<SubmitButton disabled={!!nameError} primary><Icon name='save'/>Save</SubmitButton>
 		</Modal.Actions>
 	</EnonicForm>;
 }; // NewOrEditApiKey

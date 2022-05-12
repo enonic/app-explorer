@@ -1145,9 +1145,9 @@
   integrity sha512-dBVuXR082gk3jsFp7Rd/JI4kytwGHecnCoTtXFb7DB6CNHp4rg5k1bhg0nWdLGLnOV71lmDzGQaLMy8iPLY0pw==
 
 "@enonic/js-utils@^0":
-  version "0.35.0"
-  resolved "https://registry.yarnpkg.com/@enonic/js-utils/-/js-utils-0.35.0.tgz#df2c576ed8237740cb240397d19fe483a42fb863"
-  integrity sha512-+GGTkcKi+Zhl2uzF5QGI4FZ5PyT8JfFyYBVxRhycMc63CLgjqkm27nFUSgqDFzZf1zlVCDRGTR7D5/yr7Ku+LA==
+  version "0.36.0"
+  resolved "https://registry.yarnpkg.com/@enonic/js-utils/-/js-utils-0.36.0.tgz#c6a8ec680e4611f4738d2cf061eae7f70124099d"
+  integrity sha512-wruFYZVYnI/MpJZUT2JXNDunv66/S+H7v4b+2fJO39xRJEOM74IMaGRbz5vPQX5kTpM9hnv5IXPQ59+8MOFE4w==
 
 "@enonic/semantic-ui-react-form@2.4.0":
   version "2.4.0"

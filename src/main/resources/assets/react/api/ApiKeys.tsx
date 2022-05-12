@@ -1,4 +1,4 @@
-import * as React from 'react';
+//import * as React from 'react';
 import {
 	Header,
 	Radio,
@@ -6,37 +6,12 @@ import {
 	Table
 } from 'semantic-ui-react';
 
-
-import {DeleteApiKeyModal} from './api/DeleteApiKeyModal';
-import {NewOrEditApiKeyModal} from './api/NewOrEditApiKeyModal';
-
-//@ts-ignore
-import {useInterval} from './utils/useInterval';
+import {useApiKeysState} from './useApiKeysState';
+import {DeleteApiKeyModal} from './DeleteApiKeyModal';
+import {NewOrEditApiKeyModal} from './NewOrEditApiKeyModal';
 
 
-const GQL = `{
-	queryApiKeys {
-		hits {
-			_id
-			_name
-			collections
-			interfaces
-		}
-	}
-	queryCollections {
-		hits {
-			_name
-		}
-	}
-	queryInterfaces {
-		hits {
-			_name
-		}
-	}
-}`;
-
-
-export const Api = (props :{
+export const ApiKeys = (props :{
 	servicesBaseUrl :string
 }) => {
 	//console.debug('props', props);
@@ -44,43 +19,17 @@ export const Api = (props :{
 		servicesBaseUrl
 	} = props;
 
-	const [queryApiKeysGraph, setQueryApiKeysGraph] = React.useState({
-		count: 0,
-		hits: [],
-		total: 0
+	const {
+		apiKeys,
+		memoizedFetchApiKeys,
+		setBoolPoll,
+		setShowCollections,
+		setShowInterfaces,
+		showCollections,
+		showInterfaces
+	} = useApiKeysState({
+		servicesBaseUrl
 	});
-	const [queryCollectionsGraph, setQueryCollectionsGraph] = React.useState({});
-	const [queryInterfacesGraph, setQueryInterfacesGraph] = React.useState({});
-	const [boolPoll, setBoolPoll] = React.useState(true);
-
-	const [showCollections, setShowCollections] = React.useState(false);
-	const [showInterfaces, setShowInterfaces] = React.useState(false);
-
-	const fetchApiKeys = () => {
-		fetch(`${servicesBaseUrl}/graphQL`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ query: GQL })
-		})
-			.then(res => res.json())
-			.then(res => {
-				//console.log(res);
-				if (res && res.data) {
-					setQueryApiKeysGraph(res.data.queryApiKeys);
-					setQueryCollectionsGraph(res.data.queryCollections);
-					setQueryInterfacesGraph(res.data.queryInterfaces);
-				}
-			});
-	};
-
-	React.useEffect(() => fetchApiKeys(), []); // Only once
-
-	useInterval(() => {
-		// This will continue to run as long as the Collections "tab" is open
-		if (boolPoll) {
-			fetchApiKeys();
-		}
-	}, 2500);
 
 	return <>
 		<Segment basic style={{
@@ -97,7 +46,7 @@ export const Api = (props :{
 								checked={showCollections}
 								onChange={(
 									//@ts-ignore
-									ignored,
+									event :unknown,
 									{checked}
 								) => {
 									setShowCollections(checked);
@@ -122,7 +71,7 @@ export const Api = (props :{
 				</Table.Row>
 			</Table.Header>
 			<Table.Body>
-				{queryApiKeysGraph.hits && queryApiKeysGraph.hits.map(({
+				{apiKeys.map(({
 					_id,
 					_name,
 					collections,
@@ -133,22 +82,20 @@ export const Api = (props :{
 							<NewOrEditApiKeyModal
 								_id={_id}
 								_name={_name}
-								initialValues={{
-									_name,
-									collections,
-									interfaces
-								}}
 								afterClose={() => {
 									//console.debug('NewOrEditApiKeyModal afterClose');
-									fetchApiKeys();
+									memoizedFetchApiKeys();
 									setBoolPoll(true);
 								}}
+								apiKeys={apiKeys}
 								beforeOpen={() => {
 									//console.debug('NewOrEditApiKeyModal beforeOpen');
 									setBoolPoll(false);
 								}}
-								queryCollectionsGraph={queryCollectionsGraph}
-								queryInterfacesGraph={queryInterfacesGraph}
+								initialValues={{
+									collections,
+									interfaces
+								}}
 								servicesBaseUrl={servicesBaseUrl}
 							/>
 						</Table.Cell>
@@ -161,7 +108,7 @@ export const Api = (props :{
 								_name={_name}
 								afterClose={() => {
 									//console.debug('DeleteApiKeyModal afterClose');
-									fetchApiKeys();
+									memoizedFetchApiKeys();
 									setBoolPoll(true);
 								}}
 								beforeOpen={() => {
@@ -178,15 +125,14 @@ export const Api = (props :{
 		<NewOrEditApiKeyModal
 			afterClose={() => {
 				//console.debug('NewOrEditApiKeyModal afterClose');
-				fetchApiKeys();
+				memoizedFetchApiKeys();
 				setBoolPoll(true);
 			}}
+			apiKeys={apiKeys}
 			beforeOpen={() => {
 				//console.debug('NewOrEditApiKeyModal beforeOpen');
 				setBoolPoll(false);
 			}}
-			queryCollectionsGraph={queryCollectionsGraph}
-			queryInterfacesGraph={queryInterfacesGraph}
 			servicesBaseUrl={servicesBaseUrl}
 		/>
 	</>;

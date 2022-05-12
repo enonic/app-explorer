@@ -1,8 +1,6 @@
 import type {SemanticICONS} from 'semantic-ui-react/src/generic.d';
 import type {InterfaceField} from '/lib/explorer/types/Interface.d';
-import type {
-	CollectorComponents,
-} from './index.d';
+import type {CollectorComponents} from './index.d';
 
 
 import * as gql from 'gql-query-builder';
@@ -11,7 +9,7 @@ import {
 	Header, Icon, List, Menu, Modal, Sidebar
 } from 'semantic-ui-react';
 
-import {Api} from './Api';
+import {ApiKeys} from './api/ApiKeys';
 import {Collections} from './collection/Collections';
 //import {Fields} from './fields/Fields';
 import {Interfaces} from './interfaces/Interfaces';
@@ -37,24 +35,20 @@ const SIDEBAR_WIDTH_PX = 260; // 157
 const PUSHER_WIDTH = `calc(100% - ${SIDEBAR_WIDTH_PX}px)`;
 
 const GQL_BODY_QUERY_INTERFACES_DEFAULT = JSON.stringify(gql.query({
-  operation: 'queryInterfaces',
-  fields: [
-	  {
-		  hits: [
-			  {
-				  fields: [
-					  'name'
-				  ]
-			  },
-		  ]
-	  },
-  ],
-  variables: {
-	  query: {
-		  required: false,
-		  value: "_name = 'default'"
-	  }
-  }
+	operation: 'queryInterfaces',
+	fields: [{
+		hits: [{
+			fields: [
+				'name'
+			]
+		}]
+	}],
+	variables: {
+		query: {
+			required: false,
+			value: "_name = 'default'"
+		}
+	}
 }));
 //console.debug('GQL_BODY_QUERY_INTERFACES_DEFAULT', GQL_BODY_QUERY_INTERFACES_DEFAULT);
 
@@ -546,7 +540,7 @@ export function Explorer(props :{
 						searchString=''
 					/>
 				</>}
-				{licenseValid && page === 'api' && <Api
+				{licenseValid && page === 'api' && <ApiKeys
 					servicesBaseUrl={servicesBaseUrl}
 				/>}
 				{page === 'collections' && <Collections

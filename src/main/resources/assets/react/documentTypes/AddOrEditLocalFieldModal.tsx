@@ -17,6 +17,7 @@ import {
 	VALUE_TYPE_LONG,
 	VALUE_TYPE_SET,
 	VALUE_TYPE_STRING,
+	fold,
 	isSet
 } from '@enonic/js-utils';
 import * as React from 'react';
@@ -35,7 +36,7 @@ import {
 import {mustStartWithALowercaseLetter} from '../utils/mustStartWithALowercaseLetter';
 import {notDocumentMetaData} from '../utils/notDocumentMetaData';
 import {notDoubleDot} from '../utils/notDoubleDot';
-import {onlyLettersDigitsUnderscoresAndDots} from '../utils/onlyLettersDigitsUnderscoresAndDots';
+import {onlyLowercaseAsciiLettersDigitsUnderscoresAndDots} from '../utils/onlyLowercaseAsciiLettersDigitsUnderscoresAndDots';
 import {notDoubleUnderscore} from '../utils/notDoubleUnderscore';
 import {required} from '../utils/required';
 
@@ -145,7 +146,7 @@ export const AddOrEditLocalFieldModal = ({
 			? (
 				required(name)
 				|| mustStartWithALowercaseLetter(name)
-				|| onlyLettersDigitsUnderscoresAndDots(name)
+				|| onlyLowercaseAsciiLettersDigitsUnderscoresAndDots(name)
 				|| notDoubleUnderscore(name)
 				|| notDoubleDot(name)
 				|| notDocumentMetaData(name)
@@ -197,7 +198,7 @@ export const AddOrEditLocalFieldModal = ({
 					event,
 					{value: newName}
 				) => {
-					setName(newName);
+					setName(fold(newName.toLowerCase()));
 					setNameTouched(true);
 				}}
 				placeholder='Please input a field name'
@@ -268,7 +269,7 @@ export const AddOrEditLocalFieldModal = ({
 							checked={enabled}
 							onChange={(
 								//@ts-ignore
-								event,
+								event :unknown,
 								{checked}
 							) => {
 								setEnabled(checked);
@@ -279,7 +280,7 @@ export const AddOrEditLocalFieldModal = ({
 							checked={includeInAllText}
 							onChange={(
 								//@ts-ignore
-								event,
+								event :unknown,
 								{checked}
 							) => {
 								setIncludeInAllText(checked);
@@ -290,7 +291,7 @@ export const AddOrEditLocalFieldModal = ({
 							checked={fulltext}
 							onChange={(
 								//@ts-ignore
-								event,
+								event :unknown,
 								{checked}
 							) => {
 								setFulltext(checked);
@@ -301,7 +302,7 @@ export const AddOrEditLocalFieldModal = ({
 							checked={nGram}
 							onChange={(
 								//@ts-ignore
-								event,
+								event :unknown,
 								{checked}
 							) => {
 								setNgram(checked);
@@ -312,7 +313,7 @@ export const AddOrEditLocalFieldModal = ({
 							checked={path}
 							onChange={(
 								//@ts-ignore
-								event,
+								event :unknown,
 								{checked}
 							) => {
 								setPath(checked);
