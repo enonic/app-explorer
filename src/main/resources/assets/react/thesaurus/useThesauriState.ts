@@ -1,5 +1,9 @@
 import type {Locales} from '../index.d';
-import type {QueryThesauriGraph} from './index.d';
+import type {
+	EditSynonymsModalState,
+	NewOrEditState,
+	QueryThesauriGraph
+} from './index.d';
 
 import * as React from 'react';
 
@@ -43,6 +47,17 @@ const GQL_ON_UPDATE = `{
 }`;
 
 
+export const NEW_OR_EDIT_STATE_DEFAULT :NewOrEditState = {
+	_id: undefined,
+	_name: undefined,
+	language: {
+		from: '',
+		to: ''
+	},
+	open: false,
+};
+
+
 export function useThesauriState({
 	servicesBaseUrl
 } :{
@@ -56,6 +71,12 @@ export function useThesauriState({
 		count: 0,
 		hits: [],
 		total: 0
+	});
+	const [newOrEditState, setNewOrEditState] = React.useState<NewOrEditState>(NEW_OR_EDIT_STATE_DEFAULT);
+	const [editSynonymsModalState, setEditSynonymsModalState] = React.useState<EditSynonymsModalState>({
+		_id: undefined,
+		_name: undefined,
+		open: false
 	});
 
 	const memoizedFetchOnUpdate = React.useCallback(() =>{
@@ -116,9 +137,13 @@ export function useThesauriState({
 		memoizedFetchOnMount
 	]);
 	return {
+		editSynonymsModalState,
 		isLoading,
 		locales,
 		memoizedFetchOnUpdate,
+		newOrEditState,
+		setEditSynonymsModalState,
+		setNewOrEditState,
 		setShowDelete,
 		showDelete,
 		synonymsSum,

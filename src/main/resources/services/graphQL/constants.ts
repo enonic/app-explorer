@@ -50,6 +50,9 @@ export const GQL_TYPE_STOP_WORDS_QUERY_RESULT_NAME = 'StopWordsQueryResult';
 
 export const GQL_TYPE_SYNONYM_NAME = 'Synonym';
 export const GQL_TYPE_SYNONYMS_QUERY_RESULT_NAME = 'SynonymsQueryResult';
+export const GQL_TYPE_SYNONYMS_QUERY_RESULT_AGGREGATIONS_NAME = 'SynonymsQueryResultAggregations';
+export const GQL_TYPE_SYNONYMS_QUERY_RESULT_AGGREGATIONS_THESAURUS_NAME = 'SynonymsQueryResultAggregationsThesaurus';
+export const GQL_TYPE_SYNONYMS_QUERY_RESULT_AGGREGATIONS_THESAURUS_BUCKET_NAME = 'SynonymsQueryResultAggregationsThesaurusBucket';
 
 export const GQL_TYPE_THESAURI_QUERY_HITS = 'ThesauriQueryHits';
 export const GQL_TYPE_THESAURI_QUERY_RESULT = 'ThesauriQueryResult';

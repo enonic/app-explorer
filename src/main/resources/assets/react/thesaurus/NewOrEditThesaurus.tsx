@@ -3,13 +3,10 @@ import type {
 	SetLicensedToFunction,
 	SetLicenseValidFunction
 } from '../index.d';
+import type {NewOrEditState} from './index.d';
 
 
-import * as React from 'react';
-import {
-	Button, Form, Header, Icon, Label, Modal, Popup
-} from 'semantic-ui-react';
-
+import {Button, Form, Header, Icon, Label, Modal} from 'semantic-ui-react';
 //@ts-ignore
 import {Form as EnonicForm} from 'semantic-ui-react-form/Form';
 //@ts-ignore
@@ -26,6 +23,7 @@ import {mustStartWithALowercaseLetter} from '../utils/mustStartWithALowercaseLet
 import {notDoubleUnderscore} from '../utils/notDoubleUnderscore';
 import {onlyLowercaseAsciiLettersDigitsAndUnderscores} from '../utils/onlyLowercaseAsciiLettersDigitsAndUnderscores';
 import {required} from '../utils/required';
+import {NEW_OR_EDIT_STATE_DEFAULT} from './useThesauriState';
 
 
 const GQL_MUTATION_THESAURUS_CREATE = `mutation CreateThesaurusMutation(
@@ -73,7 +71,9 @@ export function NewOrEditThesaurus(props :{
 	// Required
 	licenseValid :boolean
 	locales :Locales
+	open :boolean
 	servicesBaseUrl :string
+	setNewOrEditState :React.Dispatch<React.SetStateAction<NewOrEditState>>
 	setLicensedTo :SetLicensedToFunction
 	setLicenseValid :SetLicenseValidFunction
 	thesaurusNames :Array<string>
@@ -81,7 +81,6 @@ export function NewOrEditThesaurus(props :{
 	_id ?:string
 	_name ?:string
 	afterClose ?:() => void
-	beforeOpen ?:() => void
 	language ?:{
 		from :string
 		to :string
@@ -91,7 +90,9 @@ export function NewOrEditThesaurus(props :{
 		// Required
 		licenseValid,
 		locales,
+		open,
 		servicesBaseUrl,
+		setNewOrEditState,
 		setLicensedTo,
 		setLicenseValid,
 		thesaurusNames,
@@ -99,7 +100,6 @@ export function NewOrEditThesaurus(props :{
 		_id,
 		_name = '',
 		afterClose = () => {}, // eslint-disable-line @typescript-eslint/no-empty-function
-		beforeOpen = () => {}, // eslint-disable-line @typescript-eslint/no-empty-function
 		language = {
 			from: '',
 			to: ''
@@ -109,16 +109,8 @@ export function NewOrEditThesaurus(props :{
 	//console.debug('NewOrEditThesaurus licenseValid', licenseValid);
 	//console.debug('NewOrEditThesaurus _name', _name);
 
-	const [open, setOpen] = React.useState(false);
-
-	// Made doOpen since onOpen doesn't get called consistently.
-	function doOpen() {
-		beforeOpen();
-		setOpen(true);
-	}
-
 	function doClose() {
-		setOpen(false); // This needs to be before unmount.
+		setNewOrEditState(NEW_OR_EDIT_STATE_DEFAULT);
 		afterClose(); // This could trigger render in parent, and unmount this Component.
 	}
 
@@ -133,27 +125,6 @@ export function NewOrEditThesaurus(props :{
 		closeOnDimmerClick={false}
 		onClose={doClose}
 		open={open}
-		trigger={_id ? <Popup
-			content={`Edit thesaurus ${_name}`}
-			inverted
-			trigger={<Button
-				icon
-				onClick={doOpen}
-			><Icon color='blue' name='options'/></Button>}
-		/>
-			: <Button
-				circular
-				color='green'
-				icon
-				onClick={doOpen}
-				size='massive'
-				style={{
-					bottom: 13.5,
-					position: 'fixed',
-					right: 13.5
-				}}><Icon
-					name='plus'
-				/></Button>}
 	>{licenseValid
 			? <>
 				<Modal.Header>{_id ? `Edit thesaurus ${_name}` : 'New thesaurus'}</Modal.Header>
@@ -162,7 +133,13 @@ export function NewOrEditThesaurus(props :{
 						language,
 						_name
 					}}
-					onSubmit={(values) => {
+					onSubmit={(values :{
+						_name :string
+						language :{
+							from :string
+							to :string
+						}
+					}) => {
 						//console.debug('onSubmit values', values);
 						const {
 							_name: newName,

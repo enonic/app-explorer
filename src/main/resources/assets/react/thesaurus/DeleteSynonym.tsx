@@ -1,3 +1,4 @@
+import * as React from 'react';
 import {
 	Button, Header, Icon, Modal, Popup, Table
 } from 'semantic-ui-react';
@@ -17,7 +18,7 @@ export function DeleteSynonym(props) {
 		servicesBaseUrl,
 		to
 	} = props;
-	console.debug('DeleteSynonym id', _id);
+	//console.debug('DeleteSynonym id', _id);
 
 	const [open, setOpen] = React.useState(false);
 
@@ -117,7 +118,7 @@ export function DeleteSynonym(props) {
 					</Table.Row>
 				</Table.Header>
 				<Table.Body>
-					{from.map((v,i) => <Table.Row key={i}>
+					{from.map((v,i :number) => <Table.Row key={i}>
 						<Table.HeaderCell>{v}</Table.HeaderCell>
 					</Table.Row>)}
 				</Table.Body>
@@ -129,7 +130,7 @@ export function DeleteSynonym(props) {
 					</Table.Row>
 				</Table.Header>
 				<Table.Body>
-					{to.map((v,i) => <Table.Row key={i}>
+					{to.map((v,i :number) => <Table.Row key={i}>
 						<Table.HeaderCell>{v}</Table.HeaderCell>
 					</Table.Row>)}
 				</Table.Body>
