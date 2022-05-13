@@ -179,7 +179,6 @@ const SS_JS_CONFIG = {
 		'services/notifications/notifications': './services/notifications/notifications.ts',
 		'services/journals/journals': './services/journals/journals.ts',
 		'services/listCollectors/listCollectors': './services/listCollectors/listCollectors.ts',
-		'services/thesauri/thesauri': './services/thesauri/thesauri.ts',
 		'services/thesaurusExport/thesaurusExport': './services/thesaurusExport/thesaurusExport.ts',
 		'services/thesaurusImport/thesaurusImport': './services/thesaurusImport/thesaurusImport.ts',
 		'services/uninstallLicense/uninstallLicense': './services/uninstallLicense/uninstallLicense.ts',

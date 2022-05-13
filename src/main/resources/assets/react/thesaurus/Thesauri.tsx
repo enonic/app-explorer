@@ -28,9 +28,13 @@ export function Thesauri({
 	setLicenseValid :SetLicenseValidFunction
 }) {
 	const {
+		editSynonymsModalState,
 		isLoading,
 		locales,
 		memoizedFetchOnUpdate,
+		newOrEditState,
+		setEditSynonymsModalState,
+		setNewOrEditState,
 		setShowDelete,
 		showDelete,
 		synonymsSum,
@@ -100,29 +104,44 @@ export function Thesauri({
 							const {from,to} = language;
 							return <Table.Row key={index}>
 								<Table.Cell collapsing>
-									<NewOrEditThesaurus
-										_id={_id}
-										_name={_name}
-										afterClose={memoizedFetchOnUpdate}
-										language={language}
-										licenseValid={licenseValid}
-										locales={locales}
-										servicesBaseUrl={servicesBaseUrl}
-										setLicensedTo={setLicensedTo}
-										setLicenseValid={setLicenseValid}
-										thesaurusNames={thesaurusNames}
+									<Popup
+										content={`Edit thesaurus ${_name}`}
+										inverted
+										trigger={<Button
+											icon
+											onClick={() => {
+												setNewOrEditState({
+													_id,
+													_name,
+													language: {
+														from,
+														to
+													},
+													open: true
+												});
+											}}
+										><Icon color='blue' name='options'/></Button>}
 									/>
 								</Table.Cell>
 								<Table.Cell collapsing>{_name}</Table.Cell>
 								<Table.Cell collapsing>{from}</Table.Cell>
 								<Table.Cell collapsing>{to}</Table.Cell>
-								<Table.Cell collapsing><EditSynonymsModal
-									locales={locales}
-									afterClose={memoizedFetchOnUpdate}
-									servicesBaseUrl={servicesBaseUrl}
-									thesaurusId={_id}
-									thesaurusName={_name}
-								/></Table.Cell>
+								<Table.Cell collapsing>
+									<Popup
+										content={`Edit ${_name} synonyms`}
+										inverted
+										trigger={<Button
+											icon
+											onClick={() => {
+												setEditSynonymsModalState({
+													_id,
+													_name,
+													open: true
+												});
+											}}
+										><Icon color='blue' name='code branch'/></Button>}
+									/>
+								</Table.Cell>
 								<Table.Cell collapsing>{synonymsCount}</Table.Cell>
 								<Table.Cell collapsing>
 									<Button.Group>
@@ -169,11 +188,22 @@ export function Thesauri({
 						<Table.HeaderCell></Table.HeaderCell>
 						<Table.HeaderCell></Table.HeaderCell>
 						<Table.HeaderCell></Table.HeaderCell>
-						<Table.HeaderCell><EditSynonymsModal
-							locales={locales}
-							afterClose={memoizedFetchOnUpdate}
-							servicesBaseUrl={servicesBaseUrl}
-						/></Table.HeaderCell>
+						<Table.HeaderCell>
+							<Popup
+								content='Edit all synonyms'
+								inverted
+								trigger={<Button
+									icon
+									onClick={() => {
+										setEditSynonymsModalState({
+											_id: undefined,
+											_name: undefined,
+											open: true
+										});
+									}}
+								><Icon color='blue' name='code branch'/></Button>}
+							/>
+						</Table.HeaderCell>
 						<Table.HeaderCell>{synonymsSum}</Table.HeaderCell>
 						<Table.HeaderCell></Table.HeaderCell>
 					</Table.Row>
@@ -181,15 +211,51 @@ export function Thesauri({
 			</Table>
 			<Dimmer active={isLoading} inverted><Loader size='massive'>Loading</Loader></Dimmer>
 		</Dimmer.Dimmable>
+		<Button
+			circular
+			color='green'
+			icon
+			onClick={() => {
+				setNewOrEditState({
+					_id: undefined,
+					_name: undefined,
+					language: {
+						from: '',
+						to: ''
+					},
+					open: true
+				});
+			}}
+			size='massive'
+			style={{
+				bottom: 13.5,
+				position: 'fixed',
+				right: 13.5
+			}}><Icon
+				name='plus'
+			/></Button>
 		<NewOrEditThesaurus
-			language={{from: '', to: ''}}
+			_id={newOrEditState._id}
+			_name={newOrEditState._name}
+			open={newOrEditState.open}
+			language={newOrEditState.language}
 			licenseValid={licenseValid}
 			locales={locales}
 			afterClose={memoizedFetchOnUpdate}
 			servicesBaseUrl={servicesBaseUrl}
+			setNewOrEditState={setNewOrEditState}
 			setLicensedTo={setLicensedTo}
 			setLicenseValid={setLicenseValid}
 			thesaurusNames={thesaurusNames}
+		/>
+		<EditSynonymsModal
+			open={editSynonymsModalState.open}
+			locales={locales}
+			afterClose={memoizedFetchOnUpdate}
+			servicesBaseUrl={servicesBaseUrl}
+			setEditSynonymsModalState={setEditSynonymsModalState}
+			thesaurusId={editSynonymsModalState._id}
+			thesaurusName={editSynonymsModalState._name}
 		/>
 	</>;
 } // Thesauri

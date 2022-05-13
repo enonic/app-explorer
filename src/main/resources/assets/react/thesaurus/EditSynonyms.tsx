@@ -1,4 +1,6 @@
-import Uri from 'jsuri';
+import type {Locales} from '../index.d';
+
+
 import {
 	//Button,
 	Dropdown, Form, Header, Icon, Loader, Pagination, Table
@@ -6,138 +8,50 @@ import {
 
 import {NewOrEditSynonym} from './NewOrEditSynonym';
 import {DeleteSynonym} from './DeleteSynonym';
+import {useEditSynonymsState} from './useEditSynonymsState';
 
 
-export function EditSynonyms(props) {
-	//console.debug('EditSynonyms props', props);
-	const {
-		locales,
-		servicesBaseUrl,
-		thesaurusId,
-		thesaurusName
-	} = props;
-
-	const [state, setState] = React.useState({
-		column: 'from',
-		direction: 'ascending',
-		isLoading: true,
-		params: {
-			from: '',
-			perPage: 10,
-			page: 1,
-			query: '',
-			sort: 'from ASC',
-			thesauri: thesaurusName ? [thesaurusName] : [],
-			to: ''
-		},
-		result: {
-			aggregations: {
-				thesaurus: {
-					buckets: []
-				}
-			}
-		}
-	});
-
-	function querySynonyms(params = state.params) {
-		//console.debug('querySynonyms params', params, 'state', state);
-
-		// Get fallback params from prev state
-		Object.keys(state.params).forEach((k) => {
-			const v = state.params[k];
-			//console.debug('querySynonyms k', k, 'v', v, `params[${k}]`, params[k], `typeof params[${k}]`, typeof params[k]);
-			if (typeof params[k] === 'undefined') {
-				params[k] = v;
-			}
-		});
-		//console.debug('querySynonyms params', params, 'state', state);
-
-		// Dispatch isLoading and all params to state
-		setState(prev => {
-			const deref = JSON.parse(JSON.stringify(prev));
-			deref.isLoading = true;
-			Object.keys(params).forEach((k) => {
-				const v = params[k];
-				deref.params[k] = v;
-			});
-			const [column, direction] = params.sort.split(' '); // 'from ASC'
-			deref.column = column;
-			deref.direction = direction === 'DESC' ? 'descending' : 'ascending';
-			//console.debug('querySynonyms deref', deref);
-			return deref;
-		});
-
-		const uri = new Uri(`${servicesBaseUrl}/thesauri`);
-		Object.keys(params).forEach((k) => {
-			const v = params[k];
-			//console.debug({k, v});
-			uri.replaceQueryParam(k, v);
-		});
-		const uriStr = uri.toString();
-		//console.debug('uriStr', uriStr);
-		fetch(uriStr)
-			.then(response => response.json())
-			.then(data => {
-				//console.debug('data', data);
-				setState(prev => {
-					const deref = JSON.parse(JSON.stringify(prev));
-					deref.isLoading = false;
-					deref.result = data.queryResult;
-					return deref;
-				});
-			});
-	} // querySynonyms
-
-	React.useEffect(() => querySynonyms(), []);
-
-	function setSort({column, direction}) {
-		//console.debug('setSort column', column, 'direction', direction);
-		querySynonyms({sort: `${column} ${direction === 'ascending' ? 'ASC' : 'DESC'}`});
-	} // changeSort
-
-	const handleSortGenerator = (clickedColumn) => () => {
-		const {
-			column,
-			direction
-		} = state;
-		//console.debug('handleSortGenerator clickedColumn', clickedColumn, 'column', column, 'direction', direction);
-
-		setSort({
-			column: clickedColumn,
-			direction: clickedColumn === column
-				? (direction === 'ascending'
-					? 'descending'
-					: 'ascending'
-				) : 'ascending'
-		});
-	}; // handleSortGenerator
-	//console.debug('state', state);
-
-	const {
-		column,
-		direction,
-		isLoading,
-		params: {
-			from,
-			perPage,
-			//sort,
-			thesauri,
-			to
-		},
-		result
-	} = state;
-	//console.debug('column', column, 'direction', direction, 'sort', sort);
-
+export function EditSynonyms({
+	// Required
+	locales,
+	servicesBaseUrl,
+	// Optional
+	thesaurusId,
+	thesaurusName
+} :{
+	// Required
+	locales :Locales
+	servicesBaseUrl :string
+	// Optional
+	thesaurusId ?:string
+	thesaurusName ?:string
+}) {
 	const {
 		aggregations,
+		column,
+		direction,
 		end,
+		from,
+		memoizedHandleSortGenerator,
+		isLoading,
+		memoizedQuerySynonyms,
 		page,
+		perPage,
+		result,
+		setFrom,
+		setPage,
+		setPerPage,
+		setThesauri,
+		setTo,
 		start,
+		thesauri,
+		to,
 		total,
 		totalPages
-	} = result;
-	//console.debug('EditSynonyms result', result);
-
+	} = useEditSynonymsState({
+		servicesBaseUrl,
+		thesaurusName
+	});
 	return <>
 		<Form>
 			<Header as='h4'><Icon name='filter'/> Filter</Header>
@@ -145,7 +59,7 @@ export function EditSynonyms(props) {
 				<input
 					fluid='true'
 					label='From'
-					onChange={({target:{value}}) => querySynonyms({from: value})}
+					onChange={({target:{value}}) => setFrom(value)}
 					placeholder='From'
 					value={from}
 				/>
@@ -154,7 +68,7 @@ export function EditSynonyms(props) {
 				<input
 					fluid='true'
 					label='To'
-					onChange={({target:{value}}) => querySynonyms({to: value})}
+					onChange={({target:{value}}) => setTo(value)}
 					placeholder='To'
 					value={to}
 				/>
@@ -167,7 +81,15 @@ export function EditSynonyms(props) {
 					fluid
 					multiple={true}
 					name='thesauri'
-					onChange={(e, {value}) => querySynonyms({thesauri: value})}
+					onChange={(
+						//@ts-ignore
+						event :unknown,
+						{
+							value
+						} :{
+							value :Array<string>
+						}
+					) => setThesauri(value)}
 					options={aggregations.thesaurus.buckets.map(({key, docCount}) => {
 						const tName = key.replace('/thesauri/', '');
 						return {
@@ -186,7 +108,15 @@ export function EditSynonyms(props) {
 				<Dropdown
 					defaultValue={perPage}
 					fluid
-					onChange={(e,{value}) => querySynonyms({perPage: value})}
+					onChange={(
+						//@ts-ignore
+						event :unknown,
+						{
+							value
+						} :{
+							value :number
+						}
+					) => setPerPage(value)}
 					options={[5,10,25,50,100].map(key => ({key, text: `${key}`, value: key}))}
 					selection
 				/>
@@ -219,19 +149,19 @@ export function EditSynonyms(props) {
 						<Table.Row>
 							<Table.HeaderCell>Edit</Table.HeaderCell>
 							<Table.HeaderCell
-								onClick={handleSortGenerator('from')}
+								onClick={memoizedHandleSortGenerator('from')}
 								sorted={column === 'from' ? direction : null}
 							>From</Table.HeaderCell>
 							<Table.HeaderCell
-								onClick={handleSortGenerator('to')}
+								onClick={memoizedHandleSortGenerator('to')}
 								sorted={column === 'to' ? direction : null}
 							>To</Table.HeaderCell>
 							{thesaurusId ? null : <Table.HeaderCell
-								onClick={handleSortGenerator('_parentPath')}
+								onClick={memoizedHandleSortGenerator('_parentPath')}
 								sorted={column === '_parentPath' ? direction : null}
 							>Thesaurus</Table.HeaderCell>}
 							<Table.HeaderCell
-								onClick={handleSortGenerator('_score')}
+								onClick={memoizedHandleSortGenerator('_score')}
 								sorted={column === '_score' ? direction : null}
 							>Score</Table.HeaderCell>
 							<Table.HeaderCell>Delete</Table.HeaderCell>
@@ -246,10 +176,10 @@ export function EditSynonyms(props) {
 							thesaurus,
 							thesaurusReference,
 							to = ['']
-						}, i) => <Table.Row key={i}>
+						}, i :number) => <Table.Row key={i}>
 							<Table.Cell collapsing><NewOrEditSynonym
 								_id={_id}
-								afterClose={querySynonyms}
+								afterClose={memoizedQuerySynonyms}
 								from={from}
 								locales={locales}
 								servicesBaseUrl={servicesBaseUrl}
@@ -270,7 +200,7 @@ export function EditSynonyms(props) {
 								<DeleteSynonym
 									_id={_id}
 									from={from}
-									afterClose={querySynonyms}
+									afterClose={memoizedQuerySynonyms}
 									servicesBaseUrl={servicesBaseUrl}
 									thesaurusId={thesaurusReference}
 									to={to}
@@ -296,12 +226,20 @@ export function EditSynonyms(props) {
 					nextItem={{content: <Icon name='angle right' />, icon: true}}
 					lastItem={{content: <Icon name='angle double right' />, icon: true}}
 
-					onPageChange={(e,{activePage}) => querySynonyms({page: activePage})}
+					onPageChange={(
+						//@ts-ignore
+						event :unknown,
+						{
+							activePage
+						} :{
+							activePage :number
+						}
+					) => setPage(activePage)}
 				/>
 				<p>Displaying {start}-{end} of {total}</p>
 				{thesaurusId && <NewOrEditSynonym
 					locales={locales}
-					afterClose={querySynonyms}
+					afterClose={memoizedQuerySynonyms}
 					servicesBaseUrl={servicesBaseUrl}
 					thesaurusId={thesaurusId}
 				/>}

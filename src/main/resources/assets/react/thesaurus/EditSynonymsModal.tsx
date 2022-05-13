@@ -1,32 +1,40 @@
-import {
-	Button, Icon, Modal, Popup
-} from 'semantic-ui-react';
+import type {Locales} from '../index.d';
+import type {EditSynonymsModalState} from './index.d';
 
+
+import * as React from 'react';
+import {Button, Modal} from 'semantic-ui-react';
 import {EditSynonyms} from './EditSynonyms';
 
 
-export function EditSynonymsModal(props) {
-	//console.debug('EditSynonymsModal props', props);
-	const {
-		afterClose = () => {},
-		beforeOpen = () => {},
-		locales,
-		servicesBaseUrl,
-		thesaurusId,
-		thesaurusName
-	} = props;
-
-	const [open, setOpen] = React.useState(false);
-
+export function EditSynonymsModal({
+	// Required
+	locales,
+	open,
+	servicesBaseUrl,
+	setEditSynonymsModalState,
+	// Optional
+	afterClose = () => {/**/},
+	thesaurusId,
+	thesaurusName
+} :{
+	// Required
+	locales :Locales
+	open :boolean
+	servicesBaseUrl :string
+	setEditSynonymsModalState :React.Dispatch<React.SetStateAction<EditSynonymsModalState>>
+	// Optional
+	afterClose ?:() => void
+	thesaurusId ?:string
+	thesaurusName ?:string
+}) {
 	const doClose = () => {
-		setOpen(false); // This needs to be before unmount.
+		setEditSynonymsModalState({
+			_id: undefined,
+			_name: undefined,
+			open: false
+		});
 		afterClose(); // This could trigger render in parent, and unmount this Component.
-	};
-
-	// Made doOpen since onOpen doesn't get called consistently.
-	const doOpen = () => {
-		beforeOpen();
-		setOpen(true);
 	};
 
 	const header = `Edit ${thesaurusName || 'all'} synonyms`;
@@ -37,14 +45,6 @@ export function EditSynonymsModal(props) {
 		onClose={doClose}
 		open={open}
 		size='fullscreen'
-		trigger={<Popup
-			content={header}
-			inverted
-			trigger={<Button
-				icon
-				onClick={doOpen}
-			><Icon color='blue' name='code branch'/></Button>}
-		/>}
 	>
 		<Modal.Header>{header}</Modal.Header>
 		<Modal.Content>
