@@ -1,4 +1,4 @@
-import type {ParentPath} from '/lib/explorer/types.d';
+import type {ParentPath} from '/lib/explorer/types/index.d';
 import type {
 	ApiKeyNode,
 	ApiKeyNodeCreateParams

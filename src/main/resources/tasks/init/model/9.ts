@@ -30,7 +30,7 @@ import {
 	NT_SYNONYM
 } from '/lib/explorer/index';
 import {get as getInterface} from '/lib/explorer/interface/get';
-import {interfaceModel} from '/lib/explorer/model/2/index';
+import {interfaceModel} from './9/interfaceModel';
 import {setModel} from '/lib/explorer/model/setModel';
 import {create} from '/lib/explorer/node/create';
 import {hasValue} from '/lib/explorer/query/hasValue';
