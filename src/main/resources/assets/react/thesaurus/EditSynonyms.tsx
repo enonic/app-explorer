@@ -32,7 +32,6 @@ export function EditSynonyms({
 		direction,
 		end,
 		from,
-		memoizedHandleSortGenerator,
 		isLoading,
 		memoizedQuerySynonyms,
 		page,
@@ -43,6 +42,7 @@ export function EditSynonyms({
 		setPerPage,
 		setThesauri,
 		setTo,
+		sortAfterColumnClick,
 		start,
 		thesauri,
 		to,
@@ -149,19 +149,19 @@ export function EditSynonyms({
 						<Table.Row>
 							<Table.HeaderCell>Edit</Table.HeaderCell>
 							<Table.HeaderCell
-								onClick={memoizedHandleSortGenerator('from')}
+								onClick={() => sortAfterColumnClick('from', column, direction)}
 								sorted={column === 'from' ? direction : null}
 							>From</Table.HeaderCell>
 							<Table.HeaderCell
-								onClick={memoizedHandleSortGenerator('to')}
+								onClick={() => sortAfterColumnClick('to', column, direction)}
 								sorted={column === 'to' ? direction : null}
 							>To</Table.HeaderCell>
 							{thesaurusId ? null : <Table.HeaderCell
-								onClick={memoizedHandleSortGenerator('_parentPath')}
+								onClick={() => sortAfterColumnClick('_parentPath', column, direction)}
 								sorted={column === '_parentPath' ? direction : null}
 							>Thesaurus</Table.HeaderCell>}
 							<Table.HeaderCell
-								onClick={memoizedHandleSortGenerator('_score')}
+								onClick={() => sortAfterColumnClick('_score', column, direction)}
 								sorted={column === '_score' ? direction : null}
 							>Score</Table.HeaderCell>
 							<Table.HeaderCell>Delete</Table.HeaderCell>
