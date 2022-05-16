@@ -85,23 +85,19 @@ export function useEditSynonymsState({
 		memoizedQuerySynonyms
 	]);
 
-
-	const memoizedHandleSortGenerator = React.useCallback((
-		clickedColumn :string = column // avoid infinite loop
-	) => () => {
+	// Since this function has no dependencies, there is no point in memoizing it.
+	const sortAfterColumnClick = (clickedColumn :string, currentColumn :string, currentDirection :string) => {
+		console.debug('sortAfterColumnClick(%s, %s, %s)', clickedColumn, currentColumn, currentDirection)
 		//console.debug('handleSortGenerator clickedColumn', clickedColumn, 'column', column, 'direction', direction);
-		if (clickedColumn === column) {
-			setDirection(direction === 'ascending' ? 'descending' : 'ascending');
+		if (clickedColumn === currentColumn) {
+			setDirection(currentDirection === 'ascending' ? 'descending' : 'ascending');
 		} else { // clickedColumn !== column
 			setColumn(clickedColumn);
-			if (direction !== 'ascending') { // avoid extra setDirection
+			if (currentDirection !== 'ascending') { // avoid extra setDirection
 				setDirection('ascending');
 			}
 		}
-	}, [
-		column,
-		direction
-	]);
+	}
 
 	const {
 		aggregations,
@@ -118,7 +114,6 @@ export function useEditSynonymsState({
 		end,
 		from,
 		isLoading,
-		memoizedHandleSortGenerator,
 		memoizedQuerySynonyms,
 		page,
 		perPage,
@@ -130,6 +125,7 @@ export function useEditSynonymsState({
 		setPerPage,
 		setThesauri,
 		setTo,
+		sortAfterColumnClick,
 		start,
 		thesauri,
 		to,
