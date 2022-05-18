@@ -8,7 +8,7 @@ import type {JSONResponse}  from './index.d';
 
 export type FetchSynonymsQueryData = {
 	querySynonyms :{
-		aggregations ?:{
+		aggregations :{
 			thesaurus :AggregationsResponseEntry
 		}
 		count :number

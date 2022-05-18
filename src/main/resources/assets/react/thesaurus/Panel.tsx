@@ -1,10 +1,14 @@
+import * as React from 'react';
 import {
 	Accordion,
 	Icon
 } from 'semantic-ui-react';
 
 
-export const Panel = (props) => {
+export const Panel = (props :{
+	children :unknown
+	title :string
+}) => {
 	//console.debug('props', props);
 	const {
 		children,
@@ -17,7 +21,11 @@ export const Panel = (props) => {
 	return <Accordion {...rest}>
 		<Accordion.Title
 			active={active}
-			onClick={(syntheticEvent,{active}) => setActive(!active)}
+			onClick={(
+				//@ts-ignore
+				syntheticEvent,
+				{active}
+			) => setActive(!active)}
 		><Icon name='dropdown' />{title}</Accordion.Title>
 		<Accordion.Content
 			active={active}

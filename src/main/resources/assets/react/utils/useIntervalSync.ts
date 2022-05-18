@@ -1,5 +1,13 @@
-export function useIntervalSync(callback, delay) {
-	const savedCallback = React.useRef();
+import * as React from 'react';
+
+
+export function useIntervalSync<
+	Callback extends () => unknown = () => unknown
+>(
+	callback :Callback,
+	delay :number
+) {
+	const savedCallback = React.useRef<Callback>();
 
 	// Remember the latest callback.
 	React.useLayoutEffect(() => {
@@ -12,7 +20,7 @@ export function useIntervalSync(callback, delay) {
 			savedCallback.current();
 		}
 		if (delay !== null) {
-			let id = setInterval(tick, delay);
+			const id = setInterval(tick, delay);
 			return () => clearInterval(id);
 		}
 	}, [delay]);

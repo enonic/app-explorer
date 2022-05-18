@@ -24,6 +24,12 @@ export function post({
 		name: collectionName,
 		resume = false
 	}
+} :{
+	params :{
+		id :string
+		name :string
+		resume ?:'true'|unknown//boolean
+	}
 }) {
 	DEBUG && log.debug('collectionId:%s collectionName:%s resume:%s', collectionId, collectionName, resume);
 

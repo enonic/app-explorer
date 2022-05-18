@@ -66,17 +66,23 @@ export const Collector = (props :CollectorProps) => {
 
 
 	return <EnonicForm
-		afterValidate={(dereffed) => {
+		afterValidate={(dereffed :{
+			errors: unknown
+			visited: unknown
+		}) => {
 			// console.debug('Collector afterValidate dereffed', dereffed);
 			dispatch(setError({path, error: dereffed.errors}));
 			dispatch(setVisited({path, value: dereffed.visited}));
 		}}
-		afterVisit={(dereffed) => {
+		afterVisit={(dereffed :{
+			//errors: unknown
+			visited: unknown
+		}) => {
 			// console.debug('Collector afterVisit dereffed', dereffed);
 			dispatch(setVisited({path, value: dereffed.visited}));
 		}}
 		initialValues={initialValues}
-		onChange={(values) => {
+		onChange={(values :unknown) => {
 			//console.debug('Collector onChange values', values);
 			dispatch(setValue({path, value: values}));
 		}}
@@ -93,7 +99,7 @@ export const Collector = (props :CollectorProps) => {
 			<Form.Field>
 				<List
 					path={EXCLUDES_PATH}
-					render={(excludesArray) => {
+					render={(excludesArray :Array<string>) => {
 						//console.debug('Collector excludesArray', excludesArray);
 						if (excludesArray.length) {
 							return <>

@@ -21,6 +21,10 @@ exports.delete = ({
 	params: {
 		name
 	}
+} :{
+	params :{
+		name :string
+	}
 }) => {
 	//log.debug(`name:${toStr({name})}`);
 	const writeConnection = connect({principals: [PRINCIPAL_EXPLORER_WRITE]});
@@ -61,14 +65,15 @@ exports.delete = ({
 		_name: name
 	});
 	//log.debug(`removeRes:${toStr({removeRes})}`);
-	let body = {
-		message: `Deleted collection ${name}`
-	};
+	const body :{
+		error ?:string
+		message ?:string
+	} = {};
 	let status = 200;
-	if (!removeRes) {
-		body = {
-			error: `Failed to delete collection ${name}!`
-		};
+	if (removeRes) {
+		body.message = `Deleted collection ${name}`;
+	} else {
+		body.error = `Failed to delete collection ${name}!`;
 		status = 500;
 	}
 	return {
