@@ -1,3 +1,6 @@
+import type {AnyObject} from '/lib/explorer/types/index.d';
+
+
 import {PRINCIPAL_EXPLORER_READ} from '/lib/explorer/model/2/constants';
 import {referencedBy} from '/lib/explorer/node/referencedBy';
 import {connect} from '/lib/explorer/repo/connect';
@@ -7,7 +10,12 @@ export function referencedByMapped({
 	_id,
 	count = -1,
 	filters = {},
-	start
+	start = 0
+} :{
+	_id :string
+	count ?:number
+	filters ?:AnyObject // TODO?
+	start ?:number
 }) {
 	const res = referencedBy({
 		_id,

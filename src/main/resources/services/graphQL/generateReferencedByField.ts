@@ -23,7 +23,10 @@ export function generateReferencedByField({
 			_id: glue.getScalarType('_id'),
 			filters: glue.getInputType(GQL_INPUT_TYPE_FILTERS_NAME)
 		},
-		resolve: ({args: {_id, filters}}) => referencedByMapped({_id, filters}),
+		resolve: ({args: {_id, filters}}) => referencedByMapped({
+			_id,
+			filters
+		}),
 		type: glue.addObjectType({
 			name: GQL_TYPE_REFERENCED_BY_NAME,
 			fields: {

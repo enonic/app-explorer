@@ -15,10 +15,14 @@ export function generateDeleteDocumentTypeField({
 			args: {
 				_id
 			}
+		} :{
+			args :{
+				_id :string
+			}
 		}) {
 			const writeConnection = connect({ principals: [PRINCIPAL_EXPLORER_WRITE] });
 			const array = writeConnection.delete(_id);
-			if (!array.length === 1 ) {
+			if (array.length !== 1 ) {
 				throw new Error(`Something went wrong while trying to delete documentType with id:${_id}!`);
 			}
 			return {

@@ -1,6 +1,6 @@
 import type {CollectionNode} from '/lib/explorer/types/Collection.d';
 import type {DocumentTypeNode} from '/lib/explorer/types/DocumentType.d';
-import type {Field} from '/lib/explorer/field/types.d';
+import type {Field} from '/lib/explorer/types/index.d';
 
 
 import {

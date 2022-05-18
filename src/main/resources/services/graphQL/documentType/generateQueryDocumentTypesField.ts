@@ -36,17 +36,20 @@ export function generateQueryDocumentTypesField({
 	return {
 		resolve: () => {
 			const readConnection = connect({ principals: [PRINCIPAL_EXPLORER_READ] });
-			const res = readConnection.query({
+			const qr = readConnection.query({
 				count: -1,
 				filters: addQueryFilter({
 					filter: hasValue('_nodeType', [NT_DOCUMENT_TYPE])
 				}),
 				query: ''
 			});
-			//log.debug(`res:${toStr(res)}`);
-			res.hits = res.hits
-				.map(({id}) => coerseDocumentType(readConnection.get(id)));
-			return res;
+			//log.debug(`qr:${toStr(qr)}`);
+			const rv = {
+				count: qr.count,
+				total: qr.count,
+				hits: qr.hits.map(({id}) => coerseDocumentType(readConnection.get(id))),
+			};
+			return rv;
 		}, // resolve
 		type: glue.getObjectType(GQL_TYPE_DOCUMENT_TYPE_QUERY_RESULT_NAME)
 	};

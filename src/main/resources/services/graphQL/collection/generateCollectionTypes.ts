@@ -1,5 +1,7 @@
-//import {toStr} from '@enonic/js-utils';
+import type {AnyObject} from '/lib/explorer/types/index.d';
 
+
+//import {toStr} from '@enonic/js-utils';
 import {
 	DateTime as GraphQLDateTime,
 	GraphQLID,
@@ -11,7 +13,6 @@ import {
 	nonNull
 	//@ts-ignore
 } from '/lib/graphql';
-
 import {
 	GQL_INPUT_TYPE_COLLECTION_COLLECTOR_NAME,
 	GQL_INPUT_TYPE_COLLECTION_CRON_NAME,
@@ -54,7 +55,17 @@ export function generateCollectionTypes({
 				field: GraphQLString, // Not nonNull, because field can come from source.__fieldKey
 				filters: glue.getInputType(GQL_INPUT_TYPE_FILTERS_NAME)
 			},
-			resolve: (env) => {
+			resolve: (env :{
+				args :{
+					count ?:number
+					field ?:string
+					filters ?:AnyObject
+				}
+				source :{
+					__fieldKey :string
+					_name :string
+				}
+			}) => {
 				//log.debug(`_hasField env:${toStr(env)}`);
 				const {
 					args: {

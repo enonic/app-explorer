@@ -1,8 +1,12 @@
+import type {
+	AnyObject,
+	MultiRepoConnectionQueryNode
+} from '/lib/explorer/types/index.d';
+
 import {
 	addQueryFilter//,
 	//toStr
 } from '@enonic/js-utils';
-
 import {
 	COLLECTION_REPO_PREFIX,
 	//NT_DOCUMENT,
@@ -18,6 +22,12 @@ export function hasField({
 	count = -1,
 	field,
 	filters = {}
+} :{
+	collectionName :string
+	field ?:string
+	collections ?:Array<string>
+	count ?:number
+	filters ?:AnyObject
 }) {
 	const queryParams = {
 		// WARNING Can't aggregate on branch and repoId as they are not actual fields :(
@@ -71,26 +81,30 @@ export function hasField({
 	//log.debug(`multiConnectParams:${toStr(multiConnectParams)}`);
 	const multiRepoReadConnection = multiConnect(multiConnectParams);
 
-	const queryRes = multiRepoReadConnection.query(queryParams);
+	const qr = multiRepoReadConnection.query(queryParams);
 	//log.debug(`queryRes:${toStr(queryRes)}`);
 
-	queryRes.hits = queryRes.hits.map(({
-		id,
-		score,
-		repoId,
-		branch
-	}) => {
-		const node = connect({
-			branch,
-			principals: [PRINCIPAL_EXPLORER_READ],
-			repoId
-		}).get(id);
-		//log.debug(`node:${toStr(node)}`);
-		node._branchId = branch;
-		node._repoId = repoId;
-		node._score = score;
-		//log.debug(`node:${toStr(node)}`);
-		return node;
-	});
-	return queryRes;
+	const rv = {
+		count: qr.count,
+		total: qr.total,
+		hits: qr.hits.map(({
+			id,
+			score,
+			repoId,
+			branch
+		}) => {
+			const node = connect({
+				branch,
+				principals: [PRINCIPAL_EXPLORER_READ],
+				repoId
+			}).get(id) as MultiRepoConnectionQueryNode;
+			//log.debug(`node:${toStr(node)}`);
+			node._branchId = branch;
+			node._repoId = repoId;
+			node._score = score;
+			//log.debug(`node:${toStr(node)}`);
+			return node;
+		})
+	};
+	return rv;
 }

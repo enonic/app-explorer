@@ -1,7 +1,7 @@
 //import {toStr} from '@enonic/js-utils';
 
 import {PRINCIPAL_EXPLORER_READ} from '/lib/explorer/model/2/constants';
-import {coerseFieldType} from '/lib/explorer/field/coerseFieldType';
+import {coerceFieldType} from '/lib/explorer/field/coerceFieldType';
 import {getField} from '/lib/explorer/field/getField';
 import {connect} from '/lib/explorer/repo/connect';
 
@@ -16,7 +16,11 @@ export function addQueryFieldGet({glue}) {
 		args: {
 			_id: glue.getScalarType('_id')
 		},
-		resolve(env) {
+		resolve(env :{
+			args: {
+				_id :string
+			}
+		}) {
 			//log.debug(`env:${toStr(env)}`);
 			const {
 				args: {
@@ -27,7 +31,7 @@ export function addQueryFieldGet({glue}) {
 				connection: connect({principals: [PRINCIPAL_EXPLORER_READ]}),
 				key: _id
 			});
-			const rv = coerseFieldType(fieldNode);
+			const rv = coerceFieldType(fieldNode);
 			//log.debug(`rv:${toStr(rv)}`);
 			return rv;
 		},

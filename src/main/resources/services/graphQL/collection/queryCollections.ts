@@ -12,13 +12,18 @@ export function queryCollections({
 	query,
 	sort/*,
 	start*/ // Preferring page for now
+} :{
+	page ?:string//number
+	perPage ?:string//number
+	query ?:string
+	sort ?:string
 } = {}) {
 	//log.info(`count:${toStr(count)}`);
 	//log.info(`page:${toStr(page)}`);
 	//log.info(`perPage:${toStr(perPage)}`);
 	//log.info(`sort:${toStr(sort)}`);
 	const connection = connect({ principals: [PRINCIPAL_EXPLORER_READ] });
-	const collectionsRes = qC({
+	const qr = qC({
 		connection,
 		//count,
 		page,
@@ -47,31 +52,38 @@ export function queryCollections({
 		}
 	});*/
 	//log.info(`activeCollections:${toStr(activeCollections)}`);
-
-	collectionsRes.hits = collectionsRes.hits.map(({
-		_id,
-		_name,
-		_nodeType,
-		_path,
-		_score,
-		collector,
-		language = '',
-		documentTypeId//,
-		//type
-	}) => ({
-		_id,
-		_name,
-		_nodeType,
-		_path,
-		_score,
-		//collecting: !!activeCollections[_name],
-		collector,
-		documentCount: getDocumentCount(_name), // TODO this should live in own graphql resolver
-		interfaces: usedInInterfaces({connection, name: _name}), // TODO this should live in own graphql resolver
-		language,
-		documentTypeId//,
-		//type
-	}));
-	//log.info(`mapped collectionsRes:${toStr(collectionsRes)}`);
-	return collectionsRes;
+	const rv = {
+		count: qr.count,
+		page: qr.page,
+		pageEnd: qr.pageEnd,
+		pageStart: qr.pageStart,
+		pagesTotal: qr.pagesTotal,
+		total: qr.total,
+		hits: qr.hits.map(({
+			_id,
+			_name,
+			_nodeType,
+			_path,
+			_score,
+			collector,
+			language = '',
+			documentTypeId//,
+			//type
+		}) => ({
+			_id,
+			_name,
+			_nodeType,
+			_path,
+			_score,
+			//collecting: !!activeCollections[_name],
+			collector,
+			documentCount: getDocumentCount(_name), // TODO this should live in own graphql resolver
+			interfaces: usedInInterfaces({connection, name: _name}), // TODO this should live in own graphql resolver
+			language,
+			documentTypeId//,
+			//type
+		}))
+	};
+	//log.info(`mapped collectionsRes:${toStr(rv)}`);
+	return rv;
 }

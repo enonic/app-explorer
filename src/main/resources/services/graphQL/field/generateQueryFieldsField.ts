@@ -4,7 +4,6 @@ import {
 	//toStr
 } from '@enonic/js-utils';
 
-import {coerseFieldType} from '/lib/explorer/field/coerseFieldType';
 import {getFields} from '/lib/explorer/field/getFields';
 import {PRINCIPAL_EXPLORER_READ} from '/lib/explorer/model/2/constants';
 import {connect} from '/lib/explorer/repo/connect';
@@ -26,7 +25,12 @@ export function generateQueryFieldsField({
 			fields: list(GraphQLString), // optional, undefined means "all fields"
 			includeSystemFields: GraphQLBoolean // optional, defaults to false
 		},
-		resolve: (env) => {
+		resolve: (env :{
+			args: {
+				fields :Array<string>
+				includeSystemFields :boolean
+			}
+		}) => {
 			//log.info(`env:${toStr(env)}`);
 
 			const {args/*, context*/} = env;
@@ -49,12 +53,6 @@ export function generateQueryFieldsField({
 				includeSystemFields
 			});
 			//log.debug(`fieldsRes:${toStr(fieldsRes)}`);
-
-			fieldsRes.hits = fieldsRes.hits.map(hit => coerseFieldType(hit));
-			//log.debug(`mapped fieldsRes:${toStr(fieldsRes)}`);
-
-			// WARNING The context is a global read-only, you can't use it to pass data.
-			//context.hits = fieldsRes.hits.map(({key}) => ({key}));
 
 			return fieldsRes;
 		},

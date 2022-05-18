@@ -7,6 +7,7 @@ import {
 	nonNull
 	//@ts-ignore
 } from '/lib/graphql';
+import {coerceJournalType} from '/lib/explorer/journal/coerceJournalType';
 import {query} from '/lib/explorer/journal/query';
 
 
@@ -59,51 +60,33 @@ export function generateQueryJournalsField({
 			sort: GraphQLString,
 			start: GraphQLInt
 		},
-		resolve: (env) => {
+		resolve: (env :{
+			args :{
+				count ?:number
+				sort ?:string
+				start ?:number
+			}
+		}) => {
 			//log.info(`env:${toStr(env)}`);
-			const journalsRes = query(env.args);
-			//log.info(`journalsRes:${toStr(journalsRes)}`);
-			journalsRes.hits = journalsRes.hits.map(({
-				_id,
-				_name,
-				//_nodeType, // No point in exposing, always the same
-				_path,
-				_versionKey,
-				displayName,
-				endTime,
-				errorCount,
-				duration,
-				name,
-				startTime,
-				successCount,
-				successes
-			}) => ({
-				_id,
-				_name,
-				//_nodeType, // No point in exposing, always the same
-				_path,
-				_versionKey,
-				displayName,
-				endTime,
-				errorCount,
-				duration,
-				name,
-				startTime,
-				successCount,
-				successes
-			}));
-			//log.info(`journalsRes:${toStr(journalsRes)}`);
-			return journalsRes;
+			const qr = query(env.args);
+			//log.info(`journalsRes:${toStr(qr)}`);
+			const graph = {
+				count: qr.count,
+				hits: qr.hits.map((hit) => coerceJournalType(hit)),
+				total: qr.total
+			};
+			//log.debug(`journalsRes:${toStr(graph)}`);
+			return graph;
 		},
 		type: glue.addObjectType({
 			name: 'QueryJournals',
 			//description:
 			fields: {
 				count: { type: glue.getScalarType('count') },
-				page: { type: GraphQLInt },
-				pageStart: { type: GraphQLInt },
-				pageEnd: { type: GraphQLInt },
-				pagesTotal: { type: GraphQLInt },
+				//page: { type: GraphQLInt },
+				//pageStart: { type: GraphQLInt },
+				//pageEnd: { type: GraphQLInt },
+				//pagesTotal: { type: GraphQLInt },
 				hits: { type: list(JOURNAL_OBJECT_TYPE) },
 				total: { type: glue.getScalarType('total') }
 			} // fields

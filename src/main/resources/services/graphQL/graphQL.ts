@@ -10,6 +10,8 @@
      ^               ^                                        Loose│
      └───────────────┴─────────────────────────────────────────────┘
 */
+import type {Request} from '../../types/index.d';
+
 
 import {
 	RESPONSE_TYPE_JSON//,
@@ -286,7 +288,7 @@ export const SCHEMA = glue.schemaGenerator.createSchema({
 }); // SCHEMA
 
 
-export function post(request) {
+export function post(request :Request) {
 	//log.info(`request:${toStr(request)}`);
 
 	const {body: bodyJson} = request;

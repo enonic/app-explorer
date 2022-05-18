@@ -1,3 +1,5 @@
+import type {AnyObject} from '/lib/explorer/types/index.d';
+
 import {
 	hasOwnProperty//,
 	//toStr
@@ -8,24 +10,77 @@ import {
 	//@ts-ignore
 } from '/lib/graphql';
 
+type Fields = AnyObject;
+
+type EnumType = AnyObject;
+type InputObjectType = AnyObject;
+type InterfaceType = AnyObject;
+type ObjectType = AnyObject;
+type ScalarType = AnyObject;
+
+type FieldResolver = <
+	Env extends AnyObject = AnyObject,
+	ResultGraph = unknown
+>(env :Env) => ResultGraph
+
+type TypeResolver = () => ObjectType
 
 export class Glue {
 
 	// Private fields
-	_enumTypes = {};
-	_fields = {};
-	_inputTypes = {};
-	_interfaceTypes = {};
-	_mutations = {};
-	_objectTypes = {};
-	_queries = {};
-	_scalarTypes = {};
-	_uniqueFieldNames = {}; // mutation and query field names should be unique?
-	_uniqueNames = {};
-	_unionTypes = {};
+	_enumTypes :Record<string,EnumType> = {};
+	_fields :Record<string,Fields> = {};
+	_inputTypes :Record<string,InputObjectType> = {};
+	_interfaceTypes :Record<string,{
+		fields :unknown
+		type :InterfaceType
+	}> = {};
+	_mutations :Record<string,{
+		args :AnyObject
+		resolve :FieldResolver
+		type :unknown
+	}> = {};
+	_objectTypes :Record<string,ObjectType> = {};
+	_queries :Record<string,{
+		args :AnyObject
+		resolve :FieldResolver
+		type :unknown
+	}> = {};
+	_scalarTypes :Record<string,ScalarType> = {};
+	_uniqueFieldNames :AnyObject = {}; // mutation and query field names should be unique?
+	_uniqueNames :AnyObject = {};
+	_unionTypes :AnyObject = {};
 
 	// Public fields
-	schemaGenerator;
+	schemaGenerator :{
+		createEnumType :(params :{
+			name :string
+			values :Array<string>
+		}) => EnumType,
+		createInputObjectType :(params :{
+			fields :unknown
+			name :string
+		}) => InputObjectType
+		createInterfaceType :(params :{
+			fields :unknown
+			name :string
+			typeResolver :TypeResolver
+		}) => InterfaceType
+		createObjectType :(params :{
+			fields :AnyObject
+			interfaces ?:Array<unknown>
+			name :string
+		}) => ObjectType
+		createSchema :(params :{
+			mutation :ObjectType
+			query :ObjectType
+		}) => unknown
+		createUnionType :(params :{
+			name :string
+			typeResolver :TypeResolver
+			types :Array<unknown>
+		}) => unknown
+	};
 
 	constructor() {
 		this.schemaGenerator = newSchemaGenerator();
@@ -34,6 +89,9 @@ export class Glue {
 	addEnumType({
 		name,
 		values
+	} :{
+		name :string
+		values :Array<string>
 	}) {
 		//log.debug(`addEnumType({name:${name}})`);
 		if(this._enumTypes[name]) {
@@ -53,6 +111,9 @@ export class Glue {
 	addFields({
 		name,
 		fields
+	} :{
+		name :string
+		fields :Fields
 	}) {
 		//log.debug(`addEnumType({name:${name}})`);
 		if(this._fields[name]) {
@@ -69,6 +130,9 @@ export class Glue {
 	addInputType({
 		fields,
 		name
+	} :{
+		fields :Fields
+		name :string
 	}) {
 		//log.debug(`addInputType({name:${name},fields:${toStr(fields)}})`);
 		//log.debug(`addInputType({name:${name}})`);
@@ -90,6 +154,10 @@ export class Glue {
 		fields,
 		name,
 		typeResolver
+	} :{
+		fields :Fields
+		name :string
+		typeResolver :TypeResolver
 	}) {
 		//log.debug(`addInterfaceType({name:${name},fields:${toStr(fields)}})`);
 		//log.debug(`addInterfaceType({name:${name}})`);
@@ -116,6 +184,10 @@ export class Glue {
 		fields,
 		interfaces = [],
 		name
+	} :{
+		fields :Fields
+		interfaces :Array<unknown>
+		name :string
 	}) {
 		//log.debug(`addObjectType({name:${name},fields:${toStr(fields)})`);
 		//log.debug(`addObjectType({name:${name}})`);
@@ -139,6 +211,11 @@ export class Glue {
 		name,
 		resolve,
 		type
+	} :{
+		args :AnyObject
+		name :string
+		resolve :FieldResolver
+		type :ObjectType
 	}) {
 		//log.debug(`addEnumType({name:${name}})`);
 		if(this._mutations[name]) {
@@ -161,6 +238,11 @@ export class Glue {
 		name,
 		resolve,
 		type
+	} :{
+		args :AnyObject
+		name :string
+		resolve :FieldResolver
+		type :ObjectType
 	}) {
 		//log.debug(`addEnumType({name:${name}})`);
 		if(this._queries[name]) {
@@ -181,6 +263,9 @@ export class Glue {
 	addScalarType({
 		name,
 		type
+	} :{
+		name :string
+		type :ScalarType
 	}) {
 		//log.debug(`addScalarType({name:${name}})`);
 		if(this._scalarTypes[name]) {
@@ -198,6 +283,10 @@ export class Glue {
 		name,
 		typeResolver,
 		types = []
+	} :{
+		name :string
+		typeResolver :TypeResolver
+		types :Array<unknown>
 	}) {
 		//log.debug(`addUnionType({name:${name}})`);
 		if(this._unionTypes[name]) {
@@ -219,7 +308,7 @@ export class Glue {
 		return this._unionTypes[name];
 	}
 
-	getFields(name) {
+	getFields(name :string) {
 		//log.debug(`getFields(${name})`);
 		if (!hasOwnProperty(this._fields, name)) { // true also when property is set to undefined
 			/*if (this._uniqueNames[name]) {
@@ -235,7 +324,7 @@ export class Glue {
 		return fields;
 	}
 
-	getInputType(name) {
+	getInputType(name :string) {
 		//log.debug(`getInputType(${name})`);
 		if (!hasOwnProperty(this._inputTypes, name)) { // true also when property is set to undefined
 			if (this._uniqueNames[name]) {
@@ -251,7 +340,7 @@ export class Glue {
 		return type;
 	}
 
-	getInterfaceType(name) {
+	getInterfaceType(name :string) {
 		//log.debug(`getInterfaceType(${name})`);
 		if (!hasOwnProperty(this._interfaceTypes, name)) { // true also when property is set to undefined
 			if (this._uniqueNames[name]) {
@@ -267,7 +356,7 @@ export class Glue {
 		return type;
 	}
 
-	getInterfaceTypeFields(name) {
+	getInterfaceTypeFields(name :string) {
 		//log.debug(`getInterfaceTypeFields(${name})`);
 		if (!hasOwnProperty(this._interfaceTypes, name)) { // true also when property is set to undefined
 			throw new Error(`interfaceTypes[${name}] not found! Perhaps you're trying to use it before it's defined?`);
@@ -280,7 +369,7 @@ export class Glue {
 		return fields;
 	}
 
-	getInterfaceTypeObj(name) {
+	getInterfaceTypeObj(name :string) {
 		//log.debug(`getInterfaceTypeObj(${name})`);
 		if (!hasOwnProperty(this._interfaceTypes, name)) { // true also when property is set to undefined
 			if (this._uniqueNames[name]) {
@@ -304,7 +393,7 @@ export class Glue {
 		return this._queries;
 	}
 
-	getObjectType(name) {
+	getObjectType(name :string) {
 		//log.debug(`getobjectType(${name})`);
 		if (!hasOwnProperty(this._objectTypes, name)) { // true also when property is set to undefined
 			if (this._uniqueNames[name]) {
@@ -324,7 +413,7 @@ export class Glue {
 		return this._objectTypes;
 	}
 
-	getScalarType(name) {
+	getScalarType(name :string) {
 		//log.debug(`getScalarType(${name})`);
 		if (!hasOwnProperty(this._scalarTypes, name)) { // true also when property is set to undefined
 			if (this._uniqueNames[name]) {
@@ -344,7 +433,7 @@ export class Glue {
 		return Object.keys(this._objectTypes).sort();
 	}
 
-	getUnionTypeObj(name) {
+	getUnionTypeObj(name :string) {
 		//log.debug(`getUnionTypeObj(${name})`);
 		if (!hasOwnProperty(this._unionTypes, name)) { // true also when property is set to undefined
 			if (this._uniqueNames[name]) {

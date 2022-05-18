@@ -24,7 +24,14 @@ export function generateQueryCollectionsField({
 			sort: GraphQLString//,
 			//start: GraphQLInt
 		},
-		resolve: (env) => {
+		resolve: (env :{
+			args :{
+				page ?:string//number
+				perPage ?:string//number
+				query ?:string
+				sort ?:string
+			}
+		}) => {
 			//log.info(`env:${toStr(env)}`);
 			return queryCollections(env.args);
 		},

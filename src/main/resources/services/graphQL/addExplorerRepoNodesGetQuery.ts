@@ -1,9 +1,11 @@
+import type {BooleanFilter} from '@enonic/js-utils/src/types/index.d';
+
+
 import {
 	addQueryFilter,
 	isNotSet//,
 	//toStr
 } from '@enonic/js-utils';
-
 import {NT_DOCUMENT_TYPE} from '/lib/explorer/documentType/constants';
 import {
 	NT_COLLECTION,
@@ -38,7 +40,14 @@ export const addExplorerRepoNodesGetQuery = ({glue}) => {
 			start: GraphQLInt
 		},
 		name: GQL_QUERY_EXPLORER_REPO_NODES_GET_NAME,
-		resolve(env) {
+		resolve(env :{
+			args :{
+				count ?:number
+				nodeTypes ?:Array<string>
+				query ?:string
+				start ?:number
+			}
+		}) {
 			//log.debug(`env:${toStr(env)}`);
 			let {
 				args: {
@@ -60,7 +69,12 @@ export const addExplorerRepoNodesGetQuery = ({glue}) => {
 			if (isNotSet(query)) {query = '';}
 			if (isNotSet(start)) {start = 0;}
 			const readConnection = connect({principals: [PRINCIPAL_EXPLORER_READ]});
-			const queryParams = {
+			const queryParams :{
+				count :number
+				filters ?:BooleanFilter
+				query :string
+				start :number
+			} = {
 				count,
 				query,
 				start

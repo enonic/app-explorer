@@ -34,7 +34,7 @@ export function fetchHasField({
 		collections ?:Array<string>
 		count ?:number
 		field :string
-		filters :AnyObject
+		filters :AnyObject // TODO?
 	}
 }) {
 	fetch(url, {

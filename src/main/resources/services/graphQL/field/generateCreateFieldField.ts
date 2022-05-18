@@ -7,7 +7,7 @@ import {
 	nonNull
 	//@ts-ignore
 } from '/lib/graphql';
-import {coerseFieldType} from '/lib/explorer/field/coerseFieldType';
+import {coerceFieldType} from '/lib/explorer/field/coerceFieldType';
 import {createField} from '/lib/explorer/field/createField';
 
 import {GQL_TYPE_FIELD_NODE_NAME} from '../constants';
@@ -34,8 +34,23 @@ export function generateCreateFieldField({
 		},
 		resolve({
 			args
+		} :{
+			args :{
+				key :string
+				decideByType ?:boolean
+				enabled ?:boolean
+				description ?:string
+				fieldType ?:string
+				fulltext ?:boolean
+				includeInAllText ?:boolean
+				//indexConfig,
+				max ?:number
+				min ?:number
+				nGram ?:boolean
+				path ?:boolean
+			}
 		}) {
-			return coerseFieldType(createField(args));
+			return coerceFieldType(createField(args));
 		},
 		type: glue.getObjectType(GQL_TYPE_FIELD_NODE_NAME)
 	};

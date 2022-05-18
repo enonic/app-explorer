@@ -1,6 +1,6 @@
 import {INDEX_CONFIG_N_GRAM} from '@enonic/js-utils';
 
-import {coerseFieldType} from '/lib/explorer/field/coerseFieldType';
+import {coerceFieldType} from '/lib/explorer/field/coerceFieldType';
 import {updateField} from '/lib/explorer/field/updateField';
 import {
 	GraphQLBoolean,
@@ -33,8 +33,23 @@ export function generateUpdateFieldField({
 		},
 		resolve({
 			args
+		} :{
+			args: {
+				// Required
+				_id :string
+				// Optional
+				decideByType? :boolean
+				enabled? :boolean
+				fieldType? :string
+				fulltext? :boolean
+				includeInAllText? :boolean
+				max? :string | number
+				min? :string | number
+				nGram? :boolean
+				path? :boolean
+			}
 		}) {
-			return coerseFieldType(updateField(args));
+			return coerceFieldType(updateField(args));
 		},
 		type: glue.getObjectType(GQL_TYPE_FIELD_NODE_NAME)
 	};
