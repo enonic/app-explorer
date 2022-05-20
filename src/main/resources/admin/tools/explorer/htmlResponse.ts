@@ -122,7 +122,7 @@ export function htmlResponse({
 	const collectorsAppToUri = {};
 	const collectorsObj = {};
 	queryCollectors({
-		connection: connect({principals: PRINCIPAL_EXPLORER_READ})
+		connection: connect({principals: [PRINCIPAL_EXPLORER_READ]})
 	}).hits.forEach(({
 		//_name: collectorId,
 		appName,

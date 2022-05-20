@@ -1,11 +1,26 @@
+import type {PopupContentProps} from 'semantic-ui-react';
+import type {SemanticShorthandItem} from 'semantic-ui-react/src/generic.d';
+
+
+import * as React from 'react';
 import {
-	Button, Header, Icon, Message, Modal, Popup
+	Button, Header, Icon, Message, Modal, Popup//, PopupContent
 } from 'semantic-ui-react';
 
 import{GQL_MUTATION_FIELD_DELETE} from '../../../services/graphQL/mutations/fieldDeleteMutation';
 
 
-export function DeleteModal(props) {
+export function DeleteModal(props :{
+	_id :string
+	_name :string
+	afterClose ?:() => void
+	beforeOpen ?:() => void
+	disabled ?:boolean
+	fieldCollections ?:Array<string>
+	fieldDocumentTypes ?:Array<string>
+	popupContent ?:SemanticShorthandItem<PopupContentProps> //typeof PopupContent
+	servicesBaseUrl :string
+}) {
 	const {
 		_id,
 		_name,
@@ -91,13 +106,13 @@ export function DeleteModal(props) {
 				{fieldDocumentTypes.length
 					? <>
 						<Header as='h5'>Document types:</Header>
-						<ul>{fieldDocumentTypes.sort().map((dT, i) => <li key={i}>{dT}</li>)}</ul>
+						<ul>{fieldDocumentTypes.sort().map((dT :string, i :number) => <li key={i}>{dT}</li>)}</ul>
 					</>
 					: null}
 				{fieldCollections.length
 					? <>
 						<Header as='h5'>Collections:</Header>
-						<ul>{fieldCollections.sort().map((c, i) => <li key={i}>{c}</li>)}</ul>
+						<ul>{fieldCollections.sort().map((c :string, i :number) => <li key={i}>{c}</li>)}</ul>
 					</>
 					: null}
 				<Message

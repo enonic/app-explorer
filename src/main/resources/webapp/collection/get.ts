@@ -1,3 +1,4 @@
+import type {AnyObject} from '/lib/explorer/types/index.d';
 import type {Request} from '../../types/Request';
 
 
@@ -8,7 +9,7 @@ import {
 } from '@enonic/js-utils';
 
 
-export type GetCollectionRequest = Request<{}, {
+export type GetCollectionRequest = Request<AnyObject, {
 	collection :string
 }>
 

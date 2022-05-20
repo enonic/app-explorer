@@ -233,7 +233,7 @@ export function Collections(props :{
 									+ (showDocumentCount ? 1 : 0)
 									+ (showLanguage ? 1 : 0)
 									+ (showDocumentType ? 1 : 0)
-									+ (showInterfaces ? 1 : 0)
+									//+ (showInterfaces ? 1 : 0)
 									+ (showSchedule ? 1 : 0)
 								}><Progress
 										active

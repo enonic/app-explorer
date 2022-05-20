@@ -1,3 +1,4 @@
+import type {PaginationProps} from 'semantic-ui-react';
 import type {Locales} from '../index.d';
 
 
@@ -56,7 +57,7 @@ export function EditSynonyms({
 		<Form>
 			<Header as='h4'><Icon name='filter'/> Filter</Header>
 			<Form.Field>
-				<input
+				<Form.Input
 					fluid='true'
 					label='From'
 					onChange={({target:{value}}) => setFrom(value)}
@@ -65,7 +66,7 @@ export function EditSynonyms({
 				/>
 			</Form.Field>
 			<Form.Field>
-				<input
+				<Form.Input
 					fluid='true'
 					label='To'
 					onChange={({target:{value}}) => setTo(value)}
@@ -191,21 +192,13 @@ export function EditSynonyms({
 							{thesaurusId ? null : <Table.Cell>{thesaurus}</Table.Cell>}
 							<Table.Cell>{_score}</Table.Cell>
 							<Table.Cell collapsing>
-								{/*<Button.Group>
-									<NewOrEditSynonym
-										afterClose={querySynonyms}
-										servicesBaseUrl={servicesBaseUrl}
-										thesaurusId={thesaurusReference}
-									/>*/}
 								<DeleteSynonym
 									_id={_id}
 									from={from}
 									afterClose={memoizedQuerySynonyms}
 									servicesBaseUrl={servicesBaseUrl}
-									thesaurusId={thesaurusReference}
 									to={to}
 								/>
-								{/*</Button.Group>*/}
 							</Table.Cell>
 						</Table.Row>)}
 					</Table.Body>
@@ -231,9 +224,7 @@ export function EditSynonyms({
 						event :unknown,
 						{
 							activePage
-						} :{
-							activePage :number
-						}
+						} :PaginationProps
 					) => setPage(activePage)}
 				/>
 				<p>Displaying {start}-{end} of {total}</p>

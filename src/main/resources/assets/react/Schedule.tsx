@@ -1,11 +1,21 @@
 import {parseExpression as parseCronExpression} from 'cron-parser';
 import Gantt from 'nice-react-gantt';
 import hash from 'object-hash';
+import * as React from 'react';
 import SemanticDatepicker from 'react-semantic-ui-datepickers';
 import {Slider} from 'react-semantic-ui-range';
 import {Label, Radio, Segment, Table} from 'semantic-ui-react';
 
 import {useInterval} from './utils/useInterval';
+
+
+type ScheduledJob = {
+	collectionId :string
+	enabled :boolean
+	schedule :{
+		value :string
+	}
+}
 
 
 const JOBS_GQL = `{
@@ -22,7 +32,14 @@ const JOBS_GQL = `{
 }`;
 
 
-export const Schedule = (props) => {
+export const Schedule = (props :{
+	servicesBaseUrl :string
+	now ?:Date
+	start ?:Date
+	end ?:Date
+	zoom ?:number
+	projects ?:Array<ScheduledJob>
+}) => {
 	const {
 		servicesBaseUrl,
 		now: propNow = new Date(Date.now()),
@@ -63,7 +80,7 @@ export const Schedule = (props) => {
 							//type, // TODO: filter on CRON?
 							value: cronExpression
 						}
-					}) => {
+					} :ScheduledJob) => {
 						const projectId = collectionId;
 						const tasks = [];
 						let taskCount = 1;
@@ -81,7 +98,7 @@ export const Schedule = (props) => {
 									var obj = interval.next();
 									//console.log('value:', obj.value.toString(), 'done:', obj.done);
 									const taskId = `${projectId}.${taskCount}`;
-									const taskStart = new Date(obj.value);
+									const taskStart = new Date(obj.value as unknown as Date); // CronDate
 									const taskEnd = new Date(taskStart.getTime());
 									taskEnd.setHours( taskEnd.getHours() + 1 );
 									tasks.push({
@@ -167,7 +184,11 @@ export const Schedule = (props) => {
 								datePickerOnly={true}
 								firstDayOfWeek={1}
 								inverted
-								onChange={(ignored, {value}) => setStart(value)}
+								onChange={(
+									//@ts-ignore
+									event,
+									{value}
+								) => setStart(value as Date)}
 								showOutsideDays={false}
 								value={start}
 							/>
@@ -179,7 +200,11 @@ export const Schedule = (props) => {
 								datePickerOnly={true}
 								firstDayOfWeek={1}
 								inverted
-								onChange={(ignored, {value}) => setEnd(value)}
+								onChange={(
+									//@ts-ignore
+									event,
+									{value}
+								) => setEnd(value as Date)}
 								showOutsideDays={false}
 								showToday={false}
 								value={end}
@@ -188,7 +213,11 @@ export const Schedule = (props) => {
 						<Table.Cell collapsing>
 							<Radio
 								checked={showDisabled}
-								onChange={(ignored,{checked}) => {
+								onChange={(
+									//@ts-ignore
+									event,
+									{checked}
+								) => {
 									setShowDisabled(checked);
 								}}
 								toggle
@@ -203,7 +232,7 @@ export const Schedule = (props) => {
 									max: 5,
 									start: propZoom,
 									step: 0.1,
-									onChange: (value) => setZoom(value)
+									onChange: (value :number) => setZoom(value)
 								}}
 								value={zoom}
 							/>

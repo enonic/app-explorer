@@ -1,3 +1,4 @@
+import type {ButtonProps} from 'semantic-ui-react';
 import {Button, Icon} from 'semantic-ui-react';
 
 
@@ -6,7 +7,7 @@ export const ButtonNew = ({
 	circular = true,
 	color = 'green',
 	icon = true,
-	onClick = () => {},
+	onClick = () => {/**/},
 	size = 'massive',
 	style = {
 		bottom: 13.5,
@@ -17,7 +18,7 @@ export const ButtonNew = ({
 		right: 13.5
 	},
 	...rest
-}) => <Button
+} :ButtonProps) => <Button
 	{...rest}
 	circular={circular}
 	color={color}

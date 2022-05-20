@@ -1,3 +1,4 @@
+import * as React from 'react';
 import {Button, Header, Icon, Modal, Popup} from 'semantic-ui-react';
 
 

@@ -1,4 +1,4 @@
-import type {AnyObject} from '../../../index.d';
+import type {QueryFieldsResult} from '../../../services/graphQL/fetchers/fetchFields';
 
 
 import {VALUE_TYPE_STRING} from '@enonic/js-utils';
@@ -37,7 +37,7 @@ export function Fields(props :{
 		},
 		isLoading: true,
 		showDeleteButton: true, //false,
-		showDescriptionColumn: false,
+		//showDescriptionColumn: false,
 		showIndexConfigColumns: false,
 		showOccurencesColumns: false,
 		showSystemFields: false,
@@ -45,14 +45,10 @@ export function Fields(props :{
 	} as {
 		column :string
 		direction :'ascending'|'descending'
-		fieldsRes :{
-			count :number
-			hits :Array<AnyObject> // TODO
-			total :number
-		}
+		fieldsRes :QueryFieldsResult
 		isLoading :boolean
 		showDeleteButton :boolean
-		showDescriptionColumn :boolean
+		//showDescriptionColumn :boolean
 		showIndexConfigColumns :boolean
 		showOccurencesColumns :boolean
 		showSystemFields :boolean
@@ -68,7 +64,7 @@ export function Fields(props :{
 		fieldsRes,
 		isLoading,
 		showDeleteButton,
-		showDescriptionColumn,
+		//showDescriptionColumn,
 		showIndexConfigColumns,
 		showOccurencesColumns,
 		showSystemFields,
@@ -105,7 +101,7 @@ export function Fields(props :{
 		});
 	} // updateFields
 
-	const handleSortGenerator = (clickedColumn) => () => {
+	const handleSortGenerator = (clickedColumn :string) => () => {
 		const {
 			fieldsRes,
 			column,
@@ -153,18 +149,26 @@ export function Fields(props :{
 								label={"Show system fields"}
 								className='inverted'
 								checked={showSystemFields}
-								onChange={(ignored,{checked}) => {
+								onChange={(
+									//@ts-ignore
+									event :React.ChangeEvent<HTMLInputElement>,
+									{checked}
+								) => {
 									updateFields({includeSystemFields: checked});
 								}}
 								toggle
 							/>
 						</Table.Cell>
-						<Table.Cell collapsing>
+						{/*<Table.Cell collapsing>
 							<Radio
 								label={"Show description column"}
 								className='inverted'
 								checked={showDescriptionColumn}
-								onChange={(ignored,{checked}) => {
+								onChange={(
+									//@ts-ignore
+									event :React.ChangeEvent<HTMLInputElement>,
+									{checked}
+								) => {
 									setState(prev => ({
 										...prev,
 										showDescriptionColumn: checked
@@ -172,13 +176,17 @@ export function Fields(props :{
 								}}
 								toggle
 							/>
-						</Table.Cell>
+						</Table.Cell>*/}
 						<Table.Cell collapsing>
 							<Radio
 								label={"Show occurences columns"}
 								className='inverted'
 								checked={showOccurencesColumns}
-								onChange={(ignored,{checked}) => {
+								onChange={(
+									//@ts-ignore
+									event :React.ChangeEvent<HTMLInputElement>,
+									{checked}
+								) => {
 									setState(prev => ({
 										...prev,
 										showOccurencesColumns: checked
@@ -192,7 +200,11 @@ export function Fields(props :{
 								label={"Show document types"}
 								className='inverted'
 								checked={showDocumentTypes}
-								onChange={(ignored,{checked}) => {
+								onChange={(
+									//@ts-ignore
+									event :React.ChangeEvent<HTMLInputElement>,
+									{checked}
+								) => {
 									setShowDocumentTypes(checked);
 								}}
 								toggle
@@ -203,7 +215,11 @@ export function Fields(props :{
 								label={"Show collections"}
 								className='inverted'
 								checked={showCollections}
-								onChange={(ignored,{checked}) => {
+								onChange={(
+									//@ts-ignore
+									event :React.ChangeEvent<HTMLInputElement>,
+									{checked}
+								) => {
 									setShowCollections(checked);
 								}}
 								toggle
@@ -214,7 +230,11 @@ export function Fields(props :{
 								label={"Show index config columns"}
 								className='inverted'
 								checked={showIndexConfigColumns}
-								onChange={(ignored,{checked}) => {
+								onChange={(
+									//@ts-ignore
+									event :React.ChangeEvent<HTMLInputElement>,
+									{checked}
+								) => {
 									setState(prev => ({
 										...prev,
 										showIndexConfigColumns: checked
@@ -253,7 +273,7 @@ export function Fields(props :{
 								sorted={column === 'key' ? direction : null}
 							>Name</Table.HeaderCell>
 
-							{showDescriptionColumn ? <Table.HeaderCell>Description</Table.HeaderCell> : null}
+							{/*showDescriptionColumn ? <Table.HeaderCell>Description</Table.HeaderCell> : null*/}
 
 							<Table.HeaderCell
 								onClick={handleSortGenerator('fieldType')}
@@ -302,7 +322,7 @@ export function Fields(props :{
 							fieldType = VALUE_TYPE_STRING,
 							key,
 
-							description,
+							//description,
 							min = 0,
 							max = 0,
 
@@ -350,13 +370,12 @@ export function Fields(props :{
 								<Table.Cell>
 									<NewOrEditModal
 										_id={_id}
-										field={_name}
 										initialValues={{
 											fieldType,
 											key,
 											min,
 											max,
-											description,
+											//description,
 											decideByType,
 											enabled,
 											fulltext,
@@ -372,7 +391,7 @@ export function Fields(props :{
 
 								<Table.Cell>{key}</Table.Cell>
 
-								{showDescriptionColumn ? <Table.Cell>{description}</Table.Cell> : null}
+								{/*showDescriptionColumn ? <Table.Cell>{description}</Table.Cell> : null*/}
 
 								<Table.Cell>{fieldType === 'any' ? '*' : fieldType}</Table.Cell>
 
@@ -430,9 +449,9 @@ export function Fields(props :{
 										margin: 0,
 										padding: 0
 									}}>{fieldDocumentTypes
-										.sort()
-										.map((dT, i) => <li key={i}>{dT}</li>)
-									}</ul>
+											.sort()
+											.map((dT, i) => <li key={i}>{dT}</li>)
+										}</ul>
 								</Table.Cell> : null}
 
 								{showCollections ? <Table.Cell textAlign='center'>

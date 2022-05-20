@@ -88,7 +88,7 @@ export function list(request :Request) {
 		<h2>Collections</h2>
 		<ul>
 			<li><a href="/api/v1">..</a></li>
-			${forceArray(collections).map((collection) => `<li><a href="/api/v1/collections/${collection}">${collection}</a></li>`)}
+			${forceArray(collections).map((collection) => `<li><a href="/api/v1/collections/${collection}">${collection}</a></li>`).join('\n')}
 		</ul>
 	</body>
 </html>`,

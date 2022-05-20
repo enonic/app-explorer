@@ -1,3 +1,4 @@
+import type {PaginationProps} from 'semantic-ui-react';
 import type {EditSynonymsState} from './index.d';
 
 
@@ -19,7 +20,7 @@ export function useEditSynonymsState({
 	const [from, setFrom] = React.useState('');
 	const [isLoading, setIsLoading] = React.useState(false);
 	const [perPage, setPerPage] = React.useState(10);
-	const [page, setPage] = React.useState(1);
+	const [page, setPage] = React.useState<PaginationProps['activePage']>(1);
 	const [sort, setSort] = React.useState('from ASC');
 	const [state, setState] = React.useState<EditSynonymsState>({
 		aggregations: {
@@ -55,7 +56,7 @@ export function useEditSynonymsState({
 
 		const variables = {
 			from,
-			page,
+			page: page as number,
 			perPage,
 			sort,
 			thesauri,

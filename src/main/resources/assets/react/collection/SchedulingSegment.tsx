@@ -10,7 +10,9 @@ import {
 	List,
 	MoveDownButton,
 	MoveUpButton
+	//@ts-ignore
 } from 'semantic-ui-react-form';
+//@ts-ignore
 import {getEnonicContext} from 'semantic-ui-react-form/Context';
 
 

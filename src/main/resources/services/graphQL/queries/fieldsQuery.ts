@@ -14,7 +14,7 @@ export const GQL_QUERY_FIELDS_QUERY = `query QueryFieldsQuery(
 			_nodeType
 			_path
 			decideByType
-			description
+			#description
 			enabled
 			fieldType
 			fulltext

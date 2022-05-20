@@ -1,7 +1,39 @@
-import type {AnyObject} from '../../../types/index.d';
+import type {
+	Collection,
+	DocumentType,
+	Field
+} from '/lib/explorer/types/index.d';
+import type {JSONResponse} from './index.d';
 
 
 import {GQL_QUERY_FIELDS_QUERY} from '../queries/fieldsQuery';
+
+
+export type QueryFieldsResult = {
+	count :number
+	hits :Array<Field & {
+		_referencedBy :{
+			count :number
+			hits :Array<DocumentType & {
+				_referencedBy :{
+					count :number
+					hits :Array<Collection & {
+						_hasField :{
+							total :number
+						}
+					}>
+					total :number
+				}
+			}>
+			total :number
+		}
+	}>
+	total :number
+}
+
+export type FetchFieldsData = {
+	queryFields :QueryFieldsResult
+}
 
 
 export function fetchFields({
@@ -11,7 +43,7 @@ export function fetchFields({
 	} = {},
 	handleData = () => {},
 } :{
-	handleData :(data :AnyObject) => void
+	handleData :(data :FetchFieldsData) => void
 	url :string,
 	variables ?:{
 		includeSystemFields ?:boolean
@@ -29,7 +61,7 @@ export function fetchFields({
 			}
 		})
 	})
-		.then(response => response.json())
+		.then(response => response.json() as JSONResponse<FetchFieldsData>)
 		.then(jsonObj => {
 			//console.debug('fetchFields jsonObj', jsonObj);
 			handleData(jsonObj.data);

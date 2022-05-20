@@ -1,3 +1,4 @@
+import * as React from 'react';
 import {
 	Button, Form, Icon, Input, Modal, Popup
 } from 'semantic-ui-react';
@@ -53,7 +54,7 @@ export function Import(props) {
 					compact
 					onClick={() => {
 						const body = new FormData();
-						const fileInput = document.querySelector('#file') ;
+						const fileInput = document.querySelector('#file') as HTMLInputElement;
 						//console.debug('fileInput', fileInput);
 						body.append('name', name);
 						body.append('file', fileInput.files[0]);

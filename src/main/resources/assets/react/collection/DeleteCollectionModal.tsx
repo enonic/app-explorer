@@ -1,10 +1,18 @@
+import * as React from 'react';
 import {Button, Header, Icon, Modal, Popup} from 'semantic-ui-react';
 
-export function DeleteCollectionModal(props) {
+
+export function DeleteCollectionModal(props :{
+	_name :string
+	servicesBaseUrl :string
+	afterClose ?:() => void
+	beforeOpen ?:() => void
+	disabled ?:boolean
+}) {
 	const {
 		_name,
-		afterClose = () => {},
-		beforeOpen = () => {},
+		afterClose = () => {/**/},
+		beforeOpen = () => {/**/},
 		disabled = false,
 		servicesBaseUrl
 	} = props;

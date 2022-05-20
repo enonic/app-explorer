@@ -66,6 +66,7 @@
 		"strictNullChecks": false,
 		"target": "es5",
 		"types": [
+			"jquery",
 			"mocha",
 			"node",
 			"react"
@@ -74,6 +75,7 @@
 	"exclude": [
 		//"node_modules/@types/node/globals.global.d.ts", // Does not help
 		//"node_modules/semantic-ui-react/dist/commonjs/**/*", // Does not help
+		//"src/main/resources/lib/nashorn/global.ts", // Does not help
 		"**/*.d.ts",
 		"build/**/*",
 		"node_modules/**/*",

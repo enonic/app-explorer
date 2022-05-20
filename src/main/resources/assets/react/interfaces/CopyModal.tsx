@@ -1,3 +1,4 @@
+import * as React from 'react';
 import {Button, Icon, Input, Message, Modal} from 'semantic-ui-react';
 
 
@@ -33,7 +34,11 @@ export function CopyModal({
 		<Modal.Content>
 			<Input
 				error={interfaceExists}
-				onChange={(event, {value}) => {
+				onChange={(
+					//@ts-ignore
+					event,
+					{value}
+				) => {
 					fetch(`${servicesBaseUrl}/interfaceExists?name=${value}`)
 						.then(response => response.json())
 						.then(({exists}) => {

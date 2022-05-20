@@ -8,15 +8,19 @@ import {
 	MoveDownButton,
 	MoveUpButton,
 	SetValueButton
+	//@ts-ignore
 } from 'semantic-ui-react-form';
+//@ts-ignore
 import {getEnonicContext} from 'semantic-ui-react-form/Context';
 
 
-export function Emails(props = {}) {
+export function Emails(props :{
+	path ?:string
+} = {}) {
 	const {
 		path = 'emails'
 	} = props;
-	const [context, dispatch] = getEnonicContext();
+	const [context/*, dispatch*/] = getEnonicContext();
 	const value = getIn(context.values, path);
 
 	if (!(Array.isArray(value) && value.length)) {
@@ -38,8 +42,12 @@ export function Emails(props = {}) {
 		<Table.Body>
 			<List
 				path={path}
-				render={emails => {
-					return emails.map((email, index) => {
+				render={(emails :Array<string>) => {
+					return emails.map((
+						//@ts-ignore
+						email,
+						index
+					) => {
 						const key=`${path}.${index}`;
 						return <Table.Row key={key}>
 							<Table.Cell>

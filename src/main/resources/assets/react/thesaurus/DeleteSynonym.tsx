@@ -1,3 +1,6 @@
+import type {SemanticICONS} from 'semantic-ui-react/src/generic.d';
+
+
 import * as React from 'react';
 import {
 	Button, Header, Icon, Modal, Popup, Table
@@ -8,7 +11,14 @@ import {
 import {GQL_MUTATION_DELETE_SYNONYM} from '../../../services/graphQL/synonym/mutationDeleteSynonym';
 
 
-export function DeleteSynonym(props) {
+export function DeleteSynonym(props :{
+	_id :string
+	from :Array<string>
+	servicesBaseUrl :string
+	to :Array<string>
+	afterClose ?:() => void
+	beforeOpen ?:() => void
+}) {
 	//console.debug('DeleteSynonym props', props);
 	const {
 		_id,
@@ -37,7 +47,7 @@ export function DeleteSynonym(props) {
 		modalHeader: 'Delete synonym?',
 		modalContentHeader: 'Do you really want to delete this synonym?',
 		buttonDisabled: false,
-		buttonIcon: 'trash alternate outline',
+		buttonIcon: 'trash alternate outline' as SemanticICONS, // Bug in semantic-ui-react 'trash alternate outline' is missing in type SemanticICONS
 		buttonLoading: false,
 		buttonText: 'Confirm Delete',
 		buttonOnClick: () => {
@@ -118,7 +128,7 @@ export function DeleteSynonym(props) {
 					</Table.Row>
 				</Table.Header>
 				<Table.Body>
-					{from.map((v,i :number) => <Table.Row key={i}>
+					{from.map((v,i) => <Table.Row key={i}>
 						<Table.HeaderCell>{v}</Table.HeaderCell>
 					</Table.Row>)}
 				</Table.Body>
@@ -130,7 +140,7 @@ export function DeleteSynonym(props) {
 					</Table.Row>
 				</Table.Header>
 				<Table.Body>
-					{to.map((v,i :number) => <Table.Row key={i}>
+					{to.map((v,i) => <Table.Row key={i}>
 						<Table.HeaderCell>{v}</Table.HeaderCell>
 					</Table.Row>)}
 				</Table.Body>

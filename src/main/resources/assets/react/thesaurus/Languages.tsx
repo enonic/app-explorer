@@ -200,7 +200,7 @@ export function Languages({
 										icon={true}
 										path={PATH_LANGUAGES}
 										index={i}
-									><Icon color='red' name='alternate outline trash'/> Delete language {language}</DeleteItemButton>
+									><Icon color='red' name='trash alternate outline'/> Delete language {language}</DeleteItemButton>
 								</Button.Group>
 								<div style={{clear:'both'}}></div>
 							</Panel>

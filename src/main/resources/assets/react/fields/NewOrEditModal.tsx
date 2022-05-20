@@ -2,10 +2,15 @@ import {
 	INDEX_CONFIG_N_GRAM,
 	VALUE_TYPE_STRING
 } from '@enonic/js-utils';
+import * as React from 'react';
 import {Button, Form, Icon, Modal, Popup} from 'semantic-ui-react';
+//@ts-ignore
 import {Form as EnonicForm} from 'semantic-ui-react-form/Form';
+//@ts-ignore
 import {Input} from 'semantic-ui-react-form/inputs/Input';
+//@ts-ignore
 import {ResetButton} from 'semantic-ui-react-form/buttons/ResetButton';
+//@ts-ignore
 import {SubmitButton} from 'semantic-ui-react-form/buttons/SubmitButton';
 //import {ValidateFormButton} from 'semantic-ui-react-form/buttons/ValidateFormButton';
 //import {VisitAllButton} from 'semantic-ui-react-form/buttons/VisitAllButton';
@@ -22,14 +27,36 @@ import {required} from '../utils/required';
 import {EditFieldTable} from './EditFieldTable';
 
 
-export function NewOrEditModal(props) {
+export function NewOrEditModal(props :{
+	// Required
+	servicesBaseUrl :string
+	// Optional
+	_id ?:string
+	afterClose ?:() => void
+	beforeOpen ?:() => void
+	disabled ?:boolean
+	initialValues ?:{
+		//description :string
+		fieldType :string
+		key :string
+		min :number
+		max :number
+		decideByType :boolean
+		enabled :boolean
+		fulltext :boolean
+		includeInAllText :boolean
+		nGram :boolean
+		path :boolean
+	}
+	usedFieldKeysObj ?:Record<string, boolean>
+}) {
 	const {
 		_id, // Props because not allowed to change
-		afterClose = () => {},
-		beforeOpen = () => {},
+		afterClose = () => {/**/},
+		beforeOpen = () => {/**/},
 		disabled = false,
 		initialValues = {
-			description: '',
+			//description: '',
 			fieldType: VALUE_TYPE_STRING,
 			key: '',
 			min: 0,
@@ -59,18 +86,20 @@ export function NewOrEditModal(props) {
 		setOpen(true);
 	};
 
-	function mustBeUnique(v) {
+	function mustBeUnique(v :string) {
 		//console.debug(`mustBeUnique(${v}) usedFieldKeysObj:`, usedFieldKeysObj, ` usedFieldKeysObj[${v}]:`, usedFieldKeysObj[v]);
 		if (usedFieldKeysObj[v]) {
 			return `Name must be unique: Name '${v}' is already in use!`;
 		}
 	}
 
-	const schema = {
+	const schema :{
+		key ?:(v :string) => undefined|false|string
+	} = {
 		//fieldType: (value) => required(value), // No need to validate this as it has a default value
 	};
 	if (!_id) { // No need to validate key on edit, since key is uneditable...
-		schema.key = (v) => required(v)
+		schema.key = (v :string) => required(v)
 			|| mustStartWithALowercaseLetter(v)
 			|| onlyLettersDigitsUnderscoresAndDots(v)
 			|| notDoubleUnderscore(v)
@@ -145,12 +174,12 @@ export function NewOrEditModal(props) {
 							path='key'
 						/>
 					</Form.Field>
-					<Form.Field>
+					{/*<Form.Field>
 						<Input
 							label={{basic: true, content: 'Description'}}
 							path='description'
 						/>
-					</Form.Field>
+					</Form.Field>*/}
 					<EditFieldTable/>
 				</Form>
 			</Modal.Content>

@@ -36,20 +36,27 @@ import {FieldSelector} from './FieldSelector';
 
 
 type NewOrEditInterfaceProps = {
-	_id? :string
-	collectionIdToFieldKeys :{}
-	collectionOptions :Array<DropdownItemProps>
-	doClose :() => void
-	globalFieldsObj :Record<string, boolean>
-	interfaceNamesObj :InterfaceNamesObj
+	// Required
 	servicesBaseUrl :string
 	stopWordOptions :Array<DropdownItemProps>
 	thesauriOptions :Array<DropdownItemProps>
+	// Optional
+	_id ?:string
+	collectionIdToFieldKeys ?:Record<string,Array<string>>
+	collectionOptions ?:Array<DropdownItemProps>
+	doClose ?:() => void
+	globalFieldsObj ?:Record<string, true>
+	interfaceNamesObj ?:InterfaceNamesObj
 }
 
 
 export function NewOrEditInterface(props :NewOrEditInterfaceProps) {
 	const {
+		// Required
+		servicesBaseUrl,
+		stopWordOptions,
+		thesauriOptions,
+		// Optional
 		_id, // nullable
 		collectionIdToFieldKeys = {},
 		collectionOptions = [],
@@ -57,10 +64,7 @@ export function NewOrEditInterface(props :NewOrEditInterfaceProps) {
 		globalFieldsObj = {
 			'_allText': true // TODO Hardcode
 		},
-		interfaceNamesObj = {},
-		servicesBaseUrl,
-		stopWordOptions,
-		thesauriOptions
+		interfaceNamesObj = {}
 	} = props;
 	//console.debug('NewOrEditInterface collectionOptions', collectionOptions);
 	//console.debug('NewOrEditInterface stopWordOptions', stopWordOptions);
@@ -95,7 +99,10 @@ export function NewOrEditInterface(props :NewOrEditInterfaceProps) {
 				_id
 			}
 		});
-	}, []);
+	}, [
+		_id,
+		servicesBaseUrl
+	]);
 
 	const {
 		initialValues,

@@ -7,11 +7,13 @@ import {
 
 export const Panel = (props :{
 	children :unknown
-	title :string
+	fluid ?:boolean
+	title ?:string
 }) => {
 	//console.debug('props', props);
 	const {
 		children,
+		fluid = false,
 		title = '',
 		...rest
 	} = props;
@@ -21,6 +23,7 @@ export const Panel = (props :{
 	return <Accordion {...rest}>
 		<Accordion.Title
 			active={active}
+			fluid={fluid}
 			onClick={(
 				//@ts-ignore
 				syntheticEvent,

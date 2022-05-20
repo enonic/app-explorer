@@ -1,3 +1,6 @@
+import type {InterfaceField} from '/lib/explorer/types/index.d';
+
+
 import {getIn} from '@enonic/js-utils';
 import {Button, Form, Icon, Table} from 'semantic-ui-react';
 import {
@@ -10,16 +13,23 @@ import {
 	MoveDownButton,
 	MoveUpButton,
 	SetValueButton
+	//@ts-ignore
 } from 'semantic-ui-react-form';
-
 import {DEFAULT_INTERFACE_FIELDS} from '../../../constants';
 
 
-
-export function FieldSelector(props) {
+export function FieldSelector(props :{
+	collectionIdToFieldKeys ?:Record<string,Array<string>>
+	disabled ?:boolean
+	globalFieldsObj ?:Record<string,true>
+	name ?:string
+	parentPath ?:string
+	path ?:string
+	value ?:Array<InterfaceField>
+}) {
 
 	const [context/*, dispatch*/] = getEnonicContext();
-	const collectionIds = getIn(context.values, 'collectionIds') || [];
+	const collectionIds :Array<string> = getIn(context.values, 'collectionIds') || [];
 
 	const {
 		collectionIdToFieldKeys = {},
@@ -102,7 +112,7 @@ export function FieldSelector(props) {
 			<Table.Body>
 				<List
 					path={path}
-					render={(fieldsArray) => fieldsArray.map(({
+					render={(fieldsArray :Array<InterfaceField>) => fieldsArray.map(({
 						//boost,
 						name
 					}, index) => {

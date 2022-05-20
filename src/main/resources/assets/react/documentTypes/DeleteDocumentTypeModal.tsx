@@ -67,7 +67,11 @@ export function DeleteDocumentTypeModal({
 				<>
 					<Input
 						error={!deleteNameMatches}
-						onChange={(event, {value}) => {
+						onChange={(
+							//@ts-ignore
+							event,
+							{value}
+						) => {
 							setDeleteNameMatches(_name === value);
 							setTypedDocumentTypeName(value);
 						}}

@@ -16,9 +16,13 @@ import {
 import {
 	Input, Popup, Table
 } from 'semantic-ui-react';
+//@ts-ignore
 import {setValue} from 'semantic-ui-react-form';
+//@ts-ignore
 import {getEnonicContext} from 'semantic-ui-react-form/Context';
+//@ts-ignore
 import {Checkbox as EnonicCheckbox} from 'semantic-ui-react-form/inputs/Checkbox';
+//@ts-ignore
 import {Dropdown as EnonicDropdown} from 'semantic-ui-react-form/inputs/Dropdown';
 
 
@@ -149,7 +153,11 @@ export const EditFieldTable = () => {
 					<Input
 						min={0}
 						name='min'
-						onChange={(event, {value: newMinString}) => {
+						onChange={(
+							//@ts-ignore
+							event,
+							{value: newMinString}
+						) => {
 							const newMinInt = parseInt(newMinString);
 							if (newMinInt > max && max !== 0) {
 								dispatch(setValue({
@@ -170,7 +178,11 @@ export const EditFieldTable = () => {
 					<Input
 						min={0}
 						name='max'
-						onChange={(event, {value: newMaxString}) => {
+						onChange={(
+							//@ts-ignore
+							event,
+							{value: newMaxString}
+						) => {
 							const newMaxInt = parseInt(newMaxString);
 							if (newMaxInt !== 0 && newMaxInt < min) {
 								dispatch(setValue({

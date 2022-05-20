@@ -1,5 +1,5 @@
+import * as React from 'react';
 import {Button, Icon, Input, Message, Modal} from 'semantic-ui-react';
-
 import {fetchInterfaceDelete} from '../../../services/graphQL/fetchers/fetchInterfaceDelete';
 
 
@@ -43,7 +43,11 @@ export function DeleteModal({
 		<Modal.Content>
 			<Input
 				error={!deleteNameMatches}
-				onChange={(event, {value}) => {
+				onChange={(
+					//@ts-ignore
+					event,
+					{value}
+				) => {
 					//console.debug({name, value});
 					setDeleteNameMatches(_name === value);
 					setTypedInterfaceName(value);

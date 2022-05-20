@@ -3,16 +3,19 @@ import classNames from 'classnames';
 import moment from 'moment';
 import prettyMs from 'pretty-ms';
 //import {toStr} from './utils/toStr';
+import * as React from 'react';
 import {Dropdown, Form, Header, Table} from 'semantic-ui-react';
 
 import {useInterval} from './utils/useInterval';
 
 
+type TaskState = 'RUNNING'|'FINISHED'|'WAITING'|'FAILED';
+
+
 const FORMAT = 'YYYY-MM-DD hh:mm:ss';
 
 
-
-function taskStateToProgressClassName(state) {
+function taskStateToProgressClassName(state :TaskState) {
 	switch (state) {
 	case 'RUNNING': return 'active';
 	case 'FINISHED': return 'success';
@@ -23,7 +26,9 @@ function taskStateToProgressClassName(state) {
 }
 
 
-export function Status (props) {
+export function Status (props :{
+	servicesBaseUrl :string
+}) {
 	const {
 		//setTasks, // Application wide state has side-effects :(
 		//tasks, // Application wide state has side-effects :(
@@ -174,7 +179,7 @@ export function Status (props) {
 		updateTasks();
 	}, delay);
 
-	const sortGen = (c) => () => {
+	const sortGen = (c :string) => () => {
 		setState(prev => {
 			const deref = JSON.parse(JSON.stringify(prev));
 			if(c === prev.column) {
@@ -286,17 +291,17 @@ export function Status (props) {
 
 							<Table.Cell>{moment(new Date(startTime)).format(FORMAT)}</Table.Cell>
 							<Table.Cell>{prettyMs(durationMs, {
-								//formatSubMs: true,
-								separateMs: true
+								//formatSubMilliseconds: true,
+								separateMilliseconds: true
 							})}</Table.Cell>
 
 							<Table.Cell>{prettyMs(averageMs, {
-								//formatSubMs: true,
-								separateMs: true
+								//formatSubMilliseconds: true,
+								separateMilliseconds: true
 							})}</Table.Cell>
 							<Table.Cell>{state === 'RUNNING' ? prettyMs(remainingMs, {
-								//formatSubMs: true,
-								separateMs: true
+								//formatSubMilliseconds: true,
+								separateMilliseconds: true
 							}) : null}</Table.Cell>
 							<Table.Cell>{state === 'RUNNING' ? moment(new Date(etaMs)).format(FORMAT) : null}</Table.Cell>
 							{/* End time */}
@@ -332,7 +337,11 @@ export function Status (props) {
 				<Dropdown
 					fluid
 					selection
-					onChange={(ignored,{value}) => setDelay(value)}
+					onChange={(
+						//@ts-ignore
+						event,
+						{value}
+					) => setDelay(value as number)}
 					options={[{
 						key: 1000,
 						text: 'second',
