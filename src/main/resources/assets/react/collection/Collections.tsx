@@ -65,6 +65,7 @@ export function Collections(props :{
 		column,
 		contentTypeOptions,
 		direction,
+		durationSinceLastUpdate,
 		fieldsObj,
 		intInitializedCollectorComponents,
 		isLoading,
@@ -124,6 +125,13 @@ export function Collections(props :{
 								}}
 								toggle
 							/>
+						</Table.Cell>
+						<Table.Cell collapsing>
+							<Button
+								basic
+								color='blue'
+								loading={isLoading}
+								onClick={memoizedFetchOnUpdate}>Last updated: {durationSinceLastUpdate}</Button>
 						</Table.Cell>
 					</Table.Row>
 				</Table.Body>

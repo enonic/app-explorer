@@ -8,6 +8,7 @@ import type {
 } from './index.d';
 
 import {COLON_SIGN} from '@enonic/js-utils';
+import moment from 'moment';
 import * as React from 'react';
 import {useInterval} from '../utils/useInterval';
 
@@ -153,6 +154,9 @@ export function useCollectionsState({
 	collectorComponents :CollectorComponents
 	servicesBaseUrl :string
 }) {
+	const [updatedAt, setUpdatedAt] = React.useState(moment());
+	const [durationSinceLastUpdate, setDurationSinceLastUpdate] = React.useState('');
+
 	const [boolPoll, setBoolPoll] = React.useState(true);
 	const [jobsObj, setJobsObj] = React.useState({});
 	const [locales, setLocales] = React.useState([]);
@@ -172,6 +176,7 @@ export function useCollectionsState({
 		total: 0
 	});
 	const [documentTypes, setDocumentTypes] = React.useState([]);
+
 	const [showCollector, setShowCollector] = React.useState(false);
 	const [showDelete, setShowDelete] = React.useState(false);
 	const [showDocumentCount/*, setShowDocumentCount*/] = React.useState(true);
@@ -285,7 +290,14 @@ export function useCollectionsState({
 		siteOptions
 	} = state;
 
-	function setJobsObjFromArr(arr) {
+	function setJobsObjFromArr(arr :Array<{
+		collectionId :string
+		enabled :boolean
+		schedule :{
+			type :string
+			value :string
+		}
+	}>) {
 		const obj={};
 		arr.forEach(({
 			collectionId,
@@ -324,6 +336,7 @@ export function useCollectionsState({
 					setJobsObjFromArr(res.data.listScheduledJobs);
 					setDocumentTypes(res.data.queryDocumentTypes.hits);
 					setTasks(res.data.queryTasks);
+					setUpdatedAt(moment());
 				} // if
 			}); // then
 	}, [
@@ -345,6 +358,7 @@ export function useCollectionsState({
 					setJobsObjFromArr(res.data.listScheduledJobs);
 					setDocumentTypes(res.data.queryDocumentTypes.hits);
 					setTasks(res.data.queryTasks);
+					setUpdatedAt(moment());
 				}
 			});
 	}, [
@@ -388,10 +402,26 @@ export function useCollectionsState({
 		memoizedFetchOnMount
 	]); // Only once
 
+	React.useEffect(() => {
+		setDurationSinceLastUpdate(
+			moment
+				.duration(updatedAt.diff(moment()))
+				.humanize()
+		);
+	}, [
+		updatedAt
+	]);
+
 	useInterval(() => {
 		// This will continue to run as long as the Collections "tab" is open
 		if (boolPoll) {
-			memoizedFetchOnUpdate();
+			//memoizedFetchOnUpdate();
+			memoizedFetchTasks();
+			setDurationSinceLastUpdate(
+				moment
+					.duration(updatedAt.diff(moment()))
+					.humanize()
+			);
 		}
 	}, 2500);
 
@@ -408,6 +438,7 @@ export function useCollectionsState({
 		column,
 		contentTypeOptions,
 		direction,
+		durationSinceLastUpdate,
 		fieldsObj,
 		intInitializedCollectorComponents,
 		isLoading,
