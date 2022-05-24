@@ -2,11 +2,10 @@ import * as React from 'react';
 import {Form, Header} from 'semantic-ui-react';
 import {
 	Form as EnonicForm,
-	ResetButton,
-	SubmitButton
+	ResetButton
 	//@ts-ignore
 } from 'semantic-ui-react-form';
-
+import { ButtonSave } from './components/ButtonSave';
 import {Emails} from './notifications/Emails';
 
 
@@ -42,7 +41,10 @@ export function Notifications(props) {
 			>
 				<Emails/>
 				<Form.Field>
-					<SubmitButton/>
+					<ButtonSave
+						enonicForm
+						type='submit'
+					/>
 					<ResetButton/>
 				</Form.Field>
 			</EnonicForm>

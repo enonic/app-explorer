@@ -38,7 +38,7 @@
     "serialize-javascript": "5.0.1",
     "set-value": "^4",
     "snowball": "^0",
-    "traverse": "^0",
+    "traverse": "^0.6.6",
     "yup": "^0"
   },
   "devDependencies": {
