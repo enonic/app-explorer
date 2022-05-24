@@ -373,7 +373,8 @@ export function Explorer(props :{
 				setLicenseValid={setLicenseValid}
 			/>
 		</Menu>
-		<Sidebar.Pushable>
+		<Sidebar.Pushable
+			id='explorerPushable'>
 			<Sidebar
 				as={Menu}
 				id='mySidebar'
