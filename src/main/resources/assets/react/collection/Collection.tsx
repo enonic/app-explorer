@@ -27,7 +27,7 @@ import {
 	ResetButton,
 	SubmitButton
 	//@ts-ignore
-} from 'semantic-ui-react-form';
+} from '@enonic/semantic-ui-react-form';
 
 import {GQL_MUTATION_CREATE_COLLECTION} from '../../../services/graphQL/collection/mutationCreateCollection';
 import {GQL_MUTATION_UPDATE_COLLECTION} from '../../../services/graphQL/collection/mutationUpdateCollection';

@@ -636,7 +636,15 @@ const CLIENT_ES_CONFIG = {
 			//'/lib/explorer': path.resolve(__dirname, '../lib-explorer/src/main/resources/lib/explorer/')
 		},
 		extensions: [
-			'mjs', 'jsx', 'esm', 'es', 'es6', 'js', 'json', 'ts', 'tsx'
+			'tsx',
+			'ts',
+			'mjs',
+			'jsx',
+			'esm',
+			'es',
+			'es6',
+			'js',
+			'json'
 		].map(ext => `.${ext}`)
 	},
 	stats: STATS

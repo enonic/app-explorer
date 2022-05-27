@@ -12,18 +12,13 @@ import {
 	Loader,
 	Modal
 } from 'semantic-ui-react';
-
-//@ts-ignore
-import {Form as EnonicForm} from 'semantic-ui-react-form/Form';
-//@ts-ignore
-import {Dropdown} from 'semantic-ui-react-form/inputs/Dropdown';
-//@ts-ignore
-import {Input} from 'semantic-ui-react-form/inputs/Input';
-//@ts-ignore
-import {ResetButton} from 'semantic-ui-react-form/buttons/ResetButton';
-//@ts-ignore
-import {SubmitButton} from 'semantic-ui-react-form/buttons/SubmitButton';
-
+import {
+	Form as EnonicForm,
+	Dropdown,
+	Input,
+	ResetButton,
+	SubmitButton
+} from '@enonic/semantic-ui-react-form';
 import {DEFAULT_INTERFACE_FIELDS} from '../../../constants';
 import {fetchInterfaceCreate} from '../../../services/graphQL/fetchers/fetchInterfaceCreate';
 import {fetchInterfaceGet} from '../../../services/graphQL/fetchers/fetchInterfaceGet';

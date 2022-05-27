@@ -1,6 +1,13 @@
 import type {ApiKey} from '../../../types/ApiKey.d';
 
 
+export type ApiKeyFormValues = {
+	collections :Array<string>
+	interfaces :Array<string>
+	key ?:string
+}
+
+
 export type QueryApiKeysHit = {
 	_id :string
 	_name :string

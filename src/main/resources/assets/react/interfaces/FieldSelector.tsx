@@ -14,7 +14,7 @@ import {
 	MoveUpButton,
 	SetValueButton
 	//@ts-ignore
-} from 'semantic-ui-react-form';
+} from '@enonic/semantic-ui-react-form';
 import {DEFAULT_INTERFACE_FIELDS} from '../../../constants';
 
 

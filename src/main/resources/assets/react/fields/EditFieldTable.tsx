@@ -17,13 +17,13 @@ import {
 	Input, Popup, Table
 } from 'semantic-ui-react';
 //@ts-ignore
-import {setValue} from 'semantic-ui-react-form';
+import {setValue} from '@enonic/semantic-ui-react-form';
 //@ts-ignore
-import {getEnonicContext} from 'semantic-ui-react-form/Context';
+import {getEnonicContext} from '@enonic/semantic-ui-react-form/Context';
 //@ts-ignore
-import {Checkbox as EnonicCheckbox} from 'semantic-ui-react-form/inputs/Checkbox';
+import {Checkbox as EnonicCheckbox} from '@enonic/semantic-ui-react-form/inputs/Checkbox';
 //@ts-ignore
-import {Dropdown as EnonicDropdown} from 'semantic-ui-react-form/inputs/Dropdown';
+import {Dropdown as EnonicDropdown} from '@enonic/semantic-ui-react-form/inputs/Dropdown';
 
 
 const OPTIONS_VALUE_TYPES = [

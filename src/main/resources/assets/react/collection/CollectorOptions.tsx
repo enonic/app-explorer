@@ -9,9 +9,7 @@ import type {
 import {getIn} from '@enonic/js-utils';
 import * as React from 'react';
 import {Header, Segment} from 'semantic-ui-react';
-
-//@ts-ignore
-import {getEnonicContext} from 'semantic-ui-react-form/Context';
+import {getEnonicContext} from '@enonic/semantic-ui-react-form';
 
 
 export function CollectorOptions(props :{

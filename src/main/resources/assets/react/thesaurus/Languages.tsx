@@ -9,19 +9,19 @@ import {
 	Segment
 } from 'semantic-ui-react';
 //@ts-ignore
-import {Checkbox as EnonicCheckbox} from 'semantic-ui-react-form/inputs/Checkbox';
+import {Checkbox as EnonicCheckbox} from '@enonic/semantic-ui-react-form/inputs/Checkbox';
 //@ts-ignore
-import {Input as EnonicInput} from 'semantic-ui-react-form/inputs/Input';
+import {Input as EnonicInput} from '@enonic/semantic-ui-react-form/inputs/Input';
 //@ts-ignore
-import {List} from 'semantic-ui-react-form/List';
+import {List} from '@enonic/semantic-ui-react-form/List';
 //@ts-ignore
-import {DeleteItemButton} from 'semantic-ui-react-form/buttons/DeleteItemButton';
+import {DeleteItemButton} from '@enonic/semantic-ui-react-form/buttons/DeleteItemButton';
 //@ts-ignore
-import {InsertButton} from 'semantic-ui-react-form/buttons/InsertButton';
+import {InsertButton} from '@enonic/semantic-ui-react-form/buttons/InsertButton';
 //@ts-ignore
-import {MoveDownButton} from 'semantic-ui-react-form/buttons/MoveDownButton';
+import {MoveDownButton} from '@enonic/semantic-ui-react-form/buttons/MoveDownButton';
 //@ts-ignore
-import {MoveUpButton} from 'semantic-ui-react-form/buttons/MoveUpButton';
+import {MoveUpButton} from '@enonic/semantic-ui-react-form/buttons/MoveUpButton';
 import {LanguageDropdown} from '../collection/LanguageDropdown';
 import {Panel} from './Panel';
 

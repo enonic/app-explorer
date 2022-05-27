@@ -7,15 +7,12 @@ import type {NewOrEditState} from './index.d';
 
 
 import {Button, Form, Header, Icon, Label, Modal} from 'semantic-ui-react';
-//@ts-ignore
-import {Form as EnonicForm} from 'semantic-ui-react-form/Form';
-//@ts-ignore
-import {Input as EnonicInput} from 'semantic-ui-react-form/inputs/Input';
-//@ts-ignore
-import {ResetButton} from 'semantic-ui-react-form/buttons/ResetButton';
-//@ts-ignore
-import {SubmitButton} from 'semantic-ui-react-form/buttons/SubmitButton';
-
+import {
+	Form as EnonicForm,
+	Input as EnonicInput,
+	ResetButton,
+	SubmitButton
+} from '@enonic/semantic-ui-react-form';
 import {LanguageDropdown} from '../collection/LanguageDropdown';
 //import {EditSynonyms} from './EditSynonyms';
 import {UploadLicense} from '../UploadLicense';

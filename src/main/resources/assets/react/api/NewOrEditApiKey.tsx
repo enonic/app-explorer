@@ -1,4 +1,7 @@
-import type {QueryApiKeysHits} from './index.d';
+import type {
+	ApiKeyFormValues,
+	QueryApiKeysHits
+} from './index.d';
 
 
 import {fold} from '@enonic/js-utils';
@@ -11,15 +14,12 @@ import {
 	Modal
 } from 'semantic-ui-react';
 import {
+	Dropdown,
 	Form as EnonicForm,
 	Input as EnonicInput,
 	//ResetButton,
 	SubmitButton
-	//@ts-ignore
-} from 'semantic-ui-react-form';
-//@ts-ignore
-import {Dropdown} from 'semantic-ui-react-form/inputs/Dropdown';
-
+} from '@enonic/semantic-ui-react-form';
 import {GQL_MUTATION_API_KEY_CREATE} from '../../../services/graphQL/mutations/apiKeyCreateMutation';
 import {GQL_MUTATION_API_KEY_UPDATE} from '../../../services/graphQL/mutations/apiKeyUpdateMutation';
 import {useNewOrEditApiKeyState} from './useNewOrEditApiKeyState';
@@ -48,10 +48,7 @@ export const NewOrEditApiKey = (props :{
 	// Optional
 	_id ?:string
 	_name ?:string
-	initialValues ?:{
-		collections :Array<string>
-		interfaces :Array<string>
-	}
+	initialValues ?:ApiKeyFormValues
 }) => {
 	//console.debug('props', props);
 	const {
@@ -83,7 +80,7 @@ export const NewOrEditApiKey = (props :{
 		servicesBaseUrl
 	});
 
-	return <EnonicForm
+	return <EnonicForm<ApiKeyFormValues>
 		initialValues={initialValues}
 		onSubmit={(values) => {
 			//console.debug('onSubmit values', values);

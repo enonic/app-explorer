@@ -5,7 +5,7 @@ import {
 	ResetButton,
 	SubmitButton
 	//@ts-ignore
-} from 'semantic-ui-react-form';
+} from '@enonic/semantic-ui-react-form';
 
 import {Emails} from './notifications/Emails';
 

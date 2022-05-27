@@ -4,11 +4,10 @@ import {
 	Dropdown,
 	Header
 } from 'semantic-ui-react';
-
-//@ts-ignore
-import {getEnonicContext} from 'semantic-ui-react-form/Context';
-//@ts-ignore
-import {setValue} from 'semantic-ui-react-form/actions';
+import {
+	getEnonicContext,
+	setValue
+} from '@enonic/semantic-ui-react-form';
 
 
 const GQL_DOCUMENT_TYPE_QUERY = `{

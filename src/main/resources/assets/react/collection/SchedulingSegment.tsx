@@ -9,11 +9,9 @@ import {
 	InsertButton,
 	List,
 	MoveDownButton,
-	MoveUpButton
-	//@ts-ignore
-} from 'semantic-ui-react-form';
-//@ts-ignore
-import {getEnonicContext} from 'semantic-ui-react-form/Context';
+	MoveUpButton,
+	getEnonicContext
+} from '@enonic/semantic-ui-react-form';
 
 
 export function SchedulingSegment(/*props*/) {

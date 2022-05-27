@@ -48,7 +48,8 @@
 			"@enonic/app-explorer/*": ["./src/main/resources/*"],
 			//"@enonic/js-utils": ["node_modules/@enonic/js-utils/src"],
 			"@enonic/js-utils": ["../enonic-js-utils/src"],
-			"/lib/explorer/*": ["../lib-explorer/src/main/resources/lib/explorer/*"]
+			"/lib/explorer/*": ["../lib-explorer/src/main/resources/lib/explorer/*"],
+			"@enonic/semantic-ui-react-form": ["../semantic-ui-react-form/src"]
 		},
 		"preserveWatchOutput": false,
 		"pretty": true,
@@ -61,6 +62,12 @@
 			//"node_modules", // Does not help
 			"test"
 		],
+
+		// Even though the setting disables type checking for d.ts files,
+		// TypeScript still type checks the code you specifically
+		// refer to in your application's source code.
+		"skipLibCheck": true, // Disable type checking for node_modules
+
 		"sourceMap": false,
 		"strict": false,
 		"strictNullChecks": false,

@@ -2,11 +2,10 @@ import {
 	Button,
 	Icon
 } from 'semantic-ui-react';
-
-//@ts-ignore
-import {setValue} from 'semantic-ui-react-form';
-//@ts-ignore
-import {getEnonicContext} from 'semantic-ui-react-form/Context';
+import {
+	getEnonicContext,
+	setValue
+} from '@enonic/semantic-ui-react-form';
 
 
 function makeKey({
@@ -23,11 +22,7 @@ function makeKey({
 
 
 export const GenerateKeyButton = () => {
-	const [
-		//@ts-ignore
-		context, //eslint-disable-line @typescript-eslint/no-unused-vars
-		dispatch
-	] = getEnonicContext(); // eslint-disable-line no-unused-vars
+	const [_context,dispatch] = getEnonicContext();
 	return <Button
 		icon
 		onClick={() => {

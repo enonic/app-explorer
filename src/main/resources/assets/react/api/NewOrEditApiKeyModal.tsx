@@ -1,4 +1,7 @@
-import type {QueryApiKeysHits} from './index.d';
+import type {
+	ApiKeyFormValues,
+	QueryApiKeysHits
+} from './index.d';
 
 
 import * as React from 'react';
@@ -21,10 +24,7 @@ export const NewOrEditApiKeyModal = (props :{
 	_name ?:string
 	afterClose :() => void
 	beforeOpen :() => void
-	initialValues ?:{
-		collections :Array<string>
-		interfaces :Array<string>
-	}
+	initialValues ?:ApiKeyFormValues
 }) => {
 	//console.debug('props', props);
 	const {

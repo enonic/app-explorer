@@ -6,27 +6,19 @@ import {
 } from 'semantic-ui-react';
 
 
-//@ts-ignore
-import {Form as EnonicForm} from 'semantic-ui-react-form/Form';
-//@ts-ignore
-import {Input as EnonicInput} from 'semantic-ui-react-form/inputs/Input';
-//@ts-ignore
-import {List} from 'semantic-ui-react-form/List';
-//@ts-ignore
-import {DeleteItemButton} from 'semantic-ui-react-form/buttons/DeleteItemButton';
-//@ts-ignore
-import {InsertButton} from 'semantic-ui-react-form/buttons/InsertButton';
-//@ts-ignore
-import {MoveDownButton} from 'semantic-ui-react-form/buttons/MoveDownButton';
-//@ts-ignore
-import {MoveUpButton} from 'semantic-ui-react-form/buttons/MoveUpButton';
-//@ts-ignore
-import {ResetButton} from 'semantic-ui-react-form/buttons/ResetButton';
-//@ts-ignore
-import {SortButton} from 'semantic-ui-react-form/buttons/SortButton';
-//@ts-ignore
-import {SubmitButton} from 'semantic-ui-react-form/buttons/SubmitButton';
-//import {ValidateFormButton} from 'semantic-ui-react-form/buttons/ValidateFormButton';
+import {
+	Form as EnonicForm,
+	Input as EnonicInput,
+	List,
+	DeleteItemButton,
+	InsertButton,
+	MoveDownButton,
+	MoveUpButton,
+	ResetButton,
+	SortButton,
+	SubmitButton,
+	//ValidateFormButton
+} from '@enonic/semantic-ui-react-form';
 
 
 // NOTE: Must resolve transpile- and bundle- time.

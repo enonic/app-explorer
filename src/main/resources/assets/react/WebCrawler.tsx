@@ -18,7 +18,7 @@ import {
 	MoveUpButton,
 	SetValueButton
 	//@ts-ignore
-} from 'semantic-ui-react-form';
+} from '@enonic/semantic-ui-react-form';
 
 const DEFAULT_UA = 'Mozilla/5.0 (compatible; Enonic XP Explorer Collector Web crawler/1.0.0)';
 

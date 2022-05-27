@@ -5,15 +5,15 @@ import {
 import * as React from 'react';
 import {Button, Form, Icon, Modal, Popup} from 'semantic-ui-react';
 //@ts-ignore
-import {Form as EnonicForm} from 'semantic-ui-react-form/Form';
+import {Form as EnonicForm} from '@enonic/semantic-ui-react-form/Form';
 //@ts-ignore
-import {Input} from 'semantic-ui-react-form/inputs/Input';
+import {Input} from '@enonic/semantic-ui-react-form/inputs/Input';
 //@ts-ignore
-import {ResetButton} from 'semantic-ui-react-form/buttons/ResetButton';
+import {ResetButton} from '@enonic/semantic-ui-react-form/buttons/ResetButton';
 //@ts-ignore
-import {SubmitButton} from 'semantic-ui-react-form/buttons/SubmitButton';
-//import {ValidateFormButton} from 'semantic-ui-react-form/buttons/ValidateFormButton';
-//import {VisitAllButton} from 'semantic-ui-react-form/buttons/VisitAllButton';
+import {SubmitButton} from '@enonic/semantic-ui-react-form/buttons/SubmitButton';
+//import {ValidateFormButton} from '@enonic/semantic-ui-react-form/buttons/ValidateFormButton';
+//import {VisitAllButton} from '@enonic/semantic-ui-react-form/buttons/VisitAllButton';
 
 import {GQL_MUTATION_FIELD_CREATE} from '../../../services/graphQL/mutations/fieldCreateMutation';
 import {GQL_MUTATION_FIELD_UPDATE} from '../../../services/graphQL/mutations/fieldUpdateMutation';

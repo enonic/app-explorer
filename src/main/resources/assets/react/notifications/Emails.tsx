@@ -7,11 +7,9 @@ import {
 	List,
 	MoveDownButton,
 	MoveUpButton,
-	SetValueButton
-	//@ts-ignore
-} from 'semantic-ui-react-form';
-//@ts-ignore
-import {getEnonicContext} from 'semantic-ui-react-form/Context';
+	SetValueButton,
+	getEnonicContext
+} from '@enonic/semantic-ui-react-form';
 
 
 export function Emails(props :{

@@ -1,13 +1,12 @@
 import type {Locales} from '../index.d';
 
+import {getIn} from '@enonic/js-utils';
 //import {Dropdown as SemanticUiReactDropdown} from 'semantic-ui-react';
 //import {Flag} from 'semantic-ui-react';
-//@ts-ignore
-import {Dropdown} from 'semantic-ui-react-form';
-//@ts-ignore
-import {getEnonicContext} from 'semantic-ui-react-form/Context';
-import {getIn} from '@enonic/js-utils';
-
+import {
+	Dropdown,
+	getEnonicContext
+} from '@enonic/semantic-ui-react-form';
 import {capitalize} from '../utils/capitalize';
 
 

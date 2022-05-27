@@ -3,11 +3,10 @@ import type {DropdownItemProps} from 'semantic-ui-react/index.d';
 
 import {getIn} from '@enonic/js-utils';
 import {Dropdown as SemanticUiReactDropdown} from 'semantic-ui-react';
-
-//@ts-ignore
-import {getEnonicContext} from 'semantic-ui-react-form/Context';
-//@ts-ignore
-import {setValue} from 'semantic-ui-react-form/actions';
+import {
+	getEnonicContext,
+	setValue
+} from '@enonic/semantic-ui-react-form';
 
 
 export function CollectorSelector(props :{
