@@ -50,6 +50,8 @@ import {generateQueryCollectorsField} from './collector/generateQueryCollectorsF
 import {generateFieldsField} from './field/generateFieldsField';
 import {addQueryFieldGet} from './field/addQueryFieldGet';
 
+import {addQueryDocuments} from './document/addQueryDocuments';
+
 import {addInterfaceTypes as addExplorerInterfaceTypes} from './interface/addInterfaceTypes';
 import {addMutationInterfaceCreate} from './interface/addMutationInterfaceCreate';
 import {addMutationInterfaceDelete} from './interface/addMutationInterfaceDelete';
@@ -161,6 +163,8 @@ const {
 	reindexCollectionsField,
 	updateCollectionField
 } = generateCollectionFields({glue});
+
+addQueryDocuments({glue});
 
 const {
 	createDocumentTypeField,

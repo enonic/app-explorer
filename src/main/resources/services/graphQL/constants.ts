@@ -27,6 +27,8 @@ export const GQL_TYPE_COLLECTION_NAME = 'Collection';
 export const GQL_TYPE_COLLECTION_REINDEX_REPORT = 'CollectionReindexReport';
 export const GQL_TYPE_COLLECTIONS_QUERY_RESULT = 'CollectionsQueryResult';
 
+export const GQL_TYPE_DOCUMENT_NAME = 'Document';
+export const GQL_TYPE_DOCUMENT_QUERY_RESULT_NAME = 'DocumentQueryResult';
 export const GQL_TYPE_DOCUMENT_TYPE_NAME = 'DocumentType';
 export const GQL_TYPE_DOCUMENT_TYPE_QUERY_RESULT_NAME = 'DocumentTypeQueryResult';
 
@@ -75,6 +77,7 @@ export const GQL_MUTATION_STOP_WORDS_UPDATE_NAME = 'updateStopWords';
 
 // Query field names
 
+export const GQL_QUERY_DOCUMENTS = 'queryDocuments';
 export const GQL_QUERY_EXPLORER_REPO_NODES_GET_NAME = 'getExplorerRepoNodes';
 export const GQL_QUERY_INTERFACE_GET_NAME = 'getInterface';
 export const GQL_QUERY_FIELD_GET_NAME = 'getField';
