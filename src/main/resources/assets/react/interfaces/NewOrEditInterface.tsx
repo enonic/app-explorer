@@ -30,6 +30,15 @@ import {required} from '../utils/required';
 import {FieldSelector} from './FieldSelector';
 
 
+/* TODO
+ 1. How many documents per collection
+    - Could make a count query per collection repo, but
+	- Multirepoconnection aggregation on document_metadata.collection  (nodeType/document_metadata.documentType)
+ 2. How many documents with field across all collections (when none selected)
+ 3. How many documents with field across selected collections
+*/
+
+
 type NewOrEditInterfaceProps = {
 	// Required
 	servicesBaseUrl :string
