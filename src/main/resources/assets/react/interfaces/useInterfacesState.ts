@@ -4,6 +4,14 @@ import type {InterfaceNamesObj} from './index.d';
 import * as React from 'react';
 
 
+type Collection = {
+	_id :string
+	_name :string
+	documentTypeId :string
+	docCount ?:number
+}
+
+
 const GQL_COLLECTIONS = `queryCollections(
 	perPage: -1
 ) {
@@ -13,6 +21,25 @@ const GQL_COLLECTIONS = `queryCollections(
 		documentTypeId
 	}
 }`;
+
+const GQL_DOCUMENTS = `queryDocuments(
+    aggregations: [{
+    	name: "collections"
+    	terms: {
+			field: collectionName
+		}
+	}]
+    count: 0
+)
+{
+	aggregations {
+		name
+		buckets {
+			docCount
+			key
+    	}
+    }
+}`
 
 const GQL_DOCUMENT_TYPES = `queryDocumentTypes {
 	hits {
@@ -72,6 +99,7 @@ const GQL_THESAURI = `queryThesauri {
 
 const GQL_ALL = `{
 	${GQL_COLLECTIONS}
+	${GQL_DOCUMENTS}
 	${GQL_DOCUMENT_TYPES}
 	${GQL_FIELDS}
 	${GQL_INTERFACES}
@@ -90,7 +118,7 @@ export function useInterfacesState({
 	//const [boolIsLoadingService, setboolIsLoadingService] = React.useState(false);
 	//const [boolIsLoadingAnything, setboolIsLoadingAnything] = React.useState(false);
 
-	const [collections, setCollections] = React.useState([]);
+	const [collections, setCollections] = React.useState<Array<Collection>>([]);
 	const [collectionIdToFieldKeys, setCollectionIdToFieldKeys] = React.useState({});
 	const [globalFieldsObj/*, setGlobalFieldsObj*/] = React.useState({
 		'_allText': true // TODO: Hardcode
@@ -129,6 +157,15 @@ export function useInterfacesState({
 							_id :string
 							_name :string
 							documentTypeId :string
+						}>
+					}
+					queryDocuments :{
+						aggregations :Array<{
+							name :'collections'//string
+							buckets :Array<{
+								key :string
+								docCount :number
+							}>
 						}>
 					}
 					queryDocumentTypes :{
@@ -191,6 +228,28 @@ export function useInterfacesState({
 				setGlobalFieldsObj(newGlobalFieldsObj);*/
 				//console.debug('fieldIdToKey', fieldIdToKey);
 
+				const collectionNameToDocCount = {};
+				if (data.queryDocuments.aggregations && data.queryDocuments.aggregations.length) {
+					for (let i = 0; i < data.queryDocuments.aggregations.length; i++) {
+					    const aggregation = data.queryDocuments.aggregations[i];
+						const {
+							name,
+							buckets
+						} = aggregation;
+						if (name === 'collections') {
+							for (let i = 0; i < buckets.length; i++) {
+							    const bucket = buckets[i];
+								const {
+									docCount,
+									key
+								} = bucket;
+								collectionNameToDocCount[key] = docCount;
+							} // for buckets
+						} // if name === collections
+					} // for aggregations
+				} // if aggregations
+				//console.debug('collectionNameToDocCount', collectionNameToDocCount);
+
 				const documentTypeIdToFieldKeys :Record<string,Array<string>> = {};
 				const documentTypeIdToFields :Record<string,Array<{
 					active :boolean
@@ -231,15 +290,22 @@ export function useInterfacesState({
 				});
 				//console.debug('documentTypeIdToFieldKeys', documentTypeIdToFieldKeys);
 
-				setCollections(data.queryCollections.hits);
 				//const collectionIdToDocumentTypeIds = {};
 				const collectionIdToFieldKeys = {};
 				const collectionIdToName = {};
+				const collections = []
 				data.queryCollections.hits.forEach(({_id, _name, documentTypeId}) => {
 					//collectionIdToDocumentTypeIds[_id] = documentTypeId;
 					collectionIdToFieldKeys[_id] = documentTypeIdToFieldKeys[documentTypeId];
 					collectionIdToName[_id] = _name;
+					collections.push({
+						_id,
+						_name,
+						documentTypeId,
+						docCount: collectionNameToDocCount[_name] ? collectionNameToDocCount[_name] : 0
+					});
 				});
+				setCollections(collections);
 				//console.debug('collectionIdToDocumentTypeIds', collectionIdToDocumentTypeIds);
 				//console.debug('collectionIdToFieldKeys', collectionIdToFieldKeys);
 				setCollectionIdToFieldKeys(collectionIdToFieldKeys);
@@ -348,11 +414,15 @@ export function useInterfacesState({
 	);*/
 
 	const collectionIdToName = {};
-	const collectionOptions = collections.map(({_id, _name}) => {
+	const collectionOptions = collections.map(({
+		_id,
+		_name,
+		docCount = 0
+	}) => {
 		collectionIdToName[_id] = _name;
 		return {
 			key: _id,
-			text: _name,
+			text: `${_name} (${docCount})`,
 			value: _id
 		};
 	});
