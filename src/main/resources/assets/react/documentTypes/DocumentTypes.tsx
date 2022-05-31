@@ -54,12 +54,7 @@ export function DocumentTypes({
 	// The modal state should be handled by newOrEditDocumentTypeModal
 	const [newOrEditModalState, setNewOrEditModalState] = React.useState<DocumentTypeModal>(getDefaultModalState());
 
-	const [showAddFields, setShowAddFields] = React.useState(false);
-	const [showCollections, setShowCollections] = React.useState(false);
-	const [showDocumentsPerCollection, setShowDocumentsPerCollection] = React.useState(false);
-	const [showDetails/*, setShowDetails*/] = React.useState(false);
-	const [showInterfaces, setShowInterfaces] = React.useState(false);
-	const [showManagedBy, setShowManagedBy] = React.useState(false);
+	const [showAllFields, setShowAllFields] = React.useState(false);
 	//console.debug('DocumentTypes documentTypes', documentTypes);
 
 	/*const globalFieldsObj = {};
@@ -139,18 +134,13 @@ export function DocumentTypes({
 								<Table.Cell collapsing>
 									<Radio
 										label={'Show all fields'}
-										checked={showCollections}
+										checked={showAllFields}
 										onChange={(
 											//@ts-ignore
 											ignored,
 											{ checked }
 										) => {
-											setShowCollections(checked);
-											setShowInterfaces(checked);
-											setShowAddFields(checked);
-											setShowDocumentsPerCollection(checked);
-											//setShowDetails(checked);
-											setShowManagedBy(checked);
+											setShowAllFields(checked);
 										}}
 										toggle
 									/>
@@ -175,16 +165,20 @@ export function DocumentTypes({
 				<Table.Row>
 					<Table.HeaderCell>Edit</Table.HeaderCell>
 					<Table.HeaderCell>Name</Table.HeaderCell>
-					{showCollections ? <Table.HeaderCell>Used in collections</Table.HeaderCell> : null}
-					{showInterfaces ? <Table.HeaderCell>Used in interfaces</Table.HeaderCell> : null}
+					{showAllFields ? <Table.HeaderCell>Used in collections</Table.HeaderCell> : null}
+					{showAllFields ? <Table.HeaderCell>Used in interfaces</Table.HeaderCell> : null}
 					<Table.HeaderCell textAlign='right'>Documents</Table.HeaderCell>
-					{showDocumentsPerCollection ? <Table.HeaderCell>Documents per collection</Table.HeaderCell> : null}
+					{showAllFields ? <Table.HeaderCell>Documents per collection</Table.HeaderCell> : null}
 					<Table.HeaderCell textAlign='right'>Field count</Table.HeaderCell>
 					<Table.HeaderCell>Fields</Table.HeaderCell>
-					{showAddFields ? <Table.HeaderCell>Add fields</Table.HeaderCell> : null}
-					{showManagedBy ? <Table.HeaderCell>Managed by</Table.HeaderCell> : null}
-					{showDetails ? <Table.HeaderCell>Details</Table.HeaderCell> : null}
-					<Table.HeaderCell>Delete</Table.HeaderCell>
+					{showAllFields ?
+						<>
+							<Table.HeaderCell>Add fields</Table.HeaderCell>
+							<Table.HeaderCell>Managed by</Table.HeaderCell>
+							<Table.HeaderCell>Delete</Table.HeaderCell>
+						</>
+						: null}
+					{/* {showDetails ? <Table.HeaderCell>Details</Table.HeaderCell> : null} */}
 				</Table.Row>
 			</Table.Header>
 			<Table.Body>
@@ -222,13 +216,13 @@ export function DocumentTypes({
 						</Table.Cell>
 						<Table.Cell collapsing disabled={isLoading}>{_name}</Table.Cell>
 
-						{showCollections ? <Table.Cell disabled={isLoading}><ul style={{
+						{showAllFields ? <Table.Cell disabled={isLoading}><ul style={{
 							listStyleType: 'none',
 							margin: 0,
 							padding: 0
 						}}>{collectionNames.map((c, i) => <li key={i}>{c}</li>)}</ul></Table.Cell> : null}
 
-						{showInterfaces ? <Table.Cell disabled={isLoading}><ul style={{
+						{showAllFields ? <Table.Cell disabled={isLoading}><ul style={{
 							listStyleType: 'none',
 							margin: 0,
 							padding: 0
@@ -236,7 +230,7 @@ export function DocumentTypes({
 
 						<Table.Cell collapsing disabled={isLoading} textAlign='right'>{documentsInTotal}</Table.Cell>
 
-						{showDocumentsPerCollection ? <Table.Cell collapsing disabled={isLoading}>
+						{showAllFields ? <Table.Cell collapsing disabled={isLoading}>
 							<ul style={{
 								listStyleType: 'none',
 								margin: 0,
@@ -250,11 +244,38 @@ export function DocumentTypes({
 						<Table.Cell collapsing disabled={isLoading} textAlign='right'>{activeProperties.length}</Table.Cell>
 						<Table.Cell collapsing disabled={isLoading}>{activePropertyNames.sort().join(', ')}</Table.Cell>
 
-						{showAddFields ? <Table.Cell collapsing disabled={isLoading}>{addFields ? <Icon color='green' disabled={isLoading} name='checkmark' size='large'/> : <Icon color='grey' disabled={isLoading} name='x' size='large'/>}</Table.Cell> : null}
+						{showAllFields ?
+							<>
+								<Table.Cell collapsing disabled={isLoading}>
+									{addFields ?
+										<Icon color='green' disabled={isLoading} name='checkmark' size='large'/>
+										: <Icon color='grey' disabled={isLoading} name='x' size='large'/>}
+								</Table.Cell>
+								<Table.Cell collapsing disabled={isLoading}>{managedBy}</Table.Cell>
+								<Table.Cell collapsing disabled={isLoading}>
+									<Button.Group>
+										<DeleteDocumentTypeModal
+											_id={_id}
+											_name={_name}
+											afterClose={() => {
+												//console.debug('DeleteDocumentTypeModal afterClose');
+												memoizedUpdateState();
+												//setBoolPoll(true);
+											}}
+											beforeOpen={() => {
+												//console.debug('DeleteDocumentTypeModal beforeOpen');
+												//setBoolPoll(false);
+											}}
+											collectionNames={collectionNames}
+											disabled={isLoading}
+											servicesBaseUrl={servicesBaseUrl}
+										/>
+									</Button.Group>
+								</Table.Cell>
+							</>
+							: null}
 
-						{showManagedBy ? <Table.Cell collapsing disabled={isLoading}>{managedBy}</Table.Cell> : null}
-
-						{showDetails ? <Table.Cell collapsing>
+						{/* {showDetails ? <Table.Cell collapsing>
 							<Table>
 								<Table.Header>
 									<Table.Row>
@@ -299,28 +320,9 @@ export function DocumentTypes({
 									</Table.Row>)}
 								</Table.Body>
 							</Table>
-						</Table.Cell> : null}
+						</Table.Cell> : null} */}
 
-						<Table.Cell collapsing disabled={isLoading}>
-							<Button.Group>
-								<DeleteDocumentTypeModal
-									_id={_id}
-									_name={_name}
-									afterClose={() => {
-										//console.debug('DeleteDocumentTypeModal afterClose');
-										memoizedUpdateState();
-										//setBoolPoll(true);
-									}}
-									beforeOpen={() => {
-										//console.debug('DeleteDocumentTypeModal beforeOpen');
-										//setBoolPoll(false);
-									}}
-									collectionNames={collectionNames}
-									disabled={isLoading}
-									servicesBaseUrl={servicesBaseUrl}
-								/>
-							</Button.Group>
-						</Table.Cell>
+
 					</Table.Row>;
 				})}
 			</Table.Body>

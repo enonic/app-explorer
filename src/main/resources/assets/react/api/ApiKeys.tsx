@@ -1,9 +1,11 @@
+import * as React from 'react';
 import {
 	Header,
 	Radio,
 	Segment,
 	Table
 } from 'semantic-ui-react';
+
 
 import {useApiKeysState} from './useApiKeysState';
 import {DeleteApiKeyModal} from './DeleteApiKeyModal';
@@ -22,34 +24,27 @@ export const ApiKeys = (props :{
 		apiKeys,
 		memoizedFetchApiKeys,
 		setBoolPoll,
-		setShowCollections,
-		setShowInterfaces,
-		showCollections,
-		showInterfaces
 	} = useApiKeysState({
 		servicesBaseUrl
 	});
 
+	const [showAllFields, setShowAllFields] = React.useState(false);
+
 	return <>
-		<Segment basic style={{
-			marginLeft: -14,
-			marginTop: -14,
-			marginRight: -14
-		}}>
+		<Segment basic className="page">
 			<Table basic collapsing compact>
 				<Table.Body>
 					<Table.Row verticalAlign='middle'>
 						<Table.Cell collapsing>
 							<Radio
 								label={"Show all fields"}
-								checked={showCollections}
+								checked={showAllFields}
 								onChange={(
 									//@ts-ignore
 									event :unknown,
 									{checked}
 								) => {
-									setShowCollections(checked);
-									setShowInterfaces(checked);
+									setShowAllFields(checked);
 								}}
 								toggle
 							/>
@@ -64,9 +59,13 @@ export const ApiKeys = (props :{
 				<Table.Row>
 					<Table.HeaderCell>Edit</Table.HeaderCell>
 					<Table.HeaderCell>Name</Table.HeaderCell>
-					{showCollections ? <Table.HeaderCell>Collections</Table.HeaderCell> : null}
-					{showInterfaces ? <Table.HeaderCell>Interfaces</Table.HeaderCell> : null}
-					<Table.HeaderCell>Actions</Table.HeaderCell>
+					{showAllFields ?
+						<>
+							<Table.HeaderCell>Collections</Table.HeaderCell>
+							<Table.HeaderCell>Interfaces</Table.HeaderCell>
+							<Table.HeaderCell>Actions</Table.HeaderCell>
+						</>
+						: null}
 				</Table.Row>
 			</Table.Header>
 			<Table.Body>
@@ -99,24 +98,29 @@ export const ApiKeys = (props :{
 							/>
 						</Table.Cell>
 						<Table.Cell collapsing>{_name}</Table.Cell>
-						{showCollections ? <Table.Cell>{collections.join(', ')}</Table.Cell> : null}
-						{showInterfaces ? <Table.Cell>{interfaces.join(', ')}</Table.Cell> : null}
-						<Table.Cell collapsing>
-							<DeleteApiKeyModal
-								_id={_id}
-								_name={_name}
-								afterClose={() => {
-									//console.debug('DeleteApiKeyModal afterClose');
-									memoizedFetchApiKeys();
-									setBoolPoll(true);
-								}}
-								beforeOpen={() => {
-									//console.debug('DeleteApiKeyModal beforeOpen');
-									setBoolPoll(false);
-								}}
-								servicesBaseUrl={servicesBaseUrl}
-							/>
-						</Table.Cell>
+						{showAllFields ?
+							<>
+								<Table.Cell>{collections.join(', ')}</Table.Cell>
+								<Table.Cell>{interfaces.join(', ')}</Table.Cell>
+
+								<Table.Cell collapsing>
+									<DeleteApiKeyModal
+										_id={_id}
+										_name={_name}
+										afterClose={() => {
+											//console.debug('DeleteApiKeyModal afterClose');
+											memoizedFetchApiKeys();
+											setBoolPoll(true);
+										}}
+										beforeOpen={() => {
+											//console.debug('DeleteApiKeyModal beforeOpen');
+											setBoolPoll(false);
+										}}
+										servicesBaseUrl={servicesBaseUrl}
+									/>
+								</Table.Cell>
+							</>
+							: null}
 					</Table.Row>;
 				})}
 			</Table.Body>
