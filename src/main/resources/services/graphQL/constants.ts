@@ -1,8 +1,13 @@
 // [_A-Za-z][_0-9A-Za-z]*
 
+export const GQL_ENUM_FIELD_KEYS_FOR_AGGREGATIONS = 'EnumFieldsKeysForAggreations';
+
 export const GQL_FIELDS_DOCUMENT_TYPE_PROPERTY_NAME = 'DocumentTypePropertyFields';
 
 // Input type names
+export const GQL_INPUT_TYPE_AGGREGATION = 'AggregationInput';
+export const GQL_INPUT_TYPE_AGGREGATION_TERMS = 'AggregationTermsInput';
+
 export const GQL_INPUT_TYPE_COLLECTION_COLLECTOR_NAME = 'CollectionCollectorInput';
 export const GQL_INPUT_TYPE_COLLECTION_CRON_NAME = 'CollectionCronInput';
 
@@ -22,6 +27,9 @@ export const GQL_INTERFACE_NODE_NAME = 'Node';
 export const GQL_INTERFACE_QUERY_RESULT_NAME = 'QueryResult';
 
 // Object type names
+export const GQL_TYPE_AGGREGATION_TERMS_NAME = 'AggregationTerms';
+export const GQL_TYPE_AGGREGATION_TERMS_BUCKET_NAME = 'AggregationTermsBucket';
+
 export const GQL_TYPE_COLLECTION_COLLECTOR_NAME = 'CollectionCollector';
 export const GQL_TYPE_COLLECTION_NAME = 'Collection';
 export const GQL_TYPE_COLLECTION_REINDEX_REPORT = 'CollectionReindexReport';

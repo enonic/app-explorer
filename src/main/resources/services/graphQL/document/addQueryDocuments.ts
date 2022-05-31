@@ -21,10 +21,97 @@ import {
 	//@ts-ignore
 } from '/lib/graphql';
 import {
+	GQL_ENUM_FIELD_KEYS_FOR_AGGREGATIONS,
+	GQL_INPUT_TYPE_AGGREGATION,
+	GQL_INPUT_TYPE_AGGREGATION_TERMS,
 	GQL_QUERY_DOCUMENTS,
+	GQL_TYPE_AGGREGATION_TERMS_BUCKET_NAME,
+	GQL_TYPE_AGGREGATION_TERMS_NAME,
 	GQL_TYPE_DOCUMENT_NAME,
 	GQL_TYPE_DOCUMENT_QUERY_RESULT_NAME
 } from '../constants';
+
+type AggregationArg = {
+	name :string
+	terms :{
+		field :string
+		order ?:string
+		size ?:number
+		minDocCount ?:number
+	}
+}
+
+type AggregationRes = Record<string,{
+	buckets :Array<{
+		key :string
+		docCount :number
+	}>
+}>
+
+type QueryRes = {
+	aggregations :Record<string,AggregationRes>
+	count :number
+	total :number
+	hits :Array<{
+		branch :string
+		id :string
+		repoId :string
+		score :number
+	}>
+}
+
+
+// Name must be non-null, non-empty and match [_A-Za-z][_0-9A-Za-z]*
+const FIELD_NAME_TO_PATH = {
+	collectionName: 'document_metadata.collection'
+};
+
+
+function aggregationsArgToQuery({
+	aggregations = []
+} :{
+	aggregations ?:Array<AggregationArg>
+}) {
+	const obj = {};
+	for (let i = 0; i < aggregations.length; i++) {
+	    const {
+			name,
+			terms: {
+				field,
+				order,
+				size,
+				minDocCount
+			}
+		} = aggregations[i];
+		obj[name] = {
+			terms: {
+				field: FIELD_NAME_TO_PATH[field],
+				order,
+				size,
+				minDocCount
+			}
+		};
+	}
+	return obj;
+} // aggregationsArgToQuery
+
+
+function aggregationsResToList({
+	aggregations = {}
+} :{
+	aggregations ?:Record<string,AggregationRes>
+}) {
+	const list = [];
+	const names = Object.keys(aggregations);
+	for (let i = 0; i < names.length; i++) {
+	    const name = names[i];
+		list.push({
+			name,
+			buckets: aggregations[name]['buckets']
+		});
+	}
+	return list;
+} // aggregationsResToList
 
 
 export function addQueryDocuments({
@@ -33,20 +120,55 @@ export function addQueryDocuments({
 	glue.addQuery({
 		name: GQL_QUERY_DOCUMENTS,
 		args: {
-			collections: list(GraphQLString)
+			aggregations: list(glue.addInputType({
+				name: GQL_INPUT_TYPE_AGGREGATION,
+				fields: {
+					name: { type: nonNull(GraphQLString) },
+					terms: { type: glue.addInputType({
+						name: GQL_INPUT_TYPE_AGGREGATION_TERMS,
+						fields: {
+							field: {
+								type: nonNull(glue.addEnumType({
+									name: GQL_ENUM_FIELD_KEYS_FOR_AGGREGATIONS,
+									values: Object.keys(FIELD_NAME_TO_PATH)
+								}))
+							},
+							order: {
+								type: GraphQLString
+							},
+							size: {
+								type: GraphQLInt
+							},
+							minDocCount: {
+								type: GraphQLInt
+							}
+						}
+					})},
+				}
+			})),
+			collections: list(GraphQLString),
+			count: GraphQLInt,
+			start: GraphQLInt
 		},
 		resolve(env :{
 			args: {
+				aggregations ?:Array<AggregationArg>
+				count ?:number
 				collections ?:Array<string>
+				start ?:number
 			}
 		}) {
 			//log.debug('env:%s', toStr(env));
 
 			const {
 				args: {
-					collections = []
+					aggregations = [],
+					collections = [],
+					count = 10,
+					start = 0
 				}
 			} = env;
+			//log.debug('aggregations:%s', toStr(aggregations));
 			//log.debug('collections:%s', toStr(collections));
 
 			const explorerRepoReadConnection = connect({
@@ -107,6 +229,8 @@ export function addQueryDocuments({
 			const multiRepoReadConnection = multiConnect(multiConnectParams);
 
 			const multiRepoQueryParams = {
+				aggregations: aggregationsArgToQuery({aggregations}),
+				count,
 				filters: addQueryFilter({ // Whitelist
 					clause: 'must',
 					filter: {
@@ -119,14 +243,20 @@ export function addQueryDocuments({
 						filter: hasValue('_nodeType', ['default'])
 					})
 				}),
-				query: ''
+				query: '',
+				start
 			};
 			//log.debug('multiRepoQueryParams:%s', toStr(multiRepoQueryParams));
 
-			const queryResult = multiRepoReadConnection.query(multiRepoQueryParams);
+			const queryResult = multiRepoReadConnection.query(multiRepoQueryParams) as unknown as QueryRes;
 			//log.debug('queryResult:%s', toStr(queryResult));
+			//log.debug('queryResult.aggregations:%s', toStr(queryResult.aggregations));
 
 			return {
+				aggregations: aggregationsResToList({
+					aggregations: queryResult.aggregations
+				}),
+				aggregationsAsJson: JSON.stringify(queryResult.aggregations),
 				count: queryResult.count,
 				total: queryResult.total,
 				hits: queryResult.hits.map(({
@@ -180,8 +310,22 @@ export function addQueryDocuments({
 		type: glue.addObjectType({
 			name: GQL_TYPE_DOCUMENT_QUERY_RESULT_NAME,
 			fields: {
-				total: { type: nonNull(GraphQLInt) },
+				aggregations: { type: list(glue.addObjectType({
+					name: GQL_TYPE_AGGREGATION_TERMS_NAME,
+					fields: {
+						name: { type: nonNull(GraphQLString) },
+						buckets: { type: list(glue.addObjectType({
+							name: GQL_TYPE_AGGREGATION_TERMS_BUCKET_NAME,
+							fields: {
+								docCount: { type: nonNull(GraphQLInt) },
+								key: { type: nonNull(GraphQLString) }
+							}
+						}))},
+					}
+				}))},
+				aggregationsAsJson: { type: GraphQLJson },
 				count: { type: nonNull(GraphQLInt) },
+				total: { type: nonNull(GraphQLInt) },
 				hits: { type: list(glue.addObjectType({
 					name: GQL_TYPE_DOCUMENT_NAME,
 					fields: {
