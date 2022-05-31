@@ -153,25 +153,21 @@ export const Schedule = (props :{
 	//console.debug('key', key);
 
 	return <>
-		<Segment basic inverted style={{
-			marginLeft: -14,
-			marginTop: -14,
-			marginRight: -14
-		}}>
-			<Table basic compact inverted>
+		<Segment basic className="page">
+			<Table celled basic compact>
 			 	<Table.Header>
 					<Table.Row verticalAlign='bottom'>
 						<Table.HeaderCell collapsing>
-							<Label color='black'>Start date</Label>
+							Start date
 						</Table.HeaderCell>
 						<Table.HeaderCell collapsing>
-							<Label color='black'>End date</Label>
+							End date
 						</Table.HeaderCell>
 						<Table.HeaderCell collapsing>
-							<Label color='black'>Show disabled</Label>
+							Show disabled
 						</Table.HeaderCell>
 						<Table.HeaderCell>
-							<Label color='black'>Zoom</Label>
+							Zoom
 						</Table.HeaderCell>
 					</Table.Row>
 				</Table.Header>
