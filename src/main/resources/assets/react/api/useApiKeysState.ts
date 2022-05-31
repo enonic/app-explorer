@@ -30,9 +30,6 @@ export function useApiKeysState({
 
 	const [boolPoll, setBoolPoll] = React.useState(true);
 
-	const [showCollections, setShowCollections] = React.useState(false);
-	const [showInterfaces, setShowInterfaces] = React.useState(false);
-
 	const memoizedFetchApiKeys = React.useCallback(() => {
 		fetch(`${servicesBaseUrl}/graphQL`, {
 			method: 'POST',
@@ -65,10 +62,6 @@ export function useApiKeysState({
 	return {
 		apiKeys: queryApiKeysGraph.hits,
 		memoizedFetchApiKeys,
-		setBoolPoll,
-		setShowCollections,
-		setShowInterfaces,
-		showCollections,
-		showInterfaces
+		setBoolPoll
 	};
 }
