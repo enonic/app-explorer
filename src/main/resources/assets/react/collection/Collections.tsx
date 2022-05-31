@@ -17,7 +17,7 @@ import {
 import {parseExpression as parseCronExpression} from 'cron-parser';
 //import * as React from 'react';
 import {
-	Button, Dimmer, Header, Icon, Loader, Popup, Progress, Radio,
+	Button, Dimmer, Grid, GridColumn, Header, Icon, Loader, Popup, Progress, Radio,
 	Segment, Table
 } from 'semantic-ui-react';
 import {
@@ -98,44 +98,45 @@ export function Collections(props :{
 	});
 
 	return <>
-		<Segment basic style={{
-			marginLeft: -14,
-			marginTop: -14,
-			marginRight: -14
-		}}>
-			<Table basic collapsing compact>
-				<Table.Body>
-					<Table.Row verticalAlign='middle'>
-						<Table.Cell collapsing>
-							<Radio
-								label={"Show all fields"}
-								checked={showCollector}
-								onChange={(
-									//@ts-ignore
-									event :unknown,
-									{checked}
-								) => {
-									setShowCollector(checked);
-									// setShowDocumentCount(checked);
-									setShowLanguage(checked);
-									setShowDocumentType(checked);
-									//setShowInterfaces(checked);
-									setShowSchedule(checked);
-									setShowDelete(checked);
-								}}
-								toggle
-							/>
-						</Table.Cell>
-						<Table.Cell collapsing>
-							<Button
-								basic
-								color='blue'
-								loading={isLoading}
-								onClick={memoizedFetchOnUpdate}>Last updated: {durationSinceLastUpdate}</Button>
-						</Table.Cell>
-					</Table.Row>
-				</Table.Body>
-			</Table>
+		<Segment className='page' basic>
+			<Grid>
+				<Grid.Column floated='left' width={3}>
+					<Table basic collapsing compact>
+						<Table.Body>
+							<Table.Row verticalAlign='middle'>
+								<Table.Cell collapsing>
+									<Radio
+										label={'Show all fields'}
+										checked={showCollector}
+										onChange={(
+											//@ts-ignore
+											event: unknown,
+											{ checked }
+										) => {
+											setShowCollector(checked);
+											// setShowDocumentCount(checked);
+											setShowLanguage(checked);
+											setShowDocumentType(checked);
+											//setShowInterfaces(checked);
+											setShowSchedule(checked);
+											setShowDelete(checked);
+										}}
+										toggle
+									/>
+								</Table.Cell>
+							</Table.Row>
+						</Table.Body>
+					</Table>
+				</Grid.Column>
+				<Grid.Column floated='right' width={4}>
+					<Button
+						basic
+						floated='right'
+						color='blue'
+						loading={isLoading}
+						onClick={memoizedFetchOnUpdate}><Icon className='refresh'/>Last updated: {durationSinceLastUpdate}</Button>
+				</Grid.Column>
+			</Grid>
 		</Segment>
 		<Header as='h1'>Collections</Header>
 		<Dimmer.Dimmable dimmed={isLoading}>

@@ -9,6 +9,7 @@ import moment from 'moment';
 import * as React from 'react';
 import {
 	Button,
+	Grid,
 	Header,
 	Icon,
 	Popup,
@@ -129,43 +130,44 @@ export function DocumentTypes({
 
 
 	return <>
-		<Segment basic style={{
-			marginLeft: -14,
-			marginTop: -14,
-			marginRight: -14
-		}}>
-			<Table basic collapsing compact>
-				<Table.Body>
-					<Table.Row verticalAlign='middle'>
-						<Table.Cell collapsing>
-							<Radio
-								label={"Show all fields"}
-								checked={showCollections}
-								onChange={(
-									//@ts-ignore
-									ignored,
-									{checked}
-								) => {
-									setShowCollections(checked);
-									setShowInterfaces(checked);
-									setShowAddFields(checked);
-									setShowDocumentsPerCollection(checked);
-									//setShowDetails(checked);
-									setShowManagedBy(checked);
-								}}
-								toggle
-							/>
-						</Table.Cell>
-						<Table.Cell collapsing>
-							<Button
-								basic
-								color='blue'
-								loading={isLoading}
-								onClick={memoizedUpdateState}>Last updated: {durationSinceLastUpdate}</Button>
-						</Table.Cell>
-					</Table.Row>
-				</Table.Body>
-			</Table>
+		<Segment basic className='page'>
+			<Grid>
+				<Grid.Column floated='left' width={3}>
+					<Table basic collapsing compact>
+						<Table.Body>
+							<Table.Row verticalAlign='middle'>
+								<Table.Cell collapsing>
+									<Radio
+										label={'Show all fields'}
+										checked={showCollections}
+										onChange={(
+											//@ts-ignore
+											ignored,
+											{ checked }
+										) => {
+											setShowCollections(checked);
+											setShowInterfaces(checked);
+											setShowAddFields(checked);
+											setShowDocumentsPerCollection(checked);
+											//setShowDetails(checked);
+											setShowManagedBy(checked);
+										}}
+										toggle
+									/>
+								</Table.Cell>
+							</Table.Row>
+						</Table.Body>
+					</Table>
+				</Grid.Column>
+				<Grid.Column floated='right' width={4}>
+					<Button
+						basic
+						floated='right'
+						color='blue'
+						loading={isLoading}
+						onClick={memoizedUpdateState}><Icon className='refresh'/>Last updated: {durationSinceLastUpdate}</Button>
+				</Grid.Column>
+			</Grid>
 		</Segment>
 		<Header as='h1' content='Document types'/>
 		<Table celled collapsing compact selectable singleLine striped>
