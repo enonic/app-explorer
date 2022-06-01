@@ -308,6 +308,13 @@ export class Glue {
 		return this._unionTypes[name];
 	}
 
+	getEnumType(name :string) {
+		if (!hasOwnProperty(this._enumTypes, name)) { // true also when property is set to undefined
+			throw new Error(`enumTypes[${name}] not found! Perhaps you're trying to use it before it's defined?`);
+		}
+		return this._enumTypes[name];
+	}
+
 	getFields(name :string) {
 		//log.debug(`getFields(${name})`);
 		if (!hasOwnProperty(this._fields, name)) { // true also when property is set to undefined

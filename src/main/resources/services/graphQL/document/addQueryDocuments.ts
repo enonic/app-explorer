@@ -1,5 +1,6 @@
 import {
 	addQueryFilter//,
+	//camelize,
 	//toStr
 } from '@enonic/js-utils';
 import {getCollectionIds} from '/lib/explorer/collection/getCollectionIds';
@@ -9,6 +10,7 @@ import {
 	FIELD_PATH_META,
 	PRINCIPAL_EXPLORER_READ
 } from '/lib/explorer/constants';
+//import {queryDocumentTypes} from '/lib/explorer/documentType/queryDocumentTypes';
 import {hasValue} from '/lib/explorer/query/hasValue';
 import {connect} from '/lib/explorer/repo/connect';
 import {multiConnect} from '/lib/explorer/repo/multiConnect';
@@ -23,6 +25,7 @@ import {
 import {
 	GQL_ENUM_FIELD_KEYS_FOR_AGGREGATIONS,
 	GQL_INPUT_TYPE_AGGREGATION,
+	//GQL_INPUT_TYPE_AGGREGATION_COUNT,
 	GQL_INPUT_TYPE_AGGREGATION_TERMS,
 	GQL_QUERY_DOCUMENTS,
 	GQL_TYPE_AGGREGATION_TERMS_BUCKET_NAME,
@@ -31,9 +34,13 @@ import {
 	GQL_TYPE_DOCUMENT_QUERY_RESULT_NAME
 } from '../constants';
 
+
 type AggregationArg = {
 	name :string
-	terms :{
+	count ?:{
+		fields :Array<string>
+	}
+	terms ?:{
 		field :string
 		order ?:string
 		size ?:number
@@ -68,21 +75,25 @@ const FIELD_NAME_TO_PATH = {
 
 
 function aggregationsArgToQuery({
-	aggregations = []
+	aggregationsArg = []
 } :{
-	aggregations ?:Array<AggregationArg>
+	aggregationsArg ?:Array<AggregationArg>
 }) {
 	const obj = {};
-	for (let i = 0; i < aggregations.length; i++) {
+	for (let i = 0; i < aggregationsArg.length; i++) {
 	    const {
 			name,
+			/*count: {
+				fields
+			} = {},*/
 			terms: {
 				field,
 				order,
 				size,
 				minDocCount
-			}
-		} = aggregations[i];
+			} = {}
+		} = aggregationsArg[i];
+		//if (field) {
 		obj[name] = {
 			terms: {
 				field: FIELD_NAME_TO_PATH[field],
@@ -91,7 +102,14 @@ function aggregationsArgToQuery({
 				minDocCount
 			}
 		};
-	}
+		/*} else if (fields && fields.length) {
+			obj[name] = {
+				count: {
+					field: fields[0]
+				}
+			};
+		}*/
+	} // for
 	return obj;
 } // aggregationsArgToQuery
 
@@ -117,6 +135,11 @@ function aggregationsResToList({
 export function addQueryDocuments({
 	glue
 }) {
+	glue.addEnumType({
+		name: GQL_ENUM_FIELD_KEYS_FOR_AGGREGATIONS,
+		values: Object.keys(FIELD_NAME_TO_PATH)
+	});
+
 	glue.addQuery({
 		name: GQL_QUERY_DOCUMENTS,
 		args: {
@@ -124,14 +147,19 @@ export function addQueryDocuments({
 				name: GQL_INPUT_TYPE_AGGREGATION,
 				fields: {
 					name: { type: nonNull(GraphQLString) },
+					/*count: { type: glue.addInputType({
+						name: GQL_INPUT_TYPE_AGGREGATION_COUNT,
+						fields: {
+							fields: {
+								type: nonNull(list(glue.getEnumType(GQL_ENUM_FIELD_KEYS_FOR_AGGREGATIONS)))
+							}
+						}
+					})},*/
 					terms: { type: glue.addInputType({
 						name: GQL_INPUT_TYPE_AGGREGATION_TERMS,
 						fields: {
 							field: {
-								type: nonNull(glue.addEnumType({
-									name: GQL_ENUM_FIELD_KEYS_FOR_AGGREGATIONS,
-									values: Object.keys(FIELD_NAME_TO_PATH)
-								}))
+								type: nonNull(glue.getEnumType(GQL_ENUM_FIELD_KEYS_FOR_AGGREGATIONS))
 							},
 							order: {
 								type: GraphQLString
@@ -162,7 +190,7 @@ export function addQueryDocuments({
 
 			const {
 				args: {
-					aggregations = [],
+					aggregations: aggregationsArg = [],
 					collections = [],
 					count = 10,
 					start = 0
@@ -221,6 +249,35 @@ export function addQueryDocuments({
 			}
 			//log.debug('sources:%s', toStr(sources));
 
+			/*const documentTypes = queryDocumentTypes({
+				readConnection: connect({ principals: [PRINCIPAL_EXPLORER_READ] })
+			}).hits;*/
+			//log.debug('documentTypes:%s', toStr(documentTypes));
+
+			//const fieldNameToPath = {};
+			const aggregations = aggregationsArgToQuery({aggregationsArg});
+			/*for (let i = 0; i < documentTypes.length; i++) {
+			    const {properties} = documentTypes[i];
+				for (let j = 0; j < properties.length; j++) {
+				    const {name} = properties[j];
+					const camelizedFieldKey = camelize(name, /[.-]/g);
+					if (fieldNameToPath[camelizedFieldKey]) {
+						//log.debug(`name:${camelizedFieldKey} -> path:${name} already exist in fieldNameToPath`);
+						if (fieldNameToPath[camelizedFieldKey] !== name) {
+							log.error(`name:${camelizedFieldKey} newPath:${name} does not match oldPath:${fieldNameToPath[camelizedFieldKey]}!`);
+						}
+					} else {
+						fieldNameToPath[camelizedFieldKey] = name;
+						aggregations[`_count_Field_${camelizedFieldKey}`] = {
+							count: {
+								field: name
+							}
+						}
+					}
+				} // for properties
+			} // for documentTypes
+			//log.debug('fieldNameToPath:%s', toStr(fieldNameToPath));*/
+
 			const multiConnectParams = {
 				principals: [PRINCIPAL_EXPLORER_READ],
 				sources
@@ -229,7 +286,7 @@ export function addQueryDocuments({
 			const multiRepoReadConnection = multiConnect(multiConnectParams);
 
 			const multiRepoQueryParams = {
-				aggregations: aggregationsArgToQuery({aggregations}),
+				aggregations,
 				count,
 				filters: addQueryFilter({ // Whitelist
 					clause: 'must',

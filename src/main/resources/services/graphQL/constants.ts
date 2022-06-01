@@ -7,6 +7,7 @@ export const GQL_FIELDS_DOCUMENT_TYPE_PROPERTY_NAME = 'DocumentTypePropertyField
 // Input type names
 export const GQL_INPUT_TYPE_AGGREGATION = 'AggregationInput';
 export const GQL_INPUT_TYPE_AGGREGATION_TERMS = 'AggregationTermsInput';
+export const GQL_INPUT_TYPE_AGGREGATION_COUNT = 'AggregationCountInput';
 
 export const GQL_INPUT_TYPE_COLLECTION_COLLECTOR_NAME = 'CollectionCollectorInput';
 export const GQL_INPUT_TYPE_COLLECTION_CRON_NAME = 'CollectionCronInput';
