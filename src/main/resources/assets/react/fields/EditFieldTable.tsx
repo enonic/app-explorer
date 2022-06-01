@@ -120,13 +120,13 @@ const OPTIONS_VALUE_TYPES = [
 
 
 export const EditFieldTable = () => {
-	const [context, dispatch] = getEnonicContext();
+	const {dispatch, state} = getEnonicContext();
 	const {
 		//fieldType,
 		min,
 		max,
 		enabled
-	} = context.values;
+	} = state.values;
 	//console.debug('enabled', enabled);
 	return <Table celled compact>
 		<Table.Header>

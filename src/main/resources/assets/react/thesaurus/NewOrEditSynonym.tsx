@@ -66,7 +66,17 @@ tr: 'Turkish'
 
 
 
-export function NewOrEditSynonym(props) {
+export function NewOrEditSynonym(props :{
+	// Required
+	servicesBaseUrl :string
+	thesaurusId :string
+	// Optional
+	_id ?:string
+	afterClose ?:() => void
+	beforeOpen ?:() => void
+	from ?:Array<string>
+	to ?:Array<string>
+}) {
 	//console.debug('NewOrEditSynonym props', props);
 	const {
 		_id,

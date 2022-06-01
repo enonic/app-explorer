@@ -3,7 +3,10 @@ import type {
 	SetLicensedToFunction,
 	SetLicenseValidFunction
 } from '../index.d';
-import type {InterfaceNamesObj} from './index.d';
+import type {
+	GlobalFieldObject,
+	InterfaceNamesObj
+} from './index.d';
 
 
 import * as React from 'react';
@@ -21,7 +24,7 @@ type NewOrEditInterfaceModalProps = {
 	collectionIdToFieldKeys :{}
 	collectionOptions :Array<DropdownItemProps>
 	disabled? :boolean
-	globalFieldsObj :Record<string, boolean>
+	globalFieldsObj :GlobalFieldObject
 	interfaceNamesObj :InterfaceNamesObj
 	licenseValid :boolean
 	servicesBaseUrl :string

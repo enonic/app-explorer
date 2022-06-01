@@ -1,3 +1,6 @@
+import type {StrictTableHeaderCellProps} from 'semantic-ui-react';
+
+
 import type {
 	CollectorComponents,
 	ContentTypeOptions,
@@ -277,7 +280,7 @@ export function useCollectionsState({
 	} as {
 		column :string
 		contentTypeOptions :ContentTypeOptions
-		direction: 'ascending'|'descending'
+		direction: StrictTableHeaderCellProps['sorted']
 		isLoading :boolean
 		siteOptions :SiteOptions
 	});

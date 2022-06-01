@@ -26,9 +26,9 @@ export function CollectorOptions(props :{
 		siteOptions
 	} = props;
 
-	const [context, dispatch] = getEnonicContext();
+	const {dispatch, state} = getEnonicContext();
 	//console.debug('CollectorOptions context', context);
-	const collectorName = getIn(context.values, 'collector.name');
+	const collectorName = getIn(state.values, 'collector.name');
 
 	const isFirstRun = React.useRef(true);
 
@@ -39,7 +39,7 @@ export function CollectorOptions(props :{
 	return <Segment color='pink'>
 		<Header as='h2' dividing content={collectorName} id='collector'/>
 		{collectorComponents[collectorName]({
-			context,
+			context: state,
 			dispatch,
 			explorer: {
 				contentTypeOptions,

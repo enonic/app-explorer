@@ -20,6 +20,14 @@ import {
 	//@ts-ignore
 } from '@enonic/semantic-ui-react-form';
 
+
+type WebcrawlCollectorFormValues = {
+	baseUri :string
+	excludes ?:Array<string>
+	userAgent ?:string
+}
+
+
 const DEFAULT_UA = 'Mozilla/5.0 (compatible; Enonic XP Explorer Collector Web crawler/1.0.0)';
 
 
@@ -44,7 +52,7 @@ export const Collector = (props :CollectorProps) => {
 	} = props;
 	//console.debug('Collector context', context);
 
-	let initialValues = getIn(context.values, path);
+	let initialValues :WebcrawlCollectorFormValues = getIn(context.values, path);
 	//console.debug('Collector initialValues', initialValues);
 
 	if (isFirstRun.current) {
@@ -65,21 +73,24 @@ export const Collector = (props :CollectorProps) => {
 	}
 
 
-	return <EnonicForm
-		afterValidate={(dereffed :{
-			errors: unknown
-			visited: unknown
-		}) => {
+	return <EnonicForm<WebcrawlCollectorFormValues>
+		afterValidate={(dereffed) => {
 			// console.debug('Collector afterValidate dereffed', dereffed);
-			dispatch(setError({path, error: dereffed.errors}));
-			dispatch(setVisited({path, value: dereffed.visited}));
+			dispatch(setError({
+				path,
+				error: dereffed.errors
+			}));
+			dispatch(setVisited({
+				path,
+				value: dereffed.visits
+			}));
 		}}
-		afterVisit={(dereffed :{
-			//errors: unknown
-			visited: unknown
-		}) => {
+		afterVisit={(dereffed) => {
 			// console.debug('Collector afterVisit dereffed', dereffed);
-			dispatch(setVisited({path, value: dereffed.visited}));
+			dispatch(setVisited({
+				path,
+				value: dereffed.visits
+			}));
 		}}
 		initialValues={initialValues}
 		onChange={(values :unknown) => {

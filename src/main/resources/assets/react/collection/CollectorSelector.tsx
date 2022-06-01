@@ -19,7 +19,7 @@ export function CollectorSelector(props :{
 }) {
 	//console.debug('CollectorSelector props', props);
 
-	const [context, dispatch] = getEnonicContext();
+	const {dispatch, state} = getEnonicContext();
 	//console.debug('CollectorSelector context', context);
 
 	const {
@@ -28,7 +28,7 @@ export function CollectorSelector(props :{
 		parentPath = 'collector',
 		path = parentPath ? `${parentPath}.${name}` : name,
 		placeholder = 'none',
-		value = getIn(context.values, path),
+		value = getIn(state.values, path),
 		...rest
 	} = props;
 	//console.debug('CollectorSelector path', path, 'value', value, 'rest', rest);

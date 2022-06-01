@@ -1,26 +1,67 @@
+import type {StrictTableHeaderCellProps} from 'semantic-ui-react';
+
+
+import {
+	TASK_STATE_FAILED,
+	TASK_STATE_FINISHED,
+	TASK_STATE_RUNNING,
+	TASK_STATE_WAITING//,
+	//toStr
+} from '@enonic/js-utils';
 import _ from 'lodash';
 import classNames from 'classnames';
 import moment from 'moment';
 import prettyMs from 'pretty-ms';
-//import {toStr} from './utils/toStr';
 import * as React from 'react';
 import {Dropdown, Form, Header, Table} from 'semantic-ui-react';
 
 import {useInterval} from './utils/useInterval';
 
 
-type TaskState = 'RUNNING'|'FINISHED'|'WAITING'|'FAILED';
+const DIRECTION_ASCENDING = 'ascending';
+const DIRECTION_DESCENDING = 'descending';
 
+
+type Direction = StrictTableHeaderCellProps['sorted'];
+
+type TaskState =
+	| typeof TASK_STATE_FAILED
+	| typeof TASK_STATE_FINISHED
+	| typeof TASK_STATE_RUNNING
+	| typeof TASK_STATE_WAITING
+
+type Collector = {
+	averageMs :number
+	collection :string
+	current :number
+	currentTime :number
+	durationMs :number
+	etaMs :number
+	message :string
+	percent :number
+	remainingCount :number
+	remainingMs :number
+	startTime :number
+	state :TaskState
+	total :number
+}
+
+type StatusComponentState = {
+	collectors :Array<Collector>
+	column :string
+	direction :Direction
+	isLoading :boolean
+}
 
 const FORMAT = 'YYYY-MM-DD hh:mm:ss';
 
 
 function taskStateToProgressClassName(state :TaskState) {
 	switch (state) {
-	case 'RUNNING': return 'active';
-	case 'FINISHED': return 'success';
-	case 'WAITING': return 'warning';
-	//case 'FAILED': return 'error';
+	case TASK_STATE_RUNNING: return 'active';
+	case TASK_STATE_FINISHED: return 'success';
+	case TASK_STATE_WAITING: return 'warning';
+	//case TASK_STATE_FAILED: return 'error';
 	default: return 'error';
 	}
 }
@@ -37,10 +78,10 @@ export function Status (props :{
 	} = props;
 
 	const [delay, setDelay] = React.useState(5000);
-	const [state, setState] = React.useState({
+	const [state, setState] = React.useState<StatusComponentState>({
 		collectors: [],
 		column: 'startTime',
-		direction: 'ascending',
+		direction: DIRECTION_ASCENDING,
 		isLoading: false
 	});
 	const [tasks, setTasks] = React.useState([]);
@@ -77,9 +118,13 @@ export function Status (props :{
 		collectors,
 		column,
 		direction
+	} :{
+		collectors :Array<Collector>
+		column :string
+		direction :Direction
 	}) {
 		const sorted = _.sortBy(collectors, column);
-		if(direction === 'descending') {
+		if(direction === DIRECTION_DESCENDING) {
 			return sorted.reverse();
 		}
 		return sorted;
@@ -181,9 +226,9 @@ export function Status (props :{
 
 	const sortGen = (c :string) => () => {
 		setState(prev => {
-			const deref = JSON.parse(JSON.stringify(prev));
+			const deref = JSON.parse(JSON.stringify(prev)) as StatusComponentState;
 			if(c === prev.column) {
-				deref.direction = prev.direction === 'ascending' ? 'descending' : 'ascending';
+				deref.direction = prev.direction === DIRECTION_ASCENDING ? DIRECTION_DESCENDING : DIRECTION_ASCENDING;
 			} else {
 				deref.column = c;
 			}
@@ -299,13 +344,13 @@ export function Status (props :{
 								//formatSubMilliseconds: true,
 								separateMilliseconds: true
 							})}</Table.Cell>
-							<Table.Cell>{state === 'RUNNING' ? prettyMs(remainingMs, {
+							<Table.Cell>{state === TASK_STATE_RUNNING ? prettyMs(remainingMs, {
 								//formatSubMilliseconds: true,
 								separateMilliseconds: true
 							}) : null}</Table.Cell>
-							<Table.Cell>{state === 'RUNNING' ? moment(new Date(etaMs)).format(FORMAT) : null}</Table.Cell>
+							<Table.Cell>{state === TASK_STATE_RUNNING ? moment(new Date(etaMs)).format(FORMAT) : null}</Table.Cell>
 							{/* End time */}
-							<Table.Cell>{state === 'RUNNING' ? '' : moment(new Date(currentTime)).format(FORMAT)}</Table.Cell>
+							<Table.Cell>{state === TASK_STATE_RUNNING ? '' : moment(new Date(currentTime)).format(FORMAT)}</Table.Cell>
 
 							{/*<Table.Cell>{message}</Table.Cell>*/}
 						</Table.Row>

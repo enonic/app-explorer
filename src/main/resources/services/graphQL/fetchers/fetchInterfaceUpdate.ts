@@ -1,3 +1,6 @@
+import type {InterfaceField} from '/lib/explorer/types/index.d';
+
+
 import {GQL_MUTATION_INTERFACE_UPDATE} from '../mutations/interfaceUpdateMutation';
 
 
@@ -36,7 +39,7 @@ export function fetchInterfaceUpdate({
 		_id :string
 		_name? :string
 		collectionIds? :Array<string>
-		fields? :Array<string>
+		fields? :Array<InterfaceField>
 		stopWords? :Array<string>
 		synonymIds? :Array<string>
 	}

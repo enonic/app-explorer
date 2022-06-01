@@ -1,4 +1,4 @@
-import type {Locales} from '../index.d';
+//import type {Locales} from '../index.d';
 import type {EditSynonymsModalState} from './index.d';
 
 
@@ -9,7 +9,7 @@ import {EditSynonyms} from './EditSynonyms';
 
 export function EditSynonymsModal({
 	// Required
-	locales,
+	//locales,
 	open,
 	servicesBaseUrl,
 	setEditSynonymsModalState,
@@ -19,7 +19,7 @@ export function EditSynonymsModal({
 	thesaurusName
 } :{
 	// Required
-	locales :Locales
+	//locales :Locales
 	open :boolean
 	servicesBaseUrl :string
 	setEditSynonymsModalState :React.Dispatch<React.SetStateAction<EditSynonymsModalState>>
@@ -49,7 +49,6 @@ export function EditSynonymsModal({
 		<Modal.Header>{header}</Modal.Header>
 		<Modal.Content>
 			<EditSynonyms
-				locales={locales}
 				servicesBaseUrl={servicesBaseUrl}
 				thesaurusId={thesaurusId}
 				thesaurusName={thesaurusName}

@@ -1,4 +1,7 @@
-import type {PaginationProps} from 'semantic-ui-react';
+import type {
+	PaginationProps,
+	StrictTableHeaderCellProps
+} from 'semantic-ui-react';
 import type {EditSynonymsState} from './index.d';
 
 
@@ -16,7 +19,7 @@ export function useEditSynonymsState({
 	thesaurusName ?:string
 }) {
 	const [column, setColumn] = React.useState('from');
-	const [direction, setDirection] = React.useState('ascending');
+	const [direction, setDirection] = React.useState<StrictTableHeaderCellProps['sorted']>('ascending');
 	const [from, setFrom] = React.useState('');
 	const [isLoading, setIsLoading] = React.useState(false);
 	const [perPage, setPerPage] = React.useState(10);

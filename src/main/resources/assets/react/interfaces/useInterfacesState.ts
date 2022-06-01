@@ -1,4 +1,7 @@
-import type {InterfaceNamesObj} from './index.d';
+import type {
+	GlobalFieldObject,
+	InterfaceNamesObj
+} from './index.d';
 
 
 import * as React from 'react';
@@ -120,7 +123,7 @@ export function useInterfacesState({
 
 	const [collections, setCollections] = React.useState<Array<Collection>>([]);
 	const [collectionIdToFieldKeys, setCollectionIdToFieldKeys] = React.useState({});
-	const [globalFieldsObj/*, setGlobalFieldsObj*/] = React.useState({
+	const [globalFieldsObj/*, setGlobalFieldsObj*/] = React.useState<GlobalFieldObject>({
 		'_allText': true // TODO: Hardcode
 	});
 	const [interfaces, setInterfaces] = React.useState([]);

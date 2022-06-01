@@ -22,7 +22,7 @@ function makeKey({
 
 
 export const GenerateKeyButton = () => {
-	const [_context,dispatch] = getEnonicContext();
+	const {dispatch} = getEnonicContext();
 	return <Button
 		icon
 		onClick={() => {

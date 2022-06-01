@@ -1,5 +1,9 @@
+import type {InterfaceField} from '/lib/explorer/types/index.d';
 import type {DropdownItemProps} from 'semantic-ui-react/index.d';
-import type {InterfaceNamesObj} from './index.d';
+import type {
+	GlobalFieldObject,
+	InterfaceNamesObj
+} from './index.d';
 
 
 //import {toStr} from '@enonic/js-utils';
@@ -46,8 +50,21 @@ type NewOrEditInterfaceProps = {
 	collectionIdToFieldKeys ?:Record<string,Array<string>>
 	collectionOptions ?:Array<DropdownItemProps>
 	doClose ?:() => void
-	globalFieldsObj ?:Record<string, true>
+	globalFieldsObj ?:GlobalFieldObject
 	interfaceNamesObj ?:InterfaceNamesObj
+}
+
+type NewOrEditInterfaceFormValue = {
+	_name :string
+	collectionIds :Array<string>
+	fields :Array<InterfaceField>
+	stopWords :Array<string>
+	synonymIds :Array<string>
+}
+
+type NewOrEditInterfaceState = {
+	initialValues :NewOrEditInterfaceFormValue
+	isLoading :boolean
 }
 
 
@@ -72,7 +89,7 @@ export function NewOrEditInterface(props :NewOrEditInterfaceProps) {
 	//console.debug('NewOrEditInterface thesauriOptions', thesauriOptions);
 
 	//const [isLoading, setLoading] = React.useState(!!id);
-	const [state, setState] = React.useState({
+	const [state, setState] = React.useState<NewOrEditInterfaceState>({
 		initialValues: {
 			_name: '',
 			collectionIds: [],
@@ -136,15 +153,9 @@ export function NewOrEditInterface(props :NewOrEditInterfaceProps) {
 			|| mustBeUnique(v);
 	}
 
-	return isLoading ? <Loader active inverted>Loading</Loader> : <EnonicForm
+	return isLoading ? <Loader active inverted>Loading</Loader> : <EnonicForm<NewOrEditInterfaceFormValue>
 		initialValues={initialValues}
-		onSubmit={(values :{
-			_name :string
-			collectionIds :Array<string>
-			fields :Array<string>
-			stopWords :Array<string>
-			synonymIds :Array<string>
-		}) => {
+		onSubmit={(values) => {
 			//console.debug('submit values', values);
 			const {
 				_name,

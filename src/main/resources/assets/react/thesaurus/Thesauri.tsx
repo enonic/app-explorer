@@ -250,7 +250,6 @@ export function Thesauri({
 		/>
 		<EditSynonymsModal
 			open={editSynonymsModalState.open}
-			locales={locales}
 			afterClose={memoizedFetchOnUpdate}
 			servicesBaseUrl={servicesBaseUrl}
 			setEditSynonymsModalState={setEditSynonymsModalState}

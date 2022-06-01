@@ -27,9 +27,9 @@ export function LanguageDropdown(props :{
 		path = parentPath ? `${parentPath}.${name}` : name,
 		value
 	} = props;
-	const [context/*, dispatch*/] = getEnonicContext();
+	const {state} = getEnonicContext();
 
-	const language = value || getIn(context.values, path);
+	const language = value || getIn(state.values, path);
 	//console.debug('LanguageDropdown language', language);
 
 	const options = locales.map(({

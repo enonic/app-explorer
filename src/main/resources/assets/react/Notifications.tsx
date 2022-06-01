@@ -10,28 +10,40 @@ import {
 import {Emails} from './notifications/Emails';
 
 
-export function Notifications(props) {
+type NotificationsFormValues = {
+	emails ?:Array<string>
+}
+
+export function Notifications(props :{
+	servicesBaseUrl :string
+}) {
 	const {servicesBaseUrl} = props;
+	//console.debug('servicesBaseUrl', servicesBaseUrl);
 
-	const [initialValues, setInitialValues] = React.useState(false);
+	const [initialValues, setInitialValues] = React.useState<NotificationsFormValues>(undefined);
+	//console.debug('initialValues', initialValues);
 
-	function fetchNotifications() {
+	const memoizedFetchNotifications = React.useCallback(() => {
 		fetch(`${servicesBaseUrl}/notifications`)
 			.then(response => response.json())
 			.then(data => {
 				//console.debug('data', data);
 				setInitialValues(data);
 			});
-	}
+	}, [
+		servicesBaseUrl
+	]);
 
-	React.useEffect(() => fetchNotifications(), []);
+	React.useEffect(() => memoizedFetchNotifications(), [
+		memoizedFetchNotifications
+	]);
 
 	//console.debug('initialValues', initialValues);
 
 	return <>
 		<Header as='h1'>Notifications</Header>
 		{initialValues
-			? <EnonicForm
+			? <EnonicForm<NotificationsFormValues>
 				initialValues={initialValues}
 				onSubmit={(values) => {
 					//console.debug('values', values);

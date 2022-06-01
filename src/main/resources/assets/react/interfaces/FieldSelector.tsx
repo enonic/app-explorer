@@ -28,8 +28,8 @@ export function FieldSelector(props :{
 	value ?:Array<InterfaceField>
 }) {
 
-	const [context/*, dispatch*/] = getEnonicContext();
-	const collectionIds :Array<string> = getIn(context.values, 'collectionIds') || [];
+	const {state} = getEnonicContext();
+	const collectionIds :Array<string> = getIn(state.values, 'collectionIds') || [];
 
 	const {
 		collectionIdToFieldKeys = {},
@@ -40,7 +40,7 @@ export function FieldSelector(props :{
 		name = 'fields',
 		parentPath,
 		path = parentPath ? `${parentPath}.${name}` : name,
-		value = getIn(context.values, path)//,
+		value = getIn(state.values, path)//,
 		//...rest
 	} = props;
 	//console.debug('globalFieldsObj', globalFieldsObj);
@@ -110,64 +110,66 @@ export function FieldSelector(props :{
 				</Table.Row>
 			</Table.Header>
 			<Table.Body>
-				<List
+				<List<InterfaceField>
 					path={path}
-					render={(fieldsArray :Array<InterfaceField>) => fieldsArray.map(({
-						//boost,
-						name
-					}, index) => {
-						const key =`${path}.${index}`;
-						return <Table.Row key={key}>
-							<Table.Cell>
-								<Dropdown
-									disabled={disabled}
-									fluid
-									options={fieldOptions}
-									path={`${key}.name`}
-									placeholder='Please select a field'
-									search
-									selection
-								/>
-							</Table.Cell>
-							<Table.Cell>
-								{name
-									? <Input
+					render={(fieldsArray) => <>
+						{fieldsArray.map(({
+							//boost,
+							name
+						}, index) => {
+							const key =`${path}.${index}`;
+							return <Table.Row key={key}>
+								<Table.Cell>
+									<Dropdown
 										disabled={disabled}
 										fluid
-										parentPath={key}
-										name='boost'
-										type='number'
+										options={fieldOptions}
+										path={`${key}.name`}
+										placeholder='Please select a field'
+										search
+										selection
 									/>
-									: null
-								}
-							</Table.Cell>
-							<Table.Cell collapsing>
-								<Button.Group icon>
-									<InsertButton
-										disabled={disabled}
-										index={index+1}
-										path={path}
-										value={{name: '', boost: 1}}
-									/>
-									<MoveDownButton
-										disabled={disabled || index + 1 >= fieldsArray.length}
-										index={index}
-										path={path}
-									/>
-									<MoveUpButton
-										disabled={disabled || index === 0}
-										index={index}
-										path={path}
-									/>
-									<DeleteItemButton
-										disabled={disabled || fieldsArray.length === 1}
-										index={index}
-										path={path}
-									/>
-								</Button.Group>
-							</Table.Cell>
-						</Table.Row>;
-					})}
+								</Table.Cell>
+								<Table.Cell>
+									{name
+										? <Input
+											disabled={disabled}
+											fluid
+											parentPath={key}
+											name='boost'
+											type='number'
+										/>
+										: null
+									}
+								</Table.Cell>
+								<Table.Cell collapsing>
+									<Button.Group icon>
+										<InsertButton
+											disabled={disabled}
+											index={index+1}
+											path={path}
+											value={{name: '', boost: 1}}
+										/>
+										<MoveDownButton
+											disabled={disabled || index + 1 >= fieldsArray.length}
+											index={index}
+											path={path}
+										/>
+										<MoveUpButton
+											disabled={disabled || index === 0}
+											index={index}
+											path={path}
+										/>
+										<DeleteItemButton
+											disabled={disabled || fieldsArray.length === 1}
+											index={index}
+											path={path}
+										/>
+									</Button.Group>
+								</Table.Cell>
+							</Table.Row>;
+						})}
+					</>}
 				/>
 			</Table.Body>
 		</Table>

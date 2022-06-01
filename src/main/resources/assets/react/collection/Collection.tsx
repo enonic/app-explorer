@@ -91,7 +91,7 @@ export function Collection(props :{
 
 	const collectionNames = collections.map(({_name}) => _name);
 
-	return <EnonicForm
+	return <EnonicForm<CollectionValues>
 		afterValidate={(/*dereffed*/) => {
 			//console.debug('Collection afterValidate dereffed', dereffed);
 		}}

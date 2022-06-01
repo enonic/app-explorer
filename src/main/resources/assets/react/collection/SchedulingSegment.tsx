@@ -15,8 +15,8 @@ import {
 
 
 export function SchedulingSegment(/*props*/) {
-	const [context/*, dispatch*/] = getEnonicContext();
-	const collectorName = getIn(context.values, 'collector.name');
+	const {state} = getEnonicContext();
+	const collectorName = getIn(state.values, 'collector.name');
 	const cronPath = 'cron';
 	return collectorName ? <Segment color='green'>
 		<Header as='h2' dividing content='Scheduling' id='cron'/>
@@ -24,130 +24,138 @@ export function SchedulingSegment(/*props*/) {
 			path='doCollect'
 			label='Activate scheduling'
 		/>
-		<List
+		<List<{
+			minute :string
+			hour :string
+			dayOfMonth :string
+			month :string
+			dayOfWeek :string
+		}>
 			path={cronPath}
 			render={(cronArray) => {
 				//console.debug('Collection List cronArray', cronArray);
-				return cronArray.map(({
-					minute,
-					hour,
-					dayOfMonth,
-					month,
-					dayOfWeek
-				}, index) => {
-					const key=`cron.${index}`;
-					return <Table celled compact selectable striped key={key}>
-						<Table.Body>
-							<Table.Row>
-								<Table.HeaderCell>Month</Table.HeaderCell>
-								<Table.Cell><Dropdown
-									options={MONTH_OPTIONS.map(({value, text = value}) => ({
-										key: value,
-										text,
-										value
-									}))}
-									path={`${key}.month`}
-									placeholder='Select month'
-									search
-									selection
-									value={month}
-								/></Table.Cell>
-							</Table.Row>
-							<Table.Row>
-								<Table.HeaderCell>Day of month</Table.HeaderCell>
-								<Table.Cell><Dropdown
-									options={DAY_OF_MONTH_OPTIONS.map(({value, text = value}) => ({
-										key: value,
-										text,
-										value
-									}))}
-									path={`${key}.dayOfMonth`}
-									placeholder='Select day of month'
-									search
-									selection
-									value={dayOfMonth}
-								/></Table.Cell>
-							</Table.Row>
-							<Table.Row>
-								<Table.HeaderCell>Day of week</Table.HeaderCell>
-								<Table.Cell><Dropdown
-									options={DAY_OF_WEEK_OPTIONS.map(({value, text = value}) => ({
-										key: value,
-										text,
-										value
-									}))}
-									path={`${key}.dayOfWeek`}
-									placeholder='Select day of week'
-									search
-									selection
-									value={dayOfWeek}
-								/></Table.Cell>
-							</Table.Row>
-							<Table.Row>
-								<Table.HeaderCell>Hour</Table.HeaderCell>
-								<Table.Cell><Dropdown
-									options={HOUR_OPTIONS.map(({value, text = value}) => ({
-										key: value,
-										text,
-										value
-									}))}
-									path={`${key}.hour`}
-									placeholder='Select hour'
-									search
-									selection
-									value={hour}
-								/></Table.Cell>
-							</Table.Row>
-							<Table.Row>
-								<Table.HeaderCell>Minute</Table.HeaderCell>
-								<Table.Cell><Dropdown
-									options={MINUTE_OPTIONS.map(({value, text = value}) => ({
-										key: value,
-										text,
-										value
-									}))}
-									path={`${key}.minute`}
-									placeholder='Select minute'
-									search
-									selection
-									value={minute}
-								/></Table.Cell>
-							</Table.Row>
-							<Table.Row>
-								<Table.HeaderCell>Actions</Table.HeaderCell>
-								<Table.Cell>
-									<Button.Group icon>
-										<InsertButton
-											path={cronPath}
-											index={index+1}
-											value={{
-												month: '*',
-												dayOfMonth: '*',
-												dayOfWeek: '*',
-												minute: '*',
-												hour: '*'
-											}}
-										/>
-										<MoveDownButton
-											disabled={index + 1 >= cronArray.length}
-											path={cronPath}
-											index={index}
-										/>
-										<MoveUpButton
-											path={cronPath}
-											index={index}
-										/>
-										<DeleteItemButton
-											disabled={cronArray.length < 2}
-											path={cronPath}
-											index={index}
-										/>
-									</Button.Group>
-								</Table.Cell>
-							</Table.Row>
-						</Table.Body>
-					</Table>;
-				});
+				return <>
+					{cronArray.map(({
+						minute,
+						hour,
+						dayOfMonth,
+						month,
+						dayOfWeek
+					}, index) => {
+						const key=`cron.${index}`;
+						return <Table celled compact selectable striped key={key}>
+							<Table.Body>
+								<Table.Row>
+									<Table.HeaderCell>Month</Table.HeaderCell>
+									<Table.Cell><Dropdown
+										options={MONTH_OPTIONS.map(({value, text = value}) => ({
+											key: value,
+											text,
+											value
+										}))}
+										path={`${key}.month`}
+										placeholder='Select month'
+										search
+										selection
+										value={month}
+									/></Table.Cell>
+								</Table.Row>
+								<Table.Row>
+									<Table.HeaderCell>Day of month</Table.HeaderCell>
+									<Table.Cell><Dropdown
+										options={DAY_OF_MONTH_OPTIONS.map(({value, text = value}) => ({
+											key: value,
+											text,
+											value
+										}))}
+										path={`${key}.dayOfMonth`}
+										placeholder='Select day of month'
+										search
+										selection
+										value={dayOfMonth}
+									/></Table.Cell>
+								</Table.Row>
+								<Table.Row>
+									<Table.HeaderCell>Day of week</Table.HeaderCell>
+									<Table.Cell><Dropdown
+										options={DAY_OF_WEEK_OPTIONS.map(({value, text = value}) => ({
+											key: value,
+											text,
+											value
+										}))}
+										path={`${key}.dayOfWeek`}
+										placeholder='Select day of week'
+										search
+										selection
+										value={dayOfWeek}
+									/></Table.Cell>
+								</Table.Row>
+								<Table.Row>
+									<Table.HeaderCell>Hour</Table.HeaderCell>
+									<Table.Cell><Dropdown
+										options={HOUR_OPTIONS.map(({value, text = value}) => ({
+											key: value,
+											text,
+											value
+										}))}
+										path={`${key}.hour`}
+										placeholder='Select hour'
+										search
+										selection
+										value={hour}
+									/></Table.Cell>
+								</Table.Row>
+								<Table.Row>
+									<Table.HeaderCell>Minute</Table.HeaderCell>
+									<Table.Cell><Dropdown
+										options={MINUTE_OPTIONS.map(({value, text = value}) => ({
+											key: value,
+											text,
+											value
+										}))}
+										path={`${key}.minute`}
+										placeholder='Select minute'
+										search
+										selection
+										value={minute}
+									/></Table.Cell>
+								</Table.Row>
+								<Table.Row>
+									<Table.HeaderCell>Actions</Table.HeaderCell>
+									<Table.Cell>
+										<Button.Group icon>
+											<InsertButton
+												path={cronPath}
+												index={index+1}
+												value={{
+													month: '*',
+													dayOfMonth: '*',
+													dayOfWeek: '*',
+													minute: '*',
+													hour: '*'
+												}}
+											/>
+											<MoveDownButton
+												disabled={index + 1 >= cronArray.length}
+												path={cronPath}
+												index={index}
+											/>
+											<MoveUpButton
+												path={cronPath}
+												index={index}
+											/>
+											<DeleteItemButton
+												disabled={cronArray.length < 2}
+												path={cronPath}
+												index={index}
+											/>
+										</Button.Group>
+									</Table.Cell>
+								</Table.Row>
+							</Table.Body>
+						</Table>;
+					})}
+				</>
 			}}
 		/>
 	</Segment> : null;

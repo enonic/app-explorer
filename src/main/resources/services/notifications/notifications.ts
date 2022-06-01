@@ -1,3 +1,11 @@
+import type {
+	//Notifications,
+	NotificationsNode,
+	NotificationsNodeCreateParams,
+	NotificationsNodeSpecific
+} from '/lib/explorer/types/index.d';
+
+
 import {
 	RESPONSE_TYPE_JSON,
 	forceArray//,
@@ -14,12 +22,12 @@ import {get as getNode} from '/lib/explorer/node/get';
 
 
 export function get() {
-	const node = getNode({
+	const node = getNode<NotificationsNode>({
 		connection: connect({
 			principals: [PRINCIPAL_EXPLORER_READ]
 		}),
 		path: '/notifications'
-	}) || {};
+	}) || {} as NotificationsNode;
 	//log.info(toStr({node}));
 
 	const {emails = []} = node;
@@ -43,13 +51,13 @@ export function post({
 	//log.info(`json:${toStr(json)}`);
 
 	try {
-		const obj = JSON.parse(json);
+		const obj = JSON.parse(json) as NotificationsNodeSpecific;
 		//log.info(`obj:${toStr(obj)}`);
 
 		const {emails = []} = obj;
 		//log.info(`emails:${toStr(emails)}`);
 
-		createOrModify({
+		createOrModify<NotificationsNodeCreateParams>({
 			emails,
 			_name: 'notifications'
 		}, {

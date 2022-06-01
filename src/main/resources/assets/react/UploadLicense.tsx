@@ -27,7 +27,7 @@ export const UploadLicense = (props :{
 	return <>
 		<Modal.Header>License check</Modal.Header>
 		<Modal.Content>
-			<Form onSubmit={(event :Event) => {
+			<Form onSubmit={(event) => {
 				event.preventDefault(); // Stop form submit
 				//console.debug(event, file);
 				const formData = new FormData();

@@ -1,5 +1,5 @@
 import type {PaginationProps} from 'semantic-ui-react';
-import type {Locales} from '../index.d';
+//import type {Locales} from '../index.d';
 
 
 import {
@@ -14,14 +14,14 @@ import {useEditSynonymsState} from './useEditSynonymsState';
 
 export function EditSynonyms({
 	// Required
-	locales,
+	//locales,
 	servicesBaseUrl,
 	// Optional
 	thesaurusId,
 	thesaurusName
 } :{
 	// Required
-	locales :Locales
+	//locales :Locales
 	servicesBaseUrl :string
 	// Optional
 	thesaurusId ?:string
@@ -58,7 +58,7 @@ export function EditSynonyms({
 			<Header as='h4'><Icon name='filter'/> Filter</Header>
 			<Form.Field>
 				<Form.Input
-					fluid='true'
+					fluid={true}
 					label='From'
 					onChange={({target:{value}}) => setFrom(value)}
 					placeholder='From'
@@ -67,7 +67,7 @@ export function EditSynonyms({
 			</Form.Field>
 			<Form.Field>
 				<Form.Input
-					fluid='true'
+					fluid={true}
 					label='To'
 					onChange={({target:{value}}) => setTo(value)}
 					placeholder='To'
@@ -182,7 +182,6 @@ export function EditSynonyms({
 								_id={_id}
 								afterClose={memoizedQuerySynonyms}
 								from={from}
-								locales={locales}
 								servicesBaseUrl={servicesBaseUrl}
 								to={to}
 								thesaurusId={thesaurusReference}
@@ -229,7 +228,6 @@ export function EditSynonyms({
 				/>
 				<p>Displaying {start}-{end} of {total}</p>
 				{thesaurusId && <NewOrEditSynonym
-					locales={locales}
 					afterClose={memoizedQuerySynonyms}
 					servicesBaseUrl={servicesBaseUrl}
 					thesaurusId={thesaurusId}

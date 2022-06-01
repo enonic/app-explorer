@@ -418,6 +418,11 @@ WEBPACK_CONFIG.push(STYLE_CONFIG);
 //──────────────────────────────────────────────────────────────────────────────
 // Clientside javascript
 //──────────────────────────────────────────────────────────────────────────────
+const CS_EXTERNALS = {
+	react: 'React',
+	'react-dom': 'ReactDOM'
+};
+
 const CS_MINIMIZER = [];
 if(MODE === 'production') {
 	CS_MINIMIZER.push(new TerserPlugin({
@@ -435,10 +440,7 @@ const ASSETS_CONTEXT = path.resolve(__dirname, SRC_DIR, 'assets');
 const CLIENT_JS_CONFIG = {
 	context: SRC_ASSETS_DIR_ABS,
 	entry: './react/index.tsx',
-	externals: {
-		react: 'React',
-		'react-dom': 'ReactDOM'
-	},
+	externals: CS_EXTERNALS,
 	devtool: MODE === 'production' ? false : 'eval-source-map', // https://webpack.js.org/configuration/devtool/#devtool
 	mode: MODE,
 	module: {
@@ -559,10 +561,7 @@ const CLIENT_ES_CONFIG = {
 		'Explorer': './Explorer.tsx',
 		'WebCrawler': './WebCrawler.tsx'
 	},
-	externals: {
-		react: 'React',
-		'react-dom': 'ReactDOM'
-	},
+	externals: CS_EXTERNALS,
 	mode: MODE,
 	module: {
 		rules: [{

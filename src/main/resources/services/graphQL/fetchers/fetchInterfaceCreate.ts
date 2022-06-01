@@ -1,3 +1,6 @@
+import type {InterfaceField} from '/lib/explorer/types/index.d';
+
+
 import {GQL_MUTATION_INTERFACE_CREATE} from '../mutations/interfaceCreateMutation';
 
 
@@ -33,7 +36,7 @@ export function fetchInterfaceCreate({
 	variables :{
 		_name? :string
 		collectionIds? :Array<string>
-		fields? :Array<string>
+		fields? :Array<InterfaceField>
 		stopWords? :Array<string>
 		synonymIds? :Array<string>
 	}

@@ -1,3 +1,9 @@
+import type {
+	StrictAccordionContentProps,
+	StrictAccordionProps
+} from 'semantic-ui-react';
+
+
 import * as React from 'react';
 import {
 	Accordion,
@@ -5,9 +11,8 @@ import {
 } from 'semantic-ui-react';
 
 
-export const Panel = (props :{
-	children :unknown
-	fluid ?:boolean
+export const Panel = (props :StrictAccordionProps & {
+	children :StrictAccordionContentProps['children']
 	title ?:string
 }) => {
 	//console.debug('props', props);

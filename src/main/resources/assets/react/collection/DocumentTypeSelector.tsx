@@ -29,7 +29,7 @@ export function DocumentTypeSelector(props :{
 	placeholder ?:string
 	value ?:string
 }) {
-	const [context, dispatch] = getEnonicContext();
+	const {dispatch, state} = getEnonicContext();
 
 	const {
 		servicesBaseUrl,
@@ -37,7 +37,7 @@ export function DocumentTypeSelector(props :{
 		parentPath,
 		path = parentPath ? `${parentPath}.${name}` : name,
 		placeholder = 'Please select a document type (or leave empty and a new one will automatically be created).',
-		value = getIn(context.values, path)/*,
+		value = getIn(state.values, path)/*,
 		...rest*/
 	} = props;
 	//console.debug('context.values',context.values);
@@ -46,7 +46,7 @@ export function DocumentTypeSelector(props :{
 		collector: {
 			name: collectorName = null
 		} = {}
-	} = context.values;
+	} = state.values;
 	//console.debug('collectorName',collectorName);
 
 	const [documentTypes, setDocumentTypes] = React.useState([]);

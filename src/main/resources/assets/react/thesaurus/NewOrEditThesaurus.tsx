@@ -195,7 +195,6 @@ export function NewOrEditThesaurus(props :{
 						{/*_id && <>
 							<Header as='h2' content='Synonyms'/>
 							<EditSynonyms
-								locales={locales}
 								servicesBaseUrl={servicesBaseUrl}
 								thesaurusId={_id}
 								thesaurusName={_name}

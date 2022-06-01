@@ -18,8 +18,13 @@ export function Emails(props :{
 	const {
 		path = 'emails'
 	} = props;
-	const [context/*, dispatch*/] = getEnonicContext();
-	const value = getIn(context.values, path);
+	//console.debug('path', path);
+
+	const {state} = getEnonicContext();
+	//console.debug('state', state);
+
+	const value = getIn(state.values, path);
+	//console.debug('value', value);
 
 	if (!(Array.isArray(value) && value.length)) {
 		return <Form.Field>
@@ -38,48 +43,58 @@ export function Emails(props :{
 			</Table.Row>
 		</Table.Header>
 		<Table.Body>
-			<List
+			<List<string>
 				path={path}
-				render={(emails :Array<string>) => {
-					return emails.map((
-						//@ts-ignore
-						email,
-						index
-					) => {
-						const key=`${path}.${index}`;
-						return <Table.Row key={key}>
-							<Table.Cell>
-								<Input
-									fluid
-									path={key}
-									style={{minWidth:'25em'}}
-								/>
-							</Table.Cell>
-							<Table.Cell>
-								<Button.Group icon>
-									<InsertButton
-										path={path}
-										index={index+1}
-										value={''}
+				render={(emails) => {
+					//console.debug('emails', emails);
+					return <>
+						{emails.map((
+							//@ts-ignore
+							email,
+							index
+						) => {
+							//console.debug('email', email, 'index', index);
+
+							const key=`${path}.${index}`;
+							//console.debug('email', email, 'index', index, 'key', key);
+
+							return <Table.Row key={key}>
+								<Table.Cell>
+									<Input<string>
+										fluid
+										path={key}
+										style={{
+											minWidth:'25em'
+										}}
+										value={email}
 									/>
-									<MoveDownButton
-										disabled={index + 1 >= emails.length}
-										path={path}
-										index={index}
-									/>
-									<MoveUpButton
-										path={path}
-										index={index}
-									/>
-									<DeleteItemButton
-										disabled={emails.length < 2}
-										path={path}
-										index={index}
-									/>
-								</Button.Group>
-							</Table.Cell>
-						</Table.Row>;
-					});
+								</Table.Cell>
+								<Table.Cell>
+									<Button.Group icon>
+										<InsertButton
+											path={path}
+											index={index+1}
+											value={''}
+										/>
+										<MoveDownButton
+											disabled={index + 1 >= emails.length}
+											path={path}
+											index={index}
+										/>
+										<MoveUpButton
+											path={path}
+											index={index}
+										/>
+										<DeleteItemButton
+											disabled={emails.length < 2}
+											path={path}
+											index={index}
+										/>
+									</Button.Group>
+								</Table.Cell>
+							</Table.Row>;
+						})}
+					</>;
 				}}
 			/>
 		</Table.Body>
