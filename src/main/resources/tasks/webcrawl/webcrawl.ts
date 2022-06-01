@@ -1,5 +1,16 @@
+import type {
+	Cheerio,
+	Node,
+	SelectorType
+} from 'cheerio';
+import type {
+	HttpClientRequest,
+	Response
+} from '/lib/explorer/types/index.d';
+
+
 // TypeError: Object.getOwnPropertyDescriptors is not a function
-require('object.getownpropertydescriptors').shim();
+require('object.getownpropertydescriptors').shim(); //eslint-disable-line @typescript-eslint/no-var-requires
 
 //import 'babel-es6-polyfill'; // TypeError: Cannot read property "document" from undefined
 
@@ -11,7 +22,7 @@ require('object.getownpropertydescriptors').shim();
 
 //import 'symbol-es6'; // This does not fix: TypeError: Cannot read property "Symbol" from undefined
 
-require('array.prototype.find').shim();
+require('array.prototype.find').shim(); //eslint-disable-line @typescript-eslint/no-var-requires
 import {
 	//VALUE_TYPE_STRING,
 	toStr
@@ -60,6 +71,19 @@ import {Collector} from '/lib/explorer/collector/Collector';
 import {parseRobotsTxt} from './parseRobotsTxt';
 
 
+type RobotsTxt = {
+	isAllowed :(userAgent :string, path :string) => boolean
+	isDisallowAll :(userAgent :string) => boolean
+	isIndexable :(userAgent :string, path :string) => boolean
+}
+
+type Url = {
+	getHost :() => string
+	getScheme :() => string
+	normalize :() => string
+}
+
+
 /*function normalizeUri(uri) {
   return encodeURI(decodeURI(uri))
 }*/
@@ -71,12 +95,23 @@ const TRACE = false;
 const DEFAULT_UA = 'Mozilla/5.0 (compatible; Enonic XP Explorer Collector Web crawler/1.0.0)';
 
 
-const querySelector = (node, selector) => cheerio(node.find(selector)[0]);
+const querySelector = (
+	node :Cheerio<Node>,
+	selector :SelectorType
+) => cheerio(node.find(selector)[0]);
 
-const querySelectorAll = (node, selector) => node.find(selector).toArray()
+
+const querySelectorAll = (
+	node :Cheerio<Node>,
+	selector :SelectorType
+) => node.find(selector).toArray()
 	.map((element) => cheerio(element));
 
-const getAttributeValue = (node, name) => {
+
+const getAttributeValue = (
+	node :Cheerio<Node>,
+	name :string
+) => {
 	const attributeValue = node.attr(name);
 
 	if (typeof attributeValue === 'string') {
@@ -87,8 +122,9 @@ const getAttributeValue = (node, name) => {
 	return undefined;
 };
 
+
 //const textContent = node => node.text();
-const outerHTML = node => node.clone().wrap('<div>').parent().html();
+const outerHTML = (node :Cheerio<Node>) => node.clone().wrap('<div>').parent().html();
 //const innerHTML = node => node.html();
 
 
@@ -167,7 +203,7 @@ export function run({
 
 	// Galimatias
 	if (!baseUri.includes('://')) { baseUri = `https://${baseUri}`;}
-	const entryPointUrlObj = new URL(baseUri);
+	const entryPointUrlObj :Url = new URL(baseUri);
 
 	const normalizedentryPointUrl = entryPointUrlObj.normalize();
 	DEBUG && log.debug(`normalizedentryPointUrl:${normalizedentryPointUrl}`);
@@ -192,7 +228,7 @@ export function run({
 	const scheme = entryPointUrlObj.scheme;
 	*/
 
-	const robotsReq = {
+	const robotsReq :HttpClientRequest = {
 		contentType: 'text/plain',
 		followRedirects: false,
 		headers: {
@@ -206,8 +242,8 @@ export function run({
 	};
 	DEBUG && log.debug(toStr({robotsReq}));
 
-	const robotsRes = httpClientRequest(robotsReq); //log.debug(toStr({robotsRes}));
-	let robots;
+	const robotsRes = httpClientRequest(robotsReq) as Response; //log.debug(toStr({robotsRes}));
+	let robots :RobotsTxt;
 	if(robotsRes.status === 200 && robotsRes.contentType === 'text/plain') {
 		robots = guard(parseRobotsTxt(robotsRes.body));
 	}
@@ -216,7 +252,7 @@ export function run({
 	const seenUrisObj = {[normalizedentryPointUrl]: true};
 	const queueArr = [normalizedentryPointUrl];
 
-	function throwIfExcluded(normalized) {
+	function throwIfExcluded(normalized :string) {
 		for (let i = 0; i < excludeRegExps.length; i += 1) {
 			if (excludeRegExps[i].test(normalized)) {
 				throw new Error('Matches an exclude regexp!');
@@ -224,7 +260,7 @@ export function run({
 		}
 	}
 
-	function handleNormalizedUri(normalized) {
+	function handleNormalizedUri(normalized :string) {
 		if (
 			!seenUrisObj[normalized]
 		) {
@@ -257,7 +293,9 @@ export function run({
 					_parentPath: '/',
 					_name: nodeName
 				})) {
-					const node = get({
+					const node = get<{
+						uris :Array<string>
+					}>({
 						connection: collector.collection.connection,
 						_name: nodeName
 					});
@@ -278,7 +316,7 @@ export function run({
 						'User-Agent': userAgent
 					},
 					url: uri
-				}); TRACE && log.debug(`res:${toStr(res)}`);
+				}) as Response; TRACE && log.debug(`res:${toStr(res)}`);
 				if (res.status != 200) {
 					throw new Error(`Status: ${res.status}!`);
 				}
