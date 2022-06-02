@@ -11,22 +11,30 @@ type TablesortSettings = {
 	compare :<T>(a :T, b :T) => 1|-1|0
 }
 
-interface Tablesort extends Function {
-	DEBUG :boolean
-	defaults :TablesortSettings
-	destroy :() => null
-	log :(msg :string) => void
-	sort :(th :unknown, direction :Direction) => void
+type Tablesort = (
+	table :JQuery<HTMLTableElement>,
+	settings :TablesortSettings
+) => void
+
+type TablesortProperties = {
+	DEBUG ?:boolean
+	defaults ?:TablesortSettings
+	destroy ?:() => null
+	log ?:(msg :string) => void
+	sort ?:(th :unknown, direction :Direction) => void
 }
 
 interface JQueryStatic {
-	tablesort :Tablesort
+	tablesort :Tablesort & TablesortProperties
+	readonly fn :{ // readonly to avoid: error TS2687: All declarations of 'fn' must have identical modifiers
+		tablesort :(settings :TablesortSettings) => Array<JQuery<HTMLTableElement>>
+	}
 }
 
 interface Window {
 	jQuery ?:JQueryStatic
 	Zepto ?:JQueryStatic
-};
+}
 
 /*
 	A simple, lightweight jQuery plugin for creating sortable tables.
@@ -38,8 +46,8 @@ interface Window {
 	$.tablesort = function (
 		$table :JQuery<HTMLTableElement>,
 		settings :TablesortSettings
-	) :JQuery {
-		var self = this;
+	) :void {
+		const self = this; // eslint-disable-line @typescript-eslint/no-this-alias
 		this.$table = $table;
 		this.$thead = this.$table.find('thead') as JQuery;
 		this.settings = $.extend({}, $.tablesort.defaults, settings);
@@ -50,29 +58,29 @@ interface Window {
 		this.index = null;
 		this.$th = null;
 		this.direction = null;
-		return this; // I've added this because typings require it.
+		//return this; // I've added this because typings require it.
 	};
 
 	$.tablesort.prototype = {
 
 		sort: function(th :JQuery, direction :Direction) {
-			var start = new Date(),
-				self = this,
+			const start = new Date(),
+				self = this, // eslint-disable-line @typescript-eslint/no-this-alias
 				table = this.$table,
 				rowsContainer = table.find('tbody').length > 0 ? table.find('tbody') : table,
 				rows = rowsContainer.find('tr').has('td, th'),
 				cells = rows.find(':nth-child(' + (th.index() + 1) + ')').filter('td, th'),
-				sortBy = th.data().sortBy,
+				sortBy = th.data()['sortBy'],
 				sortedMap = [];
 
-			var unsortedValues = cells.map(function(
+			const unsortedValues = cells.map(function(
 				//@ts-ignore
 				idx :number,
 				cell :JQuery
 			) {
 				if (sortBy)
 					return (typeof sortBy === 'function') ? sortBy($(th), $(cell), self) : sortBy;
-				return ($(this).data().sortValue != null ? $(this).data().sortValue : $(this).text());
+				return ($(this).data()['sortValue'] != null ? $(this).data()['sortValue'] : $(this).text());
 			});
 			if (unsortedValues.length === 0) return;
 
@@ -160,7 +168,7 @@ interface Window {
 	};
 
 	$.fn.tablesort = function(settings :TablesortSettings) {
-		var table :JQuery, previous :Tablesort;
+		let table :JQuery<HTMLTableElement>, previous :TablesortProperties;
 		return this.each(function() {
 			table = $(this);
 			previous = table.data('tablesort');

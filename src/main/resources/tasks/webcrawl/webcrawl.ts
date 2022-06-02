@@ -1,6 +1,6 @@
 import type {
+	AnyNode,
 	Cheerio,
-	Node,
 	SelectorType
 } from 'cheerio';
 import type {
@@ -96,20 +96,20 @@ const DEFAULT_UA = 'Mozilla/5.0 (compatible; Enonic XP Explorer Collector Web cr
 
 
 const querySelector = (
-	node :Cheerio<Node>,
+	node :Cheerio<AnyNode>,
 	selector :SelectorType
 ) => cheerio(node.find(selector)[0]);
 
 
 const querySelectorAll = (
-	node :Cheerio<Node>,
+	node :Cheerio<AnyNode>,
 	selector :SelectorType
 ) => node.find(selector).toArray()
 	.map((element) => cheerio(element));
 
 
 const getAttributeValue = (
-	node :Cheerio<Node>,
+	node :Cheerio<AnyNode>,
 	name :string
 ) => {
 	const attributeValue = node.attr(name);
@@ -124,7 +124,7 @@ const getAttributeValue = (
 
 
 //const textContent = node => node.text();
-const outerHTML = (node :Cheerio<Node>) => node.clone().wrap('<div>').parent().html();
+const outerHTML = (node :Cheerio<AnyNode>) => node.clone().wrap('<div>').parent().html();
 //const innerHTML = node => node.html();
 
 
