@@ -1,6 +1,6 @@
 import type {DropdownItemProps} from 'semantic-ui-react/index.d';
+import type {CollectionFormValues} from '/lib/explorer/types/index.d';
 import type {
-	CollectionValues,
 	CollectorComponents,
 	ContentTypeOptions,
 	Fields,
@@ -26,7 +26,7 @@ export function NewOrEditCollectionModal(props :{
 	collectorOptions :Array<DropdownItemProps>
 	contentTypeOptions :ContentTypeOptions
 	fields :Fields
-	initialValues ?:CollectionValues
+	initialValues ?:CollectionFormValues
 	licenseValid :boolean
 	locales :Locales
 	servicesBaseUrl :string

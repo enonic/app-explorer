@@ -1,24 +1,3 @@
-export type CollectionValues = {
-	_id ?:string
-	_name :string
-	_path :string
-	collector :{
-		configJson ?:string
-		config ?:{}
-		name :string
-	}
-	cron :Array<{
-		month :string
-		dayOfMonth :string
-		dayOfWeek :string
-		minute :string
-		hour :string
-	}>
-	doCollect :boolean
-	documentTypeId ?:string
-	language :string
-};
-
 export type ContentTypeOptions = Array<unknown>;
 export type SiteOptions = Array<unknown>;
 

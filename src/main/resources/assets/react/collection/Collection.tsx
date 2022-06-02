@@ -1,6 +1,6 @@
 import type {DropdownItemProps} from 'semantic-ui-react/index.d';
+import type {CollectionFormValues} from '/lib/explorer/types/index.d';
 import type {
-	CollectionValues,
 	CollectorComponents,
 	ContentTypeOptions,
 	Fields,
@@ -48,7 +48,7 @@ export function Collection(props :{
 	doClose :() => void
 	fields :Fields
 	locales :Locales
-	initialValues :CollectionValues
+	initialValues :CollectionFormValues
 	servicesBaseUrl :string
 	siteOptions :SiteOptions
 }) {
@@ -81,7 +81,7 @@ export function Collection(props :{
 			}],
 			doCollect: false,
 			language: ''
-		} as CollectionValues
+		} as CollectionFormValues
 	} = props;
 	//console.debug('Collection initialValues', initialValues);
 
@@ -91,7 +91,7 @@ export function Collection(props :{
 
 	const collectionNames = collections.map(({_name}) => _name);
 
-	return <EnonicForm<CollectionValues>
+	return <EnonicForm<CollectionFormValues>
 		afterValidate={(/*dereffed*/) => {
 			//console.debug('Collection afterValidate dereffed', dereffed);
 		}}
@@ -102,7 +102,7 @@ export function Collection(props :{
 		onChange={(/*values*/) => {
 			//console.debug('Collection onChange values', values);
 		}}
-		onSubmit={(values :CollectionValues) => {
+		onSubmit={(values :CollectionFormValues) => {
 			//console.debug('submit values', values);
 
 			const {_id} = initialValues;
