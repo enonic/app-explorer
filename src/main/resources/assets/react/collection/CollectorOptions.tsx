@@ -1,3 +1,4 @@
+import type {CollectionFormValues} from '/lib/explorer/types/index.d';
 import type {
 	CollectorComponents,
 	ContentTypeOptions,
@@ -26,9 +27,9 @@ export function CollectorOptions(props :{
 		siteOptions
 	} = props;
 
-	const {dispatch, state} = getEnonicContext();
+	const {dispatch, state} = getEnonicContext<CollectionFormValues>();
 	//console.debug('CollectorOptions context', context);
-	const collectorName = getIn(state.values, 'collector.name');
+	const collectorName :string = getIn(state.values, 'collector.name');
 
 	const isFirstRun = React.useRef(true);
 

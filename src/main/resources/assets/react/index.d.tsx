@@ -1,25 +1,5 @@
-export type ContentTypeOptions = Array<unknown>;
-export type SiteOptions = Array<unknown>;
+import type {CollectorProps} from '/lib/explorer/types/index.d';
 
-export type Fields = Record<string,{
-	label :string
-}>;
-
-export type CollectorProps = {
-	context :{
-		values :unknown
-	}
-	dispatch :(theThing:unknown) => void
-	explorer :{
-		contentTypeOptions :ContentTypeOptions
-		fields :Fields
-		siteOptions :SiteOptions
-	}
-	isFirstRun :{
-		current :boolean
-	}
-	path :string
-};
 
 export type CollectorComponent = (props :CollectorProps) => JSX.Element;
 export type CollectorComponents = Record<string,CollectorComponent>;

@@ -1,3 +1,6 @@
+import type {CollectionFormValues} from '/lib/explorer/types/index.d';
+
+
 import {getIn} from '@enonic/js-utils';
 import * as React from 'react';
 import {
@@ -29,7 +32,7 @@ export function DocumentTypeSelector(props :{
 	placeholder ?:string
 	value ?:string
 }) {
-	const {dispatch, state} = getEnonicContext();
+	const {dispatch, state} = getEnonicContext<CollectionFormValues>();
 
 	const {
 		servicesBaseUrl,
