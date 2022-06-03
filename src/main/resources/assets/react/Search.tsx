@@ -126,20 +126,24 @@ export function Search(props :{
 		fieldsHits.push('_score');
 		variables['searchString'] = {
 			required: true,
-			value: 'whatever'
+			value: searchString
 		};
+
 		const gqlQuery = gql.query({
-		  operation: 'search',
-		  fields: [
-			  'count',
-			  {
-				  hits: fieldsHits
-			  },
-			  'total'
-		  ],
-		  variables
-	  	});
-		//console.debug('Search() gqlQuery:', gqlQuery);
+			operation: 'search',
+			fields: [
+				'count',
+				{
+					hits: fieldsHits
+				},
+				'total'
+			],
+			variables
+		}, null, {
+			operationName: 'InterfaceSearch'
+		});
+		console.debug('Search() gqlQuery:', gqlQuery);
+
 		fetch(uri, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
@@ -181,8 +185,7 @@ export function Search(props :{
 						}
 					}}
 					onChange={(
-						//@ts-ignore
-						ignored,
+						_event,
 						{value}
 					) => {
 						//console.debug('onChange value',value);
@@ -196,8 +199,7 @@ export function Search(props :{
 					checked={boolOnChange}
 					label='Search on every input change?'
 					onChange={(
-						//@ts-ignore
-						ignored,
+						_event,
 						{checked}
 					)=>setBoolOnChange(checked)}
 				/>
