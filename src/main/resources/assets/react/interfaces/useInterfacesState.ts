@@ -33,6 +33,7 @@ const GQL_DOCUMENTS = `queryDocuments(
 		}
 	}]
     count: 0
+	countFieldValues: true
 )
 {
 	aggregations {
@@ -41,6 +42,10 @@ const GQL_DOCUMENTS = `queryDocuments(
 			docCount
 			key
     	}
+    }
+	fieldValueCounts {
+		count
+		fieldPath
     }
 }`
 

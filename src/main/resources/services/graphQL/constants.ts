@@ -38,6 +38,8 @@ export const GQL_TYPE_COLLECTIONS_QUERY_RESULT = 'CollectionsQueryResult';
 
 export const GQL_TYPE_DOCUMENT_NAME = 'Document';
 export const GQL_TYPE_DOCUMENT_QUERY_RESULT_NAME = 'DocumentQueryResult';
+export const GQL_TYPE_DOCUMENT_QUERY_RESULT_FIELD_COUNT = 'DocumentQueryResultFieldCount';
+
 export const GQL_TYPE_DOCUMENT_TYPE_NAME = 'DocumentType';
 export const GQL_TYPE_DOCUMENT_TYPE_QUERY_RESULT_NAME = 'DocumentTypeQueryResult';
 

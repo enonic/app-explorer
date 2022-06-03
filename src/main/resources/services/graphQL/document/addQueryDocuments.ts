@@ -1,7 +1,9 @@
 import {
-	addQueryFilter//,
-	//camelize,
-	//toStr
+	VALUE_TYPE_SET,
+	addQueryFilter,
+	camelize,
+	isSet,
+	toStr
 } from '@enonic/js-utils';
 import {getCollectionIds} from '/lib/explorer/collection/getCollectionIds';
 import {
@@ -10,11 +12,12 @@ import {
 	FIELD_PATH_META,
 	PRINCIPAL_EXPLORER_READ
 } from '/lib/explorer/constants';
-//import {queryDocumentTypes} from '/lib/explorer/documentType/queryDocumentTypes';
+import {queryDocumentTypes} from '/lib/explorer/documentType/queryDocumentTypes';
 import {hasValue} from '/lib/explorer/query/hasValue';
 import {connect} from '/lib/explorer/repo/connect';
 import {multiConnect} from '/lib/explorer/repo/multiConnect';
 import {
+	GraphQLBoolean,
 	GraphQLInt,
 	GraphQLString,
 	Json as GraphQLJson,
@@ -31,6 +34,7 @@ import {
 	GQL_TYPE_AGGREGATION_TERMS_BUCKET_NAME,
 	GQL_TYPE_AGGREGATION_TERMS_NAME,
 	GQL_TYPE_DOCUMENT_NAME,
+	GQL_TYPE_DOCUMENT_QUERY_RESULT_FIELD_COUNT,
 	GQL_TYPE_DOCUMENT_QUERY_RESULT_NAME
 } from '../constants';
 
@@ -73,6 +77,7 @@ const FIELD_NAME_TO_PATH = {
 	collectionName: 'document_metadata.collection'
 };
 
+const FIELD_VALUE_COUNT_AGGREGATION_PREFIX = '_count_Field_';
 
 function aggregationsArgToQuery({
 	aggregationsArg = []
@@ -93,7 +98,7 @@ function aggregationsArgToQuery({
 				minDocCount
 			} = {}
 		} = aggregationsArg[i];
-		//if (field) {
+		if (field) {
 		obj[name] = {
 			terms: {
 				field: FIELD_NAME_TO_PATH[field],
@@ -102,7 +107,7 @@ function aggregationsArgToQuery({
 				minDocCount
 			}
 		};
-		/*} else if (fields && fields.length) {
+	} /*else if (fields && fields.length) {
 			obj[name] = {
 				count: {
 					field: fields[0]
@@ -114,22 +119,46 @@ function aggregationsArgToQuery({
 } // aggregationsArgToQuery
 
 
-function aggregationsResToList({
-	aggregations = {}
+function processAggregationsRes({
+	aggregations = {},
+	fieldNameToPath = {}
 } :{
 	aggregations ?:Record<string,AggregationRes>
+	fieldNameToPath ?:Record<string,string>
 }) {
 	const list = [];
+	const fieldValueCounts = [];
 	const names = Object.keys(aggregations);
 	for (let i = 0; i < names.length; i++) {
 	    const name = names[i];
-		list.push({
-			name,
-			buckets: aggregations[name]['buckets']
-		});
+		const {buckets, value} = aggregations[name];
+		if (buckets) {
+			list.push({
+				name,
+				buckets
+			});
+		} else if (isSet(value)) {
+			const camelizedFieldKey = name.replace(FIELD_VALUE_COUNT_AGGREGATION_PREFIX, '');
+			if (camelizedFieldKey) {
+				const fieldPath = fieldNameToPath[camelizedFieldKey];
+				if (fieldPath) {
+					fieldValueCounts.push({
+						count: value,
+						fieldPath
+					});
+				} else {
+					log.error('Unable to find fieldPath from camelizedFieldKey:%s in fieldNameToPath:%s', camelizedFieldKey, toStr(fieldNameToPath));
+				}
+			} else {
+				log.error('camelizedFieldKey became empty? name:%s', name);
+			}
+		}
 	}
-	return list;
-} // aggregationsResToList
+	return {
+		aggregations: list,
+		fieldValueCounts
+	}
+} // processAggregationsRes
 
 
 export function addQueryDocuments({
@@ -176,12 +205,14 @@ export function addQueryDocuments({
 			})),
 			collections: list(GraphQLString),
 			count: GraphQLInt,
+			countFieldValues :GraphQLBoolean,
 			start: GraphQLInt
 		},
 		resolve(env :{
 			args: {
 				aggregations ?:Array<AggregationArg>
 				count ?:number
+				countFieldValues ?:boolean
 				collections ?:Array<string>
 				start ?:number
 			}
@@ -193,6 +224,7 @@ export function addQueryDocuments({
 					aggregations: aggregationsArg = [],
 					collections = [],
 					count = 10,
+					countFieldValues = false,
 					start = 0
 				}
 			} = env;
@@ -249,34 +281,42 @@ export function addQueryDocuments({
 			}
 			//log.debug('sources:%s', toStr(sources));
 
-			/*const documentTypes = queryDocumentTypes({
+			const documentTypes = queryDocumentTypes({
 				readConnection: connect({ principals: [PRINCIPAL_EXPLORER_READ] })
-			}).hits;*/
+			}).hits;
 			//log.debug('documentTypes:%s', toStr(documentTypes));
 
-			//const fieldNameToPath = {};
+			const fieldNameToPath = {};
 			const aggregations = aggregationsArgToQuery({aggregationsArg});
-			/*for (let i = 0; i < documentTypes.length; i++) {
+			for (let i = 0; i < documentTypes.length; i++) {
 			    const {properties} = documentTypes[i];
 				for (let j = 0; j < properties.length; j++) {
-				    const {name} = properties[j];
-					const camelizedFieldKey = camelize(name, /[.-]/g);
-					if (fieldNameToPath[camelizedFieldKey]) {
-						//log.debug(`name:${camelizedFieldKey} -> path:${name} already exist in fieldNameToPath`);
-						if (fieldNameToPath[camelizedFieldKey] !== name) {
-							log.error(`name:${camelizedFieldKey} newPath:${name} does not match oldPath:${fieldNameToPath[camelizedFieldKey]}!`);
-						}
-					} else {
-						fieldNameToPath[camelizedFieldKey] = name;
-						aggregations[`_count_Field_${camelizedFieldKey}`] = {
-							count: {
-								field: name
+				    const {
+						name,
+						valueType
+					} = properties[j];
+					//log.debug('name:%s valueType:%s', name, valueType);
+					if (valueType !== VALUE_TYPE_SET) {
+						const camelizedFieldKey = camelize(name, /[.-]/g);
+						if (fieldNameToPath[camelizedFieldKey]) {
+							//log.debug(`name:${camelizedFieldKey} -> path:${name} already exist in fieldNameToPath`);
+							if (fieldNameToPath[camelizedFieldKey] !== name) {
+								log.error(`name:${camelizedFieldKey} newPath:${name} does not match oldPath:${fieldNameToPath[camelizedFieldKey]}!`);
+							}
+						} else {
+							fieldNameToPath[camelizedFieldKey] = name;
+							if (countFieldValues) {
+								aggregations[`${FIELD_VALUE_COUNT_AGGREGATION_PREFIX}${camelizedFieldKey}`] = {
+									count: {
+										field: name
+									}
+								}
 							}
 						}
-					}
+					} // !VALUE_TYPE_SET
 				} // for properties
 			} // for documentTypes
-			//log.debug('fieldNameToPath:%s', toStr(fieldNameToPath));*/
+			//log.debug('fieldNameToPath:%s', toStr(fieldNameToPath));
 
 			const multiConnectParams = {
 				principals: [PRINCIPAL_EXPLORER_READ],
@@ -309,12 +349,19 @@ export function addQueryDocuments({
 			//log.debug('queryResult:%s', toStr(queryResult));
 			//log.debug('queryResult.aggregations:%s', toStr(queryResult.aggregations));
 
+			const {
+				aggregations: list,
+				fieldValueCounts
+			} = processAggregationsRes({
+				aggregations: queryResult.aggregations,
+				fieldNameToPath
+			});
+
 			return {
-				aggregations: aggregationsResToList({
-					aggregations: queryResult.aggregations
-				}),
-				aggregationsAsJson: JSON.stringify(queryResult.aggregations),
+				aggregations: list,
+				//aggregationsAsJson: JSON.stringify(queryResult.aggregations),
 				count: queryResult.count,
+				fieldValueCounts,
 				total: queryResult.total,
 				hits: queryResult.hits.map(({
 					branch,
@@ -380,8 +427,15 @@ export function addQueryDocuments({
 						}))},
 					}
 				}))},
-				aggregationsAsJson: { type: GraphQLJson },
+				//aggregationsAsJson: { type: GraphQLJson },
 				count: { type: nonNull(GraphQLInt) },
+				fieldValueCounts: { type: list(glue.addObjectType({
+					name: GQL_TYPE_DOCUMENT_QUERY_RESULT_FIELD_COUNT,
+					fields: {
+						count: { type: nonNull(GraphQLInt) },
+						fieldPath: { type: nonNull(GraphQLString) }
+					}
+				}))},
 				total: { type: nonNull(GraphQLInt) },
 				hits: { type: list(glue.addObjectType({
 					name: GQL_TYPE_DOCUMENT_NAME,
