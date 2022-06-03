@@ -4,7 +4,7 @@ import type {
 } from '/lib/explorer/types/index.d';
 
 
-import {toStr} from '@enonic/js-utils';
+//import {toStr} from '@enonic/js-utils';
 //@ts-ignore
 //import {getMultipartStream} from '/lib/xp/portal';
 //@ts-ignore
@@ -17,7 +17,7 @@ export function post(req :EnonicXpRequest) :Response<{
 	licenseValid :boolean
 	licenseText :string
 }> {
-	log.info('req:%s', toStr(req));
+	//log.info('req:%s', toStr(req));
 
 	//const licenseStream = getMultipartStream('license');
 	//const license :string = readText(licenseStream);
