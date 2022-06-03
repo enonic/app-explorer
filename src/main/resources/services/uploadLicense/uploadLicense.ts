@@ -1,3 +1,10 @@
+import type {
+	EnonicXpRequest,
+	Response
+} from '/lib/explorer/types/index.d';
+
+
+import {toStr} from '@enonic/js-utils';
 //@ts-ignore
 import {getMultipartStream} from '/lib/xp/portal';
 //@ts-ignore
@@ -6,11 +13,16 @@ import {readText} from '/lib/xp/io';
 import {installLicense, getIssuedTo} from '/lib/licensing';
 
 
-export function post(/*req*/) {
-	const licenseStream = getMultipartStream('license');
-	const license = readText(licenseStream);
+export function post(req :EnonicXpRequest) :Response<{
+	licenseValid :boolean
+	licenseText :string
+}> {
+	log.info('req:%s', toStr(req));
 
-	const licenseInstalled = installLicense(license);
+	const licenseStream = getMultipartStream('license');
+	const license :string = readText(licenseStream);
+
+	const licenseInstalled :boolean = installLicense(license);
 
 	return {
 		status: licenseInstalled ? 200 : 500,
