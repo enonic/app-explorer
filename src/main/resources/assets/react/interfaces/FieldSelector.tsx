@@ -1,3 +1,4 @@
+import type {DropdownItemProps} from 'semantic-ui-react/index.d';
 import type {InterfaceField} from '/lib/explorer/types/index.d';
 
 
@@ -21,6 +22,7 @@ import {DEFAULT_INTERFACE_FIELDS} from '../../../constants';
 export function FieldSelector(props :{
 	collectionIdToFieldKeys ?:Record<string,Array<string>>
 	disabled ?:boolean
+	fieldOptions :Array<DropdownItemProps>
 	globalFieldsObj ?:Record<string,true>
 	name ?:string
 	parentPath ?:string
@@ -34,6 +36,7 @@ export function FieldSelector(props :{
 	const {
 		collectionIdToFieldKeys = {},
 		disabled = false,
+		fieldOptions = [],
 		globalFieldsObj = {
 			'_allText': true // TODO Hardcode
 		},
@@ -82,13 +85,13 @@ export function FieldSelector(props :{
 	});
 	//console.debug('fieldKeysObj', fieldKeysObj);
 
-	const fieldOptions = Object.keys(fieldKeysObj).sort()
+	/*const fieldOptions = Object.keys(fieldKeysObj).sort()
 		.map((key) => ({
 			icon: fieldKeysObj[key].icon,
 			key,
 			text: key,
 			value: key
-		}));
+		}));*/
 	//console.debug('fieldOptions', fieldOptions);
 
 	// This should not be needed:

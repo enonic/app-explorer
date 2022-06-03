@@ -286,8 +286,15 @@ export function addQueryDocuments({
 			}).hits;
 			//log.debug('documentTypes:%s', toStr(documentTypes));
 
-			const fieldNameToPath = {};
+			const fieldNameToPath = {
+				//_allText: '_allText'
+			};
 			const aggregations = aggregationsArgToQuery({aggregationsArg});
+			/*aggregations[`${FIELD_VALUE_COUNT_AGGREGATION_PREFIX}_allText`] = {
+				count: {
+					field: '_allText' // _alltext/_allText just returns 0
+				}
+			}*/
 			for (let i = 0; i < documentTypes.length; i++) {
 			    const {properties} = documentTypes[i];
 				for (let j = 0; j < properties.length; j++) {
@@ -356,6 +363,13 @@ export function addQueryDocuments({
 				aggregations: queryResult.aggregations,
 				fieldNameToPath
 			});
+
+			if (countFieldValues) {
+				fieldValueCounts.push({
+					count: queryResult.total,
+					fieldPath: '_alltext'
+				});
+			}
 
 			return {
 				aggregations: list,

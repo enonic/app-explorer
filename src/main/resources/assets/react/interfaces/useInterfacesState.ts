@@ -1,3 +1,4 @@
+import type {DropdownItemProps} from 'semantic-ui-react/index.d';
 import type {
 	GlobalFieldObject,
 	InterfaceNamesObj
@@ -134,8 +135,9 @@ export function useInterfacesState({
 	const [interfaces, setInterfaces] = React.useState([]);
 	const [interfaceNamesObj, setInterfaceNamesObj] = React.useState({} as InterfaceNamesObj);
 	const [interfacesTotal, setInterfacesTotal] = React.useState(0);
-	const [stopWordOptions, setStopWordOptions] = React.useState([]);
-	const [thesauriOptions, setThesauriOptions] = React.useState([]);
+	const [fieldOptions, setFieldOptions] = React.useState<Array<DropdownItemProps>>([]);
+	const [stopWordOptions, setStopWordOptions] = React.useState<Array<DropdownItemProps>>([]);
+	const [thesauriOptions, setThesauriOptions] = React.useState<Array<DropdownItemProps>>([]);
 
 	const [showCollectionCount/*, setShowCollectionCount*/] = React.useState(true);
 	const [showCollections, setShowCollections] = React.useState(false);
@@ -174,6 +176,10 @@ export function useInterfacesState({
 								key :string
 								docCount :number
 							}>
+						}>
+						fieldValueCounts :Array<{
+							count :number
+							fieldPath :string
 						}>
 					}
 					queryDocumentTypes :{
@@ -257,6 +263,23 @@ export function useInterfacesState({
 					} // for aggregations
 				} // if aggregations
 				//console.debug('collectionNameToDocCount', collectionNameToDocCount);
+
+				const newFieldOptions :Array<DropdownItemProps> = [];
+				if (data.queryDocuments.fieldValueCounts && data.queryDocuments.fieldValueCounts.length) {
+					for (let i = 0; i < data.queryDocuments.fieldValueCounts.length; i++) {
+					    const {
+							count,
+							fieldPath
+						} = data.queryDocuments.fieldValueCounts[i];
+						newFieldOptions.push({
+							key: fieldPath,
+							text: `${fieldPath} (${count})`,
+							value: fieldPath
+						});
+					}
+				}
+				//console.debug('newFieldOptions', newFieldOptions);
+				setFieldOptions(newFieldOptions);
 
 				const documentTypeIdToFieldKeys :Record<string,Array<string>> = {};
 				const documentTypeIdToFields :Record<string,Array<{
@@ -439,10 +462,11 @@ export function useInterfacesState({
 	return {
 		collectionIdToFieldKeys,
 		collectionOptions,
+		fieldOptions,
+		globalFieldsObj,
 		interfaceNamesObj,
 		interfaces,
 		interfacesTotal,
-		globalFieldsObj,
 		memoizedUpdateInterfacesCallback,
 		setShowCollections,
 		setShowDelete,

@@ -24,6 +24,7 @@ type NewOrEditInterfaceModalProps = {
 	collectionIdToFieldKeys :{}
 	collectionOptions :Array<DropdownItemProps>
 	disabled? :boolean
+	fieldOptions :Array<DropdownItemProps>
 	globalFieldsObj :GlobalFieldObject
 	interfaceNamesObj :InterfaceNamesObj
 	licenseValid :boolean
@@ -45,6 +46,7 @@ export function NewOrEditInterfaceModal(props :NewOrEditInterfaceModalProps) {
 		collectionIdToFieldKeys = {},
 		collectionOptions = [],
 		disabled = false,
+		fieldOptions = [],
 		globalFieldsObj = {
 			'_allText': true // TODO: Hardcode
 		},
@@ -111,6 +113,7 @@ export function NewOrEditInterfaceModal(props :NewOrEditInterfaceModalProps) {
 					collectionIdToFieldKeys={collectionIdToFieldKeys}
 					collectionOptions={collectionOptions}
 					doClose={doClose}
+					fieldOptions={fieldOptions}
 					globalFieldsObj={globalFieldsObj}
 					interfaceNamesObj={interfaceNamesObj}
 					servicesBaseUrl={servicesBaseUrl}

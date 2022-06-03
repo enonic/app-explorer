@@ -42,6 +42,7 @@ import {FieldSelector} from './FieldSelector';
 
 type NewOrEditInterfaceProps = {
 	// Required
+	fieldOptions :Array<DropdownItemProps>
 	servicesBaseUrl :string
 	stopWordOptions :Array<DropdownItemProps>
 	thesauriOptions :Array<DropdownItemProps>
@@ -79,6 +80,7 @@ export function NewOrEditInterface(props :NewOrEditInterfaceProps) {
 		collectionIdToFieldKeys = {},
 		collectionOptions = [],
 		doClose = () => {/**/},
+		fieldOptions = [],
 		globalFieldsObj = {
 			'_allText': true // TODO Hardcode
 		},
@@ -212,6 +214,7 @@ export function NewOrEditInterface(props :NewOrEditInterfaceProps) {
 				<FieldSelector
 					disabled={disabled}
 					collectionIdToFieldKeys={collectionIdToFieldKeys}
+					fieldOptions={fieldOptions}
 					globalFieldsObj={globalFieldsObj}
 				/>
 

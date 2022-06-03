@@ -44,10 +44,11 @@ export function Interfaces({
 	const {
 		collectionIdToFieldKeys,
 		collectionOptions,
+		fieldOptions,
+		globalFieldsObj,
 		interfaceNamesObj,
 		interfaces,
 		interfacesTotal,
-		globalFieldsObj,
 		memoizedUpdateInterfacesCallback,
 		setShowCollections,
 		setShowDelete,
@@ -131,6 +132,7 @@ export function Interfaces({
 								afterClose={() => memoizedUpdateInterfacesCallback()}
 								collectionIdToFieldKeys={collectionIdToFieldKeys}
 								collectionOptions={collectionOptions}
+								fieldOptions={fieldOptions}
 								globalFieldsObj={globalFieldsObj}
 								interfaceNamesObj={interfaceNamesObj/* Currently not allowed to edit _name anyway */}
 								licenseValid={licenseValid}
@@ -180,6 +182,7 @@ export function Interfaces({
 			afterClose={memoizedUpdateInterfacesCallback}
 			collectionOptions={collectionOptions}
 			collectionIdToFieldKeys={collectionIdToFieldKeys}
+			fieldOptions={fieldOptions}
 			globalFieldsObj={globalFieldsObj}
 			interfaceNamesObj={interfaceNamesObj}
 			licenseValid={licenseValid}
