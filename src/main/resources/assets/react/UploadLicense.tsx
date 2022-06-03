@@ -27,20 +27,36 @@ export const UploadLicense = (props :{
 		setLicenseValid,
 		whenValid = () => {/**/}
 	} = props;
+
 	const [uploadedLicenseValid, setUploadedLicenseValid] = React.useState(true);
 	const [file, setFile] = React.useState<FileWithLastModifiedDate>();
+	const [license, setLicense] = React.useState<string>();
+
+	React.useEffect(() => {
+		if (file) {
+			const reader = new FileReader();
+			reader.onload = () => {
+				setLicense(reader.result as string);
+			}
+			reader.readAsText(file);
+		}
+	}, [
+		file
+	]);
+
 	return <>
 		<Modal.Header>License check</Modal.Header>
 		<Modal.Content>
 			<Form onSubmit={(event) => {
 				event.preventDefault(); // Stop form submit
 				//console.debug(event, file);
-				const formData = new FormData();
-				formData.append('license', file);
+				//const formData = new FormData();
+				//formData.append('license', file);
 				fetch(`${servicesBaseUrl}/uploadLicense`, {
-					body: formData,
+					//body: formData,
+					body: license,
 					headers: {
-						'Content-type': 'multipart/form-data'
+						//'Content-type': 'multipart/form-data'
 					},
 					method: 'POST'
 				}).then(response => response.json())
@@ -76,23 +92,31 @@ export const UploadLicense = (props :{
 					/>
 				</Form.Field>
 				{file
-					? <Table celled collapsing compact definition selectable striped>
+					? <Table celled compact definition selectable striped>
 						<Table.Body>
 							<Table.Row>
-								<Table.HeaderCell>Filename</Table.HeaderCell>
+								<Table.HeaderCell collapsing>Filename</Table.HeaderCell>
 								<Table.Cell>{file.name}</Table.Cell>
 							</Table.Row>
 							<Table.Row>
-								<Table.HeaderCell>Filetype</Table.HeaderCell>
+								<Table.HeaderCell collapsing>Filetype</Table.HeaderCell>
 								<Table.Cell>{file.type}</Table.Cell>
 							</Table.Row>
 							<Table.Row>
-								<Table.HeaderCell>Size in bytes</Table.HeaderCell>
+								<Table.HeaderCell collapsing>Size in bytes</Table.HeaderCell>
 								<Table.Cell>{file.size}</Table.Cell>
 							</Table.Row>
 							<Table.Row>
-								<Table.HeaderCell>Last modified date</Table.HeaderCell>
-								<Table.Cell>{file.lastModifiedDate.toLocaleDateString()}</Table.Cell>
+								<Table.HeaderCell collapsing>Last modified date</Table.HeaderCell>
+								<Table.Cell>{
+									file.lastModifiedDate.toLocaleDateString()
+								}</Table.Cell>
+							</Table.Row>
+							<Table.Row>
+								<Table.HeaderCell collapsing>Content</Table.HeaderCell>
+								<Table.Cell>{
+									license ? <pre>{license}</pre> /*.split(/\r?\n/).map((line, i) => <p key={i}>{line}</p>)*/ : ''
+								}</Table.Cell>
 							</Table.Row>
 						</Table.Body>
 					</Table>
