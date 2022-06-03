@@ -6,8 +6,13 @@ import type {
 
 import * as React from 'react';
 import {
-	Button, Form, Icon, Input, Message, Modal
+	Button, Form, Icon, Input, Message, Modal, Table
 } from 'semantic-ui-react';
+
+
+type FileWithLastModifiedDate = File & {
+	lastModifiedDate :Date
+}
 
 
 export const UploadLicense = (props :{
@@ -23,7 +28,7 @@ export const UploadLicense = (props :{
 		whenValid = () => {/**/}
 	} = props;
 	const [uploadedLicenseValid, setUploadedLicenseValid] = React.useState(true);
-	const [file, setFile] = React.useState<File>();
+	const [file, setFile] = React.useState<FileWithLastModifiedDate>();
 	return <>
 		<Modal.Header>License check</Modal.Header>
 		<Modal.Content>
@@ -65,11 +70,34 @@ export const UploadLicense = (props :{
 					<Input
 						onChange={(event :React.ChangeEvent<HTMLInputElement>) => {
 							//console.debug(event);
-							setFile(event.target.files[0]);
+							setFile(event.target.files[0] as FileWithLastModifiedDate);
 						}}
 						type='file'
 					/>
 				</Form.Field>
+				{file
+					? <Table celled collapsing compact definition selectable striped>
+						<Table.Body>
+							<Table.Row>
+								<Table.HeaderCell>Filename</Table.HeaderCell>
+								<Table.Cell>{file.name}</Table.Cell>
+							</Table.Row>
+							<Table.Row>
+								<Table.HeaderCell>Filetype</Table.HeaderCell>
+								<Table.Cell>{file.type}</Table.Cell>
+							</Table.Row>
+							<Table.Row>
+								<Table.HeaderCell>Size in bytes</Table.HeaderCell>
+								<Table.Cell>{file.size}</Table.Cell>
+							</Table.Row>
+							<Table.Row>
+								<Table.HeaderCell>Last modified date</Table.HeaderCell>
+								<Table.Cell>{file.lastModifiedDate.toLocaleDateString()}</Table.Cell>
+							</Table.Row>
+						</Table.Body>
+					</Table>
+					: <p>Select a file to show details</p>
+				}
 				<Button icon type='submit'><Icon name='upload'/></Button>
 			</Form>
 		</Modal.Content>
