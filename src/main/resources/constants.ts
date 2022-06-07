@@ -1,4 +1,4 @@
 export const DEFAULT_INTERFACE_FIELDS = [{
-	name: '_allText',
+	name: '_alltext',
 	boost: 1
 }];

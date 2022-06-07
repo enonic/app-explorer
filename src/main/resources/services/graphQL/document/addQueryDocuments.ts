@@ -18,6 +18,7 @@ import {connect} from '/lib/explorer/repo/connect';
 import {multiConnect} from '/lib/explorer/repo/multiConnect';
 import {
 	GraphQLBoolean,
+	GraphQLID,
 	GraphQLInt,
 	GraphQLString,
 	Json as GraphQLJson,
@@ -99,15 +100,15 @@ function aggregationsArgToQuery({
 			} = {}
 		} = aggregationsArg[i];
 		if (field) {
-		obj[name] = {
-			terms: {
-				field: FIELD_NAME_TO_PATH[field],
-				order,
-				size,
-				minDocCount
-			}
-		};
-	} /*else if (fields && fields.length) {
+			obj[name] = {
+				terms: {
+					field: FIELD_NAME_TO_PATH[field],
+					order,
+					size,
+					minDocCount
+				}
+			};
+		} /*else if (fields && fields.length) {
 			obj[name] = {
 				count: {
 					field: fields[0]
@@ -203,6 +204,7 @@ export function addQueryDocuments({
 					})},
 				}
 			})),
+			collectionIds: list(GraphQLID),
 			collections: list(GraphQLString),
 			count: GraphQLInt,
 			countFieldValues :GraphQLBoolean,
@@ -213,6 +215,7 @@ export function addQueryDocuments({
 				aggregations ?:Array<AggregationArg>
 				count ?:number
 				countFieldValues ?:boolean
+				collectionIds ?:Array<string>
 				collections ?:Array<string>
 				start ?:number
 			}
@@ -222,6 +225,7 @@ export function addQueryDocuments({
 			const {
 				args: {
 					aggregations: aggregationsArg = [],
+					collectionIds: collectionIdsArg = [],
 					collections = [],
 					count = 10,
 					countFieldValues = false,
@@ -256,15 +260,33 @@ export function addQueryDocuments({
 			//log.debug('collectionNameToId:%s', toStr(collectionNameToId));
 
 			const sources = [];
-			if (collections && collections.length) { // Filter against exisiting collections
+			//log.debug('collectionIdsArg:%s', toStr(collectionIdsArg));
+			//log.debug('collections:%s', toStr(collections));
+			if (collectionIdsArg && collectionIdsArg.length) {
+				for (let i = 0; i < collectionIdsArg.length; i++) {
+				    const collectionId = collectionIdsArg[i];
+					if (collectionIdToName[collectionId]) {
+						sources.push({
+							repoId: `${COLLECTION_REPO_PREFIX}${collectionIdToName[collectionId]}`,
+							branch: 'master', // NOTE Hardcoded
+							principals: [PRINCIPAL_EXPLORER_READ]
+						});
+					} else {
+						log.error(`Unable to find collectionName for collectionId:${collectionId} in collectionIdToName:${toStr(collectionIdToName)}!`);
+					}
+				}
+			} else if (collections && collections.length) { // Filter against exisiting collections
 				for (let i = 0; i < collections.length; i++) {
 				    const collectionName = collections[i];
+					//log.debug('i:%s collectionName:%s', i, toStr(collectionName));
 					if (collectionNameToId[collectionName]) { // Only allow exisiting collections
 						sources.push({
 							repoId: `${COLLECTION_REPO_PREFIX}${collectionName}`,
 							branch: 'master', // NOTE Hardcoded
 							principals: [PRINCIPAL_EXPLORER_READ]
 						});
+					} else {
+						log.error(`Unable to find collectionId for collectionName:${collectionName} in collectionNameToId:${toStr(collectionNameToId)}!`);
 					}
 				}
 			} else {
@@ -276,6 +298,9 @@ export function addQueryDocuments({
 							branch: 'master', // NOTE Hardcoded
 							principals: [PRINCIPAL_EXPLORER_READ]
 						});
+					} else {
+						// Probably not possible, but whatever
+						log.error(`Unable to find collectionName for collectionId:${collectionId} in collectionIdToName:${toStr(collectionIdToName)}!`);
 					}
 				}
 			}
@@ -369,7 +394,26 @@ export function addQueryDocuments({
 					count: queryResult.total,
 					fieldPath: '_alltext'
 				});
-			}
+				fieldValueCounts.sort((a,b) => {
+					// First by descending count
+					if (a.count > b.count) {
+						return -1;
+					}
+					if (a.count < b.count) {
+						return 1;
+					}
+					// When count is equal, by ascending fieldPath
+					if (a.fieldPath < b.fieldPath) {
+						return -1;
+					}
+					if (a.fieldPath > b.fieldPath) {
+						return 1;
+					}
+					// count and fieldPath are equal
+					// This should never happen, indicates duplicate entries.
+					return 0;
+				}); // sort
+			} // if countFieldValues
 
 			return {
 				aggregations: list,

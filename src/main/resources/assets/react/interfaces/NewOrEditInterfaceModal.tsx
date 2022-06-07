@@ -3,10 +3,7 @@ import type {
 	SetLicensedToFunction,
 	SetLicenseValidFunction
 } from '../index.d';
-import type {
-	GlobalFieldObject,
-	InterfaceNamesObj
-} from './index.d';
+import type {InterfaceNamesObj} from './index.d';
 
 
 import * as React from 'react';
@@ -21,11 +18,8 @@ type NewOrEditInterfaceModalProps = {
 	_name? :string
 	afterClose :() => void
 	beforeOpen? :() => void
-	collectionIdToFieldKeys :{}
 	collectionOptions :Array<DropdownItemProps>
 	disabled? :boolean
-	fieldOptions :Array<DropdownItemProps>
-	globalFieldsObj :GlobalFieldObject
 	interfaceNamesObj :InterfaceNamesObj
 	licenseValid :boolean
 	servicesBaseUrl :string
@@ -41,16 +35,10 @@ export function NewOrEditInterfaceModal(props :NewOrEditInterfaceModalProps) {
 	const {
 		_id, // nullable
 		_name,
-		afterClose = () => {},
-		beforeOpen = () => {},
-		collectionIdToFieldKeys = {},
+		afterClose = () => {/**/},
+		beforeOpen = () => {/**/},
 		collectionOptions = [],
 		disabled = false,
-		fieldOptions = [],
-		globalFieldsObj = {
-			'_allText': true // TODO: Hardcode
-		},
-		//initialValues = {},
 		interfaceNamesObj = {},
 		licenseValid,
 		servicesBaseUrl,
@@ -110,11 +98,8 @@ export function NewOrEditInterfaceModal(props :NewOrEditInterfaceModalProps) {
 				<Modal.Header>{header}</Modal.Header>
 				<NewOrEditInterface
 					_id={_id}
-					collectionIdToFieldKeys={collectionIdToFieldKeys}
 					collectionOptions={collectionOptions}
 					doClose={doClose}
-					fieldOptions={fieldOptions}
-					globalFieldsObj={globalFieldsObj}
 					interfaceNamesObj={interfaceNamesObj}
 					servicesBaseUrl={servicesBaseUrl}
 					stopWordOptions={stopWordOptions}

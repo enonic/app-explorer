@@ -1,10 +1,10 @@
 import type {CollectionFormValues} from '/lib/explorer/types/index.d';
 import type {
-	CollectorComponents,
 	ContentTypeOptions,
 	Fields,
 	SiteOptions
-} from '../index.d';
+} from '/lib/explorer/types/Collector.d';
+import type {CollectorComponents} from '../index.d';
 
 
 import {getIn} from '@enonic/js-utils';

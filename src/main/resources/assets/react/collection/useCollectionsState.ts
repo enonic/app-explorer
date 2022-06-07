@@ -1,14 +1,11 @@
 import type {StrictTableHeaderCellProps} from 'semantic-ui-react';
-
-
 import type {
-	CollectorComponents,
 	ContentTypeOptions,
 	SiteOptions
-} from '../index.d';
-import type {
-	QueryCollectionsGraph
-} from './index.d';
+} from '/lib/explorer/types/Collector.d';
+import type {CollectorComponents} from '../index.d';
+import type {QueryCollectionsGraph} from './index.d';
+
 
 import {COLON_SIGN} from '@enonic/js-utils';
 import moment from 'moment';

@@ -34,7 +34,7 @@ const GQL_DOCUMENTS = `queryDocuments(
 		}
 	}]
     count: 0
-	countFieldValues: true
+	#countFieldValues: true
 )
 {
 	aggregations {
@@ -44,10 +44,10 @@ const GQL_DOCUMENTS = `queryDocuments(
 			key
     	}
     }
-	fieldValueCounts {
-		count
-		fieldPath
-    }
+	#fieldValueCounts {
+	#	count
+	#	fieldPath
+    #}
 }`
 
 const GQL_DOCUMENT_TYPES = `queryDocumentTypes {
@@ -128,14 +128,14 @@ export function useInterfacesState({
 	//const [boolIsLoadingAnything, setboolIsLoadingAnything] = React.useState(false);
 
 	const [collections, setCollections] = React.useState<Array<Collection>>([]);
-	const [collectionIdToFieldKeys, setCollectionIdToFieldKeys] = React.useState({});
-	const [globalFieldsObj/*, setGlobalFieldsObj*/] = React.useState<GlobalFieldObject>({
+	//const [collectionIdToFieldKeys, setCollectionIdToFieldKeys] = React.useState({});
+	/*const [globalFieldsObj, setGlobalFieldsObj] = React.useState<GlobalFieldObject>({
 		'_allText': true // TODO: Hardcode
-	});
+	});*/
 	const [interfaces, setInterfaces] = React.useState([]);
 	const [interfaceNamesObj, setInterfaceNamesObj] = React.useState({} as InterfaceNamesObj);
 	const [interfacesTotal, setInterfacesTotal] = React.useState(0);
-	const [fieldOptions, setFieldOptions] = React.useState<Array<DropdownItemProps>>([]);
+	//const [fieldOptions, setFieldOptions] = React.useState<Array<DropdownItemProps>>([]);
 	const [stopWordOptions, setStopWordOptions] = React.useState<Array<DropdownItemProps>>([]);
 	const [thesauriOptions, setThesauriOptions] = React.useState<Array<DropdownItemProps>>([]);
 
@@ -177,10 +177,10 @@ export function useInterfacesState({
 								docCount :number
 							}>
 						}>
-						fieldValueCounts :Array<{
+						/*fieldValueCounts :Array<{
 							count :number
 							fieldPath :string
-						}>
+						}>*/
 					}
 					queryDocumentTypes :{
 						hits :Array<{
@@ -264,7 +264,7 @@ export function useInterfacesState({
 				} // if aggregations
 				//console.debug('collectionNameToDocCount', collectionNameToDocCount);
 
-				const newFieldOptions :Array<DropdownItemProps> = [];
+				/*const newFieldOptions :Array<DropdownItemProps> = [];
 				if (data.queryDocuments.fieldValueCounts && data.queryDocuments.fieldValueCounts.length) {
 					for (let i = 0; i < data.queryDocuments.fieldValueCounts.length; i++) {
 					    const {
@@ -279,7 +279,7 @@ export function useInterfacesState({
 					}
 				}
 				//console.debug('newFieldOptions', newFieldOptions);
-				setFieldOptions(newFieldOptions);
+				setFieldOptions(newFieldOptions);*/
 
 				const documentTypeIdToFieldKeys :Record<string,Array<string>> = {};
 				const documentTypeIdToFields :Record<string,Array<{
@@ -339,7 +339,7 @@ export function useInterfacesState({
 				setCollections(collections);
 				//console.debug('collectionIdToDocumentTypeIds', collectionIdToDocumentTypeIds);
 				//console.debug('collectionIdToFieldKeys', collectionIdToFieldKeys);
-				setCollectionIdToFieldKeys(collectionIdToFieldKeys);
+				//setCollectionIdToFieldKeys(collectionIdToFieldKeys);
 				//setCollectionIdToDocumentTypeIds(collectionIdToDocumentTypeIds);
 
 				const thesaurusIdToName = {};
@@ -460,10 +460,10 @@ export function useInterfacesState({
 	//console.debug('collectionOptions', collectionOptions);
 
 	return {
-		collectionIdToFieldKeys,
+		//collectionIdToFieldKeys,
 		collectionOptions,
-		fieldOptions,
-		globalFieldsObj,
+		//fieldOptions,
+		//globalFieldsObj,
 		interfaceNamesObj,
 		interfaces,
 		interfacesTotal,

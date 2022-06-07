@@ -1,4 +1,4 @@
-import type {CollectorProps} from './index.d';
+import type {CollectorProps} from '/lib/explorer/types/Collector.d';
 
 
 import {getIn} from '@enonic/js-utils';

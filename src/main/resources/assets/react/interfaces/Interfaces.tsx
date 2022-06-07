@@ -42,10 +42,10 @@ export function Interfaces({
 	setLicenseValid :SetLicenseValidFunction
 }) {
 	const {
-		collectionIdToFieldKeys,
+		//collectionIdToFieldKeys,
 		collectionOptions,
-		fieldOptions,
-		globalFieldsObj,
+		//fieldOptions,
+		//globalFieldsObj,
 		interfaceNamesObj,
 		interfaces,
 		interfacesTotal,
@@ -130,10 +130,7 @@ export function Interfaces({
 								_id={_id}
 								_name={_name}
 								afterClose={() => memoizedUpdateInterfacesCallback()}
-								collectionIdToFieldKeys={collectionIdToFieldKeys}
 								collectionOptions={collectionOptions}
-								fieldOptions={fieldOptions}
-								globalFieldsObj={globalFieldsObj}
 								interfaceNamesObj={interfaceNamesObj/* Currently not allowed to edit _name anyway */}
 								licenseValid={licenseValid}
 								servicesBaseUrl={servicesBaseUrl}
@@ -181,9 +178,6 @@ export function Interfaces({
 		<NewOrEditInterfaceModal
 			afterClose={memoizedUpdateInterfacesCallback}
 			collectionOptions={collectionOptions}
-			collectionIdToFieldKeys={collectionIdToFieldKeys}
-			fieldOptions={fieldOptions}
-			globalFieldsObj={globalFieldsObj}
 			interfaceNamesObj={interfaceNamesObj}
 			licenseValid={licenseValid}
 			servicesBaseUrl={servicesBaseUrl}

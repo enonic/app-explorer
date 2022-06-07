@@ -10,8 +10,8 @@ plugins {
 
 
 repositories {
+	mavenLocal()
 	xp.enonicRepo('dev')
-	//mavenLocal()
 	mavenCentral()
 	//jcenter()
 }

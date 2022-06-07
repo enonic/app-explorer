@@ -1,11 +1,13 @@
 import type {DropdownItemProps} from 'semantic-ui-react/index.d';
 import type {CollectionFormValues} from '/lib/explorer/types/index.d';
 import type {
-	CollectorComponents,
 	ContentTypeOptions,
 	Fields,
-	Locales,
 	SiteOptions
+} from '/lib/explorer/types/Collector.d';
+import type {
+	CollectorComponents,
+	Locales
 } from '../index.d';
 import type {QueryCollectionsHits} from './index.d';
 

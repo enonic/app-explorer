@@ -1,249 +1,181 @@
-import type {InterfaceField} from '/lib/explorer/types/index.d';
-import type {DropdownItemProps} from 'semantic-ui-react/index.d';
-import type {
-	GlobalFieldObject,
-	InterfaceNamesObj
-} from './index.d';
+import type {NewOrEditInterfaceProps} from './index.d';
 
 
 //import {toStr} from '@enonic/js-utils';
-import * as React from 'react';
 import {
 	Button,
 	Form,
 	Header,
-	Icon,
-	Loader,
 	Modal
 } from 'semantic-ui-react';
-import {
-	Form as EnonicForm,
-	Dropdown,
-	Input,
-	ResetButton,
-	SubmitButton
-} from '@enonic/semantic-ui-react-form';
-import {DEFAULT_INTERFACE_FIELDS} from '../../../constants';
+import {ResetButton} from '../components/ResetButton';
+import {SubmitButton} from '../components/SubmitButton';
 import {fetchInterfaceCreate} from '../../../services/graphQL/fetchers/fetchInterfaceCreate';
-import {fetchInterfaceGet} from '../../../services/graphQL/fetchers/fetchInterfaceGet';
 import {fetchInterfaceUpdate} from '../../../services/graphQL/fetchers/fetchInterfaceUpdate';
-import {mustStartWithALowercaseLetter} from '../utils/mustStartWithALowercaseLetter';
-import {notDoubleUnderscore} from '../utils/notDoubleUnderscore';
-import {onlyLowercaseAsciiLettersDigitsAndUnderscores} from '../utils/onlyLowercaseAsciiLettersDigitsAndUnderscores';
-import {required} from '../utils/required';
 import {FieldSelector} from './FieldSelector';
+import {useNewOrEditInterfaceState} from './useNewOrEditInterfaceState';
 
 
-/* TODO
- 1. How many documents with field across all collections (when none selected)
- 2. How many documents with field across selected collections
-*/
-
-
-type NewOrEditInterfaceProps = {
+export function NewOrEditInterface({
 	// Required
-	fieldOptions :Array<DropdownItemProps>
-	servicesBaseUrl :string
-	stopWordOptions :Array<DropdownItemProps>
-	thesauriOptions :Array<DropdownItemProps>
+	servicesBaseUrl,
+	stopWordOptions,
+	thesauriOptions,
 	// Optional
-	_id ?:string
-	collectionIdToFieldKeys ?:Record<string,Array<string>>
-	collectionOptions ?:Array<DropdownItemProps>
-	doClose ?:() => void
-	globalFieldsObj ?:GlobalFieldObject
-	interfaceNamesObj ?:InterfaceNamesObj
-}
-
-type NewOrEditInterfaceFormValue = {
-	_name :string
-	collectionIds :Array<string>
-	fields :Array<InterfaceField>
-	stopWords :Array<string>
-	synonymIds :Array<string>
-}
-
-type NewOrEditInterfaceState = {
-	initialValues :NewOrEditInterfaceFormValue
-	isLoading :boolean
-}
-
-
-export function NewOrEditInterface(props :NewOrEditInterfaceProps) {
-	const {
-		// Required
-		servicesBaseUrl,
-		stopWordOptions,
-		thesauriOptions,
-		// Optional
-		_id, // nullable
-		collectionIdToFieldKeys = {},
-		collectionOptions = [],
-		doClose = () => {/**/},
-		fieldOptions = [],
-		globalFieldsObj = {
-			'_allText': true // TODO Hardcode
-		},
-		interfaceNamesObj = {}
-	} = props;
+	_id, // nullable
+	collectionOptions = [],
+	doClose = () => {/**/},
+	interfaceNamesObj = {}
+} :NewOrEditInterfaceProps) {
 	//console.debug('NewOrEditInterface collectionOptions', collectionOptions);
 	//console.debug('NewOrEditInterface stopWordOptions', stopWordOptions);
 	//console.debug('NewOrEditInterface thesauriOptions', thesauriOptions);
-
-	//const [isLoading, setLoading] = React.useState(!!id);
-	const [state, setState] = React.useState<NewOrEditInterfaceState>({
-		initialValues: {
-			_name: '',
-			collectionIds: [],
-			fields: DEFAULT_INTERFACE_FIELDS,
-			stopWords: [],
-			synonymIds: []
-		},
-		isLoading: !!_id
-	});
-
-	React.useEffect(() => {
-		if (!_id) {return;}
-		fetchInterfaceGet({
-			handleData: (data) => {
-				//console.debug('data', data);
-				setState(prev => {
-					const deref = JSON.parse(JSON.stringify(prev));
-					deref.isLoading = false;
-					deref.initialValues = data.getInterface; // Also includes _nodeType, _path, _versionKey
-					return deref;
-				});
-			},
-			url: `${servicesBaseUrl}/graphQL`,
-			variables: {
-				_id
-			}
-		});
-	}, [
-		_id,
-		servicesBaseUrl
-	]);
-
 	const {
-		initialValues,
-		initialValues: {
-			_name
-		},
-		isLoading
-	} = state;
-	//console.debug('NewOrEditInterface initialValues', initialValues);
-	//console.debug('_name', _name);
-
-	const disabled = _name === 'default';
-
-	function mustBeUnique(v :string) {
-		//console.debug(`mustBeUnique(${v}) interfaceNamesObj:`, interfaceNamesObj, ` interfaceNamesObj[${v}]:`, interfaceNamesObj[v]);
-		if (interfaceNamesObj[v]) {
-			return `Name must be unique: Name '${v}' is already in use!`;
-		}
-	}
-
-	const schema :{
-		_name? :(v :string) => string
-	} = {};
-
-	if (!_id) {
-		schema._name = (v) => required(v)
-			|| mustStartWithALowercaseLetter(v)
-			|| onlyLowercaseAsciiLettersDigitsAndUnderscores(v)
-			|| notDoubleUnderscore(v)
-			|| mustBeUnique(v);
-	}
-
-	return isLoading ? <Loader active inverted>Loading</Loader> : <EnonicForm<NewOrEditInterfaceFormValue>
-		initialValues={initialValues}
-		onSubmit={(values) => {
-			//console.debug('submit values', values);
-			const {
-				_name,
-				collectionIds,
-				fields,
-				//stopWordIds,
-				stopWords,
-				synonymIds
-			} = values; // Also includes _nodeType, _path, _versionKey
-			const url = `${servicesBaseUrl}/graphQL`;
-			(_id ? fetchInterfaceUpdate : fetchInterfaceCreate)({
-				handleResponse(response) {
-					if (response.status === 200) { doClose(); }
-				},
-				url,
-				variables: {
-					_id,
-					_name,
-					collectionIds,
-					fields,
-					//stopWordIds,
-					stopWords,
-					synonymIds
-				}
-			});
-		}}
-		schema={schema}
-	>
+		anyError,
+		collectionIds,
+		isDefaultInterface,
+		isLoading,
+		isStateChanged,
+		fieldOptions,
+		fields,
+		name,
+		nameError,
+		resetState,
+		setCollectionIds,
+		setFields,
+		setName,
+		setNameVisited,
+		setStopWords,
+		setSynonymIds,
+		stopWords,
+		synonymIds
+	} = useNewOrEditInterfaceState({
+		_id,
+		interfaceNamesObj,
+		servicesBaseUrl
+	});
+	return <>
 		<Modal.Content>
-			<Form as='div'>
-				<Form.Field>
-					<Input
-						disabled={disabled}
-						fluid
-						label={{basic: true, content: 'Name'}}
-						path='_name'
-						placeholder='Please input name'
-					/>
-				</Form.Field>
-				<Header as='h2' content='Collection(s)' disabled={disabled} dividing id='collections'/>
-				<Form.Field>
-					<Dropdown
-						disabled={disabled}
-						multiple={true}
-						options={collectionOptions}
-						path='collectionIds'
-						placeholder='Please select one or more collections...'
-						search
-						selection
-					/>
-				</Form.Field>
-
-				<Header as='h3' content='Fields' disabled={disabled} dividing id='fields'/>
-				<FieldSelector
-					disabled={disabled}
-					collectionIdToFieldKeys={collectionIdToFieldKeys}
-					fieldOptions={fieldOptions}
-					globalFieldsObj={globalFieldsObj}
-				/>
-
-				<Header as='h3' content='Synonyms' disabled={disabled} dividing id='synonyms'/>
-				<Form.Field><Dropdown
-					disabled={disabled}
+			<Form>
+				<Form.Input
+					disabled={isLoading || isDefaultInterface}
+					error={nameError}
 					fluid
+					label='Name'
+					loading={isLoading}
+					onBlur={() => setNameVisited(true)}
+					onChange={(_e,{value}) => {
+						setNameVisited(true);
+						setName(value);
+					}}
+					placeholder={isLoading ? 'Fetching name...' : 'Please input name'}
+					required={true}
+					value={name}
+				/>
+				<Header
+					as='h2'
+					content='Collection(s)'
+					disabled={isLoading || isDefaultInterface}
+					dividing
+					id='collections'
+				/>
+				<Form.Dropdown
+					disabled={isLoading || isDefaultInterface}
+					fluid
+					loading={isLoading}
+					multiple={true}
+					options={collectionOptions}
+					onChange={(_e,{value} :{value: Array<string>}) => setCollectionIds(value)}
+					placeholder={isLoading || isLoading ? 'Fetching selected collections...' : 'Please select one or more collections'}
+					search
+					selection
+					value={collectionIds}
+				/>
+				<Header
+					as='h3'
+					content='Fields'
+					disabled={isLoading || isDefaultInterface}
+					dividing
+					id='fields'
+				/>
+				<FieldSelector
+					disabled={isLoading || isDefaultInterface}
+					fieldOptions={fieldOptions}
+					setFields={setFields}
+					value={fields}
+				/>
+				<Header
+					as='h3'
+					content='Synonyms'
+					disabled={isLoading || isDefaultInterface}
+					dividing
+					id='synonyms'
+				/>
+				<Form.Dropdown
+					disabled={isLoading || isDefaultInterface}
+					fluid
+					loading={isLoading}
 					multiple={true}
 					options={thesauriOptions}
-					path='synonymIds'
+					onChange={(_e,{value} :{value: Array<string>}) => setSynonymIds(value)}
+					placeholder={isLoading ? 'Fetching selected synonyms...' : undefined}
 					search
 					selection
-				/></Form.Field>
-				<Header as='h3' content='Stop words' disabled={disabled} dividing id='stopwords'/>
-				<Dropdown
-					disabled={disabled}
+					value={synonymIds}
+				/>
+				<Header
+					as='h3'
+					content='Stop words'
+					disabled={isLoading || isDefaultInterface}
+					dividing
+					id='stopwords'
+				/>
+				<Form.Dropdown
+					disabled={isLoading || isDefaultInterface}
 					fluid
+					loading={isLoading}
 					multiple={true}
 					options={stopWordOptions}
-					path='stopWords'
+					onChange={(_e,{value} :{value: Array<string>}) => setStopWords(value)}
+					placeholder={isLoading ? 'Fetching selected stop words...' : undefined}
 					search
 					selection
+					value={stopWords}
 				/>
 			</Form>
 		</Modal.Content>
 		<Modal.Actions>
 			<Button onClick={doClose}>Cancel</Button>
-			<ResetButton secondary/>
-			<SubmitButton disabled={disabled} primary><Icon name='save'/>Save</SubmitButton>
+			<ResetButton
+				disabled={isLoading || isDefaultInterface}
+				isStateChanged={isStateChanged}
+				onClick={() => resetState()}
+				secondary
+			/>
+			<SubmitButton
+				disabled={isLoading || isDefaultInterface || anyError}
+				errorsArr={anyError ? ['only length of array used'] : []}
+				isStateChanged={isStateChanged}
+				negative={anyError}
+				onClick={()=>{
+					const url = `${servicesBaseUrl}/graphQL`;
+					(_id ? fetchInterfaceUpdate : fetchInterfaceCreate)({
+						handleResponse(response) {
+							if (response.status === 200) { doClose(); }
+						},
+						url,
+						variables: {
+							_id,
+							_name: name,
+							collectionIds,
+							fields,
+							stopWords,
+							synonymIds
+						}
+					});
+				}}
+				primary
+			/>
 		</Modal.Actions>
-	</EnonicForm>;
+	</>;
 } // function NewOrEditInterface

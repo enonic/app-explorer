@@ -2,107 +2,54 @@ import type {DropdownItemProps} from 'semantic-ui-react/index.d';
 import type {InterfaceField} from '/lib/explorer/types/index.d';
 
 
-import {getIn} from '@enonic/js-utils';
-import {Button, Form, Icon, Table} from 'semantic-ui-react';
 import {
-	getEnonicContext,
-	DeleteItemButton,
+	Button,
 	Dropdown,
+	//Form,
+	Icon,
 	Input,
-	InsertButton,
-	List,
-	MoveDownButton,
-	MoveUpButton,
-	SetValueButton
-	//@ts-ignore
-} from '@enonic/semantic-ui-react-form';
-import {DEFAULT_INTERFACE_FIELDS} from '../../../constants';
+	Table
+} from 'semantic-ui-react';
+//import {DEFAULT_INTERFACE_FIELDS} from '../../../constants';
 
 
 export function FieldSelector(props :{
-	collectionIdToFieldKeys ?:Record<string,Array<string>>
-	disabled ?:boolean
+	// Required
 	fieldOptions :Array<DropdownItemProps>
-	globalFieldsObj ?:Record<string,true>
-	name ?:string
-	parentPath ?:string
-	path ?:string
+	setFields :(fields:Array<InterfaceField>) => void
+	// Optional
+	disabled ?:boolean
 	value ?:Array<InterfaceField>
 }) {
-
-	const {state} = getEnonicContext();
-	const collectionIds :Array<string> = getIn(state.values, 'collectionIds') || [];
-
 	const {
-		collectionIdToFieldKeys = {},
 		disabled = false,
 		fieldOptions = [],
-		globalFieldsObj = {
-			'_allText': true // TODO Hardcode
-		},
-		name = 'fields',
-		parentPath,
-		path = parentPath ? `${parentPath}.${name}` : name,
-		value = getIn(state.values, path)//,
-		//...rest
+		setFields,
+		value: fieldsArray = []
 	} = props;
-	//console.debug('globalFieldsObj', globalFieldsObj);
-	//console.debug('FieldSelector path', path, 'value', value);
 
-	const fieldKeysObj = {};
-	Object.keys(globalFieldsObj).forEach((k) => {
-		fieldKeysObj[k] = {
-			icon: 'globe'/*,
-			key: k,
-			text: k,
-			value: k*/
-		};
-	});
-	//console.debug('fieldKeysObj', fieldKeysObj);
+	/*if(!(fieldsArray && Array.isArray(fieldsArray) && fieldsArray.length)) {
+		return <Form.Button
+			disabled={disabled}
+			onClick={() => {
+				setFields(DEFAULT_INTERFACE_FIELDS);
+			}}
+		><Icon color='green' name='plus'/> Add field(s)</Form.Button>;
+	}*/
 
-	collectionIds.forEach((collectionId) => {
-		//console.debug('collectionId', collectionId);
-		const collectionFieldKeys = collectionIdToFieldKeys[collectionId];
-		//console.debug('collectionFieldKeys', collectionFieldKeys);
-		if (collectionFieldKeys) {
-			collectionFieldKeys.forEach((fieldKey) => {
-				//console.debug('fieldKey', fieldKey);
-				fieldKeysObj[fieldKey] = { // This should overwrite global fields
-					icon: (fieldKeysObj[fieldKey]
-						&& (
-							fieldKeysObj[fieldKey].icon === 'globe'
-							|| fieldKeysObj[fieldKey].icon === 'question'
-						)
-					)
-						? 'question'
-						: 'map marker alternate'/*,
-					key: fieldKey,
-					text: fieldKey,
-					value: fieldKey*/
-				};
-			});
-		}
-	});
-	//console.debug('fieldKeysObj', fieldKeysObj);
+	const selectedFields = fieldsArray.map(({name}) => name);
+	//console.debug('selectedFields', selectedFields);
 
-	/*const fieldOptions = Object.keys(fieldKeysObj).sort()
-		.map((key) => ({
-			icon: fieldKeysObj[key].icon,
-			key,
-			text: key,
-			value: key
-		}));*/
 	//console.debug('fieldOptions', fieldOptions);
+	const fieldOptionsObj = {};
+	const unSelectedFieldOptions = fieldOptions.filter((fieldOption) => {
+		//console.debug('fieldOption', fieldOption);
+		fieldOptionsObj[fieldOption['key']] = fieldOption;
+		return !selectedFields.includes(fieldOption['key']);
+	});
+	//console.debug('fieldOptionsObj', fieldOptionsObj);
+	//console.debug('unSelectedFieldOptions', unSelectedFieldOptions);
 
-	// This should not be needed:
-	if(!(value && Array.isArray(value) && value.length)) {
-		return <Form.Field>
-			<SetValueButton
-				path={path}
-				value={DEFAULT_INTERFACE_FIELDS}
-			><Icon color='green' name='plus'/> Add field(s)</SetValueButton>
-		</Form.Field>;
-	}
 	return <>
 		<Table celled compact selectable singleLine striped>
 			<Table.Header>
@@ -113,67 +60,110 @@ export function FieldSelector(props :{
 				</Table.Row>
 			</Table.Header>
 			<Table.Body>
-				<List<InterfaceField>
-					path={path}
-					render={(fieldsArray) => <>
-						{fieldsArray.map(({
-							//boost,
-							name
-						}, index) => {
-							const key =`${path}.${index}`;
-							return <Table.Row key={key}>
-								<Table.Cell>
-									<Dropdown
+				{
+					fieldsArray.map(({
+						boost = 1,
+						name = ''
+					}, index) => {
+						//console.debug('index', index, 'name', name, 'boost', boost);
+						return <Table.Row key={index}>
+							<Table.Cell>
+								<Dropdown
+									disabled={disabled}
+									fluid
+									options={fieldOptionsObj[name]
+										? [fieldOptionsObj[name]].concat(unSelectedFieldOptions)
+										: unSelectedFieldOptions
+									}
+									onChange={(_e,{value:newName}) => {
+										//console.debug('newName', newName);
+										const deref = JSON.parse(JSON.stringify(fieldsArray));
+										deref[index] = {
+											name: newName,
+											boost
+										}
+										setFields(deref);
+									}}
+									placeholder='Please select a field'
+									search
+									selection
+									value={name}
+								/>
+							</Table.Cell>
+							<Table.Cell>
+								{name
+									? <Input
 										disabled={disabled}
 										fluid
-										options={fieldOptions}
-										path={`${key}.name`}
-										placeholder='Please select a field'
-										search
-										selection
+										min={1}
+										onChange={(_e,{value:newBoost}) => {
+											//console.debug('newBoost', newBoost);
+											const deref = JSON.parse(JSON.stringify(fieldsArray));
+											deref[index] = {
+												name,
+												boost: newBoost
+											}
+											setFields(deref);
+										}}
+										type='number'
+										value={boost}
 									/>
-								</Table.Cell>
-								<Table.Cell>
-									{name
-										? <Input
-											disabled={disabled}
-											fluid
-											parentPath={key}
-											name='boost'
-											type='number'
-										/>
-										: null
-									}
-								</Table.Cell>
-								<Table.Cell collapsing>
-									<Button.Group icon>
-										<InsertButton
-											disabled={disabled}
-											index={index+1}
-											path={path}
-											value={{name: '', boost: 1}}
-										/>
-										<MoveDownButton
-											disabled={disabled || index + 1 >= fieldsArray.length}
-											index={index}
-											path={path}
-										/>
-										<MoveUpButton
-											disabled={disabled || index === 0}
-											index={index}
-											path={path}
-										/>
-										<DeleteItemButton
-											disabled={disabled || fieldsArray.length === 1}
-											index={index}
-											path={path}
-										/>
-									</Button.Group>
-								</Table.Cell>
-							</Table.Row>;
-						})}
-					</>}
-				/>
+									: null
+								}
+							</Table.Cell>
+							<Table.Cell collapsing>
+								<Button.Group icon>
+									<Button
+										disabled={disabled}
+										icon
+										onClick={() => {
+											const deref = JSON.parse(JSON.stringify(fieldsArray));
+											deref.splice(index+1, 0, {
+												name: '',
+												boost: 1
+											});
+											setFields(deref);
+										}}
+										type='button'
+										value={{name: '', boost: 1}}
+									><Icon color='green' name='add'/></Button>
+									<Button
+										disabled={disabled || index + 1 >= fieldsArray.length}
+										icon
+										onClick={() => {
+											const deref = JSON.parse(JSON.stringify(fieldsArray));
+											const tmp = deref[index];
+											deref[index] = deref[index + 1];
+							        		deref[index + 1] = tmp;
+											setFields(deref);
+										}}
+									><Icon color='blue' name='arrow down'/></Button>
+									<Button
+										disabled={disabled || index === 0}
+										icon
+										onClick={() => {
+											const deref = JSON.parse(JSON.stringify(fieldsArray));
+											const tmp = deref[index];
+											deref[index] = deref[index - 1];
+							        		deref[index - 1] = tmp;
+											setFields(deref);
+										}}
+									><Icon color='blue' name='arrow up'/></Button>
+									<Button
+										disabled={disabled || fieldsArray.length === 1}
+										icon
+										onClick={() => {
+											const deref = JSON.parse(JSON.stringify(fieldsArray));
+											deref.splice(index, 1);
+											setFields(deref);
+										}}
+										type='button'
+									><Icon color='red' name='trash alternate outline'/></Button>
+								</Button.Group>
+							</Table.Cell>
+						</Table.Row>;
+					}) // map
+				}
 			</Table.Body>
 		</Table>
 	</>;
