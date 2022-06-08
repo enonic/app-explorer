@@ -22,6 +22,7 @@ type NewOrEditInterfaceModalProps = {
 	disabled? :boolean
 	interfaceNamesObj :InterfaceNamesObj
 	licenseValid :boolean
+	loading ?:boolean
 	servicesBaseUrl :string
 	setLicensedTo :SetLicensedToFunction
 	setLicenseValid :SetLicenseValidFunction
@@ -41,6 +42,7 @@ export function NewOrEditInterfaceModal(props :NewOrEditInterfaceModalProps) {
 		disabled = false,
 		interfaceNamesObj = {},
 		licenseValid,
+		loading = false,
 		servicesBaseUrl,
 		setLicensedTo,
 		setLicenseValid,
@@ -75,15 +77,17 @@ export function NewOrEditInterfaceModal(props :NewOrEditInterfaceModalProps) {
 			content={header}
 			inverted
 			trigger={_id ? <Button
-				disabled={disabled}
+				disabled={loading || disabled}
+				loading={loading}
 				icon
 				onClick={doOpen}
 			><Icon color='blue' name='edit'/></Button>
 				: <Button
 					circular
 					color='green'
-					disabled={disabled}
+					disabled={loading || disabled}
 					icon
+					loading={loading}
 					onClick={doOpen}
 					size='massive'
 					style={{

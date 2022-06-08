@@ -3,10 +3,21 @@ import {Button, Icon, Input, Message, Modal} from 'semantic-ui-react';
 
 
 export function CopyModal({
-	afterClose = () => {},
-	beforeOpen = () => {},
+	// Required
 	name,
-	servicesBaseUrl
+	servicesBaseUrl,
+	// Optional
+	afterClose = () => {/**/},
+	beforeOpen = () => {/**/},
+	loading = false,
+} :{
+	// Required
+	name :string
+	servicesBaseUrl :string
+	// Optional
+	afterClose ?:() => void
+	beforeOpen ?:() => void
+	loading ?:boolean
 }) {
 	const [interfaceExists, setInterfaceExists] = React.useState(false);
 	const [interfaceTo, setInterfaceTo] = React.useState('');
@@ -28,7 +39,14 @@ export function CopyModal({
 		closeOnDimmerClick={false}
 		onClose={doClose}
 		open={open}
-		trigger={<Button onClick={doOpen} compact size='tiny' type='button'><Icon color='green' name='copy'/>Copy</Button>}
+		trigger={<Button
+			onClick={doOpen}
+			compact
+			disabled={loading}
+			loading={loading}
+			size='tiny'
+			type='button'
+		><Icon color='green' name='copy'/>Copy</Button>}
 	>
 		<Modal.Header>Copy</Modal.Header>
 		<Modal.Content>

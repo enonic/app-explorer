@@ -6,7 +6,9 @@ import type {
 
 import {
 	Button,
+	Grid,
 	Header,
+	Icon,
 	Radio,
 	Segment,
 	Table
@@ -44,11 +46,13 @@ export function Interfaces({
 	const {
 		//collectionIdToFieldKeys,
 		collectionOptions,
+		durationSinceLastUpdate,
 		//fieldOptions,
 		//globalFieldsObj,
 		interfaceNamesObj,
 		interfaces,
 		interfacesTotal,
+		isLoading,
 		memoizedUpdateInterfacesCallback,
 		setShowCollections,
 		setShowDelete,
@@ -67,37 +71,49 @@ export function Interfaces({
 		servicesBaseUrl
 	});
 	return <>
-		<Segment basic style={{
-			marginLeft: -14,
-			marginTop: -14,
-			marginRight: -14
-		}}>
-			<Table basic collapsing compact>
-				<Table.Body>
-					<Table.Row verticalAlign='middle'>
-						<Table.Cell collapsing>
-							<Radio
-								label={"Show all fields"}
-								checked={showCollections}
-								onChange={(
-									_event,
-									{checked}
-								) => {
-									// setShowCollectionCount(checked);
-									setShowCollections(checked);
-									setShowFields(checked);
-									setShowSynonyms(checked);
-									setShowStopWords(checked);
-									setShowDelete(checked);
-								}}
-								toggle
-							/>
-						</Table.Cell>
-					</Table.Row>
-				</Table.Body>
-			</Table>
+		<Segment basic className='page'>
+			<Grid>
+				<Grid.Column floated='left' width={3}>
+					<Table basic collapsing compact>
+						<Table.Body>
+							<Table.Row verticalAlign='middle'>
+								<Table.Cell collapsing>
+									<Radio
+										label={"Show all fields"}
+										checked={showCollections}
+										onChange={(
+											_event,
+											{checked}
+										) => {
+											// setShowCollectionCount(checked);
+											setShowCollections(checked);
+											setShowFields(checked);
+											setShowSynonyms(checked);
+											setShowStopWords(checked);
+											setShowDelete(checked);
+										}}
+										toggle
+									/>
+								</Table.Cell>
+							</Table.Row>
+						</Table.Body>
+					</Table>
+				</Grid.Column>
+				<Grid.Column floated='right' width={4}>
+					<Button
+						basic
+						floated='right'
+						color='blue'
+						loading={isLoading}
+						onClick={memoizedUpdateInterfacesCallback}><Icon className='refresh'/>Last updated: {durationSinceLastUpdate}</Button>
+				</Grid.Column>
+			</Grid>
 		</Segment>
-		<Header as='h1' content='Interfaces'/>
+		<Header
+			as='h1'
+			content='Interfaces'
+			disabled={isLoading}
+		/>
 		<Table celled collapsing compact selectable singleLine striped>
 			<Table.Header>
 				<Table.Row>
@@ -133,6 +149,7 @@ export function Interfaces({
 								collectionOptions={collectionOptions}
 								interfaceNamesObj={interfaceNamesObj/* Currently not allowed to edit _name anyway */}
 								licenseValid={licenseValid}
+								loading={isLoading}
 								servicesBaseUrl={servicesBaseUrl}
 								setLicensedTo={setLicensedTo}
 								setLicenseValid={setLicenseValid}
@@ -141,24 +158,26 @@ export function Interfaces({
 								total={interfacesTotal}
 							/>
 						</Table.Cell>
-						<Table.Cell collapsing>{_name}</Table.Cell>
-						{showCollectionCount ? <Table.Cell collapsing>{_name === 'default' ? '∞' : collectionNames.length}</Table.Cell> : null}
-						{showCollections ? <Table.Cell collapsing>{_name === 'default' ? '∞' : collectionNames.join(', ')}</Table.Cell> : null}
-						{showFields ? <Table.Cell collapsing>{fields.map(({
+						<Table.Cell collapsing disabled={isLoading}>{_name}</Table.Cell>
+						{showCollectionCount ? <Table.Cell collapsing disabled={isLoading}>{_name === 'default' ? '∞' : collectionNames.length}</Table.Cell> : null}
+						{showCollections ? <Table.Cell collapsing disabled={isLoading}>{_name === 'default' ? '∞' : collectionNames.join(', ')}</Table.Cell> : null}
+						{showFields ? <Table.Cell collapsing disabled={isLoading}>{fields.map(({
 							boost,
 							//fieldId,
 							name
 						}) => `${name}${(boost && boost > 1) ? `^${boost}` : ''}`).join(', ')}</Table.Cell> : null}
-						{showSynonyms ? <Table.Cell collapsing>{thesaurusNames.join(', ')}</Table.Cell> : null}
-						{showStopWords ? <Table.Cell collapsing>{stopWords.join(', ')}</Table.Cell> : null}
+						{showSynonyms ? <Table.Cell collapsing disabled={isLoading}>{thesaurusNames.join(', ')}</Table.Cell> : null}
+						{showStopWords ? <Table.Cell collapsing disabled={isLoading}>{stopWords.join(', ')}</Table.Cell> : null}
 						<Table.Cell collapsing>
 							<Button.Group>
 								<SearchModal
 									interfaceName={_name}
+									loading={isLoading}
 									fields={fields}
 								/>
 								<CopyModal
 									afterClose={memoizedUpdateInterfacesCallback}
+									loading={isLoading}
 									name={_name}
 									servicesBaseUrl={servicesBaseUrl}
 								/>
@@ -167,6 +186,7 @@ export function Interfaces({
 									_id={_id}
 									_name={_name}
 									disabled={_name === 'default'}
+									loading={isLoading}
 									servicesBaseUrl={servicesBaseUrl}
 								/> : null}
 							</Button.Group>
@@ -180,6 +200,7 @@ export function Interfaces({
 			collectionOptions={collectionOptions}
 			interfaceNamesObj={interfaceNamesObj}
 			licenseValid={licenseValid}
+			loading={isLoading}
 			servicesBaseUrl={servicesBaseUrl}
 			setLicensedTo={setLicensedTo}
 			setLicenseValid={setLicenseValid}

@@ -8,20 +8,25 @@ import {Button, Icon, Modal} from 'semantic-ui-react';
 import {Search} from '../search/Search';
 
 
-export function SearchModal(props :{
+export function SearchModal({
+	// Required
+	interfaceName,
+	// Optional
+	afterClose = () => {/**/},
+	beforeOpen = () => {/**/},
+	//documentTypesAndFields = {},
+	fields = [],
+	loading = false
+} :{
+	// Required
 	interfaceName :string
+	// Optional
 	afterClose ?:() => void
 	beforeOpen ?:() => void
 	//documentTypesAndFields ?:Record<string,Fields>
 	fields ?:Array<InterfaceField>
+	loading ?:boolean
 }) {
-	const {
-		interfaceName,
-		afterClose = () => {/**/},
-		beforeOpen = () => {/**/},
-		//documentTypesAndFields = {},
-		fields = []
-	} = props;
 	//console.debug('documentTypesAndFields', documentTypesAndFields);
 
 	const [open, setOpen] = React.useState(false);
@@ -45,6 +50,8 @@ export function SearchModal(props :{
 		size='large'
 		trigger={<Button
 			compact
+			disabled={loading}
+			loading={loading}
 			onClick={doOpen}
 			size='tiny'
 		><Icon name='search'/>Search</Button>}

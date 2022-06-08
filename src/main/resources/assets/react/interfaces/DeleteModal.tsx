@@ -4,12 +4,25 @@ import {fetchInterfaceDelete} from '../../../services/graphQL/fetchers/fetchInte
 
 
 export function DeleteModal({
+	// Required
 	_id,
 	_name,
-	afterClose = () => {},
-	beforeOpen = () => {},
+	servicesBaseUrl,
+	// Optional
+	afterClose = () => {/**/},
+	beforeOpen = () => {/**/},
 	disabled = false,
-	servicesBaseUrl
+	loading = false
+} :{
+	// Required
+	_id :string
+	_name :string
+	servicesBaseUrl :string
+	// Optional
+	afterClose ?:() => void
+	beforeOpen ?:() => void
+	disabled ?:boolean
+	loading ?:boolean
 }) {
 	const [deleteNameMatches, setDeleteNameMatches] = React.useState(false);
 	const [typedInterfaceName, setTypedInterfaceName] = React.useState('');
@@ -33,7 +46,8 @@ export function DeleteModal({
 		open={open}
 		trigger={<Button
 			compact
-			disabled={disabled}
+			disabled={loading || disabled}
+			loading={loading}
 			onClick={doOpen}
 			size='tiny'
 			type='button'

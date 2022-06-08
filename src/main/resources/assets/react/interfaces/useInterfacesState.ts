@@ -1,11 +1,13 @@
 import type {DropdownItemProps} from 'semantic-ui-react/index.d';
 import type {
-	GlobalFieldObject,
+	//GlobalFieldObject,
 	InterfaceNamesObj
 } from './index.d';
 
 
+import moment from 'moment';
 import * as React from 'react';
+import {useInterval} from '../utils/useInterval';
 
 
 type Collection = {
@@ -123,10 +125,6 @@ export function useInterfacesState({
 } :{
 	servicesBaseUrl :string
 }) {
-	//const [boolIsLoadingGraphQL, setboolIsLoadingGraphQL] = React.useState(false);
-	//const [boolIsLoadingService, setboolIsLoadingService] = React.useState(false);
-	//const [boolIsLoadingAnything, setboolIsLoadingAnything] = React.useState(false);
-
 	const [collections, setCollections] = React.useState<Array<Collection>>([]);
 	//const [collectionIdToFieldKeys, setCollectionIdToFieldKeys] = React.useState({});
 	/*const [globalFieldsObj, setGlobalFieldsObj] = React.useState<GlobalFieldObject>({
@@ -146,10 +144,12 @@ export function useInterfacesState({
 	const [showStopWords, setShowStopWords] = React.useState(false);
 	const [showDelete, setShowDelete] = React.useState(false);
 
-	const memoizedUpdateInterfacesCallback = React.useCallback(() => {
-		//setboolIsLoadingGraphQL(true);
-		//setboolIsLoadingService(true);
+	const [isLoading, setIsLoading] = React.useState(false);
+	const [updatedAt, setUpdatedAt] = React.useState(moment());
+	const [durationSinceLastUpdate, setDurationSinceLastUpdate] = React.useState('');
 
+	const memoizedUpdateInterfacesCallback = React.useCallback(() => {
+		setIsLoading(true);
 		fetch(`${servicesBaseUrl}/graphQL`, {
 			method: 'POST',
 			headers: {
@@ -426,7 +426,8 @@ export function useInterfacesState({
 					text: _name,
 					value: _name // TODO _id
 				})));
-				//setboolIsLoadingGraphQL(false);
+				setUpdatedAt(moment());
+				setIsLoading(false);
 			});
 	}, [servicesBaseUrl]);
 
@@ -434,15 +435,15 @@ export function useInterfacesState({
 		memoizedUpdateInterfacesCallback();
 	}, [memoizedUpdateInterfacesCallback]);
 
-	/*React.useEffect(() => {
-		setboolIsLoadingAnything(boolIsLoadingGraphQL || boolIsLoadingService);
-	}, [boolIsLoadingGraphQL, boolIsLoadingService]);*/
-
-	/*console.debug(
-		'boolIsLoadingGraphQL', boolIsLoadingGraphQL,
-		'boolIsLoadingService', boolIsLoadingService,
-		'boolIsLoadingAnything', boolIsLoadingAnything
-	);*/
+	useInterval(() => {
+		if (updatedAt) {
+			setDurationSinceLastUpdate(
+				moment
+					.duration(updatedAt.diff(moment()))
+					.humanize()
+			);
+		}
+	}, 5000);
 
 	const collectionIdToName = {};
 	const collectionOptions = collections.map(({
@@ -462,11 +463,13 @@ export function useInterfacesState({
 	return {
 		//collectionIdToFieldKeys,
 		collectionOptions,
+		durationSinceLastUpdate,
 		//fieldOptions,
 		//globalFieldsObj,
 		interfaceNamesObj,
 		interfaces,
 		interfacesTotal,
+		isLoading,
 		memoizedUpdateInterfacesCallback,
 		setShowCollections,
 		setShowDelete,
