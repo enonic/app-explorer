@@ -15,7 +15,7 @@ import {Collections} from './collection/Collections';
 import {Interfaces} from './interfaces/Interfaces';
 import {Journals} from './Journals';
 import {Notifications} from './notifications/Notifications';
-import {Schedule} from './Schedule';
+import {Schedule} from './schedule/Schedule';
 import {DocumentTypes} from './documentTypes/DocumentTypes';
 import {Search} from './search/Search';
 import {Status} from './Status';

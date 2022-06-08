@@ -77,7 +77,6 @@ export function Collections(props :{
 		objCollectionsBeingReindexed,
 		queryCollectionsGraph,
 		shemaIdToName,
-		setBoolPoll,
 		setShowCollector,
 		setShowDelete,
 		setShowDocumentType,
@@ -223,11 +222,6 @@ export function Collections(props :{
 								afterClose={() => {
 									//console.debug('NewOrEditCollectionModal afterClose');
 									memoizedFetchOnUpdate();
-									setBoolPoll(true);
-								}}
-								beforeOpen={() => {
-									//console.debug('NewOrEditCollectionModal beforeOpen');
-									setBoolPoll(false);
 								}}
 								servicesBaseUrl={servicesBaseUrl}
 								setLicensedTo={setLicensedTo}
@@ -383,11 +377,6 @@ export function Collections(props :{
 										afterClose={() => {
 											//console.debug('DeleteCollectionModal afterClose');
 											memoizedFetchCollections();
-											setBoolPoll(true);
-										}}
-										beforeOpen={() => {
-											//console.debug('DeleteCollectionModal beforeOpen');
-											setBoolPoll(false);
 										}}
 										servicesBaseUrl={servicesBaseUrl}
 									/> : null}
@@ -409,11 +398,6 @@ export function Collections(props :{
 				afterClose={() => {
 					//console.debug('NewOrEditCollectionModal afterClose');
 					memoizedFetchOnUpdate();
-					setBoolPoll(true);
-				}}
-				beforeOpen={() => {
-					//console.debug('NewOrEditCollectionModal beforeOpen');
-					setBoolPoll(false);
 				}}
 				servicesBaseUrl={servicesBaseUrl}
 				setLicensedTo={setLicensedTo}

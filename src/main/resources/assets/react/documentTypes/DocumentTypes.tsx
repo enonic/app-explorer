@@ -43,7 +43,6 @@ export function DocumentTypes({
 	const [updatedAt, setUpdatedAt] = React.useState(moment());
 	const [durationSinceLastUpdate, setDurationSinceLastUpdate] = React.useState('');
 
-	//const [boolPoll, setBoolPoll] = React.useState(true);
 	//const [globalFields, setGlobalFields] = React.useState([]);
 	const [isLoading, setIsLoading] = React.useState(false);
 	const [documentTypes, setDocumentTypes] = React.useState<DocumentTypesObj>({});
@@ -105,13 +104,15 @@ export function DocumentTypes({
 	// An empty array [] means on mount and unmount. This tells React that your effect doesn’t depend on any values from props or state.
 	// If you pass an empty array ([]), the props and state inside the effect will always have their initial values
 
-	/*useInterval(() => {
-		// This will not run when a modal popup is open
-		//console.debug('boolPoll', boolPoll);
-		if (boolPoll) {
-			queryDocumentTypes();
-		}
-	}, 2500);*/
+	React.useEffect(() => {
+		setDurationSinceLastUpdate(
+			moment
+				.duration(updatedAt.diff(moment()))
+				.humanize()
+		);
+	}, [
+		updatedAt
+	]);
 
 	useInterval(() => {
 		if (updatedAt) {
@@ -260,11 +261,6 @@ export function DocumentTypes({
 											afterClose={() => {
 												//console.debug('DeleteDocumentTypeModal afterClose');
 												memoizedUpdateState();
-												//setBoolPoll(true);
-											}}
-											beforeOpen={() => {
-												//console.debug('DeleteDocumentTypeModal beforeOpen');
-												//setBoolPoll(false);
 											}}
 											collectionNames={collectionNames}
 											disabled={isLoading}
@@ -347,11 +343,6 @@ export function DocumentTypes({
 			onClose={() => {
 				setNewOrEditModalState({ open: false });
 				memoizedUpdateState();
-				//setBoolPoll(true);
-			}}
-			onMount={() => {
-				//console.debug('NewOrEditDocumentTypeModal onMount');
-				//setBoolPoll(false);
 			}}
 			servicesBaseUrl={servicesBaseUrl}
 		/>

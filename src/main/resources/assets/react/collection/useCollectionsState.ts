@@ -157,7 +157,6 @@ export function useCollectionsState({
 	const [updatedAt, setUpdatedAt] = React.useState(moment());
 	const [durationSinceLastUpdate, setDurationSinceLastUpdate] = React.useState('');
 
-	const [boolPoll, setBoolPoll] = React.useState(true);
 	const [jobsObj, setJobsObj] = React.useState({});
 	const [locales, setLocales] = React.useState([]);
 	const [queryCollectionsGraph, setQueryCollectionsGraph] = React.useState<QueryCollectionsGraph>({
@@ -413,17 +412,12 @@ export function useCollectionsState({
 	]);
 
 	useInterval(() => {
-		// This will continue to run as long as the Collections "tab" is open
-		if (boolPoll) {
-			//memoizedFetchOnUpdate();
-			memoizedFetchTasks();
-			setDurationSinceLastUpdate(
-				moment
-					.duration(updatedAt.diff(moment()))
-					.humanize()
-			);
-		}
-	}, 2500);
+		setDurationSinceLastUpdate(
+			moment
+				.duration(updatedAt.diff(moment()))
+				.humanize()
+		);
+	}, 5000);
 
 	const shemaIdToName = {};
 	documentTypes.forEach(({_id, _name}) => {
@@ -450,7 +444,6 @@ export function useCollectionsState({
 		objCollectionsBeingReindexed,
 		queryCollectionsGraph,
 		shemaIdToName,
-		setBoolPoll,
 		setShowCollector,
 		setShowDelete,
 		setShowDocumentType,
