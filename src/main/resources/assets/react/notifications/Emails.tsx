@@ -1,37 +1,30 @@
-import {getIn} from '@enonic/js-utils';
-import {Button, Form, Icon, Table} from 'semantic-ui-react';
 import {
-	DeleteItemButton,
+	Button,
+	Form,
+	Icon,
 	Input,
-	InsertButton,
-	List,
-	MoveDownButton,
-	MoveUpButton,
-	SetValueButton,
-	getEnonicContext
-} from '@enonic/semantic-ui-react-form';
+	Table
+} from 'semantic-ui-react';
+import {DeleteItemButton} from '../components/DeleteItemButton';
+import {InsertButton} from '../components/InsertButton';
+import {MoveDownButton} from '../components/MoveDownButton';
+import {MoveUpButton} from '../components/MoveUpButton';
 
 
-export function Emails(props :{
-	path ?:string
-} = {}) {
-	const {
-		path = 'emails'
-	} = props;
-	//console.debug('path', path);
-
-	const {state} = getEnonicContext();
-	//console.debug('state', state);
-
-	const value = getIn(state.values, path);
-	//console.debug('value', value);
-
-	if (!(Array.isArray(value) && value.length)) {
+export function Emails({
+	setEmails,
+	isLoading = false,
+	emails = []
+} :{
+	setEmails :(emails :Array<string>) => void
+	emails ?:Array<string>
+	isLoading ?:boolean
+}) {
+	if (!(Array.isArray(emails) && emails.length)) {
 		return <Form.Field>
-			<SetValueButton
-				path={path}
-				value={['']}
-			><Icon className='green plus'/> Add email(s)</SetValueButton>
+			<Button
+				onClick={() => setEmails([''])}
+			><Icon className='green plus'/> Add email(s)</Button>
 		</Form.Field>;
 	}
 
@@ -43,60 +36,62 @@ export function Emails(props :{
 			</Table.Row>
 		</Table.Header>
 		<Table.Body>
-			<List<string>
-				path={path}
-				render={(emails) => {
-					//console.debug('emails', emails);
-					return <>
-						{emails.map((
-							//@ts-ignore
-							email,
-							index
-						) => {
-							//console.debug('email', email, 'index', index);
-
-							const key=`${path}.${index}`;
-							//console.debug('email', email, 'index', index, 'key', key);
-
-							return <Table.Row key={key}>
-								<Table.Cell>
-									<Input<string>
-										fluid
-										path={key}
-										style={{
-											minWidth:'25em'
-										}}
-										value={email}
-									/>
-								</Table.Cell>
-								<Table.Cell>
-									<Button.Group icon>
-										<InsertButton
-											path={path}
-											index={index+1}
-											value={''}
-										/>
-										<MoveDownButton
-											disabled={index + 1 >= emails.length}
-											path={path}
-											index={index}
-										/>
-										<MoveUpButton
-											path={path}
-											index={index}
-										/>
-										<DeleteItemButton
-											disabled={emails.length < 2}
-											path={path}
-											index={index}
-										/>
-									</Button.Group>
-								</Table.Cell>
-							</Table.Row>;
-						})}
-					</>;
-				}}
-			/>
+			{emails.map((
+				//@ts-ignore
+				email,
+				index
+			) => <Table.Row key={index}>
+				<Table.Cell>
+					<Input
+						fluid
+						disabled={isLoading}
+						loading={isLoading}
+						onChange={(_e,{value:newEmail}) => {
+							const deref = JSON.parse(JSON.stringify(emails));
+							deref[index] = newEmail;
+							setEmails(deref);
+						}}
+						style={{
+							minWidth:'25em'
+						}}
+						value={email}
+					/>
+				</Table.Cell>
+				<Table.Cell>
+					<Button.Group icon>
+						<InsertButton
+							array={emails}
+							disabled={isLoading}
+							insertAtIndex={index + 1}
+							loading={isLoading}
+							setArrayFunction={setEmails}
+							valueToInsert={''}
+						/>
+						<MoveDownButton
+							array={emails}
+							disabled={isLoading || index + 1 >= emails.length}
+							index={index}
+							loading={isLoading}
+							setArrayFunction={setEmails}
+						/>
+						<MoveUpButton
+							array={emails}
+							disabled={isLoading || index === 0}
+							index={index}
+							loading={isLoading}
+							setArrayFunction={setEmails}
+						/>
+						<DeleteItemButton
+							array={emails}
+							disabled={isLoading || emails.length < 2}
+							index={index}
+							loading={isLoading}
+							setArrayFunction={setEmails}
+						/>
+					</Button.Group>
+				</Table.Cell>
+			</Table.Row>
+			)}
 		</Table.Body>
 	</Table>;
 } // Emails
