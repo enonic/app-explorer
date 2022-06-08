@@ -90,10 +90,8 @@ export const ApiKeys = (props :{
 									//console.debug('NewOrEditApiKeyModal beforeOpen');
 									setBoolPoll(false);
 								}}
-								initialValues={{
-									collections,
-									interfaces
-								}}
+								collections={collections}
+								interfaces={interfaces}
 								servicesBaseUrl={servicesBaseUrl}
 							/>
 						</Table.Cell>

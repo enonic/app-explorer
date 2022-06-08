@@ -1,7 +1,4 @@
-import type {
-	ApiKeyFormValues,
-	QueryApiKeysHits
-} from './index.d';
+import type {QueryApiKeysHits} from './index.d';
 
 
 import * as React from 'react';
@@ -24,7 +21,8 @@ export const NewOrEditApiKeyModal = (props :{
 	_name ?:string
 	afterClose :() => void
 	beforeOpen :() => void
-	initialValues ?:ApiKeyFormValues
+	collections ?:Array<string>
+	interfaces ?:Array<string>
 }) => {
 	//console.debug('props', props);
 	const {
@@ -36,7 +34,8 @@ export const NewOrEditApiKeyModal = (props :{
 		_name,
 		afterClose = () => {/**/},
 		beforeOpen = () => {/**/},
-		initialValues
+		collections = [],
+		interfaces = []
 	} = props;
 	const [state, setState] = React.useState({
 		open: false
@@ -86,7 +85,8 @@ export const NewOrEditApiKeyModal = (props :{
 			_name={_name}
 			apiKeys={apiKeys}
 			doClose={doClose}
-			initialValues={initialValues}
+			collections={collections}
+			interfaces={interfaces}
 			servicesBaseUrl={servicesBaseUrl}
 		/>
 	</Modal>;
