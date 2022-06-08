@@ -148,7 +148,7 @@ export function Interfaces({
 							boost,
 							//fieldId,
 							name
-						}) => `${name}^${boost}`).join(', ')}</Table.Cell> : null}
+						}) => `${name}${(boost && boost > 1) ? `^${boost}` : ''}`).join(', ')}</Table.Cell> : null}
 						{showSynonyms ? <Table.Cell collapsing>{thesaurusNames.join(', ')}</Table.Cell> : null}
 						{showStopWords ? <Table.Cell collapsing>{stopWords.join(', ')}</Table.Cell> : null}
 						<Table.Cell collapsing>
