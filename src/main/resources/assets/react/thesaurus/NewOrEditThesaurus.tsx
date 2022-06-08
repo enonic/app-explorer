@@ -64,7 +64,25 @@ const GQL_MUTATION_THESAURUS_UPDATE = `mutation UpdateThesaurusMutation(
 }`;
 
 
-export function NewOrEditThesaurus(props :{
+export function NewOrEditThesaurus({
+	// Required
+	licenseValid,
+	locales,
+	open,
+	servicesBaseUrl,
+	setNewOrEditState,
+	setLicensedTo,
+	setLicenseValid,
+	thesaurusNames,
+	// Optional
+	_id,
+	_name = '',
+	afterClose = () => {}, // eslint-disable-line @typescript-eslint/no-empty-function
+	language = {
+		from: '',
+		to: ''
+	}
+} :{
 	// Required
 	licenseValid :boolean
 	locales :Locales
@@ -83,25 +101,6 @@ export function NewOrEditThesaurus(props :{
 		to :string
 	}
 }) {
-	const {
-		// Required
-		licenseValid,
-		locales,
-		open,
-		servicesBaseUrl,
-		setNewOrEditState,
-		setLicensedTo,
-		setLicenseValid,
-		thesaurusNames,
-		// Optional
-		_id,
-		_name = '',
-		afterClose = () => {}, // eslint-disable-line @typescript-eslint/no-empty-function
-		language = {
-			from: '',
-			to: ''
-		}
-	} = props;
 	//console.debug('NewOrEditThesaurus _id', _id);
 	//console.debug('NewOrEditThesaurus licenseValid', licenseValid);
 	//console.debug('NewOrEditThesaurus _name', _name);

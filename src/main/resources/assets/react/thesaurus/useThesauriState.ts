@@ -5,7 +5,10 @@ import type {
 	QueryThesauriGraph
 } from './index.d';
 
+
+import moment from 'moment';
 import * as React from 'react';
+import {useInterval} from '../utils/useInterval';
 
 
 const GQL_LOCALES_GET = `getLocales {
@@ -78,6 +81,8 @@ export function useThesauriState({
 		_name: undefined,
 		open: false
 	});
+	const [updatedAt, setUpdatedAt] = React.useState(moment());
+	const [durationSinceLastUpdate, setDurationSinceLastUpdate] = React.useState('');
 
 	const memoizedFetchOnUpdate = React.useCallback(() =>{
 		setLoading(true);
@@ -98,6 +103,7 @@ export function useThesauriState({
 						.map(({synonymsCount}) => synonymsCount)
 						.reduce((accumulator, currentValue) => accumulator + currentValue) : 0;
 					setSynonymsSum(sum);
+					setUpdatedAt(moment());
 					setLoading(false);
 				} // if
 			}); // then
@@ -126,6 +132,7 @@ export function useThesauriState({
 						.map(({synonymsCount}) => synonymsCount)
 						.reduce((accumulator, currentValue) => accumulator + currentValue) : 0;
 					setSynonymsSum(sum);
+					setUpdatedAt(moment());
 					setLoading(false);
 				} // if
 			}); // then
@@ -136,7 +143,17 @@ export function useThesauriState({
 	React.useEffect(() => memoizedFetchOnMount(), [
 		memoizedFetchOnMount
 	]);
+
+	useInterval(() => {
+		setDurationSinceLastUpdate(
+			moment
+				.duration(updatedAt.diff(moment()))
+				.humanize()
+		);
+	}, 5000);
+
 	return {
+		durationSinceLastUpdate,
 		editSynonymsModalState,
 		isLoading,
 		locales,

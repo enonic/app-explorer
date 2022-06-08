@@ -13,15 +13,27 @@ const GQL_MUTATION_THESAURUS_DELETE = `mutation DeleteThesaurusMutation(
 }`;
 
 
-export function DeleteThesaurus(props) {
-	const {
-		_id,
-		afterClose = () => {},
-		beforeOpen = () => {},
-		name,
-		servicesBaseUrl
-	} = props;
-
+export function DeleteThesaurus({
+	// Required
+	_id,
+	servicesBaseUrl,
+	name,
+	// Optional
+	afterClose = () => {/**/},
+	beforeOpen = () => {/**/},
+	disabled = false,
+	loading = false
+} :{
+	// Required
+	_id :string
+	name :string
+	servicesBaseUrl :string
+	// Optional
+	afterClose ?:() => void
+	beforeOpen ?:() => void
+	disabled ?:boolean
+	loading ?:boolean
+}) {
 	const [open, setOpen] = React.useState(false);
 
 	function doClose() {
@@ -42,6 +54,8 @@ export function DeleteThesaurus(props) {
 		open={open}
 		trigger={<Popup
 			content={`Delete thesaurus ${name}`}
+			disabled={loading || disabled}
+			loading={loading}
 			inverted
 			trigger={<Button
 				icon

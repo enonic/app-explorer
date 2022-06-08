@@ -4,13 +4,25 @@ import {
 } from 'semantic-ui-react';
 
 
-export function Import(props) {
-	const {
-		afterClose = () => {},
-		beforeOpen = () => {},
-		name,
-		servicesBaseUrl
-	} = props;
+export function Import({
+	// Required
+	name,
+	servicesBaseUrl,
+	// Optional
+	afterClose = () => {/**/},
+	beforeOpen = () => {/**/},
+	disabled = false,
+	loading = false,
+} :{
+	// Required
+	name :string
+	servicesBaseUrl :string
+	// Optional
+	afterClose ?:() => void
+	beforeOpen ?:() => void
+	disabled ?:boolean
+	loading ?:boolean
+}) {
 
 	const [open, setOpen] = React.useState(false);
 
@@ -34,7 +46,9 @@ export function Import(props) {
 			content={`Import to thesaurus ${name}`}
 			inverted
 			trigger={<Button
+				disabled={disabled}
 				icon
+				loading={loading}
 				onClick={doOpen}
 			><Icon color='blue' name='upload'/></Button>}
 		/>}
