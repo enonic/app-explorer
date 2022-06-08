@@ -1,3 +1,5 @@
+import type {SemanticWIDTHS} from 'semantic-ui-react';
+
 // A utility for converting HTML strings into React components.
 // Avoids the use of dangerouslySetInnerHTML and converts standard HTML elements,
 // attributes and inline styles into their React equivalents.
@@ -17,6 +19,7 @@ export type Hit = {
 	_collectionName :string
 	_documentTypeName :string
 	_json :string
+	_highlight :Record<string,Array<string>>
 	_score :number
 }
 
@@ -26,9 +29,15 @@ export type Hit = {
 
 
 export const Hits = ({
+	firstColumnWidth = 2,
 	hits = [],
 	loading
+} :{
+	firstColumnWidth ?:1|2|3|4|5|6|7|8|9|10|11|12|13|14|15
+	hits :Array<Hit>
+	loading :boolean
 }) => {
+	const secondColumnWidth = 16 - firstColumnWidth as SemanticWIDTHS;
 	/*console.debug(toStr({
 		component: 'Hits',
 		hits,
@@ -54,8 +63,8 @@ export const Hits = ({
 				<Table compact definition fixed>
 					<Table.Body>
       					<Table.Row>
-							<Table.Cell textAlign='right' width={2}>Collection name</Table.Cell>
-							<Table.Cell width={14}>{_collectionName}</Table.Cell>
+							<Table.Cell textAlign='right' width={firstColumnWidth}>Collection name</Table.Cell>
+							<Table.Cell width={secondColumnWidth}>{_collectionName}</Table.Cell>
 						</Table.Row>
 						<Table.Row>
 							<Table.Cell textAlign='right'>DocumentType name</Table.Cell>

@@ -5,7 +5,7 @@ import type {InterfaceField} from '/lib/explorer/types/Interface.d';
 import * as React from 'react';
 import {Button, Icon, Modal} from 'semantic-ui-react';
 
-import {Search} from '../Search';
+import {Search} from '../search/Search';
 
 
 export function SearchModal(props :{
@@ -17,8 +17,8 @@ export function SearchModal(props :{
 }) {
 	const {
 		interfaceName,
-		afterClose = () => {},
-		beforeOpen = () => {},
+		afterClose = () => {/**/},
+		beforeOpen = () => {/**/},
 		//documentTypesAndFields = {},
 		fields = []
 	} = props;
@@ -52,6 +52,7 @@ export function SearchModal(props :{
 		<Modal.Header>Search interface: {interfaceName}</Modal.Header>
 		<Modal.Content>
 			<Search
+				firstColumnWidth={3}
 				fields={fields}
 				interfaceName={interfaceName}
 			/>

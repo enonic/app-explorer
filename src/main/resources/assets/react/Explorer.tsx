@@ -17,7 +17,7 @@ import {Journals} from './Journals';
 import {Notifications} from './notifications/Notifications';
 import {Schedule} from './Schedule';
 import {DocumentTypes} from './documentTypes/DocumentTypes';
-import {Search} from './Search';
+import {Search} from './search/Search';
 import {Status} from './Status';
 import {StopWords} from './stopWords/StopWords';
 import {Thesauri} from './thesaurus/Thesauri';

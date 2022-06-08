@@ -1,6 +1,6 @@
 //import type {Fields} from '/lib/explorer/types/Field.d';
 import type {InterfaceField} from '/lib/explorer/types/Interface.d';
-import type {Hit} from './search/Hits';
+import type {Hit} from './Hits';
 
 
 import {
@@ -13,7 +13,7 @@ import * as React from 'react';
 import {Form} from 'semantic-ui-react';
 //import traverse from 'traverse';
 
-import {Hits} from './search/Hits';
+import {Hits} from './Hits';
 
 
 type InterfaceName = string;
@@ -33,6 +33,7 @@ type Cache = Record<CacheKey,SearchResult>;
 export function Search(props :{
 	//documentTypesAndFields ?:Record<string,Fields>
 	fields ?:Array<InterfaceField>
+	firstColumnWidth ?:1|2|3|4|5|6|7|8|9|10|11|12|13|14|15
 	interfaceName ?:InterfaceName
 	searchString ?:SearchString
 }) {
@@ -41,6 +42,7 @@ export function Search(props :{
 		//documentTypesAndFields = [],
 		//collectionOptions = [],
 		fields = [],
+		firstColumnWidth = 2,
 		interfaceName = 'default',
 		//thesaurusOptions = []
 	} = props;
@@ -206,6 +208,7 @@ export function Search(props :{
 			</Form.Group>
 		</Form>
 		<Hits
+			firstColumnWidth={firstColumnWidth}
 			hits={result.hits}
 			loading={loading}
 		/>
