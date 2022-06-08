@@ -42,7 +42,7 @@ export const Hits = ({
   			<p>&nbsp;<br/>&nbsp;<br/>&nbsp;</p>
 		</div>;
 	}
-	return <List animated divided selection>
+	return <List relaxed='very'>
 		{
 			hits.map(({
 				_collectionName,
@@ -51,22 +51,22 @@ export const Hits = ({
 				_json,
 				_score
 			}, index) => <List.Item key={index}>
-				<Table basic compact fixed selectable>
+				<Table compact definition fixed>
 					<Table.Body>
       					<Table.Row>
-							<Table.Cell width={3}><b>Collection Name</b></Table.Cell>
-							<Table.Cell width={13}>{_collectionName}</Table.Cell>
+							<Table.Cell textAlign='right' width={2}>Collection name</Table.Cell>
+							<Table.Cell width={14}>{_collectionName}</Table.Cell>
 						</Table.Row>
 						<Table.Row>
-							<Table.Cell><b>DocumentType Name</b></Table.Cell>
+							<Table.Cell textAlign='right'>DocumentType name</Table.Cell>
 							<Table.Cell>{_documentTypeName}</Table.Cell>
 						</Table.Row>
 						<Table.Row>
-							<Table.Cell><b>Score</b></Table.Cell>
+							<Table.Cell textAlign='right'>Score</Table.Cell>
 							<Table.Cell>{_score}</Table.Cell>
 						</Table.Row>
 						<Table.Row>
-							<Table.Cell><b>Hightlight</b></Table.Cell>
+							<Table.Cell textAlign='right'>Hightlight</Table.Cell>
 							<Table.Cell><ReactJson
 								enableClipboard={true}
 								displayDataTypes={false}
@@ -75,7 +75,7 @@ export const Hits = ({
 							/></Table.Cell>
 						</Table.Row>
 						<Table.Row>
-							<Table.Cell><b>JSON</b></Table.Cell>
+							<Table.Cell textAlign='right'>JSON</Table.Cell>
 							<Table.Cell><ReactJson
 								enableClipboard={true}
 								displayDataTypes={false}
