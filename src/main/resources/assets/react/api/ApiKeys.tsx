@@ -1,6 +1,9 @@
 import * as React from 'react';
 import {
+	Button,
+	Grid,
 	Header,
+	Icon,
 	Radio,
 	Segment,
 	Table
@@ -22,8 +25,9 @@ export const ApiKeys = (props :{
 
 	const {
 		apiKeys,
-		memoizedFetchApiKeys,
-		setBoolPoll,
+		durationSinceLastUpdate,
+		isLoading,
+		memoizedFetchApiKeys
 	} = useApiKeysState({
 		servicesBaseUrl
 	});
@@ -32,28 +36,40 @@ export const ApiKeys = (props :{
 
 	return <>
 		<Segment basic className="page">
-			<Table basic collapsing compact>
-				<Table.Body>
-					<Table.Row verticalAlign='middle'>
-						<Table.Cell collapsing>
-							<Radio
-								label={"Show all fields"}
-								checked={showAllFields}
-								onChange={(
-									//@ts-ignore
-									event :unknown,
-									{checked}
-								) => {
-									setShowAllFields(checked);
-								}}
-								toggle
-							/>
-						</Table.Cell>
-					</Table.Row>
-				</Table.Body>
-			</Table>
+			<Grid>
+				<Grid.Column floated='left' width={3}>
+					<Table basic collapsing compact>
+						<Table.Body>
+							<Table.Row verticalAlign='middle'>
+								<Table.Cell collapsing>
+									<Radio
+										label={"Show all fields"}
+										checked={showAllFields}
+										onChange={(
+											//@ts-ignore
+											event :unknown,
+											{checked}
+										) => {
+											setShowAllFields(checked);
+										}}
+										toggle
+									/>
+								</Table.Cell>
+							</Table.Row>
+						</Table.Body>
+					</Table>
+				</Grid.Column>
+				<Grid.Column floated='right' width={4}>
+					<Button
+						basic
+						floated='right'
+						color='blue'
+						loading={isLoading}
+						onClick={memoizedFetchApiKeys}><Icon className='refresh'/>Last updated: {durationSinceLastUpdate}</Button>
+				</Grid.Column>
+			</Grid>
 		</Segment>
-		<Header as='h1'>API Keys</Header>
+		<Header as='h1' disabled={isLoading}>API Keys</Header>
 		<Table celled collapsing compact selectable sortable striped>
 			<Table.Header>
 				<Table.Row>
@@ -75,7 +91,7 @@ export const ApiKeys = (props :{
 					collections,
 					interfaces
 				}) => {
-					return <Table.Row key={_name}>
+					return <Table.Row disabled={isLoading} key={_name}>
 						<Table.Cell collapsing>
 							<NewOrEditApiKeyModal
 								_id={_id}
@@ -83,13 +99,10 @@ export const ApiKeys = (props :{
 								afterClose={() => {
 									//console.debug('NewOrEditApiKeyModal afterClose');
 									memoizedFetchApiKeys();
-									setBoolPoll(true);
 								}}
 								apiKeys={apiKeys}
-								beforeOpen={() => {
-									//console.debug('NewOrEditApiKeyModal beforeOpen');
-									setBoolPoll(false);
-								}}
+								disabled={isLoading}
+								loading={isLoading}
 								collections={collections}
 								interfaces={interfaces}
 								servicesBaseUrl={servicesBaseUrl}
@@ -108,12 +121,9 @@ export const ApiKeys = (props :{
 										afterClose={() => {
 											//console.debug('DeleteApiKeyModal afterClose');
 											memoizedFetchApiKeys();
-											setBoolPoll(true);
 										}}
-										beforeOpen={() => {
-											//console.debug('DeleteApiKeyModal beforeOpen');
-											setBoolPoll(false);
-										}}
+										disabled={isLoading}
+										loading={isLoading}
 										servicesBaseUrl={servicesBaseUrl}
 									/>
 								</Table.Cell>
@@ -127,13 +137,10 @@ export const ApiKeys = (props :{
 			afterClose={() => {
 				//console.debug('NewOrEditApiKeyModal afterClose');
 				memoizedFetchApiKeys();
-				setBoolPoll(true);
 			}}
 			apiKeys={apiKeys}
-			beforeOpen={() => {
-				//console.debug('NewOrEditApiKeyModal beforeOpen');
-				setBoolPoll(false);
-			}}
+			disabled={isLoading}
+			loading={isLoading}
 			servicesBaseUrl={servicesBaseUrl}
 		/>
 	</>;

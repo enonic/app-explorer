@@ -17,6 +17,8 @@ export const DeleteApiKeyModal = (props :{
 	servicesBaseUrl :string
 	afterClose? :() => void
 	beforeOpen? :() => void
+	disabled ?:boolean
+	loading ?:boolean
 }) => {
 	//console.debug('props', props);
 	const {
@@ -24,7 +26,9 @@ export const DeleteApiKeyModal = (props :{
 		_name,
 		servicesBaseUrl,
 		afterClose = () => {/**/},
-		beforeOpen = () => {/**/}
+		beforeOpen = () => {/**/},
+		disabled = false,
+		loading = false
 	} = props;
 	const [state, setState] = React.useState({
 		open: false
@@ -51,7 +55,9 @@ export const DeleteApiKeyModal = (props :{
 			content={`Delete API Key ${_name}`}
 			inverted
 			trigger={<Button
+				disabled={disabled}
 				icon
+				loading={loading}
 				onClick={doOpen}
 			><Icon color='red' name='trash alternate outline'/></Button>}/>
 		}

@@ -1,9 +1,8 @@
 import type {QueryApiKeysGraph} from './index.d';
 
 
+import moment from 'moment';
 import * as React from 'react';
-
-//@ts-ignore
 import {useInterval} from '../utils/useInterval';
 
 
@@ -27,10 +26,12 @@ export function useApiKeysState({
 	const [queryApiKeysGraph, setQueryApiKeysGraph] = React.useState<QueryApiKeysGraph>({
 		hits: []
 	});
-
-	const [boolPoll, setBoolPoll] = React.useState(true);
+	const [updatedAt, setUpdatedAt] = React.useState(moment());
+	const [durationSinceLastUpdate, setDurationSinceLastUpdate] = React.useState('');
+	const [isLoading, setIsLoading] = React.useState(false);
 
 	const memoizedFetchApiKeys = React.useCallback(() => {
+		setIsLoading(true);
 		fetch(`${servicesBaseUrl}/graphQL`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
@@ -41,7 +42,9 @@ export function useApiKeysState({
 				//console.log(res);
 				if (res && res.data) {
 					setQueryApiKeysGraph(res.data.queryApiKeys);
+					setUpdatedAt(moment());
 				}
+				setIsLoading(false);
 			});
 	},[
 		servicesBaseUrl
@@ -51,17 +54,29 @@ export function useApiKeysState({
 		memoizedFetchApiKeys
 	]); // Only once
 
+	React.useEffect(() => {
+		setDurationSinceLastUpdate(
+			moment
+				.duration(updatedAt.diff(moment()))
+				.humanize()
+		);
+	}, [
+		updatedAt
+	]);
+
 	useInterval(() => {
-		// This will continue to run as long as the Collections "tab" is open
-		if (boolPoll) {
-			memoizedFetchApiKeys();
-		}
-	}, 2500);
+		setDurationSinceLastUpdate(
+			moment
+				.duration(updatedAt.diff(moment()))
+				.humanize()
+		);
+	}, 5000);
 
 
 	return {
 		apiKeys: queryApiKeysGraph.hits,
-		memoizedFetchApiKeys,
-		setBoolPoll
+		durationSinceLastUpdate,
+		isLoading,
+		memoizedFetchApiKeys
 	};
 }

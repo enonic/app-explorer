@@ -19,9 +19,11 @@ export const NewOrEditApiKeyModal = (props :{
 	// Optional
 	_id ?:string
 	_name ?:string
-	afterClose :() => void
-	beforeOpen :() => void
+	afterClose ?:() => void
+	beforeOpen ?:() => void
 	collections ?:Array<string>
+	disabled ?:boolean
+	loading ?:boolean
 	interfaces ?:Array<string>
 }) => {
 	//console.debug('props', props);
@@ -35,6 +37,8 @@ export const NewOrEditApiKeyModal = (props :{
 		afterClose = () => {/**/},
 		beforeOpen = () => {/**/},
 		collections = [],
+		disabled = false,
+		loading = false,
 		interfaces = []
 	} = props;
 	const [state, setState] = React.useState({
@@ -62,13 +66,17 @@ export const NewOrEditApiKeyModal = (props :{
 			content={`Edit API Key ${_name}`}
 			inverted
 			trigger={<Button
+				disabled={disabled}
+				loading={loading}
 				icon
 				onClick={doOpen}
 			><Icon color='blue' name='edit'/></Button>}/>
 			: <Button
 				circular
 				color='green'
+				disabled={disabled}
 				icon
+				loading={loading}
 				onClick={doOpen}
 				size='massive'
 				style={{

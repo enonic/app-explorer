@@ -17,7 +17,7 @@ import {
 import {parseExpression as parseCronExpression} from 'cron-parser';
 //import * as React from 'react';
 import {
-	Button, Dimmer, Grid, GridColumn, Header, Icon, Loader, Popup, Progress, Radio,
+	Button, Dimmer, Grid, Header, Icon, Loader, Popup, Progress, Radio,
 	Segment, Table
 } from 'semantic-ui-react';
 import {
