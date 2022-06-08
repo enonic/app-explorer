@@ -6,11 +6,15 @@ import {
 	Button,
 	Dropdown,
 	//Form,
-	Icon,
+	//Icon,
 	Input,
 	Table
 } from 'semantic-ui-react';
 //import {DEFAULT_INTERFACE_FIELDS} from '../../../constants';
+import {DeleteItemButton} from '../components/DeleteItemButton';
+import {InsertButton} from '../components/InsertButton';
+import {MoveDownButton} from '../components/MoveDownButton';
+import {MoveUpButton} from '../components/MoveUpButton';
 
 
 export function FieldSelector(props :{
@@ -113,52 +117,31 @@ export function FieldSelector(props :{
 							</Table.Cell>
 							<Table.Cell collapsing>
 								<Button.Group icon>
-									<Button
+									<InsertButton
+										array={fieldsArray}
+										insertAtIndex={index + 1}
 										disabled={disabled}
-										icon
-										onClick={() => {
-											const deref = JSON.parse(JSON.stringify(fieldsArray));
-											deref.splice(index+1, 0, {
-												name: '',
-												boost: 1
-											});
-											setFields(deref);
-										}}
-										type='button'
-										value={{name: '', boost: 1}}
-									><Icon color='green' name='add'/></Button>
-									<Button
+										setArrayFunction={setFields}
+										valueToInsert={{name: '', boost: 1}}
+									/>
+									<MoveDownButton
+										array={fieldsArray}
 										disabled={disabled || index + 1 >= fieldsArray.length}
-										icon
-										onClick={() => {
-											const deref = JSON.parse(JSON.stringify(fieldsArray));
-											const tmp = deref[index];
-											deref[index] = deref[index + 1];
-							        		deref[index + 1] = tmp;
-											setFields(deref);
-										}}
-									><Icon color='blue' name='arrow down'/></Button>
-									<Button
+										index={index}
+										setArrayFunction={setFields}
+									/>
+									<MoveUpButton
+										array={fieldsArray}
 										disabled={disabled || index === 0}
-										icon
-										onClick={() => {
-											const deref = JSON.parse(JSON.stringify(fieldsArray));
-											const tmp = deref[index];
-											deref[index] = deref[index - 1];
-							        		deref[index - 1] = tmp;
-											setFields(deref);
-										}}
-									><Icon color='blue' name='arrow up'/></Button>
-									<Button
+										index={index}
+										setArrayFunction={setFields}
+									/>
+									<DeleteItemButton
+										array={fieldsArray}
 										disabled={disabled || fieldsArray.length === 1}
-										icon
-										onClick={() => {
-											const deref = JSON.parse(JSON.stringify(fieldsArray));
-											deref.splice(index, 1);
-											setFields(deref);
-										}}
-										type='button'
-									><Icon color='red' name='trash alternate outline'/></Button>
+										index={index}
+										setArrayFunction={setFields}
+									/>
 								</Button.Group>
 							</Table.Cell>
 						</Table.Row>;
