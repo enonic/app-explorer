@@ -1,4 +1,12 @@
-import {Button, Header, Radio, Segment, Table} from 'semantic-ui-react';
+import {
+	Button,
+	Grid,
+	Header,
+	Icon,
+	Radio,
+	Segment,
+	Table
+} from 'semantic-ui-react';
 
 import {DeleteModal} from './DeleteModal';
 import {NewOrEditModal} from './NewOrEditModal';
@@ -11,7 +19,8 @@ export function StopWords({
 	servicesBaseUrl :string
 }) {
 	const {
-		//isLoading,
+		isLoading,
+		durationSinceLastUpdate,
 		memoizedUpdateStopWords,
 		queryStopWords,
 		setShowDelete,
@@ -20,33 +29,45 @@ export function StopWords({
 		servicesBaseUrl
 	});
 	return <>
-		<Segment basic style={{
-			marginLeft: -14,
-			marginTop: -14,
-			marginRight: -14
-		}}>
-			<Table basic collapsing compact>
-				<Table.Body>
-					<Table.Row verticalAlign='middle'>
-						<Table.Cell collapsing>
-							<Radio
-								label={"Show delete"}
-								checked={showDelete}
-								onChange={(
-									//@ts-ignore
-									event :unknown,
-									{checked}
-								) => {
-									setShowDelete(checked);
-								}}
-								toggle
-							/>
-						</Table.Cell>
-					</Table.Row>
-				</Table.Body>
-			</Table>
+		<Segment className='page' basic>
+			<Grid>
+				<Grid.Column floated='left' width={3}>
+					<Table basic collapsing compact>
+						<Table.Body>
+							<Table.Row verticalAlign='middle'>
+								<Table.Cell collapsing>
+									<Radio
+										label={"Show delete"}
+										checked={showDelete}
+										onChange={(
+											//@ts-ignore
+											event :unknown,
+											{checked}
+										) => {
+											setShowDelete(checked);
+										}}
+										toggle
+									/>
+								</Table.Cell>
+							</Table.Row>
+						</Table.Body>
+					</Table>
+				</Grid.Column>
+				<Grid.Column floated='right' width={4}>
+					<Button
+						basic
+						floated='right'
+						color='blue'
+						loading={isLoading}
+						onClick={memoizedUpdateStopWords}><Icon className='refresh'/>Last updated: {durationSinceLastUpdate}</Button>
+				</Grid.Column>
+			</Grid>
 		</Segment>
-		<Header as='h1' content='Stop words'/>
+		<Header
+			as='h1'
+			content='Stop words'
+			disabled={isLoading}
+		/>
 		<Table celled collapsing compact selectable singleLine sortable striped>
 			<Table.Header>
 				<Table.Row>
@@ -64,12 +85,14 @@ export function StopWords({
 					words
 				}, index :number) => {
 					const key = `list[${index}]`;
-					return <Table.Row key={key}>
+					return <Table.Row disabled={isLoading} key={key}>
 						<Table.Cell collapsing>
 							<NewOrEditModal
 								_id={_id}
 								_name={_name}
 								afterClose={memoizedUpdateStopWords}
+								disabled={isLoading}
+								loading={isLoading}
 								stopWords={queryStopWords.hits}
 								servicesBaseUrl={servicesBaseUrl}
 								words={words}
@@ -86,6 +109,8 @@ export function StopWords({
 										_id={_id}
 										_name={_name}
 										afterClose={memoizedUpdateStopWords}
+										disabled={isLoading}
+										loading={isLoading}
 										servicesBaseUrl={servicesBaseUrl}
 									/>
 								</Button.Group>
@@ -97,6 +122,8 @@ export function StopWords({
 		</Table>
 		<NewOrEditModal
 			afterClose={memoizedUpdateStopWords}
+			disabled={isLoading}
+			loading={isLoading}
 			stopWords={queryStopWords.hits}
 			servicesBaseUrl={servicesBaseUrl}
 		/>

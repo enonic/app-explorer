@@ -9,15 +9,21 @@ export function DeleteModal(props :{
 	_name :string
 	servicesBaseUrl :string
 	// Optional
-	afterClose? :()=>void
-	beforeOpen? :()=>void
+	afterClose? :() => void
+	beforeOpen? :() => void
+	disabled ?:boolean
+	loading ?:boolean
 }) {
 	const {
+		// Required
 		_id,
 		_name,
-		afterClose = () => {},
-		beforeOpen = () => {},
-		servicesBaseUrl
+		servicesBaseUrl,
+		// Optional
+		afterClose = () => {/**/},
+		beforeOpen = () => {/**/},
+		disabled = false,
+		loading = false
 	} = props;
 
 	const [open, setOpen] = React.useState(false);
@@ -42,7 +48,9 @@ export function DeleteModal(props :{
 			content={`Open dialog to confirm deletion of stop words list ${_name}`}
 			inverted
 			trigger={<Button
+				disabled={disabled}
 				icon
+				loading={loading}
 				onClick={doOpen}
 			><Icon color='red' name='trash alternate outline'/></Button>}/>}
 	>

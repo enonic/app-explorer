@@ -144,6 +144,16 @@ export function useThesauriState({
 		memoizedFetchOnMount
 	]);
 
+	React.useEffect(() => {
+		setDurationSinceLastUpdate(
+			moment
+				.duration(updatedAt.diff(moment()))
+				.humanize()
+		);
+	}, [
+		updatedAt
+	]);
+
 	useInterval(() => {
 		setDurationSinceLastUpdate(
 			moment

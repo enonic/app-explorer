@@ -36,8 +36,10 @@ export function NewOrEditModal(props :{
 	_name? :string
 	afterClose? :()=>void
 	beforeOpen? :()=>void
+	disabled ?:boolean
 	editMode? :boolean
 	header? :string
+	loading ?:boolean
 	words? :Array<string>
 }) {
 	//console.debug('NewOrEditModal props', props);
@@ -50,8 +52,10 @@ export function NewOrEditModal(props :{
 		_name = '',
 		afterClose = () => {/**/},
 		beforeOpen = () => {/**/},
+		disabled = false,
 		editMode = !!_name,
 		header = editMode ? `Edit ${_name} stopWords` : 'New stopWords list',
+		loading = false,
 		words = ['']
 	} = props;
 	//console.debug('NewOrEditModal words', words);
@@ -86,12 +90,16 @@ export function NewOrEditModal(props :{
 			content={header}
 			inverted
 			trigger={editMode ? <Button
+				disabled={disabled}
 				icon
+				loading={loading}
 				onClick={doOpen}
 			><Icon color='blue' name='edit'/></Button> : <Button
 				circular
 				color='green'
+				disabled={disabled}
 				icon
+				loading={loading}
 				onClick={doOpen}
 				size='massive'
 				style={{

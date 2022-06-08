@@ -50,6 +50,16 @@ export function useNotificationsState({
 		isStateChanged
 	]);
 
+	React.useEffect(() => {
+		setDurationSinceLastUpdate(
+			moment
+				.duration(updatedAt.diff(moment()))
+				.humanize()
+		);
+	}, [
+		updatedAt
+	]);
+
 	useInterval(() => {
 		if (updatedAt) {
 			setDurationSinceLastUpdate(

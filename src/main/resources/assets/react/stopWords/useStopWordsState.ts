@@ -4,8 +4,10 @@ import type {
 } from '../../../services/graphQL/fetchers/fetchQueryStopWords';
 
 
+import moment from 'moment';
 import * as React from 'react';
 import {fetchQueryStopWords} from '../../../services/graphQL/fetchers/fetchQueryStopWords';
+import {useInterval} from '../utils/useInterval';
 
 
 export function useStopWordsState({
@@ -25,6 +27,8 @@ export function useStopWordsState({
 		isLoading :boolean
 		queryStopWords :QueryStopWordsResult
 	});
+	const [updatedAt, setUpdatedAt] = React.useState(moment());
+	const [durationSinceLastUpdate, setDurationSinceLastUpdate] = React.useState('');
 
 	const memoizedUpdateStopWords = React.useCallback(() => {
 		setState(prev => {
@@ -33,12 +37,15 @@ export function useStopWordsState({
 			return deref;
 		});
 		fetchQueryStopWords({
-			handleData: (data :FetchQueryStopWordsData) => setState(prev => {
-				const deref = JSON.parse(JSON.stringify(prev));
-				deref.queryStopWords = data.queryStopWords;
-				deref.isLoading = false;
-				return deref;
-			}),
+			handleData: (data :FetchQueryStopWordsData) => {
+				setState(prev => {
+					const deref = JSON.parse(JSON.stringify(prev));
+					deref.queryStopWords = data.queryStopWords;
+					deref.isLoading = false;
+					return deref;
+				});
+				setUpdatedAt(moment());
+			},
 			url: `${servicesBaseUrl}/graphQL`
 		});
 	}, [
@@ -49,12 +56,31 @@ export function useStopWordsState({
 		memoizedUpdateStopWords
 	]);
 
+	React.useEffect(() => {
+		setDurationSinceLastUpdate(
+			moment
+				.duration(updatedAt.diff(moment()))
+				.humanize()
+		);
+	}, [
+		updatedAt
+	]);
+
+	useInterval(() => {
+		setDurationSinceLastUpdate(
+			moment
+				.duration(updatedAt.diff(moment()))
+				.humanize()
+		);
+	}, 5000);
+
 	const {
 		isLoading,
 		queryStopWords
 	} = state;
 
 	return {
+		durationSinceLastUpdate,
 		isLoading,
 		memoizedUpdateStopWords,
 		queryStopWords,
