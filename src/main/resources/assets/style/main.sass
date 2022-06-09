@@ -15,3 +15,17 @@
 
 body
 	margin: 0
+
+// Have to have higher specificity than:
+// 0,3,2 .ui.table > tfoot > tr > th
+// The first four are 0,3,3
+.ui.table.disabled > tfoot > tr > th,
+.ui.table > tfoot.disabled > tr > th,
+.ui.table > tfoot > tr.disabled > th,
+.ui.table> tfoot > tr > th.disabled,
+table.disabled th,
+tr.disabled th,
+p.disabled,
+th.disabled
+	color: rgba(40, 40, 40, 0.3)
+	pointerEvents: 'none'

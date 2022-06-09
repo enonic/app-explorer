@@ -240,14 +240,9 @@ export function Thesauri({
 							><Icon color='blue' name='code branch'/></Button>}
 						/>
 					</Table.HeaderCell>
-					{
-						isLoading
-							? <Table.HeaderCell style={{ // Table.HeaderCell doesn't have a disabled prop, also adding disabled to classname doesn't help
-		              			color: 'rgba(40, 40, 40, 0.3)',
-		              			pointerEvents: 'none'
-		            		}}>{synonymsSum}</Table.HeaderCell>
-							: <Table.HeaderCell>{synonymsSum}</Table.HeaderCell>
-					}
+					<Table.HeaderCell className={isLoading ? 'disabled' : ''}>
+						{synonymsSum}
+					</Table.HeaderCell>
 					<Table.HeaderCell></Table.HeaderCell>
 				</Table.Row>
 			</Table.Footer>

@@ -74,6 +74,7 @@
 		"target": "es5",
 		"types": [
 			"jquery",
+			"jsuri",
 			"mocha",
 			"node",
 			"react"
