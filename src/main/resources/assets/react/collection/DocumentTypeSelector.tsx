@@ -1,3 +1,7 @@
+import type {
+	DropdownItemProps,
+	StrictDropdownProps
+} from 'semantic-ui-react';
 import type {CollectionFormValues} from '/lib/explorer/types/index.d';
 
 
@@ -7,10 +11,6 @@ import {
 	Dropdown,
 	Header
 } from 'semantic-ui-react';
-import {
-	getEnonicContext,
-	setValue
-} from '@enonic/semantic-ui-react-form';
 
 
 const GQL_DOCUMENT_TYPE_QUERY = `{
@@ -23,38 +23,22 @@ const GQL_DOCUMENT_TYPE_QUERY = `{
 }`;
 
 
-export function DocumentTypeSelector(props :{
+export function DocumentTypeSelector({
+	documentTypeId,
+	servicesBaseUrl,
+	setDocumentTypeId,
+	placeholder = 'Please select a document type (or leave empty and a new one will automatically be created).',
+	...rest
+} :Omit<StrictDropdownProps,'loading'|'onChange'|'options'|'value'> & {
+	documentTypeId :string
 	servicesBaseUrl :string
-
-	name ?:string
-	parentPath ?:string
-	path ?:string
-	placeholder ?:string
-	value ?:string
+	setDocumentTypeId :(documentTypeId :string) => void
 }) {
-	const {dispatch, state} = getEnonicContext<CollectionFormValues>();
-
-	const {
-		servicesBaseUrl,
-		name = 'documentTypeId',
-		parentPath,
-		path = parentPath ? `${parentPath}.${name}` : name,
-		placeholder = 'Please select a document type (or leave empty and a new one will automatically be created).',
-		value = getIn(state.values, path)/*,
-		...rest*/
-	} = props;
-	//console.debug('context.values',context.values);
-	//console.debug('value', value);
-	const {
-		collector: {
-			name: collectorName = null
-		} = {}
-	} = state.values;
-	//console.debug('collectorName',collectorName);
-
+	const [loading, setLoading] = React.useState(false);
 	const [documentTypes, setDocumentTypes] = React.useState([]);
 
-	function queryDocumentTypes() {
+	const memoizedQueryDocumentTypes = React.useCallback(() => {
+		setLoading(true);
 		fetch(`${servicesBaseUrl}/graphQL`, {
 			method: 'POST',
 			headers: {
@@ -68,31 +52,32 @@ export function DocumentTypeSelector(props :{
 			.then(data => {
 				//console.debug('data', data);
 				setDocumentTypes(data.data.queryDocumentTypes.hits);
+				setLoading(false);
 			});
-	} // queryDocumentTypes
+	}, [
+		servicesBaseUrl
+	])
 
 	React.useEffect(() => {
-		queryDocumentTypes();
-	}, [collectorName]);
-
-	if(collectorName) return null;
+		memoizedQueryDocumentTypes();
+	},[
+		memoizedQueryDocumentTypes
+	]);
 
 	return <>
 		<Header as='h2' dividing content='Document type'/>
 		<Dropdown
 			clearable={true}
 			fluid
-			loading={!documentTypes.length}
+			placeholder={placeholder}
+			selection
+			{...rest}
+			loading={loading}
 			onChange={(
-				//@ts-ignore
-				ignoredEvent,
-				{value: newValue}
+				_event,
+				{value: newDocumentTypeId}
 			) => {
-				//console.debug('newValue', newValue);
-				dispatch(setValue({
-					path,
-					value: newValue
-				}));
+				setDocumentTypeId(newDocumentTypeId as string);
 			}}
 			options={[{
 				text: 'Automatically create a new one',
@@ -104,9 +89,7 @@ export function DocumentTypeSelector(props :{
 				text,
 				value
 			})))}
-			placeholder={placeholder}
-			selection
-			value={value}
+			value={documentTypeId}
 		/>
 	</>;
 }

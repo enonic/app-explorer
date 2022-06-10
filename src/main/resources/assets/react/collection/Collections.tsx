@@ -137,10 +137,19 @@ export function Collections(props :{
 				</Grid.Column>
 			</Grid>
 		</Segment>
-		<Header as='h1'>Collections</Header>
+		<Header
+			as='h1'
+			disabled={isLoading}
+		>Collections</Header>
 		<Dimmer.Dimmable dimmed={isLoading}>
-			<Dimmer active={isLoading}><Loader size='massive'>Loading</Loader></Dimmer>
-			<Table celled collapsing compact selectable sortable striped>
+			<Dimmer active={isLoading} inverted>
+				<Loader size='large'>Loading</Loader>
+			</Dimmer>
+			<Table
+				celled collapsing compact
+				disabled={isLoading}
+				selectable sortable striped
+			>
 				<Table.Header>
 					<Table.Row>
 						{/* Width is X columns of total 16 */}
@@ -189,7 +198,7 @@ export function Collections(props :{
 							&& !busy;
 						//console.debug('editEnabled', editEnabled);
 
-						const disabled = !editEnabled;
+						const disabled = !editEnabled || isLoading;
 						//console.debug('disabled', disabled);
 
 						const cron = jobsObj[collectionId]
@@ -216,6 +225,7 @@ export function Collections(props :{
 									language
 								}}
 								fields={fieldsObj}
+								loading={isLoading}
 								locales={locales}
 								licenseValid={licenseValid}
 								_name={_name}
@@ -391,7 +401,8 @@ export function Collections(props :{
 				collectorOptions={collectorOptions}
 				collectorComponents={collectorComponents}
 				contentTypeOptions={contentTypeOptions}
-				disabled={!intInitializedCollectorComponents}
+				disabled={!intInitializedCollectorComponents || isLoading}
+				loading={isLoading}
 				fields={fieldsObj}
 				licenseValid={licenseValid}
 				locales={locales}

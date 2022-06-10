@@ -1,37 +1,30 @@
+import type {
+	DropdownItemProps,
+	StrictDropdownProps
+} from 'semantic-ui-react';
 import type {Locales} from '../index.d';
 
-import {getIn} from '@enonic/js-utils';
-//import {Dropdown as SemanticUiReactDropdown} from 'semantic-ui-react';
+
+//import {getIn} from '@enonic/js-utils';
+import {Dropdown as SemanticUiReactDropdown} from 'semantic-ui-react';
 //import {Flag} from 'semantic-ui-react';
-import {
+/*import {
 	Dropdown,
 	getEnonicContext
-} from '@enonic/semantic-ui-react-form';
+} from '@enonic/semantic-ui-react-form';*/
 import {capitalize} from '../utils/capitalize';
 
 
-export function LanguageDropdown(props :{
-	disabled ?:boolean
+export function LanguageDropdown({
+	language,
+	locales = [],
+	setLanguage,
+	...rest
+} :Omit<StrictDropdownProps,'onChange'|'options'|'value'> & {
+	language :string
+	setLanguage :(language :string) => void
 	locales :Locales
-	name ?:string
-	parentPath ?:string
-	path ?:string
-	value ?:string
 }) {
-	//console.debug('LanguageDropdown props', props);
-	const {
-		disabled = false,
-		locales = [],
-		name = 'language',
-		parentPath,
-		path = parentPath ? `${parentPath}.${name}` : name,
-		value
-	} = props;
-	const {state} = getEnonicContext();
-
-	const language = value || getIn(state.values, path);
-	//console.debug('LanguageDropdown language', language);
-
 	const options = locales.map(({
 		country,
 		//displayCountry,
@@ -73,6 +66,10 @@ export function LanguageDropdown(props :{
 			value: tag
 		};
 	}); // map
+	const optionsWithANoneOption :Array<DropdownItemProps> = [{
+		key: 'none',
+		text: 'none'
+	} as DropdownItemProps].concat(options);
 	//console.debug('LanguageDropdown options', options);
 
 	/*
@@ -84,14 +81,15 @@ export function LanguageDropdown(props :{
 	text='Select LAnguage'
 	*/
 	//return <Flag name={}/>
-	return <Dropdown
-		disabled={disabled}
+	return <SemanticUiReactDropdown
+		clearable
 		fluid
-		options={options}
-		path={path}
 		placeholder='Select language'
 		search
 		selection
+		{...rest}
+		onChange={(_event,{value: newLanguage}) => setLanguage(newLanguage as string)}
+		options={optionsWithANoneOption}
 		value={language}
 	/>;
 } // LanguageDropdown

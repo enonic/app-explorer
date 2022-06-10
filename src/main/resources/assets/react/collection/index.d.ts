@@ -1,3 +1,11 @@
+export type Cron = {
+	minute :string
+	hour :string
+	dayOfMonth :string
+	month :string
+	dayOfWeek :string
+}
+
 export type QueryCollectionsHit = {
 	_id :string
 	_name :string

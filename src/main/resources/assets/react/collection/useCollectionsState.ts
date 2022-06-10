@@ -156,6 +156,7 @@ export function useCollectionsState({
 }) {
 	const [updatedAt, setUpdatedAt] = React.useState(moment());
 	const [durationSinceLastUpdate, setDurationSinceLastUpdate] = React.useState('');
+	const [isLoading, setIsLoading] = React.useState(false);
 
 	const [jobsObj, setJobsObj] = React.useState({});
 	const [locales, setLocales] = React.useState([]);
@@ -268,7 +269,6 @@ export function useCollectionsState({
 		column: '_name',
 		contentTypeOptions: [],
 		direction: 'ascending',
-		isLoading: false,//true,
 		page: 1,
 		perPage: 10,
 		siteOptions: [],
@@ -277,7 +277,6 @@ export function useCollectionsState({
 		column :string
 		contentTypeOptions :ContentTypeOptions
 		direction: StrictTableHeaderCellProps['sorted']
-		isLoading :boolean
 		siteOptions :SiteOptions
 	});
 
@@ -285,7 +284,6 @@ export function useCollectionsState({
 		column,
 		contentTypeOptions,
 		direction,
-		isLoading,
 		siteOptions
 	} = state;
 
@@ -320,6 +318,7 @@ export function useCollectionsState({
 	} // jobsObjFromArr
 
 	const memoizedFetchOnMount = React.useCallback(() => {
+		setIsLoading(true);
 		fetch(`${servicesBaseUrl}/graphQL`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
@@ -336,6 +335,7 @@ export function useCollectionsState({
 					setDocumentTypes(res.data.queryDocumentTypes.hits);
 					setTasks(res.data.queryTasks);
 					setUpdatedAt(moment());
+					setIsLoading(false);
 				} // if
 			}); // then
 	}, [
@@ -343,6 +343,7 @@ export function useCollectionsState({
 	]);
 
 	const memoizedFetchOnUpdate = React.useCallback(() => {
+		setIsLoading(true);
 		fetch(`${servicesBaseUrl}/graphQL`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
@@ -358,6 +359,7 @@ export function useCollectionsState({
 					setDocumentTypes(res.data.queryDocumentTypes.hits);
 					setTasks(res.data.queryTasks);
 					setUpdatedAt(moment());
+					setIsLoading(false);
 				}
 			});
 	}, [
@@ -365,6 +367,7 @@ export function useCollectionsState({
 	]);
 
 	const memoizedFetchCollections = React.useCallback(() => {
+		setIsLoading(true);
 		fetch(`${servicesBaseUrl}/graphQL`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
@@ -375,12 +378,14 @@ export function useCollectionsState({
 				if (res && res.data && res.data.queryCollections) {
 					setQueryCollectionsGraph(res.data.queryCollections);
 				}
+				setIsLoading(false);
 			});
 	}, [
 		servicesBaseUrl
 	]);
 
 	const memoizedFetchTasks = React.useCallback(() => {
+		setIsLoading(true);
 		fetch(`${servicesBaseUrl}/graphQL`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
@@ -392,6 +397,7 @@ export function useCollectionsState({
 				if (res && res.data && res.data.queryTasks) {
 					setTasks(res.data.queryTasks);
 				}
+				setIsLoading(false);
 			});
 	}, [
 		servicesBaseUrl
