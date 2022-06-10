@@ -12,37 +12,55 @@ import type {
 import type {QueryCollectionsHits} from './index.d';
 
 
-//import * as React from 'react';
 import {
 	Button,
 	Form,
 	Header,
-	Icon,
-	//Label,
 	Modal,
 	Segment
 } from 'semantic-ui-react';
-
-import {
-	Form as EnonicForm,
-	Input,
-	ResetButton,
-	SubmitButton
-	//@ts-ignore
-} from '@enonic/semantic-ui-react-form';
-
 import {GQL_MUTATION_CREATE_COLLECTION} from '../../../services/graphQL/collection/mutationCreateCollection';
 import {GQL_MUTATION_UPDATE_COLLECTION} from '../../../services/graphQL/collection/mutationUpdateCollection';
 import {repoIdValidator} from '../utils/repoIdValidator';
-
+import {ResetButton} from '../components/ResetButton';
+import {SubmitButton} from '../components/SubmitButton';
 import {CollectorOptions} from './CollectorOptions';
 import {CollectorSelector} from './CollectorSelector';
 import {LanguageDropdown} from './LanguageDropdown';
 import {SchedulingSegment} from './SchedulingSegment';
 import {DocumentTypeSelector} from './DocumentTypeSelector';
+import {useCollectionState} from './useCollectionState';
 
 
-export function Collection(props :{
+export function Collection({
+	collections,
+	collectorComponents,
+	collectorOptions,
+	contentTypeOptions,
+	doClose,
+	fields = {},
+	locales, // []
+	servicesBaseUrl,
+	siteOptions,
+	initialValues = {
+		_name: '',
+		collector: {
+			//config: {}, // CollectorSelector onChange will set this.
+			//configJson: '{}',
+			name: ''//,
+			//taskName: 'collect'//, // TODO
+		},
+		cron: [{ // Default once a week
+			month: '*',
+			dayOfMonth: '*',
+			dayOfWeek: '0',
+			minute: '0',
+			hour: '0'
+		}],
+		doCollect: false,
+		language: ''
+	} as CollectionFormValues
+} :{
 	collections :QueryCollectionsHits
 	collectorComponents :CollectorComponents
 	collectorOptions :Array<DropdownItemProps>
@@ -54,177 +72,168 @@ export function Collection(props :{
 	servicesBaseUrl :string
 	siteOptions :SiteOptions
 }) {
-	//console.debug('Collection props', props);
-
 	const {
+		collectionNames,
+		collectorConfig,
+		collectorName,
+		cronArray,
+		doCollect,
+		documentTypeId,
+		isStateChanged,
+		language,
+		name,
+		nameError,
+		resetState,
+		setCollectorConfig,
+		setCollectorName,
+		setCronArray,
+		setDoCollect,
+		setDocumentTypeId,
+		setLanguage,
+		setName,
+		setNameError
+	} = useCollectionState({
 		collections,
-		collectorComponents,
-		collectorOptions,
-		contentTypeOptions,
-		doClose,
-		fields = {},
-		locales, // []
-		servicesBaseUrl,
-		siteOptions,
-		initialValues = {
-			_name: '',
-			collector: {
-				//config: {}, // CollectorSelector onChange will set this.
-				//configJson: '{}',
-				name: ''//,
-				//taskName: 'collect'//, // TODO
-			},
-			cron: [{ // Default once a week
-				month: '*',
-				dayOfMonth: '*',
-				dayOfWeek: '0',
-				minute: '0',
-				hour: '0'
-			}],
-			doCollect: false,
-			language: ''
-		} as CollectionFormValues
-	} = props;
-	//console.debug('Collection initialValues', initialValues);
+		initialValues
+	});
 
-	if (initialValues.collector && initialValues.collector.configJson) {
-		initialValues.collector.config = JSON.parse(initialValues.collector.configJson);
-	}
-
-	const collectionNames = collections.map(({_name}) => _name);
-
-	return <EnonicForm<CollectionFormValues>
-		afterValidate={(/*dereffed*/) => {
-			//console.debug('Collection afterValidate dereffed', dereffed);
-		}}
-		afterVisit={(/*dereffed*/) => {
-			//console.debug('Collection afterVisit dereffed', dereffed);
-		}}
-		initialValues={initialValues}
-		onChange={(/*values*/) => {
-			//console.debug('Collection onChange values', values);
-		}}
-		onSubmit={(values :CollectionFormValues) => {
-			//console.debug('submit values', values);
-
-			const {_id} = initialValues;
-			//console.debug('submit _id', _id);
-
-			const {
-				_name,
-				collector: {
-					name: collectorName,
-					config: collectorConfig
-				} = {},
-				cron,
-				doCollect,
-				documentTypeId,
-				language
-			} = values;
-			//console.debug('submit _name', _name);
-			//console.debug('submit collectorName', collectorName);
-			//console.debug('submit collectorConfig', collectorConfig);
-			//console.debug('submit cron', cron);
-			//console.debug('submit doCollect', doCollect);
-			//console.debug('submit documentTypeId', documentTypeId);
-
-			const variables :{
-				_id ?:string
-				_name :string
-				collector ?:{
-					configJson ?:string
-					name ?:string
-				}
-				cron :Array<{
-					month :string
-					dayOfMonth :string
-					dayOfWeek :string
-					minute :string
-					hour :string
-				}>
-				doCollect :boolean
-				documentTypeId ?:string
-				language :string
-			} = {
-				_name,
-				cron,
-				doCollect,
-				language
-			};
-			if (documentTypeId && !documentTypeId.startsWith('_')) {
-				variables.documentTypeId = documentTypeId;
-			}
-			if (collectorName || collectorConfig) {
-				variables.collector = {};
-				if (collectorName) {
-					variables.collector.name = collectorName;
-				}
-				if (collectorConfig) {
-					variables.collector.configJson = JSON.stringify(collectorConfig);
-				}
-			}
-			if (_id) {
-				variables._id = _id;
-			}
-			//console.debug('submit variables', variables);
-
-			fetch(`${servicesBaseUrl}/graphQL`, {
-				method: 'POST',
-				headers: {
-					'Content-Type':	'application/json'
-				},
-				body: JSON.stringify({
-					query: _id ? GQL_MUTATION_UPDATE_COLLECTION : GQL_MUTATION_CREATE_COLLECTION,
-					variables
-				})
-			}).then(response => {
-				if (response.status === 200) { doClose(); }
-			});
-		}}
-		schema={{
-			_name: (v :string) => collectionNames.includes(v)
-				? `The name "${v}" is already in use, please input another name."`
-				: repoIdValidator(v)
-		}}
-	>
+	return <>
 		<Modal.Content>
-			<Form>
-				<Segment color='black'>
-					<Header as='h1' dividing content='Collection' id='collection'/>
+			<Segment color='black'>
+				<Header as='h1' dividing content='Collection' id='collection'/>
+				<Form>
+					<Form.Input
+						error={nameError}
+						fluid
+						label='Name'
+						onBlur={() => {
+							if (!name) {
+								setNameError('Name is required!');
+							}
+						}}
+						onChange={(_event,{value: newName}) => {
+							setName(newName);
+							const newNameError = (
+								newName !== initialValues._name && collectionNames.includes(newName)
+							)
+								? `The name "${newName}" is already in use, please input another name."`
+								: repoIdValidator(newName);
+							if (newNameError !== nameError) {
+								setNameError(newNameError);
+							}
+						}}
+						placeholder='Please input an unique name'
+						value={name}
+					/>
 					<Form.Field>
-						<Input
-							fluid
-							label='Name'
-							path='_name'
+						<LanguageDropdown
+							locales={locales}
+							language={language}
+							setLanguage={setLanguage}
 						/>
-					</Form.Field>
-					<Form.Field>
-						{/*<Label content='Language' size='large'/>*/}
-						<LanguageDropdown locales={locales}/>
 					</Form.Field>
 					<Header as='h2' dividing content='Collector'/>
 					<CollectorSelector
+						collectorName={collectorName}
 						options={collectorOptions}
+						setCollectorName={setCollectorName}
 					/>
-					<DocumentTypeSelector
-						servicesBaseUrl={servicesBaseUrl}
-					/>
-				</Segment>
-				<CollectorOptions
-					collectorComponents={collectorComponents}
-					contentTypeOptions={contentTypeOptions}
-					fields={fields}
-					siteOptions={siteOptions}
+					{collectorName
+						? <DocumentTypeSelector
+							documentTypeId={documentTypeId}
+							servicesBaseUrl={servicesBaseUrl}
+							setDocumentTypeId={setDocumentTypeId}
+						/>
+						: null
+					}
+				</Form>
+			</Segment>
+			<CollectorOptions
+				collectorComponents={collectorComponents}
+				collectorConfig={collectorConfig}
+				collectorName={collectorName}
+				contentTypeOptions={contentTypeOptions}
+				fields={fields}
+				siteOptions={siteOptions}
+				setCollectorConfig={setCollectorConfig}
+			/>
+			{collectorName
+				? <SchedulingSegment
+					cronArray={cronArray}
+					doCollect={doCollect}
+					setCronArray={setCronArray}
+					setDoCollect={setDoCollect}
 				/>
-				<SchedulingSegment />
-			</Form>
+				: null
+			}
 		</Modal.Content>
 		<Modal.Actions>
 			<Button onClick={doClose}>Cancel</Button>
-			{/*<VisitAllButton/>*/}
-			{/*<ValidateFormButton/>*/}
-			<ResetButton secondary/>
-			<SubmitButton primary><Icon name='save'/>Save</SubmitButton>
+			<ResetButton
+				isStateChanged={isStateChanged}
+				onClick={resetState}
+				secondary
+			/>
+			<SubmitButton
+				onClick={() => {
+					const {_id} = initialValues;
+					//console.debug('submit _id', _id);
+					const variables :{
+						_id ?:string
+						_name :string
+						collector ?:{
+							configJson ?:string
+							name ?:string
+						}
+						cron :Array<{
+							month :string
+							dayOfMonth :string
+							dayOfWeek :string
+							minute :string
+							hour :string
+						}>
+						doCollect :boolean
+						documentTypeId ?:string
+						language :string
+					} = {
+						_name: name,
+						cron: cronArray,
+						doCollect,
+						language
+					};
+					if (documentTypeId && !documentTypeId.startsWith('_')) {
+						variables.documentTypeId = documentTypeId;
+					}
+					if (collectorName || collectorConfig) {
+						variables.collector = {};
+						if (collectorName) {
+							variables.collector.name = collectorName;
+						}
+						if (collectorConfig) {
+							variables.collector.configJson = JSON.stringify(collectorConfig);
+						}
+					}
+					if (_id) {
+						variables._id = _id;
+					}
+					//console.debug('submit variables', variables);
+
+					fetch(`${servicesBaseUrl}/graphQL`, {
+						method: 'POST',
+						headers: {
+							'Content-Type':	'application/json'
+						},
+						body: JSON.stringify({
+							query: _id ? GQL_MUTATION_UPDATE_COLLECTION : GQL_MUTATION_CREATE_COLLECTION,
+							variables
+						})
+					}).then(response => {
+						if (response.status === 200) { doClose(); }
+					});
+				}}
+				isStateChanged={isStateChanged}
+				primary
+			/>
 		</Modal.Actions>
-	</EnonicForm>;
+	</>;
 } // function Collection

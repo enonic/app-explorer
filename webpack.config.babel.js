@@ -628,7 +628,7 @@ const CLIENT_ES_CONFIG = {
 			'@enonic/js-utils': BOOL_LOCAL_JS_UTILS
 				? path.resolve(__dirname, '../enonic-js-utils/src/index.ts')
 				: path.resolve(__dirname, './node_modules/@enonic/js-utils/src/index.ts'),
-			'semantic-ui-react-form': BOOL_LOCAL_SEMANTIC_UI_REACT_FORM
+			'@enonic/semantic-ui-react-form': BOOL_LOCAL_SEMANTIC_UI_REACT_FORM
 				? path.resolve(__dirname, '../semantic-ui-react-form/src')
 				: path.resolve(__dirname, './node_modules/@enonic/semantic-ui-react-form/src')//,
 			// NOTE: If the local lib-explorer is not the newest there could be trouble...

@@ -138,7 +138,7 @@ export function FieldSelector(props :{
 									/>
 									<DeleteItemButton
 										array={fieldsArray}
-										disabled={disabled || fieldsArray.length === 1}
+										disabled={disabled || fieldsArray.length < 2}
 										index={index}
 										setArrayFunction={setFields}
 									/>

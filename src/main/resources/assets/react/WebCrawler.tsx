@@ -1,13 +1,21 @@
 import type {CollectorProps} from '/lib/explorer/types/Collector.d';
 
 
-import {getIn} from '@enonic/js-utils';
-import {Button, Form, Header, Icon, Table} from 'semantic-ui-react';
+import {forceArray} from '@enonic/js-utils';
+import * as React from 'react';
 import {
-	setError,
-	setSchema,
-	setValue,
-	setVisited,
+	Button,
+	Form,
+	Header,
+	Icon,
+	Input,
+	Table
+} from 'semantic-ui-react';
+/*import {
+	//setError,
+	//setSchema,
+	//setValue,
+	//setVisited,
 	//ChildForm,
 	DeleteItemButton,
 	Form as EnonicForm,
@@ -17,171 +25,170 @@ import {
 	MoveDownButton,
 	MoveUpButton,
 	SetValueButton
-	//@ts-ignore
-} from '@enonic/semantic-ui-react-form';
+} from '@enonic/semantic-ui-react-form';*/
+import {DeleteItemButton} from './components/DeleteItemButton';
+import {InsertButton} from './components/InsertButton';
+import {MoveDownButton} from './components/MoveDownButton';
+import {MoveUpButton} from './components/MoveUpButton';
 
 
-type WebcrawlCollectorFormValues = {
+/*type WebcrawlCollectorFormValues = {
 	baseUri :string
 	excludes ?:Array<string>
 	userAgent ?:string
-}
+}*/
 
 
 const DEFAULT_UA = 'Mozilla/5.0 (compatible; Enonic XP Explorer Collector Web crawler/1.0.0)';
 
 
-function required(value :string) {
-	return value ? undefined : 'Required!';
-}
+export const Collector = ({
+	collectorConfig,
+	setCollectorConfig,
+	//explorer,
+	//isFirstRun
+} :CollectorProps) => {
+	console.debug('Collector collectorConfig', collectorConfig);
 
-const EXCLUDES_PATH = 'excludes';
+	const [baseUri, setBaseUri] = React.useState<string>(collectorConfig
+		? (collectorConfig.baseUri || '')
+		: ''
+	);
+	const [baseUriError, setBaseUriError] = React.useState<string>();
+	const [excludesArray, setExcludesArray] = React.useState<Array<string>>(
+		collectorConfig && collectorConfig.excludes ? forceArray(collectorConfig.excludes) : undefined
+	);
+	const [userAgent, setUserAgent] = React.useState<string>(collectorConfig
+		? (collectorConfig.baseUri || '')
+		: ''
+	);
 
-const SCHEMA = {
-	baseUri: (v :string) => required(v)
-};
+	React.useEffect(() => setBaseUriError(baseUri ? undefined : 'Uri is required!'),[
+		baseUri
+	]);
 
-export const Collector = (props :CollectorProps) => {
-	//console.debug('Collector props', props);
-	const {
-		context,
-		dispatch,
-		//explorer,
-		isFirstRun,
-		path
-	} = props;
-	//console.debug('Collector context', context);
+	React.useEffect(() => {
+		setCollectorConfig({
+			baseUri,
+			excludes: excludesArray,
+			userAgent
+		});
+	},[
+		baseUri,
+		excludesArray,,
+		setCollectorConfig,
+		userAgent
+	]);
 
-	let initialValues :WebcrawlCollectorFormValues = getIn(context.values, path);
-	//console.debug('Collector initialValues', initialValues);
-
-	if (isFirstRun.current) {
+	/*React.useEffect(() => {
+		//if (isFirstRun.current) {
 		//console.debug('isFirstRun');
-		isFirstRun.current = false;
-		dispatch(setSchema({path, schema: SCHEMA}));
+		//isFirstRun.current = false;
 		// There are no changes, errors or visits yet!
-		if (initialValues) {
-			if (initialValues[EXCLUDES_PATH] && !Array.isArray(initialValues[EXCLUDES_PATH])) {
-				initialValues[EXCLUDES_PATH] = [initialValues[EXCLUDES_PATH]];
+		if (collectorConfig) {
+			if (collectorConfig[EXCLUDES_PATH] && !Array.isArray(collectorConfig[EXCLUDES_PATH])) {
+				collectorConfig[EXCLUDES_PATH] = [collectorConfig[EXCLUDES_PATH]];
+				setCollectorConfig(collectorConfig);
 			}
 		} else {
-			initialValues = {
-				baseUri: ''
-			};
-			dispatch(setValue({path, value: initialValues}));
+			setCollectorConfig({
+				baseUri: ''//,
+				//excludes: [''],
+				//userAgent: ''
+			});
 		}
-	}
+		//}
+	},[ // eslint-disable-line react-hooks/exhaustive-deps
+		//collectorConfig, // This will change everytime setCollectorConfig is called...might cause loop?
+		//isFirstRun,
+		setCollectorConfig
+	])*/
 
-
-	return <EnonicForm<WebcrawlCollectorFormValues>
-		afterValidate={(dereffed) => {
-			// console.debug('Collector afterValidate dereffed', dereffed);
-			dispatch(setError({
-				path,
-				error: dereffed.errors
-			}));
-			dispatch(setVisited({
-				path,
-				value: dereffed.visits
-			}));
-		}}
-		afterVisit={(dereffed) => {
-			// console.debug('Collector afterVisit dereffed', dereffed);
-			dispatch(setVisited({
-				path,
-				value: dereffed.visits
-			}));
-		}}
-		initialValues={initialValues}
-		onChange={(values :unknown) => {
-			//console.debug('Collector onChange values', values);
-			dispatch(setValue({path, value: values}));
-		}}
-		schema={SCHEMA}
-	>
-		<Form as='div'>
-			<Form.Field>
-				<Input
-					fluid
-					label='Uri'
-					path='baseUri'
-				/>
-			</Form.Field>
-			<Form.Field>
-				<List
-					path={EXCLUDES_PATH}
-					render={(excludesArray :Array<string>) => {
-						//console.debug('Collector excludesArray', excludesArray);
-						if (excludesArray.length) {
-							return <>
-								<Header as='h4' content='Exclude pattern(s)' dividing/>
-								<Table celled compact selectable striped>
-									<Table.Header>
-										<Table.Row>
-											<Table.HeaderCell collapsing>Regular expression</Table.HeaderCell>
-											<Table.HeaderCell collapsing>Actions</Table.HeaderCell>
-										</Table.Row>
-									</Table.Header>
-									<Table.Body>{excludesArray.map((
-										//@ts-ignore
-										exclude = '',
-										index
-									) => {
-										const key = `${EXCLUDES_PATH}.${index}`;
-										//console.debug(key, exclude);
-										return <Table.Row key={key}>
-											<Table.Cell>
-												<Input
-													fluid
-													path={key}
-												/>
-											</Table.Cell>
-											<Table.Cell collapsing>
-												<Button.Group>
-													<InsertButton
-														index={index+1}
-														path={EXCLUDES_PATH}
-														value=''
-													/>
-													<MoveDownButton
-														disabled={index + 1 >= excludesArray.length}
-														index={index}
-														path={EXCLUDES_PATH}
-													/>
-													<MoveUpButton
-														index={index}
-														path={EXCLUDES_PATH}
-													/>
-													<DeleteItemButton
-														index={index}
-														path={EXCLUDES_PATH}
-													/>
-												</Button.Group>
-											</Table.Cell>
-										</Table.Row>;
-									})}</Table.Body>
-								</Table>
-							</>;
-						}
-						return <Form.Field>
-							<SetValueButton
-								path={EXCLUDES_PATH}
-								value={['']}
-							>
-								<Icon color='green' name='plus'/>Add exclude pattern(s)
-							</SetValueButton>
-						</Form.Field>
+	return <Form>
+		<Form.Input
+			error={baseUriError}
+			fluid
+			label='Uri'
+			onBlur={() => {
+				if(!baseUri) {
+					setBaseUriError('Uri is required!');
+				}
+			}}
+			onChange={(_event,{value}) => setBaseUri(value)}
+			value={baseUri}
+		/>
+		{excludesArray && Array.isArray(excludesArray) && excludesArray.length
+			? <>
+				<Header as='h4' content='Exclude pattern(s)' dividing/>
+				<Table celled compact selectable striped>
+					<Table.Header>
+						<Table.Row>
+							<Table.HeaderCell collapsing>Regular expression</Table.HeaderCell>
+							<Table.HeaderCell collapsing>Actions</Table.HeaderCell>
+						</Table.Row>
+					</Table.Header>
+					<Table.Body>{excludesArray.map((
+						exclude = '',
+						index
+					) => {
+						return <Table.Row key={index}>
+							<Table.Cell>
+								<Input
+									fluid
+									onChange={(_event,{value}) => {
+										const deref = JSON.parse(JSON.stringify(excludesArray));
+										deref[index] = value;
+										setExcludesArray(deref);
+									}}
+									value={exclude}
+								/>
+							</Table.Cell>
+							<Table.Cell collapsing>
+								<Button.Group>
+									<InsertButton
+										array={excludesArray}
+										insertAtIndex={index + 1}
+										setArrayFunction={setExcludesArray}
+										valueToInsert=''
+									/>
+									<MoveDownButton
+										array={excludesArray}
+										index={index}
+										setArrayFunction={setExcludesArray}
+									/>
+									<MoveUpButton
+										array={excludesArray}
+										index={index}
+										setArrayFunction={setExcludesArray}
+									/>
+									<DeleteItemButton
+										array={excludesArray}
+										disabled={false}
+										index={index}
+										setArrayFunction={setExcludesArray}
+									/>
+								</Button.Group>
+							</Table.Cell>
+						</Table.Row>;
+					})}</Table.Body>
+				</Table>
+			</>
+			: <Form.Field>
+				<Button
+					onClick={() => {
+						setExcludesArray(['']);
 					}}
-				/>
+				>
+					<Icon color='green' name='plus'/>Add exclude pattern(s)
+				</Button>
 			</Form.Field>
-			<Form.Field>
-				<Input
-					fluid
-					label='Custom User-Agent'
-					path='userAgent'
-					placeholder={`Leave empty to use ${DEFAULT_UA}`}
-				/>
-			</Form.Field>
-		</Form>
-	</EnonicForm>;
+		}
+		<Form.Input
+			fluid
+			label='Custom User-Agent'
+			onChange={(_event,{value}) => setUserAgent(value)}
+			placeholder={`Leave empty to use ${DEFAULT_UA}`}
+			value={userAgent}
+		/>
+	</Form>;
 } // Collector

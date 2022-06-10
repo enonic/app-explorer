@@ -1,4 +1,7 @@
-import type {CollectionFormValues} from '/lib/explorer/types/index.d';
+import type {
+	AnyObject,
+	CollectionFormValues
+} from '/lib/explorer/types/index.d';
 import type {
 	ContentTypeOptions,
 	Fields,
@@ -7,48 +10,48 @@ import type {
 import type {CollectorComponents} from '../index.d';
 
 
-import {getIn} from '@enonic/js-utils';
 import * as React from 'react';
 import {Header, Segment} from 'semantic-ui-react';
-import {getEnonicContext} from '@enonic/semantic-ui-react-form';
 
 
-export function CollectorOptions(props :{
+export function CollectorOptions({
+	collectorComponents,
+	collectorConfig,
+	collectorName,
+	contentTypeOptions,
+	fields,
+	setCollectorConfig,
+	siteOptions
+} :{
 	collectorComponents :CollectorComponents
+	collectorConfig :AnyObject
+	collectorName :string
 	contentTypeOptions :ContentTypeOptions
+	setCollectorConfig :(collectorConfig :AnyObject) => void
 	siteOptions :SiteOptions
 	fields :Fields
 }) {
-	//console.debug('CollectorOptions props', props);
-	const {
-		collectorComponents,
-		contentTypeOptions,
-		fields,
-		siteOptions
-	} = props;
-
-	const {dispatch, state} = getEnonicContext<CollectionFormValues>();
-	//console.debug('CollectorOptions context', context);
-	const collectorName :string = getIn(state.values, 'collector.name');
-
+	//const [isFirstRun, setIsFirstRun] = React.useState(true);
 	const isFirstRun = React.useRef(true);
 
 	if (!collectorName) { return null; }
 
 	if (!collectorComponents[collectorName]) { return <p>Collector {collectorName} NOT found!</p>; }
 
+	const Collector = collectorComponents[collectorName];
+
 	return <Segment color='pink'>
 		<Header as='h2' dividing content={collectorName} id='collector'/>
-		{collectorComponents[collectorName]({
-			context: state,
-			dispatch,
-			explorer: {
+		<Collector
+			collectorConfig={collectorConfig}
+			setCollectorConfig={setCollectorConfig}
+			explorer={{
 				contentTypeOptions,
 				fields,
 				siteOptions
-			},
-			isFirstRun,
-			path: 'collector.config'
-		})}
+			}}
+			isFirstRun={isFirstRun}
+			path='collector.config'
+		/>
 	</Segment>;
 } // function CollectorOptions

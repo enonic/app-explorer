@@ -16,12 +16,31 @@ import type {QueryCollectionsHits} from './index.d';
 
 import * as React from 'react';
 import {Button, Icon, Modal, Popup} from 'semantic-ui-react';
-
 import {Collection} from './Collection';
 import {UploadLicense} from '../UploadLicense';
 
 
-export function NewOrEditCollectionModal(props :{
+export function NewOrEditCollectionModal({
+	afterClose = () => {/**/},
+	beforeOpen = () => {/**/},
+	collections,
+	//collectors,
+	collectorComponents,
+	collectorOptions,
+	contentTypeOptions,
+	disabled = false,
+	fields,
+	initialValues,
+	licenseValid,
+	loading = false,
+	locales, // []
+	_name,
+	servicesBaseUrl,
+	setLicensedTo,
+	setLicenseValid,
+	siteOptions,
+	totalNumberOfCollections
+} :{
 	// Required
 	collections :QueryCollectionsHits
 	collectorComponents :CollectorComponents
@@ -31,6 +50,7 @@ export function NewOrEditCollectionModal(props :{
 	initialValues ?:CollectionFormValues
 	licenseValid :boolean
 	locales :Locales
+	loading ?:boolean
 	servicesBaseUrl :string
 	setLicensedTo :SetLicensedToFunction
 	setLicenseValid :SetLicenseValidFunction
@@ -42,26 +62,6 @@ export function NewOrEditCollectionModal(props :{
 	beforeOpen ?:() => void
 	disabled ?:boolean
 }) {
-	const {
-		afterClose = () => {/**/},
-		beforeOpen = () => {/**/},
-		collections,
-		//collectors,
-		collectorComponents,
-		collectorOptions,
-		contentTypeOptions,
-		disabled = false,
-		fields,
-		initialValues,
-		licenseValid,
-		locales, // []
-		_name,
-		servicesBaseUrl,
-		setLicensedTo,
-		setLicenseValid,
-		siteOptions,
-		totalNumberOfCollections
-	} = props;
 	//console.debug('totalNumberOfCollections',totalNumberOfCollections);
 	const [state, setState] = React.useState({
 		open: false
@@ -91,6 +91,7 @@ export function NewOrEditCollectionModal(props :{
 			trigger={<Button
 				icon
 				disabled={disabled}
+				loading={loading}
 				onClick={doOpen}
 			><Icon color='blue' name='edit'/></Button>}/>
 			: <Button
@@ -98,6 +99,7 @@ export function NewOrEditCollectionModal(props :{
 				color='green'
 				disabled={disabled}
 				icon
+				loading={loading}
 				onClick={doOpen}
 				size='massive'
 				style={{
