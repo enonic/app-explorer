@@ -1,7 +1,6 @@
-import type {CollectorProps} from '/lib/explorer/types/Collector.d';
+//import type {CollectorProps} from '/lib/explorer/types/Collector.d';
 
 
-import {forceArray} from '@enonic/js-utils';
 import * as React from 'react';
 import {
 	Button,
@@ -11,110 +10,44 @@ import {
 	Input,
 	Table
 } from 'semantic-ui-react';
-/*import {
-	//setError,
-	//setSchema,
-	//setValue,
-	//setVisited,
-	//ChildForm,
-	DeleteItemButton,
-	Form as EnonicForm,
-	Input,
-	InsertButton,
-	List,
-	MoveDownButton,
-	MoveUpButton,
-	SetValueButton
-} from '@enonic/semantic-ui-react-form';*/
 import {DeleteItemButton} from './components/DeleteItemButton';
 import {InsertButton} from './components/InsertButton';
 import {MoveDownButton} from './components/MoveDownButton';
 import {MoveUpButton} from './components/MoveUpButton';
-
-
-/*type WebcrawlCollectorFormValues = {
-	baseUri :string
-	excludes ?:Array<string>
-	userAgent ?:string
-}*/
+import {useWebCrawlerState} from './useWebCrawlerState';
 
 
 const DEFAULT_UA = 'Mozilla/5.0 (compatible; Enonic XP Explorer Collector Web crawler/1.0.0)';
 
 
-export const Collector = ({
-	collectorConfig,
-	setCollectorConfig,
+export const Collector = React.forwardRef(({
+	collectorConfig, // Never changes, is not affected by setCollectorConfig
 	//explorer,
-	//isFirstRun
-} :CollectorProps) => {
-	console.debug('Collector collectorConfig', collectorConfig);
-
-	const [baseUri, setBaseUri] = React.useState<string>(collectorConfig
-		? (collectorConfig.baseUri || '')
-		: ''
-	);
-	const [baseUriError, setBaseUriError] = React.useState<string>();
-	const [excludesArray, setExcludesArray] = React.useState<Array<string>>(
-		collectorConfig && collectorConfig.excludes ? forceArray(collectorConfig.excludes) : undefined
-	);
-	const [userAgent, setUserAgent] = React.useState<string>(collectorConfig
-		? (collectorConfig.baseUri || '')
-		: ''
-	);
-
-	React.useEffect(() => setBaseUriError(baseUri ? undefined : 'Uri is required!'),[
-		baseUri
-	]);
-
-	React.useEffect(() => {
-		setCollectorConfig({
-			baseUri,
-			excludes: excludesArray,
-			userAgent
-		});
-	},[
+	setCollectorConfig, // This does not affect initialCollectorConfig
+	setCollectorConfigErrorCount
+} /*:CollectorProps*/, ref) => {
+	const {
 		baseUri,
-		excludesArray,,
-		setCollectorConfig,
+		baseUriError,
+		baseUriOnBlur,
+		baseUriOnChange,
+		excludesArray,
+		setExcludesArray,
+		setUserAgent,
 		userAgent
-	]);
-
-	/*React.useEffect(() => {
-		//if (isFirstRun.current) {
-		//console.debug('isFirstRun');
-		//isFirstRun.current = false;
-		// There are no changes, errors or visits yet!
-		if (collectorConfig) {
-			if (collectorConfig[EXCLUDES_PATH] && !Array.isArray(collectorConfig[EXCLUDES_PATH])) {
-				collectorConfig[EXCLUDES_PATH] = [collectorConfig[EXCLUDES_PATH]];
-				setCollectorConfig(collectorConfig);
-			}
-		} else {
-			setCollectorConfig({
-				baseUri: ''//,
-				//excludes: [''],
-				//userAgent: ''
-			});
-		}
-		//}
-	},[ // eslint-disable-line react-hooks/exhaustive-deps
-		//collectorConfig, // This will change everytime setCollectorConfig is called...might cause loop?
-		//isFirstRun,
-		setCollectorConfig
-	])*/
-
+	} = useWebCrawlerState({
+		collectorConfig,
+		ref,
+		setCollectorConfig,
+		setCollectorConfigErrorCount
+	});
 	return <Form>
 		<Form.Input
 			error={baseUriError}
 			fluid
 			label='Uri'
-			onBlur={() => {
-				if(!baseUri) {
-					setBaseUriError('Uri is required!');
-				}
-			}}
-			onChange={(_event,{value}) => setBaseUri(value)}
+			onBlur={() => baseUriOnBlur(baseUri)}
+			onChange={baseUriOnChange}
 			value={baseUri}
 		/>
 		{excludesArray && Array.isArray(excludesArray) && excludesArray.length
@@ -191,4 +124,5 @@ export const Collector = ({
 			value={userAgent}
 		/>
 	</Form>;
-} // Collector
+}); // Collector
+Collector.displayName = 'Collector';

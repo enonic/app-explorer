@@ -14,10 +14,11 @@ export function SubmitButton(props :Omit<
 	// Optional
 	color ?:(params :{
 		//disabled :boolean
-		errorsArr :Array<unknown>
+		errorCount :number
 		primary :boolean
 	}) => StrictButtonProps['color']|null
-	errorsArr ?:Array<unknown>
+	errorCount ?:number
+	//validateForm ?:() => boolean
 }) {
 	const {
 		isStateChanged: isStateChangedProp
@@ -30,11 +31,11 @@ export function SubmitButton(props :Omit<
 		isStateChanged: _isStateChanged, // Make sure it doesn't end up in ...rest
 		onClick,
 		// Optional
-		errorsArr = [],
+		errorCount = 0,
 		children = <>
 			<Icon name='save'/>{
-				errorsArr.length
-					? `${errorsArr.length} validation error${errorsArr.length > 1 ? 's' : ''}`
+				errorCount
+					? `${errorCount} validation error${errorCount > 1 ? 's' : ''}`
 					: booleanIsStateChanged
 						? 'Save'
 						: 'No changes to save'
@@ -42,15 +43,16 @@ export function SubmitButton(props :Omit<
 		</>,
 		color = ({
 			//disabled,
-			errorsArr,
+			errorCount,
 			primary
-		}) => errorsArr.length
+		}) => errorCount
 			? 'red'
 			: primary
 				? null
 				: 'green',
-		disabled: disabledProp = !!errorsArr.length,
+		disabled: disabledProp = !!errorCount,
 		primary = false,
+		//validateForm = () => true,
 		...rest
 	} = props;
 
@@ -60,7 +62,7 @@ export function SubmitButton(props :Omit<
 		{...rest}
 		color={color({
 			//disabled: calculatedDisabled,
-			errorsArr,
+			errorCount,
 			primary
 		})}
 		disabled={calculatedDisabled}

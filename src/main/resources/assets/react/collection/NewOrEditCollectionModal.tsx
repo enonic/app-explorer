@@ -21,25 +21,26 @@ import {UploadLicense} from '../UploadLicense';
 
 
 export function NewOrEditCollectionModal({
-	afterClose = () => {/**/},
-	beforeOpen = () => {/**/},
+	// Required
 	collections,
-	//collectors,
 	collectorComponents,
 	collectorOptions,
 	contentTypeOptions,
-	disabled = false,
-	fields,
 	initialValues,
+	fields,
 	licenseValid,
-	loading = false,
-	locales, // []
-	_name,
+	locales,
 	servicesBaseUrl,
 	setLicensedTo,
 	setLicenseValid,
 	siteOptions,
-	totalNumberOfCollections
+	totalNumberOfCollections,
+	// Optional
+	_name,
+	afterClose = () => {/**/},
+	beforeOpen = () => {/**/},
+	disabled = false,
+	loading = false,
 } :{
 	// Required
 	collections :QueryCollectionsHits
@@ -47,10 +48,9 @@ export function NewOrEditCollectionModal({
 	collectorOptions :Array<DropdownItemProps>
 	contentTypeOptions :ContentTypeOptions
 	fields :Fields
-	initialValues ?:CollectionFormValues
+	initialValues :CollectionFormValues
 	licenseValid :boolean
 	locales :Locales
-	loading ?:boolean
 	servicesBaseUrl :string
 	setLicensedTo :SetLicensedToFunction
 	setLicenseValid :SetLicenseValidFunction
@@ -61,6 +61,7 @@ export function NewOrEditCollectionModal({
 	afterClose ?:() => void
 	beforeOpen ?:() => void
 	disabled ?:boolean
+	loading ?:boolean
 }) {
 	//console.debug('totalNumberOfCollections',totalNumberOfCollections);
 	const [state, setState] = React.useState({

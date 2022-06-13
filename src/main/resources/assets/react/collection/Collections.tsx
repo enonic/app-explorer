@@ -1,3 +1,4 @@
+import type {CollectionFormValues} from '/lib/explorer/types/index.d';
 import type {
 	CollectorComponents,
 	SetLicensedToFunction,
@@ -404,6 +405,24 @@ export function Collections(props :{
 				disabled={!intInitializedCollectorComponents || isLoading}
 				loading={isLoading}
 				fields={fieldsObj}
+				initialValues={{
+					_name: '',
+					collector: {
+						//config: {}, // CollectorSelector onChange will set this.
+						//configJson: '{}',
+						name: ''//,
+						//taskName: 'collect'//, // TODO
+					},
+					cron: [{ // Default once a week
+						month: '*',
+						dayOfMonth: '*',
+						dayOfWeek: '0',
+						minute: '0',
+						hour: '0'
+					}],
+					doCollect: false,
+					language: ''
+				} as CollectionFormValues}
 				licenseValid={licenseValid}
 				locales={locales}
 				afterClose={() => {

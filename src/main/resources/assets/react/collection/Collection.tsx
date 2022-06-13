@@ -19,9 +19,6 @@ import {
 	Modal,
 	Segment
 } from 'semantic-ui-react';
-import {GQL_MUTATION_CREATE_COLLECTION} from '../../../services/graphQL/collection/mutationCreateCollection';
-import {GQL_MUTATION_UPDATE_COLLECTION} from '../../../services/graphQL/collection/mutationUpdateCollection';
-import {repoIdValidator} from '../utils/repoIdValidator';
 import {ResetButton} from '../components/ResetButton';
 import {SubmitButton} from '../components/SubmitButton';
 import {CollectorOptions} from './CollectorOptions';
@@ -33,68 +30,61 @@ import {useCollectionState} from './useCollectionState';
 
 
 export function Collection({
+	// Required
+	initialValues,
 	collections,
 	collectorComponents,
 	collectorOptions,
 	contentTypeOptions,
 	doClose,
-	fields = {},
 	locales, // []
 	servicesBaseUrl,
 	siteOptions,
-	initialValues = {
-		_name: '',
-		collector: {
-			//config: {}, // CollectorSelector onChange will set this.
-			//configJson: '{}',
-			name: ''//,
-			//taskName: 'collect'//, // TODO
-		},
-		cron: [{ // Default once a week
-			month: '*',
-			dayOfMonth: '*',
-			dayOfWeek: '0',
-			minute: '0',
-			hour: '0'
-		}],
-		doCollect: false,
-		language: ''
-	} as CollectionFormValues
+	// Optional
+	fields = {},
 } :{
+	// Required
 	collections :QueryCollectionsHits
 	collectorComponents :CollectorComponents
 	collectorOptions :Array<DropdownItemProps>
 	contentTypeOptions :ContentTypeOptions
 	doClose :() => void
-	fields :Fields
 	locales :Locales
 	initialValues :CollectionFormValues
 	servicesBaseUrl :string
 	siteOptions :SiteOptions
+	// Optional
+	fields ?:Fields
 }) {
 	const {
-		collectionNames,
+		collectorComponentRef,
 		collectorConfig,
 		collectorName,
 		cronArray,
 		doCollect,
 		documentTypeId,
+		errorCount,
 		isStateChanged,
 		language,
 		name,
 		nameError,
+		nameOnBlur,
+		nameOnChange,
+		onSubmit,
 		resetState,
 		setCollectorConfig,
+		setCollectorConfigErrorCount,
 		setCollectorName,
 		setCronArray,
 		setDoCollect,
 		setDocumentTypeId,
 		setLanguage,
-		setName,
-		setNameError
+		setNameVisited
 	} = useCollectionState({
 		collections,
-		initialValues
+		doClose,
+		initialValues,
+		servicesBaseUrl
 	});
 
 	return <>
@@ -106,22 +96,8 @@ export function Collection({
 						error={nameError}
 						fluid
 						label='Name'
-						onBlur={() => {
-							if (!name) {
-								setNameError('Name is required!');
-							}
-						}}
-						onChange={(_event,{value: newName}) => {
-							setName(newName);
-							const newNameError = (
-								newName !== initialValues._name && collectionNames.includes(newName)
-							)
-								? `The name "${newName}" is already in use, please input another name."`
-								: repoIdValidator(newName);
-							if (newNameError !== nameError) {
-								setNameError(newNameError);
-							}
-						}}
+						onBlur={() => nameOnBlur(name)}
+						onChange={nameOnChange}
 						placeholder='Please input an unique name'
 						value={name}
 					/>
@@ -149,6 +125,7 @@ export function Collection({
 				</Form>
 			</Segment>
 			<CollectorOptions
+				collectorComponentRef={collectorComponentRef}
 				collectorComponents={collectorComponents}
 				collectorConfig={collectorConfig}
 				collectorName={collectorName}
@@ -156,6 +133,7 @@ export function Collection({
 				fields={fields}
 				siteOptions={siteOptions}
 				setCollectorConfig={setCollectorConfig}
+				setCollectorConfigErrorCount={setCollectorConfigErrorCount}
 			/>
 			{collectorName
 				? <SchedulingSegment
@@ -175,62 +153,8 @@ export function Collection({
 				secondary
 			/>
 			<SubmitButton
-				onClick={() => {
-					const {_id} = initialValues;
-					//console.debug('submit _id', _id);
-					const variables :{
-						_id ?:string
-						_name :string
-						collector ?:{
-							configJson ?:string
-							name ?:string
-						}
-						cron :Array<{
-							month :string
-							dayOfMonth :string
-							dayOfWeek :string
-							minute :string
-							hour :string
-						}>
-						doCollect :boolean
-						documentTypeId ?:string
-						language :string
-					} = {
-						_name: name,
-						cron: cronArray,
-						doCollect,
-						language
-					};
-					if (documentTypeId && !documentTypeId.startsWith('_')) {
-						variables.documentTypeId = documentTypeId;
-					}
-					if (collectorName || collectorConfig) {
-						variables.collector = {};
-						if (collectorName) {
-							variables.collector.name = collectorName;
-						}
-						if (collectorConfig) {
-							variables.collector.configJson = JSON.stringify(collectorConfig);
-						}
-					}
-					if (_id) {
-						variables._id = _id;
-					}
-					//console.debug('submit variables', variables);
-
-					fetch(`${servicesBaseUrl}/graphQL`, {
-						method: 'POST',
-						headers: {
-							'Content-Type':	'application/json'
-						},
-						body: JSON.stringify({
-							query: _id ? GQL_MUTATION_UPDATE_COLLECTION : GQL_MUTATION_CREATE_COLLECTION,
-							variables
-						})
-					}).then(response => {
-						if (response.status === 200) { doClose(); }
-					});
-				}}
+				errorCount={errorCount}
+				onClick={onSubmit}
 				isStateChanged={isStateChanged}
 				primary
 			/>

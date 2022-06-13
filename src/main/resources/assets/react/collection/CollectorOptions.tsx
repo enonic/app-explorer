@@ -15,19 +15,26 @@ import {Header, Segment} from 'semantic-ui-react';
 
 
 export function CollectorOptions({
+	collectorComponentRef,
 	collectorComponents,
 	collectorConfig,
 	collectorName,
 	contentTypeOptions,
 	fields,
 	setCollectorConfig,
+	setCollectorConfigErrorCount,
 	siteOptions
 } :{
+	collectorComponentRef :React.MutableRefObject<{
+		reset :() => void
+		validate :(collectorConfig :AnyObject) => boolean
+			}>
 	collectorComponents :CollectorComponents
 	collectorConfig :AnyObject
 	collectorName :string
 	contentTypeOptions :ContentTypeOptions
 	setCollectorConfig :(collectorConfig :AnyObject) => void
+	setCollectorConfigErrorCount :(count :number) => void
 	siteOptions :SiteOptions
 	fields :Fields
 }) {
@@ -45,6 +52,7 @@ export function CollectorOptions({
 		<Collector
 			collectorConfig={collectorConfig}
 			setCollectorConfig={setCollectorConfig}
+			setCollectorConfigErrorCount={setCollectorConfigErrorCount}
 			explorer={{
 				contentTypeOptions,
 				fields,
@@ -52,6 +60,7 @@ export function CollectorOptions({
 			}}
 			isFirstRun={isFirstRun}
 			path='collector.config'
+			ref={collectorComponentRef}
 		/>
 	</Segment>;
 } // function CollectorOptions
