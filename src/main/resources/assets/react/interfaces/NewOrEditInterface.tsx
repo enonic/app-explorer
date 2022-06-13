@@ -154,7 +154,7 @@ export function NewOrEditInterface({
 			/>
 			<SubmitButton
 				disabled={isLoading || isDefaultInterface || anyError}
-				errorsArr={anyError ? ['only length of array used'] : []}
+				errorCount={anyError ? 1 : 0}
 				isStateChanged={isStateChanged}
 				negative={anyError}
 				onClick={()=>{
