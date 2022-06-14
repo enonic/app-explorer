@@ -1,4 +1,4 @@
-import type {Locales} from '../index.d';
+//import type {Locales} from '../index.d';
 
 
 import {forceArray} from '@enonic/js-utils';
@@ -22,7 +22,13 @@ import {InsertButton} from '@enonic/semantic-ui-react-form/buttons/InsertButton'
 import {MoveDownButton} from '@enonic/semantic-ui-react-form/buttons/MoveDownButton';
 //@ts-ignore
 import {MoveUpButton} from '@enonic/semantic-ui-react-form/buttons/MoveUpButton';
-import {LanguageDropdown} from '../collection/LanguageDropdown';
+
+// The LanguageDropdown has been rewritten to not use semantic-ui-react-form
+// This this component has to be rewritten too (to not use semantic-ui-react-form)
+// However since it's currently not in use anywhere, that can wait.
+// The LanguageDropdown is commented out to avoid typescript errors.
+//import {LanguageDropdown} from '../collection/LanguageDropdown';
+
 import {Panel} from './Panel';
 
 
@@ -31,9 +37,9 @@ const PATH_LANGUAGES = 'languages';
 
 
 export function Languages({
-	locales
+	//locales
 } :{
-	locales :Locales
+	//locales :Locales
 }) {
 	return ENABLE_EXPERIMENTAL_GUI
 		? <>
@@ -90,12 +96,13 @@ export function Languages({
 								title={language || 'Please select language'}
 							>
 								{/*<h3>Language: {language}</h3>*/}
-								{language ? null : <LanguageDropdown
-									disabled={!!language /* FEATURE: As soon as a language is selected, it's disabled so one cannot change language */}
+								{/* Commented out to avoid typescript errors
+									language ? null : <LanguageDropdown
+									disabled={!!language /* FEATURE: As soon as a language is selected, it's disabled so one cannot change language /}
 									locales={locales}
 									parentPath={pathALanguage}
 									value={language}
-								/>}
+								/>*/}
 								<Table celled compact selectable sortable striped>
 									<Table.Header>
 										<Table.Row>

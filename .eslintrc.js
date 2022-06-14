@@ -159,6 +159,7 @@ module.exports = {
 		'import/no-extraneous-dependencies': ['off'],
 		'import/no-unresolved': ['off'],
 		indent: ['warn', 'tab'],
+		'jsx-a11y/label-has-associated-control': ['off'],
 		'max-len': ['error', 160, 2, {
 			ignoreUrls: true,
 			ignoreComments: true,

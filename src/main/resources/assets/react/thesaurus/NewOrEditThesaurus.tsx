@@ -6,62 +6,14 @@ import type {
 import type {NewOrEditState} from './index.d';
 
 
-import {Button, Form, Header, Icon, Label, Modal} from 'semantic-ui-react';
-import {
-	Form as EnonicForm,
-	Input as EnonicInput,
-	ResetButton,
-	SubmitButton
-} from '@enonic/semantic-ui-react-form';
+import {Button, Form, Header, Label, Modal} from 'semantic-ui-react';
 import {LanguageDropdown} from '../collection/LanguageDropdown';
 //import {EditSynonyms} from './EditSynonyms';
 import {UploadLicense} from '../UploadLicense';
-import {mustStartWithALowercaseLetter} from '../utils/mustStartWithALowercaseLetter';
-import {notDoubleUnderscore} from '../utils/notDoubleUnderscore';
-import {onlyLowercaseAsciiLettersDigitsAndUnderscores} from '../utils/onlyLowercaseAsciiLettersDigitsAndUnderscores';
-import {required} from '../utils/required';
+import {ResetButton} from '../components/ResetButton';
+import {SubmitButton} from '../components/SubmitButton';
 import {NEW_OR_EDIT_STATE_DEFAULT} from './useThesauriState';
-
-
-const GQL_MUTATION_THESAURUS_CREATE = `mutation CreateThesaurusMutation(
-  $_name: String!,
-  $language: ThesaurusLanguageInput!
-) {
-  createThesaurus(
-    _name: $_name,
-    language: $language
-  ) {
-    _id
-    _name
-    _nodeType
-    _path
-    language {
-      from
-      to
-    }
-  }
-}`;
-
-const GQL_MUTATION_THESAURUS_UPDATE = `mutation UpdateThesaurusMutation(
-  $_id: ID!,
-  $_name: String!,
-  $language: ThesaurusLanguageInput!
-) {
-  updateThesaurus(
-    _id: $_id,
-    _name: $_name,
-    language: $language
-  ) {
-    _id
-    _name
-    _nodeType
-    _path
-    language {
-      from
-      to
-    }
-  }
-}`;
+import {useNewOrEditThesaurusState} from './useNewOrEditThesaurusState';
 
 
 export function NewOrEditThesaurus({
@@ -101,111 +53,119 @@ export function NewOrEditThesaurus({
 		to :string
 	}
 }) {
-	//console.debug('NewOrEditThesaurus _id', _id);
-	//console.debug('NewOrEditThesaurus licenseValid', licenseValid);
-	//console.debug('NewOrEditThesaurus _name', _name);
-
 	function doClose() {
 		setNewOrEditState(NEW_OR_EDIT_STATE_DEFAULT);
 		afterClose(); // This could trigger render in parent, and unmount this Component.
 	}
 
-	function mustBeUnique(v :string) {
-		if (thesaurusNames.includes(v)) {
-			return `Name must be unique: Name '${v}' is already in use!`;
-		}
-	}
+	const {
+		errorCount,
+		fromLanguage,
+		fromLanguageError,
+		fromLanguageOnBlur,
+		isStateChanged,
+		loading,
+		name,
+		nameError,
+		nameOnBlur,
+		nameOnChange,
+		onSubmit,
+		resetState,
+		setFromLanguage,
+		setToLanguage,
+		toLanguage,
+		toLanguageError,
+		toLanguageOnBlur
+	} = useNewOrEditThesaurusState({
+		_id,
+		_name,
+		doClose,
+		language,
+		servicesBaseUrl,
+		thesaurusNames
+	});
 
 	return <Modal
 		closeIcon
 		closeOnDimmerClick={false}
 		onClose={doClose}
+		onMount={resetState}
 		open={open}
 	>{licenseValid
 			? <>
 				<Modal.Header>{_id ? `Edit thesaurus ${_name}` : 'New thesaurus'}</Modal.Header>
-				<EnonicForm
-					initialValues={{
-						language,
-						_name
-					}}
-					onSubmit={(values :{
-						_name :string
-						language :{
-							from :string
-							to :string
-						}
-					}) => {
-						//console.debug('onSubmit values', values);
-						const {
-							_name: newName,
-							language: newLanguage
-						} = values;
-						//console.debug('onSubmit newName', newName);
-						//console.debug('onSubmit newLanguage', newLanguage);
-						fetch(`${servicesBaseUrl}/graphQL`, {
-							method: 'POST',
-							headers: {
-								'Content-Type':	'application/json'
-							},
-							body: JSON.stringify({
-								query: _id ? GQL_MUTATION_THESAURUS_UPDATE : GQL_MUTATION_THESAURUS_CREATE,
-								variables: {
-									_id,
-									_name: newName, // Support rename...
-									language: newLanguage
-								}
-							})
-						}).then((response) => {
-							if (response.status === 200) {doClose();}
-							//doClose();
-						});
-					}}
-					schema={{
-						language: {
-							from: (value :string) => required(value),
-							to: (value :string) => required(value)
-						},
-						_name: (v :string) => _id ? false : required(v)
-							|| mustStartWithALowercaseLetter(v)
-							|| onlyLowercaseAsciiLettersDigitsAndUnderscores(v)
-							|| notDoubleUnderscore(v)
-							|| mustBeUnique(v)
-					}}
-				>
-					<Modal.Content>
-						<Form as='div'>
-							{!_id && <Form.Field>
-								<EnonicInput
-									fluid
-									label={{basic: true, content: 'Name'}}
-									path='_name'
-									placeholder='Please input name'
-								/>
-							</Form.Field>}
-							<Form.Field>
-								<Header as='h3' content='Language'/>
-								<Label content='From' size='large'/>
-								<LanguageDropdown locales={locales} parentPath='language' name='from'/>
-								<Label content='To' size='large'/>
-								<LanguageDropdown locales={locales} parentPath='language' name='to'/>
-							</Form.Field>
-						</Form>
-						{/*_id && <>
-							<Header as='h2' content='Synonyms'/>
-							<EditSynonyms
-								servicesBaseUrl={servicesBaseUrl}
-								thesaurusId={_id}
-								thesaurusName={_name}
+				<Modal.Content>
+					<Form as='div'>
+						{!_id && <Form.Input
+							error={nameError}
+							fluid
+							label={'Name'}
+							onBlur={() => nameOnBlur(name)}
+							onChange={nameOnChange}
+							placeholder='Please input name'
+							value={name}
+						/>}
+						<Form.Field>
+							<Header as='h3' content='Language'/>
+							<label>From</label>
+							<LanguageDropdown
+								error={!!fromLanguageError}
+								language={fromLanguage}
+								locales={locales}
+								onBlur={() => fromLanguageOnBlur(fromLanguage)}
+								setLanguage={setFromLanguage}
 							/>
-						</>*/}
-					</Modal.Content>
-					<Modal.Actions>
-						<Button onClick={doClose}>Cancel</Button>
-						<ResetButton secondary/>
-						<SubmitButton primary><Icon name='save'/>Save</SubmitButton>
-					</Modal.Actions>
-				</EnonicForm>
+							{fromLanguageError
+								? <Label pointing prompt>{fromLanguageError}</Label>
+								: null
+							}
+						</Form.Field>
+						<Form.Field>
+							<label>To</label>
+							<LanguageDropdown
+								error={!!toLanguageError}
+								language={toLanguage}
+								locales={locales}
+								onBlur={() => toLanguageOnBlur(toLanguage)}
+								setLanguage={setToLanguage}
+							/>
+							{toLanguageError
+								? <Label pointing prompt>{toLanguageError}</Label>
+								: null
+							}
+						</Form.Field>
+					</Form>
+					{/*_id && <>
+						<Header as='h2' content='Synonyms'/>
+						<EditSynonyms
+							servicesBaseUrl={servicesBaseUrl}
+							thesaurusId={_id}
+							thesaurusName={_name}
+						/>
+					</>*/}
+				</Modal.Content>
+				<Modal.Actions>
+					<Button
+						disabled={loading}
+						loading={loading}
+						onClick={doClose}
+					>Cancel</Button>
+					<ResetButton
+						disabled={loading}
+						isStateChanged={isStateChanged}
+						loading={loading}
+						onClick={resetState}
+						secondary
+					/>
+					<SubmitButton
+						disabled={loading}
+						errorCount={errorCount}
+						isStateChanged={isStateChanged}
+						loading={loading}
+						onClick={onSubmit}
+						primary
+					/>
+				</Modal.Actions>
 			</>
 			: <UploadLicense
 				servicesBaseUrl={servicesBaseUrl}
