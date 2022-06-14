@@ -15,11 +15,13 @@ type CollectorConfig = {
 
 export function useWebCrawlerState({
 	collectorConfig,
+	initialCollectorConfig,
 	ref,
 	setCollectorConfig,
 	setCollectorConfigErrorCount
 } :{
 	collectorConfig :CollectorConfig,
+	initialCollectorConfig :CollectorConfig,
 	ref :React.ForwardedRef<unknown>,
 	setCollectorConfig :(collectorConfig :CollectorConfig) => void
 	setCollectorConfigErrorCount :(collectorConfigErrorCount :number) => void
@@ -45,7 +47,7 @@ export function useWebCrawlerState({
 	// Callbacks, should only depend on props, not state
 	//──────────────────────────────────────────────────────────────────────────
 	const validateBaseUri = React.useCallback((baseUri :string) => {
-		console.debug('in validateBaseUri');
+		//console.debug('in validateBaseUri');
 		const newError = !baseUri ? 'Uri is required!' : undefined;
 		setBaseUriError(newError); // useEffect[baseUriError] triggers setCollectorConfigErrorCount
 		return !!!newError;
@@ -55,6 +57,7 @@ export function useWebCrawlerState({
 		_event :React.ChangeEvent<HTMLInputElement>,
 		{value} : {value :string}
 	) => {
+		//console.debug('baseUriOnChange');
 		setBaseUri(value);
 		validateBaseUri(value);
 	}, [
@@ -62,34 +65,35 @@ export function useWebCrawlerState({
 	]);
 
 	const baseUriOnBlur = React.useCallback((baseUri :string) => {
+		//console.debug('baseUriOnBlur');
 		setBaseUriVisited(true);
 		validateBaseUri(baseUri);
 	}, [validateBaseUri]);
 
 	const reset = React.useCallback(() => {
-		console.debug('in collector component reset');
-		setBaseUri(collectorConfig
-			? (collectorConfig.baseUri || '')
+		//console.debug('in collector component reset');
+		setBaseUri(initialCollectorConfig
+			? (initialCollectorConfig.baseUri || '')
 			: ''); // useEffect[baseUri] should trigger setCollectorConfig
 		setBaseUriVisited(false); // no listeners on baseUriVisited :)
 		setBaseUriError(undefined); // useEffect[baseUriError] SHOULD trigger setCollectorConfigErrorCount, but DOESN'T ???
 
 		// useEffect[excludesArray] should trigger setCollectorConfig
-		setExcludesArray(collectorConfig && collectorConfig.excludes ? forceArray(collectorConfig.excludes) : undefined);
+		setExcludesArray(initialCollectorConfig && initialCollectorConfig.excludes ? forceArray(initialCollectorConfig.excludes) : undefined);
 
 		// useEffect[userAgent] should trigger setCollectorConfig
-		setUserAgent(collectorConfig
-			? (collectorConfig.userAgent || '')
+		setUserAgent(initialCollectorConfig
+			? (initialCollectorConfig.userAgent || '')
 			: ''
 		);
 		setCollectorConfigErrorCount(0); // useEffect[baseUriError] SHOULD trigger setCollectorConfigErrorCount, but DOESN'T ???
 	}, [
-		collectorConfig,
+		initialCollectorConfig, // never changes
 		setCollectorConfigErrorCount
 	]);
 
 	const validate = React.useCallback<(collectorConfig :AnyObject) => boolean>(({baseUri} :{baseUri :string}) => {
-		console.debug('in validateCollectorConfig');
+		//console.debug('in validateCollectorConfig');
 		const newCollectorConfigErrorCount = validateBaseUri(baseUri) ? 0 : 1;
 		//setCollectorConfigErrorCount(newCollectorConfigErrorCount); // useEffect on baseUriError triggers setCollectorConfigErrorCount
 		return !!!newCollectorConfigErrorCount;
@@ -107,17 +111,24 @@ export function useWebCrawlerState({
 	}));
 
 	//──────────────────────────────────────────────────────────────────────────
+	// Init
+	//──────────────────────────────────────────────────────────────────────────
+	/*React.useEffect(() => {
+		console.debug('Collector component init');
+	},[]);*/
+
+	//──────────────────────────────────────────────────────────────────────────
 	// Updates (changes, not init)
 	//──────────────────────────────────────────────────────────────────────────
 	useUpdateEffect(() => {
-		console.debug('Collector component baseUriError changed', baseUriError);
+		//console.debug('Collector component baseUriError changed', baseUriError);
 		setCollectorConfigErrorCount(baseUriError ? 1 : 0);
 	}, [
 		baseUriError
 	]);
 
 	useUpdateEffect(() => {
-		console.debug('any change calling setCollectorConfig()');
+		//console.debug('any change calling setCollectorConfig()');
 		setCollectorConfig({
 			baseUri,
 			excludes: excludesArray,

@@ -53,6 +53,7 @@ export function useCollectionState({
 		reset :() => void
 		validate :(collectorConfig :AnyObject) => boolean
 			}>(null);
+	const [initialCollectorConfig] = React.useState(collectorConfigFromInitiaValues(initialValues));
 	const [collectorConfig, setCollectorConfig] = React.useState(collectorConfigFromInitiaValues(initialValues));
 
 	const [collectorName, setCollectorName] = React.useState<string>(initialValues.collector ? initialValues.collector.name : undefined);
@@ -67,6 +68,7 @@ export function useCollectionState({
 	const [/*nameVisited*/, setNameVisited] = React.useState(false);
 	const [collectorConfigErrorCount, setCollectorConfigErrorCount] = React.useState(0);
 	const [errorCount, setErrorCount] = React.useState(0);
+	const [loading, setLoading] = React.useState(false);
 
 	//──────────────────────────────────────────────────────────────────────────
 	// Callbacks, should only depend on props, not state
@@ -104,14 +106,14 @@ export function useCollectionState({
 		collectionName :string
 		collectorConfig :AnyObject
 	}) => {
-		console.debug('validateForm collectionName:', collectionName, ' collectorConfig:', collectorConfig);
+		//console.debug('validateForm collectionName:', collectionName, ' collectorConfig:', collectorConfig);
 
 		const valid = validateName(collectionName);
-		console.debug('validateForm valid:', valid);
+		//console.debug('validateForm valid:', valid);
 
 		let collectorConfigValid = true;
 		if (collectorComponentRef && collectorComponentRef.current && isFunction(collectorComponentRef.current.validate)) {
-			console.debug('calling validate collectorConfig:', collectorConfig);
+			//console.debug('calling validate collectorConfig:', collectorConfig);
 			collectorConfigValid = collectorComponentRef.current.validate(collectorConfig);
 		}
 
@@ -134,7 +136,7 @@ export function useCollectionState({
 	}
 
 	useUpdateEffect(() => {
-		console.debug('collectorConfig changed', collectorConfig);
+		//console.debug('collectorConfig changed', collectorConfig);
 		const newIsStateChanged = checkIsChanged();
 		if (newIsStateChanged !== isStateChanged) {
 			setIsStateChanged(newIsStateChanged);
@@ -142,7 +144,7 @@ export function useCollectionState({
 	}, [collectorConfig]);
 
 	useUpdateEffect(() => {
-		console.debug('collectorName changed', collectorName);
+		//console.debug('collectorName changed', collectorName);
 		const newIsStateChanged = checkIsChanged();
 		if (newIsStateChanged !== isStateChanged) {
 			setIsStateChanged(newIsStateChanged);
@@ -150,7 +152,7 @@ export function useCollectionState({
 	}, [collectorName]);
 
 	useUpdateEffect(() => {
-		console.debug('cronArray changed', cronArray);
+		//console.debug('cronArray changed', cronArray);
 		const newIsStateChanged = checkIsChanged();
 		if (newIsStateChanged !== isStateChanged) {
 			setIsStateChanged(newIsStateChanged);
@@ -158,7 +160,7 @@ export function useCollectionState({
 	}, [cronArray]);
 
 	useUpdateEffect(() => {
-		console.debug('doCollect changed', doCollect);
+		//console.debug('doCollect changed', doCollect);
 		const newIsStateChanged = checkIsChanged();
 		if (newIsStateChanged !== isStateChanged) {
 			setIsStateChanged(newIsStateChanged);
@@ -166,7 +168,7 @@ export function useCollectionState({
 	}, [doCollect]);
 
 	useUpdateEffect(() => {
-		console.debug('documentTypeId changed', documentTypeId);
+		//console.debug('documentTypeId changed', documentTypeId);
 		const newIsStateChanged = checkIsChanged();
 		if (newIsStateChanged !== isStateChanged) {
 			setIsStateChanged(newIsStateChanged);
@@ -180,7 +182,7 @@ export function useCollectionState({
 	]);*/
 
 	useUpdateEffect(() => {
-		console.debug('language changed', language);
+		//console.debug('language changed', language);
 		const newIsStateChanged = checkIsChanged();
 		if (newIsStateChanged !== isStateChanged) {
 			setIsStateChanged(newIsStateChanged);
@@ -188,7 +190,7 @@ export function useCollectionState({
 	}, [language]);
 
 	useUpdateEffect(() => {
-		console.debug('name changed', name);
+		//console.debug('name changed', name);
 		const newIsStateChanged = checkIsChanged();
 		if (newIsStateChanged !== isStateChanged) {
 			setIsStateChanged(newIsStateChanged);
@@ -196,14 +198,14 @@ export function useCollectionState({
 	}, [name]);
 
 	useUpdateEffect(() => {
-		console.debug('collectorName changed', collectorName);
+		//console.debug('collectorName changed', collectorName);
 		if (!collectorName) {
 			setDocumentTypeId(undefined);
 		}
 	}, [collectorName]);
 
 	useUpdateEffect(() => {
-		console.debug('collectorConfigErrorCount:', collectorConfigErrorCount, ' or nameError:', nameError, ' changed');
+		//console.debug('collectorConfigErrorCount:', collectorConfigErrorCount, ' or nameError:', nameError, ' changed');
 		const newErrorCount = (nameError ? 1 : 0) + collectorConfigErrorCount;
 		//if (newErrorCount !== errorCount) {
 		setErrorCount(newErrorCount);
@@ -215,7 +217,7 @@ export function useCollectionState({
 	]);
 
 	function resetState() {
-		console.debug('resetState');
+		//console.debug('resetState');
 
 		if (collectorComponentRef && collectorComponentRef.current && isFunction(collectorComponentRef.current.reset)) {
 			collectorComponentRef.current.reset();
@@ -240,11 +242,13 @@ export function useCollectionState({
 	}
 
 	function onSubmit() {
-		console.debug('SubmitButton onClick, collectorConfig:', collectorConfig);
+		setLoading(true);
+		//console.debug('SubmitButton onClick, collectorConfig:', collectorConfig);
 		if (!validateForm({
 			collectionName: name,
 			collectorConfig
 		})) {
+			setLoading(false);
 			return;
 		}
 		const {_id} = initialValues;
@@ -300,6 +304,7 @@ export function useCollectionState({
 			})
 		}).then(response => {
 			if (response.status === 200) { doClose(); }
+			setLoading(false);
 		});
 	} // onSubmit
 
@@ -311,8 +316,10 @@ export function useCollectionState({
 		doCollect,
 		documentTypeId,
 		errorCount,
+		initialCollectorConfig,
 		isStateChanged,
 		language,
+		loading,
 		name,
 		nameError,
 		nameOnBlur,
@@ -326,7 +333,6 @@ export function useCollectionState({
 		setDoCollect,
 		setDocumentTypeId,
 		setLanguage,
-		setName,
-		setNameVisited
+		setName
 	}; // return
 } // useCollectionState
