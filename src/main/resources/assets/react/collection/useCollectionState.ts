@@ -1,5 +1,9 @@
 import type {QueryCollectionsHits} from './index.d';
-import type {AnyObject, CollectionFormValues} from '/lib/explorer/types/index.d';
+import type {
+	AnyObject,
+	CollectionFormValues,
+	CollectorComponentImperativeHandle
+} from '/lib/explorer/types/index.d';
 
 
 import {isFunction} from '@enonic/js-utils';
@@ -49,10 +53,7 @@ export function useCollectionState({
 	//──────────────────────────────────────────────────────────────────────────
 	// State
 	//──────────────────────────────────────────────────────────────────────────
-	const collectorComponentRef = React.useRef<{
-		reset :() => void
-		validate :(collectorConfig :AnyObject) => boolean
-			}>(null);
+	const collectorComponentRef = React.useRef<CollectorComponentImperativeHandle>(null);
 	const [initialCollectorConfig] = React.useState(collectorConfigFromInitiaValues(initialValues));
 	const [collectorConfig, setCollectorConfig] = React.useState(collectorConfigFromInitiaValues(initialValues));
 

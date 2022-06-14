@@ -1,7 +1,4 @@
-import type {
-	AnyObject,
-	CollectionFormValues
-} from '/lib/explorer/types/index.d';
+import type {AnyObject} from '/lib/explorer/types/index.d';
 import type {
 	ContentTypeOptions,
 	Fields,
@@ -42,9 +39,6 @@ export function CollectorOptions({
 	siteOptions :SiteOptions
 	fields :Fields
 }) {
-	//const [isFirstRun, setIsFirstRun] = React.useState(true);
-	const isFirstRun = React.useRef(true);
-
 	if (!collectorName) { return null; }
 
 	if (!collectorComponents[collectorName]) { return <p>Collector {collectorName} NOT found!</p>; }
@@ -63,8 +57,6 @@ export function CollectorOptions({
 				fields,
 				siteOptions
 			}}
-			isFirstRun={isFirstRun}
-			path='collector.config'
 			ref={collectorComponentRef}
 		/>
 	</Segment>;

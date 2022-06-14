@@ -1,11 +1,6 @@
-import type {
-	DropdownItemProps,
-	StrictDropdownProps
-} from 'semantic-ui-react';
-import type {CollectionFormValues} from '/lib/explorer/types/index.d';
+import type {StrictDropdownProps} from 'semantic-ui-react';
 
 
-import {getIn} from '@enonic/js-utils';
 import * as React from 'react';
 import {
 	Dropdown,
