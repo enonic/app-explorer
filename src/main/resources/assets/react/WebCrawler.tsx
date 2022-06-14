@@ -1,5 +1,8 @@
-//import type {CollectorProps} from '/lib/explorer/types/Collector.d';
-
+import type {
+	CollectorComponentRef,
+	CollectorProps
+} from '/lib/explorer/types/index.d';
+import type {CollectorConfig} from './useWebCrawlerState';
 
 import * as React from 'react';
 import {
@@ -26,7 +29,7 @@ export const Collector = React.forwardRef(({
 	//explorer,
 	setCollectorConfig, // This only affects collectorConfig, NOT initialCollectorConfig.
 	setCollectorConfigErrorCount
-} /*:CollectorProps*/, ref) => {
+} :CollectorProps<CollectorConfig>, ref :CollectorComponentRef<CollectorConfig>) => {
 	const {
 		baseUri,
 		baseUriError,

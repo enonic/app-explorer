@@ -1,4 +1,8 @@
-import type {AnyObject} from '/lib/explorer/types/index.d';
+import type {
+	CollectorComponentRef,
+	CollectorComponentResetFunction,
+	CollectorComponentValidateFunction
+} from '/lib/explorer/types/index.d';
 
 
 import {forceArray} from '@enonic/js-utils';
@@ -6,7 +10,7 @@ import * as React from 'react';
 import {useUpdateEffect} from './utils/useUpdateEffect';
 
 
-type CollectorConfig = {
+export type CollectorConfig = {
 	baseUri ?:string
 	excludes ?:string|Array<string>
 	userAgent ?:string
@@ -22,7 +26,7 @@ export function useWebCrawlerState({
 } :{
 	collectorConfig :CollectorConfig,
 	initialCollectorConfig :CollectorConfig,
-	ref :React.ForwardedRef<unknown>,
+	ref :CollectorComponentRef<CollectorConfig>,
 	setCollectorConfig :(collectorConfig :CollectorConfig) => void
 	setCollectorConfigErrorCount :(collectorConfigErrorCount :number) => void
 }) {
@@ -70,7 +74,7 @@ export function useWebCrawlerState({
 		validateBaseUri(baseUri);
 	}, [validateBaseUri]);
 
-	const reset = React.useCallback(() => {
+	const reset = React.useCallback<CollectorComponentResetFunction>(() => {
 		//console.debug('in collector component reset');
 		setBaseUri(initialCollectorConfig
 			? (initialCollectorConfig.baseUri || '')
@@ -92,7 +96,7 @@ export function useWebCrawlerState({
 		setCollectorConfigErrorCount
 	]);
 
-	const validate = React.useCallback<(collectorConfig :AnyObject) => boolean>(({baseUri} :{baseUri :string}) => {
+	const validate = React.useCallback<CollectorComponentValidateFunction<CollectorConfig>>(({baseUri} :{baseUri :string}) => {
 		//console.debug('in validateCollectorConfig');
 		const newCollectorConfigErrorCount = validateBaseUri(baseUri) ? 0 : 1;
 		//setCollectorConfigErrorCount(newCollectorConfigErrorCount); // useEffect on baseUriError triggers setCollectorConfigErrorCount

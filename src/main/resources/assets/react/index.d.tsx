@@ -1,7 +1,13 @@
-import type {CollectorProps} from '/lib/explorer/types/index.d';
+import type {
+	AnyObject,
+	CollectorComponentRef,
+	CollectorProps
+} from '/lib/explorer/types/index.d';
 
 
-export type CollectorComponent = (props :CollectorProps) => JSX.Element;
+export type CollectorComponent<CollectorConfig extends AnyObject = AnyObject> = (props :CollectorProps & {
+	ref :CollectorComponentRef<CollectorConfig>
+}) => JSX.Element;
 export type CollectorComponents = Record<string,CollectorComponent>;
 
 export type Locale = {
