@@ -21,9 +21,10 @@ const DEFAULT_UA = 'Mozilla/5.0 (compatible; Enonic XP Explorer Collector Web cr
 
 
 export const Collector = React.forwardRef(({
-	collectorConfig, // Never changes, is not affected by setCollectorConfig
+	collectorConfig, // Changes is affected by setCollectorConfig
+	initialCollectorConfig, // Never changes, is not affected by setCollectorConfig
 	//explorer,
-	setCollectorConfig, // This does not affect initialCollectorConfig
+	setCollectorConfig, // This only affects collectorConfig, NOT initialCollectorConfig.
 	setCollectorConfigErrorCount
 } /*:CollectorProps*/, ref) => {
 	const {
@@ -37,6 +38,7 @@ export const Collector = React.forwardRef(({
 		userAgent
 	} = useWebCrawlerState({
 		collectorConfig,
+		initialCollectorConfig,
 		ref,
 		setCollectorConfig,
 		setCollectorConfigErrorCount

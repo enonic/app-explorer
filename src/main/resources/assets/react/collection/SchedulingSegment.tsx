@@ -19,15 +19,17 @@ import {MoveUpButton} from '../components/MoveUpButton';
 export function SchedulingSegment({
 	cronArray,
 	doCollect,
+	loading,
 	setCronArray,
 	setDoCollect
 } :{
 	cronArray :Array<Cron>
 	doCollect :boolean
+	loading :boolean
 	setCronArray :(cronArray :Array<Cron>) => void
 	setDoCollect :(doCollect :boolean) => void
 }) {
-	return <Segment color='green'>
+	return <Segment color='green' disabled={loading}>
 		<Header as='h2' dividing content='Scheduling' id='cron'/>
 		<Checkbox
 			checked={doCollect}

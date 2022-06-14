@@ -64,8 +64,10 @@ export function Collection({
 		doCollect,
 		documentTypeId,
 		errorCount,
+		initialCollectorConfig,
 		isStateChanged,
 		language,
+		loading,
 		name,
 		nameError,
 		nameOnBlur,
@@ -78,8 +80,7 @@ export function Collection({
 		setCronArray,
 		setDoCollect,
 		setDocumentTypeId,
-		setLanguage,
-		setNameVisited
+		setLanguage
 	} = useCollectionState({
 		collections,
 		doClose,
@@ -89,7 +90,10 @@ export function Collection({
 
 	return <>
 		<Modal.Content>
-			<Segment color='black'>
+			<Segment
+				color='black'
+				disabled={loading}
+			>
 				<Header as='h1' dividing content='Collection' id='collection'/>
 				<Form>
 					<Form.Input
@@ -131,6 +135,8 @@ export function Collection({
 				collectorName={collectorName}
 				contentTypeOptions={contentTypeOptions}
 				fields={fields}
+				initialCollectorConfig={initialCollectorConfig}
+				loading={loading}
 				siteOptions={siteOptions}
 				setCollectorConfig={setCollectorConfig}
 				setCollectorConfigErrorCount={setCollectorConfigErrorCount}
@@ -139,6 +145,7 @@ export function Collection({
 				? <SchedulingSegment
 					cronArray={cronArray}
 					doCollect={doCollect}
+					loading={loading}
 					setCronArray={setCronArray}
 					setDoCollect={setDoCollect}
 				/>
@@ -146,14 +153,22 @@ export function Collection({
 			}
 		</Modal.Content>
 		<Modal.Actions>
-			<Button onClick={doClose}>Cancel</Button>
+			<Button
+				disabled={loading}
+				loading={loading}
+				onClick={doClose}
+			>Cancel</Button>
 			<ResetButton
+				disabled={loading}
 				isStateChanged={isStateChanged}
+				loading={loading}
 				onClick={resetState}
 				secondary
 			/>
 			<SubmitButton
+				disabled={loading}
 				errorCount={errorCount}
+				loading={loading}
 				onClick={onSubmit}
 				isStateChanged={isStateChanged}
 				primary

@@ -21,6 +21,8 @@ export function CollectorOptions({
 	collectorName,
 	contentTypeOptions,
 	fields,
+	initialCollectorConfig,
+	loading,
 	setCollectorConfig,
 	setCollectorConfigErrorCount,
 	siteOptions
@@ -33,6 +35,8 @@ export function CollectorOptions({
 	collectorConfig :AnyObject
 	collectorName :string
 	contentTypeOptions :ContentTypeOptions
+	initialCollectorConfig :AnyObject
+	loading :boolean
 	setCollectorConfig :(collectorConfig :AnyObject) => void
 	setCollectorConfigErrorCount :(count :number) => void
 	siteOptions :SiteOptions
@@ -47,10 +51,11 @@ export function CollectorOptions({
 
 	const Collector = collectorComponents[collectorName];
 
-	return <Segment color='pink'>
+	return <Segment color='pink' disabled={loading}>
 		<Header as='h2' dividing content={collectorName} id='collector'/>
 		<Collector
 			collectorConfig={collectorConfig}
+			initialCollectorConfig={initialCollectorConfig}
 			setCollectorConfig={setCollectorConfig}
 			setCollectorConfigErrorCount={setCollectorConfigErrorCount}
 			explorer={{
