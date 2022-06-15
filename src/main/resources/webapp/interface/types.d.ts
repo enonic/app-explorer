@@ -15,11 +15,11 @@ export {
 } from './types/Aggregation.d';
 
 
-export interface CamelToFieldObj {
+export type CamelToFieldObj = {
 	[key :string] :string
 }
 
-export interface SearchResolverEnv {
+export type SearchResolverEnv = {
 	args :{
 		aggregations? :GraphQLInterfaceSearchAggregation
 		count :number
@@ -32,7 +32,7 @@ export interface SearchResolverEnv {
 	}
 }
 
-export interface SearchConnectionResolverEnv {
+export type SearchConnectionResolverEnv = {
 	args :{
 		aggregations? :GraphQLInterfaceSearchAggregation
 		after :string
