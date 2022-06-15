@@ -15,15 +15,15 @@ Goals:
 
 type Fields = AnyObject;
 //type EnumType = AnyObject;
-type GraphQLObjectType = AnyObject;
-type GraphQLInterfaceType = AnyObject;
+type GraphQLObjectType = unknown;
+type GraphQLInterfaceType = unknown;
 type GraphQLTypeReference = string;
 //type InputObjectType = AnyObject;
 //type ScalarType = AnyObject;
 
 type FieldResolver<
 	Env extends AnyObject = AnyObject,
-	ResultGraph = unknown
+	ResultGraph extends AnyObject = AnyObject
 > = (env :Env) => ResultGraph
 type TypeResolver = () => GraphQLObjectType
 
@@ -115,7 +115,7 @@ function addObjectType({
 	interfaces ?:Interfaces
 	name :string
 }) {
-	//log.debug(`addObjectType({ name: ${name} })`);
+	//log.debug('Glue addObjectType({ name: %s })', name);
 	if(this.uniqueNames[name]) {
 		throw new Error(`Name ${name} already used as ${this.uniqueNames[name]}!`);
 	}
@@ -220,7 +220,8 @@ function getInterfaceTypeObject(name :string) {
 
 
 function addQueryField<
-	Env extends AnyObject = AnyObject
+	Env extends AnyObject = AnyObject,
+	ResultGraph extends AnyObject = AnyObject
 >({
 	args = {},
 	name,
@@ -229,9 +230,10 @@ function addQueryField<
 } : {
 	args ?:AnyObject
 	name :string
-	resolve :FieldResolver<Env>
+	resolve :FieldResolver<Env, ResultGraph>
 	type :GraphQLObjectType
 }) {
+	//log.debug('Glue addQueryField({ name: %s })', name);
 	if(this.queryFields[name]) {
 		throw new Error(`Name ${name} already added!`);
 	}
@@ -245,6 +247,7 @@ function addQueryField<
 
 
 function buildSchema() {
+	//log.debug('Glue buildSchema');
 	/*
 	 GIVEN that an objectType that implements an interface
 	 AND that objectType is NOT directly added/available in the schema
@@ -257,6 +260,7 @@ function buildSchema() {
 	*/
 	const objectTypesWithInterfaces = [];
 	const objectTypeNames = Object.keys(this.objectTypes);
+	//log.debug('objectTypeNames:%s', objectTypeNames);
 	for (let i = 0; i < objectTypeNames.length; i++) {
 		const objectTypeName = objectTypeNames[i];
 		if (
@@ -264,11 +268,13 @@ function buildSchema() {
 			&& Array.isArray(this.objectTypes[objectTypeName].interfaces)
 			&& this.objectTypes[objectTypeName].interfaces.length
 		) {
+			log.debug('objectTypeName:%s has interfaces', objectTypeName);
 			objectTypesWithInterfaces.push(this.objectTypes[objectTypeName].type);
 		}
 	} // for objectTypeNames
 	//log.debug(`Number of objectTypes:${Object.keys(this.objectTypes).length} Number of objectTypes implementing interfaces:${objectTypesWithInterfaces.length}`);
 
+	//log.debug('queryFields:%s', Object.keys(this.queryFields));
 	return this.schemaGenerator.createSchema({
 		//dictionary: Object.keys(this.objectTypes).map((k) => this.objectTypes[k].type), // No need to add all objectTypes...
 		dictionary: objectTypesWithInterfaces,
