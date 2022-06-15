@@ -4,7 +4,10 @@ import type {
 	SiteOptions
 } from '/lib/explorer/types/Collector.d';
 import type {CollectorComponents} from '../index.d';
-import type {QueryCollectionsGraph} from './index.d';
+import type {
+	DropdownItemsWithKeys,
+	QueryCollectionsGraph
+} from './index.d';
 
 
 import {COLON_SIGN} from '@enonic/js-utils';
@@ -201,7 +204,7 @@ export function useCollectionsState({
 	}) : [];
 
 	const collectorsObj = {};
-	const collectorOptions = queryCollectorsGraph.hits
+	const collectorOptions :DropdownItemsWithKeys<string> = queryCollectorsGraph.hits
 		? queryCollectorsGraph.hits.map(({
 			appName,
 			collectTaskName,

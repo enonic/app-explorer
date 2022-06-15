@@ -2,7 +2,7 @@ import {
 	Collection,
 	CollectionNode,
 	CollectionNodeCreateParams,
-	CollectionWithCron,
+	CollectionWithCron
 } from '/lib/explorer/types/index.d';
 import type {GraphQLField} from '../types.d';
 
@@ -113,7 +113,7 @@ export function generateCreateCollectionField({
 				principals: [PRINCIPAL_EXPLORER_WRITE]
 			});
 
-			if (!documentTypeId) {
+			if (documentTypeId === '_new') {
 				// Create DocumentType With CollectionName pluss some integer if already existing
 				let documentTypeName = _name;
 				let i = 0;
@@ -129,7 +129,9 @@ export function generateCreateCollectionField({
 				//log.debug(`createdDocumentTypeNode:${toStr(createdDocumentTypeNode)}`);
 				documentTypeId = createdDocumentTypeNode._id;
 			}
-			nodeToBeCreated.documentTypeId = referenceValue(documentTypeId);
+			if (documentTypeId && !documentTypeId.startsWith('_')) {
+				nodeToBeCreated.documentTypeId = referenceValue(documentTypeId);
+			}
 			//log.debug(`nodeToBeCreated:${toStr(nodeToBeCreated)}`);
 
 			const createdNode = writeConnection.create(nodeToBeCreated) as CollectionNode;

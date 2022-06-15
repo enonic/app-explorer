@@ -1,4 +1,3 @@
-import type {DropdownItemProps} from 'semantic-ui-react/index.d';
 import type {CollectionFormValues} from '/lib/explorer/types/index.d';
 import type {
 	ContentTypeOptions,
@@ -9,7 +8,10 @@ import type {
 	CollectorComponents,
 	Locales
 } from '../index.d';
-import type {QueryCollectionsHits} from './index.d';
+import type {
+	DropdownItemsWithKeys,
+	QueryCollectionsHits
+} from './index.d';
 
 
 import {
@@ -46,7 +48,7 @@ export function Collection({
 	// Required
 	collections :QueryCollectionsHits
 	collectorComponents :CollectorComponents
-	collectorOptions :Array<DropdownItemProps>
+	collectorOptions :DropdownItemsWithKeys<string>
 	contentTypeOptions :ContentTypeOptions
 	doClose :() => void
 	locales :Locales
@@ -141,7 +143,7 @@ export function Collection({
 				setCollectorConfig={setCollectorConfig}
 				setCollectorConfigErrorCount={setCollectorConfigErrorCount}
 			/>
-			{collectorName
+			{(collectorName && collectorName !== '_none')
 				? <SchedulingSegment
 					cronArray={cronArray}
 					doCollect={doCollect}
