@@ -6,7 +6,7 @@ import type {
 	CamelToFieldObj,
 	GraphQLInterfaceSearchAggregation,
 	SearchResolverEnv
-} from './types.d';
+} from '../types.d';
 
 import {
 	addQueryFilter//,

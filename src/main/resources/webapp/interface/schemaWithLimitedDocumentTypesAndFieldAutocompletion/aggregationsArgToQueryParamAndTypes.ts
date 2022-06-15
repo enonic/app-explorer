@@ -4,11 +4,11 @@ import type {
 	AggregationType,
 	AggregationTypesObj,
 	CamelToFieldObj
-} from './types';
+} from '../types';
 
 
 import {
-	isSet,
+	isSet//,
 	//toStr
 } from '@enonic/js-utils';
 

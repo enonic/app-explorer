@@ -11,17 +11,18 @@ import type {
 import type {
 	CamelToFieldObj,
 	SearchResolverEnv
-} from './types.d';
+} from '../types.d';
 
 
 //import {toStr} from '@enonic/js-utils';
 import {PRINCIPAL_EXPLORER_READ} from '/lib/explorer/constants';
 import {connect} from '/lib/explorer/repo/connect';
 
+import {connectToCollectionRepos} from '../utils/connectToCollectionRepos';
+import {washDocumentNode} from '../utils/washDocumentNode';
+
 import {buildQueryParams} from './buildQueryParams';
-import {connectToCollectionRepos} from './connectToCollectionRepos';
 import {queryResAggregationsObjToArray} from './queryResAggregationsObjToArray';
-import {washDocumentNode} from './washDocumentNode';
 
 
 export function doQuery({

@@ -1,6 +1,6 @@
 import type {DocumentTypeNode} from '/lib/explorer/types/DocumentType.d';
-import type {CamelToFieldObj} from '../types.d';
-import type {Glue} from '../glue';
+import type {CamelToFieldObj} from '../../types.d';
+import type {Glue} from '../../utils/Glue';
 import type {GlobalFieldsObj} from '../buildGlobalFieldsObj';
 
 

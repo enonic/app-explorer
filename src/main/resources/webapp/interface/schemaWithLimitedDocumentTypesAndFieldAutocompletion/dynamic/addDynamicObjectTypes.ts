@@ -1,4 +1,4 @@
-import type {Glue} from '../glue';
+import type {Glue} from '../../utils/Glue';
 
 
 //import {toStr} from '@enonic/js-utils';
