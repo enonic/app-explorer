@@ -98,6 +98,7 @@ export const NewOrEditApiKey = (props :{
 				}
 				<Form.Input
 					fluid
+					onChange={(_e,{value:newKey} :{value: string}) => setKey(newKey)}
 					placeholder={_name ? 'If you type anything here, it will overwrite the previous key on save' : 'Key is one way hashed on save'}
 					value={key}
 				>
