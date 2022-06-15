@@ -1,5 +1,7 @@
-import {hasOwnProperty} from '@enonic/js-utils';
+import type {AnyObject} from '/lib/explorer/types/index.d';
 
+
+import {hasOwnProperty} from '@enonic/js-utils';
 import {GQL_OBJECT_TYPE_QUERY} from './constants';
 
 
@@ -12,10 +14,32 @@ Goals:
 
 */
 
+type Fields = AnyObject;
+//type EnumType = AnyObject;
+type GraphQLObjectType = AnyObject;
+type GraphQLInterfaceType = AnyObject;
+type GraphQLTypeReference = string;
+//type InputObjectType = AnyObject;
+//type ScalarType = AnyObject;
+
+type FieldResolver<
+	Env extends AnyObject = AnyObject,
+	ResultGraph = unknown
+> = (env :Env) => ResultGraph
+type TypeResolver = () => GraphQLObjectType
+
+type Interfaces = Array<GraphQLInterfaceType|GraphQLTypeReference>
+type Types = Array<GraphQLObjectType|GraphQLTypeReference>
+
 
 function addEnumType({
+	description,
 	name,
 	values
+} :{
+	description ?:string
+	name :string
+	values :Array<string>
 }) {
 	//log.debug(`addEnumType({ name: ${name} })`);
 	if(this.uniqueNames[name]) {
@@ -23,6 +47,7 @@ function addEnumType({
 	}
 	this.uniqueNames[name] = 'enumType';
 	this.enumTypes[name] = this.schemaGenerator.createEnumType({
+		description,
 		name,
 		values
 	});
@@ -30,7 +55,7 @@ function addEnumType({
 }
 
 
-function getEnumType(name) {
+function getEnumType(name :string) {
 	return this.enumTypes[name];
 }
 
@@ -38,6 +63,8 @@ function getEnumType(name) {
 function addInputFields({
 	_name,
 	...rest
+} : {
+	_name :string
 }) {
 	if (this.inputFields[_name]) {
 		throw new Error(`InputFields ${_name} already added!`);
@@ -46,14 +73,19 @@ function addInputFields({
 	return this.inputFields[_name];
 }
 
-function getInputFields(name) {
+function getInputFields(name :string) {
 	return this.inputFields[name];
 }
 
 
 function addInputType({
+	description,
 	fields,
 	name
+} :{
+	description ?:string
+	fields :Fields
+	name :string
 }) {
 	//log.debug(`addInputType({ name: ${name} })`);
 	if(this.uniqueNames[name]) {
@@ -61,21 +93,28 @@ function addInputType({
 	}
 	this.uniqueNames[name] = 'inputType';
 	this.inputTypes[name] = this.schemaGenerator.createInputObjectType({
+		description,
 		fields,
 		name
 	});
 	return this.inputTypes[name];
 }
 
-function getInputType(name) {
+function getInputType(name :string) {
 	return this.inputTypes[name];
 }
 
 
 function addObjectType({
+	description,
 	fields,
 	interfaces = [],
 	name
+} : {
+	description ?:string
+	fields :Fields
+	interfaces ?:Interfaces
+	name :string
 }) {
 	//log.debug(`addObjectType({ name: ${name} })`);
 	if(this.uniqueNames[name]) {
@@ -85,6 +124,7 @@ function addObjectType({
 	this.objectTypes[name] = {
 		interfaces,
 		type: this.schemaGenerator.createObjectType({
+			description,
 			fields,
 			interfaces,
 			name
@@ -93,7 +133,7 @@ function addObjectType({
 	return this.objectTypes[name].type;
 }
 
-function getObjectType(name) {
+function getObjectType(name :string) {
 	return this.objectTypes[name].type;
 }
 
@@ -101,7 +141,11 @@ function getObjectType(name) {
 function addUnionType({
 	name,
 	typeResolver,
-	types = []
+	types
+} :{
+	name :string
+	typeResolver :TypeResolver
+	types :Types
 }) {
 	//log.debug(`addUnionType({ name: ${name} })`);
 	if(this.uniqueNames[name]) {
@@ -120,7 +164,7 @@ function addUnionType({
 	return this.unionTypes[name].type;
 }
 
-function getUnionType(name) {
+function getUnionType(name :string) {
 	if (!hasOwnProperty(this.unionTypes, name)) { // true also when property is set to undefined
 		if (this.uniqueNames[name]) {
 			throw new Error(`name:${name} is not an unionType! but ${this.uniqueNames[name]}`);
@@ -136,9 +180,15 @@ function getUnionType(name) {
 
 
 function addInterfaceType({
+	description,
 	fields,
 	name,
 	typeResolver
+} : {
+	description ?:string
+	fields :Fields
+	name :string
+	typeResolver :TypeResolver
 }) {
 	if(this.uniqueNames[name]) {
 		throw new Error(`Name ${name} already used as ${this.uniqueNames[name]}!`);
@@ -147,6 +197,7 @@ function addInterfaceType({
 	this.interfaceTypes[name] = {
 		fields,
 		type: this.schemaGenerator.createInterfaceType({
+			description,
 			fields,
 			name,
 			typeResolver
@@ -156,24 +207,31 @@ function addInterfaceType({
 	return this.interfaceTypes[name].type;
 }
 
-function getInterfaceType(name) {
+function getInterfaceType(name :string) {
 	return this.interfaceTypes[name].type;
 }
 
-function getInterfaceTypeFields(name) {
+function getInterfaceTypeFields(name :string) {
 	return this.interfaceTypes[name].fields;
 }
 
-function getInterfaceTypeObject(name) {
+function getInterfaceTypeObject(name :string) {
 	return this.interfaceTypes[name];
 }
 
 
-function addQueryField({
+function addQueryField<
+	Env extends AnyObject = AnyObject
+>({
 	args = {},
 	name,
 	resolve,// = () => {},
 	type
+} : {
+	args ?:AnyObject
+	name :string
+	resolve :FieldResolver<Env>
+	type :GraphQLObjectType
 }) {
 	if(this.queryFields[name]) {
 		throw new Error(`Name ${name} already added!`);
@@ -200,7 +258,7 @@ function buildSchema() {
 	*/
 	const objectTypesWithInterfaces = [];
 	const objectTypeNames = Object.keys(this.objectTypes);
-	for (var i = 0; i < objectTypeNames.length; i++) {
+	for (let i = 0; i < objectTypeNames.length; i++) {
 		const objectTypeName = objectTypeNames[i];
 		if (
 			this.objectTypes[objectTypeName].interfaces
