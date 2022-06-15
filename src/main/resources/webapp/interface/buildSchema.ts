@@ -65,7 +65,7 @@ export function buildSchema({
 	const inputTypeFilters = glue.getInputType(GQL_INPUT_TYPE_FILTERS);
 	const inputTypeHighlight = glue.getInputType(GQL_INPUT_TYPE_HIGHLIGHT);
 
-	glue.addQueryField({
+	glue.addQueryField<SearchConnectionResolverEnv>({
 		args: {
 			after: GraphQLString,
 			aggregations: list(inputTypeAggregation),
@@ -75,7 +75,7 @@ export function buildSchema({
 			searchString: GraphQLString
 		},
 		name: 'getSearchConnection',
-		resolve(env :SearchConnectionResolverEnv) {
+		resolve(env) {
 			//log.debug(`env:${toStr({env})}`);
 			const {
 				after,// = encodeCursor('0'), // encoded representation of start
@@ -108,7 +108,7 @@ export function buildSchema({
 		type: glue.getObjectType(GQL_OBJECT_TYPE_INTERFACE_SEARCH_CONNECTION)
 	});
 
-	glue.addQueryField({
+	glue.addQueryField<SearchResolverEnv>({
 		args: {
 			aggregations: list(inputTypeAggregation),
 			count: GraphQLInt,
@@ -118,7 +118,7 @@ export function buildSchema({
 			start: GraphQLInt
 		},
 		name: 'search',
-		resolve: (env :SearchResolverEnv) => searchResolver(env),
+		resolve: (env) => searchResolver(env),
 		type: glue.getObjectType(GQL_OBJECT_TYPE_INTERFACE_SEARCH)
 	});
 

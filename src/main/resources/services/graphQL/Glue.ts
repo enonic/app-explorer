@@ -18,10 +18,10 @@ type InterfaceType = AnyObject;
 type ObjectType = AnyObject;
 type ScalarType = AnyObject;
 
-type FieldResolver = <
+type FieldResolver<
 	Env extends AnyObject = AnyObject,
 	ResultGraph = unknown
->(env :Env) => ResultGraph
+> = (env :Env) => ResultGraph
 
 type TypeResolver = () => ObjectType
 
