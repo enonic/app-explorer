@@ -21,8 +21,7 @@ function collectionArrayToNamesObj(collections :QueryCollectionsHits) {
 	) as {[collectionName :string] :true};
 }
 
-
-function collectorConfigFromInitiaValues(initialValues :CollectionFormValues) :AnyObject|undefined {
+function getCollectorConfigFromInitiaValues(initialValues :CollectionFormValues) :AnyObject|undefined {
 	if (!initialValues.collector) {
 		return undefined;
 	}
@@ -36,6 +35,22 @@ function collectorConfigFromInitiaValues(initialValues :CollectionFormValues) :A
 	}
 
 	return {};
+}
+
+function getCollectorNameFromInitiaValues(initialValues :CollectionFormValues) :string|undefined {
+	return (initialValues.collector && initialValues.collector.name)
+		? initialValues.collector.name
+		: initialValues._id
+			? '_none'
+			: undefined;
+}
+
+function getDocumentTypeIdFromInitiaValues(initialValues :CollectionFormValues) :string|undefined {
+	return initialValues.documentTypeId
+		? initialValues.documentTypeId
+		: initialValues._id
+			? '_none'
+			: undefined;
 }
 
 
@@ -54,12 +69,11 @@ export function useCollectionState({
 	// State
 	//──────────────────────────────────────────────────────────────────────────
 	const collectorComponentRef = React.useRef<CollectorComponentImperativeHandle>(null);
-	const [initialCollectorConfig] = React.useState(collectorConfigFromInitiaValues(initialValues));
-	const [collectorConfig, setCollectorConfig] = React.useState(collectorConfigFromInitiaValues(initialValues));
-
-	const [collectorName, setCollectorName] = React.useState<string>(initialValues.collector ? initialValues.collector.name : undefined);
+	const [initialCollectorConfig] = React.useState(getCollectorConfigFromInitiaValues(initialValues));
+	const [collectorConfig, setCollectorConfig] = React.useState(getCollectorConfigFromInitiaValues(initialValues));
+	const [collectorName, setCollectorName] = React.useState<string>(getCollectorNameFromInitiaValues(initialValues));
 	const [cronArray, setCronArray] = React.useState(initialValues.cron);
-	const [documentTypeId, setDocumentTypeId] = React.useState<string>(initialValues.documentTypeId);
+	const [documentTypeId, setDocumentTypeId] = React.useState<string>(getDocumentTypeIdFromInitiaValues(initialValues));
 	const [doCollect, setDoCollect] = React.useState(initialValues.doCollect);
 	const [language, setLanguage] = React.useState(initialValues.language);
 	const [name, setName] = React.useState(initialValues._name);
@@ -223,14 +237,14 @@ export function useCollectionState({
 		if (collectorComponentRef && collectorComponentRef.current && isFunction(collectorComponentRef.current.reset)) {
 			collectorComponentRef.current.reset();
 		} else {
-			setCollectorConfig(collectorConfigFromInitiaValues(initialValues));
+			setCollectorConfig(getCollectorConfigFromInitiaValues(initialValues));
 			setCollectorConfigErrorCount(0); // This will trigger setErrorCount
 			//setErrorCount(0); // This will be called by useEffect on [collectorConfigErrorCount, nameError]
 		}
 
-		setCollectorName(initialValues.collector ? initialValues.collector.name : undefined);
+		setCollectorName(getCollectorNameFromInitiaValues(initialValues));
 		setCronArray(initialValues.cron);
-		setDocumentTypeId(initialValues.documentTypeId);
+		setDocumentTypeId(getDocumentTypeIdFromInitiaValues(initialValues));
 		setDoCollect(initialValues.doCollect);
 		setLanguage(initialValues.language);
 
@@ -277,14 +291,16 @@ export function useCollectionState({
 			doCollect,
 			language
 		};
-		if (documentTypeId && !documentTypeId.startsWith('_')) {
+		if (
+			documentTypeId
+			//&& !documentTypeId.startsWith('_') // Handled in the backend (_none and _new doesn't mean the same...)
+		) {
 			variables.documentTypeId = documentTypeId;
 		}
-		if (collectorName || collectorConfig) {
-			variables.collector = {};
-			if (collectorName) {
-				variables.collector.name = collectorName;
-			}
+		if (collectorName && collectorName !== '_none') {
+			variables.collector = {
+				name: collectorName
+			};
 			if (collectorConfig) {
 				variables.collector.configJson = JSON.stringify(collectorConfig);
 			}

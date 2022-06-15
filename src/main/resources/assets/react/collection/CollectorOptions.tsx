@@ -39,9 +39,10 @@ export function CollectorOptions({
 	siteOptions :SiteOptions
 	fields :Fields
 }) {
-	if (!collectorName) { return null; }
-
-	if (!collectorComponents[collectorName]) { return <p>Collector {collectorName} NOT found!</p>; }
+	if (!collectorName || collectorName === '_none') { return null; }
+	if (collectorComponents[collectorName]) {
+		return <p>Collector {collectorName} NOT found!</p>;
+	}
 
 	const Collector = collectorComponents[collectorName];
 

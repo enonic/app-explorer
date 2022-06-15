@@ -1,4 +1,5 @@
 import type {StrictDropdownProps} from 'semantic-ui-react';
+import {DropdownItemsWithKeys} from './index.d';
 
 
 import * as React from 'react';
@@ -22,7 +23,7 @@ export function DocumentTypeSelector({
 	documentTypeId,
 	servicesBaseUrl,
 	setDocumentTypeId,
-	placeholder = 'Please select a document type (or leave empty and a new one will automatically be created).',
+	placeholder = 'Please select a document type',
 	...rest
 } :Omit<StrictDropdownProps,'loading'|'onChange'|'options'|'value'> & {
 	documentTypeId :string
@@ -59,8 +60,28 @@ export function DocumentTypeSelector({
 		memoizedQueryDocumentTypes
 	]);
 
+	// Even though DropdownItemProps
+
+	const documentTypeOptions :DropdownItemsWithKeys<string> = [{
+		key: '_none',
+		text: 'none',
+		value: '_none'
+	},{
+		key: '_new',
+		text: 'automatically create a new one',
+		value: '_new'
+	}].concat(documentTypes.map(({
+		_id: key,
+		_name: text
+	}) => ({
+		key,
+		text,
+		value: key
+	})));
+	//console.debug('DocumentTypeSelector documentTypeOptions', documentTypeOptions);
+
 	return <>
-		<Header as='h2' dividing content='Document type'/>
+		<Header as='h2' dividing content='Default document type'/>
 		<Dropdown
 			clearable={true}
 			fluid
@@ -74,16 +95,7 @@ export function DocumentTypeSelector({
 			) => {
 				setDocumentTypeId(newDocumentTypeId as string);
 			}}
-			options={[{
-				text: 'Automatically create a new one',
-				value: '_new'
-			}].concat(documentTypes.map(({
-				_id: value,
-				_name: text
-			}) => ({
-				text,
-				value
-			})))}
+			options={documentTypeOptions}
 			value={documentTypeId}
 		/>
 	</>;
