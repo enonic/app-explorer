@@ -19,7 +19,8 @@ import {
 import {hash} from '/lib/explorer/string/hash';
 import {connect} from '/lib/explorer/repo/connect';
 
-import {generateSchemaForInterface} from './schemaWithLimitedDocumentTypesAndFieldAutocompletion/generateSchemaForInterface';
+//import {generateSchemaForInterface} from './schemaWithLimitedDocumentTypesAndFieldAutocompletion/generateSchemaForInterface';
+import {makeSchema} from './schemaWithAllDocumentTypesAndNoFieldAutocompletion/makeSchema';
 
 
 export type InterfaceRequest = Request<EmptyObject,{
@@ -148,11 +149,14 @@ export function overrideable(request :InterfaceRequest, fn = isUnauthorized) {
 	const {query, variables} = body;
 	//log.debug('query:%s', query);
 	//log.debug(`variables:${toStr(variables)}`);
-	const context = {};
+	const context = {
+		interfaceName
+	};
 	//log.debug(`context:${toStr(context)}`);
 	return {
 		contentType: RESPONSE_TYPE_JSON,
-		body: JSON.stringify(execute(generateSchemaForInterface(interfaceName), query, variables, context))
+		//body: JSON.stringify(execute(generateSchemaForInterface(interfaceName), query, variables, context))
+		body: JSON.stringify(execute(makeSchema(), query, variables, context))
 	};
 }
 
