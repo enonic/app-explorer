@@ -2,7 +2,6 @@ import type {AnyObject} from '/lib/explorer/types/index.d';
 
 
 import {hasOwnProperty} from '@enonic/js-utils';
-import {GQL_OBJECT_TYPE_QUERY} from './constants';
 
 
 /*
@@ -276,7 +275,7 @@ function buildSchema() {
 
 		//mutation:,
 		query: this.addObjectType({
-			name: GQL_OBJECT_TYPE_QUERY,
+			name: 'Query',
 			fields: this.queryFields
 		})//,
 		//subscription:

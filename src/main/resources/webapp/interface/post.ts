@@ -19,7 +19,7 @@ import {
 import {hash} from '/lib/explorer/string/hash';
 import {connect} from '/lib/explorer/repo/connect';
 
-import {generateSchemaForInterface} from './generateSchemaForInterface';
+import {generateSchemaForInterface} from './schemaWithLimitedDocumentTypesAndFieldAutocompletion/generateSchemaForInterface';
 
 
 export type InterfaceRequest = Request<EmptyObject,{

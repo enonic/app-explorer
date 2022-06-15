@@ -10,12 +10,13 @@ import {connect} from '/lib/explorer/repo/connect';
 //@ts-ignore
 import {newSchemaGenerator} from '/lib/graphql';
 
+import {getInterfaceInfo} from '../utils/getInterfaceInfo';
+import {constructGlue} from '../utils/Glue';
+
 import {addDynamicTypes} from './dynamic/addDynamicTypes';
 import {addStaticTypes} from './static/addStaticTypes';
 import {buildGlobalFieldsObj} from './buildGlobalFieldsObj';
 import {buildSchema} from './buildSchema';
-import {constructGlue} from './Glue';
-import {getInterfaceInfo} from './getInterfaceInfo';
 
 
 const schemaGenerator = newSchemaGenerator();

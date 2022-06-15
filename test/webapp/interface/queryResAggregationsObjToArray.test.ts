@@ -1,5 +1,5 @@
 import {deepStrictEqual} from 'assert';
-import {queryResAggregationsObjToArray} from '../../../src/main/resources/webapp/interface/queryResAggregationsObjToArray';
+import {queryResAggregationsObjToArray} from '../../../src/main/resources/webapp/interface/schemaWithLimitedDocumentTypesAndFieldAutocompletion/queryResAggregationsObjToArray';
 
 
 describe('webapp', () => {
