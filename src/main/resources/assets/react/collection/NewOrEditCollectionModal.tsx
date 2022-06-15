@@ -1,4 +1,3 @@
-import type {DropdownItemProps} from 'semantic-ui-react/index.d';
 import type {CollectionFormValues} from '/lib/explorer/types/index.d';
 import type {
 	ContentTypeOptions,
@@ -11,7 +10,10 @@ import type {
 	SetLicensedToFunction,
 	SetLicenseValidFunction
 } from '../index.d';
-import type {QueryCollectionsHits} from './index.d';
+import type {
+	DropdownItemsWithKeys,
+	QueryCollectionsHits
+} from './index.d';
 
 
 import * as React from 'react';
@@ -45,7 +47,7 @@ export function NewOrEditCollectionModal({
 	// Required
 	collections :QueryCollectionsHits
 	collectorComponents :CollectorComponents
-	collectorOptions :Array<DropdownItemProps>
+	collectorOptions :DropdownItemsWithKeys<string>
 	contentTypeOptions :ContentTypeOptions
 	fields :Fields
 	initialValues :CollectionFormValues
