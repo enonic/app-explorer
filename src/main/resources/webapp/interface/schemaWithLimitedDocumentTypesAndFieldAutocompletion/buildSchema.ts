@@ -5,8 +5,8 @@ import type {
 	CamelToFieldObj,
 	SearchConnectionResolverEnv,
 	SearchResolverEnv
-} from './types.d';
-import type {Glue} from './Glue';
+} from '../types.d';
+import type {Glue} from '../utils/Glue';
 
 
 import {

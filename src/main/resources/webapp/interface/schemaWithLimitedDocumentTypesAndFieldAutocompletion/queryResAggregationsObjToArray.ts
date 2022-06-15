@@ -1,6 +1,6 @@
 import type {AggregationsResponse} from '/lib/explorer/types.d';
 
-import {AggregationTypesObj} from './types.d';
+import {AggregationTypesObj} from '../types.d';
 
 import {
 	isSet//,

@@ -59,7 +59,6 @@ export const GQL_OBJECT_TYPE_INTERFACE_SEARCH_CONNECTION_EDGE = 'InterfaceSearch
 export const GQL_OBJECT_TYPE_INTERFACE_SEARCH_CONNECTION_PAGE_INFO = 'InterfaceSearchConnectionPageInfo';
 export const GQL_OBJECT_TYPE_INTERFACE_SEARCH_HIT = 'InterfaceSearchHit';
 export const GQL_OBJECT_TYPE_INTERFACE_SEARCH_HIT_HIGHLIGHT = 'InterfaceSearchHitHighlight';
-export const GQL_OBJECT_TYPE_QUERY = 'Query';
 
 
 //log.debug(`Number.MIN_SAFE_INTEGER:${Number.MIN_SAFE_INTEGER} Number.MAX_SAFE_INTEGER:${Number.MAX_SAFE_INTEGER}`); // Undefined
