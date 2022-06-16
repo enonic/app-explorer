@@ -2,11 +2,12 @@ import type {
 	AnyObject,
 	DocumentNode
 } from '/lib/explorer/types/index.d';
+import type {Highlight} from '../highlight/input/index.d';
 
 
 import {
-	getIn//,
-	//toStr
+	getIn,
+	toStr
 } from '@enonic/js-utils';
 //@ts-ignore
 import {newCache} from '/lib/cache';
@@ -33,17 +34,18 @@ import {getInterfaceInfo} from './getInterfaceInfo';
 import {makeQueryParams} from './makeQueryParams';
 import {addAggregationInput} from '../aggregations/guillotine/input/addAggregationInput';
 import {addFilterInput} from '../filters/guillotine/input/addFilterInput';
+import {addInputTypeHighlight} from '../highlight/input/addInputTypeHighlight';
 
 
-type Hit = DocumentNode & {
+type Hit = {
 	_collection :string
 	//_collector ?:string  // from FIELD_PATH_META
 	//_collectorVersion ?:string  // from FIELD_PATH_META
 	_createdTime ?:string // from FIELD_PATH_META
 	_documentType ?:string // from FIELD_PATH_META
-	//_highlight ?:Record<string,Array<string>>
+	_highlight ?:Record<string,Array<string>>
 	//_json :string
-	_json :Hit
+	_json :DocumentNode
 	_modifiedTime ?:string // from FIELD_PATH_META
 	//_language ?:string // from FIELD_PATH_META
 	_score :number
@@ -71,7 +73,8 @@ export function makeSchema() {
 			args :{ // Typescript input types
 				aggregations ?:Array<AnyObject> // TODO?
 				count ?:number
-				filters ?:Array<AnyObject>
+				filters ?:Array<AnyObject> // TODO?
+				highlight ?:Highlight
 				searchString :string
 				start ?:number
 			},
@@ -87,6 +90,7 @@ export function makeSchema() {
 				aggregations: list(addAggregationInput({glue})),
 				count: GraphQLInt,
 				filters: list(addFilterInput({glue})),
+				highlight: addInputTypeHighlight({glue}),
 				searchString: GraphQLString,
 				start: GraphQLInt
 			},
@@ -96,6 +100,7 @@ export function makeSchema() {
 					aggregations: aggregationsArg,
 					count, // ?:number
 					filters: filtersArg,
+					highlight: highlightArg,
 					searchString = '', // :string
 					start // ?:number
 				},
@@ -105,6 +110,7 @@ export function makeSchema() {
 			}) => {
 				//log.debug('aggregationsArg:%s', toStr(aggregationsArg));
 				//log.debug('filtersArg:%s', toStr(filtersArg));
+				//log.debug('highlightArg:%s', toStr(highlightArg));
 				//log.debug('interfaceName:%s searchString:%s', interfaceName, searchString);
 
 				const {
@@ -128,6 +134,7 @@ export function makeSchema() {
 					count,
 					fields,
 					filtersArg,
+					highlightArg,
 					searchString,
 					start,
 					stopWords
@@ -136,7 +143,7 @@ export function makeSchema() {
 
 				//@ts-ignore filters type supports array too
 				const queryRes = multiRepoReadConnection.query(queryParams);
-				//log.debug('queryRes:%s', toStr(queryRes));
+				log.debug('queryRes:%s', toStr(queryRes));
 				//log.debug('queryRes.aggregations:%s', toStr(queryRes.aggregations));
 
 				const rv = {
@@ -144,7 +151,7 @@ export function makeSchema() {
 					count: queryRes.count,
 					hits: queryRes.hits.map(({
 						branch,
-						//highlight, // TODO
+						highlight,
 						id,
 						repoId,
 						score
@@ -157,16 +164,21 @@ export function makeSchema() {
 						}).get<DocumentNode>(id);
 						//log.debug('collectionNode:%s', toStr(collectionNode));
 
-						const washedNode = washDocumentNode(collectionNode) as Hit;
-						washedNode._collection = collectionName;
-						washedNode._createdTime = getIn(collectionNode, [FIELD_PATH_META, 'createdTime'], undefined);
-						washedNode._documentType = getIn(collectionNode, [FIELD_PATH_META, 'documentType'], undefined);
-						washedNode._json = JSON.parse(JSON.stringify(washedNode)) as Hit; // deref to avoid circular reference
-						washedNode._modifiedTime = getIn(collectionNode, [FIELD_PATH_META, 'modifiedTime'], undefined);
-						washedNode._score = score;
+						const washedNode = washDocumentNode(collectionNode);
 						//log.debug('washedNode:%s', toStr(washedNode));
 
-						return washedNode;
+						const hit :Hit = {
+							_collection: collectionName,
+							_createdTime: getIn(collectionNode, [FIELD_PATH_META, 'createdTime'], undefined),
+							_documentType: getIn(collectionNode, [FIELD_PATH_META, 'documentType'], undefined),
+							_highlight: highlight,
+							_json: washedNode,
+							_modifiedTime: getIn(collectionNode, [FIELD_PATH_META, 'modifiedTime'], undefined),
+							_score: score
+						}
+						log.debug('hit:%s', toStr(hit));
+
+						return hit;
 					}),
 					total: queryRes.total
 				};
