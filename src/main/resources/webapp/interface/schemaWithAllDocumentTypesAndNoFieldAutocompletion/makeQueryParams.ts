@@ -2,6 +2,7 @@ import type {
 	AnyObject,
 	InterfaceField
 } from '/lib/explorer/types/index.d';
+import type {Highlight} from '../highlight/input/index.d';
 
 
 import {
@@ -23,6 +24,7 @@ import {
 	//@ts-ignore
 } from '/lib/guillotine/util/factory';
 import {makeQuery} from './makeQuery';
+import {highlightGQLArgToEnonicXPQuery} from '../highlight/input/highlightGQLArgToEnonicXPQuery';
 
 
 export function makeQueryParams({
@@ -30,6 +32,7 @@ export function makeQueryParams({
 	count,
 	fields,
 	filtersArg,
+	highlightArg,
 	searchString = '',
 	start,
 	stopWords
@@ -38,6 +41,7 @@ export function makeQueryParams({
 	count ?:number
 	fields :Array<InterfaceField>
 	filtersArg ?:Array<AnyObject>
+	highlightArg ?:Highlight
 	searchString :string
 	start ?:number
 	stopWords :Array<string>
@@ -95,6 +99,7 @@ export function makeQueryParams({
 		aggregations,
 		count,
 		filters: filtersArray ? filtersArray : staticFilter,
+		highlight: highlightArg ? highlightGQLArgToEnonicXPQuery({highlightArg}) : undefined,
 		query,
 		start
 	};
