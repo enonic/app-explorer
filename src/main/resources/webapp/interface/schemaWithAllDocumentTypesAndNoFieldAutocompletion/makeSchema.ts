@@ -3,11 +3,12 @@ import type {
 	DocumentNode
 } from '/lib/explorer/types/index.d';
 import type {Highlight} from '../highlight/input/index.d';
+import type {HighlightArray} from '../highlight/output/index.d';
 
 
 import {
-	getIn,
-	toStr
+	getIn//,
+	//toStr
 } from '@enonic/js-utils';
 //@ts-ignore
 import {newCache} from '/lib/cache';
@@ -35,6 +36,7 @@ import {makeQueryParams} from './makeQueryParams';
 import {addAggregationInput} from '../aggregations/guillotine/input/addAggregationInput';
 import {addFilterInput} from '../filters/guillotine/input/addFilterInput';
 import {addInputTypeHighlight} from '../highlight/input/addInputTypeHighlight';
+import {queryResHighlightObjToArray} from '../highlight/output/queryResHighlightObjToArray';
 
 
 type Hit = {
@@ -43,7 +45,7 @@ type Hit = {
 	//_collectorVersion ?:string  // from FIELD_PATH_META
 	_createdTime ?:string // from FIELD_PATH_META
 	_documentType ?:string // from FIELD_PATH_META
-	_highlight ?:Record<string,Array<string>>
+	_highlight ?:HighlightArray
 	//_json :string
 	_json :DocumentNode
 	_modifiedTime ?:string // from FIELD_PATH_META
@@ -143,7 +145,7 @@ export function makeSchema() {
 
 				//@ts-ignore filters type supports array too
 				const queryRes = multiRepoReadConnection.query(queryParams);
-				log.debug('queryRes:%s', toStr(queryRes));
+				//log.debug('queryRes:%s', toStr(queryRes));
 				//log.debug('queryRes.aggregations:%s', toStr(queryRes.aggregations));
 
 				const rv = {
@@ -151,7 +153,7 @@ export function makeSchema() {
 					count: queryRes.count,
 					hits: queryRes.hits.map(({
 						branch,
-						highlight,
+						highlight: highlightObj,
 						id,
 						repoId,
 						score
@@ -171,12 +173,12 @@ export function makeSchema() {
 							_collection: collectionName,
 							_createdTime: getIn(collectionNode, [FIELD_PATH_META, 'createdTime'], undefined),
 							_documentType: getIn(collectionNode, [FIELD_PATH_META, 'documentType'], undefined),
-							_highlight: highlight,
+							_highlight: queryResHighlightObjToArray({highlightObj}),
 							_json: washedNode,
 							_modifiedTime: getIn(collectionNode, [FIELD_PATH_META, 'modifiedTime'], undefined),
 							_score: score
 						}
-						log.debug('hit:%s', toStr(hit));
+						//log.debug('hit:%s', toStr(hit));
 
 						return hit;
 					}),
@@ -196,6 +198,13 @@ export function makeSchema() {
 							_createdTime: { type: GraphQLString },
 							_documentType: { type: GraphQLString },
 							_json: { type: nonNull(GraphQLJson) },
+							_highlight: { type: list(glue.addObjectType({
+								name: 'SearchResultHitHighlight',
+								fields: {
+									fieldPath: { type: GraphQLString },
+									highlights: { type: list(GraphQLString) }
+								}
+							}))},
 							_modifiedTime: { type: GraphQLString },
 							_score: { type: nonNull(GraphQLFloat) }
 						}}))
