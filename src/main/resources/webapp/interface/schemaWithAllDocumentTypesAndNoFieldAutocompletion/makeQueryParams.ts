@@ -4,7 +4,10 @@ import type {
 } from '/lib/explorer/types/index.d';
 
 
-import {addQueryFilter} from '@enonic/js-utils';
+import {
+	addQueryFilter//,
+	//toStr
+} from '@enonic/js-utils';
 import {
 	NT_DOCUMENT,
 	PRINCIPAL_EXPLORER_READ
@@ -14,8 +17,11 @@ import {hasValue} from '/lib/explorer/query/hasValue';
 import {removeStopWords} from '/lib/explorer/query/removeStopWords';
 import {wash} from '/lib/explorer/query/wash';
 import {get as getStopWordsList} from '/lib/explorer/stopWords/get';
-//@ts-ignore
-import {createAggregation} from '/lib/guillotine/util/factory';
+import {
+	createAggregation,
+	createFilters
+	//@ts-ignore
+} from '/lib/guillotine/util/factory';
 import {makeQuery} from './makeQuery';
 
 
@@ -23,7 +29,7 @@ export function makeQueryParams({
 	aggregationsArg,
 	count,
 	fields,
-	filters = {},
+	filtersArg,
 	searchString = '',
 	start,
 	stopWords
@@ -31,7 +37,7 @@ export function makeQueryParams({
 	aggregationsArg :Array<AnyObject>
 	count ?:number
 	fields :Array<InterfaceField>
-	filters :AnyObject
+	filtersArg ?:Array<AnyObject>
 	searchString :string
 	start ?:number
 	stopWords :Array<string>
@@ -42,6 +48,21 @@ export function makeQueryParams({
 			createAggregation(aggregations, aggregation);
 		});
 	}
+
+	const staticFilter = addQueryFilter({
+		filter: hasValue('_nodeType', [NT_DOCUMENT]),
+		filters: {}
+	});
+	//log.debug('staticFilter:%s', toStr(staticFilter));
+
+	let filtersArray :Array<AnyObject>;
+	if (filtersArg) {
+		filtersArray = createFilters(filtersArg);
+		//log.debug('filtersArray:%s', toStr(filtersArray));
+		filtersArray.push(staticFilter as unknown as AnyObject);
+		//log.debug('filtersArray:%s', toStr(filtersArray));
+	}
+
 	const washedSearchString = wash({string: searchString});
 	const listOfStopWords = [];
 	if (stopWords && stopWords.length) {
@@ -73,10 +94,7 @@ export function makeQueryParams({
 	return {
 		aggregations,
 		count,
-		filters: addQueryFilter({
-			filter: hasValue('_nodeType', [NT_DOCUMENT]),
-			filters
-		}),
+		filters: filtersArray ? filtersArray : staticFilter,
 		query,
 		start
 	};
