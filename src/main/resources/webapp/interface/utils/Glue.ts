@@ -59,17 +59,18 @@ function getEnumType(name :string) {
 }
 
 
-function addInputFields({
-	_name,
-	...rest
+function addInputFields<InputFields extends AnyObject = AnyObject>({
+	name,
+	fields
 } : {
-	_name :string
+	name :string
+	fields :InputFields
 }) {
-	if (this.inputFields[_name]) {
-		throw new Error(`InputFields ${_name} already added!`);
+	if (this.inputFields[name]) {
+		throw new Error(`InputFields ${name} already added!`);
 	}
-	this.inputFields[_name] = rest;
-	return this.inputFields[_name];
+	this.inputFields[name] = fields;
+	return this.inputFields[name];
 }
 
 function getInputFields(name :string) {
