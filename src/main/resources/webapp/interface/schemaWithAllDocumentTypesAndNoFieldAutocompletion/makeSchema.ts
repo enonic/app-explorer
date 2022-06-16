@@ -1,10 +1,12 @@
 import type {DocumentNode} from '/lib/explorer/types/index.d';
 
 
+import {getIn, toStr} from '@enonic/js-utils';
 //@ts-ignore
 import {newCache} from '/lib/cache';
 import {
 	COLLECTION_REPO_PREFIX,
+	FIELD_PATH_META,
 	PRINCIPAL_EXPLORER_READ
 } from '/lib/explorer/constants';
 import {connect} from '/lib/explorer/repo/connect';
@@ -24,6 +26,22 @@ import {washDocumentNode} from '../utils/washDocumentNode';
 import {getInterfaceInfo} from './getInterfaceInfo';
 import {makeQueryParams} from './makeQueryParams';
 
+
+type Hit = DocumentNode & {
+	_collection :string
+	//_collector ?:string  // from FIELD_PATH_META
+	//_collectorVersion ?:string  // from FIELD_PATH_META
+	_createdTime ?:string // from FIELD_PATH_META
+	_documentType ?:string // from FIELD_PATH_META
+	//_highlight ?:Record<string,Array<string>>
+	_json :string
+	_modifiedTime ?:string // from FIELD_PATH_META
+	//_language ?:string // from FIELD_PATH_META
+	_score :number
+	//_stemmingLanguage ?:string // from FIELD_PATH_META
+}
+
+
 const SECONDS_TO_CACHE = 10;
 
 const schemaCache = newCache({
@@ -42,22 +60,29 @@ export function makeSchema() {
 
 		glue.addQueryField<{
 			args :{
+				count ?:number
 				searchString :string
+				start ?:number
 			},
 			context: {
 				interfaceName :string
 			}
 		}, {
 			count :number
+			hits :Array<Hit>
 			total :number
 		}>({
 			args: {
-				searchString: GraphQLString
+				count :GraphQLInt,
+				searchString: GraphQLString,
+				start :GraphQLInt
 			},
 			name: 'search',
 			resolve: ({
 				args: {
-					searchString
+					count, // ?:number
+					searchString = '', // :string
+					start // ?:number
 				},
 				context: {
 					interfaceName
@@ -80,13 +105,15 @@ export function makeSchema() {
 					}))
 				});
 				const queryParams = makeQueryParams({
+					count,
 					fields,
 					filters: {}, // TODO
 					searchString,
+					start,
 					stopWords
 				});
 				const queryRes = multiRepoReadConnection.query(queryParams);
-				log.debug('queryRes:%s', queryRes);
+				//log.debug('queryRes:%s', toStr(queryRes));
 
 				const rv = {
 					count: queryRes.count,
@@ -103,19 +130,17 @@ export function makeSchema() {
 							principals: [PRINCIPAL_EXPLORER_READ],
 							repoId
 						}).get<DocumentNode>(id);
-						const washedNode = washDocumentNode(collectionNode) as DocumentNode & {
-							_collection ?:string
-							//_documentType ?:string
-							//_highlight ?:Record<string,Array<string>>
-							_json ?:string
-							_score ?:number
-						}
-						const json = JSON.stringify(washedNode);
-						/* eslint-disable no-underscore-dangle */
+						//log.debug('collectionNode:%s', toStr(collectionNode));
+
+						const washedNode = washDocumentNode(collectionNode) as Hit;
 						washedNode._collection = collectionName;
-						washedNode._json = json;
+						washedNode._createdTime = getIn(collectionNode, [FIELD_PATH_META, 'createdTime'], undefined);
+						washedNode._documentType = getIn(collectionNode, [FIELD_PATH_META, 'documentType'], undefined);
+						washedNode._json = JSON.stringify(washedNode);
+						washedNode._modifiedTime = getIn(collectionNode, [FIELD_PATH_META, 'modifiedTime'], undefined);
 						washedNode._score = score;
-						/* eslint-enable no-underscore-dangle */
+						//log.debug('washedNode:%s', toStr(washedNode));
+
 						return washedNode;
 					}),
 					total: queryRes.total
@@ -130,7 +155,10 @@ export function makeSchema() {
 						name: 'SearchResultHit',
 						fields: {
 							_collection: { type: nonNull(GraphQLString) },
-							_json: { type: GraphQLJson },
+							_createdTime: { type: GraphQLString },
+							_documentType: { type: GraphQLString },
+							_json: { type: nonNull(GraphQLJson) },
+							_modifiedTime: { type: GraphQLString },
 							_score: { type: nonNull(GraphQLFloat) }
 						}}))
 					},

@@ -174,10 +174,15 @@ module.exports = {
 			allow: [
 				'__', // Enonic XP Java Bridge
 				'__connection', // My own stupidity
-				'_id', // content-type property
 				'_branchId', // fake node property
+				'_collection', // fake node property
+				'_createdTime', // fake node property
+				'_documentType', // fake node property
+				'_id', // content-type property
 				'_indexConfig', // node property
 				'_inheritsPermissions', // node property
+				'_json', // fake node property
+				'_modifiedTime', // fake node property
 				'_name', // node property
 				'_nodeType', // node property
 				'_parentPath', // node property
