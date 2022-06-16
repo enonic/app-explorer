@@ -78,7 +78,7 @@ const SS_EXTERNALS = [
 	'/lib/galimatias',
 	'/lib/graphql',
 	'/lib/graphql-connection',
-	'/lib/guillotine',
+	/^\/lib\/guillotine/,
 	/\/lib\/http-client/,
 	/\/lib\/license/,
 	/\/lib\/router/,
