@@ -5,8 +5,8 @@ import type {
 
 
 import {
-	getIn,
-	toStr
+	getIn//,
+	//toStr
 } from '@enonic/js-utils';
 //@ts-ignore
 import {newCache} from '/lib/cache';
@@ -32,6 +32,7 @@ import {washDocumentNode} from '../utils/washDocumentNode';
 import {getInterfaceInfo} from './getInterfaceInfo';
 import {makeQueryParams} from './makeQueryParams';
 import {addAggregationInput} from '../aggregations/guillotine/input/addAggregationInput';
+import {addFilterInput} from '../filters/guillotine/input/addFilterInput';
 
 
 type Hit = DocumentNode & {
@@ -70,6 +71,7 @@ export function makeSchema() {
 			args :{ // Typescript input types
 				aggregations ?:Array<AnyObject> // TODO?
 				count ?:number
+				filters ?:Array<AnyObject>
 				searchString :string
 				start ?:number
 			},
@@ -84,6 +86,7 @@ export function makeSchema() {
 			args: { // GraphQL input types
 				aggregations: list(addAggregationInput({glue})),
 				count: GraphQLInt,
+				filters: list(addFilterInput({glue})),
 				searchString: GraphQLString,
 				start: GraphQLInt
 			},
@@ -92,6 +95,7 @@ export function makeSchema() {
 				args: {
 					aggregations: aggregationsArg,
 					count, // ?:number
+					filters: filtersArg,
 					searchString = '', // :string
 					start // ?:number
 				},
@@ -100,7 +104,9 @@ export function makeSchema() {
 				}
 			}) => {
 				//log.debug('aggregationsArg:%s', toStr(aggregationsArg));
+				//log.debug('filtersArg:%s', toStr(filtersArg));
 				//log.debug('interfaceName:%s searchString:%s', interfaceName, searchString);
+
 				const {
 					collectionNameToId,
 					fields,
@@ -116,15 +122,19 @@ export function makeSchema() {
 						principals: [PRINCIPAL_EXPLORER_READ]
 					}))
 				});
+
 				const queryParams = makeQueryParams({
 					aggregationsArg,
 					count,
 					fields,
-					filters: {}, // TODO
+					filtersArg,
 					searchString,
 					start,
 					stopWords
 				});
+				//log.debug('queryParams:%s', toStr(queryParams));
+
+				//@ts-ignore filters type supports array too
 				const queryRes = multiRepoReadConnection.query(queryParams);
 				//log.debug('queryRes:%s', toStr(queryRes));
 				//log.debug('queryRes.aggregations:%s', toStr(queryRes.aggregations));
