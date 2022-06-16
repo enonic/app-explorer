@@ -18,14 +18,18 @@ import {makeQuery} from './makeQuery';
 
 
 export function makeQueryParams({
+	count,
 	fields,
 	filters = {},
 	searchString = '',
+	start,
 	stopWords
 } :{
+	count ?:number
 	fields :Array<InterfaceField>
 	filters :AnyObject
 	searchString :string
+	start ?:number
 	stopWords :Array<string>
 }) {
 	const washedSearchString = wash({string: searchString});
@@ -57,10 +61,12 @@ export function makeQueryParams({
 		searchStringWithoutStopWords
 	});
 	return {
+		count,
 		filters: addQueryFilter({
 			filter: hasValue('_nodeType', [NT_DOCUMENT]),
 			filters
 		}),
-		query
+		query,
+		start
 	};
 }
