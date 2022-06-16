@@ -14,10 +14,13 @@ import {hasValue} from '/lib/explorer/query/hasValue';
 import {removeStopWords} from '/lib/explorer/query/removeStopWords';
 import {wash} from '/lib/explorer/query/wash';
 import {get as getStopWordsList} from '/lib/explorer/stopWords/get';
+//@ts-ignore
+import {createAggregation} from '/lib/guillotine/util/factory';
 import {makeQuery} from './makeQuery';
 
 
 export function makeQueryParams({
+	aggregationsArg,
 	count,
 	fields,
 	filters = {},
@@ -25,6 +28,7 @@ export function makeQueryParams({
 	start,
 	stopWords
 } :{
+	aggregationsArg :Array<AnyObject>
 	count ?:number
 	fields :Array<InterfaceField>
 	filters :AnyObject
@@ -32,6 +36,12 @@ export function makeQueryParams({
 	start ?:number
 	stopWords :Array<string>
 }) {
+	const aggregations = {};
+	if (aggregationsArg) {
+		aggregationsArg.forEach(aggregation => {
+			createAggregation(aggregations, aggregation);
+		});
+	}
 	const washedSearchString = wash({string: searchString});
 	const listOfStopWords = [];
 	if (stopWords && stopWords.length) {
@@ -61,6 +71,7 @@ export function makeQueryParams({
 		searchStringWithoutStopWords
 	});
 	return {
+		aggregations,
 		count,
 		filters: addQueryFilter({
 			filter: hasValue('_nodeType', [NT_DOCUMENT]),

@@ -1,7 +1,13 @@
-import type {DocumentNode} from '/lib/explorer/types/index.d';
+import type {
+	AnyObject,
+	DocumentNode
+} from '/lib/explorer/types/index.d';
 
 
-import {getIn, toStr} from '@enonic/js-utils';
+import {
+	getIn,
+	toStr
+} from '@enonic/js-utils';
 //@ts-ignore
 import {newCache} from '/lib/cache';
 import {
@@ -25,6 +31,7 @@ import {constructGlue} from '../utils/Glue';
 import {washDocumentNode} from '../utils/washDocumentNode';
 import {getInterfaceInfo} from './getInterfaceInfo';
 import {makeQueryParams} from './makeQueryParams';
+import {addAggregationInput} from '../aggregations/guillotine/input/addAggregationInput';
 
 
 type Hit = DocumentNode & {
@@ -34,7 +41,8 @@ type Hit = DocumentNode & {
 	_createdTime ?:string // from FIELD_PATH_META
 	_documentType ?:string // from FIELD_PATH_META
 	//_highlight ?:Record<string,Array<string>>
-	_json :string
+	//_json :string
+	_json :Hit
 	_modifiedTime ?:string // from FIELD_PATH_META
 	//_language ?:string // from FIELD_PATH_META
 	_score :number
@@ -54,12 +62,13 @@ const schemaGenerator = newSchemaGenerator();
 
 export function makeSchema() {
 	return schemaCache.get('static-key', () => {
-		log.debug('caching a new schema for %s seconds', SECONDS_TO_CACHE);
+		//log.debug('caching a new schema for %s seconds', SECONDS_TO_CACHE);
 
 		const glue = constructGlue({schemaGenerator});
 
 		glue.addQueryField<{
-			args :{
+			args :{ // Typescript input types
+				aggregations ?:Array<AnyObject> // TODO?
 				count ?:number
 				searchString :string
 				start ?:number
@@ -67,19 +76,21 @@ export function makeSchema() {
 			context: {
 				interfaceName :string
 			}
-		}, {
+		}, { // Typescript return types
 			count :number
 			hits :Array<Hit>
 			total :number
 		}>({
-			args: {
-				count :GraphQLInt,
+			args: { // GraphQL input types
+				aggregations: list(addAggregationInput({glue})),
+				count: GraphQLInt,
 				searchString: GraphQLString,
-				start :GraphQLInt
+				start: GraphQLInt
 			},
 			name: 'search',
 			resolve: ({
 				args: {
+					aggregations: aggregationsArg,
 					count, // ?:number
 					searchString = '', // :string
 					start // ?:number
@@ -88,6 +99,7 @@ export function makeSchema() {
 					interfaceName
 				}
 			}) => {
+				//log.debug('aggregationsArg:%s', toStr(aggregationsArg));
 				//log.debug('interfaceName:%s searchString:%s', interfaceName, searchString);
 				const {
 					collectionNameToId,
@@ -105,6 +117,7 @@ export function makeSchema() {
 					}))
 				});
 				const queryParams = makeQueryParams({
+					aggregationsArg,
 					count,
 					fields,
 					filters: {}, // TODO
@@ -114,8 +127,10 @@ export function makeSchema() {
 				});
 				const queryRes = multiRepoReadConnection.query(queryParams);
 				//log.debug('queryRes:%s', toStr(queryRes));
+				//log.debug('queryRes.aggregations:%s', toStr(queryRes.aggregations));
 
 				const rv = {
+					aggregationsAsJson: queryRes.aggregations, // GraphQL automatically converts to JSON
 					count: queryRes.count,
 					hits: queryRes.hits.map(({
 						branch,
@@ -136,7 +151,7 @@ export function makeSchema() {
 						washedNode._collection = collectionName;
 						washedNode._createdTime = getIn(collectionNode, [FIELD_PATH_META, 'createdTime'], undefined);
 						washedNode._documentType = getIn(collectionNode, [FIELD_PATH_META, 'documentType'], undefined);
-						washedNode._json = JSON.stringify(washedNode);
+						washedNode._json = JSON.parse(JSON.stringify(washedNode)) as Hit; // deref to avoid circular reference
 						washedNode._modifiedTime = getIn(collectionNode, [FIELD_PATH_META, 'modifiedTime'], undefined);
 						washedNode._score = score;
 						//log.debug('washedNode:%s', toStr(washedNode));
@@ -150,6 +165,7 @@ export function makeSchema() {
 			type: glue.addObjectType({
 				name: 'SearchResult',
 				fields: {
+					aggregationsAsJson: { type: GraphQLJson },
 					count: { type: nonNull(GraphQLInt) },
 					hits: { type: list(glue.addObjectType({
 						name: 'SearchResultHit',
