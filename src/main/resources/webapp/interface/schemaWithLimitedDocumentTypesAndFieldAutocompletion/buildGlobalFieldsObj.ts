@@ -8,7 +8,7 @@ import {
 	//toStr
 } from '@enonic/js-utils';
 
-import {VALUE_TYPE_JSON} from './constants';
+import {VALUE_TYPE_JSON} from '../constants';
 
 
 export function buildGlobalFieldsObj({
