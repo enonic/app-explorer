@@ -40,7 +40,7 @@ export function CollectorOptions({
 	fields :Fields
 }) {
 	if (!collectorName || collectorName === '_none') { return null; }
-	if (collectorComponents[collectorName]) {
+	if (!collectorComponents[collectorName]) {
 		return <p>Collector {collectorName} NOT found!</p>;
 	}
 
