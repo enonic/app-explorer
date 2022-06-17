@@ -20,7 +20,9 @@ import {multiConnect} from '/lib/explorer/repo/multiConnect';
 import {washDocumentNode} from '../utils/washDocumentNode';
 import {getInterfaceInfo} from './getInterfaceInfo';
 import {makeQueryParams} from './makeQueryParams';
-import {queryResHighlightObjToArray} from '../highlight/output/queryResHighlightObjToArray';
+/*import {
+	queryResHighlightObjToArray
+} from '../highlight/output/queryResHighlightObjToArray';*/
 
 
 export function searchResolver({
@@ -36,10 +38,10 @@ export function searchResolver({
 		interfaceName
 	}
 } :SearchResolverEnv) :SearchResolverReturnType {
-	//log.debug('aggregationsArg:%s', toStr(aggregationsArg));
-	//log.debug('filtersArg:%s', toStr(filtersArg));
-	//log.debug('highlightArg:%s', toStr(highlightArg));
-	//log.debug('interfaceName:%s searchString:%s', interfaceName, searchString);
+	//log.debug('searchResolver aggregationsArg:%s', toStr(aggregationsArg));
+	//log.debug('searchResolver filtersArg:%s', toStr(filtersArg));
+	//log.debug('searchResolver highlightArg:%s', toStr(highlightArg));
+	//log.debug('searchResolver interfaceName:%s searchString:%s', interfaceName, searchString);
 
 	const {
 		collectionNameToId,
@@ -67,12 +69,12 @@ export function searchResolver({
 		start,
 		stopWords
 	});
-	//log.debug('queryParams:%s', toStr(queryParams));
+	//log.debug('searchResolver queryParams:%s', toStr(queryParams));
 
 	//@ts-ignore filters type supports array too
 	const queryRes = multiRepoReadConnection.query(queryParams);
-	//log.debug('queryRes:%s', toStr(queryRes));
-	//log.debug('queryRes.aggregations:%s', toStr(queryRes.aggregations));
+	//log.debug('searchResolver queryRes:%s', toStr(queryRes));
+	//log.debug('searchResolver queryRes.aggregations:%s', toStr(queryRes.aggregations));
 
 	const rv :SearchResolverReturnType = {
 		aggregationsAsJson: queryRes.aggregations, // GraphQL automatically converts to JSON
@@ -99,7 +101,7 @@ export function searchResolver({
 				_collection: collectionName,
 				_createdTime: getIn(collectionNode, [FIELD_PATH_META, 'createdTime'], undefined),
 				_documentType: getIn(collectionNode, [FIELD_PATH_META, 'documentType'], undefined),
-				_highlight: queryResHighlightObjToArray({highlightObj}),
+				_highlight: highlightObj, //queryResHighlightObjToArray({highlightObj}),
 				_json: washedNode,
 				_modifiedTime: getIn(collectionNode, [FIELD_PATH_META, 'modifiedTime'], undefined),
 				_score: score

@@ -24,7 +24,9 @@ import {
 	//@ts-ignore
 } from '/lib/guillotine/util/factory';
 import {makeQuery} from './makeQuery';
-import {highlightGQLArgToEnonicXPQuery} from '../highlight/input/highlightGQLArgToEnonicXPQuery';
+import {
+	highlightGQLArgToEnonicXPQuery
+} from '../highlight/input/highlightGQLArgToEnonicXPQuery';
 
 
 export function makeQueryParams({
@@ -46,6 +48,8 @@ export function makeQueryParams({
 	start ?:number
 	stopWords :Array<string>
 }) {
+	//log.debug('makeQueryParams highlightArg:%s', toStr(highlightArg));
+
 	const aggregations = {};
 	if (aggregationsArg) {
 		aggregationsArg.forEach(aggregation => {
@@ -99,7 +103,9 @@ export function makeQueryParams({
 		aggregations,
 		count,
 		filters: filtersArray ? filtersArray : staticFilter,
-		highlight: highlightArg ? highlightGQLArgToEnonicXPQuery({highlightArg}) : undefined,
+		highlight: highlightArg
+			? highlightGQLArgToEnonicXPQuery({highlightArg})
+			: null,
 		query,
 		start
 	};
