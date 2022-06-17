@@ -21,10 +21,14 @@ import {
 	//@ts-ignore
 } from '/lib/graphql-connection';
 import {constructGlue} from '../utils/Glue';
+
 import {addAggregationInput} from '../aggregations/guillotine/input/addAggregationInput';
 import {addFilterInput} from '../filters/guillotine/input/addFilterInput';
 import {addInputTypeHighlight} from '../highlight/input/addInputTypeHighlight';
+
 import {searchResolver} from './searchResolver';
+
+import {addDocumentTypeObjectTypes} from './output/addDocumentTypeObjectTypes';
 import {addObjectTypeSearchConnection} from './output/addObjectTypeSearchConnection';
 import {addObjectTypeSearchResult} from './output/addObjectTypeSearchResult';
 
@@ -44,6 +48,14 @@ export function makeSchema() {
 		//log.debug('caching a new schema for %s seconds', SECONDS_TO_CACHE);
 
 		const glue = constructGlue({schemaGenerator});
+
+		const documentTypeObjectTypes = {}; // Defined before addDynamicInterfaceTypes, populated after
+		const camelToFieldObj = {};
+		addDocumentTypeObjectTypes({
+			camelToFieldObj, // modified within
+			documentTypeObjectTypes, // modified within
+			glue
+		});
 
 		const commonGQLInputFields = {
 			aggregations: list(addAggregationInput({glue})),

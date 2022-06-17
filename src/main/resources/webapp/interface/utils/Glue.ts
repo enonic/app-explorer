@@ -15,7 +15,7 @@ Goals:
 
 type Fields = AnyObject;
 //type EnumType = AnyObject;
-type GraphQLObjectType = unknown;
+export type GraphQLObjectType = unknown;
 type GraphQLInterfaceType = unknown;
 type GraphQLTypeReference = string;
 //type InputObjectType = AnyObject;
@@ -25,12 +25,14 @@ type FieldResolver<
 	Env extends AnyObject = AnyObject,
 	ResultGraph extends AnyObject = AnyObject
 > = (env :Env) => ResultGraph
-type TypeResolver = () => GraphQLObjectType
+type TypeResolver<Node extends AnyObject = AnyObject> = (node :Node) => GraphQLObjectType
 
 type Interfaces = Array<GraphQLInterfaceType|GraphQLTypeReference>
 type Types = Array<GraphQLObjectType|GraphQLTypeReference>
 
-
+//──────────────────────────────────────────────────────────────────────────────
+// EnumType
+//──────────────────────────────────────────────────────────────────────────────
 function addEnumType({
 	description,
 	name,
@@ -58,7 +60,9 @@ function getEnumType(name :string) {
 	return this.enumTypes[name];
 }
 
-
+//──────────────────────────────────────────────────────────────────────────────
+// InputFields
+//──────────────────────────────────────────────────────────────────────────────
 function addInputFields<InputFields extends AnyObject = AnyObject>({
 	name,
 	fields
@@ -77,7 +81,9 @@ function getInputFields(name :string) {
 	return this.inputFields[name];
 }
 
-
+//──────────────────────────────────────────────────────────────────────────────
+// InputType
+//──────────────────────────────────────────────────────────────────────────────
 function addInputType({
 	description,
 	fields,
@@ -104,7 +110,9 @@ function getInputType(name :string) {
 	return this.inputTypes[name];
 }
 
-
+//──────────────────────────────────────────────────────────────────────────────
+// ObjectType
+//──────────────────────────────────────────────────────────────────────────────
 function addObjectType({
 	description,
 	fields,
@@ -141,7 +149,32 @@ function getObjectType(name :string) {
 	return this.objectTypes[name].type;
 }
 
+//──────────────────────────────────────────────────────────────────────────────
+// OutputFields
+//──────────────────────────────────────────────────────────────────────────────
+function addOutputFields<OutputFields extends AnyObject = AnyObject>({
+	name,
+	fields
+} : {
+	name :string
+	fields :OutputFields
+}) {
+	if (this.outputFields[name]) {
+		//throw new Error(`OutputFields ${name} already added!`);
+		//log.error('OutputFields "%s" already added, returning previous', name)
+		return this.outputFields[name];
+	}
+	this.outputFields[name] = fields;
+	return this.outputFields[name];
+}
 
+function getOutputFields(name :string) {
+	return this.outputFields[name];
+}
+
+//──────────────────────────────────────────────────────────────────────────────
+// UnionType
+//──────────────────────────────────────────────────────────────────────────────
 function addUnionType({
 	name,
 	typeResolver,
@@ -182,8 +215,10 @@ function getUnionType(name :string) {
 	return this.unionTypes[name].typeResolver;
 }*/
 
-
-function addInterfaceType({
+//──────────────────────────────────────────────────────────────────────────────
+// InterfaceType
+//──────────────────────────────────────────────────────────────────────────────
+function addInterfaceType<Node extends AnyObject = AnyObject>({
 	description,
 	fields,
 	name,
@@ -192,8 +227,12 @@ function addInterfaceType({
 	description ?:string
 	fields :Fields
 	name :string
-	typeResolver :TypeResolver
+	typeResolver :TypeResolver<Node>
 }) {
+	if(this.interfaceTypes[name]) {
+		//log.debug('interfaceType "%s" already added, returning previous', name);
+		return this.interfaceTypes[name].type;
+	}
 	if(this.uniqueNames[name]) {
 		throw new Error(`Name ${name} already used as ${this.uniqueNames[name]}!`);
 	}
@@ -223,7 +262,9 @@ function getInterfaceTypeObject(name :string) {
 	return this.interfaceTypes[name];
 }
 
-
+//──────────────────────────────────────────────────────────────────────────────
+// QueryField
+//──────────────────────────────────────────────────────────────────────────────
 function addQueryField<
 	Env extends AnyObject = AnyObject,
 	ResultGraph extends AnyObject = AnyObject
@@ -303,6 +344,7 @@ export function constructGlue({
 		addInputType, // function
 		addInterfaceType, // function
 		addObjectType, // function
+		addOutputFields, // function
 		addQueryField, // function
 		addUnionType, // function
 		buildSchema, // function
@@ -314,12 +356,14 @@ export function constructGlue({
 		getInterfaceTypeFields, // function
 		getInterfaceTypeObject, // function
 		getObjectType, // function
+		getOutputFields, // function
 		getUnionType, // function
 		//getUnionTypeResolver, // function
 		inputFields: {},
 		inputTypes: {},
 		interfaceTypes: {},
 		objectTypes: {},
+		outputFields: {},
 		queryFields: {},
 		schemaGenerator,
 		unionTypes: {},

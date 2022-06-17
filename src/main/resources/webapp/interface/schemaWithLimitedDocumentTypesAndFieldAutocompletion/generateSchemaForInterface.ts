@@ -1,4 +1,3 @@
-import 'reflect-metadata'; // Must be imported only once per WebPack Bundle (Required by setIn)
 /*import {
 	//VALUE_TYPE_STRING,
 	toStr

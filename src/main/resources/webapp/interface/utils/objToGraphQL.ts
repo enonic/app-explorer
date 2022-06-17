@@ -1,5 +1,6 @@
 import {
 	camelize,
+	toStr,
 	ucFirst
 } from '@enonic/js-utils';
 import traverse from 'traverse';
@@ -18,6 +19,7 @@ export function objToGraphQL({
 	glue,
 	obj
 }) {
+	log.debug('objToGraphQL documentTypeName:%s obj:%s', documentTypeName, toStr(obj));
 	return traverse(obj).map(function(value) { // Fat arrow destroys this
 		//log.debug(`this:${toStr(this)}`); // JSON.stringify got a cyclic data structure
 		//log.debug(`key:${toStr(this.key)} value:${toStr(value)} isLeaf:${toStr(this.isLeaf)}`);
@@ -25,11 +27,13 @@ export function objToGraphQL({
 		//log.debug(`this.level:${toStr(this.level)} this.key:${toStr(this.key)} this.path:${toStr(this.path)} this.node:${toStr(this.node)} value:${toStr(value)}`);
 		if (this.notRoot) {
 			if (this.notLeaf) {
+				log.debug('objToGraphQL value:%s', value);
 				const {
 					_max = 0,
 					_min = 0,
 					_valueType
 				} = value;
+				log.debug('objToGraphQL _max:%s _min:%s _valueType:%s', _max, _min, _valueType);
 				if (_valueType) {
 					let type = valueTypeToGraphQLType(_valueType);
 					if (_min > 0) {
