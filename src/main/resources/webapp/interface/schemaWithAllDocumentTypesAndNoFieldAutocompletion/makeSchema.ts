@@ -1,25 +1,32 @@
-import type {AnyObject} from '/lib/explorer/types/index.d';
-import type {Highlight} from '../highlight/input/index.d';
-import type {Hit} from './searchResolver';
+import type {
+	SearchConnectionResolverEnv,
+	SearchResolverEnv,
+	SearchResolverReturnType
+} from './index.d';
 
 
+//import {toStr} from '@enonic/js-utils';
 //@ts-ignore
 import {newCache} from '/lib/cache';
 import {
-	Json as GraphQLJson,
-	GraphQLFloat,
 	GraphQLInt,
 	GraphQLString,
 	newSchemaGenerator,
-	nonNull,
 	list
 	//@ts-ignore
 } from '/lib/graphql';
+import {
+	decodeCursor//,
+	//encodeCursor // Just use to generate after for testing
+	//@ts-ignore
+} from '/lib/graphql-connection';
 import {constructGlue} from '../utils/Glue';
 import {addAggregationInput} from '../aggregations/guillotine/input/addAggregationInput';
 import {addFilterInput} from '../filters/guillotine/input/addFilterInput';
 import {addInputTypeHighlight} from '../highlight/input/addInputTypeHighlight';
 import {searchResolver} from './searchResolver';
+import {addObjectTypeSearchConnection} from './output/addObjectTypeSearchConnection';
+import {addObjectTypeSearchResult} from './output/addObjectTypeSearchResult';
 
 
 const SECONDS_TO_CACHE = 10;
@@ -38,59 +45,64 @@ export function makeSchema() {
 
 		const glue = constructGlue({schemaGenerator});
 
-		glue.addQueryField<{
-			args :{ // Typescript input types
-				aggregations ?:Array<AnyObject> // TODO?
-				count ?:number
-				filters ?:Array<AnyObject> // TODO?
-				highlight ?:Highlight
-				searchString :string
-				start ?:number
+		const commonGQLInputFields = {
+			aggregations: list(addAggregationInput({glue})),
+			filters: list(addFilterInput({glue})),
+			highlight: addInputTypeHighlight({glue}),
+			searchString: GraphQLString,
+		}
+
+		glue.addQueryField<SearchConnectionResolverEnv, SearchResolverReturnType>({
+			args: {
+				...commonGQLInputFields,
+				after: GraphQLString,
+				first: GraphQLInt,
 			},
-			context: {
-				interfaceName :string
-			}
-		}, { // Typescript return types
-			count :number
-			hits :Array<Hit>
-			total :number
-		}>({
+			name: 'getSearchConnection',
+			resolve(env) {
+				//log.debug(`env:${toStr({env})}`);
+				const {
+					after,// = encodeCursor('0'), // encoded representation of start
+					aggregations,
+					filters,
+					first = 10, // count
+					highlight,
+					searchString
+				} = env.args;
+				//log.debug('after:%s', toStr(after));
+				//log.debug('first:%s', toStr(first));
+				//log.debug("encodeCursor('0'):%s", toStr(encodeCursor('0'))); // MA==
+				//log.debug("encodeCursor('1'):%s", toStr(encodeCursor('1'))); // MQ==
+				//log.debug("encodeCursor('2'):%s", toStr(encodeCursor('2'))); // Mg==
+
+				const start = after ? parseInt(decodeCursor(after)) + 1 : 0;
+				//log.debug('start:%s', toStr(start));
+
+				const res = searchResolver({
+					args: {
+						aggregations,
+						count: first,
+						filters,
+						highlight,
+						searchString,
+						start
+					},
+					context: env.context
+				});
+				return res;
+			},
+			type: addObjectTypeSearchConnection({glue})
+		});
+
+		glue.addQueryField<SearchResolverEnv, SearchResolverReturnType>({
 			args: { // GraphQL input types
-				aggregations: list(addAggregationInput({glue})),
+				...commonGQLInputFields,
 				count: GraphQLInt,
-				filters: list(addFilterInput({glue})),
-				highlight: addInputTypeHighlight({glue}),
-				searchString: GraphQLString,
 				start: GraphQLInt
 			},
 			name: 'search',
 			resolve: (env) => searchResolver(env),
-			type: glue.addObjectType({
-				name: 'SearchResult',
-				fields: {
-					aggregationsAsJson: { type: GraphQLJson },
-					count: { type: nonNull(GraphQLInt) },
-					hits: { type: list(glue.addObjectType({
-						name: 'SearchResultHit',
-						fields: {
-							_collection: { type: nonNull(GraphQLString) },
-							_createdTime: { type: GraphQLString },
-							_documentType: { type: GraphQLString },
-							_json: { type: nonNull(GraphQLJson) },
-							_highlight: { type: list(glue.addObjectType({
-								name: 'SearchResultHitHighlight',
-								fields: {
-									fieldPath: { type: GraphQLString },
-									highlights: { type: list(GraphQLString) }
-								}
-							}))},
-							_modifiedTime: { type: GraphQLString },
-							_score: { type: nonNull(GraphQLFloat) }
-						}}))
-					},
-					total: { type: nonNull(GraphQLInt) }
-				}
-			})
+			type: addObjectTypeSearchResult({glue})
 		}); // addQueryField search
 
 		return glue.buildSchema();

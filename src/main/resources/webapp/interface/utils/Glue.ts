@@ -117,6 +117,10 @@ function addObjectType({
 	name :string
 }) {
 	//log.debug('Glue addObjectType({ name: %s })', name);
+	if(this.objectTypes[name]) {
+		//log.debug('objectType "%s" already added, returning previous', name);
+		return this.objectTypes[name].type;
+	}
 	if(this.uniqueNames[name]) {
 		throw new Error(`Name ${name} already used as ${this.uniqueNames[name]}!`);
 	}
