@@ -65,6 +65,3 @@ export const GQL_OBJECT_TYPE_INTERFACE_SEARCH_HIT_HIGHLIGHT = 'InterfaceSearchHi
 //log.debug(`Number.MIN_VALUE:${Number.MIN_VALUE} Number.MAX_VALUE:${Number.MAX_VALUE}`); // Number.MIN_VALUE:5e-324 Number.MAX_VALUE:1.7976931348623157e+308
 export const JAVA_MIN_SAFE_INT = -2147483648;
 export const JAVA_MAX_SAFE_INT =  2147483647;
-
-
-export const VALUE_TYPE_JSON = 'JSON';

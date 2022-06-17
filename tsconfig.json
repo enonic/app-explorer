@@ -77,7 +77,8 @@
 			"jsuri",
 			"mocha",
 			"node",
-			"react"
+			"react",
+			"traverse"
 		]
 	},
 	"exclude": [

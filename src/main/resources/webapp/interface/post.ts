@@ -5,6 +5,7 @@ import type {
 } from '../../types';
 
 
+import 'reflect-metadata'; // Must be imported only once per WebPack Bundle (Required by setIn)
 import {
 	RESPONSE_TYPE_JSON//,
 	//toStr

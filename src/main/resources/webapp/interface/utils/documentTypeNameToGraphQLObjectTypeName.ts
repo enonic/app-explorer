@@ -4,6 +4,6 @@ import {
 } from '@enonic/js-utils';
 
 
-export function documentTypeNameToGraphQLObjectTypeName(documentTypeName) {
+export function documentTypeNameToGraphQLObjectTypeName(documentTypeName :string) {
 	return `DocumentType_${ucFirst(documentTypeName)}`;
 }

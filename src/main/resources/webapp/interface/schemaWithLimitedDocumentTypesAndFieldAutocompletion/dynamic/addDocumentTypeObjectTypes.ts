@@ -10,9 +10,9 @@ import {
 	GQL_INTERFACE_TYPE_DOCUMENT,
 	GQL_OBJECT_TYPE_INTERFACE_SEARCH_HIT_HIGHLIGHT
 } from '../constants';
-import {documentTypeNameToGraphQLObjectTypeName} from './documentTypeNameToGraphQLObjectTypeName';
-import {mergeFields} from './mergeFields';
-import {objToGraphQL} from './objToGraphQL';
+import {documentTypeNameToGraphQLObjectTypeName} from '../../utils/documentTypeNameToGraphQLObjectTypeName';
+import {mergeFields} from '../../utils/mergeFields';
+import {objToGraphQL} from '../../utils/objToGraphQL';
 
 
 export function addDocumentTypeObjectTypes({
