@@ -65,25 +65,49 @@ export function useCollectionState({
 	initialValues :CollectionFormValues
 	servicesBaseUrl :string
 }) {
-	//──────────────────────────────────────────────────────────────────────────
-	// State
-	//──────────────────────────────────────────────────────────────────────────
 	const collectorComponentRef = React.useRef<CollectorComponentImperativeHandle>(null);
-	const [initialCollectorConfig] = React.useState(getCollectorConfigFromInitiaValues(initialValues));
-	const [collectorConfig, setCollectorConfig] = React.useState(getCollectorConfigFromInitiaValues(initialValues));
-	const [collectorName, setCollectorName] = React.useState<string>(getCollectorNameFromInitiaValues(initialValues));
+
+	//──────────────────────────────────────────────────────────────────────────
+	// "Derived" state
+	//──────────────────────────────────────────────────────────────────────────
+	const [collectorName, setCollectorName] = React.useState<string>(initialValues.collector ? initialValues.collector.name : undefined);
 	const [cronArray, setCronArray] = React.useState(initialValues.cron);
 	const [documentTypeId, setDocumentTypeId] = React.useState<string>(getDocumentTypeIdFromInitiaValues(initialValues));
 	const [doCollect, setDoCollect] = React.useState(initialValues.doCollect);
 	const [language, setLanguage] = React.useState(initialValues.language);
 	const [name, setName] = React.useState(initialValues._name);
 
+	//──────────────────────────────────────────────────────────────────────────
+	// Internal state
+	//──────────────────────────────────────────────────────────────────────────
 	const [isStateChanged, setIsStateChanged] = React.useState(false);
 	const [nameError, setNameError] = React.useState<false|string>(false);
 	const [/*nameVisited*/, setNameVisited] = React.useState(false);
-	const [collectorConfigErrorCount, setCollectorConfigErrorCount] = React.useState(0);
-	const [errorCount, setErrorCount] = React.useState(0);
 	const [loading, setLoading] = React.useState(false);
+	const [errorCount, setErrorCount] = React.useState(0);
+
+	//──────────────────────────────────────────────────────────────────────────
+	// State passed to and sometimes affected by Collector Component
+	//──────────────────────────────────────────────────────────────────────────
+	const [initialCollectorConfig] = React.useState(getCollectorConfigFromInitiaValues(initialValues));
+	const [collectorConfig, setCollectorConfig] = React.useState(getCollectorConfigFromInitiaValues(initialValues));
+	const [collectorConfigErrorCount, setCollectorConfigErrorCount] = React.useState(0);
+
+	//──────────────────────────────────────────────────────────────────────────
+	// Debug
+	//──────────────────────────────────────────────────────────────────────────
+	/*
+	useUpdateEffect(() => {console.debug('collectorConfig changed', collectorConfig);}, [collectorConfig]);
+	useUpdateEffect(() => {console.debug('collectorName changed', collectorName);}, [collectorName]);
+	useUpdateEffect(() => {console.debug('cronArray changed', cronArray);}, [cronArray]);
+	useUpdateEffect(() => {console.debug('doCollect changed', doCollect);}, [doCollect]);
+	useUpdateEffect(() => {console.debug('documentTypeId changed', documentTypeId);}, [documentTypeId]);
+	useUpdateEffect(() => {console.debug('language changed', language);}, [language]);
+	useUpdateEffect(() => {console.debug('name changed', name);}, [name]);
+
+	// TODO: Why does this change!!! Seems to happen if props deconstruction contain default values.
+	useUpdateEffect(() => {console.debug('initialValues changed', initialValues);}, [initialValues]);
+	*/
 
 	//──────────────────────────────────────────────────────────────────────────
 	// Callbacks, should only depend on props, not state
@@ -151,69 +175,21 @@ export function useCollectionState({
 	}
 
 	useUpdateEffect(() => {
-		//console.debug('collectorConfig changed', collectorConfig);
 		const newIsStateChanged = checkIsChanged();
 		if (newIsStateChanged !== isStateChanged) {
 			setIsStateChanged(newIsStateChanged);
 		}
-	}, [collectorConfig]);
-
-	useUpdateEffect(() => {
-		//console.debug('collectorName changed', collectorName);
-		const newIsStateChanged = checkIsChanged();
-		if (newIsStateChanged !== isStateChanged) {
-			setIsStateChanged(newIsStateChanged);
-		}
-	}, [collectorName]);
-
-	useUpdateEffect(() => {
-		//console.debug('cronArray changed', cronArray);
-		const newIsStateChanged = checkIsChanged();
-		if (newIsStateChanged !== isStateChanged) {
-			setIsStateChanged(newIsStateChanged);
-		}
-	}, [cronArray]);
-
-	useUpdateEffect(() => {
-		//console.debug('doCollect changed', doCollect);
-		const newIsStateChanged = checkIsChanged();
-		if (newIsStateChanged !== isStateChanged) {
-			setIsStateChanged(newIsStateChanged);
-		}
-	}, [doCollect]);
-
-	useUpdateEffect(() => {
-		//console.debug('documentTypeId changed', documentTypeId);
-		const newIsStateChanged = checkIsChanged();
-		if (newIsStateChanged !== isStateChanged) {
-			setIsStateChanged(newIsStateChanged);
-		}
-	}, [documentTypeId]);
-
-	/*useUpdateEffect(() => {
-		console.debug('initialValues changed', initialValues);
 	}, [
-		initialValues // TODO: Why does this change!!! Seems to happen if props deconstruction contain default values.
-	]);*/
+		collectorConfig,
+		collectorName,
+		cronArray,
+		doCollect,
+		documentTypeId,
+		language,
+		name
+	]);
 
 	useUpdateEffect(() => {
-		//console.debug('language changed', language);
-		const newIsStateChanged = checkIsChanged();
-		if (newIsStateChanged !== isStateChanged) {
-			setIsStateChanged(newIsStateChanged);
-		}
-	}, [language]);
-
-	useUpdateEffect(() => {
-		//console.debug('name changed', name);
-		const newIsStateChanged = checkIsChanged();
-		if (newIsStateChanged !== isStateChanged) {
-			setIsStateChanged(newIsStateChanged);
-		}
-	}, [name]);
-
-	useUpdateEffect(() => {
-		//console.debug('collectorName changed', collectorName);
 		if (!collectorName) {
 			setDocumentTypeId(undefined);
 		}
