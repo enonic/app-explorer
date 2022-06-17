@@ -1,10 +1,9 @@
+import type {DocumentNode} from '/lib/explorer/types/index.d';
 import type {
-	AnyObject,
-	DocumentNode
-} from '/lib/explorer/types/index.d';
-import type {Highlight} from '../highlight/input/index.d';
-import type {HighlightArray} from '../highlight/output/index.d';
-
+	Hit,
+	SearchResolverEnv,
+	SearchResolverReturnType
+} from './index.d';
 
 
 import {
@@ -24,39 +23,6 @@ import {makeQueryParams} from './makeQueryParams';
 import {queryResHighlightObjToArray} from '../highlight/output/queryResHighlightObjToArray';
 
 
-export type GraphQLContext = {
-	interfaceName :string
-}
-
-export type SearchResolverArgs = {
-	aggregations ?:Array<AnyObject> // TODO?
-	count ?:number
-	filters ?:Array<AnyObject> // TODO?
-	highlight ?:Highlight
-	searchString :string
-	start ?:number
-}
-
-export type SearchResolverEnv = {
-	args :SearchResolverArgs
-	context :GraphQLContext
-}
-
-export type Hit = {
-	_collection :string
-	//_collector ?:string  // from FIELD_PATH_META
-	//_collectorVersion ?:string  // from FIELD_PATH_META
-	_createdTime ?:string // from FIELD_PATH_META
-	_documentType ?:string // from FIELD_PATH_META
-	_highlight ?:HighlightArray
-	//_json :string
-	_json :DocumentNode
-	_modifiedTime ?:string // from FIELD_PATH_META
-	//_language ?:string // from FIELD_PATH_META
-	_score :number
-	//_stemmingLanguage ?:string // from FIELD_PATH_META
-}
-
 export function searchResolver({
 	args: {
 		aggregations: aggregationsArg,
@@ -64,12 +30,12 @@ export function searchResolver({
 		filters: filtersArg,
 		highlight: highlightArg,
 		searchString = '', // :string
-		start // ?:number
+		start = 0
 	},
 	context: {
 		interfaceName
 	}
-} :SearchResolverEnv) {
+} :SearchResolverEnv) :SearchResolverReturnType {
 	//log.debug('aggregationsArg:%s', toStr(aggregationsArg));
 	//log.debug('filtersArg:%s', toStr(filtersArg));
 	//log.debug('highlightArg:%s', toStr(highlightArg));
@@ -108,7 +74,7 @@ export function searchResolver({
 	//log.debug('queryRes:%s', toStr(queryRes));
 	//log.debug('queryRes.aggregations:%s', toStr(queryRes.aggregations));
 
-	const rv = {
+	const rv :SearchResolverReturnType = {
 		aggregationsAsJson: queryRes.aggregations, // GraphQL automatically converts to JSON
 		count: queryRes.count,
 		hits: queryRes.hits.map(({
@@ -142,6 +108,7 @@ export function searchResolver({
 
 			return hit;
 		}),
+		start, // Used by searchConnection
 		total: queryRes.total
 	};
 	return rv
