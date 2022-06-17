@@ -3,7 +3,7 @@ import type {
 	DocumentNode
 } from '/lib/explorer/types/index.d';
 import type {Highlight} from '../highlight/input/index.d';
-import type {HighlightArray} from '../highlight/output/index.d';
+//import type {HighlightArray} from '../highlight/output/index.d';
 
 
 export type {EmptyObject} from '/lib/explorer/types/index.d';
@@ -44,7 +44,8 @@ export type Hit = {
 	//_collectorVersion ?:string  // from FIELD_PATH_META
 	_createdTime ?:string // from FIELD_PATH_META
 	_documentType ?:string // from FIELD_PATH_META
-	_highlight ?:HighlightArray
+	_highlight ?:Record<string,Array<string>>
+	//_highlight ?:HighlightArray
 	_json :DocumentNode
 	_modifiedTime ?:string // from FIELD_PATH_META
 	//_language ?:string // from FIELD_PATH_META
