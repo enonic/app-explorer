@@ -1,3 +1,4 @@
+import type {GraphQL} from '../../../index.d';
 import type {Glue} from '../../../utils/Glue';
 
 
@@ -33,7 +34,13 @@ import {addTermsAggregationInput} from './addTermsAggregationInput';
 import {addValueCountAggregationInput} from './addValueCountAggregationInput';
 
 
-export function addAggregationInput({glue} :{glue :Glue}) {
+export function addAggregationInput({
+	fieldType = GraphQLString, // What guillotine uses
+	glue
+} :{
+	fieldType ?:GraphQL.ArgsType
+	glue :Glue
+}) {
 	addDateRangeInput({glue});
 	addGeoPointInput({glue});
 	addNumberRangeInput({glue});
@@ -48,35 +55,35 @@ export function addAggregationInput({glue} :{glue :Glue}) {
 				type: GraphQLString
 			},
 			terms: {
-				type: addTermsAggregationInput({glue})
+				type: addTermsAggregationInput({fieldType, glue})
 				//type: glue.getInputType(GQL_INPUT_TYPE_AGGREGATION_TERMS)
 			},
 			stats: {
-				type: addStatsAggregationInput({glue})
+				type: addStatsAggregationInput({fieldType, glue})
 				//type: glue.getInputType(GQL_INPUT_TYPE_AGGREGATION_STATS)
 			},
 			range: {
-				type: addRangeAggregationInput({glue})
+				type: addRangeAggregationInput({fieldType, glue})
 				//type: glue.getInputType(GQL_INPUT_TYPE_AGGREGATION_RANGE)
 			},
 			dateRange: {
-				type: addDateRangeAggregationInput({glue})
+				type: addDateRangeAggregationInput({fieldType, glue})
 				//type: glue.getInputType(GQL_INPUT_TYPE_AGGREGATION_DATE_RANGE)
 			},
 			dateHistogram: {
-				type: addDateHistogramAggregationInput({glue})
+				type: addDateHistogramAggregationInput({fieldType, glue})
 				//type: glue.getInputType(GQL_INPUT_TYPE_AGGREGATION_DATE_HISTORGAM)
 			},
 			geoDistance: {
-				type: addGeoDistanceAggregationInput({glue})
+				type: addGeoDistanceAggregationInput({fieldType, glue})
 				//type: glue.getInputType(GQL_INPUT_TYPE_AGGREGATION_GEO_DISTANCE)
 			},
 			min: {
-				type: addMinAggregationInput({glue})
+				type: addMinAggregationInput({fieldType, glue})
 				//type: glue.getInputType(GQL_INPUT_TYPE_AGGREGATION_MIN)
 			},
 			max: {
-				type: addMaxAggregationInput({glue})
+				type: addMaxAggregationInput({fieldType, glue})
 				//type: glue.getInputType(GQL_INPUT_TYPE_AGGREGATION_MAX)
 			},
 			count: {

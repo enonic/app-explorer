@@ -1,7 +1,9 @@
+import type {GraphQL} from '../../index.d';
 import type {Glue} from '../../utils/Glue';
 
 
 import {
+	GraphQLString,
 	list,
 	nonNull
 	//@ts-ignore
@@ -19,7 +21,13 @@ import {addInputFieldsHighlightPropertyOptions} from './addInputFieldsHighlightP
 import {addInputTypeHighlightProperty} from './addInputTypeHighlightProperty';
 
 
-export function addInputTypeHighlight({glue} :{glue :Glue}) {
+export function addInputTypeHighlight({
+	fieldType = GraphQLString,
+	glue
+} :{
+	fieldType ?:GraphQL.ArgsType
+	glue :Glue
+}) {
 	addInputFieldsHighlightPropertyOptions({glue}); // Initializes GQL_INPUT_FIELDS_HIGHLIGHT_PROPERTY_OPTIONS
 	return glue.addInputType({
 		name: GQL_INPUT_TYPE_HIGHLIGHT,
@@ -31,8 +39,11 @@ export function addInputTypeHighlight({glue} :{glue :Glue}) {
 			},
 			//...addInputFieldsHighlightPropertyOptions({glue}),
 			...glue.getInputFields(GQL_INPUT_FIELDS_HIGHLIGHT_PROPERTY_OPTIONS),
-			properties: {
-				type: nonNull(list(addInputTypeHighlightProperty({glue})))
+			fields: {
+				type: nonNull(list(addInputTypeHighlightProperty({
+					fieldType,
+					glue
+				})))
 				//type: list(glue.getInputType(GQL_INPUT_TYPE_HIGHLIGHT_PROPERTY))
 			},
 			tagsSchema: { // Global only

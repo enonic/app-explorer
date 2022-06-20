@@ -1,4 +1,4 @@
 export type HighlightArray = Array<{
-	fieldPath :string
+	field :string
 	highlights :Array<string>
 }>

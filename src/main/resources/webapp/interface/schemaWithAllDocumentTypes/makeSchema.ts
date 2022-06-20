@@ -8,6 +8,7 @@ import type {
 //import {toStr} from '@enonic/js-utils';
 //@ts-ignore
 import {newCache} from '/lib/cache';
+import {FIELD_PATH_META} from '/lib/explorer/constants';
 import {
 	GraphQLInt,
 	GraphQLString,
@@ -51,17 +52,46 @@ export function makeSchema() {
 		const glue = constructGlue({schemaGenerator});
 
 		const documentTypeObjectTypes = {}; // Defined before addDynamicInterfaceTypes, populated after
-		const camelToFieldObj = {};
+		const camelToFieldObj :Record<string,string> = {};
 		addDocumentTypeObjectTypes({ // Does addDynamicInterfaceTypes for us :)
 			camelToFieldObj, // modified within
 			documentTypeObjectTypes, // modified within
 			glue
 		});
+		//log.debug('makeSchema camelToFieldObj:%s', toStr(camelToFieldObj));
+
+		const fieldsEnumType = glue.addEnumType({
+			name: 'Fields',
+			values: {
+				_collection: `${FIELD_PATH_META}.collection`,
+				_createdTime: `${FIELD_PATH_META}.createdTime`,
+				_documentType: `${FIELD_PATH_META}.documentType`,
+				_modifiedTime: `${FIELD_PATH_META}.modifiedTime`,
+				...camelToFieldObj, // Must be populated first!
+			}
+		});
+
+		const highlightFieldsEnumType = glue.addEnumType({
+			name: 'HighlightFields',
+			values: {
+				_alltext: '_alltext',
+				...camelToFieldObj // Must be populated first!
+			}
+		});
 
 		const commonGQLInputFields = {
-			aggregations: list(addAggregationInput({glue})),
-			filters: list(addFilterInput({glue})),
-			highlight: addInputTypeHighlight({glue}),
+			aggregations: list(addAggregationInput({
+				fieldType: fieldsEnumType,
+				glue
+			})),
+			filters: list(addFilterInput({
+				fieldType: fieldsEnumType,
+				glue
+			})),
+			highlight: addInputTypeHighlight({
+				fieldType: highlightFieldsEnumType,
+				glue
+			}),
 			searchString: GraphQLString,
 		}
 

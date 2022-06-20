@@ -1,3 +1,4 @@
+import type {GraphQL} from '../../../index.d';
 import type {Glue} from '../../../utils/Glue';
 
 
@@ -13,13 +14,19 @@ import {
 } from '../constants';
 
 
-export function addGeoDistanceAggregationInput({glue} :{glue :Glue}) {
+export function addGeoDistanceAggregationInput({
+	fieldType = GraphQLString, // What guillotine uses
+	glue
+} :{
+	fieldType ?:GraphQL.ArgsType
+	glue :Glue
+}) {
 	return glue.addInputType({
 		name: GQL_INPUT_TYPE_AGGREGATION_DATE_HISTORGAM,
 		description: 'GeoDistance aggregation input type',
 		fields: {
 			field: {
-				type: nonNull(GraphQLString)
+				type: nonNull(fieldType)
 			},
 			unit: {
 				type: GraphQLString

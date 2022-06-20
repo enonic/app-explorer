@@ -17,11 +17,11 @@ export function highlightGQLArgToEnonicXPQuery({
 	for (let i = 0; i < keys.length; i++) {
 	    const key = keys[i];
 		//log.debug('highlightGQLArgToEnonicXPQuery i:%s key:%s', i, key);
-		if (key === 'properties') {
-			for (let j = 0; j < highlightArg.properties.length; j++) {
+		if (key === 'fields') {
+			for (let j = 0; j < highlightArg.fields.length; j++) {
 				//log.debug('highlightGQLArgToEnonicXPQuery highlightArg.properties[%s]:%s', j, toStr(highlightArg.properties[j]));
-				const {fieldPath, ...rest} = highlightArg.properties[j];
-				highlight.properties[fieldPath] = rest;
+				const {field, ...rest} = highlightArg.fields[j];
+				highlight.properties[field] = rest;
 			}
 		} else {
 			highlight[key] = highlightArg[key];

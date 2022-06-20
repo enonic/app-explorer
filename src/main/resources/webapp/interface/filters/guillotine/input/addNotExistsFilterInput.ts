@@ -1,3 +1,4 @@
+import type {GraphQL} from '../../../index.d';
 import type {Glue} from '../../../utils/Glue';
 
 
@@ -9,13 +10,19 @@ import {
 import {GQL_INPUT_TYPE_FILTER_NOT_EXISTS} from '../constants';
 
 
-export function addNotExistsFilterInput({glue} :{glue :Glue}) {
+export function addNotExistsFilterInput({
+	fieldType = GraphQLString, // What guillotine uses
+	glue
+} :{
+	fieldType ?:GraphQL.ArgsType
+	glue :Glue
+}) {
 	return glue.addInputType({
 		name: GQL_INPUT_TYPE_FILTER_NOT_EXISTS,
 		description: 'NotExistsFilter input type',
 		fields: {
 			field: {
-				type: nonNull(GraphQLString)
+				type: nonNull(fieldType)
 			}
 		}
 	});
