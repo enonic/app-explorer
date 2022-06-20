@@ -1,7 +1,5 @@
-import type {
-	Glue,
-	GraphQLObjectType
-} from '../../utils/Glue';
+import type {GraphQLObjectType} from '../../utils/index.d';
+import type {Glue} from '../../utils/Glue';
 import type {Hit} from './index.d';
 
 
