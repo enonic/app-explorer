@@ -1,4 +1,12 @@
 import type {AnyObject} from '/lib/explorer/types/index.d';
+import type {
+	FieldResolver,
+	Fields,
+	GraphQLObjectType,
+	Interfaces,
+	TypeResolver,
+	Types
+} from './index.d';
 
 
 import {hasOwnProperty} from '@enonic/js-utils';
@@ -12,24 +20,6 @@ Goals:
  3. Easy access to all types
 
 */
-
-type Fields = AnyObject;
-//type EnumType = AnyObject;
-export type GraphQLObjectType = unknown;
-type GraphQLInterfaceType = unknown;
-type GraphQLTypeReference = string;
-//type InputObjectType = AnyObject;
-//type ScalarType = AnyObject;
-
-type FieldResolver<
-	Env extends AnyObject = AnyObject,
-	ResultGraph extends AnyObject = AnyObject
-> = (env :Env) => ResultGraph
-type TypeResolver<Node extends AnyObject = AnyObject> = (node :Node) => GraphQLObjectType
-
-type Interfaces = Array<GraphQLInterfaceType|GraphQLTypeReference>
-type Types = Array<GraphQLObjectType|GraphQLTypeReference>
-
 //──────────────────────────────────────────────────────────────────────────────
 // EnumType
 //──────────────────────────────────────────────────────────────────────────────
@@ -307,6 +297,7 @@ function buildSchema() {
 	const objectTypesWithInterfaces = [];
 	const objectTypeNames = Object.keys(this.objectTypes);
 	//log.debug('objectTypeNames:%s', objectTypeNames);
+
 	for (let i = 0; i < objectTypeNames.length; i++) {
 		const objectTypeName = objectTypeNames[i];
 		if (
@@ -314,7 +305,7 @@ function buildSchema() {
 			&& Array.isArray(this.objectTypes[objectTypeName].interfaces)
 			&& this.objectTypes[objectTypeName].interfaces.length
 		) {
-			log.debug('objectTypeName:%s has interfaces', objectTypeName);
+			//log.debug('Glue objectTypeName:%s has interfaces', objectTypeName);
 			objectTypesWithInterfaces.push(this.objectTypes[objectTypeName].type);
 		}
 	} // for objectTypeNames

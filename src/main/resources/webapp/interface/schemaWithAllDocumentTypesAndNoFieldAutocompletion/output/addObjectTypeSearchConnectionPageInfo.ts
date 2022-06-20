@@ -2,7 +2,7 @@ import type {Glue} from '../../utils/Glue';
 import type {
 	EmptyObject,
 	GraphQLContext
-} from '../index.d';
+} from './index.d';
 
 
 //import {toStr} from '@enonic/js-utils';

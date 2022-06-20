@@ -1,7 +1,10 @@
+import type {DocumentTypeFields} from '/lib/explorer/types/index.d';
+import type {Branch} from './index.d';
+
+
 import {
 	VALUE_TYPE_STRING,
-	camelize,
-	forceArray//,
+	camelize//,
 	//toStr
 } from '@enonic/js-utils';
 import setIn from 'set-value'; // Number.isInteger and Reflect
@@ -11,19 +14,33 @@ export function mergeFields({
 	camelToFieldObj, // modified
 	globalFieldsObj, // just read
 	properties // just read
-}) {
-	const mergedglobalFieldsObj = JSON.parse(JSON.stringify(globalFieldsObj)); // deref
+} :{
+	camelToFieldObj :Record<string, string>
+	globalFieldsObj :Record<string,{
+		_max :number
+		_min :number
+		_valueType :string
+	}>
+	properties :DocumentTypeFields
+}) :Branch {
+	const mergedglobalFieldsObj :Branch = JSON.parse(JSON.stringify(globalFieldsObj)); // deref
 	//log.debug(`documentTypeName:${toStr(documentTypeName)} mergedglobalFieldsObj:${toStr(mergedglobalFieldsObj)}`);
 
 	if (properties) {
-		forceArray(properties).forEach(({
+		properties.forEach(({
 			max = 0,
 			min = 0,
 			name,
 			valueType = VALUE_TYPE_STRING
 		}) => {
-			const camelizedFieldPath = name.split('.').map((k) => camelize(k, /[-]/g)).join('.');
+			const camelizedFieldPath = name // 'nes-ted.na-me'
+				.split('.') // ['nes-ted', 'na-me']
+				.map((k) => camelize(k, /[-]/g)) // ['nesTed', 'naMe']
+				.join('.'); // 'nesTed.naMe'
+			//log.debug('mergeFields name:%s camelizedFieldPath:%s', name, camelizedFieldPath);
+
 			setIn(mergedglobalFieldsObj, camelizedFieldPath, {
+				// These are prefixed with underscore to avoid colliding with nested PropertyKeys
 				_max: max,
 				_min: min,
 				_valueType: valueType
@@ -37,6 +54,6 @@ export function mergeFields({
 			camelToFieldObj[camelizedFieldKey] = name;
 		}); // properties.forEach
 	}
-	//log.debug(`documentTypeName:${toStr(documentTypeName)} mergedglobalFieldsObj:${toStr(mergedglobalFieldsObj)}`);
+	//log.debug('mergeFields mergedglobalFieldsObj:%s', toStr(mergedglobalFieldsObj));
 	return mergedglobalFieldsObj;
 }

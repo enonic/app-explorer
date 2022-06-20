@@ -8,6 +8,7 @@ import type {Highlight} from '../highlight/input/index.d';
 
 export type {EmptyObject} from '/lib/explorer/types/index.d';
 
+
 export type GraphQLContext = {
 	interfaceName :string
 }

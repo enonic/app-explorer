@@ -2,8 +2,11 @@ import type {
 	Glue,
 	GraphQLObjectType
 } from '../../utils/Glue';
+import type {Hit} from './index.d';
 
 
+//import {toStr} from '@enonic/js-utils';
+import {GQL_INTERFACE_TYPE_DOCUMENT} from './constants';
 import {addOutputFieldsSearchResultHit} from './addOutputFieldsSearchResultHit';
 
 
@@ -14,14 +17,14 @@ export function addInterfaceTypeDocument({
 	documentTypeObjectTypes :Record<string,GraphQLObjectType>
 	glue :Glue
 }) {
-	return glue.addInterfaceType<{
-		_documentTypeName :string
-	}>({
-		name: 'Document',
+	return glue.addInterfaceType<Hit>({
+		name: GQL_INTERFACE_TYPE_DOCUMENT,
 		fields: addOutputFieldsSearchResultHit({glue}),
-		typeResolver({_documentTypeName}) {
-			log.debug('_documentTypeName', _documentTypeName);
-			return documentTypeObjectTypes[_documentTypeName]; // eslint-disable-line no-underscore-dangle
+		typeResolver(node) {
+			//log.debug('Document InterfaceType typeResolver node:%s', toStr(node));
+			const {_documentType} = node;
+			//log.debug('_documentTypeName:%s', _documentType);
+			return documentTypeObjectTypes[_documentType]; // eslint-disable-line no-underscore-dangle
 		}
 	});
 }
