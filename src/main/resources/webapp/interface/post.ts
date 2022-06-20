@@ -20,8 +20,8 @@ import {
 import {hash} from '/lib/explorer/string/hash';
 import {connect} from '/lib/explorer/repo/connect';
 
-//import {generateSchemaForInterface} from './schemaWithLimitedDocumentTypesAndFieldAutocompletion/generateSchemaForInterface';
-import {makeSchema} from './schemaWithAllDocumentTypesAndNoFieldAutocompletion/makeSchema';
+//import {generateSchemaForInterface} from './schemaWithLimitedDocumentTypes/generateSchemaForInterface';
+import {makeSchema} from './schemaWithAllDocumentTypes/makeSchema';
 
 
 export type InterfaceRequest = Request<EmptyObject,{
