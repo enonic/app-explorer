@@ -3,7 +3,7 @@ import type {
 	EmptyObject,
 	GraphQLContext,
 	SearchResolverReturnType
-} from '../index.d';
+} from './index.d';
 
 
 //import {toStr} from '@enonic/js-utils';

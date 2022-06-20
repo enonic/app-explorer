@@ -8,7 +8,7 @@ import {
 	list
 	//@ts-ignore
 } from '/lib/graphql';
-import {addObjectTypeSearchResultHit} from './addObjectTypeSearchResultHit';
+import {GQL_INTERFACE_TYPE_DOCUMENT} from './constants';
 
 
 export function addObjectTypeSearchResult({glue} :{glue :Glue}) {
@@ -17,7 +17,8 @@ export function addObjectTypeSearchResult({glue} :{glue :Glue}) {
 		fields: {
 			aggregationsAsJson: { type: GraphQLJson },
 			count: { type: nonNull(GraphQLInt) },
-			hits: { type: list(addObjectTypeSearchResultHit({glue})) },
+			hits: { type: list(glue.getInterfaceType(GQL_INTERFACE_TYPE_DOCUMENT)) },
+			//hits: { type: list(addObjectTypeSearchResultHit({glue})) },
 			start: { type: nonNull(GraphQLInt) }, // Used in search connection
 			total: { type: nonNull(GraphQLInt) }
 		}

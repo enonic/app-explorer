@@ -2,7 +2,7 @@ import type {
 	SearchConnectionResolverEnv,
 	SearchResolverEnv,
 	SearchResolverReturnType
-} from './index.d';
+} from './output/index.d';
 
 
 //import {toStr} from '@enonic/js-utils';
@@ -22,12 +22,13 @@ import {
 } from '/lib/graphql-connection';
 import {constructGlue} from '../utils/Glue';
 
+// Input
 import {addAggregationInput} from '../aggregations/guillotine/input/addAggregationInput';
 import {addFilterInput} from '../filters/guillotine/input/addFilterInput';
 import {addInputTypeHighlight} from '../highlight/input/addInputTypeHighlight';
 
-import {searchResolver} from './searchResolver';
-
+// Output
+import {searchResolver} from './output/searchResolver';
 import {addDocumentTypeObjectTypes} from './output/addDocumentTypeObjectTypes';
 import {addObjectTypeSearchConnection} from './output/addObjectTypeSearchConnection';
 import {addObjectTypeSearchResult} from './output/addObjectTypeSearchResult';
@@ -51,7 +52,7 @@ export function makeSchema() {
 
 		const documentTypeObjectTypes = {}; // Defined before addDynamicInterfaceTypes, populated after
 		const camelToFieldObj = {};
-		addDocumentTypeObjectTypes({
+		addDocumentTypeObjectTypes({ // Does addDynamicInterfaceTypes for us :)
 			camelToFieldObj, // modified within
 			documentTypeObjectTypes, // modified within
 			glue
