@@ -1,14 +1,12 @@
-import type {
-	Glue,
-	GraphQLObjectType
-} from '../../utils/Glue';
+import type {GraphQLObjectType} from '../../utils/index.d';
+import type {Glue} from '../../utils/Glue';
 
 
 import {
 	VALUE_TYPE_DOUBLE,
 	VALUE_TYPE_STRING,
-	sortKeys,
-	toStr
+	sortKeys//,
+	//toStr
 } from '@enonic/js-utils';
 import {PRINCIPAL_EXPLORER_READ} from '/lib/explorer/model/2/constants';
 import {queryDocumentTypes} from '/lib/explorer/documentType/queryDocumentTypes';

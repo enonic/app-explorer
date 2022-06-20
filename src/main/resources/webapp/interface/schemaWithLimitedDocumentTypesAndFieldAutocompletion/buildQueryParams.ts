@@ -1,10 +1,10 @@
+import type {AggregationForGraphQLSchemaQueryArgsInputType} from '@enonic/js-utils/src/types';
 import type {
 	InterfaceField,
 	RepoConnection
 } from '/lib/explorer/types/index.d';
 import type {
 	CamelToFieldObj,
-	GraphQLInterfaceSearchAggregation,
 	SearchResolverEnv
 } from '../types.d';
 
@@ -59,7 +59,7 @@ export function buildQueryParams({
 		aggregations,
 		types
 	} = aggregationsArgToQueryParamAndTypes({
-		gqlSearchArgAggregationsArray: aggregationsArg as Array<GraphQLInterfaceSearchAggregation>,
+		gqlSearchArgAggregationsArray: aggregationsArg as Array<AggregationForGraphQLSchemaQueryArgsInputType>,
 		camelToFieldObj
 	});
 	//log.debug(`aggregations:${toStr(aggregations)}`);

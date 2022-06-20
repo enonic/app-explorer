@@ -1,6 +1,6 @@
+import type {AggregationForGraphQLSchemaQueryArgsInputType} from '@enonic/js-utils/src/types';
 import type {Aggregation} from '/lib/explorer/types.d';
 import type {
-	GraphQLInterfaceSearchAggregation,
 	AggregationType,
 	AggregationTypesObj,
 	CamelToFieldObj
@@ -22,7 +22,7 @@ export function aggregationsArgToQueryParamAndTypes<
 	gqlSearchArgAggregationsArray = [],
 	camelToFieldObj
 } :{
-	gqlSearchArgAggregationsArray :Array<GraphQLInterfaceSearchAggregation>,
+	gqlSearchArgAggregationsArray :Array<AggregationForGraphQLSchemaQueryArgsInputType>,
 	camelToFieldObj :CamelToFieldObj
 }) :{
 	aggregations: Record<AggregationKey, Aggregation>,
