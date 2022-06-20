@@ -1,15 +1,11 @@
+import type {AggregationForGraphQLSchemaQueryArgsInputType} from '@enonic/js-utils/src/types';
 import type {
 	Highlight,
 	QueryFilters
 } from '/lib/explorer/types/index.d';
 
-import {
-	GraphQLInterfaceSearchAggregation
-} from './types/Aggregation.d';
-
 
 export {
-	GraphQLInterfaceSearchAggregation,
 	AggregationType,
 	AggregationTypesObj
 } from './types/Aggregation.d';
@@ -21,7 +17,7 @@ export type CamelToFieldObj = {
 
 export type SearchResolverEnv = {
 	args :{
-		aggregations? :GraphQLInterfaceSearchAggregation
+		aggregations ?:Array<AggregationForGraphQLSchemaQueryArgsInputType>
 		count :number
 		//after :string
 		filters? :QueryFilters
@@ -34,7 +30,7 @@ export type SearchResolverEnv = {
 
 export type SearchConnectionResolverEnv = {
 	args :{
-		aggregations? :GraphQLInterfaceSearchAggregation
+		aggregations ?:Array<AggregationForGraphQLSchemaQueryArgsInputType>
 		after :string
 		filters? :QueryFilters
 		first :number
