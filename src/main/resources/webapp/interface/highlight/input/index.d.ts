@@ -1,5 +1,5 @@
 export type HightlightPropertyOptions = {
-	fieldPath :string
+	field :string
 	fragmenter ?:'simple'|'span'
 	fragmentSize ?:number
 	noMatchSize ?:number
@@ -12,6 +12,6 @@ export type HightlightPropertyOptions = {
 
 export type Highlight = {
 	encoder ?:'default'|'html'
-	properties :Array<HightlightPropertyOptions>
+	fields :Array<HightlightPropertyOptions>
 	tagsSchema ?:'styled'
 } & HightlightPropertyOptions;

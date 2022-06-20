@@ -1,4 +1,5 @@
 import type {AnyObject} from '/lib/explorer/types/index.d';
+import type {GraphQL} from '../index.d';
 import type {
 	FieldResolver,
 	Fields,
@@ -30,8 +31,8 @@ function addEnumType({
 } :{
 	description ?:string
 	name :string
-	values :Array<string>
-}) {
+	values :GraphQL.EnumValues
+}) :GraphQL.EnumType {
 	//log.debug(`addEnumType({ name: ${name} })`);
 	if(this.uniqueNames[name]) {
 		throw new Error(`Name ${name} already used as ${this.uniqueNames[name]}!`);
@@ -46,7 +47,7 @@ function addEnumType({
 }
 
 
-function getEnumType(name :string) {
+function getEnumType(name :string) :GraphQL.EnumType {
 	return this.enumTypes[name];
 }
 

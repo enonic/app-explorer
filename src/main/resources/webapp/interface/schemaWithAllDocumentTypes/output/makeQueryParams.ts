@@ -53,6 +53,7 @@ export function makeQueryParams({
 	const aggregations = {};
 	if (aggregationsArg) {
 		aggregationsArg.forEach(aggregation => {
+			// This works magically because fieldType is an Enum.
 			createAggregation(aggregations, aggregation);
 		});
 	}
@@ -65,6 +66,7 @@ export function makeQueryParams({
 
 	let filtersArray :Array<AnyObject>;
 	if (filtersArg) {
+		// This works magically because fieldType is an Enum?
 		filtersArray = createFilters(filtersArg);
 		//log.debug('filtersArray:%s', toStr(filtersArray));
 		filtersArray.push(staticFilter as unknown as AnyObject);
