@@ -6,7 +6,6 @@ import type {
 
 import {
 	VALUE_TYPE_DOUBLE,
-	VALUE_TYPE_REFERENCE,
 	VALUE_TYPE_STRING,
 	sortKeys,
 	toStr
@@ -30,7 +29,7 @@ export function addDocumentTypeObjectTypes({
 	documentTypeObjectTypes,
 	glue
 } : {
-	camelToFieldObj :unknown // TODO
+	camelToFieldObj :Record<string, string> // TODO
 	documentTypeObjectTypes :Record<string,GraphQLObjectType>
 	glue :Glue
 }) {
@@ -43,14 +42,14 @@ export function addDocumentTypeObjectTypes({
 			glue,
 		})
 	];
-	log.debug('addDocumentTypeObjectTypes interfaces:%s', toStr(interfaces));
+	//log.debug('addDocumentTypeObjectTypes interfaces:%s', toStr(interfaces));
 
 	for (let i = 0; i < documentTypes.hits.length; i++) {
 	    const {
 			_name: documentTypeName,
 			properties
 		} = documentTypes.hits[i];
-		log.debug('addDocumentTypeObjectTypes documentTypeName:%s properties', documentTypeName, toStr(properties));
+		//log.debug('addDocumentTypeObjectTypes documentTypeName:%s properties:%s', documentTypeName, toStr(properties));
 
 		const mergedglobalFieldsObj = mergeFields({
 			camelToFieldObj, // modified
@@ -88,6 +87,8 @@ export function addDocumentTypeObjectTypes({
 			}, // just read
 			properties // just read
 		});
+		//log.debug('addDocumentTypeObjectTypes documentTypeName:%s camelToFieldObj:%s', documentTypeName, toStr(camelToFieldObj));
+		//log.debug('addDocumentTypeObjectTypes documentTypeName:%s mergedglobalFieldsObj:%s', documentTypeName, toStr(mergedglobalFieldsObj));
 
 		const fields = {
 			...objToGraphQL({
@@ -99,7 +100,7 @@ export function addDocumentTypeObjectTypes({
 		};
 
 		const sortedFields = sortKeys(fields);
-		log.debug('addDocumentTypeObjectTypes sortedFields:%s', toStr(sortedFields));
+		//log.debug('addDocumentTypeObjectTypes documentTypeName:%s sortedFields:%s', documentTypeName, toStr(sortedFields));
 
 		documentTypeObjectTypes[documentTypeName] = glue.addObjectType({
 			name: documentTypeNameToGraphQLObjectTypeName(documentTypeName),
@@ -107,5 +108,5 @@ export function addDocumentTypeObjectTypes({
 			interfaces
 		});
 	}
-	log.debug('addDocumentTypeObjectTypes camelToFieldObj:%s', toStr(camelToFieldObj));
+	//log.debug('addDocumentTypeObjectTypes camelToFieldObj:%s', toStr(camelToFieldObj));
 }

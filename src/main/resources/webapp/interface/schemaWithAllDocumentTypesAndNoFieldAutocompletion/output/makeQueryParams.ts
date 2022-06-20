@@ -2,7 +2,7 @@ import type {
 	AnyObject,
 	InterfaceField
 } from '/lib/explorer/types/index.d';
-import type {Highlight} from '../highlight/input/index.d';
+import type {Highlight} from '../../highlight/input/index.d';
 
 
 import {
@@ -26,7 +26,7 @@ import {
 import {makeQuery} from './makeQuery';
 import {
 	highlightGQLArgToEnonicXPQuery
-} from '../highlight/input/highlightGQLArgToEnonicXPQuery';
+} from '../../highlight/input/highlightGQLArgToEnonicXPQuery';
 
 
 export function makeQueryParams({

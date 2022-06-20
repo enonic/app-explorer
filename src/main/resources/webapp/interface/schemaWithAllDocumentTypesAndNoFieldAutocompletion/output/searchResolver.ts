@@ -17,7 +17,7 @@ import {
 } from '/lib/explorer/constants';
 import {connect} from '/lib/explorer/repo/connect';
 import {multiConnect} from '/lib/explorer/repo/multiConnect';
-import {washDocumentNode} from '../utils/washDocumentNode';
+import {washDocumentNode} from '../../utils/washDocumentNode';
 import {getInterfaceInfo} from './getInterfaceInfo';
 import {makeQueryParams} from './makeQueryParams';
 /*import {
@@ -98,6 +98,7 @@ export function searchResolver({
 			//log.debug('washedNode:%s', toStr(washedNode));
 
 			const hit :Hit = {
+				...washedNode, // Needed for ... on DocumentType_...
 				_collection: collectionName,
 				_createdTime: getIn(collectionNode, [FIELD_PATH_META, 'createdTime'], undefined),
 				_documentType: getIn(collectionNode, [FIELD_PATH_META, 'documentType'], undefined),
