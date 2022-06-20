@@ -1,3 +1,4 @@
+import type {GraphQL} from '../../../index.d';
 import type {Glue} from '../../../utils/Glue';
 
 
@@ -13,13 +14,19 @@ import {
 import {GQL_INPUT_TYPE_FILTER_HAS_VALUE} from '../constants';
 
 
-export function addHasValueFilterInput({glue} :{glue :Glue}) {
+export function addHasValueFilterInput({
+	fieldType = GraphQLString, // What guillotine uses
+	glue
+} :{
+	fieldType ?:GraphQL.ArgsType
+	glue :Glue
+}) {
 	return glue.addInputType({
 		name: GQL_INPUT_TYPE_FILTER_HAS_VALUE,
 		description: 'HasValueFilter input type',
 		fields: {
 			field: {
-				type: nonNull(GraphQLString)
+				type: nonNull(fieldType)
 			},
 			stringValues: {
 				type: list(GraphQLString)

@@ -1,3 +1,4 @@
+import type {GraphQL} from '../../../index.d';
 import type {Glue} from '../../../utils/Glue';
 
 
@@ -10,13 +11,19 @@ import {
 import {GQL_INPUT_TYPE_AGGREGATION_TERMS} from '../constants';
 
 
-export function addTermsAggregationInput({glue} :{glue :Glue}) {
+export function addTermsAggregationInput({
+	fieldType = GraphQLString, // What guillotine uses
+	glue
+} :{
+	fieldType ?:GraphQL.ArgsType
+	glue :Glue
+}) {
 	return glue.addInputType({
 		name: GQL_INPUT_TYPE_AGGREGATION_TERMS,
 		description: 'Terms aggregation input type',
 		fields: {
 			field: {
-				type: nonNull(GraphQLString)
+				type: nonNull(fieldType)
 			},
 			order: {
 				type: GraphQLString

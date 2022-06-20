@@ -1,18 +1,29 @@
+import type {GraphQL} from '../../index.d';
 import type {Glue} from '../../utils/Glue';
 
-//@ts-ignore
-import {GraphQLString} from '/lib/graphql';
+
+import {
+	GraphQLString,
+	nonNull
+	//@ts-ignore
+} from '/lib/graphql';
 import {
 	GQL_INPUT_FIELDS_HIGHLIGHT_PROPERTY_OPTIONS,
 	GQL_INPUT_TYPE_HIGHLIGHT_PROPERTY
 } from './constants';
 
 
-export function addInputTypeHighlightProperty({glue} :{glue :Glue}) {
+export function addInputTypeHighlightProperty({
+	fieldType = GraphQLString,
+	glue
+} :{
+	fieldType ?:GraphQL.ArgsType
+	glue :Glue
+}) {
 	return glue.addInputType({
 		name: GQL_INPUT_TYPE_HIGHLIGHT_PROPERTY,
 		fields: {
-			fieldPath: { type: GraphQLString },
+			field: { type: nonNull(fieldType) },
 			...glue.getInputFields(GQL_INPUT_FIELDS_HIGHLIGHT_PROPERTY_OPTIONS)
 		}
 	});

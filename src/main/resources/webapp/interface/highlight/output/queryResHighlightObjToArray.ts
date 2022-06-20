@@ -12,7 +12,7 @@ export function queryResHighlightObjToArray({
 	for (let i = 0; i < keys.length; i++) {
 	    const key = keys[i];
 		highlightArray.push({
-			fieldPath: key,
+			field: key,
 			highlights: highlightObj[key]
 		});
 	}

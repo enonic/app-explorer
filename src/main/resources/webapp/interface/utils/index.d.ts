@@ -3,12 +3,10 @@ export type Branch<Leaf = string> = {
 }
 
 export type Fields = AnyObject;
-//type EnumType = AnyObject;
+
 export type GraphQLObjectType = unknown;
 type GraphQLInterfaceType = unknown;
 type GraphQLTypeReference = string;
-//type InputObjectType = AnyObject;
-//type ScalarType = AnyObject;
 
 export type FieldResolver<
 	Env extends AnyObject = AnyObject,
