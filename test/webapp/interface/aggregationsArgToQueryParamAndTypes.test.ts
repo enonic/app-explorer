@@ -1,5 +1,5 @@
 import {deepStrictEqual} from 'assert';
-import {aggregationsArgToQueryParamAndTypes} from '../../../src/main/resources/webapp/interface/schemaWithLimitedDocumentTypesAndFieldAutocompletion/aggregationsArgToQueryParamAndTypes';
+import {aggregationsArgToQueryParamAndTypes} from '../../../src/main/resources/webapp/interface/schemaWithLimitedDocumentTypes/aggregationsArgToQueryParamAndTypes';
 
 
 describe('webapp', () => {
