@@ -1,3 +1,5 @@
+import type {CustomEvent} from '@enonic/js-utils/src/types/index.d';
+import type {DocumentTypeNode} from '/lib/explorer/types/index.d';
 import type {
 	SearchConnectionResolverEnv,
 	SearchResolverEnv,
@@ -8,7 +10,11 @@ import type {
 //import {toStr} from '@enonic/js-utils';
 //@ts-ignore
 import {newCache} from '/lib/cache';
-import {FIELD_PATH_META} from '/lib/explorer/constants';
+import {
+	EVENT_LISTEN_TYPE_CUSTOM_EXPLORER_DOCUMENTTYPE_CREATED,
+	EVENT_LISTEN_TYPE_CUSTOM_EXPLORER_DOCUMENTTYPE_UPDATED//,
+	//FIELD_PATH_META
+} from '/lib/explorer/constants';
 import {
 	GraphQLInt,
 	GraphQLString,
@@ -21,6 +27,8 @@ import {
 	//encodeCursor // Just use to generate after for testing
 	//@ts-ignore
 } from '/lib/graphql-connection';
+//@ts-ignore
+import {listener} from '/lib/xp/event';
 import {constructGlue} from '../utils/Glue';
 
 // Input
@@ -35,7 +43,7 @@ import {addObjectTypeSearchConnection} from './output/addObjectTypeSearchConnect
 import {addObjectTypeSearchResult} from './output/addObjectTypeSearchResult';
 
 
-const SECONDS_TO_CACHE = 10;
+const SECONDS_TO_CACHE = 3600; // One hour
 
 const schemaCache = newCache({
 	size: 1,
@@ -47,7 +55,7 @@ const schemaGenerator = newSchemaGenerator();
 
 export function makeSchema() {
 	return schemaCache.get('static-key', () => {
-		//log.debug('caching a new schema for %s seconds', SECONDS_TO_CACHE);
+		//log.debug('Caching a new Interface GraphQL Schema for %s seconds', SECONDS_TO_CACHE);
 
 		const glue = constructGlue({schemaGenerator});
 
@@ -60,7 +68,7 @@ export function makeSchema() {
 		});
 		//log.debug('makeSchema camelToFieldObj:%s', toStr(camelToFieldObj));
 
-		const fieldsEnumType = glue.addEnumType({
+		/*const fieldsEnumType = glue.addEnumType({
 			name: 'Fields',
 			values: {
 				_collection: `${FIELD_PATH_META}.collection`,
@@ -77,19 +85,19 @@ export function makeSchema() {
 				_alltext: '_alltext',
 				...camelToFieldObj // Must be populated first!
 			}
-		});
+		});*/
 
 		const commonGQLInputFields = {
 			aggregations: list(addAggregationInput({
-				fieldType: fieldsEnumType,
+				//fieldType: fieldsEnumType,
 				glue
 			})),
 			filters: list(addFilterInput({
-				fieldType: fieldsEnumType,
+				//fieldType: fieldsEnumType,
 				glue
 			})),
 			highlight: addInputTypeHighlight({
-				fieldType: highlightFieldsEnumType,
+				//fieldType: highlightFieldsEnumType,
 				glue
 			}),
 			searchString: GraphQLString,
@@ -151,3 +159,31 @@ export function makeSchema() {
 		return glue.buildSchema();
 	}); // schemaCache.get
 } // makeSchema
+
+
+/*log.debug(
+	'Starting event listener for %s and %s',
+	EVENT_LISTEN_TYPE_CUSTOM_EXPLORER_DOCUMENTTYPE_CREATED,
+	EVENT_LISTEN_TYPE_CUSTOM_EXPLORER_DOCUMENTTYPE_UPDATED
+);*/
+listener({
+	type: 'custom.*',
+	localOnly: false,
+	callback: (event :CustomEvent<
+		typeof EVENT_LISTEN_TYPE_CUSTOM_EXPLORER_DOCUMENTTYPE_CREATED
+		|typeof EVENT_LISTEN_TYPE_CUSTOM_EXPLORER_DOCUMENTTYPE_UPDATED,
+		DocumentTypeNode
+	>) => {
+		//log.debug('custom.* event:%s', toStr(event));
+		const {type} = event;
+		if (
+			type === EVENT_LISTEN_TYPE_CUSTOM_EXPLORER_DOCUMENTTYPE_CREATED
+			|| type === EVENT_LISTEN_TYPE_CUSTOM_EXPLORER_DOCUMENTTYPE_UPDATED
+		) {
+			//const {_id} = event.data;
+			//log.debug('_id:%s', _id);
+			//log.debug('Clearing cached Interface GraphQL Schema');
+			schemaCache.clear();
+		}
+	}
+});

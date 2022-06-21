@@ -47,7 +47,7 @@
 		"paths": {
 			"@enonic/app-explorer/*": ["./src/main/resources/*"],
 			//"@enonic/js-utils": ["node_modules/@enonic/js-utils/src"],
-			"@enonic/js-utils": ["../enonic-js-utils/src"],
+			"@enonic/js-utils/*": ["../enonic-js-utils/*"],
 			"/lib/explorer/*": ["../lib-explorer/src/main/resources/lib/explorer/*"],
 			"@enonic/semantic-ui-react-form": ["../semantic-ui-react-form/src"]
 		},
