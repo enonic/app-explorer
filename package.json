@@ -39,6 +39,7 @@
     "set-value": "^4",
     "snowball": "^0",
     "traverse": "^0",
+    "uri-js": "^4.4.1",
     "yup": "^0"
   },
   "devDependencies": {
