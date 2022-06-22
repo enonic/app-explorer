@@ -6,7 +6,8 @@ import type {Highlight} from '../../highlight/input/index.d';
 
 
 import {
-	addQueryFilter//,
+	addQueryFilter,
+	forceArray//,
 	//toStr
 } from '@enonic/js-utils';
 import {
@@ -27,6 +28,7 @@ import {makeQuery} from './makeQuery';
 import {
 	highlightGQLArgToEnonicXPQuery
 } from '../../highlight/input/highlightGQLArgToEnonicXPQuery';
+import {resolveFieldShortcuts} from './resolveFieldShortcuts';
 
 
 export function makeQueryParams({
@@ -52,7 +54,10 @@ export function makeQueryParams({
 
 	const aggregations = {};
 	if (aggregationsArg) {
-		aggregationsArg.forEach(aggregation => {
+		//log.debug('makeQueryParams aggregationsArg:%s', toStr(aggregationsArg));
+		forceArray(resolveFieldShortcuts({
+			basicObject: aggregationsArg
+		})).forEach(aggregation => {
 			// This works magically because fieldType is an Enum.
 			createAggregation(aggregations, aggregation);
 		});
@@ -67,7 +72,9 @@ export function makeQueryParams({
 	let filtersArray :Array<AnyObject>;
 	if (filtersArg) {
 		// This works magically because fieldType is an Enum?
-		filtersArray = createFilters(filtersArg);
+		filtersArray = createFilters(resolveFieldShortcuts({
+			basicObject: filtersArg
+		}));
 		//log.debug('filtersArray:%s', toStr(filtersArray));
 		filtersArray.push(staticFilter as unknown as AnyObject);
 		//log.debug('filtersArray:%s', toStr(filtersArray));
