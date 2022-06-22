@@ -5,7 +5,7 @@ mapping.api.target = /webapp/com.enonic.app.explorer/api
 mapping.api.idProvider.system = default
 */
 
-import type {Request} from '../types/Request';
+import type {EnonicXpRequest} from '/lib/explorer/types/index.d';
 import type {GetCollectionRequest} from './collection/get';
 import type {AllDocumentRequest} from './collection/document';
 import type {InterfaceRequest} from './interface/post';
@@ -13,10 +13,10 @@ import type {InterfaceRequest} from './interface/post';
 
 import '@enonic/nashorn-polyfills';
 
-import {
-	RESPONSE_TYPE_HTML/*,
-	toStr*/
-} from '@enonic/js-utils';
+/*import {
+	RESPONSE_TYPE_HTML,
+	toStr
+} from '@enonic/js-utils';*/
 
 //@ts-ignore
 import Router from '/lib/router';
@@ -29,11 +29,15 @@ import {
 	list as listInterfaces,
 	post as interfacePost
 } from './interface';
+import {
+	ROUTER_PATH_COLLECTIONS_API,
+	ROUTER_PATH_INTERFACES_API
+} from './constants';
 
 
 const router = Router();
 
-router.all('/api', () => ({
+/*router.all('/api', () => ({
 	body: `<html>
 <head>
 	<title>Versions - API documentation</title>
@@ -64,12 +68,12 @@ router.all('/api/v1', () => ({
 </body>
 </html>`,
 	contentType: RESPONSE_TYPE_HTML
-}));
-router.all('/api/v1/collections', (r :Request) => listCollections(r));
-router.all('/api/v1/collections/{collection}', (r :GetCollectionRequest) => getCollection(r));
-router.all('/api/v1/collections/{collection}/documents', (r :AllDocumentRequest) => documentResponse(r));
-router.all('/api/v1/interfaces', (r :InterfaceRequest) => listInterfaces(r));
-router.post('/api/v1/interface/{interfaceName}', (r :InterfaceRequest) => interfacePost(r));
+}));*/
+router.all(`${ROUTER_PATH_COLLECTIONS_API}/v1`, (r :EnonicXpRequest) => listCollections(r));
+router.all(`${ROUTER_PATH_COLLECTIONS_API}/v1/collection/{collection}`, (r :GetCollectionRequest) => getCollection(r));
+router.all(`${ROUTER_PATH_COLLECTIONS_API}/v1/collection/{collection}/documents`, (r :AllDocumentRequest) => documentResponse(r));
 
+router.all(`${ROUTER_PATH_INTERFACES_API}/v1`, (r :InterfaceRequest) => listInterfaces(r));
+router.post(`${ROUTER_PATH_INTERFACES_API}/v1/interface/{interfaceName}`, (r :InterfaceRequest) => interfacePost(r));
 
 export const all = (r :Request) => router.dispatch(r);

@@ -6,7 +6,6 @@ import type {EditSynonymsState} from './index.d';
 
 
 //import {isSet} from '@enonic/js-utils';
-import Uri from 'jsuri';
 import * as React from 'react';
 import {fetchSynonymsQuery} from '../../../services/graphQL/fetchers/fetchSynonymsQuery';
 

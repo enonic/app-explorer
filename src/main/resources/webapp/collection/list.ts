@@ -1,4 +1,5 @@
-import type {Request} from '../../types/Request';
+import type {EnonicXpRequest} from '/lib/explorer/types/index.d';
+
 
 import {
 	//RESPONSE_TYPE_JSON,
@@ -7,8 +8,7 @@ import {
 	startsWith//,
 	//toStr
 } from '@enonic/js-utils';
-
-
+import {resolve} from 'uri-js';
 import {
 	NT_API_KEY,
 	PRINCIPAL_EXPLORER_READ
@@ -16,17 +16,17 @@ import {
 import {connect} from '/lib/explorer/repo/connect';
 import {hash} from '/lib/explorer/string/hash';
 import {coerceApiKey} from '../../services/graphQL/apiKey/coerceApiKey';
+import {AUTH_PREFIX} from '../constants';
 
 
-const AUTH_PREFIX = 'Explorer-Api-Key ';
+export function list(request :EnonicXpRequest) {
+	//log.debug('request:%s', toStr(request));
 
-
-export function list(request :Request) {
-	//log.debug(`request:${toStr(request)}`);
 	const {
 		headers: {
 			'Authorization': authorization // 'Explorer-Api-Key XXXX'
-		}
+		},
+		path
 	} = request;
 	if(!authorization) {
 		log.error(`Authorization header missing!`);
@@ -78,6 +78,10 @@ export function list(request :Request) {
 	//log.debug(`apiKeyNode:${toStr(apiKeyNode)}`);
 	const {collections} = apiKeyNode;
 	//log.debug(`collections:${toStr(collections)}`);
+
+	const parentHref = resolve(path, '..');
+	//log.debug('parentHref:%s', toStr(parentHref));
+
 	return {
 		body: `<html>
 	<head>
@@ -87,8 +91,8 @@ export function list(request :Request) {
 		<h1>API documentation</h1>
 		<h2>Collections</h2>
 		<ul>
-			<li><a href="/api/v1">..</a></li>
-			${forceArray(collections).map((collection) => `<li><a href="/api/v1/collections/${collection}">${collection}</a></li>`).join('\n')}
+			<li><a href="${parentHref}">..</a></li-->
+			${forceArray(collections).map((collection) => `<li><a href="${path}/collection/${collection}">${collection}</a></li>`).join('\n')}
 		</ul>
 	</body>
 </html>`,

@@ -101,6 +101,7 @@ const SS_EXTERNALS = [
 	'/lib/xp/task',
 	'/lib/xp/value',
 	'/lib/xp/value.js',
+	/^\/lib\/xp\/vhost/,
 	'/lib/xp/websocket'
 ];
 

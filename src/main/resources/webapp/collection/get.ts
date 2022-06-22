@@ -1,5 +1,8 @@
-import type {AnyObject} from '/lib/explorer/types/index.d';
-import type {Request} from '../../types/Request';
+import type {
+	EmptyObject,
+	EnonicXpRequest
+} from '/lib/explorer/types/index.d';
+
 
 
 import {
@@ -7,9 +10,10 @@ import {
 	RESPONSE_TYPE_HTML//,
 	//toStr
 } from '@enonic/js-utils';
+import {resolve} from 'uri-js';
 
 
-export type GetCollectionRequest = Request<AnyObject, {
+export type GetCollectionRequest = EnonicXpRequest<EmptyObject, {
 	collection :string
 }>
 
@@ -17,11 +21,17 @@ export type GetCollectionRequest = Request<AnyObject, {
 export function get(request :GetCollectionRequest) {
 	//log.debug(`request:${toStr(request)}`);
 	const {
+		path/*,
 		pathParams: {
 			collection
-		}
+		}*/
 	} = request;
+	//log.debug('path:%s', path);
 	//log.debug(`collection:${toStr(collection)}`);
+	// I don't understand why '/collections/collection/anapicollection' is
+	// resolved to '/collections/' and not '/collections/collection/',
+	// but if it works, it works, right?
+	const collectionsHref = resolve(path, '..');
 	return {
 		body: `<html>
 	<head>
@@ -31,8 +41,8 @@ export function get(request :GetCollectionRequest) {
 		<h1>API documentation</h1>
 		<h2>Endpoints</h2>
 		<ul>
-			<li><a href="/api/v1/collections">..</a></li>
-			<li><a href="/api/v1/collections/${collection}/documents">documents</a></li>
+			<li><a href="${collectionsHref}">..</a></li>
+			<li><a href="${path}/documents">documents</a></li>
 		</ul>
 	</body>
 </html>`,

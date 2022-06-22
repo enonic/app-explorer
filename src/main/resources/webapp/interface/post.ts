@@ -1,7 +1,7 @@
+import type {EnonicXpRequest} from '/lib/explorer/types/index.d';
 import type {
 	ApiKeyNode,
-	EmptyObject,
-	Request
+	EmptyObject
 } from '../../types';
 
 
@@ -24,7 +24,7 @@ import {connect} from '/lib/explorer/repo/connect';
 import {makeSchema} from './schemaWithAllDocumentTypes/makeSchema';
 
 
-export type InterfaceRequest = Request<EmptyObject,{
+export type InterfaceRequest = EnonicXpRequest<EmptyObject,{
 	interfaceName :string
 }>
 
@@ -37,7 +37,7 @@ function isUnauthorized({
 	request
 } :{
 	interfaceName :string
-	request :Request
+	request :EnonicXpRequest
 }) {
 	//log.debug('isUnauthorized interfaceName:%s request:%s', interfaceName, toStr(request));
 	const {
