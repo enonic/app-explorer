@@ -32,7 +32,7 @@ export function querySynonyms({
 		start
 	}));*/
 	const connection = connect({ principals: [PRINCIPAL_EXPLORER_READ] });
-	const synonymsRes = qS({
+	const synonymsRes = qS<'thesaurus'>({
 		connection,
 		count,
 		filters,
