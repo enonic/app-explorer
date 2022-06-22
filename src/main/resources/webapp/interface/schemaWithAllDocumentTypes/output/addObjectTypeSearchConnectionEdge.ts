@@ -12,7 +12,8 @@ import {
 	nonNull
 	//@ts-ignore
 } from '/lib/graphql';
-import {addObjectTypeSearchResultHit} from './addObjectTypeSearchResultHit';
+import {GQL_INTERFACE_TYPE_DOCUMENT} from './constants';
+//import {addObjectTypeSearchResultHit} from './addObjectTypeSearchResultHit';
 
 
 type SearchConnectionEdgeEnv = {
@@ -37,7 +38,8 @@ export function addObjectTypeSearchConnectionEdge({glue} :{glue :Glue}) {
 				}
 			},
 			node: {
-				type: addObjectTypeSearchResultHit({glue}),
+				//type: addObjectTypeSearchResultHit({glue}),
+				type: glue.getInterfaceType(GQL_INTERFACE_TYPE_DOCUMENT),
 				resolve(env :SearchConnectionEdgeEnv) {
 					//log.debug('SearchConnectionEdge node resolve env:%s', toStr(env));
 					return env.source.node;
