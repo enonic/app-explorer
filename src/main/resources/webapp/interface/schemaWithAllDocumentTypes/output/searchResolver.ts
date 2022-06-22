@@ -100,11 +100,25 @@ export function searchResolver({
 			const hit :Hit = {
 				...washedNode, // Needed for ... on DocumentType_...
 				_collection: collectionName,
-				_createdTime: getIn(collectionNode, [FIELD_PATH_META, 'createdTime'], undefined),
-				_documentType: getIn(collectionNode, [FIELD_PATH_META, 'documentType'], undefined),
+				_createdTime: getIn<
+					DocumentNode,
+					//[typeof FIELD_PATH_META, 'createdTime'] // not keyof DocumentNode
+					keyof DocumentNode,
+					//DocumentNode[typeof FIELD_PATH_META]['createdTime'], // string|Date
+					string,
+					undefined
+				>(collectionNode, [FIELD_PATH_META, 'createdTime'], undefined),
+				_documentType: getIn<DocumentNode, keyof DocumentNode, DocumentNode[typeof FIELD_PATH_META]['documentType'], undefined>(collectionNode, [FIELD_PATH_META, 'documentType'], undefined),
 				_highlight: highlightObj, //queryResHighlightObjToArray({highlightObj}),
 				_json: washedNode,
-				_modifiedTime: getIn(collectionNode, [FIELD_PATH_META, 'modifiedTime'], undefined),
+				_modifiedTime: getIn<
+					DocumentNode,
+					//[typeof FIELD_PATH_META, 'modifiedTime'] // not keyof DocumentNode
+					keyof DocumentNode,
+					//DocumentNode[typeof FIELD_PATH_META]['modifiedTime'], // string|Date
+					string,
+					undefined
+				>(collectionNode, [FIELD_PATH_META, 'modifiedTime'], undefined),
 				_score: score
 			}
 			//log.debug('hit:%s', toStr(hit));
