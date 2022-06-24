@@ -9,6 +9,14 @@ import type {
 } from '/lib/explorer/types/index.d';
 
 
+import 'core-js/stable/array/from';
+import 'core-js/stable/object/assign';
+import 'core-js/stable/string/includes';
+import 'core-js/stable/string/from-code-point';
+import 'core-js/stable/array/includes';
+import 'core-js/stable/array/find-index';
+//import 'core-js-pure/actual/array/from';
+//import 'core-js-pure/actual/object/assign'; // Doesn't work
 // TypeError: Object.getOwnPropertyDescriptors is not a function
 require('object.getownpropertydescriptors').shim(); //eslint-disable-line @typescript-eslint/no-var-requires
 
@@ -32,7 +40,7 @@ import guard from 'robots-txt-guard';
 // Cheerio import causes:
 // TypeError: Cannot read property "TYPED_ARRAY_SUPPORT" from undefined
 // And requires global to be provided by webpack.
-import cheerio from 'cheerio';
+import cheerio from 'cheerio'; // uses Array.from
 //import cheerio from '/lib/cheerio';
 
 
@@ -461,7 +469,12 @@ export function run({
 						uris // This has no field definition by default
 					};
 					TRACE && log.debug(`documentToPersist:${toStr(documentToPersist)}`);
-					const persistedDocument = collector.persistDocument(documentToPersist);
+					const persistedDocument = collector.persistDocument(
+						documentToPersist, {
+							// Must be identical to a _name in src/main/resources/documentTypes.json
+							documentTypeName: 'webpage'
+						}
+					);
 					DEBUG && log.debug(`persistedDocument:${toStr(persistedDocument)}`);
 				} // indexable
 			} // resume ... else

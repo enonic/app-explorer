@@ -1,0 +1,9 @@
+{
+	"compilerOptions": {
+		"paths": {
+			"/lib/licensing": ["./src/main/resources/lib/licensing.ts"],
+			"@enonic/nashorn-polyfills": ["./src/main/resources/lib/nashorn/index.ts"]
+		},
+		"target": "es6"
+	}
+}
