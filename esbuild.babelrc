@@ -1,0 +1,17 @@
+{
+  "plugins": [],
+  "presets": [
+    [
+        "@babel/preset-env",
+        {
+			"corejs": 3,
+			"forceAllTransforms": false,
+			"targets": {
+				"esmodules": true,
+				"node": "0.10.48"
+			},
+            "useBuiltIns": "entry"
+        }
+    ]
+  ]
+}
