@@ -13,7 +13,6 @@ repositories {
 	mavenLocal()
 	xp.enonicRepo('dev')
 	mavenCentral()
-	//jcenter()
 }
 
 
