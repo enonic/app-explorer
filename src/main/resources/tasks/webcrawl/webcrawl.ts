@@ -205,7 +205,7 @@ export function run({
 		excludes = [],
 		userAgent = DEFAULT_UA
 	} = collector.config;
-	DEBUG && log.debug(`userAgent:${userAgent}`);
+	DEBUG && log.debug('userAgent:%s', userAgent);
 
 	const excludeRegExps = excludes.map(str => new RegExp(str));
 
@@ -214,13 +214,13 @@ export function run({
 	const entryPointUrlObj :Url = new URL(baseUri);
 
 	const normalizedentryPointUrl = entryPointUrlObj.normalize();
-	DEBUG && log.debug(`normalizedentryPointUrl:${normalizedentryPointUrl}`);
+	DEBUG && log.debug('normalizedentryPointUrl:%s', normalizedentryPointUrl);
 
 	const domain = entryPointUrlObj.getHost();
-	DEBUG && log.debug(`domain:${domain}`);
+	DEBUG && log.debug('domain:%s', domain);
 
 	const scheme = entryPointUrlObj.getScheme();
-	DEBUG && log.debug(`scheme:${scheme}`);
+	DEBUG && log.debug('scheme:%s', scheme);
 
 	// jsuri
 	/*
@@ -248,14 +248,14 @@ export function run({
 		method: 'GET',
 		url: `${scheme}://${domain}/robots.txt`
 	};
-	DEBUG && log.debug(toStr({robotsReq}));
+	DEBUG && log.debug('robotsReq:%s', toStr(robotsReq));
 
 	const robotsRes = httpClientRequest(robotsReq) as Response; //log.debug(toStr({robotsRes}));
 	let robots :RobotsTxt;
 	if(robotsRes.status === 200 && robotsRes.contentType === 'text/plain') {
 		robots = guard(parseRobotsTxt(robotsRes.body));
 	}
-	DEBUG && log.debug(toStr({robots}));
+	DEBUG && log.debug('robots:%s', toStr(robots));
 
 	const seenUrisObj = {[normalizedentryPointUrl]: true};
 	const queueArr = [normalizedentryPointUrl];
@@ -284,7 +284,7 @@ export function run({
 			break whileQueueLoop;
 		}
 		const uri = queueArr.shift(); // Normalized before added to queue
-		DEBUG && log.debug(`uri:${uri}`);
+		DEBUG && log.debug('uri:%s', uri);
 
 		const baseUrlObj = new URL(uri);
 		//log.debug(toStr({baseUrlObj}));
@@ -324,7 +324,7 @@ export function run({
 						'User-Agent': userAgent
 					},
 					url: uri
-				}) as Response; TRACE && log.debug(`res:${toStr(res)}`);
+				}) as Response; TRACE && log.debug('res:%s', toStr(res));
 				if (res.status != 200) {
 					throw new Error(`Status: ${res.status}!`);
 				}
@@ -397,7 +397,7 @@ export function run({
 				const uris = [];
 				if (boolFollow) {
 					const linkEls = querySelectorAll(bodyEl, "a[href]:not([href^='#']):not([href^='mailto:']):not([href^='tel:'])");
-					DEBUG && log.debug(`linkEls.length:${toStr(linkEls.length)}`);
+					DEBUG && log.debug('linkEls.length:%s', linkEls.length);
 					linksForLoop:
 					for (let i = 0; i < linkEls.length; i += 1) {
 						const el = linkEls[i];
@@ -407,7 +407,7 @@ export function run({
 							continue linksForLoop;
 						}
 						const href = getAttributeValue(el, 'href'); // javascript:void(0)
-						DEBUG && log.debug(`href:${toStr(href)}`);
+						DEBUG && log.debug('href:%s', href);
 
 						if (href.startsWith('javascript:')) {
 							continue linksForLoop;
@@ -415,13 +415,13 @@ export function run({
 
 						// Galimatias
 						const resolved = baseUrlObj.resolve(href);
-						TRACE && log.debug(`resolved:${toStr(resolved)}`);
+						TRACE && log.debug('resolved:%s', toStr(resolved));
 
 						const resolvedUriObj = new URL(resolved);
-						TRACE && log.debug(`resolvedUriObj:${toStr(resolvedUriObj)}`);
+						TRACE && log.debug('resolvedUriObj:%s', toStr(resolvedUriObj));
 
 						const currentHost = resolvedUriObj.getHost(); // null has no such function "toString" probably because javascript:void(0) doesn't have any host...
-						TRACE && log.debug(`currentHost:${toStr(currentHost)}`);
+						TRACE && log.debug('currentHost:%s', toStr(currentHost));
 
 						// jsuri
 						/*
@@ -441,7 +441,7 @@ export function run({
 						if (currentHost === domain) {
 							// Galimatias
 							const normalized = resolvedUriObj.setFragment('').normalize();
-							log.debug(`normalized:${toStr(normalized)}`);
+							DEBUG && log.debug('webcrawl: normalized:%s', toStr(normalized));
 
 							// jsuri
 							//resolvedUriObj.setAnchor('');
@@ -468,14 +468,14 @@ export function run({
 						uri,
 						uris // This has no field definition by default
 					};
-					TRACE && log.debug(`documentToPersist:${toStr(documentToPersist)}`);
+					TRACE && log.debug('documentToPersist:%s', toStr(documentToPersist));
 					const persistedDocument = collector.persistDocument(
 						documentToPersist, {
 							// Must be identical to a _name in src/main/resources/documentTypes.json
 							documentTypeName: 'webpage'
 						}
 					);
-					DEBUG && log.debug(`persistedDocument:${toStr(persistedDocument)}`);
+					DEBUG && log.debug('persistedDocument:%s', toStr(persistedDocument));
 				} // indexable
 			} // resume ... else
 			log.debug(`success uri:${toStr(uri)}`);
@@ -509,36 +509,37 @@ export function run({
 			sort: ''
 		});
 		//log.debug(`res:${toStr(res)}`); // Huuge!
-		//log.debug(`count:${res.count}`);
-		//log.debug(`total:${res.total}`);
-		//log.debug(`res.hits.length:${toStr(res.hits.length)}`);
-		//log.debug(`res.hits[0]:${toStr(res.hits[0])}`);
-
-		const keys = [];
-		const nodeId2Uri = {};
-		for (let i = 0; i < res.hits.length; i += 1) {
-			const node = res.hits[i]; //log.debug(`node:${toStr(node)}`);
-			if (node) { // Handle ghost nodes
-				const {_id, uri} = node;
-				keys.push(_id);
-				nodeId2Uri[_id] = uri;
+		TRACE && log.debug('count:%s total:%s res.hits.length:%s', res.count, res.total, res.hits.length);
+		if (res.hits.length) {
+			TRACE && log.debug(`res.hits[0]:${toStr(res.hits[0])}`);
+			const idsToDelete = [];
+			const pathsToDelete = [];
+			const nodeId2Uri = {};
+			for (let i = 0; i < res.hits.length; i += 1) {
+				const node = res.hits[i]; //log.debug(`node:${toStr(node)}`);
+				if (node) { // Handle ghost nodes
+					const {_id, _path, uri} = node;
+					idsToDelete.push(_id);
+					pathsToDelete.push(_path);
+					nodeId2Uri[_id] = uri;
+				}
 			}
-		}
-		//log.debug(`keys:${toStr(keys)}`);
-		//log.debug(`nodeId2Uri:${toStr(nodeId2Uri)}`);
+			//log.debug(`nodeId2Uri:${toStr(nodeId2Uri)}`);
 
-		if (keys.length) {
-			const deleteRes = collector.collection.connection.delete(keys);
-			//log.debug(toStr({deleteRes}));
-			const uris = deleteRes.map(nodeId => nodeId2Uri[nodeId]);
-			//log.debug(toStr({uris}));
-			if (uris.length) {
-				uris.forEach((uri) => {
-					collector.journal.successes.push({uri, message: 'deleted'});
-				});
+			if (idsToDelete.length) {
+				DEBUG && log.debug('deleting ids:%s paths:%s', toStr(idsToDelete), toStr(pathsToDelete));
+				const deleteRes = collector.collection.connection.delete(idsToDelete);
+				//log.debug(toStr({deleteRes}));
+				const uris = deleteRes.map(nodeId => nodeId2Uri[nodeId]);
+				//log.debug(toStr({uris}));
+				if (uris.length) {
+					uris.forEach((uri) => {
+						collector.journal.successes.push({uri, message: 'deleted'});
+					});
+				}
+				collector.collection.connection.refresh();
 			}
-			collector.collection.connection.refresh();
-		}
+		} // if res.hits.length
 	} // function deleteOldNodes
 
 	if (!collector.shouldStop()) {
