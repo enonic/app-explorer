@@ -1178,7 +1178,12 @@
   resolved "https://registry.yarnpkg.com/@discoveryjs/json-ext/-/json-ext-0.5.7.tgz#1d572bfbbe14b7704e0ba0f39b74815b84870d70"
   integrity sha512-dBVuXR082gk3jsFp7Rd/JI4kytwGHecnCoTtXFb7DB6CNHp4rg5k1bhg0nWdLGLnOV71lmDzGQaLMy8iPLY0pw==
 
-"@enonic/js-utils@^0", "@enonic/js-utils@^0.38.0":
+"@enonic/js-utils@^0":
+  version "0.38.9"
+  resolved "https://registry.yarnpkg.com/@enonic/js-utils/-/js-utils-0.38.9.tgz#0fc97789943b8fe24b59b9e48670fea696ac91cb"
+  integrity sha512-jdKmPYD6+ljjWZp/FKp7n9sU3NUYZh8I8M0HhSdohM4lHNOkTMf6MKxJVmoGd7mr6U2sdAfdFf/mHpr89eJ6qw==
+
+"@enonic/js-utils@^0.38.0":
   version "0.38.8"
   resolved "https://registry.yarnpkg.com/@enonic/js-utils/-/js-utils-0.38.8.tgz#c4190ca6bbb57040b9d2ace43893c93a5c4e380a"
   integrity sha512-jVTq+my4gahkXqOwUytZ0wc5T7h11zvbqoKBMNsXmJdhmfS/NmAyf5NV2k9ql7qVQOa97sjE6KH/0c1iPN40Fw==

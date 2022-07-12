@@ -64,14 +64,8 @@ import {URL} from '/lib/galimatias';
 //@ts-ignore
 import {request as httpClientRequest} from '/lib/http-client';
 
-import {
-	NT_DOCUMENT
-} from '/lib/explorer/model/2/constants';
-import {query} from '/lib/explorer/connection/query';
 import {exists} from '/lib/explorer/node/exists';
 import {get} from '/lib/explorer/node/get';
-import {addFilter} from '/lib/explorer/query/addFilter';
-import {hasValue} from '/lib/explorer/query/hasValue';
 import {hash} from '/lib/explorer/string/hash';
 
 import {Collector} from '/lib/explorer/collector/Collector';
@@ -461,14 +455,49 @@ export function run({
 				} // boolFollow
 
 				if (boolIndex && (!robots || robots.isIndexable('', uri))) {
-					const documentToPersist = {
+					const documentToPersist :{
+						displayName :string
+						text :string
+						title :string
+						uri :string
+						uris :Array<string>
+						_id ?:string
+					} = {
 						displayName: title, // This has no field definition by default
-						title,
 						text: bodyEl.text(),
+						title,
 						uri,
 						uris // This has no field definition by default
 					};
 					TRACE && log.debug('documentToPersist:%s', toStr(documentToPersist));
+
+					// TODO Check if any document with uri exists
+					const documentsRes = collector.queryDocuments({
+						aggregations: null,
+						count: 1,
+						filters: null,
+						query: {
+							boolean: {
+								must: {
+									term: {
+										field: 'uri',
+										value: uri
+									}
+								}
+							}
+						},
+						sort: null,
+						start: null
+					});
+					//log.debug('webcrawl documentsRes:%s', toStr(documentsRes));
+
+					if (documentsRes.total > 1) {
+						throw new Error(`Multiple documents found with uri:${uri}! uri is supposed to be unique!`);
+					} else if (documentsRes.total === 1) {
+						// Provide which document node to update (rather than creating a new document node)
+						documentToPersist._id = documentsRes.hits[0].id;
+					}
+
 					const persistedDocument = collector.persistDocument(
 						documentToPersist, {
 							// Must be identical to a _name in src/main/resources/documentTypes.json
@@ -491,37 +520,50 @@ export function run({
 	// 6. Delete old nodes
 	//──────────────────────────────────────────────────────────────────────────
 	function deleteOldNodes() {
-		const filters = addFilter({
-			filter: hasValue('type', [NT_DOCUMENT])
-		});
-		addFilter({
+		/*const filters = addQueryFilter({
 			clause: 'mustNot',
-			filter: hasValue('uri', Object.keys(seenUrisObj)),
-			filters
-		});
+			filter: hasValue('uri', Object.keys(seenUrisObj))
+		});*/
 		//log.debug(toStr({filters}));
-		const res = query({
-			aggregations: {},
-			connection: collector.collection.connection,
+		const res = collector.queryDocuments({
+			aggregations: null,
 			count: -1,
-			filters,
-			query: '',
-			sort: ''
+			filters: null,
+			query: {
+				boolean: {
+					mustNot: {
+						in: {
+							field: 'uri',
+							values: Object.keys(seenUrisObj)
+						}
+					}
+				}
+			},
+			sort: null,
+			start: null
 		});
 		//log.debug(`res:${toStr(res)}`); // Huuge!
 		TRACE && log.debug('count:%s total:%s res.hits.length:%s', res.count, res.total, res.hits.length);
+
 		if (res.hits.length) {
 			TRACE && log.debug(`res.hits[0]:${toStr(res.hits[0])}`);
 			const idsToDelete = [];
 			const pathsToDelete = [];
 			const nodeId2Uri = {};
 			for (let i = 0; i < res.hits.length; i += 1) {
-				const node = res.hits[i]; //log.debug(`node:${toStr(node)}`);
+				const {id} = res.hits[i];
+
+				const node = collector.collection.connection.get<{
+					_path :string
+					uri :string
+				}>(id);
+				//log.debug('node:%s', toStr(node));
+
 				if (node) { // Handle ghost nodes
-					const {_id, _path, uri} = node;
-					idsToDelete.push(_id);
+					const {_path, uri} = node;
+					idsToDelete.push(id);
 					pathsToDelete.push(_path);
-					nodeId2Uri[_id] = uri;
+					nodeId2Uri[id] = uri;
 				}
 			}
 			//log.debug(`nodeId2Uri:${toStr(nodeId2Uri)}`);
