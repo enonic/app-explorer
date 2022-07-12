@@ -31,7 +31,6 @@ export const Collector = React.forwardRef(({
 	setCollectorConfigErrorCount
 } :CollectorProps<CollectorConfig>, ref :CollectorComponentRef<CollectorConfig>) => {
 	const {
-		baseUri,
 		baseUriError,
 		baseUriOnBlur,
 		baseUriOnChange,
@@ -51,9 +50,12 @@ export const Collector = React.forwardRef(({
 			error={baseUriError}
 			fluid
 			label='Uri'
-			onBlur={() => baseUriOnBlur(baseUri)}
+			onBlur={baseUriOnBlur}
 			onChange={baseUriOnChange}
-			value={baseUri}
+			required
+			value={collectorConfig
+				? (collectorConfig.baseUri || '')
+				: ''}
 		/>
 		{excludesArray && Array.isArray(excludesArray) && excludesArray.length
 			? <>

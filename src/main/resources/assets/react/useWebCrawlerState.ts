@@ -27,16 +27,12 @@ export function useWebCrawlerState({
 	collectorConfig :CollectorConfig,
 	initialCollectorConfig :CollectorConfig,
 	ref :CollectorComponentRef<CollectorConfig>,
-	setCollectorConfig :(collectorConfig :CollectorConfig) => void
+	setCollectorConfig :(param :CollectorConfig|((prevCollectorConfig :CollectorConfig) => CollectorConfig)) => void
 	setCollectorConfigErrorCount :(collectorConfigErrorCount :number) => void
 }) {
 	//──────────────────────────────────────────────────────────────────────────
 	// State
 	//──────────────────────────────────────────────────────────────────────────
-	const [baseUri, setBaseUri] = React.useState<string>(collectorConfig
-		? (collectorConfig.baseUri || '')
-		: ''
-	);
 	const [baseUriError, setBaseUriError] = React.useState<string>(undefined);
 	const [/*baseUriVisited*/, setBaseUriVisited] = React.useState(false);
 	const [excludesArray, setExcludesArray] = React.useState<Array<string>>(
@@ -62,23 +58,30 @@ export function useWebCrawlerState({
 		{value} : {value :string}
 	) => {
 		//console.debug('baseUriOnChange');
-		setBaseUri(value);
+		setCollectorConfig(prevCollectorConfig => ({
+			...prevCollectorConfig,
+			baseUri: value
+		}));
 		validateBaseUri(value);
 	}, [
+		setCollectorConfig,
 		validateBaseUri
 	]);
 
-	const baseUriOnBlur = React.useCallback((baseUri :string) => {
+	const baseUriOnBlur = React.useCallback(() => {
 		//console.debug('baseUriOnBlur');
 		setBaseUriVisited(true);
-		validateBaseUri(baseUri);
-	}, [validateBaseUri]);
+		validateBaseUri(collectorConfig
+			? (collectorConfig.baseUri || '')
+			: '');
+	}, [
+		collectorConfig,
+		validateBaseUri
+	]);
 
 	const reset = React.useCallback<CollectorComponentResetFunction>(() => {
 		//console.debug('in collector component reset');
-		setBaseUri(initialCollectorConfig
-			? (initialCollectorConfig.baseUri || '')
-			: ''); // useEffect[baseUri] should trigger setCollectorConfig
+		setCollectorConfig(initialCollectorConfig); // TODO This should be taken care of by the parent itself!
 		setBaseUriVisited(false); // no listeners on baseUriVisited :)
 		setBaseUriError(undefined); // useEffect[baseUriError] SHOULD trigger setCollectorConfigErrorCount, but DOESN'T ???
 
@@ -93,6 +96,7 @@ export function useWebCrawlerState({
 		setCollectorConfigErrorCount(0); // useEffect[baseUriError] SHOULD trigger setCollectorConfigErrorCount, but DOESN'T ???
 	}, [
 		initialCollectorConfig, // never changes
+		setCollectorConfig,
 		setCollectorConfigErrorCount
 	]);
 
@@ -133,20 +137,18 @@ export function useWebCrawlerState({
 
 	useUpdateEffect(() => {
 		//console.debug('any change calling setCollectorConfig()');
-		setCollectorConfig({
-			baseUri,
+		setCollectorConfig(prevCollectorConfig => ({
+			...prevCollectorConfig,
 			excludes: excludesArray,
 			userAgent
-		});
+		}));
 	},[
-		baseUri,
 		excludesArray,
 		setCollectorConfig,
 		userAgent
 	]);
 
 	return {
-		baseUri,
 		baseUriOnBlur,
 		baseUriOnChange,
 		baseUriError,
