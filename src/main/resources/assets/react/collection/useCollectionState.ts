@@ -42,7 +42,7 @@ function getCollectorNameFromInitiaValues(initialValues :CollectionFormValues) :
 		? initialValues.collector.name
 		: initialValues._id
 			? '_none'
-			: undefined;
+			: '';
 }
 
 function getDocumentTypeIdFromInitiaValues(initialValues :CollectionFormValues) :string|undefined {
@@ -70,7 +70,7 @@ export function useCollectionState({
 	//──────────────────────────────────────────────────────────────────────────
 	// "Derived" state
 	//──────────────────────────────────────────────────────────────────────────
-	const [collectorName, setCollectorName] = React.useState<string>(initialValues.collector ? initialValues.collector.name : undefined);
+	const [collectorName, setCollectorName] = React.useState<string>(getCollectorNameFromInitiaValues(initialValues));
 	const [cronArray, setCronArray] = React.useState(initialValues.cron);
 	const [documentTypeId, setDocumentTypeId] = React.useState<string>(getDocumentTypeIdFromInitiaValues(initialValues));
 	const [doCollect, setDoCollect] = React.useState(initialValues.doCollect);
@@ -210,12 +210,16 @@ export function useCollectionState({
 	function resetState() {
 		//console.debug('resetState');
 
-		if (collectorComponentRef && collectorComponentRef.current && isFunction(collectorComponentRef.current.reset)) {
-			collectorComponentRef.current.reset();
-		} else {
-			setCollectorConfig(getCollectorConfigFromInitiaValues(initialValues));
-			setCollectorConfigErrorCount(0); // This will trigger setErrorCount
-			//setErrorCount(0); // This will be called by useEffect on [collectorConfigErrorCount, nameError]
+		setCollectorConfig(getCollectorConfigFromInitiaValues(initialValues));
+		setCollectorConfigErrorCount(0); // This will trigger setErrorCount
+		//setErrorCount(0); // This will be called by useEffect on [collectorConfigErrorCount, nameError]
+
+		if (
+			collectorComponentRef
+			&& collectorComponentRef.current
+			&& isFunction(collectorComponentRef.current.afterReset)
+		) {
+			collectorComponentRef.current.afterReset();
 		}
 
 		setCollectorName(getCollectorNameFromInitiaValues(initialValues));

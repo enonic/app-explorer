@@ -25,7 +25,7 @@ export function CollectorOptions({
 	siteOptions
 } :{
 	collectorComponentRef :React.MutableRefObject<{
-		reset :() => void
+		afterReset :() => void
 		validate :(collectorConfig :AnyObject) => boolean
 			}>
 	collectorComponents :CollectorComponents

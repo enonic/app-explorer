@@ -1,6 +1,6 @@
 import type {
 	CollectorComponentRef,
-	CollectorComponentResetFunction,
+	CollectorComponentAfterResetFunction,
 	CollectorComponentValidateFunction
 } from '/lib/explorer/types/index.d';
 
@@ -19,29 +19,51 @@ export type CollectorConfig = {
 
 export function useWebCrawlerState({
 	collectorConfig,
-	initialCollectorConfig,
+	//initialCollectorConfig,
 	ref,
 	setCollectorConfig,
 	setCollectorConfigErrorCount
 } :{
 	collectorConfig :CollectorConfig,
-	initialCollectorConfig :CollectorConfig,
+	//initialCollectorConfig :CollectorConfig,
 	ref :CollectorComponentRef<CollectorConfig>,
 	setCollectorConfig :(param :CollectorConfig|((prevCollectorConfig :CollectorConfig) => CollectorConfig)) => void
 	setCollectorConfigErrorCount :(collectorConfigErrorCount :number) => void
 }) {
 	//──────────────────────────────────────────────────────────────────────────
+	// Avoiding derived state, by simply "symlinking"
+	//──────────────────────────────────────────────────────────────────────────
+	const baseUri = collectorConfig
+		? (collectorConfig.baseUri || '')
+		: '';
+
+	const excludesArray = collectorConfig && collectorConfig.excludes ? forceArray(collectorConfig.excludes) : undefined; // Avoid derived state, so don't wrap with useState!
+	//console.debug('excludesArray', excludesArray);
+
+	const setExcludesArray = (newExcludesArray :Array<string>) => setCollectorConfig(prevCollectorConfig => {
+		//console.debug('setExcludesArray newExcludesArray', newExcludesArray);
+		return {
+			...prevCollectorConfig,
+			excludes: newExcludesArray
+		};
+	});
+
+	const userAgent = collectorConfig
+		? (collectorConfig.userAgent || '')
+		: '';
+
+	const setUserAgent = (newUserAgent :string) => setCollectorConfig(prevCollectorConfig => {
+		return {
+			...prevCollectorConfig,
+			userAgent: newUserAgent
+		};
+	});
+
+	//──────────────────────────────────────────────────────────────────────────
 	// State
 	//──────────────────────────────────────────────────────────────────────────
 	const [baseUriError, setBaseUriError] = React.useState<string>(undefined);
 	const [/*baseUriVisited*/, setBaseUriVisited] = React.useState(false);
-	const [excludesArray, setExcludesArray] = React.useState<Array<string>>(
-		collectorConfig && collectorConfig.excludes ? forceArray(collectorConfig.excludes) : undefined
-	);
-	const [userAgent, setUserAgent] = React.useState<string>(collectorConfig
-		? (collectorConfig.userAgent || '')
-		: ''
-	);
 
 	//──────────────────────────────────────────────────────────────────────────
 	// Callbacks, should only depend on props, not state
@@ -79,26 +101,10 @@ export function useWebCrawlerState({
 		validateBaseUri
 	]);
 
-	const reset = React.useCallback<CollectorComponentResetFunction>(() => {
-		//console.debug('in collector component reset');
-		setCollectorConfig(initialCollectorConfig); // TODO This should be taken care of by the parent itself!
+	const afterReset :CollectorComponentAfterResetFunction = () => {
 		setBaseUriVisited(false); // no listeners on baseUriVisited :)
 		setBaseUriError(undefined); // useEffect[baseUriError] SHOULD trigger setCollectorConfigErrorCount, but DOESN'T ???
-
-		// useEffect[excludesArray] should trigger setCollectorConfig
-		setExcludesArray(initialCollectorConfig && initialCollectorConfig.excludes ? forceArray(initialCollectorConfig.excludes) : undefined);
-
-		// useEffect[userAgent] should trigger setCollectorConfig
-		setUserAgent(initialCollectorConfig
-			? (initialCollectorConfig.userAgent || '')
-			: ''
-		);
-		setCollectorConfigErrorCount(0); // useEffect[baseUriError] SHOULD trigger setCollectorConfigErrorCount, but DOESN'T ???
-	}, [
-		initialCollectorConfig, // never changes
-		setCollectorConfig,
-		setCollectorConfigErrorCount
-	]);
+	};
 
 	const validate = React.useCallback<CollectorComponentValidateFunction<CollectorConfig>>(({baseUri} :{baseUri :string}) => {
 		//console.debug('in validateCollectorConfig');
@@ -114,7 +120,7 @@ export function useWebCrawlerState({
 	// Make it possible for parent to call these functions
 	//──────────────────────────────────────────────────────────────────────────
 	React.useImperativeHandle(ref, () => ({
-		reset,
+		afterReset,
 		validate
 	}));
 
@@ -135,20 +141,8 @@ export function useWebCrawlerState({
 		baseUriError
 	]);
 
-	useUpdateEffect(() => {
-		//console.debug('any change calling setCollectorConfig()');
-		setCollectorConfig(prevCollectorConfig => ({
-			...prevCollectorConfig,
-			excludes: excludesArray,
-			userAgent
-		}));
-	},[
-		excludesArray,
-		setCollectorConfig,
-		userAgent
-	]);
-
 	return {
+		baseUri,
 		baseUriOnBlur,
 		baseUriOnChange,
 		baseUriError,
