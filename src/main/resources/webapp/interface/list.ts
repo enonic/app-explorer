@@ -4,8 +4,8 @@ import type {EnonicXpRequest} from '/lib/explorer/types/index.d';
 import {
 	RESPONSE_TYPE_HTML,
 	forceArray,
-	startsWith,
-	toStr
+	startsWith//,
+	//toStr
 } from '@enonic/js-utils';
 import {resolve} from 'uri-js';
 import {
