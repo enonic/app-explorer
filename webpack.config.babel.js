@@ -188,8 +188,8 @@ const SS_JS_CONFIG = {
 		'tasks/init/init': './tasks/init/init.ts',
 		'tasks/reindexCollection/reindexCollection': './tasks/reindexCollection/reindexCollection.ts',
 		'tasks/test/test': './tasks/test/test.ts',
-		'tasks/webcrawl/webcrawl': './tasks/webcrawl/webcrawl.ts'//,
-		//'webapp/webapp': './webapp/webapp.ts'
+		//'tasks/webcrawl/webcrawl': './tasks/webcrawl/webcrawl.ts',
+		'webapp/webapp': './webapp/webapp.ts'
 	},
 	externals: SS_EXTERNALS,
 	mode: MODE,
