@@ -1,6 +1,6 @@
 [{
 	"_name": "webpage",
-	"addFields": true,
+	"addFields": false,
 	"properties": [{
 		"active": true,
 		"enabled": true,
@@ -29,7 +29,7 @@
 		"fulltext": true,
 		"includeInAllText": false,
 		"max": 0,
-		"min": 0,
+		"min": 1,
 		"name": "url",
 		"nGram": false,
 		"path": false,

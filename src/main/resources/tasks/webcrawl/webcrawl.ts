@@ -471,7 +471,7 @@ export function run({
 					};
 					TRACE && log.debug('documentToPersist:%s', toStr(documentToPersist));
 
-					// TODO Check if any document with uri exists
+					// Check if any document with uri exists
 					const documentsRes = collector.queryDocuments({
 						aggregations: null,
 						count: 1,
