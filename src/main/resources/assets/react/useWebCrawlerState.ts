@@ -19,14 +19,12 @@ export type CollectorConfig = {
 
 export function useWebCrawlerState({
 	collectorConfig,
-	//initialCollectorConfig,
 	ref,
 	setCollectorConfig,
 	setCollectorConfigErrorCount
 } :{
-	collectorConfig :CollectorConfig,
-	//initialCollectorConfig :CollectorConfig,
-	ref :CollectorComponentRef<CollectorConfig>,
+	collectorConfig :CollectorConfig
+	ref :CollectorComponentRef<CollectorConfig>
 	setCollectorConfig :(param :CollectorConfig|((prevCollectorConfig :CollectorConfig) => CollectorConfig)) => void
 	setCollectorConfigErrorCount :(collectorConfigErrorCount :number) => void
 }) {
@@ -72,7 +70,7 @@ export function useWebCrawlerState({
 		//console.debug('in validateBaseUri');
 		const newError = !baseUri ? 'Uri is required!' : undefined;
 		setBaseUriError(newError); // useEffect[baseUriError] triggers setCollectorConfigErrorCount
-		return !!!newError;
+		return !newError;
 	},[]); // Since there are no deps, it could have been a normal function rather than a React.useCallback
 
 	const baseUriOnChange = React.useCallback((
@@ -106,13 +104,11 @@ export function useWebCrawlerState({
 		setBaseUriError(undefined); // useEffect[baseUriError] SHOULD trigger setCollectorConfigErrorCount, but DOESN'T ???
 	};
 
-	const validate = React.useCallback<CollectorComponentValidateFunction<CollectorConfig>>(({baseUri} :{baseUri :string}) => {
+	const validate = React.useCallback<CollectorComponentValidateFunction<CollectorConfig>>(({baseUri} :CollectorConfig) => {
 		//console.debug('in validateCollectorConfig');
 		const newCollectorConfigErrorCount = validateBaseUri(baseUri) ? 0 : 1;
-		//setCollectorConfigErrorCount(newCollectorConfigErrorCount); // useEffect on baseUriError triggers setCollectorConfigErrorCount
-		return !!!newCollectorConfigErrorCount;
+		return !newCollectorConfigErrorCount;
 	}, [
-		//setCollectorConfigErrorCount,
 		validateBaseUri
 	]);
 
