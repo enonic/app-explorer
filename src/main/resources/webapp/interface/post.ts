@@ -154,10 +154,13 @@ export function overrideable(request :InterfaceRequest, fn = isUnauthorized) {
 		interfaceName
 	};
 	//log.debug(`context:${toStr(context)}`);
+
+	const schema = makeSchema();
+
 	return {
 		contentType: RESPONSE_TYPE_JSON,
 		//body: JSON.stringify(execute(generateSchemaForInterface(interfaceName), query, variables, context))
-		body: JSON.stringify(execute(makeSchema(), query, variables, context))
+		body: JSON.stringify(execute(schema, query, variables, context))
 	};
 }
 

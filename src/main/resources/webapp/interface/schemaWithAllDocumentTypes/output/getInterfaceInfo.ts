@@ -1,7 +1,10 @@
 import type {CollectionNode} from '/lib/explorer/types/Collection.d';
 
 
-import {forceArray} from '@enonic/js-utils';
+import {
+	forceArray,
+	toStr
+} from '@enonic/js-utils';
 import {PRINCIPAL_EXPLORER_READ} from '/lib/explorer/constants';
 import {connect} from '/lib/explorer/repo/connect';
 import {getCollectionIds} from '/lib/explorer/collection/getCollectionIds';
@@ -25,9 +28,10 @@ export function getInterfaceInfo({
 
 	const {
 		fields = [],// = DEFAULT_INTERFACE_FIELDS, TODO This wont work when fields = [] which filter does
-		stopWords//,
-		//synonyms // TODO
+		stopWords,
+		synonymIds
 	} = filteredInterfaceNode;
+	//log.debug('synonymIds:%s', toStr(synonymIds));
 
 	let {
 		collectionIds,
@@ -53,9 +57,35 @@ export function getInterfaceInfo({
 		collectionNameToId[_name] = _id;
 	}
 
+	const thesauriNames = synonymIds.length // Avoid: Cannot build empty 'IN' statements"
+		? explorerRepoReadConnection.query({
+			count: -1,
+			query: {
+				boolean: {
+					must: {
+						in: {
+							field: '_id',
+							values: synonymIds
+						}
+					}
+				}
+			}
+		}).hits.map(({id}) => {
+			const thesauriNode = explorerRepoReadConnection.get(id);
+			//log.debug('thesauriNode:%s', toStr(thesauriNode));
+			if (thesauriNode) {
+				return thesauriNode._name;
+			} else {
+				log.error(`Interface ${interfaceName} refers to an thesarusId ${synonymIds} that doesn't exist!`);
+			}
+		}).filter((x) => x)
+		: []; // Remove missing thesauri.
+	//log.debug('thesauriNames:%s', toStr(thesauriNames));
+
 	return {
 		collectionNameToId,
 		fields,
-		stopWords
+		stopWords,
+		thesauriNames
 	};
 } // getInterfaceInfo
