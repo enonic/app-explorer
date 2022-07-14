@@ -19,6 +19,8 @@ import {hasValue} from '/lib/explorer/query/hasValue';
 import {removeStopWords} from '/lib/explorer/query/removeStopWords';
 import {wash} from '/lib/explorer/query/wash';
 import {get as getStopWordsList} from '/lib/explorer/stopWords/get';
+import {getSynonymsFromSearchString} from '/lib/explorer/synonym/getSynonymsFromSearchString';
+import {flattenSynonyms} from '/lib/explorer/synonym/flattenSynonyms';
 import {
 	createAggregation,
 	createFilters
@@ -39,7 +41,8 @@ export function makeQueryParams({
 	highlightArg,
 	searchString = '',
 	start,
-	stopWords
+	stopWords,
+	thesauriNames
 } :{
 	aggregationsArg :Array<AnyObject>
 	count ?:number
@@ -49,6 +52,7 @@ export function makeQueryParams({
 	searchString :string
 	start ?:number
 	stopWords :Array<string>
+	thesauriNames :Array<string>
 }) {
 	//log.debug('makeQueryParams highlightArg:%s', toStr(highlightArg));
 
@@ -80,13 +84,15 @@ export function makeQueryParams({
 		//log.debug('filtersArray:%s', toStr(filtersArray));
 	}
 
+	const explorerRepoReadConnection = connect({ principals: [PRINCIPAL_EXPLORER_READ] });
+
 	const washedSearchString = wash({string: searchString});
 	const listOfStopWords = [];
 	if (stopWords && stopWords.length) {
 		//log.debug(`stopWords:${toStr(stopWords)}`);
 		stopWords.forEach((name) => {
 			const {words} = getStopWordsList({ // Not a query
-				connection: connect({ principals: [PRINCIPAL_EXPLORER_READ] }),
+				connection: explorerRepoReadConnection,
 				name
 			});
 			//log.debug(`words:${toStr(words)}`);
@@ -104,18 +110,60 @@ export function makeQueryParams({
 		stopWords: listOfStopWords,
 		string: washedSearchString
 	});
+
+	const synonyms = getSynonymsFromSearchString({
+		//expand,
+		//explain,
+		explorerRepoReadConnection,
+		searchString: searchStringWithoutStopWords,
+		showSynonyms: true,
+		thesauri: thesauriNames
+	});
+	//log.debug('synonyms:%s', toStr(synonyms));
+
+	const flattenedSynonyms = flattenSynonyms({
+		//expand,
+		synonyms
+	}).map(s => `${s}`); // Removed double quotes https://enonic.zendesk.com/agent/tickets/3714
+	//log.debug('flattenedSynonyms:%s', toStr(flattenedSynonyms));
+
+	//log.debug('fields:%s', toStr(fields));
 	const query = makeQuery({
 		fields,
 		searchStringWithoutStopWords
 	});
+	//log.debug('query:%s', toStr(query));
+
+	if (flattenedSynonyms) {
+		for (let i = 0; i < flattenedSynonyms.length; i++) {
+			//log.debug(`flattenedSynonyms[${i}]:%s`, flattenedSynonyms[i]);
+			//log.debug('before query.boolean.should:%s', toStr(query.boolean.should));
+			const aSynonymQuery = {
+				fulltext: {
+					fields: fields.map(({name}) => name), // NOTE: No boosting
+					operator: 'AND',
+					query: flattenedSynonyms[i]
+				}
+			};
+			//log.debug('aSynonymQuery:%s', toStr(aSynonymQuery));
+			//@ts-ignore // We know it's a list
+			query.boolean.should.push(aSynonymQuery);
+			//log.debug('after query.boolean.should:%s', toStr(query.boolean.should));
+		} // for flattenedSynonyms
+	}
+	//log.debug('query:%s', toStr(query));
+
 	return {
-		aggregations,
-		count,
-		filters: filtersArray ? filtersArray : staticFilter,
-		highlight: highlightArg
-			? highlightGQLArgToEnonicXPQuery({highlightArg})
-			: null,
-		query,
-		start
+		queryParams: {
+			aggregations,
+			count,
+			filters: filtersArray ? filtersArray : staticFilter,
+			highlight: highlightArg
+				? highlightGQLArgToEnonicXPQuery({highlightArg})
+				: null,
+			query,
+			start,
+		},
+		synonyms
 	};
 }

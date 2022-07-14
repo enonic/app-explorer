@@ -4,6 +4,7 @@ import type {
 } from '/lib/explorer/types/index.d';
 import type {Highlight} from '../highlight/input/index.d';
 //import type {HighlightArray} from '../highlight/output/index.d';
+import type {SynonymsArray} from '/lib/explorer/synonym/index.d';
 
 
 export type {EmptyObject} from '/lib/explorer/types/index.d';
@@ -59,5 +60,6 @@ export type SearchResolverReturnType = {
 	count :number
 	hits :Array<Hit>
 	start :number
+	synonyms :SynonymsArray
 	total :number
 }
