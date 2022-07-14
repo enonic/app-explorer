@@ -46,7 +46,8 @@ export function searchResolver({
 	const {
 		collectionNameToId,
 		fields,
-		stopWords
+		stopWords,
+		thesauriNames
 	} = getInterfaceInfo({
 		interfaceName
 	});
@@ -59,7 +60,10 @@ export function searchResolver({
 		}))
 	});
 
-	const queryParams = makeQueryParams({
+	const {
+		queryParams,
+		synonyms
+	} = makeQueryParams({
 		aggregationsArg,
 		count,
 		fields,
@@ -67,7 +71,8 @@ export function searchResolver({
 		highlightArg,
 		searchString,
 		start,
-		stopWords
+		stopWords,
+		thesauriNames,
 	});
 	//log.debug('searchResolver queryParams:%s', toStr(queryParams));
 
@@ -126,6 +131,7 @@ export function searchResolver({
 			return hit;
 		}),
 		start, // Used by searchConnection
+		synonyms,
 		total: queryRes.total
 	};
 	return rv
