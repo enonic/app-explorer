@@ -59,8 +59,8 @@ describe('webapp', () => {
 									}
 								],
 								terms: {
-								field: 'language',
-								size: 10
+									field: 'language',
+									size: 10
 							  }
 							},
 							{
