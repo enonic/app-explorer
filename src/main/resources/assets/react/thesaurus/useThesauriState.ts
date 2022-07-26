@@ -6,57 +6,59 @@ import type {
 } from './index.d';
 
 
+import * as gql from 'gql-query-builder';
 import moment from 'moment';
 import * as React from 'react';
 import {useInterval} from '../utils/useInterval';
 
 
-const GQL_LOCALES_GET = `getLocales {
-	country
-	#displayCountry
-	#displayLanguage
-	displayName
-	#displayVariant
-	#language
-	tag
-	#variant
-}`;
+const GQL_LOCALES_GET = {
+	operation: 'getLocales',
+	fields: [
+		'country',
+		//displayCountry
+		//displayLanguage
+		'displayName',
+		//displayVariant
+		//language
+		'tag'
+		//variant
+	]
+};
 
-const GQL_THESAURI_QUERY = `queryThesauri {
-	total
-	count
-	hits {
-		_id
-		_name
-		_nodeType
-		_path
-		#_versionKey
-		description
-		language {
-			from
-			to
-		}
-		synonymsCount
-	}
-}`;
+const GQL_THESAURI_QUERY = {
+	operation: 'queryThesauri',
+	fields: [
+		'count',
+		{
+			hits: [
+				'_id',
+				'_name',
+				//'_nodeType',
+				//'_path',
+				//'_versionKey',
+				'allowedLanguages',
+				//'description',
+				'synonymsCount'
+			]
+		},
+		'total'
+	]
+};
 
-const GQL_ON_MOUNT = `{
-	${GQL_LOCALES_GET}
-	${GQL_THESAURI_QUERY}
-}`;
+const GQL_ON_MOUNT = JSON.stringify(gql.query([
+	GQL_LOCALES_GET,
+	GQL_THESAURI_QUERY
+]));
 
-const GQL_ON_UPDATE = `{
-	${GQL_THESAURI_QUERY}
-}`;
+const GQL_ON_UPDATE = JSON.stringify(gql.query([
+	GQL_THESAURI_QUERY
+]));
+
 
 
 export const NEW_OR_EDIT_STATE_DEFAULT :NewOrEditState = {
 	_id: undefined,
-	_name: undefined,
-	language: {
-		from: '',
-		to: ''
-	},
 	open: false,
 };
 
@@ -78,7 +80,6 @@ export function useThesauriState({
 	const [newOrEditState, setNewOrEditState] = React.useState<NewOrEditState>(NEW_OR_EDIT_STATE_DEFAULT);
 	const [editSynonymsModalState, setEditSynonymsModalState] = React.useState<EditSynonymsModalState>({
 		_id: undefined,
-		_name: undefined,
 		open: false
 	});
 	const [updatedAt, setUpdatedAt] = React.useState(moment());
@@ -89,7 +90,7 @@ export function useThesauriState({
 		fetch(`${servicesBaseUrl}/graphQL`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ query: GQL_ON_UPDATE })
+			body: GQL_ON_UPDATE
 		})
 			.then(res => res.json() as Promise<{
 				data :{
@@ -116,7 +117,7 @@ export function useThesauriState({
 		fetch(`${servicesBaseUrl}/graphQL`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ query: GQL_ON_MOUNT })
+			body: GQL_ON_MOUNT
 		})
 			.then(res => res.json() as Promise<{
 				data :{

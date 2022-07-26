@@ -7,42 +7,45 @@ import {
 import {thesaurus as thesaurusModel} from '/lib/explorer/model/2/nodeTypes/thesaurus';
 import {connect} from '/lib/explorer/repo/connect';
 import {
-	GQL_INPUT_TYPE_THESAURUS_LANGUAGE_NAME,
-	GQL_TYPE_THESAURUS_NAME
-} from '../constants';
+	GraphQLString,
+	list
+	//@ts-ignore
+} from '/lib/graphql';
+import {GQL_TYPE_THESAURUS_NAME} from '../constants';
 
 
-export function generateCreateThesaurusField({
+export function addMutationThesaurusCreate({
 	glue
 }) {
-	return {
+	glue.addMutation({
+		name: 'createThesaurus',
 		args: {
 			_name: glue.getScalarType('_name'),
-			language: glue.getInputType(GQL_INPUT_TYPE_THESAURUS_LANGUAGE_NAME)
+			allowedLanguages: list(GraphQLString)
 		},
 		resolve({
 			args: {
 				_name,
-				language
+				allowedLanguages
 			}
 		}) {
 			const writeConnection = connect({ principals: [PRINCIPAL_EXPLORER_WRITE] });
 			const createdNode = writeConnection.create(thesaurusModel({
 				_name,
-				language
+				allowedLanguages
 			}));
 			//log.debug(`createdNode:${toStr(createdNode)}`);
 			writeConnection.refresh();
 			return createdNode;
 		},
 		type: glue.getObjectType(GQL_TYPE_THESAURUS_NAME)
-	};
+	});
 }
 
 /*
 mutation CreateThesaurusMutation(
   $_name: String!,
-  $language: ThesaurusLanguageInput!
+  $allowedLanguages: [String]!
 ) {
   createThesaurus(
     _name: $_name,
@@ -52,10 +55,7 @@ mutation CreateThesaurusMutation(
     _name
     _nodeType
     _path
-    language {
-      from
-      to
-    }
+    allowedLanguages
   }
 }
 */

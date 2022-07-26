@@ -24,8 +24,8 @@ export function generateQueryThesauriField({
 				_name,
 				_nodeType,
 				_path,
+				allowedLanguages,
 				description,
-				language,
 				synonymsCount,
 				_versionKey
 			}) => ({
@@ -33,8 +33,8 @@ export function generateQueryThesauriField({
 				_name,
 				_nodeType,
 				_path,
+				allowedLanguages,
 				description,
-				language,
 				synonyms: querySynonyms({
 					count: 0, // No need to fetch any data
 					filters: {
@@ -70,10 +70,7 @@ export function generateQueryThesauriField({
 			_path
 			description
 			#displayName
-			language {
-				from
-				to
-			}
+			allowedLanguages
 			synonyms {
 				total
 				count

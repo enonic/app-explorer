@@ -18,7 +18,6 @@ import {
 } from 'semantic-ui-react';
 
 import {EditSynonymsModal} from './EditSynonymsModal';
-//import {NewOrEditSynonym} from './NewOrEditSynonym';
 import {NewOrEditThesaurus} from './NewOrEditThesaurus';
 import {DeleteThesaurus} from './DeleteThesaurus';
 import {Import} from './Import';
@@ -101,8 +100,7 @@ export function Thesauri({
 				<Table.Row>
 					<Table.HeaderCell>Options</Table.HeaderCell>
 					<Table.HeaderCell>Name</Table.HeaderCell>
-					<Table.HeaderCell>From Language</Table.HeaderCell>
-					<Table.HeaderCell>To Language</Table.HeaderCell>
+					<Table.HeaderCell>Languages</Table.HeaderCell>
 					<Table.HeaderCell>Synonyms</Table.HeaderCell>
 					<Table.HeaderCell>Count</Table.HeaderCell>
 					<Table.HeaderCell>Actions</Table.HeaderCell>
@@ -115,17 +113,9 @@ export function Thesauri({
 						//description,
 						_id,
 						_name,
-						language,/* = {  // This doesn't help when null is passed in! Happens when execute is surrounded with JSON.stringify
-							from: '',
-							to: ''
-						},*/
+						allowedLanguages,
 						synonymsCount
 					}, index) => {
-						if (!language) { language = {
-							from: '',
-							to: ''
-						};}
-						const {from,to} = language;
 						return <Table.Row disabled={isLoading} key={index}>
 							<Table.Cell collapsing>
 								<Popup
@@ -138,11 +128,6 @@ export function Thesauri({
 										onClick={() => {
 											setNewOrEditState({
 												_id,
-												_name,
-												language: {
-													from,
-													to
-												},
 												open: true
 											});
 										}}
@@ -150,8 +135,7 @@ export function Thesauri({
 								/>
 							</Table.Cell>
 							<Table.Cell collapsing>{_name}</Table.Cell>
-							<Table.Cell collapsing>{from}</Table.Cell>
-							<Table.Cell collapsing>{to}</Table.Cell>
+							<Table.Cell collapsing>{allowedLanguages.join(', ')}</Table.Cell>
 							<Table.Cell collapsing>
 								<Popup
 									content={`Edit ${_name} synonyms`}
@@ -173,17 +157,6 @@ export function Thesauri({
 							<Table.Cell collapsing>{synonymsCount}</Table.Cell>
 							<Table.Cell collapsing>
 								<Button.Group>
-									{/*<NewOrEditSynonym
-										afterClose={fetchOnUpdate}
-										servicesBaseUrl={servicesBaseUrl}
-										thesaurusId={_id}
-									/>*/}
-									{/*<EditSynonymsModal
-										afterClose={fetchOnUpdate}
-										servicesBaseUrl={servicesBaseUrl}
-										thesaurusId={_id}
-										thesaurusName={_name}
-									/>*/}
 									<Import
 										name={_name}
 										afterClose={memoizedFetchOnUpdate}
@@ -218,7 +191,6 @@ export function Thesauri({
 			</Table.Body>
 			<Table.Footer>
 				<Table.Row disabled={isLoading}>
-					<Table.HeaderCell></Table.HeaderCell>
 					<Table.HeaderCell></Table.HeaderCell>
 					<Table.HeaderCell></Table.HeaderCell>
 					<Table.HeaderCell></Table.HeaderCell>
@@ -257,11 +229,6 @@ export function Thesauri({
 			onClick={() => {
 				setNewOrEditState({
 					_id: undefined,
-					_name: undefined,
-					language: {
-						from: '',
-						to: ''
-					},
 					open: true
 				});
 			}}
@@ -275,9 +242,7 @@ export function Thesauri({
 			/></Button>
 		<NewOrEditThesaurus
 			_id={newOrEditState._id}
-			_name={newOrEditState._name}
 			open={newOrEditState.open}
-			language={newOrEditState.language}
 			licenseValid={licenseValid}
 			locales={locales}
 			afterClose={memoizedFetchOnUpdate}

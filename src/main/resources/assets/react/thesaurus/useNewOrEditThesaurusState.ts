@@ -1,3 +1,9 @@
+import type {Thesaurus} from '/lib/explorer/types/index.d';
+import type {JSONResponse}  from '../../../services/graphQL/fetchers/index.d';
+
+
+import fastDeepEqual from 'fast-deep-equal/react';
+import * as gql from 'gql-query-builder';
 import * as React from 'react';
 import {mustStartWithALowercaseLetter} from '../utils/mustStartWithALowercaseLetter';
 import {notDoubleUnderscore} from '../utils/notDoubleUnderscore';
@@ -6,80 +12,136 @@ import {required} from '../utils/required';
 import {useUpdateEffect} from '../utils/useUpdateEffect';
 
 
-const GQL_MUTATION_THESAURUS_CREATE = `mutation CreateThesaurusMutation(
-  $_name: String!,
-  $language: ThesaurusLanguageInput!
-) {
-  createThesaurus(
-    _name: $_name,
-    language: $language
-  ) {
-    _id
-    _name
-    _nodeType
-    _path
-    language {
-      from
-      to
-    }
-  }
-}`;
-
-const GQL_MUTATION_THESAURUS_UPDATE = `mutation UpdateThesaurusMutation(
-  $_id: ID!,
-  $_name: String!,
-  $language: ThesaurusLanguageInput!
-) {
-  updateThesaurus(
-    _id: $_id,
-    _name: $_name,
-    language: $language
-  ) {
-    _id
-    _name
-    _nodeType
-    _path
-    language {
-      from
-      to
-    }
-  }
-}`;
+declare type Name = string
+declare type State = {
+	_name :Name
+	languages :Array<string>
+}
+declare type VariableOption<
+	List extends boolean = false,
+	Type extends 'string'|'ID' = 'string',
+	TypeScriptType = Type extends 'string'
+		? string
+		: Type extends 'ID'
+		 ? string
+		 : unknown,
+	Value = List extends true
+		? Array<TypeScriptType>
+		: TypeScriptType
+> = {
+	value :Value
+    list ?:List
+	name ?:string
+	required ?:boolean
+	type ?:Type
+}
 
 
 export function useNewOrEditThesaurusState({
 	_id,
-	_name,
 	doClose,
-	language,
 	servicesBaseUrl,
 	thesaurusNames
 } :{
 	_id ?:string
-	_name :string
 	doClose :() => void
-	language ?:{
-		from :string
-		to :string
-	}
 	servicesBaseUrl :string
 	thesaurusNames :Array<string>
 }) {
-	//console.debug('_name:', _name, ' language:', language);
+	//──────────────────────────────────────────────────────────────────────────
+	// Initial state (fetched from server)
+	//──────────────────────────────────────────────────────────────────────────
+	const [initialState, setInitialState] = React.useState<State>({
+		_name: '',
+		languages: []
+	});
+
+	//──────────────────────────────────────────────────────────────────────────
+	// Fetch state from server ONLY ONCE on "mount"
+	//──────────────────────────────────────────────────────────────────────────
+	const getThesaurus = ({
+		_id,
+		servicesBaseUrl
+	} :{
+		_id :string
+		servicesBaseUrl :string
+	}) => {
+		setLoading(true);
+		fetch(`${servicesBaseUrl}/graphQL`, {
+			method: 'POST',
+			headers: {
+				'Content-Type':	'application/json'
+			},
+			body: JSON.stringify(gql.query({
+				operation: 'getThesaurus',
+				fields: [
+					'_id',
+					'_name',
+					'_path',
+					'_versionKey',
+					'allowedLanguages',
+					'description'
+				],
+				variables: {
+					_id: {
+						required: true,
+						type: 'ID',
+						value: _id
+					}
+				}
+			}))
+		})
+			.then(res => res.json() as JSONResponse<{getThesaurus :Thesaurus}>)
+			.then(({
+				data: {
+					getThesaurus: {
+						_name,
+						allowedLanguages: languages
+					}
+				}
+			}) => {
+				/*console.debug('Setting initialState to', {
+					_name,
+					languages
+				});*/
+				setInitialState({
+					_name,
+					languages
+				});
+				setLoading(false);
+			});
+	};
+
+	React.useEffect(() => {
+		//console.debug('useEffect _id:', _id);
+		if (_id) {
+			getThesaurus({
+				_id,
+				servicesBaseUrl
+			});
+		} else {
+			setInitialState({
+				_name: '',
+				languages: []
+			});
+		}
+	},[
+		_id,
+		servicesBaseUrl
+	]);
+	//console.debug('initialState:', initialState);
+
 	//──────────────────────────────────────────────────────────────────────────
 	// State
 	//──────────────────────────────────────────────────────────────────────────
-	const [name, setName] = React.useState<string>(''); // Changes onMount
+	const [name, setName] = React.useState<Name>(initialState._name); // Changes onMount
+	//console.debug('name:', name);
+
 	const [nameError, setNameError] = React.useState<false|string>(false);
 	//const [/*nameVisited*/, setNameVisited] = React.useState(false);
 
-	const [fromLanguage, setFromLanguage] = React.useState<string>(''); // Changes onMount
-	const [fromLanguageError, setFromLanguageError] = React.useState<false|string>(false);
-	const [fromLanguageVisited, setFromLanguageVisited] = React.useState(false);
-
-	const [toLanguage, setToLanguage] = React.useState<string>(''); // Changes onMount
-	const [toLanguageError, setToLanguageError] = React.useState<false|string>(false);
-	const [toLanguageVisited, setToLanguageVisited] = React.useState(false);
+	const [languages, setLanguages] = React.useState<Array<string>>(initialState.languages); // Changes onMount
+	//console.debug('languages:', languages);
 
 	const [loading, setLoading] = React.useState(false);
 
@@ -102,58 +164,28 @@ export function useNewOrEditThesaurusState({
 		return !newNameError;
 	}, [_id, mustBeUnique]);
 
-	const validateFromLanguage = React.useCallback((langToValidate :string) => {
-		//console.debug('validateFromLanguage', langToValidate);
-		const e = required(langToValidate);
-		setFromLanguageError(e);
-		return !e;
-	}, []);
-
-	const validateToLanguage = React.useCallback((langToValidate :string) => {
-		//console.debug('validateToLanguage', langToValidate);
-		const e = required(langToValidate);
-		setToLanguageError(e);
-		return !e;
-	}, []);
-
 	const validateForm = React.useCallback(({
-		name,
-		language: {
-			from,
-			to
-		}
+		name
 	}) => {
 		/*console.debug('validateForm', {
-			name,
-			language: {
-				from,
-				to
-			}
+			name
 		});*/
 		const nameValid = validateName(name);
-		const fromLanguageValid = validateFromLanguage(from);
-		const toLanguageValid = validateToLanguage(to);
-		return nameValid && fromLanguageValid && toLanguageValid;
+		return nameValid// && fromLanguageValid && toLanguageValid;
 	}, [
-		validateName,
-		validateFromLanguage,
-		validateToLanguage
+		validateName
 	]);
 
 	//──────────────────────────────────────────────────────────────────────────
 	// Updates
 	//──────────────────────────────────────────────────────────────────────────
 	useUpdateEffect(() => {
-		if (fromLanguageVisited) {
-			validateFromLanguage(fromLanguage);
-		}
-	}, [fromLanguage, fromLanguageVisited, validateFromLanguage]);
-
-	useUpdateEffect(() => {
-		if (toLanguageVisited) {
-			validateToLanguage(toLanguage);
-		}
-	}, [toLanguage, toLanguageVisited, validateToLanguage]);
+		//console.debug('useUpdateEffect initialState:', initialState);
+		setName(initialState._name);
+		setLanguages(initialState.languages);
+	}, [
+		initialState
+	]);
 
 	//──────────────────────────────────────────────────────────────────────────
 	// Event callbacks
@@ -171,58 +203,70 @@ export function useNewOrEditThesaurusState({
 		validateName(newName);
 	}, [validateName]);
 
-	const fromLanguageOnBlur = React.useCallback((currentFromLanguage :string) => {
-		setFromLanguageVisited(true);
-		validateFromLanguage(currentFromLanguage);
-	}, [validateFromLanguage]);
-
-	const toLanguageOnBlur = React.useCallback((currentToLanguage :string) => {
-		setToLanguageVisited(true);
-		validateToLanguage(currentToLanguage);
-	}, [validateToLanguage]);
-
 	function resetState() {
 		//setNameVisited(false);
-		setFromLanguageVisited(false);
-		setToLanguageVisited(false);
 
-		setName(_name);
-		setFromLanguage(language && language.from ? language.from : ''); // triggers validateFromLanguage
-		setToLanguage(language && language.to ? language.to : ''); // triggers validateToLanguage
+		if (_id) {
+			getThesaurus({
+				_id,
+				servicesBaseUrl
+			});
+		} else {
+			setName(initialState._name);
+			setLanguages(initialState.languages);
+		}
 
 		setNameError(false);
-		setFromLanguageError(false);
-		setToLanguageError(false);
 	}
 
 	function onSubmit() {
 		setLoading(true);
 		if (!validateForm({
-			name,
-			language: {
-				from: fromLanguage,
-				to: toLanguage
-			}
+			name
 		})) {
 			setLoading(false);
 			return;
+		}
+		const variables :{
+			_name :VariableOption
+			allowedLanguages :VariableOption<true>
+			_id ?:VariableOption<false,'ID'>
+		} = {
+			_name: {
+				required: true,
+				value: name
+			}, // TODO Support rename?
+			allowedLanguages: {
+				list: true,
+				required: true,
+				//type: 'string',
+				value: languages
+			}
+		}
+		if (_id) {
+			variables._id = {
+				required: true,
+				type: 'ID',
+				value: _id
+			};
 		}
 		fetch(`${servicesBaseUrl}/graphQL`, {
 			method: 'POST',
 			headers: {
 				'Content-Type':	'application/json'
 			},
-			body: JSON.stringify({
-				query: _id ? GQL_MUTATION_THESAURUS_UPDATE : GQL_MUTATION_THESAURUS_CREATE,
-				variables: {
-					_id,
-					_name: name, // TODO Support rename?
-					language: {
-						from: fromLanguage,
-						to: toLanguage
-					}
-				}
-			})
+			body: JSON.stringify(gql.mutation({
+				operation: _id ? 'updateThesaurus' : 'createThesaurus',
+				variables,
+				fields: [
+					'_id',
+					'_name',
+					'_path',
+					'_versionKey',
+					'allowedLanguages',
+					'description'
+				]
+			})),
 		}).then((response) => {
 			if (response.status === 200) {
 				doClose();
@@ -234,24 +278,19 @@ export function useNewOrEditThesaurusState({
 	//──────────────────────────────────────────────────────────────────────────
 
 	return {
-		errorCount: (nameError ? 1 : 0) + (fromLanguageError ? 1 : 0) + (toLanguageError ? 1 : 0),
-		fromLanguage,
-		fromLanguageError,
-		fromLanguageOnBlur,
+		errorCount: (nameError ? 1 : 0),
 		loading,
-		isStateChanged: name !== _name
-			|| fromLanguage !== (language && language.from ? language.from : '')
-			|| toLanguage !== (language && language.to ? language.to : ''),
+		isStateChanged: !fastDeepEqual({
+			_name: name,
+			languages
+		}, initialState),
 		name,
 		nameError,
 		nameOnBlur,
 		nameOnChange,
+		languages,
 		onSubmit,
 		resetState,
-		setFromLanguage,
-		setToLanguage,
-		toLanguage,
-		toLanguageError,
-		toLanguageOnBlur
+		setLanguages
 	};
 }

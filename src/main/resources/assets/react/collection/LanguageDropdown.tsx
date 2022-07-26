@@ -16,13 +16,16 @@ import {capitalize} from '../utils/capitalize';
 
 
 export function LanguageDropdown({
+	includeANoneOption = true,
 	language,
 	locales = [],
 	setLanguage,
+	onChange = (_event,{value: newLanguage}) => setLanguage(newLanguage as string),
 	...rest
-} :Omit<StrictDropdownProps,'onChange'|'options'|'value'> & {
-	language :string
-	setLanguage :(language :string) => void
+} :Omit<StrictDropdownProps,'options'|'value'> & {
+	includeANoneOption :boolean
+	language :string|Array<string>
+	setLanguage :(language :string|Array<string>) => void
 	locales :Locales
 }) {
 	const options = locales.map(({
@@ -66,10 +69,10 @@ export function LanguageDropdown({
 			value: tag
 		};
 	}); // map
-	const optionsWithANoneOption :Array<DropdownItemProps> = [{
+	const optionsWithANoneOption :Array<DropdownItemProps> = includeANoneOption ? [{
 		key: 'none',
 		text: 'none'
-	} as DropdownItemProps].concat(options);
+	} as DropdownItemProps].concat(options) : options;
 	//console.debug('LanguageDropdown options', options);
 
 	/*
@@ -88,7 +91,7 @@ export function LanguageDropdown({
 		search
 		selection
 		{...rest}
-		onChange={(_event,{value: newLanguage}) => setLanguage(newLanguage as string)}
+		onChange={onChange}
 		options={optionsWithANoneOption}
 		value={language}
 	/>;
