@@ -6,13 +6,12 @@ import type {
 import type {NewOrEditState} from './index.d';
 
 
-import {Button, Form, Header, Label, Modal} from 'semantic-ui-react';
-import {LanguageDropdown} from '../collection/LanguageDropdown';
-//import {EditSynonyms} from './EditSynonyms';
+import {Button, Form, Modal} from 'semantic-ui-react';
 import {UploadLicense} from '../UploadLicense';
 import {ResetButton} from '../components/ResetButton';
 import {SubmitButton} from '../components/SubmitButton';
 import {NEW_OR_EDIT_STATE_DEFAULT} from './useThesauriState';
+import {ThesaurusLanguages} from './ThesaurusLanguages';
 import {useNewOrEditThesaurusState} from './useNewOrEditThesaurusState';
 
 
@@ -30,10 +29,6 @@ export function NewOrEditThesaurus({
 	_id,
 	_name = '',
 	afterClose = () => {}, // eslint-disable-line @typescript-eslint/no-empty-function
-	language = {
-		from: '',
-		to: ''
-	}
 } :{
 	// Required
 	licenseValid :boolean
@@ -48,10 +43,6 @@ export function NewOrEditThesaurus({
 	_id ?:string
 	_name ?:string
 	afterClose ?:() => void
-	language ?:{
-		from :string
-		to :string
-	}
 }) {
 	function doClose() {
 		setNewOrEditState(NEW_OR_EDIT_STATE_DEFAULT);
@@ -60,10 +51,8 @@ export function NewOrEditThesaurus({
 
 	const {
 		errorCount,
-		fromLanguage,
-		fromLanguageError,
-		fromLanguageOnBlur,
 		isStateChanged,
+		languages,
 		loading,
 		name,
 		nameError,
@@ -71,16 +60,10 @@ export function NewOrEditThesaurus({
 		nameOnChange,
 		onSubmit,
 		resetState,
-		setFromLanguage,
-		setToLanguage,
-		toLanguage,
-		toLanguageError,
-		toLanguageOnBlur
+		setLanguages,
 	} = useNewOrEditThesaurusState({
 		_id,
-		_name,
 		doClose,
-		language,
 		servicesBaseUrl,
 		thesaurusNames
 	});
@@ -105,49 +88,16 @@ export function NewOrEditThesaurus({
 							placeholder='Please input name'
 							value={name}
 						/>}
-						<Form.Field>
-							<Header as='h3' content='Language'/>
-							<label>From</label>
-							<LanguageDropdown
-								error={!!fromLanguageError}
-								language={fromLanguage}
-								locales={locales}
-								onBlur={() => fromLanguageOnBlur(fromLanguage)}
-								setLanguage={setFromLanguage}
-							/>
-							{fromLanguageError
-								? <Label pointing prompt>{fromLanguageError}</Label>
-								: null
-							}
-						</Form.Field>
-						<Form.Field>
-							<label>To</label>
-							<LanguageDropdown
-								error={!!toLanguageError}
-								language={toLanguage}
-								locales={locales}
-								onBlur={() => toLanguageOnBlur(toLanguage)}
-								setLanguage={setToLanguage}
-							/>
-							{toLanguageError
-								? <Label pointing prompt>{toLanguageError}</Label>
-								: null
-							}
-						</Form.Field>
-					</Form>
-					{/*_id && <>
-						<Header as='h2' content='Synonyms'/>
-						<EditSynonyms
-							servicesBaseUrl={servicesBaseUrl}
-							thesaurusId={_id}
-							thesaurusName={_name}
+						<ThesaurusLanguages
+							languages={languages}
+							loading={loading}
+							locales={locales}
+							setLanguages={setLanguages}
 						/>
-					</>*/}
+					</Form>
 				</Modal.Content>
 				<Modal.Actions>
 					<Button
-						disabled={loading}
-						loading={loading}
 						onClick={doClose}
 					>Cancel</Button>
 					<ResetButton

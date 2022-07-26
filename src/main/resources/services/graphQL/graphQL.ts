@@ -63,8 +63,12 @@ import {generateScheduledJobsListField} from './scheduler/generateScheduledJobsL
 import {generateSchedulerTypes} from './scheduler/generateSchedulerTypes';
 import {generateDocumentTypeFields} from './documentType/generateDocumentTypeFields';
 import {generateSynonymFields} from './synonym/generateSynonymFields';
-import {generateThesaurusFields} from './thesaurus/generateThesaurusFields';
 
+import {addGetThesaurus} from './thesaurus/addGetThesaurus'
+import {addMutationThesaurusCreate} from './thesaurus/addMutationThesaurusCreate'
+import {addMutationThesaurusUpdate} from './thesaurus/addMutationThesaurusUpdate'
+import {addThesaurusTypes} from './thesaurus/addThesaurusTypes';
+import {generateThesaurusFields} from './thesaurus/generateThesaurusFields';
 
 import {addStopWordsTypes} from './stopWords/addStopWordsTypes';
 import {generateQueryStopWordsField} from './stopWords/generateQueryStopWordsField';
@@ -192,11 +196,15 @@ const {
 	updateSynonymField
 } = generateSynonymFields({glue});
 
+addThesaurusTypes({
+	glue
+});
+addMutationThesaurusCreate({glue});
+addMutationThesaurusUpdate({glue});
+addGetThesaurus({glue});
 const {
-	createThesaurusField,
 	deleteThesaurusField,
 	queryThesauriField,
-	updateThesaurusField
 } = generateThesaurusFields({glue});
 
 const getLicense = generateGetLicenseField({glue});
@@ -235,7 +243,6 @@ const mutation = glue.schemaGenerator.createObjectType({
 		createDocumentType: createDocumentTypeField,
 		createField: createFieldField,
 		createSynonym: createSynonymField,
-		createThesaurus: createThesaurusField,
 
 		deleteDocumentType: deleteDocumentTypeField,
 		deleteField: deleteFieldField,
@@ -246,7 +253,6 @@ const mutation = glue.schemaGenerator.createObjectType({
 		updateDocumentType: updateDocumentTypeField,
 		updateField: updateFieldField,
 		updateSynonym: updateSynonymField,
-		updateThesaurus: updateThesaurusField,
 
 		reindexCollections: reindexCollectionsField
 	}

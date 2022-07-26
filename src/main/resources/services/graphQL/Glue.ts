@@ -186,7 +186,7 @@ export class Glue {
 		name
 	} :{
 		fields :Fields
-		interfaces :Array<unknown>
+		interfaces ?:Array<unknown>
 		name :string
 	}) {
 		//log.debug(`addObjectType({name:${name},fields:${toStr(fields)})`);
@@ -233,15 +233,18 @@ export class Glue {
 		return this._mutations[name];
 	}
 
-	addQuery({
-		args = {},
+	addQuery<Args extends AnyObject = AnyObject>({
+		//@ts-ignore
+		args = {} as AnyObject,
 		name,
 		resolve,
 		type
 	} :{
-		args :AnyObject
+		args :Args
 		name :string
-		resolve :FieldResolver
+		resolve :FieldResolver<{
+			args: Args
+		}>
 		type :ObjectType
 	}) {
 		//log.debug(`addEnumType({name:${name}})`);

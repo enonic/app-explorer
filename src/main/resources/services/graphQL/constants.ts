@@ -19,8 +19,6 @@ export const GQL_INPUT_TYPE_FILTERS_BOOLEAN_NAME = 'FiltersBoolean';
 
 export const GQL_INPUT_TYPE_INTERFACE_FIELD_NAME = 'InterfaceFieldInput';
 
-export const GQL_INPUT_TYPE_THESAURUS_LANGUAGE_NAME = 'ThesaurusLanguageInput';
-
 export const GQL_TYPE_API_KEY_NAME = 'ApiKey';
 
 // Interface type names
@@ -69,7 +67,6 @@ export const GQL_TYPE_SYNONYMS_QUERY_RESULT_AGGREGATIONS_THESAURUS_BUCKET_NAME =
 
 export const GQL_TYPE_THESAURI_QUERY_HITS = 'ThesauriQueryHits';
 export const GQL_TYPE_THESAURI_QUERY_RESULT = 'ThesauriQueryResult';
-export const GQL_TYPE_THESAURUS_LANGUAGE_NAME = 'ThesaurusLanguage';
 export const GQL_TYPE_THESAURUS_NAME = 'Thesaurus';
 
 // Union type names

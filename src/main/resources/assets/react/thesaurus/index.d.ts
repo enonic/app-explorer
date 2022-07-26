@@ -27,11 +27,6 @@ export type EditSynonymsState = {
 
 export type NewOrEditState = {
 	_id ?:string
-	_name ?:string
-	language :{
-		from: string
-		to: string
-	}
 	open :boolean
 }
 
@@ -45,10 +40,7 @@ export type QueryThesauriGraph = {
 		//_score :number
 		//_versionKey :string
 		description :string
-		language :{
-			from :string
-			to :string
-		}
+		allowedLanguages :Array<string>
 		synonymsCount :number
 	}>
 	total :number
