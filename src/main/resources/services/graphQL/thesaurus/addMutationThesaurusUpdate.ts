@@ -3,25 +3,28 @@
 import {PRINCIPAL_EXPLORER_WRITE} from '/lib/explorer/model/2/constants';
 import {connect} from '/lib/explorer/repo/connect';
 import {
-	GQL_INPUT_TYPE_THESAURUS_LANGUAGE_NAME,
-	GQL_TYPE_THESAURUS_NAME
-} from '../constants';
+	GraphQLString,
+	list
+	//@ts-ignore
+} from '/lib/graphql';
+import {GQL_TYPE_THESAURUS_NAME} from '../constants';
 
 
-export function generateUpdateThesaurusField({
+export function addMutationThesaurusUpdate({
 	glue
 }) {
-	return {
+	glue.addMutation({
+		name: 'updateThesaurus',
 		args: {
 			_id: glue.getScalarType('_id'),
 			_name: glue.getScalarType('_name'),
-			language: glue.getInputType(GQL_INPUT_TYPE_THESAURUS_LANGUAGE_NAME)
+			allowedLanguages: list(GraphQLString)
 		},
 		resolve({
 			args: {
 				_id,
 				_name,
-				language
+				allowedLanguages
 			}
 		}) {
 			const writeConnection = connect({ principals: [PRINCIPAL_EXPLORER_WRITE] });
@@ -57,11 +60,11 @@ export function generateUpdateThesaurusField({
 			}
 			// TODO Diff?
 			const modifiedNode = writeConnection.modify<{
-				language :string
+				allowedLanguages: Array<string>
 			}>({
 				key: _id,
 				editor: (node) => {
-					node.language = language;
+					node.allowedLanguages = allowedLanguages;
 					return node;
 				}
 			});
@@ -70,5 +73,5 @@ export function generateUpdateThesaurusField({
 			return modifiedNode;
 		},
 		type: glue.getObjectType(GQL_TYPE_THESAURUS_NAME)
-	};
+	});
 }
