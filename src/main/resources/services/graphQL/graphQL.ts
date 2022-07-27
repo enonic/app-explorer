@@ -190,10 +190,8 @@ const getContentTypesField = generateGetContentTypesField({glue});
 generateSchedulerTypes({glue});
 
 const {
-	createSynonymField,
 	deleteSynonymField,
-	querySynonymsField,
-	updateSynonymField
+	querySynonymsField
 } = generateSynonymFields({glue});
 
 addThesaurusTypes({
@@ -242,7 +240,6 @@ const mutation = glue.schemaGenerator.createObjectType({
 		createCollection: createCollectionField,
 		createDocumentType: createDocumentTypeField,
 		createField: createFieldField,
-		createSynonym: createSynonymField,
 
 		deleteDocumentType: deleteDocumentTypeField,
 		deleteField: deleteFieldField,
@@ -252,7 +249,6 @@ const mutation = glue.schemaGenerator.createObjectType({
 		updateCollection: updateCollectionField,
 		updateDocumentType: updateDocumentTypeField,
 		updateField: updateFieldField,
-		updateSynonym: updateSynonymField,
 
 		reindexCollections: reindexCollectionsField
 	}
