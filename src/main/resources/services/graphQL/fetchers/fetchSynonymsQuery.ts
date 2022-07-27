@@ -100,10 +100,27 @@ export async function fetchSynonymsQuery({
 					'_path',
 					'_score',
 					'_versionKey',
-					'from',
+					'comment',
+					'enabled',
+					'disabledInInterfaces',
+					{
+						languages: [
+							'comment',
+							'enabled',
+							'disabledInInterfaces',
+							{
+								synonyms: [
+									'comment',
+									'enabled',
+									'disabledInInterfaces',
+									'synonym',
+									'use'
+								]
+							}
+						]
+					},
 					'thesaurus',
 					'thesaurusReference',
-					'to'
 				]
 			},
 			'page',

@@ -8,6 +8,8 @@ import {
 	Placeholder,
 	Popup
 } from 'semantic-ui-react';
+import {ResetButton} from '../../components/ResetButton';
+import {SubmitButton} from '../../components/SubmitButton';
 import {SynonymOptions} from './SynonymOptions';
 import {SynonymLanguages} from './SynonymLanguages';
 import {useNewOrEditSynonymState} from './useNewOrEditSynonymState';
@@ -53,10 +55,13 @@ export function NewOrEditSynonym({
 		doClose,
 		doOpen,
 		interfaceOptions,
+		isStateChanged,
 		loading,
 		open,
+		resetState,
 		setState,
 		state,
+		submit,
 		thesaurusLanguages
 	} = useNewOrEditSynonymState({
 		afterClose,
@@ -141,5 +146,17 @@ export function NewOrEditSynonym({
 				styled
 			/>
 		}
+		<Modal.Actions>
+			<Button onClick={doClose}>Cancel</Button>
+			<ResetButton
+				isStateChanged={isStateChanged}
+				onClick={resetState}
+				secondary
+			/>
+			<SubmitButton
+				isStateChanged={isStateChanged}
+				onClick={submit}
+			/>
+		</Modal.Actions>
 	</Modal>;
 } // NewOrEditSynonym

@@ -3,6 +3,7 @@ import type {
 	QueryFilters,
 	QueriedSynonym
 } from '/lib/explorer/types/index.d';
+import type {Glue} from '../Glue';
 
 
 import {
@@ -25,10 +26,13 @@ import {
 import {querySynonyms} from './querySynonyms';
 
 
-export function generateQuerySynonymsField({
+export function addQuerySynonymsField({
 	glue
+} :{
+	glue :Glue
 }) {
-	return {
+	glue.addQuery({
+		name: 'querySynonyms',
 		args: {
 			count: GraphQLInt,
 			filters: glue.getInputType(GQL_INPUT_TYPE_FILTERS_NAME),
@@ -128,7 +132,7 @@ export function generateQuerySynonymsField({
 			return result;
 		},
 		type: glue.getObjectType(GQL_TYPE_SYNONYMS_QUERY_RESULT_NAME)
-	};
+	});
 }
 
 /* Example query
@@ -177,10 +181,9 @@ export function generateQuerySynonymsField({
 			_path
 			_score
 			_versionKey
-			from
 			thesaurus
 			thesaurusReference
-			to
+			# TODO
 		}
 	}
 }
