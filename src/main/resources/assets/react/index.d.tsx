@@ -11,7 +11,7 @@ export type CollectorComponent<CollectorConfig extends AnyObject = AnyObject> = 
 export type CollectorComponents = Record<string,CollectorComponent>;
 
 export type Locale = {
-	country :string
+	country ?:string // zxx has no country
 	displayName :string
 	tag :string
 }
