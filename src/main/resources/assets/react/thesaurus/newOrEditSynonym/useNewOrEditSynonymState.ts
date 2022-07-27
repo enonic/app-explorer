@@ -3,10 +3,12 @@ import type {SynonymGUIState} from '/lib/explorer/types/Synonym.d';
 import type {JSONResponse}  from '../../../../services/graphQL/fetchers/index.d';
 
 
+import fastDeepEqual from 'fast-deep-equal/react';
 import * as gql from 'gql-query-builder';
 import * as React from 'react';
 
 // NOTE: Must resolve transpile- and bundle- time.
+import {GQL_INPUT_TYPE_SYNONYM_LANGUAGE_NAME} from '../../../../services/graphQL/constants';
 //import {GQL_MUTATION_CREATE_SYNONYM} from '../../../../services/graphQL/synonym/mutationCreateSynonym';
 //import {GQL_MUTATION_UPDATE_SYNONYM} from '../../../../services/graphQL/synonym/mutationUpdateSynonym';
 
@@ -37,7 +39,7 @@ export function useNewOrEditSynonymState({
 		text :string
 		value :string
 	}>>([]);
-	const [state, setState] = React.useState<SynonymGUIState>({
+	const [initialState, setInitialState] = React.useState<SynonymGUIState>({
 		comment: 'Comment across all languages',
 		enabled: true,
 		disabledInInterfaces: [],
@@ -80,9 +82,10 @@ export function useNewOrEditSynonymState({
 			}
 		}
 	});
+	const [state, setState] = React.useState<SynonymGUIState>(initialState);
 
 	//──────────────────────────────────────────────────────────────────────────
-	// Functions
+	// Functions (no internal state dependencies)
 	//──────────────────────────────────────────────────────────────────────────
 	const fetchState = ({
 		_id,
@@ -158,11 +161,6 @@ export function useNewOrEditSynonymState({
 			});
 	}; // fetchState
 
-	function doClose() {
-		setOpen(false); // This needs to be before unmount.
-		afterClose(); // This could trigger render in parent, and unmount this Component.
-	}
-
 	// Made doOpen since onOpen doesn't get called consistently.
 	const doOpen = () => {
 		fetchState({
@@ -173,14 +171,100 @@ export function useNewOrEditSynonymState({
 		setOpen(true);
 	};
 
+	//──────────────────────────────────────────────────────────────────────────
+	// Callbacks (props and/or state dependencies)
+	//──────────────────────────────────────────────────────────────────────────
+	const doClose = React.useCallback(() => {
+		setOpen(false); // This needs to be before unmount.
+		afterClose(); // This could trigger render in parent, and unmount this Component.
+	}, [
+		afterClose
+	]);
+
+	const resetState = React.useCallback(() => {
+		setState(initialState);
+	}, [
+		initialState
+	]);
+
+	const submit = React.useCallback(() => {
+		const languagesArray = [];
+		const locales = Object.keys(state.languages);
+		for (let i = 0; i < locales.length; i++) {
+		    const locale = locales[i];
+			languagesArray.push({
+				...state.languages[locale],
+				locale
+			});
+		}
+		fetch(`${servicesBaseUrl}/graphQL`, {
+			method: 'POST',
+			headers: {
+				'Content-Type':	'application/json'
+			},
+			body: JSON.stringify(gql.mutation({
+				operation: 'createSynonym', // TODO updateSynonym
+				variables: {
+					comment: {
+						required: false,
+						type: 'String',
+						value: state.comment
+					},
+					enabled: {
+						required: false,
+						type: 'Boolean',
+						value: state.enabled
+					},
+					disabledInInterfaces: {
+						list: true,
+						required: false,
+						type: 'ID',
+						value: state.disabledInInterfaces
+					},
+					languages: {
+						list: true,
+						required: false,
+						type: GQL_INPUT_TYPE_SYNONYM_LANGUAGE_NAME,
+						value: languagesArray
+					},
+					thesaurusId: {
+						type: 'ID',
+						required: true,
+						value: thesaurusId
+					}
+				},
+				fields: ['_id'],
+			}))
+		}).then((response) => {
+			if (response.status === 200) { doClose(); }
+		});
+	}, [
+		doClose,
+		servicesBaseUrl,
+		state,
+		thesaurusId
+	]);
+
+	//──────────────────────────────────────────────────────────────────────────
+	// Effects
+	//──────────────────────────────────────────────────────────────────────────
+	React.useEffect(() => {
+		resetState()
+	}, [
+		resetState // the callback changes when initialState changes :)
+	]);
+
 	return {
 		doClose,
 		doOpen,
 		interfaceOptions,
+		isStateChanged: !fastDeepEqual(state, initialState),
 		loading,
 		open,
+		resetState,
 		setState,
 		state,
+		submit,
 		thesaurusLanguages
 	};
 } // function useNewOrEditSynonymState

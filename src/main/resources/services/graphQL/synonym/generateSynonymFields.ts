@@ -1,8 +1,8 @@
 import {addSynonymTypes} from './addSynonymTypes';
 import {addMutationSynonymCreate} from './addMutationSynonymCreate';
 import {addMutationSynonymUpdate} from './addMutationSynonymUpdate';
+import {addQuerySynonymsField} from './addQuerySynonymsField';
 import {generateDeleteSynonymField} from './generateDeleteSynonymField';
-import {generateQuerySynonymsField} from './generateQuerySynonymsField';
 
 
 export function generateSynonymFields({
@@ -11,12 +11,10 @@ export function generateSynonymFields({
 	addSynonymTypes({glue});
 	addMutationSynonymCreate({glue});
 	addMutationSynonymUpdate({glue});
+	addQuerySynonymsField({glue});
 	return {
 		deleteSynonymField: generateDeleteSynonymField({
 			glue
 		}),
-		querySynonymsField: generateQuerySynonymsField({
-			glue
-		})
 	}; // return
 } // generateSynonymField

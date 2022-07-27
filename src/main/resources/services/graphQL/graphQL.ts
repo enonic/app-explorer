@@ -190,8 +190,7 @@ const getContentTypesField = generateGetContentTypesField({glue});
 generateSchedulerTypes({glue});
 
 const {
-	deleteSynonymField,
-	querySynonymsField
+	deleteSynonymField
 } = generateSynonymFields({glue});
 
 addThesaurusTypes({
@@ -273,7 +272,6 @@ const query = glue.schemaGenerator.createObjectType({
 		queryInterfaces,
 		queryJournals,
 		queryStopWords,
-		querySynonyms: querySynonymsField,
 		queryDocumentTypes: queryDocumentTypesField,
 		queryThesauri: queryThesauriField,
 		queryTasks,
