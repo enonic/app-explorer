@@ -508,8 +508,9 @@ const CLIENT_JS_CONFIG = {
 		new CaseSensitivePathsPlugin(),
 		new CopyWebpackPlugin({
 			patterns: [
-				{ context: NODE_MODULES_CONTEXT, from: 'fomantic-ui-css/semantic*', to: 'semantic-ui-css/[name][ext]'},
-				{ context: NODE_MODULES_CONTEXT, from: 'fomantic-ui-css/themes', to: 'semantic-ui-css/themes'}, // Fonts
+				// Has issues with Loaders
+				//{ context: NODE_MODULES_CONTEXT, from: 'fomantic-ui-css/semantic*', to: 'semantic-ui-css/[name][ext]'},
+				//{ context: NODE_MODULES_CONTEXT, from: 'fomantic-ui-css/themes', to: 'semantic-ui-css/themes'}, // Fonts
 
 				//{ context: NODE_MODULES_CONTEXT, from: 'frappe-gantt/dist/*', to: 'frappe-gantt/[name].[ext]' },
 				{ context: NODE_MODULES_CONTEXT, from: 'nice-react-gantt/lib/css/style.css', to: 'nice-react-gantt/style.css' },
@@ -518,8 +519,9 @@ const CLIENT_JS_CONFIG = {
 				{ context: NODE_MODULES_CONTEXT, from: 'react-dom/umd/react-dom.*.js', to: 'react-dom/[name][ext]' },
 				{ context: NODE_MODULES_CONTEXT, from: 'react-semantic-ui-datepickers/dist/react-semantic-ui-datepickers.css', to: 'react-semantic-ui-datepickers/react-semantic-ui-datepickers.css' },
 
-				//{ context: NODE_MODULES_CONTEXT, from: 'semantic-ui-css/semantic*', to: 'semantic-ui-css/[name][ext]'},
-				//{ context: NODE_MODULES_CONTEXT, from: 'semantic-ui-css/themes', to: 'semantic-ui-css/themes'}, // Fonts
+				// Used to have issues, seems to work better than fomantic now. For example Loaders.
+				{ context: NODE_MODULES_CONTEXT, from: 'semantic-ui-css/semantic*', to: 'semantic-ui-css/[name][ext]'},
+				{ context: NODE_MODULES_CONTEXT, from: 'semantic-ui-css/themes', to: 'semantic-ui-css/themes'}, // Fonts
 
 				//{ context: NODE_MODULES_CONTEXT, from: 'semantic-ui/dist', to: 'semantic-ui'},
 				{ context: NODE_MODULES_CONTEXT, from: 'semantic-ui-react/dist', to: 'semantic-ui-react'},
