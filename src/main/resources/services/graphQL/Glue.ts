@@ -32,7 +32,7 @@ export class Glue {
 	_fields :Record<string,Fields> = {};
 	_inputTypes :Record<string,InputObjectType> = {};
 	_interfaceTypes :Record<string,{
-		fields :unknown
+		fields :Fields
 		type :InterfaceType
 	}> = {};
 	_mutations :Record<string,{
@@ -206,15 +206,18 @@ export class Glue {
 		return this._objectTypes[name];
 	}
 
-	addMutation({
-		args = {},
+	addMutation<Args extends AnyObject = AnyObject>({
+		//@ts-ignore
+		args = {} as AnyObject,
 		name,
 		resolve,
 		type
 	} :{
 		args :AnyObject
 		name :string
-		resolve :FieldResolver
+		resolve :FieldResolver<{
+			args: Args
+		}>
 		type :ObjectType
 	}) {
 		//log.debug(`addEnumType({name:${name}})`);

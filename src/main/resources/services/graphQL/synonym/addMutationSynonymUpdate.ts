@@ -1,4 +1,5 @@
 import type {SynonymNode} from '/lib/explorer/types/index.d';
+import type {Glue} from '../Glue';
 
 
 import {toStr} from '@enonic/js-utils';
@@ -9,32 +10,49 @@ import {
 } from '/lib/explorer/model/2/constants';
 import {get} from '/lib/explorer/node/get';
 import {connect} from '/lib/explorer/repo/connect';
-import {coerseSynonymType} from '/lib/explorer/synonym/coerseSynonymType';
+import {coerceSynonymType} from '/lib/explorer/synonym/coerceSynonymType';
+import {
+	GraphQLBoolean,
+	GraphQLID,
+	GraphQLString,
+	list
+	//@ts-ignore
+} from '/lib/graphql';
+import {
+	GQL_INPUT_TYPE_SYNONYM_LANGUAGE_NAME,
+	GQL_TYPE_SYNONYM_NAME
+} from '../constants';
 
-import {GQL_TYPE_SYNONYM_NAME} from '../constants';
 
-
-export function generateUpdateSynonymField({
-	GQL_TYPE_FROM,
-	GQL_TYPE_TO,
+export function addMutationSynonymUpdate({
 	glue
+} :{
+	glue :Glue
 }) {
-	return {
+	glue.addMutation({
+		name: 'updateSynonym',
 		args: {
 			_id: glue.getScalarType('_id'),
-			from: GQL_TYPE_FROM,
-			to: GQL_TYPE_TO
+			comment: GraphQLString,
+			disabledInInterfaces: list(GraphQLID),
+			enabled: GraphQLBoolean,
+			languages: list(glue.getInputType(GQL_INPUT_TYPE_SYNONYM_LANGUAGE_NAME)),
 		},
 		resolve({
 			args: {
 				_id,
-				from,
-				to
+				comment,
+				disabledInInterfaces,
+				enabled,
+				languages,
 			}
 		}) {
-			//log.debug(`_id:${toStr(_id)}`);
-			//log.debug(`from:${toStr(from)}`);
-			//log.debug(`to:${toStr(to)}`);
+			log.debug('_id:%s', toStr(_id));
+			log.debug('comment:%s', toStr(comment));
+			log.debug('disabledInInterfaces:%s', toStr(disabledInInterfaces));
+			log.debug('enabled:%s', toStr(enabled));
+			log.debug('languages:%s', toStr(languages));
+			throw new Error('Under implementation!');
 			const synonymNode = get({
 				connection: connect({
 					principals: [PRINCIPAL_EXPLORER_READ]
@@ -52,8 +70,7 @@ export function generateUpdateSynonymField({
 				key: _id,
 				editor: (node) => {
 					//log.debug(`node:${toStr(node)}`);
-					node.from = from;
-					node.to = to;
+					// TODO!!!
 					//log.debug(`node:${toStr(node)}`);
 					return node;
 				}
@@ -62,8 +79,8 @@ export function generateUpdateSynonymField({
 				throw new Error(`Something went wrong when trying to modify synonym _id:${_id} from:${toStr(from)} to:${toStr(to)}!`);
 			}
 			//log.debug(`modifyRes:${toStr(modifyRes)}`);
-			return coerseSynonymType(modifyRes);
+			return coerceSynonymType(modifyRes);
 		},
 		type: glue.getObjectType(GQL_TYPE_SYNONYM_NAME)
-	};
+	});
 }

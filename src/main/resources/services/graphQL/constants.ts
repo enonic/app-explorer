@@ -4,7 +4,9 @@ export const GQL_ENUM_FIELD_KEYS_FOR_AGGREGATIONS = 'EnumFieldsKeysForAggreation
 
 export const GQL_FIELDS_DOCUMENT_TYPE_PROPERTY_NAME = 'DocumentTypePropertyFields';
 
+//──────────────────────────────────────────────────────────────────────────────
 // Input type names
+//──────────────────────────────────────────────────────────────────────────────
 export const GQL_INPUT_TYPE_AGGREGATION = 'AggregationInput';
 export const GQL_INPUT_TYPE_AGGREGATION_TERMS = 'AggregationTermsInput';
 export const GQL_INPUT_TYPE_AGGREGATION_COUNT = 'AggregationCountInput';
@@ -19,13 +21,21 @@ export const GQL_INPUT_TYPE_FILTERS_BOOLEAN_NAME = 'FiltersBoolean';
 
 export const GQL_INPUT_TYPE_INTERFACE_FIELD_NAME = 'InterfaceFieldInput';
 
+export const GQL_INPUT_TYPE_SYNONYM_LANGUAGE_NAME = 'SynonymLanguageInput';
+
+//──────────────────────────────────────────────────────────────────────────────
+
 export const GQL_TYPE_API_KEY_NAME = 'ApiKey';
 
+//──────────────────────────────────────────────────────────────────────────────
 // Interface type names
+//──────────────────────────────────────────────────────────────────────────────
 export const GQL_INTERFACE_NODE_NAME = 'Node';
 export const GQL_INTERFACE_QUERY_RESULT_NAME = 'QueryResult';
 
+//──────────────────────────────────────────────────────────────────────────────
 // Object type names
+//──────────────────────────────────────────────────────────────────────────────
 export const GQL_TYPE_AGGREGATION_TERMS_NAME = 'AggregationTerms';
 export const GQL_TYPE_AGGREGATION_TERMS_BUCKET_NAME = 'AggregationTermsBucket';
 
@@ -69,10 +79,14 @@ export const GQL_TYPE_THESAURI_QUERY_HITS = 'ThesauriQueryHits';
 export const GQL_TYPE_THESAURI_QUERY_RESULT = 'ThesauriQueryResult';
 export const GQL_TYPE_THESAURUS_NAME = 'Thesaurus';
 
+//──────────────────────────────────────────────────────────────────────────────
 // Union type names
+//──────────────────────────────────────────────────────────────────────────────
 export const GQL_UNION_TYPE_ANY_NODE = 'AnyNode';
 
+//──────────────────────────────────────────────────────────────────────────────
 // Mutation field names
+//──────────────────────────────────────────────────────────────────────────────
 export const GQL_MUTATION_API_KEY_CREATE_NAME = 'createApiKey';
 export const GQL_MUTATION_API_KEY_DELETE_NAME = 'deleteApiKey';
 export const GQL_MUTATION_API_KEY_UPDATE_NAME = 'updateApiKey';
@@ -83,8 +97,9 @@ export const GQL_MUTATION_STOP_WORDS_CREATE_NAME = 'createStopWords';
 export const GQL_MUTATION_STOP_WORDS_DELETE_NAME = 'deleteStopWords';
 export const GQL_MUTATION_STOP_WORDS_UPDATE_NAME = 'updateStopWords';
 
+//──────────────────────────────────────────────────────────────────────────────
 // Query field names
-
+//──────────────────────────────────────────────────────────────────────────────
 export const GQL_QUERY_DOCUMENTS = 'queryDocuments';
 export const GQL_QUERY_EXPLORER_REPO_NODES_GET_NAME = 'getExplorerRepoNodes';
 export const GQL_QUERY_INTERFACE_GET_NAME = 'getInterface';

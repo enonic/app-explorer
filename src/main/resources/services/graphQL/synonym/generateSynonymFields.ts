@@ -1,38 +1,22 @@
-import {generateCreateSynonymField} from './generateCreateSynonymField';
+import {addSynonymTypes} from './addSynonymTypes';
+import {addMutationSynonymCreate} from './addMutationSynonymCreate';
+import {addMutationSynonymUpdate} from './addMutationSynonymUpdate';
 import {generateDeleteSynonymField} from './generateDeleteSynonymField';
 import {generateQuerySynonymsField} from './generateQuerySynonymsField';
-import {generateSynonymTypes} from './generateSynonymTypes';
-import {generateUpdateSynonymField} from './generateUpdateSynonymField';
 
 
 export function generateSynonymFields({
 	glue
 }) {
-
-	const {
-		GQL_TYPE_FROM,
-		GQL_TYPE_TO
-	} = generateSynonymTypes({
-		glue
-	});
-
+	addSynonymTypes({glue});
+	addMutationSynonymCreate({glue});
+	addMutationSynonymUpdate({glue});
 	return {
-		createSynonymField: generateCreateSynonymField({
-			GQL_TYPE_FROM,
-			GQL_TYPE_TO,
-			glue
-		}),
 		deleteSynonymField: generateDeleteSynonymField({
 			glue
 		}),
 		querySynonymsField: generateQuerySynonymsField({
 			glue
-		}),
-		updateSynonymField: generateUpdateSynonymField({
-			GQL_TYPE_FROM,
-			GQL_TYPE_TO,
-			glue
 		})
 	}; // return
-
 } // generateSynonymField
