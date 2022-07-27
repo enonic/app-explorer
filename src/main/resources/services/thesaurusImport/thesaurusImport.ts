@@ -13,7 +13,7 @@ import {
 } from '/lib/explorer/model/2/constants';
 import {connect} from '/lib/explorer/repo/connect';
 import {createOrModify} from '/lib/explorer/node/createOrModify';
-import {synonym} from '/lib/explorer/model/2/nodeTypes/synonym';
+//import {synonym} from '/lib/explorer/model/2/nodeTypes/synonym';
 import {parseCsv} from '/lib/explorer/parseCsv';
 
 
@@ -51,13 +51,13 @@ export function post({
 			&& isString(from) && from.trim() // Skip cells with just whitespace, emptystring is Falsy
 			&& isString(to) && to.trim() // Skip cells with just whitespace, emptystring is Falsy
 		) { // Skip empty values
-			const fromArr = from.trim().split(',').map(str => str.trim());
+			/*const fromArr = from.trim().split(',').map(str => str.trim());
 			const toArr = to.trim().split(',').map(str => str.trim());
-			const params = synonym({
+			const params = synonym({ // TODO
 				_name: name,
 				_parentPath: `/thesauri/${name}`,
-				from: fromArr,//.length > 1 ? fromArr : fromArr.join(),
-				to: toArr//.length > 1 ? toArr : toArr.join()
+				//from: fromArr,//.length > 1 ? fromArr : fromArr.join(),
+				//to: toArr//.length > 1 ? toArr : toArr.join()
 			});
 			//log.info(toStr({params}));
 			const createOrModifyRes = createOrModify(params, {
@@ -65,9 +65,9 @@ export function post({
 			});
 			if (createOrModifyRes) {
 				successes += 1;
-			} else {
+			} else {*/
 				errors += 1;
-			}
+			//}
 		}
 	});
 

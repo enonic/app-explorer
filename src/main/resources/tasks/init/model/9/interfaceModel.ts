@@ -35,12 +35,12 @@ interface InterfaceModelParamsRemoved {
 	_versionKey? :string
 }
 
-interface InterfaceModelParamsOverWritten {
-	_indexConfig? :IndexConfig
-	_inheritsPermissions? :boolean
-	_parentPath? :ParentPath
-	_permissions? :Array<PermissionsParams>
-	_nodeType? :string
+type InterfaceModelParamsOverWritten = {
+	_indexConfig ?:IndexConfig
+	_inheritsPermissions ?:boolean
+	_parentPath ?:ParentPath
+	_permissions ?:Array<PermissionsParams>
+	_nodeType ?:string
 }
 
 interface InterfaceModelParamsPassedOn {
