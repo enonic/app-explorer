@@ -7,7 +7,7 @@ import {
 	Dropdown, Form, Header, Icon, Loader, Pagination, Table
 } from 'semantic-ui-react';
 
-import {NewOrEditSynonym} from './NewOrEditSynonym';
+import {NewOrEditSynonym} from './newOrEditSynonym/index';
 import {DeleteSynonym} from './DeleteSynonym';
 import {useEditSynonymsState} from './useEditSynonymsState';
 
