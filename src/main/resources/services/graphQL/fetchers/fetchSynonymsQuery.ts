@@ -108,6 +108,7 @@ export async function fetchSynonymsQuery({
 							'comment',
 							'enabled',
 							'disabledInInterfaces',
+							'locale',
 							{
 								synonyms: [
 									'comment',
