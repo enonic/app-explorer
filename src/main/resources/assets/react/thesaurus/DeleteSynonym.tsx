@@ -22,8 +22,8 @@ export function DeleteSynonym(props :{
 	//console.debug('DeleteSynonym props', props);
 	const {
 		_id,
-		afterClose = () => {},
-		beforeOpen = () => {},
+		afterClose = () => {/**/},
+		beforeOpen = () => {/**/},
 		from,
 		servicesBaseUrl,
 		to

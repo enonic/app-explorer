@@ -1,5 +1,4 @@
-//import type {Locales} from '../index.d';
-import type {EditSynonymsModalState} from './index.d';
+import type {Locales} from '../index.d';
 
 
 import * as React from 'react';
@@ -7,9 +6,16 @@ import {Button, Modal} from 'semantic-ui-react';
 import {EditSynonyms} from './EditSynonyms';
 
 
+export type EditSynonymsModalState = {
+	_id ?:string
+	_name ?:string
+	open :boolean
+}
+
+
 export function EditSynonymsModal({
 	// Required
-	//locales,
+	locales,
 	open,
 	servicesBaseUrl,
 	setEditSynonymsModalState,
@@ -19,7 +25,7 @@ export function EditSynonymsModal({
 	thesaurusName
 } :{
 	// Required
-	//locales :Locales
+	locales :Locales
 	open :boolean
 	servicesBaseUrl :string
 	setEditSynonymsModalState :React.Dispatch<React.SetStateAction<EditSynonymsModalState>>
@@ -49,6 +55,7 @@ export function EditSynonymsModal({
 		<Modal.Header>{header}</Modal.Header>
 		<Modal.Content>
 			<EditSynonyms
+				locales={locales}
 				servicesBaseUrl={servicesBaseUrl}
 				thesaurusId={thesaurusId}
 				thesaurusName={thesaurusName}
