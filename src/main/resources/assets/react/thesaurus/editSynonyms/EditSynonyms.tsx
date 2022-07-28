@@ -1,27 +1,28 @@
 import type {PaginationProps} from 'semantic-ui-react';
-//import type {Locales} from '../index.d';
+import type {SynonymLanguage} from '/lib/explorer/types/Synonym';
+import type {Locales} from '../../index.d';
 
 
 import {
 	//Button,
 	Dropdown, Form, Header, Icon, Loader, Pagination, Table
 } from 'semantic-ui-react';
-
-import {NewOrEditSynonym} from './newOrEditSynonym/index';
-import {DeleteSynonym} from './DeleteSynonym';
+import {LanguageDropdown} from '../../collection/LanguageDropdown';
+import {NewOrEditSynonym} from '../newOrEditSynonym/index';
+import {DeleteSynonym} from '../DeleteSynonym';
 import {useEditSynonymsState} from './useEditSynonymsState';
 
 
 export function EditSynonyms({
 	// Required
-	//locales,
+	locales,
 	servicesBaseUrl,
 	// Optional
 	thesaurusId,
 	thesaurusName
 } :{
 	// Required
-	//locales :Locales
+	locales :Locales
 	servicesBaseUrl :string
 	// Optional
 	thesaurusId ?:string
@@ -34,11 +35,13 @@ export function EditSynonyms({
 		end,
 		from,
 		isLoading,
+		languages,
 		memoizedQuerySynonyms,
 		page,
 		perPage,
 		result,
 		setFrom,
+		setLanguages,
 		setPage,
 		setPerPage,
 		setThesauri,
@@ -56,6 +59,18 @@ export function EditSynonyms({
 	return <>
 		<Form>
 			<Header as='h4'><Icon name='filter'/> Filter</Header>
+			<Form.Field>
+				<LanguageDropdown
+					clearable={true}
+					disabled={isLoading}
+					includeANoneOption={false}
+					language={languages}
+					loading={isLoading}
+					locales={locales}
+					multiple={true}
+					setLanguage={(newLanguages) => setLanguages(newLanguages as Array<string>)}
+				/>
+			</Form.Field>
 			<Form.Field>
 				<Form.Input
 					fluid={true}
@@ -157,6 +172,10 @@ export function EditSynonyms({
 								onClick={() => sortAfterColumnClick('to', column, direction)}
 								sorted={column === 'to' ? direction : null}
 							>To</Table.HeaderCell>
+							<Table.HeaderCell
+								onClick={() => sortAfterColumnClick('both', column, direction)}
+								sorted={column === 'both' ? direction : null}
+							>Both</Table.HeaderCell>
 							{thesaurusId ? null : <Table.HeaderCell
 								onClick={() => sortAfterColumnClick('_parentPath', column, direction)}
 								sorted={column === '_parentPath' ? direction : null}
@@ -170,36 +189,57 @@ export function EditSynonyms({
 					</Table.Header>
 					<Table.Body>
 						{result.hits.map(({
-							from = [''],
 							_id,
 							//name,
 							_score,
+							languages: languagesArray,
 							thesaurus,
 							thesaurusReference,
-							to = ['']
-						}, i :number) => <Table.Row key={i}>
-							<Table.Cell collapsing><NewOrEditSynonym
-								_id={_id}
-								afterClose={memoizedQuerySynonyms}
-								from={from}
-								servicesBaseUrl={servicesBaseUrl}
-								to={to}
-								thesaurusId={thesaurusReference}
-							/></Table.Cell>
-							<Table.Cell>{(Array.isArray(from) ? from : [from]).join(', ')}</Table.Cell>
-							<Table.Cell>{(Array.isArray(to) ? to : [to]).join(', ')}</Table.Cell>
-							{thesaurusId ? null : <Table.Cell>{thesaurus}</Table.Cell>}
-							<Table.Cell>{_score}</Table.Cell>
-							<Table.Cell collapsing>
-								<DeleteSynonym
+						}, i :number) => {
+							const synonymsObj = {
+								both: [],
+								from: [],
+								to: []
+							};
+							for (let i = 0; i < (languagesArray as unknown as Array<SynonymLanguage & {locale :string}>).length; i++) {
+							    const {
+									locale,
+									synonyms
+								} = languagesArray[i] as SynonymLanguage & {locale :string};
+								for (let j = 0; j < synonyms.length; j++) {
+								    const {
+										synonym,
+										use// = 'to'
+									} = synonyms[j];
+									const str = `${synonym} (${locale})`;
+									if (!synonymsObj[use].includes(str)) {
+										synonymsObj[use].push(str);
+									}
+								}
+							} // for languagesArray
+							console.debug('synonymsObj', synonymsObj);
+							return <Table.Row key={i}>
+								<Table.Cell collapsing><NewOrEditSynonym
 									_id={_id}
-									from={from}
 									afterClose={memoizedQuerySynonyms}
 									servicesBaseUrl={servicesBaseUrl}
-									to={to}
-								/>
-							</Table.Cell>
-						</Table.Row>)}
+									thesaurusId={thesaurusReference}
+								/></Table.Cell>
+								<Table.Cell>{synonymsObj.from.join(', ')}</Table.Cell>
+								<Table.Cell>{synonymsObj.to.join(', ')}</Table.Cell>
+								<Table.Cell>{synonymsObj.both.join(', ')}</Table.Cell>
+								{thesaurusId ? null : <Table.Cell>{thesaurus}</Table.Cell>}
+								<Table.Cell>{_score}</Table.Cell>
+								<Table.Cell collapsing>
+									<DeleteSynonym
+										_id={_id}
+										from={synonymsObj.from}
+										afterClose={memoizedQuerySynonyms}
+										servicesBaseUrl={servicesBaseUrl}
+										to={synonymsObj.to}
+									/>
+								</Table.Cell>
+							</Table.Row>})}
 					</Table.Body>
 				</Table>
 				<Pagination

@@ -62,7 +62,7 @@ export function SynonymLanguageSynonymsTable({
 						value={state.languages[lang].synonyms[j].synonym}
 					/>
 				</Table.Cell>
-				<Table.Cell collapsing>
+				<Table.Cell>
 					<Form.Dropdown
 						disabled={!state.enabled || !state.languages[lang].enabled || !state.languages[lang].synonyms[j].enabled}
 						fluid
