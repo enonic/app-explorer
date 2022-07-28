@@ -128,6 +128,7 @@ export function addQuerySynonymsField({
 			result.start = start + 1;
 			result.end = Math.min(start + perPage, result.total);
 			result.totalPages = Math.ceil(result.total / perPage);
+
 			//log.debug('result:%s', toStr(result));
 			return result;
 		},
