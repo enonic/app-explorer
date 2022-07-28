@@ -7,10 +7,11 @@ import type {Glue} from '../Glue';
 
 
 import {
-	QUERY_FUNCTION_FULLTEXT,
-	QUERY_FUNCTION_NGRAM,
-	addQueryFilter//,
-	//toStr
+	//QUERY_FUNCTION_FULLTEXT,
+	//QUERY_FUNCTION_NGRAM,
+	addQueryFilter,
+	//storage,
+	toStr
 } from '@enonic/js-utils';
 import {hasValue} from '/lib/explorer/query/hasValue';
 import {
@@ -26,17 +27,38 @@ import {
 import {querySynonyms} from './querySynonyms';
 
 
+/*const bool = storage.query.dsl.bool;
+const fulltext = storage.query.dsl.fulltext;
+const ngram = storage.query.dsl.ngram;
+const or = storage.query.dsl.or;
+const stemmed = storage.query.dsl.stemmed;
+const term = storage.query.dsl.term;*/
+
+
 export function addQuerySynonymsField({
 	glue
 } :{
 	glue :Glue
 }) {
-	glue.addQuery({
+	glue.addQuery<{
+		count ?:number
+		filters ?:QueryFilters
+		from ?:string
+		languages ?:Array<string>
+		query ?:string
+		page ?:number
+		perPage ?:number
+		sort ?:string
+		start ?:number
+		thesaurusNames ?:Array<string>
+		to ?:string
+	}>({
 		name: 'querySynonyms',
 		args: {
 			count: GraphQLInt,
 			filters: glue.getInputType(GQL_INPUT_TYPE_FILTERS_NAME),
 			from: GraphQLString,
+			languages: list(GraphQLString),
 			query: GraphQLString,
 			page: GraphQLInt,
 			perPage: GraphQLInt,
@@ -45,24 +67,12 @@ export function addQuerySynonymsField({
 			thesaurusNames: list(GraphQLString),
 			to: GraphQLString
 		},
-		resolve: (env :{
-			args :{
-				count ?:number
-				filters ?:QueryFilters
-				from ?:string
-				query ?:string
-				page ?:number
-				perPage ?:number
-				sort ?:string
-				start ?:number
-				thesaurusNames ?:Array<string>
-				to ?:string
-			}
-		}) => {
-			//log.debug(`env:${toStr(env)}`);
-			const {
+		resolve: ({
+			args: {
+				filters = {},
 				from,
 				//highlight, // TODO?
+				languages = [],
 				query: queryArg = '',
 				page = 1, // NOTE First index is 1 not 0
 				perPage = 10,
@@ -71,11 +81,9 @@ export function addQuerySynonymsField({
 				thesaurusNames = [],
 				to,
 				sort = (from || queryArg || to) ? '_score DESC' : '_name ASC',
-			} = env.args;
-
-			let {
-				filters = {},
-			} = env.args;
+			}
+		}) => {
+			//log.debug(`env:${toStr(env)}`);
 			if(thesaurusNames) {
 				thesaurusNames.forEach(thesaurusName => {
 					filters = addQueryFilter({
@@ -85,9 +93,24 @@ export function addQuerySynonymsField({
 					});
 				});
 			}
-			//log.debug('filters:%s', toStr(filters));
 
-			const queries = [];
+			if (languages && languages.length) {
+				for (let i = 0; i < languages.length; i++) {
+				    const locale = languages[i];
+					filters = addQueryFilter({
+						clause: 'must',
+						filters,
+						filter: {
+							exists: {
+								field: `languages.${locale}`
+							}
+						}
+					});
+				} // for languages
+			}
+			log.debug('filters:%s', toStr(filters));
+
+			/*const queries = [];
 			if (from) {
 				queries.push(`(${QUERY_FUNCTION_FULLTEXT}('from^2', '${from}', 'AND') OR ${QUERY_FUNCTION_NGRAM}('from^1', '${from}', 'AND'))`);
 			}
@@ -100,7 +123,11 @@ export function addQuerySynonymsField({
 					: `(${queries.join(' OR ')})`
 				: queryArg
 					? queryArg
-					: '';
+					: '';*/
+			/*const query = bool(
+				//term('languages.zxx.synonyms.use')
+			);*/
+			const query = '';
 			//log.debug('query:%s', toStr(query));
 
 			const querySynonymsParams = {
@@ -135,57 +162,3 @@ export function addQuerySynonymsField({
 		type: glue.getObjectType(GQL_TYPE_SYNONYMS_QUERY_RESULT_NAME)
 	});
 }
-
-/* Example query
-{
-	querySynonyms(
-		#count: -1
-		#filters: {
-	  	#	boolean: {
-		#		must: {
-		#			hasValue: {
-		#				field: "thesaurusReference"
-		#				values: [
-		#					"dce02ab6-f851-4ee9-a84f-28dcd3027eee"
-		#				]
-		#			}
-		#		}
-	  	#	}
-		#}
-		#from: "ord"
-		#query: "thesaurusReference = 'dce02ab6-f851-4ee9-a84f-28dcd3027eee'"
-		#sort: "_from ASC"
-		#start: 0
-		#to: "word"
-		#thesaurusNames: [
-		#	"ordbok"
-		#]
-	) {
-		aggregations {
-			thesaurus {
-				buckets {
-					docCount
-					key
-				}
-			}
-		}
-		count
-		end
-		page
-		start
-		total
-		totalPages
-		hits {
-			_id
-			_name
-			_nodeType
-			_path
-			_score
-			_versionKey
-			thesaurus
-			thesaurusReference
-			# TODO
-		}
-	}
-}
-*/

@@ -1,6 +1,6 @@
 import type {Locales} from '../index.d';
+import type {EditSynonymsModalState} from './editSynonyms/EditSynonymsModal';
 import type {
-	EditSynonymsModalState,
 	NewOrEditState,
 	QueryThesauriGraph
 } from './index.d';

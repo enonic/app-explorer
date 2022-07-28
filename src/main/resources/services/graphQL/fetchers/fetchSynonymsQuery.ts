@@ -28,6 +28,7 @@ export async function fetchSynonymsQuery({
 	variables: {
 		//count,
 		from,
+		languages,
 		page,
 		perPage,
 		query,
@@ -67,6 +68,7 @@ export async function fetchSynonymsQuery({
 	variables :{
 		//count ?:number
 		from ?:string
+		languages ?:Array<string>
 		page ?:number,
 		perPage ?:number,
 		query ?:string,
@@ -138,6 +140,12 @@ export async function fetchSynonymsQuery({
 			from: {
 				required: false,
 				value: from
+			},
+			languages: {
+				list: true,
+				required: false,
+				type: 'String',
+				value: languages
 			},
 			page: {
 				required: false,

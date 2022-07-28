@@ -1,30 +1,3 @@
-import type {QueriedSynonym} from '/lib/explorer/types/index.d';
-
-
-export type EditSynonymsModalState = {
-	_id ?:string
-	_name ?:string
-	open :boolean
-}
-
-export type EditSynonymsState = {
-	aggregations: {
-		thesaurus: {
-			buckets: Array<{
-				docCount :number
-				key :string
-			}>
-		}
-	},
-	count :number
-	end :number
-	hits :Array<QueriedSynonym>
-	page :number
-	start :number
-	total :number
-	totalPages :number
-}
-
 export type NewOrEditState = {
 	_id ?:string
 	open :boolean

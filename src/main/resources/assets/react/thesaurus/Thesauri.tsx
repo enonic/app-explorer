@@ -17,7 +17,7 @@ import {
 	Table
 } from 'semantic-ui-react';
 
-import {EditSynonymsModal} from './EditSynonymsModal';
+import {EditSynonymsModal} from './editSynonyms/EditSynonymsModal';
 import {NewOrEditThesaurus} from './NewOrEditThesaurus';
 import {DeleteThesaurus} from './DeleteThesaurus';
 import {Import} from './Import';
@@ -255,6 +255,7 @@ export function Thesauri({
 		<EditSynonymsModal
 			open={editSynonymsModalState.open}
 			afterClose={memoizedFetchOnUpdate}
+			locales={locales}
 			servicesBaseUrl={servicesBaseUrl}
 			setEditSynonymsModalState={setEditSynonymsModalState}
 			thesaurusId={editSynonymsModalState._id}

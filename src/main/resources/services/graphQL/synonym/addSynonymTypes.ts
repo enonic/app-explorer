@@ -16,6 +16,7 @@ import {
 	GQL_INTERFACE_NODE_NAME,
 	GQL_INPUT_TYPE_SYNONYM_LANGUAGE_NAME,
 	GQL_TYPE_SYNONYM_NAME,
+	GQL_TYPE_SYNONYM_QUERIED_NAME,
 	GQL_TYPE_SYNONYMS_QUERY_RESULT_AGGREGATIONS_NAME,
 	GQL_TYPE_SYNONYMS_QUERY_RESULT_AGGREGATIONS_THESAURUS_NAME,
 	GQL_TYPE_SYNONYMS_QUERY_RESULT_AGGREGATIONS_THESAURUS_BUCKET_NAME,
@@ -28,23 +29,28 @@ export function addSynonymTypes({
 } :{
 	glue :Glue
 }) {
-	glue.addInputType({
-		name: GQL_INPUT_TYPE_SYNONYM_LANGUAGE_NAME,
+	const synonymLanguageSynonymInput = glue.addInputType({
+		name: 'SynonymLanguageSynonymInput',
 		fields: {
-			locale: { type: nonNull(GraphQLString) },
 			comment: { type: GraphQLString },
 			disabledInInterfaces: { type: list(GraphQLID) },
 			enabled: { type: GraphQLBoolean },
-			synonyms: { type: list(glue.addInputType({
-				name: 'SynonymLanguageSynonymInput',
-				fields: {
-					comment: { type: GraphQLString },
-					disabledInInterfaces: { type: list(GraphQLID) },
-					enabled: { type: GraphQLBoolean },
-					synonym: { type: nonNull(GraphQLString) }, // If this is null the SynonymLanguageSynonymInput object should not exist!
-					use: { type: GraphQLString } // TODO? Enum: from, to, both
-				}
-			}))}
+			synonym: { type: nonNull(GraphQLString) }, // If this is null the SynonymLanguageSynonymInput object should not exist!
+		}
+	});
+
+	glue.addInputType({
+		name: GQL_INPUT_TYPE_SYNONYM_LANGUAGE_NAME,
+		fields: {
+			// Required
+			locale: { type: nonNull(GraphQLString) },
+			// Optional
+			both: { type: list(synonymLanguageSynonymInput)},
+			comment: { type: GraphQLString },
+			disabledInInterfaces: { type: list(GraphQLID) },
+			enabled: { type: GraphQLBoolean },
+			from: { type: list(synonymLanguageSynonymInput)},
+			to: { type: list(synonymLanguageSynonymInput)}
 		}
 	});
 
@@ -53,39 +59,54 @@ export function addSynonymTypes({
 		type: interfaceNodeType
 	} = glue.getInterfaceTypeObj(GQL_INTERFACE_NODE_NAME);
 
-	const gqlTypeSynonym = glue.addObjectType({
-		name: GQL_TYPE_SYNONYM_NAME,
+	const synonymLanguageSynonym = glue.addObjectType({
+		name: 'SynonymLanguageSynonym',
 		fields: {
-			...interfaceNodeFields,
-			//_highlight: { type: } // TODO
-			_score: { type: GraphQLFloat }, // NOTE: Only when quering
 			comment: { type: GraphQLString },
 			disabledInInterfaces: { type: list(GraphQLID) },
 			enabled: { type: GraphQLBoolean },
-			languages: { type: list(glue.addObjectType({
-				name: 'SynonymLanguage',
-				fields: {
-					locale: { type: nonNull(GraphQLString) },
-					comment: { type: GraphQLString },
-					disabledInInterfaces: { type: list(GraphQLID) },
-					enabled: { type: GraphQLBoolean },
-					synonyms: { type: list(glue.addObjectType({
-						name: 'SynonymLanguageSynonym',
-						fields: {
-							comment: { type: GraphQLString },
-							disabledInInterfaces: { type: list(GraphQLID) },
-							enabled: { type: GraphQLBoolean },
-							synonym: { type: nonNull(GraphQLString) }, // If this is null the SynonymLanguageSynonym object should not exist!
-							use: { type: GraphQLString } // TODO? Enum: from, to, both
-						}
-					}))}
-				}
-			}))},
-			thesaurus: { type: nonNull(GraphQLString) }, // NOTE: Added from path by forceTypeSynonym
-			thesaurusReference: { type: glue.getScalarType('_id') },
+			synonym: { type: nonNull(GraphQLString) }, // If this is null the SynonymLanguageSynonym object should not exist!
+		}
+	});
+
+	const synonymFields = {
+		...interfaceNodeFields,
+		comment: { type: GraphQLString },
+		disabledInInterfaces: { type: list(GraphQLID) },
+		enabled: { type: GraphQLBoolean },
+		languages: { type: list(glue.addObjectType({
+			name: 'SynonymLanguage',
+			fields: {
+				// Required
+				locale: { type: nonNull(GraphQLString) },
+				// Optional
+				both: { type: list(synonymLanguageSynonym)},
+				comment: { type: GraphQLString },
+				disabledInInterfaces: { type: list(GraphQLID) },
+				enabled: { type: GraphQLBoolean },
+				from: { type: list(synonymLanguageSynonym)},
+				to: { type: list(synonymLanguageSynonym)}
+			}
+		}))},
+		thesaurus: { type: nonNull(GraphQLString) }, // NOTE: Added from path by forceTypeSynonym
+		thesaurusReference: { type: glue.getScalarType('_id') },
+	}
+
+	glue.addObjectType({
+		name: GQL_TYPE_SYNONYM_NAME,
+		fields: synonymFields,
+		//interfaces: [interfaceNodeType]
+	})
+
+	const gqlTypeSynonymQueried = glue.addObjectType({
+		name: GQL_TYPE_SYNONYM_QUERIED_NAME,
+		fields: {
+			...synonymFields,
+			//_highlight: { type: } // TODO
+			_score: { type: GraphQLFloat }, // NOTE: Only when quering
 		},
 		interfaces: [interfaceNodeType]
-	})
+	});
 
 	glue.addObjectType({
 		name: GQL_TYPE_SYNONYMS_QUERY_RESULT_NAME,
@@ -109,7 +130,7 @@ export function addSynonymTypes({
 			}) },
 			count: { type: nonNull(GraphQLInt) },
 			end: { type: nonNull(GraphQLInt) },
-			hits: { type: list(gqlTypeSynonym) },
+			hits: { type: list(gqlTypeSynonymQueried) },
 			page: { type: nonNull(GraphQLInt) },
 			start: { type: nonNull(GraphQLInt) },
 			total: { type: nonNull(GraphQLInt) },
