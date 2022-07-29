@@ -7,8 +7,6 @@ import type {QueryFilters} from '/lib/explorer/types/index.d';
 import {PRINCIPAL_EXPLORER_READ} from '/lib/explorer/constants';
 import {connect} from '/lib/explorer/repo/connect';
 import {query as qS} from '/lib/explorer/synonym/query';
-import {coerceSynonymType} from '/lib/explorer/synonym/coerceSynonymType';
-import {languagesObjectToArray} from '/lib/explorer/synonym/languagesObjectToArray';
 
 
 export function querySynonyms({
@@ -50,23 +48,6 @@ export function querySynonyms({
 		total :number
 	};
 	//log.debug('synonymsRes1:%s', toStr(synonymsRes));
-
-	//@ts-ignore
-	synonymsRes.hits = synonymsRes.hits
-		.map((item) => coerceSynonymType(
-			//@ts-ignore
-			item
-		))
-		.map(({
-			languages: languagesObject,
-			...rest
-		}) => ({
-			...rest,
-			languages: languagesObjectToArray({
-				languagesObject
-			})
-		}));
-	//log.debug('synonymsRes2:%s', toStr(synonymsRes));
 
 	const aggQueryParams = {
 		connection,
