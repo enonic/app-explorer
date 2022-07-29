@@ -1,16 +1,24 @@
 import type {SynonymNode} from '/lib/explorer/types/index.d';
 import type {Glue} from '../Glue';
+import type {
+	InputTypeLanguageSynonym,
+	InputTypeSynonymLanguages
+} from './';
 
 
-import {toStr} from '@enonic/js-utils';
+//import {toStr} from '@enonic/js-utils';
 
 import {
 	PRINCIPAL_EXPLORER_READ,
 	PRINCIPAL_EXPLORER_WRITE
-} from '/lib/explorer/model/2/constants';
-import {get} from '/lib/explorer/node/get';
+} from '/lib/explorer/constants';
 import {connect} from '/lib/explorer/repo/connect';
-import {coerceSynonymType} from '/lib/explorer/synonym/coerceSynonymType';
+import {moldSynonymNode} from '/lib/explorer/synonym/moldSynonymNode';
+import {getSynonym} from '/lib/explorer/synonym/getSynonym';
+import {
+	getValidInterfaceIdReferences,
+	moldInputTypeLanguages
+} from './addMutationSynonymCreate';
 import {
 	GraphQLBoolean,
 	GraphQLID,
@@ -29,7 +37,16 @@ export function addMutationSynonymUpdate({
 } :{
 	glue :Glue
 }) {
-	glue.addMutation({
+	glue.addMutation<{
+		// Required
+		_id :string
+		thesaurusId :string
+		// Optional
+		comment ?:string
+		disabledInInterfaces ?:Array<string>
+		enabled ?:boolean
+		languages ?:InputTypeSynonymLanguages
+	}>({
 		name: 'updateSynonym',
 		args: {
 			_id: glue.getScalarType('_id'),
@@ -41,45 +58,54 @@ export function addMutationSynonymUpdate({
 		resolve({
 			args: {
 				_id,
-				comment,
-				disabledInInterfaces,
-				enabled,
-				languages,
+				comment: commentArg = '',
+				disabledInInterfaces: disabledInInterfacesArg = [],
+				enabled: enabledArg = true,
+				languages: languagesArg = [],
 			}
 		}) {
-			log.debug('_id:%s', toStr(_id));
-			log.debug('comment:%s', toStr(comment));
-			log.debug('disabledInInterfaces:%s', toStr(disabledInInterfaces));
-			log.debug('enabled:%s', toStr(enabled));
-			log.debug('languages:%s', toStr(languages));
-			throw new Error('Under implementation!');
-			const synonymNode = get({
-				connection: connect({
-					principals: [PRINCIPAL_EXPLORER_READ]
-				}),
-				key: _id
+			//log.debug('_id:%s', toStr(_id));
+			//log.debug('comment:%s', toStr(comment));
+			//log.debug('disabledInInterfaces:%s', toStr(disabledInInterfaces));
+			//log.debug('enabled:%s', toStr(enabled));
+			//log.debug('languages:%s', toStr(languages));
+			const explorerRepoReadConnection = connect({
+				principals: [PRINCIPAL_EXPLORER_READ]
 			});
-			if (!synonymNode) {
-				throw new Error(`Unable to find synonym with _id:${_id}!`);
-			}
+			getSynonym({ // Throws if not found or wrong _nodeType
+				explorerRepoReadConnection,
+				_id
+			});
 			const writeConnection = connect({
 				principals: [PRINCIPAL_EXPLORER_WRITE]
 			});
 
+			const interfaceIdsCheckedObject :Record<string,boolean> = {};
 			const modifyRes = writeConnection.modify<SynonymNode>({
 				key: _id,
 				editor: (node) => {
 					//log.debug(`node:${toStr(node)}`);
-					// TODO!!!
+					node.comment = commentArg;
+					node.disabledInInterfaces = getValidInterfaceIdReferences({
+						explorerRepoReadConnection,
+						interfaceIdsArray: disabledInInterfacesArg,
+						interfaceIdsCheckedObject // modified within
+					});
+					node.enabled = enabledArg;
+					node.languages = moldInputTypeLanguages({
+						explorerRepoReadConnection,
+						interfaceIdsCheckedObject,
+						languagesArg
+					});
 					//log.debug(`node:${toStr(node)}`);
 					return node;
 				}
 			});
 			if (!modifyRes) {
-				throw new Error(`Something went wrong when trying to modify synonym _id:${_id} from:${toStr(from)} to:${toStr(to)}!`);
+				throw new Error(`Something went wrong when trying to modify synonym _id:${_id}!`);
 			}
 			//log.debug(`modifyRes:${toStr(modifyRes)}`);
-			return coerceSynonymType(modifyRes);
+			return moldSynonymNode(modifyRes);
 		},
 		type: glue.getObjectType(GQL_TYPE_SYNONYM_NAME)
 	});
