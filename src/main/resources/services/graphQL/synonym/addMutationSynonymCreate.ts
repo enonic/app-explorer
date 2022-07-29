@@ -1,10 +1,13 @@
 import type {
 	RepoConnection,
-	Synonym,
 	SynonymNodeCreateParams
 } from '/lib/explorer/types/index.d';
 //import type {} from '/lib/explorer/types/Synonym.d';
 import type {Glue} from '../Glue';
+import type {
+	InputTypeLanguageSynonym,
+	InputTypeSynonymLanguages
+} from './';
 
 
 import {
@@ -22,7 +25,7 @@ import {get} from '/lib/explorer/node/get';
 import {connect} from '/lib/explorer/repo/connect';
 import {createRandomNamed} from '/lib/explorer/node/createRandomNamed';
 import {buildSynonymIndexConfig} from '/lib/explorer/synonym/buildSynonymIndexConfig';
-import {coerceSynonymType} from '/lib/explorer/synonym/coerceSynonymType';
+import {moldSynonymNode} from '/lib/explorer/synonym/moldSynonymNode';
 import {
 	GraphQLBoolean,
 	GraphQLID,
@@ -71,42 +74,6 @@ export function getValidInterfaceIdReferences({
 }
 
 
-function coerceSynonymGqlType({
-	partialSynonymNode
-} :{
-	partialSynonymNode :Synonym & {
-		_score ?:number
-		thesaurus :string
-	}
-}) {
-	const deref :Synonym & {
-		_score ?:number
-		thesaurus :string
-	} = JSON.parse(JSON.stringify(partialSynonymNode));
-	const locales = Object.keys(deref.languages);
-	const languagesArray = [];
-	for (let i = 0; i < locales.length; i++) {
-	    const locale = locales[i];
-		languagesArray.push({
-			...deref.languages[locale],
-			locale
-		});
-	}
-	//@ts-ignore
-	deref.languages = languagesArray;
-	return deref;
-}
-
-
-declare type InputTypeLanguageSynonym = {
-	// Required
-	synonym :string
-	// Optional
-	comment ?:string
-	disabledInInterfaces ?:Array<string>
-	enabled ?:boolean
-}
-
 declare type CreateSynonymNodeLanguageSynonym = {
 	// Required
 	synonym :string
@@ -150,6 +117,57 @@ function arrayOfInputTypeLanguageSynonymsToArrayOfSynonymNodeLanguageSynonyms({
 }
 
 
+export function moldInputTypeLanguages({
+	explorerRepoReadConnection,
+	interfaceIdsCheckedObject,
+	languagesArg
+} :{
+	explorerRepoReadConnection :RepoConnection
+	interfaceIdsCheckedObject :Record<string,boolean> // modified within
+	languagesArg :InputTypeSynonymLanguages
+}) {
+	const languages = {};
+	for (let i = 0; i < languagesArg.length; i++) {
+		const {
+			// Required
+			locale,
+			// Optional
+			both = [],
+			comment: languageComment = '',
+			disabledInInterfaces: languageDisabledInInterfaces = [],
+			enabled: languageEnabled = true,
+			from = [],
+			to = []
+		} = languagesArg[i];
+		languages[locale] = {
+			both: arrayOfInputTypeLanguageSynonymsToArrayOfSynonymNodeLanguageSynonyms({
+				arrayOfInputTypeLanguageSynonyms: both,
+				explorerRepoReadConnection,
+				interfaceIdsCheckedObject
+			}),
+			comment: languageComment,
+			disabledInInterfaces: getValidInterfaceIdReferences({
+				explorerRepoReadConnection,
+				interfaceIdsArray: languageDisabledInInterfaces,
+				interfaceIdsCheckedObject // modified within
+			}),
+			enabled: languageEnabled,
+			from: arrayOfInputTypeLanguageSynonymsToArrayOfSynonymNodeLanguageSynonyms({
+				arrayOfInputTypeLanguageSynonyms: from,
+				explorerRepoReadConnection,
+				interfaceIdsCheckedObject
+			}),
+			to: arrayOfInputTypeLanguageSynonymsToArrayOfSynonymNodeLanguageSynonyms({
+				arrayOfInputTypeLanguageSynonyms: to,
+				explorerRepoReadConnection,
+				interfaceIdsCheckedObject
+			})
+		}
+	} // for languagesArg
+	return languages;
+}
+
+
 export function addMutationSynonymCreate({
 	glue
 } :{
@@ -162,17 +180,7 @@ export function addMutationSynonymCreate({
 		comment ?:string
 		disabledInInterfaces ?:Array<string>
 		enabled ?:boolean
-		languages ?:Array<{
-			// Required
-			locale :string
-			// Optional
-			both ?:Array<InputTypeLanguageSynonym>
-			comment ?:string
-			disabledInInterfaces ?:Array<string>
-			enabled ?:boolean
-			from ?:Array<InputTypeLanguageSynonym>
-			to ?:Array<InputTypeLanguageSynonym>
-		}>
+		languages ?:InputTypeSynonymLanguages
 	}>({
 		name: 'createSynonym',
 		args: {
@@ -214,45 +222,6 @@ export function addMutationSynonymCreate({
 			}
 
 			const interfaceIdsCheckedObject :Record<string,boolean> = {};
-			const languages = {};
-			for (let i = 0; i < languagesArg.length; i++) {
-			    const {
-					// Required
-					locale,
-					// Optional
-					both = [],
-					comment: languageComment = '',
-					disabledInInterfaces: languageDisabledInInterfaces = [],
-					enabled: languageEnabled = true,
-					from = [],
-					to = []
-				} = languagesArg[i];
-				languages[locale] = {
-					both: arrayOfInputTypeLanguageSynonymsToArrayOfSynonymNodeLanguageSynonyms({
-						arrayOfInputTypeLanguageSynonyms: both,
-						explorerRepoReadConnection,
-						interfaceIdsCheckedObject
-					}),
-					comment: languageComment,
-					disabledInInterfaces: getValidInterfaceIdReferences({
-						explorerRepoReadConnection,
-						interfaceIdsArray: languageDisabledInInterfaces,
-						interfaceIdsCheckedObject // modified within
-					}),
-					enabled: languageEnabled,
-					from: arrayOfInputTypeLanguageSynonymsToArrayOfSynonymNodeLanguageSynonyms({
-						arrayOfInputTypeLanguageSynonyms: from,
-						explorerRepoReadConnection,
-						interfaceIdsCheckedObject
-					}),
-					to: arrayOfInputTypeLanguageSynonymsToArrayOfSynonymNodeLanguageSynonyms({
-						arrayOfInputTypeLanguageSynonyms: to,
-						explorerRepoReadConnection,
-						interfaceIdsCheckedObject
-					})
-				}
-			} // for languagesArg
-			//log.debug('languages:%s', toStr(languages));
 
 			const createSynonymParams :SynonymNodeCreateParams = {
 				_nodeType: NT_SYNONYM,
@@ -264,7 +233,11 @@ export function addMutationSynonymCreate({
 					interfaceIdsCheckedObject // modified within
 				}),
 				enabled: enabledArg,
-				languages,
+				languages: moldInputTypeLanguages({
+					explorerRepoReadConnection,
+					interfaceIdsCheckedObject,
+					languagesArg
+				}),
 				thesaurusReference: referenceValue(thesaurusNode._id),
 			};
 			createSynonymParams._indexConfig = buildSynonymIndexConfig({
@@ -281,12 +254,7 @@ export function addMutationSynonymCreate({
 			}
 			//log.debug(`createRes:${toStr(createRes)}`);
 
-			return coerceSynonymGqlType({
-				partialSynonymNode: coerceSynonymType(
-					//@ts-ignore // TODO
-					createRes
-				)
-			});
+			return moldSynonymNode(createRes);
 		},
 		type: glue.getObjectType(GQL_TYPE_SYNONYM_NAME)
 	});
