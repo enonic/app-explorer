@@ -78,6 +78,7 @@
 			"mocha",
 			"node",
 			"react",
+			"react-html-parser",
 			"traverse"
 		]
 	},

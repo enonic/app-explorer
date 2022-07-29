@@ -1,9 +1,6 @@
 import type {SynonymNode} from '/lib/explorer/types/index.d';
 import type {Glue} from '../Glue';
-import type {
-	InputTypeLanguageSynonym,
-	InputTypeSynonymLanguages
-} from './';
+import type {InputTypeSynonymLanguages} from './';
 
 
 //import {toStr} from '@enonic/js-utils';
@@ -13,8 +10,9 @@ import {
 	PRINCIPAL_EXPLORER_WRITE
 } from '/lib/explorer/constants';
 import {connect} from '/lib/explorer/repo/connect';
-import {moldSynonymNode} from '/lib/explorer/synonym/moldSynonymNode';
+import {buildSynonymIndexConfig} from '/lib/explorer/synonym/buildSynonymIndexConfig';
 import {getSynonym} from '/lib/explorer/synonym/getSynonym';
+import {moldSynonymNode} from '/lib/explorer/synonym/moldSynonymNode';
 import {
 	getValidInterfaceIdReferences,
 	moldInputTypeLanguages
@@ -97,6 +95,9 @@ export function addMutationSynonymUpdate({
 						interfaceIdsCheckedObject,
 						languagesArg
 					});
+					node._indexConfig = buildSynonymIndexConfig({
+						partialSynonymNode: node
+					});
 					//log.debug(`node:${toStr(node)}`);
 					return node;
 				}
@@ -104,6 +105,7 @@ export function addMutationSynonymUpdate({
 			if (!modifyRes) {
 				throw new Error(`Something went wrong when trying to modify synonym _id:${_id}!`);
 			}
+			writeConnection.refresh();
 			//log.debug(`modifyRes:${toStr(modifyRes)}`);
 			return moldSynonymNode(modifyRes);
 		},

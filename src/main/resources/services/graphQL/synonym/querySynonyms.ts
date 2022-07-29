@@ -1,6 +1,13 @@
+import type {
+	QueryDSL,
+	SortDSLExpression
+} from '@enonic/js-utils/src/types';
 import type {AggregationsResponseEntry} from '@enonic/js-utils/src/types/node/query/Aggregation.d';
-import type {QueriedSynonym} from '/lib/explorer/types/index.d';
-import type {QueryFilters} from '/lib/explorer/types/index.d';
+import type {
+	Highlight,
+	QueryFilters,
+	QueriedSynonym
+} from '/lib/explorer/types/index.d';
 
 
 //import {toStr} from '@enonic/js-utils';
@@ -12,15 +19,16 @@ import {query as qS} from '/lib/explorer/synonym/query';
 export function querySynonyms({
 	count, // NOTE: lib-explorer/synonym/query defaults to -1
 	filters = {},
-	//highlight, // TODO?
+	highlight = {},
 	query = '',
 	sort = '_name ASC',
 	start = 0
 } :{
 	count ?:number
 	filters ?:QueryFilters
-	query ?:string
-	sort ?:string
+	highlight ?:Highlight
+	query ?:QueryDSL|string
+	sort ?:SortDSLExpression|string
 	start ?:number
 }) {
 	/*log.debug('querySynonyms(%s)', toStr({
@@ -35,7 +43,7 @@ export function querySynonyms({
 		connection,
 		count,
 		filters,
-		//highlight, // TODO?
+		highlight,
 		query,
 		sort,
 		start

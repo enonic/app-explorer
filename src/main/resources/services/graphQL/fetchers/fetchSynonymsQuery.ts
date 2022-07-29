@@ -96,6 +96,7 @@ export async function fetchSynonymsQuery({
 			'end',
 			{
 				hits: [
+					'_highlight',
 					'_id',
 					'_name',
 					'_nodeType',
@@ -107,17 +108,32 @@ export async function fetchSynonymsQuery({
 					'disabledInInterfaces',
 					{
 						languages: [
-							'comment',
-							'enabled',
-							'disabledInInterfaces',
-							'locale',
 							{
-								synonyms: [
+								both: [
 									'comment',
 									'enabled',
 									'disabledInInterfaces',
-									'synonym',
-									'use'
+									'synonym'
+								]
+							},
+							'comment',
+							'enabled',
+							'disabledInInterfaces',
+							{
+								from: [
+									'comment',
+									'enabled',
+									'disabledInInterfaces',
+									'synonym'
+								]
+							},
+							'locale',
+							{
+								to: [
+									'comment',
+									'enabled',
+									'disabledInInterfaces',
+									'synonym'
 								]
 							}
 						]
@@ -126,6 +142,7 @@ export async function fetchSynonymsQuery({
 					'thesaurusReference',
 				]
 			},
+			'localeToStemmingLanguage',
 			'page',
 			//'perPage', // Only in input, not output
 			'start',

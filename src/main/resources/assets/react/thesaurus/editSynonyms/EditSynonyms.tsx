@@ -1,11 +1,12 @@
 import type {PaginationProps} from 'semantic-ui-react';
-import type {SynonymLanguage} from '/lib/explorer/types/Synonym';
+import type {Synonym_Language} from '/lib/explorer/types/Synonym';
 import type {Locales} from '../../index.d';
 
 
+import ReactHtmlParser from 'react-html-parser';
 import {
 	//Button,
-	Dropdown, Form, Header, Icon, Loader, Pagination, Table
+	Form, Header, Icon, List, Loader, Pagination, Table
 } from 'semantic-ui-react';
 import {LanguageDropdown} from '../../collection/LanguageDropdown';
 import {NewOrEditSynonym} from '../newOrEditSynonym/index';
@@ -57,8 +58,35 @@ export function EditSynonyms({
 		thesaurusName
 	});
 	return <>
+		<Header as='h4'><Icon name='search'/> Query</Header>
 		<Form>
-			<Header as='h4'><Icon name='filter'/> Filter</Header>
+			<Form.Input
+				fluid={true}
+				label='From'
+				onChange={({target:{value}}) => setFrom(value)}
+				placeholder='From'
+				value={from}
+			/>
+			<Form.Input
+				fluid={true}
+				label='To'
+				onChange={({target:{value}}) => setTo(value)}
+				placeholder='To'
+				value={to}
+			/>
+			{/*
+			<Form.Input
+				fluid={true}
+				label='Both'
+				onChange={({target:{value}}) => setTo(value)}
+				placeholder='Both'
+				value={both}
+			/>
+			*/}
+		</Form>
+
+		<Header as='h4'><Icon name='filter'/> Filters</Header>
+		<Form>
 			<Form.Field>
 				<LanguageDropdown
 					clearable={true}
@@ -71,28 +99,12 @@ export function EditSynonyms({
 					setLanguage={(newLanguages) => setLanguages(newLanguages as Array<string>)}
 				/>
 			</Form.Field>
-			<Form.Field>
-				<Form.Input
-					fluid={true}
-					label='From'
-					onChange={({target:{value}}) => setFrom(value)}
-					placeholder='From'
-					value={from}
-				/>
-			</Form.Field>
-			<Form.Field>
-				<Form.Input
-					fluid={true}
-					label='To'
-					onChange={({target:{value}}) => setTo(value)}
-					placeholder='To'
-					value={to}
-				/>
-			</Form.Field>
+		</Form>
 
-			{thesaurusId ? null : <>
-				<Header as='h4'><Icon name='font'/> Thesauri</Header>
-				<Dropdown
+		{thesaurusId ? null : <>
+			<Header as='h4'><Icon name='font'/> Thesauri</Header>
+			<Form>
+				<Form.Dropdown
 					defaultValue={thesauri}
 					fluid
 					multiple={true}
@@ -117,46 +129,46 @@ export function EditSynonyms({
 					search
 					selection
 				/>
-			</>}
+			</Form>
+		</>}
 
-			<Header as='h4'><Icon name='resize vertical'/> Per page</Header>
-			<Form.Field>
-				<Dropdown
-					defaultValue={perPage}
-					fluid
-					onChange={(
-						//@ts-ignore
-						event :unknown,
-						{
-							value
-						} :{
-							value :number
-						}
-					) => setPerPage(value)}
-					options={[5,10,25,50,100].map(key => ({key, text: `${key}`, value: key}))}
-					selection
-				/>
-			</Form.Field>
-
-			{/*<Header as='h4'><Icon name='sort'/> Sort</Header>
-			<Form.Field>
-				<Dropdown
-					defaultValue={sort}
-					fluid
-					onChange={(e,{value}) => querySynonyms({sort: value})}
-					options={[{
-						key: '_score DESC',
-						text: 'Score descending',
-						value: '_score DESC'
-					}, {
-						key: 'from ASC',
-						text: 'From ascending',
-						value: 'from ASC'
-					}]}
-					selection
-				/>
-			</Form.Field>*/}
+		<Header as='h4'><Icon name='resize vertical'/> Per page</Header>
+		<Form>
+			<Form.Dropdown
+				defaultValue={perPage}
+				fluid
+				onChange={(
+					//@ts-ignore
+					event :unknown,
+					{
+						value
+					} :{
+						value :number
+					}
+				) => setPerPage(value)}
+				options={[5,10,25,50,100].map(key => ({key, text: `${key}`, value: key}))}
+				selection
+			/>
 		</Form>
+
+		{/*<Header as='h4'><Icon name='sort'/> Sort</Header>
+		<Form.Field>
+			<Dropdown
+				defaultValue={sort}
+				fluid
+				onChange={(e,{value}) => querySynonyms({sort: value})}
+				options={[{
+					key: '_score DESC',
+					text: 'Score descending',
+					value: '_score DESC'
+				}, {
+					key: 'from ASC',
+					text: 'From ascending',
+					value: 'from ASC'
+				}]}
+				selection
+			/>
+		</Form.Field>*/}
 		{isLoading
 			? <Loader active inverted>Loading</Loader>
 			: <>
@@ -189,6 +201,7 @@ export function EditSynonyms({
 					</Table.Header>
 					<Table.Body>
 						{result.hits.map(({
+							_highlight,
 							_id,
 							//name,
 							_score,
@@ -196,28 +209,54 @@ export function EditSynonyms({
 							thesaurus,
 							thesaurusReference,
 						}, i :number) => {
+							//console.debug(_highlight, _highlight);
 							const synonymsObj = {
 								both: [],
 								from: [],
 								to: []
 							};
-							for (let i = 0; i < (languagesArray as unknown as Array<SynonymLanguage & {locale :string}>).length; i++) {
+							for (let i = 0; i < (languagesArray as unknown as Array<Synonym_Language>).length; i++) {
 							    const {
+									both,
+									from,
 									locale,
-									synonyms
-								} = languagesArray[i] as SynonymLanguage & {locale :string};
-								for (let j = 0; j < synonyms.length; j++) {
+									to
+								} = languagesArray[i] as Synonym_Language;
+								for (let j = 0; j < both.length; j++) {
+									const highlighted = _highlight[`languages.${locale}.both.synonym`];
+									const highlightedStemmed = _highlight[`languages.${locale}.both.synonym._stemmed_${result.localeToStemmingLanguage[locale]}`]
 								    const {
-										synonym,
-										use// = 'to'
-									} = synonyms[j];
-									const str = `${synonym} (${locale})`;
-									if (!synonymsObj[use].includes(str)) {
-										synonymsObj[use].push(str);
+										synonym
+									} = both[j];
+									const str = `${highlighted||highlightedStemmed||synonym} (${locale})`;
+									if (!synonymsObj.both.includes(str)) {
+										synonymsObj.both.push(str);
+									}
+								}
+								for (let j = 0; j < from.length; j++) {
+									const highlighted = _highlight[`languages.${locale}.from.synonym`];
+									const highlightedStemmed = _highlight[`languages.${locale}.from.synonym._stemmed_${result.localeToStemmingLanguage[locale]}`]
+								    const {
+										synonym
+									} = from[j];
+									const str = `${highlighted||highlightedStemmed||synonym} (${locale})`;
+									if (!synonymsObj.from.includes(str)) {
+										synonymsObj.from.push(str);
+									}
+								}
+								for (let j = 0; j < to.length; j++) {
+									const highlighted = _highlight[`languages.${locale}.to.synonym`];
+									const highlightedStemmed = _highlight[`languages.${locale}.to.synonym._stemmed_${result.localeToStemmingLanguage[locale]}`]
+								    const {
+										synonym
+									} = to[j];
+									const str = `${highlighted||highlightedStemmed||synonym} (${locale})`;
+									if (!synonymsObj.to.includes(str)) {
+										synonymsObj.to.push(str);
 									}
 								}
 							} // for languagesArray
-							console.debug('synonymsObj', synonymsObj);
+							//console.debug('synonymsObj', synonymsObj);
 							return <Table.Row key={i}>
 								<Table.Cell collapsing><NewOrEditSynonym
 									_id={_id}
@@ -225,9 +264,9 @@ export function EditSynonyms({
 									servicesBaseUrl={servicesBaseUrl}
 									thesaurusId={thesaurusReference}
 								/></Table.Cell>
-								<Table.Cell>{synonymsObj.from.join(', ')}</Table.Cell>
-								<Table.Cell>{synonymsObj.to.join(', ')}</Table.Cell>
-								<Table.Cell>{synonymsObj.both.join(', ')}</Table.Cell>
+								<Table.Cell><List>{synonymsObj.from.map((item, j) => <List.Item key={j}>{ReactHtmlParser(item)}</List.Item>)}</List></Table.Cell>
+								<Table.Cell><List>{synonymsObj.to.map((item, j) => <List.Item key={j}>{ReactHtmlParser(item)}</List.Item>)}</List></Table.Cell>
+								<Table.Cell><List>{synonymsObj.both.map((item, j) => <List.Item key={j}>{ReactHtmlParser(item)}</List.Item>)}</List></Table.Cell>
 								{thesaurusId ? null : <Table.Cell>{thesaurus}</Table.Cell>}
 								<Table.Cell>{_score}</Table.Cell>
 								<Table.Cell collapsing>

@@ -243,16 +243,19 @@ export function addMutationSynonymCreate({
 			createSynonymParams._indexConfig = buildSynonymIndexConfig({
 				partialSynonymNode: createSynonymParams
 			});
+			const writeConnection = connect({
+				principals: [PRINCIPAL_EXPLORER_WRITE]
+			});
 			const createRes = createRandomNamed<SynonymNodeCreateParams>(createSynonymParams, {
-				connection: connect({
-					principals: [PRINCIPAL_EXPLORER_WRITE]
-				})
+				connection: writeConnection
 			});
 			if (!createRes) {
 				log.error(`Something went wrong when trying to create synonym createSynonymParams:${toStr(createSynonymParams)} in thesaurus with id:${thesaurusId}`);
 				throw new Error(`Something went wrong when trying to create synonym in thesaurus with id:${thesaurusId}!`);
 			}
 			//log.debug(`createRes:${toStr(createRes)}`);
+
+			//writeConnection.refresh(); // Already done by createRandomNamed
 
 			return moldSynonymNode(createRes);
 		},
