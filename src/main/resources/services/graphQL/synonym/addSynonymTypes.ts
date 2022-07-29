@@ -7,6 +7,7 @@ import {
 	GraphQLID,
 	GraphQLInt,
 	GraphQLString,
+	Json as GraphQLJSON,
 	list,
 	nonNull
 	//@ts-ignore
@@ -102,7 +103,7 @@ export function addSynonymTypes({
 		name: GQL_TYPE_SYNONYM_QUERIED_NAME,
 		fields: {
 			...synonymFields,
-			//_highlight: { type: } // TODO
+			_highlight: { type: GraphQLJSON },
 			_score: { type: GraphQLFloat }, // NOTE: Only when quering
 		},
 		interfaces: [interfaceNodeType]
@@ -131,6 +132,7 @@ export function addSynonymTypes({
 			count: { type: nonNull(GraphQLInt) },
 			end: { type: nonNull(GraphQLInt) },
 			hits: { type: list(gqlTypeSynonymQueried) },
+			localeToStemmingLanguage: { type: GraphQLJSON },
 			page: { type: nonNull(GraphQLInt) },
 			start: { type: nonNull(GraphQLInt) },
 			total: { type: nonNull(GraphQLInt) },
