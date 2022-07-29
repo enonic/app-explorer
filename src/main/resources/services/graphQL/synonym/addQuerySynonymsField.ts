@@ -7,13 +7,16 @@ import type {Glue} from '../Glue';
 
 
 import {
-	//QUERY_FUNCTION_FULLTEXT,
-	//QUERY_FUNCTION_NGRAM,
 	addQueryFilter,
-	//storage,
+	storage,
 	toStr
 } from '@enonic/js-utils';
+import {PRINCIPAL_EXPLORER_READ} from '/lib/explorer/constants';
 import {hasValue} from '/lib/explorer/query/hasValue';
+import {connect} from '/lib/explorer/repo/connect';
+import {javaLocaleToSupportedLanguage} from '/lib/explorer/stemming/javaLocaleToSupportedLanguage';
+import {getThesaurus} from '/lib/explorer/thesaurus/getThesaurus';
+import {query as queryThesauri} from '/lib/explorer/thesaurus/query';
 import {
 	GraphQLInt,
 	GraphQLString,
@@ -27,12 +30,13 @@ import {
 import {querySynonyms} from './querySynonyms';
 
 
-/*const bool = storage.query.dsl.bool;
+//const and = storage.query.dsl.and;
+const bool = storage.query.dsl.bool;
 const fulltext = storage.query.dsl.fulltext;
 const ngram = storage.query.dsl.ngram;
 const or = storage.query.dsl.or;
 const stemmed = storage.query.dsl.stemmed;
-const term = storage.query.dsl.term;*/
+//const term = storage.query.dsl.term;
 
 
 export function addQuerySynonymsField({
@@ -64,7 +68,7 @@ export function addQuerySynonymsField({
 			perPage: GraphQLInt,
 			sort: GraphQLString,
 			start: GraphQLInt,
-			thesaurusNames: list(GraphQLString),
+			thesaurusNames: list(GraphQLString), // Can be empty
 			to: GraphQLString
 		},
 		resolve: ({
@@ -83,16 +87,59 @@ export function addQuerySynonymsField({
 				sort = (from || queryArg || to) ? '_score DESC' : '_name ASC',
 			}
 		}) => {
-			//log.debug(`env:${toStr(env)}`);
-			if(thesaurusNames) {
+			//log.debug('thesaurusNames:%s', toStr(thesaurusNames));
+			const highlightLocales = [];
+			const localeToStemmingLanguage :Record<string,string> = {};
+			const explorerRepoReadConnection = connect({
+				principals: [PRINCIPAL_EXPLORER_READ]
+			});
+			if(thesaurusNames.length) {
 				thesaurusNames.forEach(thesaurusName => {
 					filters = addQueryFilter({
 						clause: 'should',
 						filters,
 						filter: hasValue('_parentPath', `/thesauri/${thesaurusName}`)
 					});
+					const { // TODO Refactor
+						//_id,
+						allowedLanguages
+					} = getThesaurus({
+						connection: explorerRepoReadConnection,
+						_name: thesaurusName
+					});
+					for (let i = 0; i < allowedLanguages.length; i++) {
+					    const locale = allowedLanguages[i];
+						if (!highlightLocales.includes(locale)) {
+							highlightLocales.push(locale);
+						}
+						if (locale !== 'zxx' && !localeToStemmingLanguage[locale]) {
+							localeToStemmingLanguage[locale] = javaLocaleToSupportedLanguage(locale); // Doesn't support zxx
+						}
+					}
 				});
+			} else {
+				const {hits} = queryThesauri({
+					connection: explorerRepoReadConnection,
+					count: -1,
+					getSynonymsCount: false
+				});
+				for (let i = 0; i < hits.length; i++) { // TODO Refactor
+				    const {
+						allowedLanguages
+					} = hits[i];
+					for (let j = 0; j < allowedLanguages.length; j++) {
+					    const locale = allowedLanguages[j];
+						if (!highlightLocales.includes(locale)) {
+							highlightLocales.push(locale);
+						}
+						if (locale !== 'zxx' && !localeToStemmingLanguage[locale]) {
+							localeToStemmingLanguage[locale] = javaLocaleToSupportedLanguage(locale); // Doesn't support zxx
+						}
+					}
+				}
 			}
+			//log.debug('highlightLocales:%s', toStr(highlightLocales));
+			//log.debug('localeToStemmingLanguage:%s', toStr(localeToStemmingLanguage));
 
 			if (languages && languages.length) {
 				for (let i = 0; i < languages.length; i++) {
@@ -108,36 +155,74 @@ export function addQuerySynonymsField({
 					});
 				} // for languages
 			}
-			log.debug('filters:%s', toStr(filters));
+			//log.debug('filters:%s', toStr(filters));
 
-			/*const queries = [];
-			if (from) {
-				queries.push(`(${QUERY_FUNCTION_FULLTEXT}('from^2', '${from}', 'AND') OR ${QUERY_FUNCTION_NGRAM}('from^1', '${from}', 'AND'))`);
+			const highlight = {
+				//encoder: 'default', // default, html
+				//fragmenter: 'span', // span, simple
+				fragmentSize: -1, // 100
+				//noMatchSize: 255,
+				numberOfFragments: 1, // 5
+				//order: 'none', // none, score
+				postTag: '</b>',
+				preTag: '<b>',
+				properties: {
+					//_alltext: {}
+				},
+				//requireFieldMatch: false,// true
+				//tagsSchema: 'styled'
+			};
+			const shouldQueries = [];
+			if (from) { // TODO Refactor
+				shouldQueries.push(fulltext('languages.*.from.synonym', from, 'AND'));
+				//shouldQueries.push(fulltext(highlightLocales.map((l) => `languages.${l}.from.synonym`), from, 'AND'));
+				shouldQueries.push(ngram('languages.*.from.synonym', from, 'AND'));
+
+				const locales = Object.keys(localeToStemmingLanguage);
+				if (locales.length) {
+					for (let i = 0; i < locales.length; i++) {
+					    const l = locales[i];
+						shouldQueries.push(stemmed(`languages.${l}.from.synonym`, from, 'AND', localeToStemmingLanguage[l]));
+					}
+				}
+
+				for (let i = 0; i < highlightLocales.length; i++) {
+				    const l = highlightLocales[i];
+					const fieldPath = `languages.${l}.from.synonym`
+					highlight.properties[fieldPath] = {};
+				}
 			}
-			if (to) {
-				queries.push(`(${QUERY_FUNCTION_FULLTEXT}('to^2', '${to}', 'AND') OR ${QUERY_FUNCTION_NGRAM}('to^1', '${to}', 'AND'))`);
+			if (to) { // TODO Refactor
+				shouldQueries.push(fulltext('languages.*.to.synonym', to, 'AND'));
+				//shouldQueries.push(fulltext(highlightLocales.map((l) => `languages.${l}.to.synonym`), to, 'AND'));
+				shouldQueries.push(ngram('languages.*.to.synonym', to, 'AND'));
+
+				const locales = Object.keys(localeToStemmingLanguage);
+				if (locales.length) {
+					for (let i = 0; i < locales.length; i++) {
+					    const l = locales[i];
+						shouldQueries.push(stemmed(`languages.${l}.to.synonym`, to, 'AND', localeToStemmingLanguage[l]));
+					}
+				}
+				for (let i = 0; i < highlightLocales.length; i++) {
+				    const l = highlightLocales[i];
+					const fieldPath = `languages.${l}.to.synonym`
+					highlight.properties[fieldPath] = {};
+				}
 			}
-			const query = queries.length
-				? queryArg
-					? `(${queryArg}) AND (${queries.join(' OR ')})`
-					: `(${queries.join(' OR ')})`
-				: queryArg
-					? queryArg
-					: '';*/
-			/*const query = bool(
-				//term('languages.zxx.synonyms.use')
-			);*/
-			const query = '';
+
+			const query = shouldQueries.length ? bool(or(shouldQueries)) : '';
 			//log.debug('query:%s', toStr(query));
 
 			const querySynonymsParams = {
 				count,
 				filters,
+				highlight,
 				query,
 				sort,
 				start
 			};
-			//log.debug('querySynonymsParams:%s', toStr(querySynonymsParams));
+			log.debug('querySynonymsParams:%s', toStr(querySynonymsParams));
 
 			const result = querySynonyms(querySynonymsParams) as {
 				aggregations ?:{
@@ -146,11 +231,13 @@ export function addQuerySynonymsField({
 				count :number
 				end :number
 				hits: Array<QueriedSynonym>
+				localeToStemmingLanguage :Record<string,string>
 				page :number
 				start :number
 				total :number
 				totalPages :number
 			};
+			result.localeToStemmingLanguage = localeToStemmingLanguage;
 			result.page = page;
 			result.start = start + 1;
 			result.end = Math.min(start + perPage, result.total);

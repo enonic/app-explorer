@@ -22,6 +22,7 @@ type EditSynonymsState = {
 	count :number
 	end :number
 	hits :Array<QueriedSynonym>
+	localeToStemmingLanguage :Record<string,string>
 	page :number
 	start :number
 	total :number
@@ -56,6 +57,7 @@ export function useEditSynonymsState({
 		count: 0,
 		end: 0,
 		hits: [],
+		localeToStemmingLanguage: {},
 		page: 1,
 		start: 1,
 		total: 0,
