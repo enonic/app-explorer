@@ -6,6 +6,7 @@ import type {Locales} from '../../index.d';
 import ReactHtmlParser from 'react-html-parser';
 import {
 	//Button,
+	Dropdown,
 	Form, Header, Icon, List, Loader, Pagination, Table
 } from 'semantic-ui-react';
 import {LanguageDropdown} from '../../collection/LanguageDropdown';
@@ -60,34 +61,37 @@ export function EditSynonyms({
 	return <>
 		<Header as='h4'><Icon name='search'/> Query</Header>
 		<Form>
-			<Form.Input
-				fluid={true}
-				label='From'
-				onChange={({target:{value}}) => setFrom(value)}
-				placeholder='From'
-				value={from}
-			/>
-			<Form.Input
-				fluid={true}
-				label='To'
-				onChange={({target:{value}}) => setTo(value)}
-				placeholder='To'
-				value={to}
-			/>
-			{/*
-			<Form.Input
-				fluid={true}
-				label='Both'
-				onChange={({target:{value}}) => setTo(value)}
-				placeholder='Both'
-				value={both}
-			/>
-			*/}
+			<Form.Group widths='equal'>
+				<Form.Input
+					fluid={true}
+					label='From'
+					onChange={({target:{value}}) => setFrom(value)}
+					placeholder='From'
+					value={from}
+				/>
+				<Form.Input
+					fluid={true}
+					label='To'
+					onChange={({target:{value}}) => setTo(value)}
+					placeholder='To'
+					value={to}
+				/>
+				{/*
+				<Form.Input
+					fluid={true}
+					label='Both'
+					onChange={({target:{value}}) => setTo(value)}
+					placeholder='Both'
+					value={both}
+				/>
+				*/}
+			</Form.Group>
 		</Form>
 
 		<Header as='h4'><Icon name='filter'/> Filters</Header>
 		<Form>
 			<Form.Field>
+				<label>Languages</label>
 				<LanguageDropdown
 					clearable={true}
 					disabled={isLoading}
@@ -96,39 +100,43 @@ export function EditSynonyms({
 					loading={isLoading}
 					locales={locales}
 					multiple={true}
+					placeholder='Select languages'
 					setLanguage={(newLanguages) => setLanguages(newLanguages as Array<string>)}
 				/>
 			</Form.Field>
 		</Form>
 
 		{thesaurusId ? null : <>
-			<Header as='h4'><Icon name='font'/> Thesauri</Header>
+			{/*<Header as='h4'><Icon name='font'/> Thesauri</Header>*/}
 			<Form>
-				<Form.Dropdown
-					defaultValue={thesauri}
-					fluid
-					multiple={true}
-					name='thesauri'
-					onChange={(
-						//@ts-ignore
-						event :unknown,
-						{
-							value
-						} :{
-							value :Array<string>
-						}
-					) => setThesauri(value)}
-					options={aggregations.thesaurus.buckets.map(({key, docCount}) => {
-						const tName = key.replace('/thesauri/', '');
-						return {
-							key: tName,
-							text: `${tName} (${docCount})`,
-							value: tName
-						};
-					})}
-					search
-					selection
-				/>
+				<Form.Field>
+					<label>Thesauri</label>
+					<Dropdown
+						defaultValue={thesauri}
+						fluid
+						multiple={true}
+						name='thesauri'
+						onChange={(
+							//@ts-ignore
+							event :unknown,
+							{
+								value
+							} :{
+								value :Array<string>
+							}
+						) => setThesauri(value)}
+						options={aggregations.thesaurus.buckets.map(({key, docCount}) => {
+							const tName = key.replace('/thesauri/', '');
+							return {
+								key: tName,
+								text: `${tName} (${docCount})`,
+								value: tName
+							};
+						})}
+						search
+						selection
+					/>
+				</Form.Field>
 			</Form>
 		</>}
 
@@ -176,18 +184,9 @@ export function EditSynonyms({
 					<Table.Header>
 						<Table.Row>
 							<Table.HeaderCell>Edit</Table.HeaderCell>
-							<Table.HeaderCell
-								onClick={() => sortAfterColumnClick('from', column, direction)}
-								sorted={column === 'from' ? direction : null}
-							>From</Table.HeaderCell>
-							<Table.HeaderCell
-								onClick={() => sortAfterColumnClick('to', column, direction)}
-								sorted={column === 'to' ? direction : null}
-							>To</Table.HeaderCell>
-							<Table.HeaderCell
-								onClick={() => sortAfterColumnClick('both', column, direction)}
-								sorted={column === 'both' ? direction : null}
-							>Both</Table.HeaderCell>
+							<Table.HeaderCell>From</Table.HeaderCell>
+							<Table.HeaderCell>To</Table.HeaderCell>
+							<Table.HeaderCell>Both</Table.HeaderCell>
 							{thesaurusId ? null : <Table.HeaderCell
 								onClick={() => sortAfterColumnClick('_parentPath', column, direction)}
 								sorted={column === '_parentPath' ? direction : null}
