@@ -230,7 +230,7 @@ export function addQuerySynonymsField({
 				sort,
 				start
 			};
-			log.debug('querySynonymsParams:%s', toStr(querySynonymsParams));
+			//log.debug('querySynonymsParams:%s', toStr(querySynonymsParams));
 
 			const result = querySynonyms(querySynonymsParams) as {
 				aggregations ?:{

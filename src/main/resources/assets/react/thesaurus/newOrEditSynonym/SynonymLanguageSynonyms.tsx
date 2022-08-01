@@ -1,6 +1,6 @@
 import type {
-	SynonymGUIState,
-	SynonymLanguagesSynonymObject
+	SynonymGUI,
+	SynonymGUI_LanguagesSynonymObject
 } from '/lib/explorer/types/Synonym.d';
 
 
@@ -10,40 +10,41 @@ import {SynonymLanguageSynonymsTable} from './SynonymLanguageSynonymsTable';
 
 export function SynonymLanguageSynonyms({
 	interfaceOptions,
-	lang,
+	languageIndex,
 	setState,
 	state
 } :{
 	interfaceOptions :Array<unknown> // TODO
-	lang :string
-	setState :React.Dispatch<React.SetStateAction<SynonymGUIState>>
-	state :SynonymGUIState
+	languageIndex :number
+	setState :React.Dispatch<React.SetStateAction<SynonymGUI>>
+	state :SynonymGUI
 }) {
-	return state.languages[lang].synonyms.length
-		? <>
-			<SynonymLanguageSynonymsTable
+	return <>
+		{state.languages[languageIndex].synonyms.length
+			? <SynonymLanguageSynonymsTable
 				interfaceOptions={interfaceOptions}
-				lang={lang}
+				languageIndex={languageIndex}
 				setState={setState}
 				state={state}
 			/>
-			<InsertButton
-				array={state.languages[lang].synonyms}
-				disabled={!state.enabled || !state.languages[lang].enabled}
-				setArrayFunction={(changedArray :Array<SynonymLanguagesSynonymObject<'Array'>>) => setState(prev => {
-					const deref :SynonymGUIState = JSON.parse(JSON.stringify(prev));
-					deref.languages[lang].synonyms = changedArray;
-					return deref;
-				})}
-				insertAtIndex={state.languages[lang].synonyms.length}
-				valueToInsert={{
-					comment: '',
-					disabledInInterfaces: [],
-					enabled: true,
-					synonym: '',
-					use: 'from'
-				}}
-			/>
-		</>
-		: null;
+			: null
+		}
+		<InsertButton
+			array={state.languages[languageIndex].synonyms}
+			disabled={!state.enabled || !state.languages[languageIndex].enabled}
+			setArrayFunction={(changedArray :Array<SynonymGUI_LanguagesSynonymObject>) => setState(prev => {
+				const deref :SynonymGUI = JSON.parse(JSON.stringify(prev));
+				deref.languages[languageIndex].synonyms = changedArray;
+				return deref;
+			})}
+			insertAtIndex={state.languages[languageIndex].synonyms.length}
+			valueToInsert={{
+				comment: '',
+				disabledInInterfaces: [],
+				enabled: true,
+				synonym: '',
+				use: 'from'
+			}}
+		/>
+	</>;
 }
