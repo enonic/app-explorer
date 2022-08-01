@@ -175,39 +175,47 @@ export function addQuerySynonymsField({
 			const shouldQueries = [];
 			if (from) { // TODO Refactor
 				shouldQueries.push(fulltext('languages.*.from.synonym', from, 'AND'));
+				shouldQueries.push(fulltext('languages.*.both.synonym', from, 'AND'));
+
 				//shouldQueries.push(fulltext(highlightLocales.map((l) => `languages.${l}.from.synonym`), from, 'AND'));
 				shouldQueries.push(ngram('languages.*.from.synonym', from, 'AND'));
+				shouldQueries.push(ngram('languages.*.both.synonym', from, 'AND'));
 
 				const locales = Object.keys(localeToStemmingLanguage);
 				if (locales.length) {
 					for (let i = 0; i < locales.length; i++) {
 					    const l = locales[i];
 						shouldQueries.push(stemmed(`languages.${l}.from.synonym`, from, 'AND', localeToStemmingLanguage[l]));
+						shouldQueries.push(stemmed(`languages.${l}.both.synonym`, from, 'AND', localeToStemmingLanguage[l]));
 					}
 				}
 
 				for (let i = 0; i < highlightLocales.length; i++) {
 				    const l = highlightLocales[i];
-					const fieldPath = `languages.${l}.from.synonym`
-					highlight.properties[fieldPath] = {};
+					highlight.properties[`languages.${l}.from.synonym`] = {};
+					highlight.properties[`languages.${l}.both.synonym`] = {};
 				}
 			}
 			if (to) { // TODO Refactor
 				shouldQueries.push(fulltext('languages.*.to.synonym', to, 'AND'));
+				shouldQueries.push(fulltext('languages.*.both.synonym', to, 'AND'));
+
 				//shouldQueries.push(fulltext(highlightLocales.map((l) => `languages.${l}.to.synonym`), to, 'AND'));
 				shouldQueries.push(ngram('languages.*.to.synonym', to, 'AND'));
+				shouldQueries.push(ngram('languages.*.both.synonym', to, 'AND'));
 
 				const locales = Object.keys(localeToStemmingLanguage);
 				if (locales.length) {
 					for (let i = 0; i < locales.length; i++) {
 					    const l = locales[i];
 						shouldQueries.push(stemmed(`languages.${l}.to.synonym`, to, 'AND', localeToStemmingLanguage[l]));
+						shouldQueries.push(stemmed(`languages.${l}.both.synonym`, to, 'AND', localeToStemmingLanguage[l]));
 					}
 				}
 				for (let i = 0; i < highlightLocales.length; i++) {
 				    const l = highlightLocales[i];
-					const fieldPath = `languages.${l}.to.synonym`
-					highlight.properties[fieldPath] = {};
+					highlight.properties[`languages.${l}.to.synonym`] = {};
+					highlight.properties[`languages.${l}.both.synonym`] = {};
 				}
 			}
 
