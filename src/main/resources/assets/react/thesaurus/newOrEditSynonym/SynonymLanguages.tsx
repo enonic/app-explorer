@@ -1,4 +1,4 @@
-import type {SynonymGUIState} from '/lib/explorer/types/Synonym.d';
+import type {SynonymGUI} from '/lib/explorer/types/Synonym.d';
 
 
 import {
@@ -10,59 +10,63 @@ import {SynonymLanguageSynonyms} from './SynonymLanguageSynonyms';
 
 
 export function SynonymLanguages({
+	// Required
 	interfaceOptions,
 	setState,
 	state,
-	thesaurusLanguages
+	// Optional
+	_id
 } :{
+	// Required
 	interfaceOptions :Array<unknown> // TODO
-	setState :React.Dispatch<React.SetStateAction<SynonymGUIState>>
-	state :SynonymGUIState
-	thesaurusLanguages :Array<string>
+	setState :React.Dispatch<React.SetStateAction<SynonymGUI>>
+	state :SynonymGUI
+	// Optional
+	_id ?:string
 }) {
-
-	return thesaurusLanguages.length
+	return state.languages.length
 		? <Accordion.Accordion
-			defaultActiveIndex={thesaurusLanguages.map((_, i) => i)}
+			defaultActiveIndex={state.languages.map((_, i) => i)}
 			exclusive={false}
-			fluid
-			panels={thesaurusLanguages.map((lang, i) => ({
+			panels={state.languages.map(({locale}, i) => ({
 				key: i,
-				title: lang,
+				title: locale,
 				content: {
-					content: (state.languages[lang]
+					content: (state.languages[i]
 						? <>
-							<Accordion.Accordion
-								fluid
-								panels={[{
-									key: 0,
-									title: 'Language Options',
-									content: {
-										content:(
-											<Segment
-												basic
-												disabled={!state.enabled}
-												vertical
-											>
-												<SynonymLanguageOptions
-													interfaceOptions={interfaceOptions}
-													lang={lang}
-													setState={setState}
-													state={state}
-												/>
-											</Segment>
-										)
-									}
-								}]}
-							/>
+							{_id
+								? <Accordion.Accordion
+									panels={[{
+										key: 0,
+										title: 'Language Options',
+										content: {
+											content:(
+												<Segment
+													basic
+													disabled={!state.enabled}
+													vertical
+												>
+													<SynonymLanguageOptions
+														interfaceOptions={interfaceOptions}
+														languageIndex={i}
+														setState={setState}
+														state={state}
+													/>
+												</Segment>
+											)
+										}
+									}]}
+								/>
+								: null
+							}
 							<Segment
 								basic
-								disabled={!state.enabled || !state.languages[lang].enabled}
+								disabled={!state.enabled || !state.languages[i].enabled}
 								vertical
 							>
 								<SynonymLanguageSynonyms
 									interfaceOptions={interfaceOptions}
-									lang={lang}
+									languageIndex={i}
 									setState={setState}
 									state={state}
 								/>
