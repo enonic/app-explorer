@@ -41,13 +41,13 @@ export function useEditSynonymsState({
 	// State
 	//──────────────────────────────────────────────────────────────────────────
 	const [languages, setLanguages] = React.useState([]);
-	const [column, setColumn] = React.useState('from');
+	const [column, setColumn] = React.useState('_score');
 	const [direction, setDirection] = React.useState<StrictTableHeaderCellProps['sorted']>('ascending');
 	const [from, setFrom] = React.useState('');
 	const [isLoading, setIsLoading] = React.useState(false);
 	const [perPage, setPerPage] = React.useState(10);
 	const [page, setPage] = React.useState<PaginationProps['activePage']>(1);
-	const [sort, setSort] = React.useState('from ASC');
+	const [sort, setSort] = React.useState('_score ASC');
 	const [state, setState] = React.useState<EditSynonymsState>({
 		aggregations: {
 			thesaurus: {
