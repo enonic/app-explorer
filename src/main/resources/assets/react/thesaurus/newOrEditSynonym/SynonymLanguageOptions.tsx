@@ -1,75 +1,58 @@
-import type {SynonymGUIState} from '/lib/explorer/types/Synonym.d';
+import type {SynonymGUI} from '/lib/explorer/types/Synonym.d';
 
 
-import {
-	Form,
-	Table
-} from 'semantic-ui-react';
+import {Form} from 'semantic-ui-react';
 
 
 export function SynonymLanguageOptions({
 	interfaceOptions,
-	lang,
+	languageIndex,
 	setState,
 	state
 } :{
+	languageIndex :number
 	interfaceOptions :Array<unknown> // TODO
-	lang :string
-	setState :React.Dispatch<React.SetStateAction<SynonymGUIState>>
-	state :SynonymGUIState
+	setState :React.Dispatch<React.SetStateAction<SynonymGUI>>
+	state :SynonymGUI
 }) {
-	return <Table celled compact striped>
-		<Table.Header>
-			<Table.Row>
-				<Table.HeaderCell>Enabled</Table.HeaderCell>
-				<Table.HeaderCell>Disabled in interfaces</Table.HeaderCell>
-				<Table.HeaderCell>Comment</Table.HeaderCell>
-			</Table.Row>
-		</Table.Header>
-		<Table.Body>
-			<Table.Row>
-				<Table.Cell collapsing>
-					<Form.Checkbox
-						checked={state.languages[lang].enabled}
-						disabled={!state.enabled}
-						onChange={(_e, {checked}) => setState(prev => {
-							const deref = JSON.parse(JSON.stringify(prev));
-							deref.languages[lang].enabled = checked;
-							return deref;
-						})}
-						toggle
-					/>
-				</Table.Cell>
-				<Table.Cell>
-					<Form.Dropdown
-						clearable
-						disabled={!state.enabled || !state.languages[lang].enabled}
-						fluid
-						multiple
-						onChange={(_e,{value}) => setState(prev => {
-							const deref :SynonymGUIState = JSON.parse(JSON.stringify(prev));
-							deref.languages[lang].disabledInInterfaces = value as Array<string>;
-							return deref;
-						})}
-						options={interfaceOptions}
-						search
-						selection
-						value={state.languages[lang].disabledInInterfaces}
-					/>
-				</Table.Cell>
-				<Table.Cell>
-					<Form.Input
-						disabled={!state.enabled || !state.languages[lang].enabled}
-						fluid
-						onChange={(_e, {value}) => setState(prev => {
-							const deref = JSON.parse(JSON.stringify(prev));
-							deref.languages[lang].comment = value;
-							return deref;
-						})}
-						value={state.languages[lang].comment}
-					/>
-				</Table.Cell>
-			</Table.Row>
-		</Table.Body>
-	</Table>;
+	return <Form>
+		<Form.Checkbox
+			checked={state.languages[languageIndex].enabled}
+			disabled={!state.enabled}
+			label='Enabled'
+			onChange={(_e, {checked}) => setState(prev => {
+				const deref = JSON.parse(JSON.stringify(prev));
+				deref.languages[languageIndex].enabled = checked;
+				return deref;
+			})}
+			toggle
+		/>
+		<Form.Dropdown
+			clearable
+			disabled={!state.enabled || !state.languages[languageIndex].enabled}
+			fluid
+			label='Disabled in interfaces'
+			multiple
+			onChange={(_e,{value}) => setState(prev => {
+				const deref :SynonymGUI = JSON.parse(JSON.stringify(prev));
+				deref.languages[languageIndex].disabledInInterfaces = value as Array<string>;
+				return deref;
+			})}
+			options={interfaceOptions}
+			search
+			selection
+			value={state.languages[languageIndex].disabledInInterfaces}
+		/>
+		<Form.Input
+			disabled={!state.enabled || !state.languages[languageIndex].enabled}
+			fluid
+			label='Comment'
+			onChange={(_e, {value}) => setState(prev => {
+				const deref = JSON.parse(JSON.stringify(prev));
+				deref.languages[languageIndex].comment = value;
+				return deref;
+			})}
+			value={state.languages[languageIndex].comment}
+		/>
+	</Form>;
 }

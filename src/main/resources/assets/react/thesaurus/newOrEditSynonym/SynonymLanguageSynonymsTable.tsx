@@ -1,10 +1,11 @@
 import type {
-	SynonymGUIState,
-	SynonymLanguagesSynonymObject,
+	SynonymGUI,
+	SynonymGUI_LanguagesSynonymObject,
 	SynonymUse
 } from '/lib/explorer/types/Synonym.d';
 
 
+//import {isSet} from '@enonic/js-utils';
 import {
 	Form,
 	Table
@@ -16,14 +17,14 @@ import {DeleteItemButton} from '../../components/DeleteItemButton';
 
 export function SynonymLanguageSynonymsTable({
 	interfaceOptions,
-	lang,
+	languageIndex,
 	setState,
 	state
 } :{
 	interfaceOptions :Array<unknown> // TODO
-	lang :string
-	setState :React.Dispatch<React.SetStateAction<SynonymGUIState>>
-	state :SynonymGUIState
+	languageIndex :number
+	setState :React.Dispatch<React.SetStateAction<SynonymGUI>>
+	state :SynonymGUI
 }) {
 	return <Table celled compact striped>
 		<Table.Header>
@@ -37,14 +38,14 @@ export function SynonymLanguageSynonymsTable({
 			</Table.Row>
 		</Table.Header>
 		<Table.Body>
-			{state.languages[lang].synonyms.map((_s, j) => <Table.Row key={j}>
+			{state.languages[languageIndex].synonyms.map((_, j) => <Table.Row key={j}>
 				<Table.Cell collapsing>
 					<Form.Checkbox
-						checked={state.languages[lang].synonyms[j].enabled}
-						disabled={!state.enabled || !state.languages[lang].enabled}
+						checked={state.languages[languageIndex].synonyms[j].enabled}
+						disabled={!state.enabled || !state.languages[languageIndex].enabled}
 						onChange={(_e, {checked}) => setState(prev => {
 							const deref = JSON.parse(JSON.stringify(prev));
-							deref.languages[lang].synonyms[j].enabled = checked;
+							deref.languages[languageIndex].synonyms[j].enabled = checked;
 							return deref;
 						})}
 						toggle
@@ -52,23 +53,23 @@ export function SynonymLanguageSynonymsTable({
 				</Table.Cell>
 				<Table.Cell>
 					<Form.Input
-						disabled={!state.enabled || !state.languages[lang].enabled || !state.languages[lang].synonyms[j].enabled}
+						disabled={!state.enabled || !state.languages[languageIndex].enabled || !state.languages[languageIndex].synonyms[j].enabled}
 						fluid
 						onChange={(_e, {value}) => setState(prev => {
 							const deref = JSON.parse(JSON.stringify(prev));
-							deref.languages[lang].synonyms[j].synonym = value;
+							deref.languages[languageIndex].synonyms[j].synonym = value;
 							return deref;
 						})}
-						value={state.languages[lang].synonyms[j].synonym}
+						value={state.languages[languageIndex].synonyms[j].synonym}
 					/>
 				</Table.Cell>
 				<Table.Cell>
 					<Form.Dropdown
-						disabled={!state.enabled || !state.languages[lang].enabled || !state.languages[lang].synonyms[j].enabled}
+						disabled={!state.enabled || !state.languages[languageIndex].enabled || !state.languages[languageIndex].synonyms[j].enabled}
 						fluid
 						onChange={(_e,{value}) => setState(prev => {
-							const deref :SynonymGUIState = JSON.parse(JSON.stringify(prev));
-							deref.languages[lang].synonyms[j].use = value as SynonymUse;
+							const deref :SynonymGUI = JSON.parse(JSON.stringify(prev));
+							deref.languages[languageIndex].synonyms[j].use = value as SynonymUse;
 							return deref;
 						})}
 						options={[{
@@ -86,46 +87,46 @@ export function SynonymLanguageSynonymsTable({
 						}]}
 						search
 						selection
-						value={state.languages[lang].synonyms[j].use}
+						value={state.languages[languageIndex].synonyms[j].use}
 					/>
 				</Table.Cell>
 				<Table.Cell>
 					<Form.Input
-						disabled={!state.enabled || !state.languages[lang].enabled || !state.languages[lang].synonyms[j].enabled}
+						disabled={!state.enabled || !state.languages[languageIndex].enabled || !state.languages[languageIndex].synonyms[j].enabled}
 						fluid
 						onChange={(_e, {value}) => setState(prev => {
 							const deref = JSON.parse(JSON.stringify(prev));
-							deref.languages[lang].synonyms[j].comment = value;
+							deref.languages[languageIndex].synonyms[j].comment = value;
 							return deref;
 						})}
-						value={state.languages[lang].synonyms[j].comment}
+						value={state.languages[languageIndex].synonyms[j].comment}
 					/>
 				</Table.Cell>
 				<Table.Cell>
 					<Form.Dropdown
 						clearable
-						disabled={!state.enabled || !state.languages[lang].enabled || !state.languages[lang].synonyms[j].enabled}
+						disabled={!state.enabled || !state.languages[languageIndex].enabled || !state.languages[languageIndex].synonyms[j].enabled}
 						fluid
 						multiple
 						onChange={(_e,{value}) => setState(prev => {
-							const deref :SynonymGUIState = JSON.parse(JSON.stringify(prev));
-							deref.languages[lang].synonyms[j].disabledInInterfaces = value as Array<string>;
+							const deref :SynonymGUI = JSON.parse(JSON.stringify(prev));
+							deref.languages[languageIndex].synonyms[j].disabledInInterfaces = value as Array<string>;
 							return deref;
 						})}
 						options={interfaceOptions}
 						search
 						selection
-						value={state.languages[lang].synonyms[j].disabledInInterfaces}
+						value={state.languages[languageIndex].synonyms[j].disabledInInterfaces}
 					/>
 				</Table.Cell>
 				<Table.Cell collapsing>
 					{/*
 					<Button.Group>
 							<InsertButton
-							array={state.languages[lang].synonyms}
+							array={state.languages[languageIndex].synonyms}
 							setArrayFunction={(changedArray :Array<SynonymLanguagesSynonymObject<'Array'>>) => setState(prev => {
 								const deref :SynonymGUIState = JSON.parse(JSON.stringify(prev));
-								deref.languages[lang].synonyms = changedArray;
+								deref.languages[languageIndex].synonyms = changedArray;
 								return deref;
 							})}
 							insertAtIndex={j+1}
@@ -137,19 +138,19 @@ export function SynonymLanguageSynonymsTable({
 							}}
 						/>
 						<MoveDownButton
-							array={state.languages[lang].synonyms}
+							array={state.languages[languageIndex].synonyms}
 							setArrayFunction={(changedArray :Array<SynonymLanguagesSynonymObject<'Array'>>) => setState(prev => {
 								const deref :SynonymGUIState = JSON.parse(JSON.stringify(prev));
-								deref.languages[lang].synonyms = changedArray;
+								deref.languages[languageIndex].synonyms = changedArray;
 								return deref;
 							})}
 							index={j}
 						/>
 						<MoveUpButton
-							array={state.languages[lang].synonyms}
+							array={state.languages[languageIndex].synonyms}
 							setArrayFunction={(changedArray :Array<SynonymLanguagesSynonymObject<'Array'>>) => setState(prev => {
 								const deref :SynonymGUIState = JSON.parse(JSON.stringify(prev));
-								deref.languages[lang].synonyms = changedArray;
+								deref.languages[languageIndex].synonyms = changedArray;
 								return deref;
 							})}
 							index={j}
@@ -157,11 +158,11 @@ export function SynonymLanguageSynonymsTable({
 						</Button.Group>
 						*/}
 					<DeleteItemButton
-						array={state.languages[lang].synonyms}
-						disabled={!state.enabled || !state.languages[lang].enabled || !state.languages[lang].synonyms[j].enabled}
-						setArrayFunction={(changedArray :Array<SynonymLanguagesSynonymObject<'Array'>>) => setState(prev => {
-							const deref :SynonymGUIState = JSON.parse(JSON.stringify(prev));
-							deref.languages[lang].synonyms = changedArray;
+						array={state.languages[languageIndex].synonyms}
+						disabled={!state.enabled || !state.languages[languageIndex].enabled || !state.languages[languageIndex].synonyms[j].enabled/* || j < 2*/}
+						setArrayFunction={(changedArray :Array<SynonymGUI_LanguagesSynonymObject>) => setState(prev => {
+							const deref :SynonymGUI = JSON.parse(JSON.stringify(prev));
+							deref.languages[languageIndex].synonyms = changedArray;
 							return deref;
 						})}
 						index={j}

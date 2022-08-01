@@ -61,9 +61,9 @@ export function NewOrEditSynonym({
 		resetState,
 		setState,
 		state,
-		submit,
-		thesaurusLanguages
+		submit
 	} = useNewOrEditSynonymState({
+		_id,
 		afterClose,
 		beforeOpen,
 		servicesBaseUrl,
@@ -71,6 +71,37 @@ export function NewOrEditSynonym({
 	});
 	/*const fromStemmer = new Snowball('Norwegian');
 	const toStemmer = new Snowball('English');*/
+
+	const panels = [{
+		key: 'languages',
+		title: 'Languages',
+		content: {
+			content: (
+				<SynonymLanguages
+					_id={_id}
+					interfaceOptions={interfaceOptions}
+					setState={setState}
+					state={state}
+				/>
+			)
+		}
+	}];
+	if (_id) {
+		panels.unshift({
+			key: 'options',
+			title: 'Options',
+			content: {
+				content: (
+					<SynonymOptions
+						interfaceOptions={interfaceOptions}
+						setState={setState}
+						state={state}
+					/>
+				)
+			}
+		});
+	}
+
 	return <Modal
 		closeIcon
 		closeOnDimmerClick={false}
@@ -114,35 +145,10 @@ export function NewOrEditSynonym({
 				</Placeholder>
 			</Dimmer.Dimmable>
 			: <Accordion
-				defaultActiveIndex={[1]}
+				defaultActiveIndex={_id ? [1] : [0]}
 				exclusive={false}
 				fluid
-				panels={[{
-					key: 0,
-					title: 'Options',
-					content: {
-						content: (
-							<SynonymOptions
-								interfaceOptions={interfaceOptions}
-								setState={setState}
-								state={state}
-							/>
-						)
-					}
-				},{
-					key: 1,
-					title: 'Languages',
-					content: {
-						content: (
-							<SynonymLanguages
-								interfaceOptions={interfaceOptions}
-								setState={setState}
-								state={state}
-								thesaurusLanguages={thesaurusLanguages}
-							/>
-						)
-					}
-				}]}
+				panels={panels}
 				styled
 			/>
 		}
