@@ -1,5 +1,4 @@
 import type {PaginationProps} from 'semantic-ui-react';
-import type {Synonym_Language} from '/lib/explorer/types/Synonym';
 import type {Locales} from '../../index.d';
 
 
@@ -12,6 +11,7 @@ import {
 import {LanguageDropdown} from '../../collection/LanguageDropdown';
 import {NewOrEditSynonym} from '../newOrEditSynonym/index';
 import {DeleteSynonym} from '../DeleteSynonym';
+import {processLanguages} from './processLanguages';
 import {useEditSynonymsState} from './useEditSynonymsState';
 
 
@@ -209,52 +209,11 @@ export function EditSynonyms({
 							thesaurusReference,
 						}, i :number) => {
 							//console.debug(_highlight, _highlight);
-							const synonymsObj = {
-								both: [],
-								from: [],
-								to: []
-							};
-							for (let i = 0; i < (languagesArray as unknown as Array<Synonym_Language>).length; i++) {
-							    const {
-									both,
-									from,
-									locale,
-									to
-								} = languagesArray[i] as Synonym_Language;
-								for (let j = 0; j < both.length; j++) {
-									const highlighted = _highlight[`languages.${locale}.both.synonym`];
-									const highlightedStemmed = _highlight[`languages.${locale}.both.synonym._stemmed_${result.localeToStemmingLanguage[locale]}`]
-								    const {
-										synonym
-									} = both[j];
-									const str = `${highlighted||highlightedStemmed||synonym} (${locale})`;
-									if (!synonymsObj.both.includes(str)) {
-										synonymsObj.both.push(str);
-									}
-								}
-								for (let j = 0; j < from.length; j++) {
-									const highlighted = _highlight[`languages.${locale}.from.synonym`];
-									const highlightedStemmed = _highlight[`languages.${locale}.from.synonym._stemmed_${result.localeToStemmingLanguage[locale]}`]
-								    const {
-										synonym
-									} = from[j];
-									const str = `${highlighted||highlightedStemmed||synonym} (${locale})`;
-									if (!synonymsObj.from.includes(str)) {
-										synonymsObj.from.push(str);
-									}
-								}
-								for (let j = 0; j < to.length; j++) {
-									const highlighted = _highlight[`languages.${locale}.to.synonym`];
-									const highlightedStemmed = _highlight[`languages.${locale}.to.synonym._stemmed_${result.localeToStemmingLanguage[locale]}`]
-								    const {
-										synonym
-									} = to[j];
-									const str = `${highlighted||highlightedStemmed||synonym} (${locale})`;
-									if (!synonymsObj.to.includes(str)) {
-										synonymsObj.to.push(str);
-									}
-								}
-							} // for languagesArray
+							const synonymsObj = processLanguages({
+								_highlight,
+								languagesArray,
+								localeToStemmingLanguage: result.localeToStemmingLanguage
+							});
 							//console.debug('synonymsObj', synonymsObj);
 							return <Table.Row key={i}>
 								<Table.Cell collapsing><NewOrEditSynonym
