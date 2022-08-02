@@ -1,50 +1,90 @@
+import type {Request} from '../../types/Request';
+
+
 import {
-	NT_SYNONYM,
 	PRINCIPAL_EXPLORER_READ
-} from '/lib/explorer/model/2/constants';
+} from '/lib/explorer/constants';
 import {connect} from '/lib/explorer/repo/connect';
+import {query as querySynonyms} from '/lib/explorer/synonym/query';
 
 
-function getThesaurus({name}) {
+function getThesaurus({
+	fromLanguage,
+	name,
+	toLanguage
+} :{
+	fromLanguage :string
+	name :string
+	toLanguage :string
+}) {
 	const connection = connect({
 		principals: [PRINCIPAL_EXPLORER_READ]
 	});
-	const queryParams = {
+	const queryRes = querySynonyms({
+		connection,
 		count: -1,
-		filters: {
-			boolean: {
-				must: [{
-					hasValue: {
-						field: 'type',
-						values: [NT_SYNONYM]
-					}
-				}]
-			}
-		},
 		query: `_parentPath = '/thesauri/${name}'`,
-		sort: '_name ASC'
-	};
-	const queryRes = connection.query(queryParams);
-	const thesaurus = queryRes.hits.map((hit) => {
-		const {
-			_name, displayName, from, to
-		} = connection.get(hit.id);
-		return {
-			displayName, from, id: hit.id, name: _name, to
-		};
 	});
+	const thesaurus = queryRes.hits.map(({
+		//_id,
+		languages
+	}) => {
+		const fromArray :Array<string>= [];
+		const toArray :Array<string>= [];
+
+		for (let i = 0; i < languages.length; i++) {
+			const {both, from, locale, to} = languages[i];
+			for (let j = 0; j < both.length; j++) {
+				const {synonym} = both[j];
+				if (locale === fromLanguage) {
+					fromArray.push(synonym);
+				}
+				if (locale === toLanguage) {
+					toArray.push(synonym);
+				}
+			}
+			if (locale === fromLanguage) {
+				for (let j = 0; j < from.length; j++) {
+					const {synonym} = from[j];
+					fromArray.push(synonym);
+				}
+			}
+			if (locale === toLanguage) {
+				for (let j = 0; j < to.length; j++) {
+					const {synonym} = to[j];
+					toArray.push(synonym);
+				}
+			}
+		} // for languages
+
+		if (fromArray.length && toArray.length) {
+			return {
+				from: fromArray, to: toArray
+			};
+		}
+	}).filter((x) => x);
 	return thesaurus;
 }
 
 
 export function get({
 	params: {
-		name
+		fromLanguage,
+		name,
+		toLanguage
 	}
-}) {
-	const thesaurus = getThesaurus({name});
+} :Request<{
+	fromLanguage :string
+	name :string
+	toLanguage :string
+}>) {
+	const thesaurus = getThesaurus({
+		fromLanguage,
+		name,
+		toLanguage
+	});
 	return {
-		body: `"From","To"${thesaurus.map(s => `\n"${Array.isArray(s.from) ? s.from.join(', ') : s.from}","${Array.isArray(s.to) ? s.to.join(', ') : s.to}"`).join('')}\n`,
+		body: `"From","To"${thesaurus.map(s => `\n"${s.from.join(', ')}","${s.to.join(', ')}"`).join('')}\n`,
 		contentType: 'text/csv;charset=utf-8',
 		headers: {
 			'Content-Disposition': `attachment; filename="${name}.csv"`

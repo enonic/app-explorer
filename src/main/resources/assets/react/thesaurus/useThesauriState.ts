@@ -84,6 +84,15 @@ export function useThesauriState({
 	});
 	const [updatedAt, setUpdatedAt] = React.useState(moment());
 	const [durationSinceLastUpdate, setDurationSinceLastUpdate] = React.useState('');
+	const [exportDialogState, setExportDialogState] = React.useState<{
+		allowedLocales :Locales
+		open :boolean
+		thesaurusName :string
+	}>({
+		allowedLocales: [],
+		open: false,
+		thesaurusName: ''
+	});
 
 	const memoizedFetchOnUpdate = React.useCallback(() =>{
 		setLoading(true);
@@ -166,11 +175,13 @@ export function useThesauriState({
 	return {
 		durationSinceLastUpdate,
 		editSynonymsModalState,
+		exportDialogState,
 		isLoading,
 		locales,
 		memoizedFetchOnUpdate,
 		newOrEditState,
 		setEditSynonymsModalState,
+		setExportDialogState,
 		setNewOrEditState,
 		setShowDelete,
 		showDelete,
