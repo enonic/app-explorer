@@ -71,7 +71,7 @@ export function useEditSynonymsState({
 	//──────────────────────────────────────────────────────────────────────────
 	// Since this function has no dependencies, there is no point in memoizing it.
 	const sortAfterColumnClick = (clickedColumn :string, currentColumn :string, currentDirection :string) => {
-		console.debug('sortAfterColumnClick(%s, %s, %s)', clickedColumn, currentColumn, currentDirection)
+		//console.debug('sortAfterColumnClick(%s, %s, %s)', clickedColumn, currentColumn, currentDirection)
 		//console.debug('handleSortGenerator clickedColumn', clickedColumn, 'column', column, 'direction', direction);
 		if (clickedColumn === currentColumn) {
 			setDirection(currentDirection === 'ascending' ? 'descending' : 'ascending');
