@@ -17,6 +17,7 @@ import {
 	Table
 } from 'semantic-ui-react';
 
+import {ExportThesaurusModal} from './exportThesaurus/ExportThesaurusModal';
 import {EditSynonymsModal} from './editSynonyms/EditSynonymsModal';
 import {NewOrEditThesaurus} from './NewOrEditThesaurus';
 import {DeleteThesaurus} from './DeleteThesaurus';
@@ -38,11 +39,13 @@ export function Thesauri({
 	const {
 		durationSinceLastUpdate,
 		editSynonymsModalState,
+		exportDialogState,
 		isLoading,
 		locales,
 		memoizedFetchOnUpdate,
 		newOrEditState,
 		setEditSynonymsModalState,
+		setExportDialogState,
 		setNewOrEditState,
 		setShowDelete,
 		showDelete,
@@ -168,11 +171,19 @@ export function Thesauri({
 										content={`Export from thesaurus ${_name}`}
 										inverted
 										trigger={<Button
-											as='a'
 											disabled={isLoading}
 											icon
 											loading={isLoading}
-											href={`${servicesBaseUrl}/thesaurusExport?name=${_name}`}
+											onClick={() => {
+												setExportDialogState({
+													allowedLocales: locales.filter(({tag}) => {
+														//console.debug('allowedLanguages:', allowedLanguages, ' tag:', tag);
+														return allowedLanguages.includes(tag);
+													}),
+													open: true,
+													thesaurusName: _name
+												})
+											}}
 										><Icon color='blue' name='download'/></Button>}
 									/>
 									{showDelete ? <DeleteThesaurus
@@ -260,6 +271,13 @@ export function Thesauri({
 			setEditSynonymsModalState={setEditSynonymsModalState}
 			thesaurusId={editSynonymsModalState._id}
 			thesaurusName={editSynonymsModalState._name}
+		/>
+		<ExportThesaurusModal
+			allowedLocales={exportDialogState.allowedLocales}
+			open={exportDialogState.open}
+			setExportDialogState={setExportDialogState}
+			servicesBaseUrl={servicesBaseUrl}
+			thesaurusName={exportDialogState.thesaurusName}
 		/>
 	</>;
 } // Thesauri
