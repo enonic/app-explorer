@@ -21,7 +21,7 @@ import {hash} from '/lib/explorer/string/hash';
 import {connect} from '/lib/explorer/repo/connect';
 
 //import {generateSchemaForInterface} from './schemaWithLimitedDocumentTypes/generateSchemaForInterface';
-import {makeSchema} from './schemaWithAllDocumentTypes/makeSchema';
+import {getCachedSchema} from '/lib/explorer/interface/graphql/getCachedSchema';
 
 
 export type InterfaceRequest = EnonicXpRequest<EmptyObject,{
@@ -155,7 +155,7 @@ export function overrideable(request :InterfaceRequest, fn = isUnauthorized) {
 	};
 	//log.debug(`context:${toStr(context)}`);
 
-	const schema = makeSchema();
+	const schema = getCachedSchema();
 
 	return {
 		contentType: RESPONSE_TYPE_JSON,
