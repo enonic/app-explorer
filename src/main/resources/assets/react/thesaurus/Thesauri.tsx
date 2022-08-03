@@ -21,7 +21,7 @@ import {ExportThesaurusModal} from './exportThesaurus/ExportThesaurusModal';
 import {EditSynonymsModal} from './editSynonyms/EditSynonymsModal';
 import {NewOrEditThesaurus} from './NewOrEditThesaurus';
 import {DeleteThesaurus} from './DeleteThesaurus';
-import {Import} from './Import';
+import {ImportThesaurusModal} from './importThesaurus/ImportThesaurusModal';
 import {useThesauriState} from './useThesauriState';
 
 
@@ -40,12 +40,14 @@ export function Thesauri({
 		durationSinceLastUpdate,
 		editSynonymsModalState,
 		exportDialogState,
+		importDialogState,
 		isLoading,
 		locales,
 		memoizedFetchOnUpdate,
 		newOrEditState,
 		setEditSynonymsModalState,
 		setExportDialogState,
+		setImportDialogState,
 		setNewOrEditState,
 		setShowDelete,
 		showDelete,
@@ -160,12 +162,24 @@ export function Thesauri({
 							<Table.Cell collapsing>{synonymsCount}</Table.Cell>
 							<Table.Cell collapsing>
 								<Button.Group>
-									<Import
-										name={_name}
-										afterClose={memoizedFetchOnUpdate}
-										disabled={isLoading}
-										loading={isLoading}
-										servicesBaseUrl={servicesBaseUrl}
+									<Popup
+										content={`Import to thesaurus ${_name}`}
+										inverted
+										trigger={<Button
+											disabled={isLoading}
+											icon
+											loading={isLoading}
+											onClick={() => {
+												setImportDialogState({
+													allowedLocales: locales.filter(({tag}) => {
+														//console.debug('allowedLanguages:', allowedLanguages, ' tag:', tag);
+														return allowedLanguages.includes(tag);
+													}),
+													open: true,
+													thesaurusName: _name
+												})
+											}}
+										><Icon color='blue' name='upload'/></Button>}
 									/>
 									<Popup
 										content={`Export from thesaurus ${_name}`}
@@ -271,6 +285,14 @@ export function Thesauri({
 			setEditSynonymsModalState={setEditSynonymsModalState}
 			thesaurusId={editSynonymsModalState._id}
 			thesaurusName={editSynonymsModalState._name}
+		/>
+		<ImportThesaurusModal
+			afterClose={memoizedFetchOnUpdate}
+			allowedLocales={importDialogState.allowedLocales}
+			open={importDialogState.open}
+			servicesBaseUrl={servicesBaseUrl}
+			setImportDialogState={setImportDialogState}
+			thesaurusName={importDialogState.thesaurusName}
 		/>
 		<ExportThesaurusModal
 			allowedLocales={exportDialogState.allowedLocales}
