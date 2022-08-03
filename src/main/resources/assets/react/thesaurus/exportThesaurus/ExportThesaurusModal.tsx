@@ -26,9 +26,13 @@ export function ExportThesaurusModal({
 	const [fromLanguage, setFromLanguage] = React.useState('');
 	const [toLanguage, setToLanguage] = React.useState('');
 
-	function doClose() {
+	function reset() {
 		setFromLanguage('');
 		setToLanguage('');
+	}
+
+	function doClose() {
+		reset();
 		setExportDialogState({
 			allowedLocales: [],
 			open: false,
@@ -72,11 +76,13 @@ export function ExportThesaurusModal({
 		</Modal.Content>
 		<Modal.Actions>
 			<Button onClick={doClose}>Cancel</Button>
+			<Button onClick={reset} secondary type="reset">Reset</Button>
 			<Button
 				as='a'
 				disabled={!fromLanguage || !toLanguage}
 				icon
 				href={`${servicesBaseUrl}/thesaurusExport?fromLanguage=${fromLanguage}&name=${thesaurusName}&toLanguage=${toLanguage}`}
+				primary
 			><Icon color='blue' name='download'/> Download</Button>
 		</Modal.Actions>
 	</Modal>;

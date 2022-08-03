@@ -84,6 +84,17 @@ export function useThesauriState({
 	});
 	const [updatedAt, setUpdatedAt] = React.useState(moment());
 	const [durationSinceLastUpdate, setDurationSinceLastUpdate] = React.useState('');
+
+	const [importDialogState, setImportDialogState] = React.useState<{
+		allowedLocales :Locales
+		open :boolean
+		thesaurusName :string
+	}>({
+		allowedLocales: [],
+		open: false,
+		thesaurusName: ''
+	});
+
 	const [exportDialogState, setExportDialogState] = React.useState<{
 		allowedLocales :Locales
 		open :boolean
@@ -176,12 +187,14 @@ export function useThesauriState({
 		durationSinceLastUpdate,
 		editSynonymsModalState,
 		exportDialogState,
+		importDialogState,
 		isLoading,
 		locales,
 		memoizedFetchOnUpdate,
 		newOrEditState,
 		setEditSynonymsModalState,
 		setExportDialogState,
+		setImportDialogState,
 		setNewOrEditState,
 		setShowDelete,
 		showDelete,
