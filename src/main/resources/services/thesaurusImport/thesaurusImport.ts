@@ -196,7 +196,7 @@ export function post(request :Request<{
 						value: aToSynonym
 					}
 				});
-				toLanguageObject.from.push({
+				toLanguageObject.to.push({
 					synonym: aToSynonym
 				});
 			} // for cleanedToArr
