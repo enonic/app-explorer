@@ -1,15 +1,15 @@
 import type {Thesaurus} from '/lib/explorer/types/index.d';
-import type {JSONResponse}  from '../../../services/graphQL/fetchers/index.d';
+import type {JSONResponse}  from '../../../../services/graphQL/fetchers/index.d';
 
 
 import fastDeepEqual from 'fast-deep-equal/react';
 import * as gql from 'gql-query-builder';
 import * as React from 'react';
-import {mustStartWithALowercaseLetter} from '../utils/mustStartWithALowercaseLetter';
-import {notDoubleUnderscore} from '../utils/notDoubleUnderscore';
-import {onlyLowercaseAsciiLettersDigitsAndUnderscores} from '../utils/onlyLowercaseAsciiLettersDigitsAndUnderscores';
-import {required} from '../utils/required';
-import {useUpdateEffect} from '../utils/useUpdateEffect';
+import {mustStartWithALowercaseLetter} from '../../utils/mustStartWithALowercaseLetter';
+import {notDoubleUnderscore} from '../../utils/notDoubleUnderscore';
+import {onlyLowercaseAsciiLettersDigitsAndUnderscores} from '../../utils/onlyLowercaseAsciiLettersDigitsAndUnderscores';
+import {required} from '../../utils/required';
+import {useUpdateEffect} from '../../utils/useUpdateEffect';
 
 
 declare type Name = string
@@ -141,6 +141,9 @@ export function useNewOrEditThesaurusState({
 	//const [/*nameVisited*/, setNameVisited] = React.useState(false);
 
 	const [languages, setLanguages] = React.useState<Array<string>>(initialState.languages); // Changes onMount
+	const [fromLanguage, setFromLanguage] = React.useState<string>();
+	const [toLanguage, setToLanguage] = React.useState<string>();
+	const [migrateTaskId, setMigrateTaskId] = React.useState<string>();
 	//console.debug('languages:', languages);
 
 	const [loading, setLoading] = React.useState(false);
@@ -239,7 +242,7 @@ export function useNewOrEditThesaurusState({
 			allowedLanguages: {
 				list: true,
 				required: true,
-				//type: 'string',
+				//type: 'String',
 				value: languages
 			}
 		}
@@ -279,11 +282,13 @@ export function useNewOrEditThesaurusState({
 
 	return {
 		errorCount: (nameError ? 1 : 0),
+		fromLanguage,
 		loading,
 		isStateChanged: !fastDeepEqual({
 			_name: name,
 			languages
 		}, initialState),
+		migrateTaskId,
 		name,
 		nameError,
 		nameOnBlur,
@@ -291,6 +296,11 @@ export function useNewOrEditThesaurusState({
 		languages,
 		onSubmit,
 		resetState,
-		setLanguages
+		setFromLanguage,
+		setLanguages,
+		setLoading,
+		setMigrateTaskId,
+		setToLanguage,
+		toLanguage
 	};
 }
