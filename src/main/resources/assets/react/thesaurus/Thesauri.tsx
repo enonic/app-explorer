@@ -19,7 +19,7 @@ import {
 
 import {ExportThesaurusModal} from './exportThesaurus/ExportThesaurusModal';
 import {EditSynonymsModal} from './editSynonyms/EditSynonymsModal';
-import {NewOrEditThesaurus} from './NewOrEditThesaurus';
+import {NewOrEditThesaurus} from './newOrEditThesaurus/NewOrEditThesaurus';
 import {DeleteThesaurus} from './DeleteThesaurus';
 import {ImportThesaurusModal} from './importThesaurus/ImportThesaurusModal';
 import {useThesauriState} from './useThesauriState';

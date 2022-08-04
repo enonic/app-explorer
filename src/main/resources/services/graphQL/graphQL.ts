@@ -69,6 +69,7 @@ import {addMutationThesaurusCreate} from './thesaurus/addMutationThesaurusCreate
 import {addMutationThesaurusUpdate} from './thesaurus/addMutationThesaurusUpdate'
 import {addThesaurusTypes} from './thesaurus/addThesaurusTypes';
 import {generateThesaurusFields} from './thesaurus/generateThesaurusFields';
+import {addMutationMigrateThesaurusSynonyms_v1_to_v2} from './thesaurus/addMutationMigrateThesaurusSynonyms_v1_to_v2';
 
 import {addStopWordsTypes} from './stopWords/addStopWordsTypes';
 import {generateQueryStopWordsField} from './stopWords/generateQueryStopWordsField';
@@ -193,6 +194,7 @@ const {
 	deleteSynonymField
 } = generateSynonymFields({glue});
 
+
 addThesaurusTypes({
 	glue
 });
@@ -203,6 +205,8 @@ const {
 	deleteThesaurusField,
 	queryThesauriField,
 } = generateThesaurusFields({glue});
+addMutationMigrateThesaurusSynonyms_v1_to_v2({glue});
+
 
 const getLicense = generateGetLicenseField({glue});
 const getLocales = generateGetLocalesField({glue});
