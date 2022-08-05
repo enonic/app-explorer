@@ -72,6 +72,7 @@ export function addSynonymTypes({
 
 	const synonymFields = {
 		...interfaceNodeFields,
+		_nodeTypeVersion: { type: GraphQLInt },
 		comment: { type: GraphQLString },
 		disabledInInterfaces: { type: list(GraphQLID) },
 		enabled: { type: GraphQLBoolean },
@@ -90,7 +91,7 @@ export function addSynonymTypes({
 			}
 		}))},
 		thesaurus: { type: nonNull(GraphQLString) }, // NOTE: Added from path by forceTypeSynonym
-		thesaurusReference: { type: glue.getScalarType('_id') },
+		thesaurusReference: { type: GraphQLID }, // Nullable to support nonMigrated synonyms
 	}
 
 	glue.addObjectType({

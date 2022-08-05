@@ -6,7 +6,7 @@ import ReactHtmlParser from 'react-html-parser';
 import {
 	//Button,
 	Dropdown,
-	Form, Header, Icon, List, Loader, Pagination, Table
+	Form, Header, Icon, List, Loader, Message, Pagination, Table
 } from 'semantic-ui-react';
 import {LanguageDropdown} from '../../collection/LanguageDropdown';
 import {NewOrEditSynonym} from '../newOrEditSynonym/index';
@@ -202,7 +202,8 @@ export function EditSynonyms({
 						{result.hits.map(({
 							_highlight,
 							_id,
-							//name,
+							//_name,
+							_nodeTypeVersion,
 							_score,
 							languages: languagesArray,
 							thesaurus,
@@ -222,9 +223,21 @@ export function EditSynonyms({
 									servicesBaseUrl={servicesBaseUrl}
 									thesaurusId={thesaurusReference}
 								/></Table.Cell>
-								<Table.Cell><List>{synonymsObj.from.map((item, j) => <List.Item key={j}>{ReactHtmlParser(item)}</List.Item>)}</List></Table.Cell>
-								<Table.Cell><List>{synonymsObj.to.map((item, j) => <List.Item key={j}>{ReactHtmlParser(item)}</List.Item>)}</List></Table.Cell>
-								<Table.Cell><List>{synonymsObj.both.map((item, j) => <List.Item key={j}>{ReactHtmlParser(item)}</List.Item>)}</List></Table.Cell>
+								<Table.Cell>{
+									_nodeTypeVersion && _nodeTypeVersion > 1
+										? <List>{synonymsObj.from.map((item, j) => <List.Item key={j}>{ReactHtmlParser(item)}</List.Item>)}</List>
+										: <Message content='Needs migration' negative/>
+								}</Table.Cell>
+								<Table.Cell>{
+									_nodeTypeVersion && _nodeTypeVersion > 1
+										?<List>{synonymsObj.to.map((item, j) => <List.Item key={j}>{ReactHtmlParser(item)}</List.Item>)}</List>
+										: <Message content='Needs migration' negative/>
+								}</Table.Cell>
+								<Table.Cell>{
+									_nodeTypeVersion && _nodeTypeVersion > 1
+										?<List>{synonymsObj.both.map((item, j) => <List.Item key={j}>{ReactHtmlParser(item)}</List.Item>)}</List>
+										: <Message content='Needs migration' negative/>
+								}</Table.Cell>
 								{thesaurusId ? null : <Table.Cell>{thesaurus}</Table.Cell>}
 								<Table.Cell>{_score}</Table.Cell>
 								<Table.Cell collapsing>
