@@ -100,6 +100,7 @@ export async function fetchSynonymsQuery({
 					'_id',
 					'_name',
 					'_nodeType',
+					'_nodeTypeVersion',
 					'_path',
 					'_score',
 					'_versionKey',
