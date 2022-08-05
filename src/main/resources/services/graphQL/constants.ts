@@ -1,6 +1,7 @@
 // [_A-Za-z][_0-9A-Za-z]*
 
 export const GQL_ENUM_FIELD_KEYS_FOR_AGGREGATIONS = 'EnumFieldsKeysForAggreations';
+export const GQL_ENUM_TASK_STATES = 'EnumTaskStates';
 
 export const GQL_FIELDS_DOCUMENT_TYPE_PROPERTY_NAME = 'DocumentTypePropertyFields';
 
@@ -75,6 +76,8 @@ export const GQL_TYPE_SYNONYMS_QUERY_RESULT_NAME = 'SynonymsQueryResult';
 export const GQL_TYPE_SYNONYMS_QUERY_RESULT_AGGREGATIONS_NAME = 'SynonymsQueryResultAggregations';
 export const GQL_TYPE_SYNONYMS_QUERY_RESULT_AGGREGATIONS_THESAURUS_NAME = 'SynonymsQueryResultAggregationsThesaurus';
 export const GQL_TYPE_SYNONYMS_QUERY_RESULT_AGGREGATIONS_THESAURUS_BUCKET_NAME = 'SynonymsQueryResultAggregationsThesaurusBucket';
+
+export const GQL_TYPE_TASK = 'Task';
 
 export const GQL_TYPE_THESAURI_QUERY_HITS = 'ThesauriQueryHits';
 export const GQL_TYPE_THESAURI_QUERY_RESULT = 'ThesauriQueryResult';

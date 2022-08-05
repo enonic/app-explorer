@@ -1,4 +1,3 @@
-import type {JSONResponse}  from '../../../../services/graphQL/fetchers/index.d';
 import type {
 	Locales,
 	SetLicensedToFunction,
@@ -7,13 +6,13 @@ import type {
 import type {NewOrEditState} from '../index.d';
 
 
-import * as gql from 'gql-query-builder';
-import {Button, Form, Header, Modal, Segment} from 'semantic-ui-react';
+import {Button, Form, Modal} from 'semantic-ui-react';
 import {LanguageDropdown} from '../../collection/LanguageDropdown';
 import {ResetButton} from '../../components/ResetButton';
 import {SubmitButton} from '../../components/SubmitButton';
 import {UploadLicense} from '../../UploadLicense';
 import {NEW_OR_EDIT_STATE_DEFAULT} from '../useThesauriState';
+import {MigrationSegment} from './MigrationSegment';
 import {useNewOrEditThesaurusState} from './useNewOrEditThesaurusState';
 
 
@@ -53,23 +52,17 @@ export function NewOrEditThesaurus({
 
 	const {
 		errorCount,
-		fromLanguage,
 		isStateChanged,
 		languages,
 		loading,
-		migrateTaskId,
 		name,
 		nameError,
 		nameOnBlur,
 		nameOnChange,
 		onSubmit,
 		resetState,
-		setFromLanguage,
 		setLanguages,
-		setLoading,
-		setMigrateTaskId,
-		setToLanguage,
-		toLanguage
+		setLoading
 	} = useNewOrEditThesaurusState({
 		_id,
 		doClose,
@@ -110,84 +103,14 @@ export function NewOrEditThesaurus({
 							/>
 						</Form.Field>
 						{_id
-							? <Segment>
-								<Header as='h2' content='Migration'/>
-								<Form.Field>
-									<label>From Language</label>
-									<LanguageDropdown
-										disabled={loading}
-										includeANoneOption={false}
-										language={fromLanguage}
-										loading={loading}
-										locales={locales.filter(({tag}) => languages.includes(tag))}
-										multiple={false}
-										setLanguage={(language) => setFromLanguage(language as string)}
-									/>
-								</Form.Field>
-								<Form.Field>
-									<label>To Language</label>
-									<LanguageDropdown
-										disabled={loading}
-										includeANoneOption={false}
-										language={toLanguage}
-										loading={loading}
-										locales={locales.filter(({tag}) => languages.includes(tag))}
-										multiple={false}
-										setLanguage={(language) => setToLanguage(language as string)}
-									/>
-								</Form.Field>
-								<Button
-									content={'Migrate x synonyms'}
-									disabled={!fromLanguage || !toLanguage}
-									icon={{name: 'tasks'}}
-									onClick={() => {
-										setLoading(true);
-										fetch(`${servicesBaseUrl}/graphQL`, {
-											method: 'POST',
-											headers: {
-												'Content-Type':	'application/json'
-											},
-											body: JSON.stringify(gql.mutation({
-												operation: 'migrateThesaurusSynonyms_v1_to_v2',
-												fields: [
-													'taskId'
-												],
-												variables: {
-													fromLocale: {
-														required: true,
-														type: 'String',
-														value: fromLanguage
-													},
-													thesaurusId: {
-														required: true,
-														type: 'ID',
-														value: _id
-													},
-													toLocale: {
-														required: true,
-														type: 'String',
-														value: toLanguage
-													}
-												}
-											}))
-										})
-											.then(res => res.json() as JSONResponse<{migrateThesaurusSynonyms_v1_to_v2 :{
-												taskId :string
-											}}>)
-											.then(({
-												data: {
-													migrateThesaurusSynonyms_v1_to_v2: {
-														taskId
-													}
-												}
-											}) => {
-												console.debug('taskId', taskId);
-												setMigrateTaskId(taskId);
-												setLoading(false);
-											});
-									}}
-								/>
-							</Segment>
+							? <MigrationSegment
+								languages={languages}
+								loading={loading}
+								locales={locales}
+								servicesBaseUrl={servicesBaseUrl}
+								setLoading={setLoading}
+								thesaurusId={_id}
+							/>
 							: null
 						}
 					</Form>
