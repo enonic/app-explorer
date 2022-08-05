@@ -35,7 +35,6 @@ import {generateGetContentTypesField} from './generateGetContentTypesField';
 import {generateGetLicenseField} from './generateGetLicenseField';
 import {generateGetLocalesField} from './generateGetLocalesField';
 import {generateGetSitesField} from './generateGetSitesField';
-import {generateListTasksField} from './generateListTasksField';
 import {generateQueryJournalsField} from './generateQueryJournalsField';
 import {generateReferencedByField} from './generateReferencedByField';
 
@@ -76,6 +75,11 @@ import {generateQueryStopWordsField} from './stopWords/generateQueryStopWordsFie
 import {addStopWordsCreate} from './stopWords/addStopWordsCreate';
 import {addStopWordsDelete} from './stopWords/addStopWordsDelete';
 import {addStopWordsUpdate} from './stopWords/addStopWordsUpdate';
+
+import {addTaskTypes} from './task/addTaskTypes';
+import {addQueryGetTask} from './task/addQueryGetTask';
+import {addQueryQueryTasks} from './task/addQueryQueryTasks';
+
 
 import {hasFieldQuery} from './hasFieldQuery';
 import {addUnionTypes} from './addUnionTypes';
@@ -229,7 +233,9 @@ addStopWordsDelete({glue});
 addStopWordsUpdate({glue});
 const queryStopWords = generateQueryStopWordsField({glue});
 
-const queryTasks = generateListTasksField({glue});
+addTaskTypes({glue});
+addQueryGetTask({glue});
+addQueryQueryTasks({glue});
 
 const {
 	queryDocumentTypesField
@@ -278,7 +284,6 @@ const query = glue.schemaGenerator.createObjectType({
 		queryStopWords,
 		queryDocumentTypes: queryDocumentTypesField,
 		queryThesauri: queryThesauriField,
-		queryTasks,
 		referencedBy
 	} // fields
 }); // query

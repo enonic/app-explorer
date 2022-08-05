@@ -30,7 +30,7 @@ declare type VariableOption<
 		: TypeScriptType
 > = {
 	value :Value
-    list ?:List
+	list ?:List
 	name ?:string
 	required ?:boolean
 	type ?:Type
@@ -141,9 +141,6 @@ export function useNewOrEditThesaurusState({
 	//const [/*nameVisited*/, setNameVisited] = React.useState(false);
 
 	const [languages, setLanguages] = React.useState<Array<string>>(initialState.languages); // Changes onMount
-	const [fromLanguage, setFromLanguage] = React.useState<string>();
-	const [toLanguage, setToLanguage] = React.useState<string>();
-	const [migrateTaskId, setMigrateTaskId] = React.useState<string>();
 	//console.debug('languages:', languages);
 
 	const [loading, setLoading] = React.useState(false);
@@ -282,13 +279,11 @@ export function useNewOrEditThesaurusState({
 
 	return {
 		errorCount: (nameError ? 1 : 0),
-		fromLanguage,
 		loading,
 		isStateChanged: !fastDeepEqual({
 			_name: name,
 			languages
 		}, initialState),
-		migrateTaskId,
 		name,
 		nameError,
 		nameOnBlur,
@@ -296,11 +291,7 @@ export function useNewOrEditThesaurusState({
 		languages,
 		onSubmit,
 		resetState,
-		setFromLanguage,
 		setLanguages,
-		setLoading,
-		setMigrateTaskId,
-		setToLanguage,
-		toLanguage
+		setLoading
 	};
 }

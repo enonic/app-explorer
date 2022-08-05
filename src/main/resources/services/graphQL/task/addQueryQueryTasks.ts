@@ -1,3 +1,7 @@
+import type {Task} from '/lib/explorer/types/'
+import type {Glue} from '../Glue';
+
+
 import {
 	COLON_SIGN,
 	TASK_STATE_FAILED,
@@ -6,76 +10,49 @@ import {
 	TASK_STATE_WAITING/*,
 	toStr*/
 } from '@enonic/js-utils';
-//import {getIn} from '@enonic/js-utils';
-
 import {
 	GraphQLBoolean,
-	GraphQLInt,
 	GraphQLString,
-	list,
-	nonNull
+	list
 	//@ts-ignore
 } from '/lib/graphql';
 //@ts-ignore
 import {list as listTasks} from '/lib/xp/task';
+import {queryCollectors} from '../collector/queryCollectors';
+import {
+	GQL_ENUM_TASK_STATES,
+	GQL_TYPE_TASK
+} from '../constants';
 
-import {queryCollectors} from './collector/queryCollectors';
 
-
-export function generateListTasksField({
+export function addQueryQueryTasks({
 	glue
+} :{
+	glue :Glue
 }) {
-	const ENUM_TASK_STATES = glue.addEnumType({
-		name: 'EnumTaskStates',
-		values: [
-			TASK_STATE_FAILED,
-			TASK_STATE_FINISHED,
-			TASK_STATE_RUNNING,
-			TASK_STATE_WAITING
-		]
-	});
-
-
-	const TASK_OBJECT_TYPE = glue.addObjectType({
-		name: 'Task',
-		//description:,
-		fields: {
-			application: { type: nonNull(GraphQLString) },
-			description: { type: nonNull(GraphQLString) },
-			id: { type: nonNull(GraphQLString) },
-			name: { type: nonNull(GraphQLString) },
-			progress: { type: nonNull(glue.addObjectType({
-				name: 'TaskProgress',
-				//description:,
-				fields: {
-					current: { type: nonNull(GraphQLInt) },
-					info: { type: nonNull(GraphQLString) }, // TODO May be empty?
-					total: { type: nonNull(GraphQLInt) }
-				}
-			})) },
-			startTime: { type: nonNull(GraphQLString) },
-			state: { type: nonNull(GraphQLString) },
-			user: { type: nonNull(GraphQLString) }
-		}
-	}); // TASK_OBJECT_TYPE
-
-	return {
+	return glue.addQuery<{
+		appName ?:string
+		name ?:string
+		onlyRegisteredCollectorTasks ?:boolean
+		state ?:typeof TASK_STATE_FAILED|typeof TASK_STATE_FINISHED|typeof TASK_STATE_RUNNING|typeof TASK_STATE_WAITING
+	}>({
+		name: 'queryTasks',
 		args: {
 			appName: GraphQLString, // Filter by appName // com.enonic.app.explorer
 			name: GraphQLString, // com.enonic.app.explorer:webcrawl
 			onlyRegisteredCollectorTasks: GraphQLBoolean,
-			state: ENUM_TASK_STATES
+			state: glue.getEnumType(GQL_ENUM_TASK_STATES)
 		},
-		resolve: (env) => {
-			//log.info(`env:${toStr(env)}`);
-			const {
+		resolve({
+			args: {
 				appName = undefined,
 				name,
 				onlyRegisteredCollectorTasks = false,
 				state
-			} = env.args;
+			}
+		}) {
 			//const activeCollections = {};
-			let taskList = listTasks({
+			let taskList :Array<Task> = listTasks({
 				name,
 				state
 			});
@@ -115,10 +92,21 @@ export function generateListTasksField({
 				taskList = taskList.filter(({name}) => name.startsWith(`${appName}${COLON_SIGN}`));
 			}
 
+			for (let i = 0; i < taskList.length; i++) {
+				const task = taskList[i];
+				const {id: taskId} = task;
+				try {
+					task.progress.infoObj = JSON.parse(task.progress.info);
+				} catch (e) {
+					log.warning(`Unable to JSON.parse task.progress.info:${task.progress.info} taskId:${taskId}`);
+					task.progress.infoObj = {}; // satisfy nonNull
+				}
+			}
+
 			return taskList;
 		},
-		type: list(TASK_OBJECT_TYPE)
-	};
+		type: list(glue.getObjectType(GQL_TYPE_TASK))
+	});
 }
 
 /* Example query

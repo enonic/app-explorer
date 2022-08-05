@@ -243,7 +243,7 @@ export class Glue {
 		resolve,
 		type
 	} :{
-		args :Args
+		args :AnyObject
 		name :string
 		resolve :FieldResolver<{
 			args: Args
