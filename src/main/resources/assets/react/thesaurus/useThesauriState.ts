@@ -59,6 +59,7 @@ const GQL_ON_UPDATE = JSON.stringify(gql.query([
 
 export const NEW_OR_EDIT_STATE_DEFAULT :NewOrEditState = {
 	_id: undefined,
+	_name: undefined,
 	open: false,
 };
 
