@@ -508,10 +508,10 @@ export function run({
 				} // indexable
 			} // resume ... else
 			log.debug(`success uri:${toStr(uri)}`);
-			collector.addSuccess({uri});
+			collector.addSuccess({message: uri});
 		} catch (e) {
 			log.error(`uri:${uri} message:${e.message}`, e);
-			collector.addError({uri, message: e.message});
+			collector.addError({message: `uri:${uri} ${e.message}`});
 		} // try ... catch
 	} // while
 
@@ -576,7 +576,7 @@ export function run({
 				//log.debug(toStr({uris}));
 				if (uris.length) {
 					uris.forEach((uri) => {
-						collector.journal.successes.push({uri, message: 'deleted'});
+						collector.journal.successes.push({message: `uri:${uri} deleted`});
 					});
 				}
 				collector.collection.connection.refresh();
