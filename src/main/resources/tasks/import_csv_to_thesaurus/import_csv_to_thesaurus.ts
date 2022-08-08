@@ -1,80 +1,89 @@
 import type {InputTypeSynonymLanguage} from '/lib/explorer/types/Synonym.d';
-import type {Request} from '../../types/Request';
 
 
 import {
-	RESPONSE_TYPE_JSON,
 	isString,
 	toStr
 } from '@enonic/js-utils';
-//@ts-ignore
-import {getMultipartText} from '/lib/xp/portal';
 import {
 	NT_SYNONYM,
 	PRINCIPAL_EXPLORER_WRITE
 } from '/lib/explorer/constants';
-import {connect} from '/lib/explorer/repo/connect';
-//import {createOrModify} from '/lib/explorer/node/createOrModify';
-//import {synonym} from '/lib/explorer/model/2/nodeTypes/synonym';
-import {parseCsv} from '/lib/explorer/parseCsv';
 import {query} from '/lib/explorer/node/query';
+import {parseCsv} from '/lib/explorer/parseCsv';
+import {connect} from '/lib/explorer/repo/connect';
 import {createSynonym} from '/lib/explorer/synonym/createSynonym';
 import {query as querySynonyms} from '/lib/explorer/synonym/query';
-//import {updateSynonym} from '/lib/explorer/synonym/updateSynonym';
-import {getThesaurus} from '/lib/explorer/thesaurus/getThesaurus';
+import {constructProgress} from '/lib/explorer/task/constructProgress'
+import {getThesaurus} from '/lib/explorer/thesaurus/getThesaurus'
 
 
-function jsonResponse(body = {}, status = 500) {
-	return {
-		body,
-		contentType: RESPONSE_TYPE_JSON,
-		status
+export function run({
+	csv,
+	fromLocale,
+	thesaurusId,
+	toLocale
+} :{
+	csv :string
+	fromLocale :string
+	thesaurusId :string
+	toLocale :string
+}) {
+	/*log.debug('csv:%s', csv);
+	log.debug('fromLocale:%s', fromLocale);
+	log.debug('thesaurusId:%s', thesaurusId);
+	log.debug('toLocale:%s', toLocale);*/
+
+	const progress = constructProgress({
+		message: `Checking parameters`
+	}).report()//.debug();
+
+	if (!csv) {
+		const msg = 'Missing required parameter csv!';
+		progress.setMessage(msg).report().error();
+		throw new Error(msg);
 	}
-}
 
-
-function badRequestJsonResponse(error :string) {
-	return jsonResponse({error}, 400);
-}
-
-
-/*function internalServerErrorJsonResponse(error ?:string) {
-	return jsonResponse({error}, 500);
-}*/
-
-
-export function post(request :Request<{
-	fromLanguage :string
-	thesaurusName :string
-	toLanguage :string
-}>) {
-	//log.debug('request:%s', toStr(request));
-	const {
-		params: {
-			fromLanguage,
-			thesaurusName,
-			toLanguage
-		}
-	} = request;
-	if (!fromLanguage) {
-		return badRequestJsonResponse('Missing required parameter fromLanguage!');
+	if (!fromLocale) {
+		const msg = 'Missing required parameter fromLocale!';
+		progress.setMessage(msg).report().error();
+		throw new Error(msg);
 	}
-	if (!thesaurusName) {
-		return badRequestJsonResponse('Missing required parameter thesaurusName!');
+
+	if (!thesaurusId) {
+		const msg = 'Missing required parameter thesaurusId!';
+		progress.setMessage(msg).report().error();
+		throw new Error(msg);
 	}
-	if (!toLanguage) {
-		return badRequestJsonResponse('Missing required parameter toLanguage!');
+
+	if (!toLocale) {
+		const msg = 'Missing required parameter toLocale!';
+		progress.setMessage(msg).report().error();
+		throw new Error(msg);
 	}
-	//log.debug('fromLanguage:%s toLanguage:%s', fromLanguage, toLanguage);
+
+	progress.finishItem().addItems(1).setMessage(`Getting thesaurus with id:${thesaurusId}`).report()//.debug();
 
 	const explorerRepoWriteConnection = connect({
-		principals: [PRINCIPAL_EXPLORER_WRITE]
+		principals:[PRINCIPAL_EXPLORER_WRITE]
 	});
 
-	const thesaurusNode = getThesaurus({ // Will throw on error
-		connection: explorerRepoWriteConnection,
+	let thesaurusNode :ReturnType<typeof getThesaurus>;
+	try {
+		thesaurusNode = getThesaurus({
+			connection: explorerRepoWriteConnection,
+			_id: thesaurusId
+		});
+	} catch (e) {
+		progress.setMessage(e.message).report().error();
+		throw e;
+	}
+	const {
 		_name: thesaurusName
-	});
+	} = thesaurusNode
+	//log.debug('thesaurusName:%s', thesaurusName);
+
+	progress.finishItem().addItems(1).setMessage(`Getting existing synonymIds`).report()//.debug();
 
 	const synonymsQueryRes = query({
 		connection: explorerRepoWriteConnection,
@@ -86,7 +95,19 @@ export function post(request :Request<{
 	const synonymIdsExisting = synonymsQueryRes.hits.map(({id}) => id);
 	//log.debug('synonymIdsExisting:%s', toStr(synonymIdsExisting));
 
-	const text :string = getMultipartText('file');
+	progress.finishItem().addItems(1).setMessage(`Parsing csv`).report()//.debug();
+
+	const parsedCsv :Array<{
+		from ?:string
+		to ?:string
+	}> = parseCsv({
+		csvString: csv,
+		columns: ['from', 'to'],
+		start: 1 // Aka skip line 0
+	});
+
+	progress.finishItem().addItems(parsedCsv.length).setMessage(`Processing csv lines`).report()//.debug();
+
 	let errors = 0;
 	let successes = 0;
 
@@ -96,18 +117,12 @@ export function post(request :Request<{
 	//const synonymIdsUpdated = [];
 	const synonymIdsUntouched = [];
 
-	parseCsv({
-		csvString: text,
-		columns: ['from', 'to'],
-		start: 1 // Aka skip line 0
-	}).forEach(({
-		from,
-		to
-	} :{
-		from ?:string
-		to ?:string
-	}) => {
-		//log.info(toStr({from, to}));
+	for (let i = 0; i < parsedCsv.length; i++) {
+		progress.setMessage(`Processing csv line:${i+1}`).report()//.debug();
+		const {
+			from,
+			to
+		} = parsedCsv[i];
 		if (
 			from // Skip empty cells
 			&& to // Skip empty cells
@@ -120,7 +135,7 @@ export function post(request :Request<{
 			const bothArr = [];
 			let cleanedFromArr = [];
 			let cleanedToArr = [];
-			if (fromLanguage === toLanguage) {
+			if (fromLocale === toLocale) {
 
 				for (let i = 0; i < fromArr.length; i++) {
 					const aFromSynonym = fromArr[i];
@@ -138,25 +153,25 @@ export function post(request :Request<{
 					}
 				} // for toArr
 
-			} else { //fromLanguage !== toLanguage
+			} else { //fromLocale !== toLocale
 				cleanedFromArr = fromArr;
 				cleanedToArr = toArr;
-			} // if fromLanguage === toLanguage
+			} // if fromLocale === toLocale
 			//log.debug('bothArr:%s', toStr(bothArr));
 			//log.debug('cleanedFromArr:%s', toStr(cleanedFromArr));
 			//log.debug('cleanedToArr:%s', toStr(cleanedToArr));
 
 			const fromLanguageObject :InputTypeSynonymLanguage = {
 				both: [],
-				locale: fromLanguage,
+				locale: fromLocale,
 				from: [],
 				to: []
 			};
-			const toLanguageObject = fromLanguage === toLanguage
+			const toLanguageObject = fromLocale === toLocale
 				? fromLanguageObject
 				: {
 					both: [],
-					locale: toLanguage,
+					locale: toLocale,
 					from: [],
 					to: []
 				}
@@ -166,7 +181,7 @@ export function post(request :Request<{
 				const aBothSynonym = bothArr[i];
 				mustQueries.push({
 					term: {
-						field: `languages.${fromLanguage}.both.synonym`, // fromLanguage === toLanguage
+						field: `languages.${fromLocale}.both.synonym`, // fromLocale === toLocale
 						value: aBothSynonym
 					}
 				});
@@ -179,7 +194,7 @@ export function post(request :Request<{
 				const aFromSynonym = cleanedFromArr[i];
 				mustQueries.push({
 					term: {
-						field: `languages.${fromLanguage}.from.synonym`,
+						field: `languages.${fromLocale}.from.synonym`,
 						value: aFromSynonym
 					}
 				});
@@ -192,7 +207,7 @@ export function post(request :Request<{
 				const aToSynonym = cleanedToArr[i];
 				mustQueries.push({
 					term: {
-						field: `languages.${toLanguage}.to.synonym`,
+						field: `languages.${toLocale}.to.synonym`,
 						value: aToSynonym
 					}
 				});
@@ -221,7 +236,7 @@ export function post(request :Request<{
 				synonymIdsUntouched.push(_id);
 			} else {
 				const languages = [fromLanguageObject];
-				if (fromLanguage !== toLanguage) {
+				if (fromLocale !== toLocale) {
 					languages.push(toLanguageObject)
 				}
 
@@ -260,7 +275,8 @@ export function post(request :Request<{
 				}
 			}
 		}
-	});
+		progress.finishItem();
+	} // for parsedCsv
 	explorerRepoWriteConnection.refresh();
 
 	const notDeleted = [];
@@ -274,19 +290,7 @@ export function post(request :Request<{
 		}
 	}
 
-	const body :{
-		error ?:string
-		errors :number
-		message ?:string
-		successes :number
-		synonymIds :{
-			created: Array<string>
-			untouched: Array<string>
-			possibleDuplicates: Record<string, Array<string>>
-			notDeleted: Array<string>
-			exisited: Array<string>
-		}
-	} = {
+	log.info(`Import to thesaurus id:%s name:%s state:%s`,thesaurusId, thesaurusName, toStr({
 		errors,
 		successes,
 		synonymIds: {
@@ -296,13 +300,7 @@ export function post(request :Request<{
 			notDeleted,
 			exisited: synonymIdsExisting
 		}
-	};
-	let status = 200;
-	if (errors) {
-		body.error = `There were ${errors} error(s) while importing to thesaurus ${thesaurusName}!`;
-		status = 500;
-	} else {
-		body.message = `Imported ${successes} synonym(s) to thesaurus ${thesaurusName}`;
-	}
-	return jsonResponse(body, status);
-} // post
+	}));
+
+	progress.setMessage(`Finished importing to thesaurus ${thesaurusName}`).report().debug();
+}

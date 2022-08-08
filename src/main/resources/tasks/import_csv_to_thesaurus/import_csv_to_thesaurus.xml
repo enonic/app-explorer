@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<task>
+	<description>Import CSV to Thesaurus</description>
+	<form>
+		<input name="csv" type="TextLine">
+			<label>csv</label>
+			<occurrences minimum="1" maximum="1"/>
+		</input>
+		<input name="fromLocale" type="TextLine">
+			<label>fromLocale</label>
+			<occurrences minimum="1" maximum="1"/>
+		</input>
+		<input name="thesaurusId" type="TextLine">
+			<label>thesaurusId</label>
+			<occurrences minimum="1" maximum="1"/>
+		</input>
+		<input name="toLocale" type="TextLine">
+			<label>toLocale</label>
+			<occurrences minimum="1" maximum="1"/>
+		</input>
+	</form>
+</task>
