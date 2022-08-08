@@ -1,13 +1,31 @@
-// https://stackoverflow.com/questions/9107240/1-evalthis-vs-evalthis-in-javascript
+//https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/globalThis
+//type AnyObject = Record<PropertyKey,unknown>
+type MyGlobal = {
+	frames :typeof globalThis
+	globalThis :typeof globalThis
+	self :typeof globalThis
+	window :typeof globalThis
+	//crypto :typeof globalThis['crypto']
+	//crypto :Window['crypto']
+	crypto :{
+		getRandomValues :Crypto['getRandomValues']
+	}
+}
+/* Google uses this:
+type GlobalThis = typeof globalThis & Window & {
+	NaN: never;
+	Infinity: never;
+};*/
 
+// https://stackoverflow.com/questions/9107240/1-evalthis-vs-evalthis-in-javascript
 //@ts-ignore TS2451: Cannot redeclare block-scoped variable 'global'.
-const global = (1, eval)('this'); // eslint-disable-line no-eval
+const global :typeof globalThis = (1, eval)('this'); // eslint-disable-line no-eval
 
 global.global = global;
-global.globalThis = global;
-global.frames = global;
-global.self = global;
-global.window = global;
+(global as unknown as MyGlobal).globalThis = global;
+(global as unknown as MyGlobal).frames = global;
+(global as unknown as MyGlobal).self = global;
+(global as unknown as MyGlobal).window = global;
 
 //const window = global;
 // Avoid Error: Secure random number generation is not supported by this browser. Use Chrome, Firefox or Internet Explorer 11
@@ -26,7 +44,9 @@ global.window = global;
 
 // Actually works, but:
 // WARNING Prefer a proper cryptographic entropy source over this module. If you are out of luck you can use this in a pinch
-global.crypto = { getRandomValues: require('polyfill-crypto.getrandomvalues') };
+(global as unknown as MyGlobal).crypto = {
+	getRandomValues: require('polyfill-crypto.getrandomvalues') as Crypto['getRandomValues'] // eslint-disable-line @typescript-eslint/no-var-requires
+};
 
 // get-random-values uses crypto node module randomBytes()
 //global.crypto = { getRandomValues: require('get-random-values') };

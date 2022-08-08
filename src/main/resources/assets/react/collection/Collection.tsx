@@ -109,9 +109,10 @@ export function Collection({
 					/>
 					<Form.Field>
 						<LanguageDropdown
+							includeANoneOption={true}
 							locales={locales}
 							language={language}
-							setLanguage={setLanguage}
+							setLanguage={(l) => setLanguage(l as string)}
 						/>
 					</Form.Field>
 					<Header as='h2' dividing content='Collector'/>
