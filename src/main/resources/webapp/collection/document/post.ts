@@ -20,7 +20,6 @@ import {
 	ROLE_SYSTEM_ADMIN*/
 } from '/lib/explorer/constants';
 import {USER as EXPLORER_APP_USER} from '/lib/explorer/model/2/users/explorer';
-//import {Document} from '/lib/explorer/model/2/nodeTypes/document';
 //import {get as getCollection} from '/lib/explorer/collection/get';
 //import {createOrModify} from '/lib/explorer/node/createOrModify';
 import {connect} from '/lib/explorer/repo/connect';
