@@ -1,3 +1,6 @@
+import type {Locales} from '../../index.d';
+
+
 import {
 	Accordion,
 	Button,
@@ -36,14 +39,17 @@ tr: 'Turkish'
 
 
 export function NewOrEditSynonym({
+	// Required
+	locales,
+	servicesBaseUrl,
+	thesaurusId,
+	// Optional
 	_id,
 	afterClose = () => {}, // eslint-disable-line @typescript-eslint/no-empty-function
 	beforeOpen = () => {}, // eslint-disable-line @typescript-eslint/no-empty-function
-	//locales,
-	servicesBaseUrl,
-	thesaurusId,
 } :{
 	// Required
+	locales :Locales
 	servicesBaseUrl :string
 	thesaurusId :string
 	// Optional
@@ -80,6 +86,7 @@ export function NewOrEditSynonym({
 				<SynonymLanguages
 					_id={_id}
 					interfaceOptions={interfaceOptions}
+					locales={locales}
 					setState={setState}
 					state={state}
 				/>

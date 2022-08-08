@@ -220,6 +220,7 @@ export function EditSynonyms({
 								<Table.Cell collapsing><NewOrEditSynonym
 									_id={_id}
 									afterClose={memoizedQuerySynonyms}
+									locales={locales}
 									servicesBaseUrl={servicesBaseUrl}
 									thesaurusId={thesaurusReference}
 								/></Table.Cell>
@@ -279,6 +280,7 @@ export function EditSynonyms({
 				<p>Displaying {start}-{end} of {total}</p>
 				{thesaurusId && <NewOrEditSynonym
 					afterClose={memoizedQuerySynonyms}
+					locales={locales}
 					servicesBaseUrl={servicesBaseUrl}
 					thesaurusId={thesaurusId}
 				/>}

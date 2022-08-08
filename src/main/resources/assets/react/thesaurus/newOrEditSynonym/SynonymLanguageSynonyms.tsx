@@ -2,6 +2,7 @@ import type {
 	SynonymGUI,
 	SynonymGUI_LanguagesSynonymObject
 } from '/lib/explorer/types/Synonym.d';
+import type {Locales} from '../../index.d';
 
 
 import {InsertButton} from '../../components/InsertButton';
@@ -11,11 +12,13 @@ import {SynonymLanguageSynonymsTable} from './SynonymLanguageSynonymsTable';
 export function SynonymLanguageSynonyms({
 	interfaceOptions,
 	languageIndex,
+	locales,
 	setState,
 	state
 } :{
 	interfaceOptions :Array<unknown> // TODO
 	languageIndex :number
+	locales: Locales
 	setState :React.Dispatch<React.SetStateAction<SynonymGUI>>
 	state :SynonymGUI
 }) {
@@ -24,6 +27,7 @@ export function SynonymLanguageSynonyms({
 			? <SynonymLanguageSynonymsTable
 				interfaceOptions={interfaceOptions}
 				languageIndex={languageIndex}
+				locales={locales}
 				setState={setState}
 				state={state}
 			/>
