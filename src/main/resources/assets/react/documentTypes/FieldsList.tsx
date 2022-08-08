@@ -25,6 +25,24 @@ import {AddOrEditLocalFieldModal} from './AddOrEditLocalFieldModal';
 import {RemoveFieldFromDocumentTypeModal} from './RemoveFieldFromDocumentTypeModal';
 
 
+const ADD_OR_EDIT_MODAL_STATE_DEFAULT :AddOrEditLocalFieldModalState = {
+	open: false,
+	state: {
+		active: true,
+		enabled: true,
+		includeInAllText : true,
+		index: null,
+		fulltext: true,
+		max: 0,
+		min: 0,
+		name: '',
+		nGram: true,
+		path: false,
+		valueType: VALUE_TYPE_STRING
+	}
+};
+
+
 export const FieldsList = ({
 	collectionNames,
 	interfaceNames,
@@ -39,22 +57,7 @@ export const FieldsList = ({
 	updateOrDeleteProperties :UpdateOrDeletePropertiesFunction
 }) => {
 
-	const [addOrEditModalState, setAddOrEditModalState] = React.useState<AddOrEditLocalFieldModalState>({
-		open: false,
-		state: {
-			active: true,
-			enabled: true,
-			includeInAllText : true,
-			index: null,
-			fulltext: true,
-			max: 0,
-			min: 0,
-			name: '',
-			nGram: true,
-			path: false,
-			valueType: VALUE_TYPE_STRING
-		}
-	});
+	const [addOrEditModalState, setAddOrEditModalState] = React.useState<AddOrEditLocalFieldModalState>(ADD_OR_EDIT_MODAL_STATE_DEFAULT);
 	const [removeModalState, setRemoveModalState] = React.useState({
 		...addOrEditModalState,
 		open: false,
@@ -194,7 +197,7 @@ export const FieldsList = ({
 			trigger={<Button
 				icon
 				onClick={() => setAddOrEditModalState({
-					...addOrEditModalState,
+					...ADD_OR_EDIT_MODAL_STATE_DEFAULT, // Fix for BUG #564 Edit documentType, addField dialog is actually editField
 					open: true
 				})}><Icon
 					color='green'
