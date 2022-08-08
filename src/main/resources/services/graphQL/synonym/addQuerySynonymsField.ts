@@ -25,6 +25,7 @@ import {
 } from '/lib/graphql';
 import {
 	GQL_INPUT_TYPE_FILTERS_NAME,
+	GQL_QUERY_SYNONYMS_NAME,
 	GQL_TYPE_SYNONYMS_QUERY_RESULT_NAME
 } from '../constants';
 import {querySynonyms} from './querySynonyms';
@@ -57,7 +58,7 @@ export function addQuerySynonymsField({
 		thesaurusNames ?:Array<string>
 		to ?:string
 	}>({
-		name: 'querySynonyms',
+		name: GQL_QUERY_SYNONYMS_NAME,
 		args: {
 			count: GraphQLInt,
 			filters: glue.getInputType(GQL_INPUT_TYPE_FILTERS_NAME),

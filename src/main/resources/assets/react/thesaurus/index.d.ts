@@ -1,5 +1,6 @@
 export type NewOrEditState = {
 	_id ?:string
+	_name ?:string // Used to filter queries on _parentPath, rather than opening thesaurusNodes to get _path
 	open :boolean
 }
 

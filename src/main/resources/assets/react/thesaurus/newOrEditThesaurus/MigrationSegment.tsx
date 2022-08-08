@@ -12,6 +12,7 @@ import {
 import * as gql from 'gql-query-builder';
 import * as React from 'react';
 import {Button, Form, Header, Progress, Segment} from 'semantic-ui-react';
+import {GQL_QUERY_SYNONYMS_NAME} from '../../../../services/graphQL/constants';
 import {LanguageDropdown} from '../../collection/LanguageDropdown';
 //import {useUpdateEffect} from '../../utils/useUpdateEffect';
 import {useInterval} from '../../utils/useInterval';
@@ -23,7 +24,8 @@ export function MigrationSegment({
 	locales,
 	servicesBaseUrl,
 	setLoading,
-	thesaurusId
+	thesaurusId,
+	thesaurusName
 } :{
 	languages :Array<string>
 	loading :boolean
@@ -31,7 +33,9 @@ export function MigrationSegment({
 	servicesBaseUrl :string
 	setLoading :React.Dispatch<React.SetStateAction<boolean>>
 	thesaurusId :string
+	thesaurusName :string
 }) {
+	const [needsMigrationCount, setNeedsMigrationCount] = React.useState<number>();
 	const [fromLanguage, setFromLanguage] = React.useState<string>();
 	const [toLanguage, setToLanguage] = React.useState<string>();
 	const [migrateTaskId, setMigrateTaskId] = React.useState<string>();
@@ -56,6 +60,66 @@ export function MigrationSegment({
 		value: 0,
 		warning: false
 	});
+
+	React.useEffect(() => {
+		setLoading(true);
+		fetch(`${servicesBaseUrl}/graphQL`, {
+			method: 'POST',
+			headers: {
+				'Content-Type':	'application/json'
+			},
+			body: JSON.stringify(gql.query({
+				operation: GQL_QUERY_SYNONYMS_NAME,
+				fields: [
+					'total',
+				],
+				variables: {
+					count: {
+						required: false,
+						type: 'Int',
+						value: 0
+					},
+					filters: {
+						required: false,
+						type: 'Filters',
+						value: {
+							boolean: {
+								mustNot: {
+									hasValue: {
+										field: 'nodeTypeVersion',
+										values: ["2"]
+									} // hasValue
+								} // mustNot
+							} // boolean
+						} // value
+					}, // filters
+					thesaurusNames: {
+						list: true,
+						required: false,
+						type: "String",
+						value: [thesaurusName]
+					}
+				} // variables
+			}))
+		}).then(res => res.json() as JSONResponse<{
+			querySynonyms :{
+				total :number
+			}
+		}>).then(({
+			data: {
+				querySynonyms: {
+					total
+				}
+			}
+		}) => {
+			setNeedsMigrationCount(total);
+			setLoading(false);
+		})
+	}, [
+		servicesBaseUrl,
+		setLoading,
+		thesaurusName
+	]);
 
 	useInterval(() => {
 		if (migrating) {
@@ -161,6 +225,10 @@ export function MigrationSegment({
 		migrateTaskId
 	]);*/
 
+	if (needsMigrationCount === 0) {
+		return null;
+	}
+
 	return <Segment>
 		<Header as='h2' content='Migration'/>
 		<Form.Field>
@@ -202,8 +270,8 @@ export function MigrationSegment({
 			: null
 		}
 		<Button
-			content={'Migrate x synonyms'}
-			disabled={!!migrateTaskId || !fromLanguage || !toLanguage}
+			content={`Migrate ${needsMigrationCount} synonyms`}
+			disabled={!!migrateTaskId || !fromLanguage || !toLanguage ||  loading}
 			icon={{name: 'tasks'}}
 			loading={migrating || loading}
 			onClick={() => {

@@ -133,6 +133,7 @@ export function Thesauri({
 										onClick={() => {
 											setNewOrEditState({
 												_id,
+												_name,
 												open: true
 											});
 										}}
@@ -255,6 +256,7 @@ export function Thesauri({
 			onClick={() => {
 				setNewOrEditState({
 					_id: undefined,
+					_name: undefined,
 					open: true
 				});
 			}}
@@ -268,6 +270,7 @@ export function Thesauri({
 			/></Button>
 		<NewOrEditThesaurus
 			_id={newOrEditState._id}
+			_name={newOrEditState._name}
 			open={newOrEditState.open}
 			licenseValid={licenseValid}
 			locales={locales}

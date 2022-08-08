@@ -110,6 +110,7 @@ export function NewOrEditThesaurus({
 								servicesBaseUrl={servicesBaseUrl}
 								setLoading={setLoading}
 								thesaurusId={_id}
+								thesaurusName={_name}
 							/>
 							: null
 						}
