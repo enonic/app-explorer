@@ -18,11 +18,9 @@ export const queryJournals = ({
 		successCount
 		#errors {
 		#	message
-		#	uri
 		#}
 		#successes {
 		#	message
-		#	uri
 		#}
 	}
 	total
