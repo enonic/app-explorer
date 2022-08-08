@@ -8,6 +8,7 @@ import {
 	TASK_STATE_WAITING
 } from '@enonic/js-utils';
 import {
+	GraphQLID,
 	GraphQLInt,
 	GraphQLString,
 	Json as GraphQLJson,
@@ -16,7 +17,8 @@ import {
 } from '/lib/graphql';
 import {
 	GQL_ENUM_TASK_STATES,
-	GQL_TYPE_TASK
+	GQL_TYPE_TASK,
+	GQL_TYPE_TASK_SUBMITTED
 } from '../constants';
 
 
@@ -54,6 +56,13 @@ export function addTaskTypes({
 			startTime: { type: nonNull(GraphQLString) },
 			state: { type: nonNull(GraphQLString) },
 			user: { type: nonNull(GraphQLString) }
+		}
+	});
+
+	glue.addObjectType({
+		name: GQL_TYPE_TASK_SUBMITTED,
+		fields: {
+			taskId: { type: nonNull(GraphQLID) }
 		}
 	});
 }

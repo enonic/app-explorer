@@ -88,10 +88,12 @@ export function useThesauriState({
 	const [importDialogState, setImportDialogState] = React.useState<{
 		allowedLocales :Locales
 		open :boolean
+		thesaurusId :string
 		thesaurusName :string
 	}>({
 		allowedLocales: [],
 		open: false,
+		thesaurusId: undefined,
 		thesaurusName: ''
 	});
 

@@ -1,11 +1,22 @@
+import type {Task} from '/lib/explorer/types/'
 import type {Locales} from '../../index.d';
+import type {JSONResponse}  from '../../../../services/graphQL/fetchers/index.d';
 
 
+import {
+	TASK_STATE_FAILED,
+	TASK_STATE_FINISHED,
+	TASK_STATE_RUNNING,
+	TASK_STATE_WAITING
+} from '@enonic/js-utils';
+import * as gql from 'gql-query-builder';
 import * as React from 'react';
 import {
-	Button, Form, Grid, Input, Modal, Table
+	Button, Form, Grid, Input, Modal, Progress, Table
 } from 'semantic-ui-react';
+import {GQL_MUTATION_THESAURUS_IMPORT_NAME} from '../../../../services/graphQL/constants';
 import {LanguageDropdown} from '../../collection/LanguageDropdown';
+import {useInterval} from '../../utils/useInterval';
 
 
 type FileWithLastModifiedDate = File & {
@@ -19,6 +30,7 @@ export function ImportThesaurusModal({
 	open,
 	servicesBaseUrl,
 	setImportDialogState,
+	thesaurusId,
 	thesaurusName,
 	// Optional
 	afterClose = () => {/**/}
@@ -30,8 +42,10 @@ export function ImportThesaurusModal({
 	setImportDialogState :React.Dispatch<React.SetStateAction<{
 		allowedLocales :Locales
 		open: boolean
+		thesaurusId :string
 		thesaurusName :string
 	}>>
+	thesaurusId :string
 	thesaurusName :string
 	// Optional
 	afterClose ?:() => void
@@ -42,6 +56,28 @@ export function ImportThesaurusModal({
 	const [fromLanguage, setFromLanguage] = React.useState('');
 	const [toLanguage, setToLanguage] = React.useState('');
 	const [loading, setLoading] = React.useState(false);
+	const [importTaskId, setImportTaskId] = React.useState<string>();
+	const [importing, setImporting] = React.useState<boolean>(false);
+	const [interval, setInterval] = React.useState<number>(1000);
+	const [progress, setProgress] = React.useState<{
+		error :boolean
+		indicating :boolean
+		label :string
+		percent :number
+		success :boolean
+		total :number
+		value :number
+		warning :boolean
+	}>({
+		error: false,
+		indicating: true,
+		label: '',
+		percent: 0,
+		success: false,
+		total: 1,
+		value: 0,
+		warning: false
+	});
 
 	React.useEffect(() => {
 		if (file) {
@@ -95,10 +131,108 @@ export function ImportThesaurusModal({
 		setImportDialogState({
 			allowedLocales: [],
 			open: false,
+			thesaurusId: undefined,
 			thesaurusName: ''
 		})
 		afterClose();
 	}
+
+	useInterval(() => {
+		if (importing) {
+			fetch(`${servicesBaseUrl}/graphQL`, {
+				method: 'POST',
+				headers: {
+					'Content-Type':	'application/json'
+				},
+				body: JSON.stringify(gql.query({
+					operation: 'getTask',
+					fields: [
+						//'application',
+						//'description',
+						//'id',
+						//'name',
+						{
+							progress: [
+								'current',
+								//'info',
+								'infoObj',
+								'total'
+							]
+						},
+						//'startTime',
+						'state',
+						//'user'
+					],
+					variables: {
+						taskId: {
+							required: true,
+							type: 'ID',
+							value: importTaskId
+						}
+					}
+				}))
+			})
+				.then(res => res.json() as JSONResponse<{getTask :Task<{
+					currentTime :number
+					message :string
+					startTime :number
+				}>}>)
+				.then(({
+					data: {
+						getTask: {
+							//application,
+							//description,
+							//id,
+							//name,
+							progress: {
+								current,
+								//info,
+								infoObj: {
+									currentTime,
+									message,
+									startTime
+								},
+								total
+							},
+							//startTime,
+							state,
+							//user
+						}
+					}
+				}) => {
+					const remainingCount = total - current;
+					const percent = Math.floor(current / total * 10000)/100; // Keeping two decimals
+					const durationMs = currentTime - startTime;
+					const averageMs = current ? durationMs / current : durationMs;
+					const remainingMs = (remainingCount * averageMs);
+					const etaMs = currentTime + remainingMs;
+					const error = state === TASK_STATE_FAILED;
+					const success = state === TASK_STATE_FINISHED;
+					const warning = state === TASK_STATE_WAITING;
+					setProgress({
+						error,
+						indicating: state === TASK_STATE_RUNNING || warning,
+						label: warning
+							? 'Task state waiting!'
+							: error
+								? `Task failed!`
+								: success
+									? message
+									: `${message} etaMs:${etaMs}`,
+						percent,
+						success,
+						total: total,
+						value: current,
+						warning
+					});
+					if (success || error) {
+						setLoading(false);
+						setImporting(false);
+						setInterval(5000);
+					}
+				})
+		} // if migrateTaskId
+	}, interval); // useInterval
 
 	return <Modal
 		closeIcon
@@ -183,6 +317,20 @@ export function ImportThesaurusModal({
 					/>
 				</Form.Field>
 			</Form>
+			{importTaskId
+				? <Progress
+					error={progress.error}
+					indicating={progress.indicating}
+					label={progress.label}
+					percent={progress.percent}
+					progress='ratio'
+					success={progress.success}
+					total={progress.total}
+					value={progress.value}
+					warning={progress.warning}
+				/>
+				: null
+			}
 		</Modal.Content>
 		<Modal.Actions>
 			<Grid columns={3}>
@@ -204,27 +352,51 @@ export function ImportThesaurusModal({
 							loading={loading}
 							onClick={() => {
 								setLoading(true);
-								const body = new FormData();
-								//console.debug('fileInput', fileInput);
-								body.append('file', file); // binary
-
-								// These do not become part of the url in the query string,
-								// but they end up in request.params on the serverside :)
-								//body.append('fileContent', fileContent); // string //
-								body.append('fromLanguage', fromLanguage);
-								body.append('thesaurusName', thesaurusName);
-								body.append('toLanguage', toLanguage);
-								fetch(`${servicesBaseUrl}/thesaurusImport`, {
-									body,
-									headers: {
-										//'Content-type': 'multipart/form-data' // Automatically set
-									},
+								fetch(`${servicesBaseUrl}/graphQL`, {
+									body: JSON.stringify(gql.mutation({
+										operation: GQL_MUTATION_THESAURUS_IMPORT_NAME,
+										fields: ['taskId'],
+										variables: {
+											csv: {
+												required: true,
+												type: 'String',
+												value: fileContent
+											},
+											fromLocale: {
+												required: true,
+												type: 'String',
+												value: fromLanguage
+											},
+											thesaurusId: {
+												required: true,
+												type: 'ID',
+												value: thesaurusId
+											},
+											toLocale: {
+												required: true,
+												type: 'String',
+												value: toLanguage
+											}
+										}
+									})),
 									method: 'POST'
 								})
-									.then(response => response.json())
-									.then((data) => {
-										console.debug('data', data);
-										setLoading(false);
+									.then(response => response.json() as JSONResponse<{
+										importThesaurus: {
+											taskId :string
+										}
+									}>)
+									.then(({
+										data:{
+											importThesaurus: {
+												taskId
+											}
+										}
+									}) => {
+										//console.debug('taskId', taskId);
+										setImportTaskId(taskId);
+										setImporting(true);
+										//setLoading(false);
 										//doClose();
 									});
 							}}

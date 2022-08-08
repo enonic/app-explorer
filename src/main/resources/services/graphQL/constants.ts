@@ -78,6 +78,7 @@ export const GQL_TYPE_SYNONYMS_QUERY_RESULT_AGGREGATIONS_THESAURUS_NAME = 'Synon
 export const GQL_TYPE_SYNONYMS_QUERY_RESULT_AGGREGATIONS_THESAURUS_BUCKET_NAME = 'SynonymsQueryResultAggregationsThesaurusBucket';
 
 export const GQL_TYPE_TASK = 'Task';
+export const GQL_TYPE_TASK_SUBMITTED = 'SubmittedTask';
 
 export const GQL_TYPE_THESAURI_QUERY_HITS = 'ThesauriQueryHits';
 export const GQL_TYPE_THESAURI_QUERY_RESULT = 'ThesauriQueryResult';
@@ -100,6 +101,7 @@ export const GQL_MUTATION_INTERFACE_UPDATE_NAME = 'updateInterface';
 export const GQL_MUTATION_STOP_WORDS_CREATE_NAME = 'createStopWords';
 export const GQL_MUTATION_STOP_WORDS_DELETE_NAME = 'deleteStopWords';
 export const GQL_MUTATION_STOP_WORDS_UPDATE_NAME = 'updateStopWords';
+export const GQL_MUTATION_THESAURUS_IMPORT_NAME = 'importThesaurus';
 
 //──────────────────────────────────────────────────────────────────────────────
 // Query field names

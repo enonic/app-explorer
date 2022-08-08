@@ -176,6 +176,7 @@ export function Thesauri({
 														return allowedLanguages.includes(tag);
 													}),
 													open: true,
+													thesaurusId: _id,
 													thesaurusName: _name
 												})
 											}}
@@ -293,6 +294,7 @@ export function Thesauri({
 			servicesBaseUrl={servicesBaseUrl}
 			setImportDialogState={setImportDialogState}
 			thesaurusName={importDialogState.thesaurusName}
+			thesaurusId={importDialogState.thesaurusId}
 		/>
 		<ExportThesaurusModal
 			allowedLocales={exportDialogState.allowedLocales}
