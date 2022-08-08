@@ -3,6 +3,7 @@ import type {
 	SynonymGUI_LanguagesSynonymObject,
 	SynonymUse
 } from '/lib/explorer/types/Synonym.d';
+import type {Locales} from '../../index.d';
 
 
 //import {isSet} from '@enonic/js-utils';
@@ -10,6 +11,7 @@ import {
 	Form,
 	Table
 } from 'semantic-ui-react';
+import {LanguageDropdown} from '../../collection/LanguageDropdown';
 import {DeleteItemButton} from '../../components/DeleteItemButton';
 //import {MoveDownButton} from '../../components/MoveDownButton';
 //import {MoveUpButton} from '../../components/MoveUpButton';
@@ -18,14 +20,27 @@ import {DeleteItemButton} from '../../components/DeleteItemButton';
 export function SynonymLanguageSynonymsTable({
 	interfaceOptions,
 	languageIndex,
+	locales,
 	setState,
 	state
 } :{
+	locales :Locales
 	interfaceOptions :Array<unknown> // TODO
 	languageIndex :number
 	setState :React.Dispatch<React.SetStateAction<SynonymGUI>>
 	state :SynonymGUI
 }) {
+	const localesInLanguages = [];
+	const localeToIndex = {};
+	for (let i = 0; i < state.languages.length; i++) {
+		const {locale} = state.languages[i];
+		localesInLanguages.push(locale);
+		localeToIndex[locale] = i;
+	}
+	//console.debug('localesInLanguages', localesInLanguages);
+	//console.debug('localeToIndex', localeToIndex);
+	const filteredLocaleOptions = locales.filter(({tag}) => localesInLanguages.includes(tag))
+
 	return <Table celled compact striped>
 		<Table.Header>
 			<Table.Row>
@@ -34,6 +49,7 @@ export function SynonymLanguageSynonymsTable({
 				<Table.HeaderCell>Use</Table.HeaderCell>
 				<Table.HeaderCell>Comment</Table.HeaderCell>
 				<Table.HeaderCell>Disabled in interfaces</Table.HeaderCell>
+				<Table.HeaderCell>Language</Table.HeaderCell>
 				<Table.HeaderCell>Actions</Table.HeaderCell>
 			</Table.Row>
 		</Table.Header>
@@ -117,6 +133,23 @@ export function SynonymLanguageSynonymsTable({
 						search
 						selection
 						value={state.languages[languageIndex].synonyms[j].disabledInInterfaces}
+					/>
+				</Table.Cell>
+				<Table.Cell>
+					<LanguageDropdown
+						clearable={false}
+						includeANoneOption={false}
+						locales={filteredLocaleOptions}
+						language={state.languages[languageIndex].locale}
+						setLanguage={(value) => setState(prev => {
+							//console.debug('setLanguage', value);
+							const deref :SynonymGUI = JSON.parse(JSON.stringify(prev));
+							deref.languages[localeToIndex[value as string]].synonyms.push(
+								deref.languages[languageIndex].synonyms[j]
+							);
+							deref.languages[languageIndex].synonyms.splice(j,1);
+							return deref;
+						})}
 					/>
 				</Table.Cell>
 				<Table.Cell collapsing>
