@@ -14,6 +14,7 @@ export type FetchSynonymsQueryData = {
 		count :number
 		end :number
 		hits: Array<QueriedSynonym>
+		localeToStemmingLanguage :Record<string,string>
 		page :number
 		start :number
 		total :number

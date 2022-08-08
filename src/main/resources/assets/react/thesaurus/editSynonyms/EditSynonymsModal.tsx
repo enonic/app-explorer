@@ -1,4 +1,4 @@
-import type {Locales} from '../index.d';
+import type {Locales} from '../../index.d';
 
 
 import * as React from 'react';
