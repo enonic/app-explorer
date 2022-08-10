@@ -3,6 +3,7 @@ import type {AnyObject} from '/lib/explorer/types/index.d';
 
 //import {toStr} from '@enonic/js-utils';
 import {list as getApplications} from '/lib/explorer/application';
+import {runAsSu} from '/lib/explorer/runAsSu';
 //@ts-ignore
 import {listener} from '/lib/xp/event';
 import {createFromDocumentTypesJson} from './createFromDocumentTypesJson';
@@ -113,10 +114,12 @@ export function applicationListener() {
 				&& eventType === EVENT_TYPE_APPLICATION_EVENT_TYPE_STARTED
 			) {
 				//log.info(`Application:${applicationKey} potentially with collector(s) started!`);
-				createFromDocumentTypesJson({
-					applicationKey
-				});
-			}
-		}
-	});
-}
+				runAsSu(() => { // Fix for BUG #590 documentTypes.json from external collector app fails to install
+					createFromDocumentTypesJson({
+						applicationKey
+					});
+				}); // runAsSu
+			} // if
+		} // callback
+	}); // listener
+} // applicationListener
