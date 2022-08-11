@@ -87,7 +87,7 @@ export function NewOrEditCollectionModal({
 		closeOnDimmerClick={false}
 		onClose={doClose}
 		open={state.open}
-		size='large'
+		size='fullscreen'
 		trigger={_name ? <Popup
 			content={`Edit collection ${_name}`}
 			inverted
