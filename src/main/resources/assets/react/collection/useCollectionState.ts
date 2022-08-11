@@ -92,6 +92,7 @@ export function useCollectionState({
 	const [initialCollectorConfig] = React.useState(getCollectorConfigFromInitiaValues(initialValues));
 	const [collectorConfig, setCollectorConfig] = React.useState(getCollectorConfigFromInitiaValues(initialValues));
 	const [collectorConfigErrorCount, setCollectorConfigErrorCount] = React.useState(0);
+	//console.debug('collectorConfig', collectorConfig);
 
 	//──────────────────────────────────────────────────────────────────────────
 	// Debug
