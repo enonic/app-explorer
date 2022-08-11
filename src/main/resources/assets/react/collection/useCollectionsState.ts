@@ -1,5 +1,6 @@
 import type {StrictTableHeaderCellProps} from 'semantic-ui-react';
 import type {
+	Collector,
 	ContentTypeOptions,
 	SiteOptions
 } from '/lib/explorer/types/Collector.d';
@@ -45,9 +46,10 @@ const COLLECTORS_GQL = `queryCollectors {
 	count
 	hits {
 		appName
-		collectTaskName
+		componentPath
 		configAssetPath
 		displayName
+		taskName
 	}
 }`;
 
@@ -168,7 +170,11 @@ export function useCollectionsState({
 		hits: [],
 		total: 0
 	});
-	const [queryCollectorsGraph, setQueryCollectorsGraph] = React.useState({
+	const [queryCollectorsGraph, setQueryCollectorsGraph] = React.useState<{
+		count :number
+		hits :Array<Collector>
+		total :number
+	}>({
 		count: 0,
 		hits: [],
 		total: 0
@@ -207,15 +213,15 @@ export function useCollectionsState({
 	const collectorOptions :DropdownItemsWithKeys<string> = queryCollectorsGraph.hits
 		? queryCollectorsGraph.hits.map(({
 			appName,
-			collectTaskName,
+			taskName,
 			//_name: key,
 			displayName: text
 		}) => {
-			collectorsObj[`${appName}:${collectTaskName}`] = true;
+			collectorsObj[`${appName}:${taskName}`] = true;
 			return {
-				key: `${appName}:${collectTaskName}`,
+				key: `${appName}:${taskName}`,
 				text,
-				value: `${appName}:${collectTaskName}`
+				value: `${appName}:${taskName}`
 			};
 		})
 		: [];

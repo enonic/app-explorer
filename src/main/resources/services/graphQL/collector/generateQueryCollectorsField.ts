@@ -27,7 +27,7 @@ export function generateQueryCollectorsField({
 			//_path: { type: (GraphQLString) },
 
 			appName: { type: nonNull(GraphQLString) },
-			collectTaskName: { type: nonNull(GraphQLString) },
+			taskName: { type: nonNull(GraphQLString) },
 			componentPath: { type: nonNull(GraphQLString) },
 			configAssetPath: { type: nonNull(GraphQLString) },
 			displayName: { type: nonNull(GraphQLString) }//,
@@ -67,7 +67,7 @@ export function generateQueryCollectorsField({
 			#_nodeType
 			#_path
 			appName
-			collectTaskName
+			taskName
 			configAssetPath
 			displayName
 			#type

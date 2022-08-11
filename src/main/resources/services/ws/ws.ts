@@ -49,7 +49,7 @@ const COLLECTORS_GQL = `queryCollectors {
 		_path
 		_name
 		appName
-		collectTaskName
+		taskName
 		configAssetPath
 		displayName
 		type
@@ -373,8 +373,8 @@ listener({
 				}
 			}
 		} = colletorsState;
-		hits.forEach(({appName, collectTaskName}) => {
-			if (name === `${appName}:${collectTaskName}`) {
+		hits.forEach(({appName, taskName}) => {
+			if (name === `${appName}:${taskName}`) {
 				// Update the status page and collection buttons on the collections page
 				sendToGroup(WEBSOCKET_GROUP, JSON.stringify({
 					type: 'tasks',

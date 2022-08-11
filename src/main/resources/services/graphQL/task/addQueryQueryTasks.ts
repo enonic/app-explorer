@@ -79,9 +79,9 @@ export function addQueryQueryTasks({
 				const registeredCollectors = {};
 				collectorsRes.hits.forEach(({
 					appName,
-					collectTaskName
+					taskName
 				}) => {
-					registeredCollectors[`${appName}:${collectTaskName}`] = true;
+					registeredCollectors[`${appName}:${taskName}`] = true;
 				});
 				//log.info(`registeredCollectors:${toStr(registeredCollectors)}`);
 				taskList = taskList.filter(({name}) => registeredCollectors[name]);

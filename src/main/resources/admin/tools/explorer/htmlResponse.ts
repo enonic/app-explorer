@@ -126,11 +126,11 @@ export function htmlResponse({
 	}).hits.forEach(({
 		//_name: collectorId,
 		appName,
-		collectTaskName,
+		taskName,
 		componentPath,
 		configAssetPath
 	}) => {
-		const collectorId = `${appName}:${collectTaskName}`;
+		const collectorId = `${appName}:${taskName}`;
 		collectorsAppToUri[collectorId] = assetUrl({
 			application: appName,
 			path: configAssetPath

@@ -68,6 +68,7 @@ export function post({
 		},
 		language
 	} = collectionNode;
+	DEBUG && log.debug(`currentCollectorId:${toStr(currentCollectorId)}`);
 	//log.debug(`currentCollectorId:${currentCollectorId} incomingConfigJson:${toStr(incomingConfigJson)}`);
 
 	const config = incomingConfigJson
@@ -80,7 +81,7 @@ export function post({
 	}).hits.map(({
 		appName,
 		displayName,
-		collectTaskName: taskName,
+		taskName,
 		configAssetPath
 	}) => {
 		return {
@@ -94,14 +95,14 @@ export function post({
 			})
 		};
 	}).filter(({collectorId}) => collectorId === currentCollectorId)[0];
-	//log.debug(`collector:${toStr({collector})}`);
+	DEBUG && log.debug('collector:%s', toStr(collector));
 
 	if (resume === 'true') { // Surgeon specific
 		config.resume = true;
 	}
 
 	const configJson = JSON.stringify(config);
-	DEBUG && log.debug(`configJson:${toStr({configJson})}`);
+	DEBUG && log.debug(`configJson:${toStr(configJson)}`);
 
 	const submitTaskParams = {
 		descriptor: collector.collectorId, // <appname>:<taskname>
@@ -113,10 +114,10 @@ export function post({
 			language
 		}
 	};
-	DEBUG && log.debug(`submitTaskParams:${toStr({submitTaskParams})}`);
+	DEBUG && log.debug('submitTaskParams:%s', toStr(submitTaskParams));
 
 	const taskId = submitTask(submitTaskParams);
-	DEBUG && log.debug(`taskId:${toStr({taskId})}`);
+	DEBUG && log.debug('taskId:%s', toStr(taskId));
 
 	return {
 		body: {
