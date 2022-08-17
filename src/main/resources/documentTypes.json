@@ -30,7 +30,7 @@
 		"includeInAllText": false,
 		"max": 0,
 		"min": 1,
-		"name": "url",
+		"name": "uri",
 		"nGram": false,
 		"path": false,
 		"valueType": "string"

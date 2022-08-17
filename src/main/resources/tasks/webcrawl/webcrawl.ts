@@ -456,14 +456,14 @@ export function run({
 
 				if (boolIndex && (!robots || robots.isIndexable('', uri))) {
 					const documentToPersist :{
-						displayName :string
+						//displayName :string
 						text :string
 						title :string
 						uri :string
 						uris :Array<string>
 						_id ?:string
 					} = {
-						displayName: title, // This has no field definition by default
+						//displayName: title, // This has no field definition by default
 						text: bodyEl.text(),
 						title,
 						uri,
