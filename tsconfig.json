@@ -14,7 +14,6 @@
 		"inlineSources": false,
 		"jsx": "react-jsx",
 		"lib": [
-			//"es3",
 			//"es5",
 			//"es6", // alias for es2015
 			//"es7", // alias for es2016
