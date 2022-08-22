@@ -7,10 +7,11 @@ import type {DropdownItemProps} from 'semantic-ui-react/index.d';
 import type {InterfaceNamesObj} from './index.d';
 
 
+import {isSet} from '@enonic/js-utils';
 import fastDeepEqual from 'fast-deep-equal/react';
 import * as gql from 'gql-query-builder';
 import * as React from 'react';
-import {DEFAULT_INTERFACE_FIELDS} from '../../../constants';
+import {DEFAULT_INTERFACE_FIELDS} from '../constants';
 import {mustStartWithALowercaseLetter} from '../utils/mustStartWithALowercaseLetter';
 import {notDoubleUnderscore} from '../utils/notDoubleUnderscore';
 import {onlyLowercaseAsciiLettersDigitsAndUnderscores} from '../utils/onlyLowercaseAsciiLettersDigitsAndUnderscores';
@@ -231,8 +232,17 @@ export function useNewOrEditInterfaceState({
 					} = data.getInterface;
 					setName(initialName);
 					setCollectionIds(initialCollectionIds);
-					setFields(initialFields);
-					//console.debug('initialFields', initialFields);
+					if (isSet(initialFields)) {
+						if (!Array.isArray(initialFields)) {
+							setFields([initialFields]);
+						} else if (initialFields.length) { // non-empty array
+							setFields(initialFields);
+						} else { // initialFields is an empty array
+							setFields(DEFAULT_INTERFACE_FIELDS);
+						}
+					} else {
+						setFields(DEFAULT_INTERFACE_FIELDS);
+					}
 					setStopWords(initialStopWords);
 					setSynonymIds(initialSynonymIds);
 					setInitialState({
