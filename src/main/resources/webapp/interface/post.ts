@@ -1,5 +1,5 @@
 import type {EnonicXpRequest} from '/lib/explorer/types/index.d';
-import {GraphQLContext} from '/lib/explorer/interface/graphql/index.d';
+import {GraphQLContext} from '/lib/explorer/interface/graphql/output/index.d';
 import type {
 	ApiKeyNode,
 	EmptyObject
@@ -43,7 +43,7 @@ function isUnauthorized({
 	//log.debug('isUnauthorized interfaceName:%s request:%s', interfaceName, toStr(request));
 	const {
 		headers: {
-			'Authorization': authorization // 'Explorer-Api-Key XXXX'
+			'Authorization': authorization//, // 'Explorer-Api-Key XXXX
 		}
 	} = request;
 	//log.debug(`authorization:${toStr(authorization)}`);
@@ -130,6 +130,10 @@ export function overrideable(request :InterfaceRequest, fn = isUnauthorized) {
 	//log.debug('overrideable request:%s', toStr(request));
 	const {
 		body: bodyJson = '{}',
+		headers: {
+			'Explorer-Log-Query': logQueryHeader, // '1'
+			'Explorer-Log-Synonyms-Query': logSynonymsQueryHeader // '1'
+		},
 		pathParams: {
 			interfaceName// = 'default'
 		} = {}
@@ -152,7 +156,9 @@ export function overrideable(request :InterfaceRequest, fn = isUnauthorized) {
 	//log.debug('query:%s', query);
 	//log.debug(`variables:${toStr(variables)}`);
 	const context :GraphQLContext = {
-		interfaceName
+		interfaceName,
+		logQuery: logQueryHeader === '1',
+		logSynonymsQuery: logSynonymsQueryHeader === '1'
 	};
 	//log.debug(`context:${toStr(context)}`);
 
