@@ -1,4 +1,5 @@
 import type {EnonicXpRequest} from '/lib/explorer/types/index.d';
+import {GraphQLContext} from '/lib/explorer/interface/graphql/index.d';
 import type {
 	ApiKeyNode,
 	EmptyObject
@@ -150,7 +151,7 @@ export function overrideable(request :InterfaceRequest, fn = isUnauthorized) {
 	const {query, variables} = body;
 	//log.debug('query:%s', query);
 	//log.debug(`variables:${toStr(variables)}`);
-	const context = {
+	const context :GraphQLContext = {
 		interfaceName
 	};
 	//log.debug(`context:${toStr(context)}`);
