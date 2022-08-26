@@ -10,7 +10,7 @@ import {Button, Form, Modal} from 'semantic-ui-react';
 import {LanguageDropdown} from '../../collection/LanguageDropdown';
 import {ResetButton} from '../../components/ResetButton';
 import {SubmitButton} from '../../components/SubmitButton';
-import {UploadLicense} from '../../UploadLicense';
+import {UploadLicense} from '../../components/UploadLicense';
 import {NEW_OR_EDIT_STATE_DEFAULT} from '../useThesauriState';
 import {MigrationSegment} from './MigrationSegment';
 import {useNewOrEditThesaurusState} from './useNewOrEditThesaurusState';

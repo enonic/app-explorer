@@ -19,3 +19,8 @@ export type Locales = Array<Locale>
 
 export type SetLicensedToFunction = (to :string) => void;
 export type SetLicenseValidFunction = (valid :boolean) => void;
+
+export type LicenseBsd2Clause = 'BSD 2-Clause'
+export type LicenseBsd3Clause = 'BSD 3-Clause'
+export type LicenseMit = 'MIT'
+export type License = LicenseBsd2Clause | LicenseBsd3Clause | LicenseMit

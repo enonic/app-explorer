@@ -1,14 +1,10 @@
-import type {SemanticICONS} from 'semantic-ui-react/src/generic.d';
-import type {InterfaceField} from '/lib/explorer/types/Interface.d';
-import type {CollectorComponents} from './index.d';
+import type {
+	CollectorComponents,
+	License
+} from './index.d';
 
 
-import * as gql from 'gql-query-builder';
-import * as React from 'react';
-import {
-	Header, Icon, List, Menu, Modal, Sidebar
-} from 'semantic-ui-react';
-
+import {Header, Grid, Icon, List, Menu, Sidebar} from 'semantic-ui-react';
 import {ApiKeys} from './api/ApiKeys';
 import {Collections} from './collection/Collections';
 //import {Fields} from './fields/Fields';
@@ -21,340 +17,53 @@ import {Search} from './search/Search';
 import {Status} from './Status';
 import {StopWords} from './stopWords/StopWords';
 import {Thesauri} from './thesaurus/Thesauri';
-import {UploadLicense} from './UploadLicense';
-
-/*const SIDEBAR_WIDTH_NAME_TO_PX = {
-	'very thin': 60,
-	'thin': 150,
-	undefined: 260,
-	'wide': 350,
-	'very wide': 475
-};*/
-//const SIDEBAR_WIDTH = 'very thin';
-const SIDEBAR_WIDTH_PX = 260; // 157
-const PUSHER_WIDTH = `calc(100% - ${SIDEBAR_WIDTH_PX}px)`;
-
-const GQL_BODY_QUERY_INTERFACES_DEFAULT = JSON.stringify(gql.query({
-	operation: 'queryInterfaces',
-	fields: [{
-		hits: [{
-			fields: [
-				'name'
-			]
-		}]
-	}],
-	variables: {
-		query: {
-			required: false,
-			value: "_name = 'default'"
-		}
-	}
-}));
-//console.debug('GQL_BODY_QUERY_INTERFACES_DEFAULT', GQL_BODY_QUERY_INTERFACES_DEFAULT);
-
-/*const PUSHER_STYLE_SIDEBAR_HIDE = {
-	padding: '54px 14px 14px',
-	transform: 'none',
-	'-webkit-transform': 'none',
-	width: 'auto'
-};
-
-const PUSHER_STYLE_SIDEBAR_SHOW = {
-	padding: '54px 14px 14px',
-	transform: `translate3d(${SIDEBAR_WIDTH_PX}px, 0, 0)`,
-	'-webkit-transform': `translate3d(${SIDEBAR_WIDTH_PX}px, 0, 0)`,
-	width: PUSHER_WIDTH
-};*/
-
-const NODE_MODULES = [{
-	header: 'Classnames', // app-explorer
-	href: 'https://github.com/JedWatson/classnames/blob/master/LICENSE'
-},{
-	header: 'cron-parser', // app-explorer
-	href: 'https://github.com/harrisiirak/cron-parser/blob/master/LICENSE'
-},{
-	header: 'd3-dsv', // lib-explorer
-	description: 'BSD 3-Clause',
-	href: 'https://github.com/d3/d3-dsv/blob/master/LICENSE'
-},{
-	header: 'deep-object-diff', // lib/app-explorer
-	href: 'https://github.com/mattphillips/deep-object-diff/blob/main/LICENSE'
-},{
-	header:'fast-deep-equal', // lib/app-explorer
-	href: 'https://github.com/epoberezkin/fast-deep-equal/blob/master/LICENSE'
-},{
-	header: 'fnv-plus', // lib-explorer
-	href: 'https://github.com/tjwebb/fnv-plus#license'
-},{
-	header: 'fomantic-ui-css', // app-explorer
-	href: 'https://github.com/fomantic/Fomantic-UI-CSS/blob/master/package.json'
-},{
-	header: 'GraphQL Query Builder', // app-explorer
-	href: 'https://github.com/atulmy/gql-query-builder/blob/master/LICENSE'
-},{
-	header: 'human-object-diff', // lib-explorer
-	href: 'https://github.com/Spence-S/human-object-diff/blob/master/LICENSE'
-},{
-	header: 'jsdiff', // diff lib/app-explorer
-	href: 'https://github.com/kpdecker/jsdiff/blob/master/LICENSE',
-	description: 'BSD-3-Clause'
-},{
-	header: 'jQuery', // lib-explorer
-	href: 'https://github.com/jquery/jquery/blob/master/LICENSE.txt'
-},{
-	header: 'jsUri', // lib/app-explorer
-	href: 'https://github.com/derek-watson/jsUri/blob/master/LICENSE'
-},{
-	header: 'Moment.js',
-	href: 'https://github.com/moment/moment/blob/develop/LICENSE'
-},{
-	header: 'pretty-ms',
-	href: 'https://github.com/sindresorhus/pretty-ms/blob/master/license'
-},{
-	header: 'React and React-DOM',
-	href: 'https://github.com/facebook/react/blob/master/LICENSE'
-},{
-	header: 'React-gantt-antd', // app-explorer
-	href: 'https://github.com/JSainsburyPLC/react-timelines/blob/master/LICENSE'
-},{
-	header: 'RJV react-json-view',
-	href: 'https://github.com/mac-s-g/react-json-view/blob/master/LICENSE'
-},/*{
-	header: 'react-scrollspy',
-	href: 'https://github.com/makotot/react-scrollspy/blob/master/LICENSE'
-},*/{
-	header: 'Semantic UI',
-	href: 'https://github.com/Semantic-Org/Semantic-UI/blob/master/LICENSE.md'
-},{
-	header: 'Semantic UI React',
-	href: 'https://github.com/jhudson8/react-semantic-ui/blob/master/LICENSE'
-},{
-	header: 'Serialize JavaScript', // app-explorer
-	href: 'https://github.com/yahoo/serialize-javascript/blob/main/LICENSE',
-	description: 'BSD-3-Clause'
-},{
-	header: 'set-in', // app-explorer
-	href: 'https://github.com/ahdinosaur/set-in/blob/master/package.json',
-	description: 'Apache-2.0'
-},{
-	header: 'traverse',
-	description: 'MIT/X11',
-	href: 'https://github.com/substack/js-traverse/blob/master/LICENSE'
-},{
-	header: 'URI.js', // lib-explorer
-	href: 'https://github.com/garycourt/uri-js/blob/master/LICENSE',
-	description: 'BSD-2-Clause'
-},{
-	header: 'uuid', // lib-explorer
-	href: 'https://github.com/uuidjs/uuid/blob/main/LICENSE.md'
-}];
+import {UploadLicenseModal} from './components/UploadLicenseModal';
+import {useExplorerState} from './useExplorerState';
+import {
+	ICON_STYLE,
+	LICENSE_BSD_2_CLAUSE,
+	LICENSE_BSD_3_CLAUSE,
+	LICENSE_MIT,
+	LICENSE_TEXT_BSD_2_CLAUSE,
+	LICENSE_TEXT_BSD_3_CLAUSE,
+	LICENSE_TEXT_MIT,
+	NODE_MODULES,
+	PUSHER_WIDTH
+} from './constants';
 
 
-const UploadLicenseModal = (props) => {
-	//console.debug('props', props);
-	const {
-		licenseValid,
-		licensedTo,
-		servicesBaseUrl,
-		setLicensedTo,
-		setLicenseValid
-	} = props;
-	const [open, setOpen] = React.useState(false);
-	return <Modal
-		closeIcon
-		closeOnDimmerClick={false}
-		onClose={() => {setOpen(false);}}
-		open={open}
-		size='large'
-		trigger={<Menu.Item
-			style={{pointerEvents: licenseValid ? 'none' : null}}
-			onClick={() => {!licenseValid && setOpen(true);}}>{licensedTo}
-		</Menu.Item>}
-	>
-		<UploadLicense
-			servicesBaseUrl={servicesBaseUrl}
-			setLicensedTo={setLicensedTo}
-			setLicenseValid={setLicenseValid}
-			whenValid={() => {setOpen(false);}}
-		/>
-	</Modal>;
-}; // UploadLicenseModal
-
-
-export function Explorer(props :{
+export function Explorer({
+	collectorComponents,
+	licensedTo: initialLicensedTo,
+	licenseValid: initialLicenseValid,
+	servicesBaseUrl//,
+	//wsBaseUrl
+} :{
 	collectorComponents :CollectorComponents
 	licensedTo :string
 	licenseValid :boolean
 	servicesBaseUrl :string
 }) {
-	//console.debug('Explorer props', props);
 	const {
-		collectorComponents,
-		licensedTo: initialLicensedTo,
-		licenseValid: initialLicenseValid,
-		servicesBaseUrl//,
-		//wsBaseUrl
-	} = props;
-	//console.debug('Explorer initialLicenseValid', initialLicenseValid);
-
-	//const [wsColor, setWsColor] = React.useState('#888888');
-	//const [wsStatus, setWsStatus] = React.useState('');
-	const [licenseValid, setLicenseValid] = React.useState(initialLicenseValid);
-	const [licensedTo, setLicensedTo] = React.useState(initialLicensedTo);
-	const [menuIconName, setMenuIconName] = React.useState<SemanticICONS>('close');
-	const [defaultInterfaceFields, setDefaultInterfaceFields] = React.useState<Array<InterfaceField>>([]);
-	const [page, setPage] = React.useState('home');
-	//const [pusherStyle, setPusherStyle] = React.useState(PUSHER_STYLE_SIDEBAR_SHOW);
-	const [sideBarVisible, setSideBarVisible] = React.useState(true);
-	const [pusherWidth, setPusherWidth] = React.useState(PUSHER_WIDTH);
-
-	//const [websocket, setWebsocket] = React.useState(null);
-	//const [queryCollectorsGraph, setQueryCollectorsGraph] = React.useState({});
-	//const [fields, setFields] = React.useState({});
-	//const [tasks, setTasks] = React.useState([]);
-	//console.debug('Explorer tasks', tasks);
-
-	const memoizedQueryInterfacesDefault = React.useCallback(() => {
-		fetch(`${servicesBaseUrl}/graphQL`, {
-			method: 'POST',
-			headers: {
-				'Content-Type':	'application/json'
-			},
-			body: GQL_BODY_QUERY_INTERFACES_DEFAULT
-		})
-			.then(response => response.json())
-			.then(json => {
-				//console.debug(json);
-				setDefaultInterfaceFields(json.data.queryInterfaces.hits[0].fields);
-			});
-	}, [servicesBaseUrl]); // memoizedQueryInterfacesDefault
-
-	React.useEffect(() => {
-		memoizedQueryInterfacesDefault();
-	}, [memoizedQueryInterfacesDefault]);
-	//console.debug('defaultInterfaceFields', defaultInterfaceFields);
-
-	React.useEffect(() => {
-		const hashPage = window.location.hash.substring(1);
-		if (hashPage) { setPage(hashPage); }
-		/*const wsUrl = wsBaseUrl + '/ws';
-		//console.debug('wsUrl', wsUrl);
-
-		let intervalId = null;
-		const reconnectingWs = () => {
-			setWsColor('#000000');
-			setWsStatus('WebSocket Connecting...');
-			const ws = new WebSocket(wsUrl); //open
-			setWebsocket(ws);
-			ws.onopen = (event) => {
-				setWsColor('#00FF00');
-				setWsStatus('WebSocket Connection Open');
-				//console.debug('event', event);
-				ws.send('subscribe');
-				clearInterval(intervalId); // Make sure there are never more than one interval going.
-				intervalId = setInterval(() => { // Keep-alive
-					//console.debug('Sending ping', Date.now());
-					//console.debug('ws.readyState', ws.readyState);
-					//0	CONNECTING	Socket has been created. The connection is not yet open.
-					//1	OPEN	The connection is open and ready to communicate.
-					//2	CLOSING	The connection is in the process of closing.
-					//3	CLOSED	The connection is closed or couldn't be opened.
-					if (ws.readyState === 1) {
-						setWsColor('#FFFF00');
-						ws.send('ping');
-						setWsStatus('WebSocket Client Sent Ping...');
-					} else if (ws.readyState === 2 || ws.readyState === 3) {
-						setWsColor('#FFA500');
-						setWsStatus('WebSocket Client Reconnecting...');
-						reconnectingWs();
-						// Fails to connect when server is still down.
-						// Fails to connect to restarted server because credentials are no longer valid.
-						// But should work when server has not been down, aka other reasons why socket has been closed. For example client has been sleeping.
-					}
-				}, 30000); // Every 30 seconds
-				/*setTimeout(() => { // Keep-alive
-					console.debug('Sending initial ping');
-					ws.send('ping'); // Date.now()
-				}, 30000); // In 30 seconds
-			}; // onopen
-
-			ws.onmessage = (event) => {
-				//console.debug('event', event);
-				setWsColor('#00FF00');
-				setWsStatus('WebSocket Client Received Message');
-				const {data, type} = JSON.parse(event.data);
-				//console.debug('data', data);
-				//console.debug('type', type);
-				if (type === 'pong') {
-					// Do nothing
-				} else if (type === 'initialize') {
-					//console.debug('data', data);
-					const {
-						data:{
-							//queryCollections,
-							//queryCollectors//,
-							//queryFields//,
-							//queryTasks
-						}// = {},
-						//errors // [{errorType, message, locations, validationErrorType}]
-					} = data;
-					//console.debug('queryCollections', queryCollections);
-					//console.debug('queryCollectors', queryCollectors);
-					//console.debug('queryFields', queryFields);
-					//console.debug('queryTasks', queryTasks);
-					//setQueryCollectorsGraph(queryCollectors);
-					//setFields(queryFields);
-					//setTasks(queryTasks);
-				} /*else if (type === 'collectors') {
-					const {data:{
-						queryCollectors
-					}} = data;
-					//console.debug('queryCollectors', queryCollectors);
-					setQueryCollectorsGraph(queryCollectors);
-				} /*else if (type === 'fields') {
-					const {data:{
-						queryFields
-					}} = data;
-					//console.debug('queryFields', queryFields);
-					setFields(queryFields);
-				} else if (type === 'license') {
-					//console.debug('type', type);
-					//console.debug('data', data);
-					setLicensedTo(data.licensedTo);
-					setLicenseValid(data.licenseValid);
-				}
-				/*setTimeout(() => { // Keep-alive
-					console.debug('Sending ping');
-					ws.send('ping'); // Date.now()
-				}, 30000); // In 30 seconds
-			}; // onmessage
-
-			ws.onerror = (event) => {
-				console.error('WebSocket error observed:', event);
-				setWsColor('#FF0000');
-				setWsStatus('WebSocket Client Error!')
-				ws.close();
-			};
-
-			ws.onclose = (event) => {
-				// As soon as I stop the Enonic Server I get this event :)
-				console.log('WebSocket is closed now.', event);
-				setWsColor('#FF0000');
-				setWsStatus('WebSocket Connection Closed!')
-			};
-		} // reconnectingWs
-		reconnectingWs();*/
-	}, []); // useEffect
-
-	React.useEffect(() => {
-		setMenuIconName(sideBarVisible ? 'close' : 'bars');
-	}, [sideBarVisible]);
-
-	const iconStyle = {
-		float: 'left',
-		margin: '0 7px 0 0'
-	};
-
+		defaultInterfaceFields,
+		licensedTo,
+		licenseValid,
+		page,
+		pusherWidth,
+		menuIconName,
+		setLicensedTo,
+		setLicenseValid,
+		setPage,
+		setPusherWidth,
+		setSideBarVisible,
+		setShowWhichLicense,
+		showWhichLicense,
+		sideBarVisible
+	} = useExplorerState({
+		initialLicensedTo,
+		initialLicenseValid,
+		servicesBaseUrl
+	});
 	return <>
 		<Menu
 			className="admin-ui-gray"
@@ -412,20 +121,20 @@ export function Explorer(props :{
 					href='#home'
 					active={page === 'home'}
 					onClick={() => setPage('home')}
-				><Icon name='search' style={iconStyle}/> Home</Menu.Item>
+				><Icon name='search' style={ICON_STYLE}/> Home</Menu.Item>
 
 				{licenseValid && <Menu.Item
 					as='a'
 					href='#api'
 					active={page === 'api'}
 					onClick={() => setPage('api')}
-				><Icon name='plug' style={iconStyle}/> API</Menu.Item>}
+				><Icon name='plug' style={ICON_STYLE}/> API</Menu.Item>}
 				<Menu.Item
 					as='a'
 					href='#collections'
 					active={page === 'collections'}
 					onClick={() => setPage('collections')}
-				><Icon name='database' style={iconStyle}/> Collections</Menu.Item>
+				><Icon name='database' style={ICON_STYLE}/> Collections</Menu.Item>
 				{[
 					'collections',
 					'status',
@@ -439,25 +148,25 @@ export function Explorer(props :{
 						href='#status'
 						active={page === 'status'}
 						onClick={() => setPage('status')}
-					><Icon name='cogs' style={iconStyle}/> Status</Menu.Item>
+					><Icon name='cogs' style={ICON_STYLE}/> Status</Menu.Item>
 					<Menu.Item
 						as='a'
 						href='#journal'
 						active={page === 'journal'}
 						onClick={() => setPage('journal')}
-					><Icon name='newspaper' style={iconStyle}/> Journal</Menu.Item>
+					><Icon name='newspaper' style={ICON_STYLE}/> Journal</Menu.Item>
 					<Menu.Item
 						as='a'
 						href='#notifications'
 						active={page === 'notifications'}
 						onClick={() => setPage('notifications')}
-					><Icon name='warning' style={iconStyle}/> Notifications</Menu.Item>
+					><Icon name='warning' style={ICON_STYLE}/> Notifications</Menu.Item>
 					<Menu.Item
 						as='a'
 						href='#schedule'
 						active={page === 'schedule'}
 						onClick={() => setPage('schedule')}
-					><Icon name='calendar' style={iconStyle}/> Schedule</Menu.Item>
+					><Icon name='calendar' style={ICON_STYLE}/> Schedule</Menu.Item>
 				</Menu.Menu>}
 
 				<Menu.Item
@@ -465,7 +174,7 @@ export function Explorer(props :{
 					href='#documentTypes'
 					active={page === 'documentTypes'}
 					onClick={() => setPage('documentTypes')}
-				><Icon name='file' style={iconStyle}/> Document types</Menu.Item>
+				><Icon name='file' style={ICON_STYLE}/> Document types</Menu.Item>
 
 				{/*[
 					'documentTypes',
@@ -477,7 +186,7 @@ export function Explorer(props :{
 						href='#fields'
 						active={page === 'fields'}
 						onClick={() => setPage('fields')}
-					><Icon name='list' style={iconStyle}/> Global fields</Menu.Item>
+					><Icon name='list' style={ICON_STYLE}/> Global fields</Menu.Item>
 				</Menu.Menu>*/}
 
 				<Menu.Item
@@ -485,25 +194,25 @@ export function Explorer(props :{
 					href='#stopWords'
 					active={page === 'stopWords'}
 					onClick={() => setPage('stopWords')}
-				><Icon name='ban' style={iconStyle}/> StopWords</Menu.Item>
+				><Icon name='ban' style={ICON_STYLE}/> StopWords</Menu.Item>
 				<Menu.Item
 					as='a'
 					href='#synonyms'
 					active={page === 'synonyms'}
 					onClick={() => setPage('synonyms')}
-				><Icon name='code branch' style={iconStyle}/> Synonyms</Menu.Item>
+				><Icon name='code branch' style={ICON_STYLE}/> Synonyms</Menu.Item>
 				<Menu.Item
 					as='a'
 					href='#interfaces'
 					active={page === 'interfaces'}
 					onClick={() => setPage('interfaces')}
-				><Icon name='plug' style={iconStyle}/> Interfaces</Menu.Item>
+				><Icon name='plug' style={ICON_STYLE}/> Interfaces</Menu.Item>
 				<Menu.Item
 					as='a'
 					href='#about'
 					active={page === 'about'}
 					onClick={() => setPage('about')}
-				><Icon name='info' style={iconStyle}/> About</Menu.Item>
+				><Icon name='info' style={ICON_STYLE}/> About</Menu.Item>
 			</Sidebar>
 
 			<Sidebar.Pusher
@@ -586,19 +295,37 @@ export function Explorer(props :{
 				/>}
 				{page === 'about' && <>
 					<Header as='h1' content='Licenses'/>
-					<List animated divided relaxed selection>
-						{NODE_MODULES.map(({
-							description = 'MIT',
-							header,
-							href
-						}, i) => <List.Item key={i}>
-							<Icon color='red' size='large' aligned='middle' name='npm'/>
-							<List.Content as='a' href={href}>
-								<List.Header content={header}/>
-								<List.Description content={description}/>
-							</List.Content>
-						</List.Item>)}
-					</List>
+					<Grid columns={3} divided>
+						<Grid.Row>
+							<Grid.Column>
+								<List animated divided relaxed selection>
+									{NODE_MODULES.map(({
+										description = LICENSE_MIT,
+										header,
+										href
+									}, i) => <List.Item key={i}
+										onMouseEnter={() => setShowWhichLicense(description as License)}
+										onMouseLeave={() => setShowWhichLicense(undefined)}
+									>
+										<Icon color='red' size='large' aligned='middle' name='npm'/>
+										<List.Content as='a' href={href}>
+											<List.Header content={header}/>
+											<List.Description content={description}/>
+										</List.Content>
+									</List.Item>)}
+								</List>
+							</Grid.Column>
+							<Grid.Column>
+								<pre>{showWhichLicense === LICENSE_MIT
+									? LICENSE_TEXT_MIT
+									: showWhichLicense === LICENSE_BSD_3_CLAUSE
+										? LICENSE_TEXT_BSD_3_CLAUSE
+										: showWhichLicense === LICENSE_BSD_2_CLAUSE
+											? LICENSE_TEXT_BSD_2_CLAUSE
+											: ''}</pre>
+							</Grid.Column>
+						</Grid.Row>
+					</Grid>
 				</>}
 			</Sidebar.Pusher>
 		</Sidebar.Pushable>

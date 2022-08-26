@@ -10,7 +10,7 @@ import * as React from 'react';
 import {Button, Icon, Modal, Popup} from 'semantic-ui-react';
 
 import {NewOrEditInterface} from './NewOrEditInterface';
-import {UploadLicense} from '../UploadLicense';
+import {UploadLicense} from '../components/UploadLicense';
 
 
 type NewOrEditInterfaceModalProps = {

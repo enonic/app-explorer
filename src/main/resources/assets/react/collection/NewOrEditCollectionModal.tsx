@@ -19,7 +19,7 @@ import type {
 import * as React from 'react';
 import {Button, Icon, Modal, Popup} from 'semantic-ui-react';
 import {Collection} from './Collection';
-import {UploadLicense} from '../UploadLicense';
+import {UploadLicense} from '../components/UploadLicense';
 
 
 export function NewOrEditCollectionModal({

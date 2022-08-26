@@ -1,0 +1,206 @@
+Licenses used by app-explorer
+(full license texts are provided after the list of libraries)
+
+	cheerio
+	MIT License
+	https://github.com/cheeriojs/cheerio/blob/main/LICENSE
+
+	Classnames
+	MIT License
+	https://github.com/JedWatson/classnames/blob/master/LICENSE
+
+	core-js
+	MIT License
+	https://github.com/zloirock/core-js/blob/master/LICENSE
+
+	cron-parser
+	MIT License
+	https://github.com/harrisiirak/cron-parser/blob/master/LICENSE
+
+	d3-dsv
+	BSD 3-Clause
+	https://github.com/d3/d3-dsv/blob/master/LICENSE
+
+	deep-object-diff
+	MIT License
+	https://github.com/mattphillips/deep-object-diff/blob/main/LICENSE
+
+	fast-deep-equal
+	MIT License
+	https://github.com/epoberezkin/fast-deep-equal/blob/master/LICENSE
+
+	fnv-plus
+	MIT License
+	https://github.com/tjwebb/fnv-plus#license
+
+	GraphQL Query Builder
+	MIT License
+	https://github.com/atulmy/gql-query-builder/blob/master/LICENSE
+
+	human-object-diff
+	MIT License
+	https://github.com/Spence-S/human-object-diff/blob/master/LICENSE
+
+	jQuery
+	MIT License
+	https://github.com/jquery/jquery/blob/master/LICENSE.txt
+
+	jQuery tablesort
+	MIT License
+	https://github.com/kylefox/jquery-tablesort/blob/master/LICENSE
+
+	jsdiff
+	BSD 3-Clause
+	https://github.com/kpdecker/jsdiff/blob/master/LICENSE
+
+	jsUri
+	MIT License
+	https://github.com/derek-watson/jsUri/blob/master/LICENSE
+
+	Moment.js
+	MIT License
+	https://github.com/moment/moment/blob/develop/LICENSE
+
+	pretty-ms
+	MIT License
+	https://github.com/sindresorhus/pretty-ms/blob/master/license
+
+	React and React-DOM
+	MIT License
+	https://github.com/facebook/react/blob/master/LICENSE
+
+	React-gantt-antd
+	MIT License
+	https://github.com/JSainsburyPLC/react-timelines/blob/master/LICENSE
+
+	React HTML Parser
+	MIT License
+	https://github.com/peternewnham/react-html-parser/blob/master/LICENSE.md
+
+	react-semantic-ui-datepickers
+	MIT License
+	https://github.com/arthurdenner/react-semantic-ui-datepickers/blob/develop/LICENSE
+
+	react-semantic-ui-range
+	MIT License
+	https://github.com/iozbeyli/react-semantic-ui-range/blob/master/LICENSE
+
+	RJV react-json-view
+	MIT License
+	https://github.com/mac-s-g/react-json-view/blob/master/LICENSE
+
+	robots-txt-guard
+	MIT License
+	https://github.com/Woorank/robots-txt-guard/blob/master/LICENSE.md
+
+	Semantic UI
+	MIT License
+	https://github.com/Semantic-Org/Semantic-UI/blob/master/LICENSE.md
+
+	Semantic UI React
+	MIT License
+	https://github.com/jhudson8/react-semantic-ui/blob/master/LICENSE
+
+	Serialize JavaScript
+	BSD-3-Clause
+	https://github.com/yahoo/serialize-javascript/blob/main/LICENSE
+
+	traverse
+	MIT License
+	https://github.com/substack/js-traverse/blob/master/LICENSE
+
+	URI.js
+	BSD-2-Clause
+	https://github.com/garycourt/uri-js/blob/master/LICENSE
+
+	uuid
+	MIT License
+	https://github.com/uuidjs/uuid/blob/main/LICENSE.md
+
+────────────────────────────────────────────────────────────────────────────────
+
+LICENSE TEXTS
+
+1. MIT License
+2. BSD 3-clause license
+3. BSD 2-clause license
+
+────────────────────────────────────────────────────────────────────────────────
+MIT License
+
+	Permission is hereby granted, free  of charge, to any person obtaining
+	a  copy  of this  software  and  associated  documentation files  (the
+	"Software"), to  deal in  the Software without  restriction, including
+	without limitation  the rights to  use, copy, modify,  merge, publish,
+	distribute,  sublicense, and/or sell  copies of  the Software,  and to
+	permit persons to whom the Software  is furnished to do so, subject to
+	the following conditions:
+
+	The  above  copyright  notice  and  this permission  notice  shall  be
+	included in all copies or substantial portions of the Software.
+
+	THE  SOFTWARE IS  PROVIDED  "AS  IS", WITHOUT  WARRANTY  OF ANY  KIND,
+	EXPRESS OR  IMPLIED, INCLUDING  BUT NOT LIMITED  TO THE  WARRANTIES OF
+	MERCHANTABILITY,    FITNESS    FOR    A   PARTICULAR    PURPOSE    AND
+	NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+	LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+	OF CONTRACT, TORT OR OTHERWISE,  ARISING FROM, OUT OF OR IN CONNECTION
+	WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+────────────────────────────────────────────────────────────────────────────────
+
+The 3-clause BSD license
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this list of
+conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright
+notice, this list of conditions and the following disclaimer in the
+documentation and/or other materials provided with the distribution.
+
+3. Neither the name of Hamcrest nor the names of its contributors may be used to endorse
+or promote products derived from this software without specific prior written
+permission.
+
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
+SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
+WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+DAMAGE.
+
+────────────────────────────────────────────────────────────────────────────────
+
+The 2-clause BSD license
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this list of
+conditions and the following disclaimer.
+
+2. Neither the name of Hamcrest nor the names of its contributors may be used to endorse
+or promote products derived from this software without specific prior written
+permission.
+
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
+SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
+WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+DAMAGE.
+
+────────────────────────────────────────────────────────────────────────────────
