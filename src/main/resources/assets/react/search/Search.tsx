@@ -1,6 +1,8 @@
+//import type {AnyObject} from '@enonic/js-utils/src/types';
 //import type {Fields} from '/lib/explorer/types/Field.d';
 import type {InterfaceField} from '/lib/explorer/types/Interface.d';
 import type {Hit} from './Hits';
+import type {Synonyms} from './index.d';
 
 
 import {
@@ -14,6 +16,7 @@ import {Form} from 'semantic-ui-react';
 //import traverse from 'traverse';
 
 import {Hits} from './Hits';
+import {SynonymsAccordion} from './SynonymsAccordion';
 
 
 type InterfaceName = string;
@@ -22,6 +25,7 @@ type CacheKey = `${InterfaceName}.${SearchString}`;
 type SearchResult = {
 	count :number
 	hits :Array<Hit>
+	synonyms :Synonyms
 	total :number
 }
 type Cache = Record<CacheKey,SearchResult>;
@@ -74,6 +78,7 @@ export function Search(props :{
 			setResult({
 				count: 0,
 				hits: [],
+				synonyms: [],
 				total: 0
 			});
 			return;
@@ -99,20 +104,11 @@ export function Search(props :{
 			string
 			|Record<string,Array<string>>
 		> = [
-			'_collectionName',
-			'_documentTypeName',
+			'_collection',
+			'_documentType',
 		];
 		if (fields.length) {
-			const fieldsHitsHighlight = [];
-			const variablesHighlightProperties = {};
-			for (let i = 0; i < fields.length; i++) {
-				const {name} = fields[i];
-				fieldsHitsHighlight.push(name);
-				variablesHighlightProperties[name] = {};
-			}
-			fieldsHits.push({
-				_highlight: fieldsHitsHighlight
-			});
+			fieldsHits.push('_highlight'); // GraphQLJson
 			variables['highlight'] = {
 				required: false,
 				type: 'InputTypeHighlight',
@@ -120,7 +116,11 @@ export function Search(props :{
 					numberOfFragments: 1,
 					postTag: '</b>',
 					preTag: '<b>',
-					properties: variablesHighlightProperties
+					fields: fields.map(({
+						name
+					}) => ({
+						field: name
+					}))
 				}
 			}
 		}
@@ -138,13 +138,26 @@ export function Search(props :{
 				{
 					hits: fieldsHits
 				},
+				{
+					synonyms: [
+						'_highlight',
+						'_score',
+						{
+							synonyms: [
+								'locale',
+								'synonym'
+							]
+						},
+						'thesaurusName'
+					]
+				},
 				'total'
 			],
 			variables
 		}, null, {
 			operationName: 'InterfaceSearch'
 		});
-		console.debug('Search() gqlQuery:', gqlQuery);
+		//console.debug('Search() gqlQuery:', gqlQuery);
 
 		fetch(uri, {
 			method: 'POST',
@@ -153,9 +166,10 @@ export function Search(props :{
 		})
 			.then(response => response.json())
 			.then(aResult => {
-				//console.debug(aResult);
+				//console.debug('fetch aResult', aResult);
 				if (aResult && aResult.data && aResult.data.search) {
 					setCache(prev => {
+						//console.debug('setCache prev', prev);
 						const deref = JSON.parse(JSON.stringify(prev));
 						setIn(deref, `${interfaceName}.${ss}`, aResult.data.search);
 						return deref;
@@ -163,8 +177,8 @@ export function Search(props :{
 					setResult(aResult.data.search);
 				}
 				setLoading(false);
-			});
-	}
+			}); // fetch
+	} // function search
 
 	React.useEffect(() => search(searchString), []);
 
@@ -207,6 +221,9 @@ export function Search(props :{
 				/>
 			</Form.Group>
 		</Form>
+		<SynonymsAccordion
+			synonyms={result.synonyms || []}
+		/>
 		<Hits
 			firstColumnWidth={firstColumnWidth}
 			hits={result.hits}
