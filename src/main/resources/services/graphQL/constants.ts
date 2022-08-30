@@ -22,6 +22,8 @@ export const GQL_INPUT_TYPE_FILTERS_BOOLEAN_NAME = 'FiltersBoolean';
 
 export const GQL_INPUT_TYPE_INTERFACE_FIELD_NAME = 'InterfaceFieldInput';
 
+export const GQL_INPUT_TYPE_QUERY_DSL_BOOLEAN_CLAUSE = 'QueryDSLBooleanClause';
+
 export const GQL_INPUT_TYPE_SYNONYM_LANGUAGE_NAME = 'SynonymLanguageInput';
 
 //──────────────────────────────────────────────────────────────────────────────

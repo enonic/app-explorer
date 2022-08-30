@@ -1,3 +1,15 @@
+import type {
+	QueryDSL
+} from '@enonic/js-utils/src/types';
+import type {
+	BooleanFilter,
+	Guillotine
+} from '@enonic/js-utils/src/types/node/query/Filters.d';
+import type {
+	AnyObject
+} from '/lib/explorer/types/index.d';
+
+
 import {
 	VALUE_TYPE_SET,
 	addQueryFilter,
@@ -13,6 +25,7 @@ import {
 	PRINCIPAL_EXPLORER_READ
 } from '/lib/explorer/constants';
 import {queryDocumentTypes} from '/lib/explorer/documentType/queryDocumentTypes';
+import {addFilterInput} from '/lib/explorer/interface/graphql/filters/guillotine/input/addFilterInput';
 import {hasValue} from '/lib/explorer/query/hasValue';
 import {connect} from '/lib/explorer/repo/connect';
 import {multiConnect} from '/lib/explorer/repo/multiConnect';
@@ -27,10 +40,16 @@ import {
 	//@ts-ignore
 } from '/lib/graphql';
 import {
+	//createAggregation,
+	createFilters
+	//@ts-ignore
+} from '/lib/guillotine/util/factory';
+import {
 	GQL_ENUM_FIELD_KEYS_FOR_AGGREGATIONS,
 	GQL_INPUT_TYPE_AGGREGATION,
 	//GQL_INPUT_TYPE_AGGREGATION_COUNT,
 	GQL_INPUT_TYPE_AGGREGATION_TERMS,
+	GQL_INPUT_TYPE_QUERY_DSL_BOOLEAN_CLAUSE,
 	GQL_QUERY_DOCUMENTS,
 	GQL_TYPE_AGGREGATION_TERMS_BUCKET_NAME,
 	GQL_TYPE_AGGREGATION_TERMS_NAME,
@@ -75,7 +94,11 @@ type QueryRes = {
 
 // Name must be non-null, non-empty and match [_A-Za-z][_0-9A-Za-z]*
 const FIELD_NAME_TO_PATH = {
-	collectionName: 'document_metadata.collection'
+	collectionName: 'document_metadata.collection',
+	// DEBUG
+	//informationType: 'information-type',
+	//language: 'language',
+	//source: 'source'
 };
 
 const FIELD_VALUE_COUNT_AGGREGATION_PREFIX = '_count_Field_';
@@ -165,6 +188,52 @@ function processAggregationsRes({
 export function addQueryDocuments({
 	glue
 }) {
+	const filterInput = addFilterInput({glue});
+
+	const queryDslBooleanClauseInput = glue.addInputType({
+		name: GQL_INPUT_TYPE_QUERY_DSL_BOOLEAN_CLAUSE,
+		fields: {
+			term: {
+				type: glue.addInputType({
+					name: 'QueryDSLTermExpression',
+					fields: {
+						boost: {
+							type: GraphQLInt
+						},
+						field: {
+							type: nonNull(GraphQLString)
+						},
+						value: {
+							type: GraphQLString // TODO
+						}
+					} // fields
+				}) // QueryDSLTermExpression
+			} // term
+		} // fields
+	})
+
+	const queryInput = glue.addInputType({
+		name: 'QueryDSL',
+		fields: {
+			boolean: {
+				type: glue.addInputType({
+					name: 'QueryDSLBoolean',
+					fields: {
+						must: {
+							type: list(queryDslBooleanClauseInput)
+						},
+						mustNot: {
+							type: list(queryDslBooleanClauseInput)
+						},
+						should: {
+							type: list(queryDslBooleanClauseInput)
+						}
+					}
+				})
+			}
+		}
+	});
+
 	glue.addEnumType({
 		name: GQL_ENUM_FIELD_KEYS_FOR_AGGREGATIONS,
 		values: Object.keys(FIELD_NAME_TO_PATH)
@@ -190,6 +259,7 @@ export function addQueryDocuments({
 						fields: {
 							field: {
 								type: nonNull(glue.getEnumType(GQL_ENUM_FIELD_KEYS_FOR_AGGREGATIONS))
+								//type: nonNull(GraphQLString) // DEBUG
 							},
 							order: {
 								type: GraphQLString
@@ -208,6 +278,8 @@ export function addQueryDocuments({
 			collections: list(GraphQLString),
 			count: GraphQLInt,
 			countFieldValues :GraphQLBoolean,
+			filters: list(filterInput),
+			query: queryInput,
 			start: GraphQLInt
 		},
 		resolve(env :{
@@ -217,6 +289,8 @@ export function addQueryDocuments({
 				countFieldValues ?:boolean
 				collectionIds ?:Array<string>
 				collections ?:Array<string>
+				filters ?:Guillotine.BooleanFilter
+				query ?:QueryDSL|string
 				start ?:number
 			}
 		}) {
@@ -229,11 +303,15 @@ export function addQueryDocuments({
 					collections = [],
 					count = 10,
 					countFieldValues = false,
+					filters: filtersArg,
+					query,
 					start = 0
 				}
 			} = env;
 			//log.debug('aggregations:%s', toStr(aggregations));
 			//log.debug('collections:%s', toStr(collections));
+			//log.debug('filters:%s', toStr(filters));
+			//log.debug('query:%s', toStr(query));
 
 			const explorerRepoReadConnection = connect({
 				principals: [PRINCIPAL_EXPLORER_READ]
@@ -357,22 +435,33 @@ export function addQueryDocuments({
 			//log.debug('multiConnectParams:%s', toStr(multiConnectParams));
 			const multiRepoReadConnection = multiConnect(multiConnectParams);
 
+			const staticFilters = addQueryFilter({ // Whitelist
+				clause: 'must',
+				filter: {
+					exists: {
+						field: 'document_metadata.collection'
+					}
+				},
+				filters: addQueryFilter({ // Blacklist
+					clause: 'mustNot',
+					filter: hasValue('_nodeType', ['default'])
+				})
+			});
+
+			let filtersArray :Array<AnyObject>;
+			if (filtersArg) {
+				// This works magically because fieldType is an Enum?
+				filtersArray = createFilters(filtersArg);
+				//log.debug('filtersArray:%s', toStr(filtersArray));
+				filtersArray.push(staticFilters as unknown as AnyObject);
+				//log.debug('filtersArray:%s', toStr(filtersArray));
+			}
+
 			const multiRepoQueryParams = {
 				aggregations,
 				count,
-				filters: addQueryFilter({ // Whitelist
-					clause: 'must',
-					filter: {
-						exists: {
-							field: 'document_metadata.collection'
-						}
-					},
-					filters: addQueryFilter({ // Blacklist
-						clause: 'mustNot',
-						filter: hasValue('_nodeType', ['default'])
-					})
-				}),
-				query: '',
+				filters: (filtersArray ? filtersArray : staticFilters) as BooleanFilter,
+				query: query ? query : '',
 				start
 			};
 			//log.debug('multiRepoQueryParams:%s', toStr(multiRepoQueryParams));
