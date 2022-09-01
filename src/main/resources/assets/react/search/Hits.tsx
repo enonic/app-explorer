@@ -5,7 +5,7 @@ import type {SemanticWIDTHS} from 'semantic-ui-react';
 // Avoids the use of dangerouslySetInnerHTML and converts standard HTML elements,
 // attributes and inline styles into their React equivalents.
 //import ReactHtmlParser from 'react-html-parser';
-import ReactJson from 'react-json-view'
+import {TypedReactJson} from './TypedReactJson';
 
 import {
 	//Header,
@@ -78,7 +78,7 @@ export const Hits = ({
 							</Table.Row>
 							<Table.Row>
 								<Table.Cell textAlign='right'>Hightlight</Table.Cell>
-								<Table.Cell><ReactJson
+								<Table.Cell><TypedReactJson
 									enableClipboard={true}
 									displayArrayKey={false}
 									displayDataTypes={false}
@@ -92,7 +92,7 @@ export const Hits = ({
 							</Table.Row>
 							<Table.Row>
 								<Table.Cell textAlign='right'>JSON</Table.Cell>
-								<Table.Cell><ReactJson
+								<Table.Cell><TypedReactJson
 									enableClipboard={true}
 									displayArrayKey={false}
 									displayDataTypes={false}

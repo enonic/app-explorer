@@ -132,7 +132,8 @@ export function overrideable(request :InterfaceRequest, fn = isUnauthorized) {
 		body: bodyJson = '{}',
 		headers: {
 			'Explorer-Log-Query': logQueryHeader, // '1'
-			'Explorer-Log-Synonyms-Query': logSynonymsQueryHeader // '1'
+			'Explorer-Log-Synonyms-Query': logSynonymsQueryHeader, // '1'
+			'Explorer-Log-Synonyms-Query-Result': logSynonymsQueryResultHeader // '1'
 		},
 		pathParams: {
 			interfaceName// = 'default'
@@ -158,7 +159,9 @@ export function overrideable(request :InterfaceRequest, fn = isUnauthorized) {
 	const context :GraphQLContext = {
 		interfaceName,
 		logQuery: logQueryHeader === '1',
-		logSynonymsQuery: logSynonymsQueryHeader === '1'
+		logSynonymsQuery: logSynonymsQueryHeader === '1',
+		logSynonymsQueryResult: logSynonymsQueryResultHeader === '1'//,
+		//query
 	};
 	//log.debug(`context:${toStr(context)}`);
 
