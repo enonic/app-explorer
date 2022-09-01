@@ -145,7 +145,9 @@ const SS_PLUGINS = [
 		Buffer: ['buffer', 'Buffer'],
 
 		// Not always polyfilled only when identifier global found
-		global: path.resolve(__dirname, 'src/main/resources/lib/nashorn/global.ts')
+		global: path.resolve(__dirname, 'src/main/resources/lib/nashorn/global.ts'),
+
+		//process: 'process/browser' // Needed by graphql-parse-fields in lib-explorer when BOOL_LOCAL_LIB_EXPLORER = true
 	})
 ];
 

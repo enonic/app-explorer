@@ -1,7 +1,7 @@
 import type {
 	SetLicensedToFunction,
 	SetLicenseValidFunction
-} from './index.d';
+} from '../index.d';
 
 
 import * as React from 'react';
