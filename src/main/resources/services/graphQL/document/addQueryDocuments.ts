@@ -433,7 +433,7 @@ export function addQueryDocuments({
 				sources
 			};
 			//log.debug('multiConnectParams:%s', toStr(multiConnectParams));
-			const multiRepoReadConnection = multiConnect(multiConnectParams);
+			const multiRepoReadConnection = multiConnect(multiConnectParams); // NOTE: This now protects against empty sources array.
 
 			const staticFilters = addQueryFilter({ // Whitelist
 				clause: 'must',
