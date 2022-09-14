@@ -87,7 +87,7 @@ export function LanguageDropdown({
 	return <SemanticUiReactDropdown
 		clearable
 		fluid
-		placeholder='Select language'
+		placeholder='Please select language'
 		search
 		selection
 		{...rest}

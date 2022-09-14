@@ -108,10 +108,12 @@ export function Collection({
 						value={name}
 					/>
 					<Form.Field>
+						<label>Default language</label>
 						<LanguageDropdown
 							includeANoneOption={true}
 							locales={locales}
 							language={language}
+							placeholder='Please select default language'
 							setLanguage={(l) => setLanguage(l as string)}
 						/>
 					</Form.Field>
