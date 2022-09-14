@@ -41,7 +41,7 @@ export function model14({
 	}));
 	//log.debug('sources:%s', toStr(sources));
 
-	const multiReadConnection = multiConnect({
+	const multiReadConnection = multiConnect({ // NOTE: This now protects against empty sources array.
 		sources
 	});
 

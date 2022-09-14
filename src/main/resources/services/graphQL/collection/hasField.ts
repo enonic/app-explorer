@@ -79,7 +79,7 @@ export function hasField({
 		}))
 	};
 	//log.debug(`multiConnectParams:${toStr(multiConnectParams)}`);
-	const multiRepoReadConnection = multiConnect(multiConnectParams);
+	const multiRepoReadConnection = multiConnect(multiConnectParams); // NOTE: This now protects against empty sources array.
 
 	const qr = multiRepoReadConnection.query(queryParams);
 	//log.debug(`queryRes:${toStr(queryRes)}`);
