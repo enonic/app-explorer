@@ -240,6 +240,7 @@ export function MigrationSegment({
 				loading={loading}
 				locales={locales.filter(({tag}) => languages.includes(tag))}
 				multiple={false}
+				placeholder='Please select from language'
 				setLanguage={(language) => setFromLanguage(language as string)}
 			/>
 		</Form.Field>
@@ -252,6 +253,7 @@ export function MigrationSegment({
 				loading={loading}
 				locales={locales.filter(({tag}) => languages.includes(tag))}
 				multiple={false}
+				placeholder='Please select to language'
 				setLanguage={(language) => setToLanguage(language as string)}
 			/>
 		</Form.Field>

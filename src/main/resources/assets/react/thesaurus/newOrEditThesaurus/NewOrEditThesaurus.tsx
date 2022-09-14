@@ -99,6 +99,7 @@ export function NewOrEditThesaurus({
 								loading={loading}
 								locales={locales}
 								multiple={true}
+								placeholder='Please select one or more languages'
 								setLanguage={(languages) => setLanguages(languages as Array<string>)}
 							/>
 						</Form.Field>
