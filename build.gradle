@@ -36,7 +36,7 @@ dependencies {
 
 	include "com.enonic.xp:lib-admin:${xpVersion}"
 	include "com.enonic.xp:lib-auth:${xpVersion}"
-	//include "com.enonic.xp:lib-cluster:${xpVersion}"
+	include "com.enonic.xp:lib-cluster:${xpVersion}" // src/main/resources/main.ts:import {isMaster} from '/lib/xp/cluster';
 	include "com.enonic.xp:lib-common:${xpVersion}"
 	include "com.enonic.xp:lib-context:${xpVersion}" // Needed by lib-explorer
 	include "com.enonic.xp:lib-event:${xpVersion}"
