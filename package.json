@@ -82,7 +82,7 @@
     "@swc/core": "^1",
     "@types/jquery": "^3",
     "@types/jsuri": "^1",
-    "@types/mocha": "^9",
+    "@types/mocha": "^10",
     "@types/node": "^18",
     "@types/react": "^18",
     "@types/react-html-parser": "^2",
