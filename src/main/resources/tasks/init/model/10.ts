@@ -70,22 +70,30 @@ export function model10({
 					connection: writeConnection,
 					name: collectionName
 				});
-				//log.debug(`collectionNode:${toStr(collectionNode)}`);
-				const {_id: collectionId} = collectionNode;
-				//log.debug(`collectionId:${toStr(collectionId)}`);
-				job.config.collectionId = collectionId; // Not using reference since this is in another repo.
-				job.name = uniqueId({
-					repoId: REPO_ID_EXPLORER,
-					nodeId: collectionId,
-					versionKey: jobNumber
-				});
-				//log.debug(`job.name:${toStr(job.name)}`);
-				log.debug(`job:${toStr(job)}`);
-				const createdJob = createJob(job);
-				log.debug(`createdJob:${toStr(createdJob)}`);
-				if (createdJob) {
+				if (collectionNode) {
+					//log.debug(`collectionNode:${toStr(collectionNode)}`);
+					const {_id: collectionId} = collectionNode;
+					//log.debug(`collectionId:${toStr(collectionId)}`);
+					job.config.collectionId = collectionId; // Not using reference since this is in another repo.
+					job.name = uniqueId({
+						repoId: REPO_ID_EXPLORER,
+						nodeId: collectionId,
+						versionKey: jobNumber
+					});
+					//log.debug(`job.name:${toStr(job.name)}`);
+					log.debug(`job:${toStr(job)}`);
+					const createdJob = createJob(job);
+					log.debug(`createdJob:${toStr(createdJob)}`);
+					if (createdJob) {
+						const deleteRes = deleteJob({name});
+						log.debug(`deleteRes:${toStr(deleteRes)}`);
+					}
+				} else { // !collectionNode
+					// A schedule exists for a collection that "no longer" exists
+					// So delete the schedule
+					log.warning(`Deleting schedule with name:${name} as collection:${collectionName} not found!`);
 					const deleteRes = deleteJob({name});
-					log.debug(`deleteRes:${toStr(deleteRes)}`);
+					log.warning(`Deleted schedule with name:${name} as collection:${collectionName} not found! deleteRes:${toStr(deleteRes)}`);
 				}
 				progress.finishItem();
 			}
