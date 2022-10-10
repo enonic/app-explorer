@@ -147,8 +147,6 @@ export function useScheduleState({
 	// It seems the Gantt component doesn't update or render when the projects prop is changed.
 	// By changing key we can force a re-mount.
 	React.useEffect(()=> {
-		//setKey(uuidv4()); // Happens twice for some reason, so:
-		// TODO: Make a checksum of projects instead, less flashing
 		setKey(hash(projects));
 	}, [projects]);
 	return {

@@ -150,9 +150,6 @@ export const NODE_MODULES :{
 	header: 'URI.js', // lib-explorer
 	href: 'https://github.com/garycourt/uri-js/blob/master/LICENSE',
 	description: LICENSE_BSD_2_CLAUSE
-},{
-	header: 'uuid', // lib-explorer
-	href: 'https://github.com/uuidjs/uuid/blob/main/LICENSE.md'
 }];
 
 
