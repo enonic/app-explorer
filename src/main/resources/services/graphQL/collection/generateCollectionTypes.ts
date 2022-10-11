@@ -1,7 +1,7 @@
 import type {AnyObject} from '/lib/explorer/types/index.d';
 
 
-//import {toStr} from '@enonic/js-utils';
+// import {toStr} from '@enonic/js-utils';
 import {
 	DateTime as GraphQLDateTime,
 	GraphQLID,
@@ -66,7 +66,7 @@ export function generateCollectionTypes({
 					_name :string
 				}
 			}) => {
-				//log.debug(`_hasField env:${toStr(env)}`);
+				// log.debug('_hasField env:%s', toStr(env));
 				const {
 					args: {
 						count,
@@ -78,6 +78,7 @@ export function generateCollectionTypes({
 						_name: collectionName
 					}
 				} = env;
+				// log.debug('_hasField collectionName:%s', toStr(collectionName));
 				return hasField({
 					collectionName,
 					count,

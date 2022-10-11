@@ -5,7 +5,7 @@ import type {
 
 import {
 	addQueryFilter//,
-	//toStr
+	// toStr
 } from '@enonic/js-utils';
 import {
 	COLLECTION_REPO_PREFIX,
@@ -18,7 +18,7 @@ import {multiConnect} from '/lib/explorer/repo/multiConnect';
 
 export function hasField({
 	collectionName,
-	collections = collectionName ? [collectionName] : [],
+	collections = collectionName ? [collectionName] : [], // NOTE: empty sources no longer allowed!
 	count = -1,
 	field,
 	filters = {}
@@ -78,16 +78,24 @@ export function hasField({
 			principals: [PRINCIPAL_EXPLORER_READ]
 		}))
 	};
-	//log.debug(`multiConnectParams:${toStr(multiConnectParams)}`);
-	const multiRepoReadConnection = multiConnect(multiConnectParams); // NOTE: This now protects against empty sources array.
-
-	const qr = multiRepoReadConnection.query(queryParams);
-	//log.debug(`queryRes:${toStr(queryRes)}`);
+	// log.debug('multiConnectParams:%s', toStr(multiConnectParams));
 
 	const rv = {
-		count: qr.count,
-		total: qr.total,
-		hits: qr.hits.map(({
+		count: 0,
+		total: 0,
+		hits: []
+	};
+
+	// When a collection exist, but not the corrensponding repo this fails with: multiConnect: empty sources is not allowed
+	try {
+		const multiRepoReadConnection = multiConnect(multiConnectParams); // NOTE: This now protects against empty sources array.
+
+		const qr = multiRepoReadConnection.query(queryParams);
+		//log.debug(`queryRes:${toStr(queryRes)}`);
+
+		rv.count = qr.count;
+		rv.total = qr.total;
+		rv.hits = qr.hits.map(({
 			id,
 			score,
 			repoId,
@@ -104,7 +112,9 @@ export function hasField({
 			node._score = score;
 			//log.debug(`node:${toStr(node)}`);
 			return node;
-		})
-	};
+		});
+	} catch (e) {
+		// No-op, see comment before try
+	}
 	return rv;
 }
