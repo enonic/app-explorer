@@ -1,3 +1,4 @@
+import type {InterfaceField} from '/lib/explorer/types/Interface';
 import type {DropdownItemProps} from 'semantic-ui-react/index.d';
 import type {
 	//GlobalFieldObject,
@@ -17,6 +18,16 @@ type Collection = {
 	docCount ?:number
 }
 
+type Interface = {
+	_id :string
+	_name :string
+	// boostableFieldKeys: :Array<string>
+	collectionNames :Array<string>
+	// documentTypesAndFields,
+	fields :Array<InterfaceField>
+	stopWords :Array<string>
+	thesaurusNames :Array<string>
+}
 
 const GQL_COLLECTIONS = `queryCollections(
 	perPage: -1
@@ -130,7 +141,7 @@ export function useInterfacesState({
 	/*const [globalFieldsObj, setGlobalFieldsObj] = React.useState<GlobalFieldObject>({
 		'_allText': true // TODO: Hardcode
 	});*/
-	const [interfaces, setInterfaces] = React.useState([]);
+	const [interfaces, setInterfaces] = React.useState<Array<Interface>>([]);
 	const [interfaceNamesObj, setInterfaceNamesObj] = React.useState({} as InterfaceNamesObj);
 	const [interfacesTotal, setInterfacesTotal] = React.useState(0);
 	//const [fieldOptions, setFieldOptions] = React.useState<Array<DropdownItemProps>>([]);

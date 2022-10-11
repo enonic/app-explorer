@@ -44,11 +44,17 @@
 		"noUnusedParameters": true,
 		"outDir": "build/tsc",
 		"paths": {
+			// Development (should be commented out when commiting)
+			"@enonic/js-utils/*": ["../enonic-js-utils/*"],
+			"@enonic/semantic-ui-react-form": ["../semantic-ui-react-form/src"],
+			"/lib/explorer/*": ["../lib-explorer/src/main/resources/lib/explorer/*"],
+			// Production (should be commented in when commiting)
 			"@enonic/app-explorer/*": ["./src/main/resources/*"],
 			//"@enonic/js-utils": ["node_modules/@enonic/js-utils/src"],
-			"@enonic/js-utils/*": ["../enonic-js-utils/*"],
-			"/lib/explorer/*": ["../lib-explorer/src/main/resources/lib/explorer/*"],
-			"@enonic/semantic-ui-react-form": ["../semantic-ui-react-form/src"]
+			"/lib/xp/cluster": ["node_modules/@enonic-types/lib-cluster"],
+			// "/lib/xp/node": ["node_modules/@enonic-types/lib-node"],
+			// "/lib/xp/repo": ["node_modules/@enonic-types/lib-repo"],
+			"/lib/xp/task": ["node_modules/@enonic-types/lib-task"]
 		},
 		"preserveWatchOutput": false,
 		"pretty": true,
@@ -71,7 +77,16 @@
 		"strict": false,
 		"strictNullChecks": false,
 		"target": "es5",
+		"typeRoots": [
+			"node_modules/@types",
+			"node_modules/@enonic-types",
+		],
 		"types": [
+			"@enonic-types/global",
+			"@enonic-types/lib-cluster",
+			// "@enonic-types/lib-node",
+			// "@enonic-types/lib-repo",
+			"@enonic-types/lib-task",
 			"jquery",
 			"jsuri",
 			"mocha",
