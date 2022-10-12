@@ -52,8 +52,8 @@
 			"@enonic/app-explorer/*": ["./src/main/resources/*"],
 			//"@enonic/js-utils": ["node_modules/@enonic/js-utils/src"],
 			"/lib/xp/cluster": ["node_modules/@enonic-types/lib-cluster"],
-			// "/lib/xp/node": ["node_modules/@enonic-types/lib-node"],
-			// "/lib/xp/repo": ["node_modules/@enonic-types/lib-repo"],
+			"/lib/xp/node": ["node_modules/@enonic-types/lib-node"],
+			"/lib/xp/repo": ["node_modules/@enonic-types/lib-repo"],
 			"/lib/xp/task": ["node_modules/@enonic-types/lib-task"]
 		},
 		"preserveWatchOutput": false,
@@ -84,8 +84,8 @@
 		"types": [
 			"@enonic-types/global",
 			"@enonic-types/lib-cluster",
-			// "@enonic-types/lib-node",
-			// "@enonic-types/lib-repo",
+			"@enonic-types/lib-node",
+			"@enonic-types/lib-repo",
 			"@enonic-types/lib-task",
 			"jquery",
 			"jsuri",

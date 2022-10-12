@@ -136,11 +136,13 @@ export class Glue {
 	}) {
 		//log.debug(`addInputType({name:${name},fields:${toStr(fields)}})`);
 		//log.debug(`addInputType({name:${name}})`);
-		if(this._inputTypes[name]) {
-			throw new Error(`Input type ${name} already defined!`);
-		}
-		if(this._uniqueNames[name]) {
+		if(this._uniqueNames[name] && this._uniqueNames[name] !== 'inputType') {
 			throw new Error(`Name ${name} already used as ${this._uniqueNames[name]}!`);
+		}
+		if(this._inputTypes[name]) {
+			// throw new Error(`Input type ${name} already defined!`);
+			// log.debug(`Name ${name} already added as ${this._uniqueNames[name]} :)`);
+			return this._inputTypes[name];
 		}
 		this._uniqueNames[name] = 'inputType';
 		this._inputTypes[name] = this.schemaGenerator.createInputObjectType({

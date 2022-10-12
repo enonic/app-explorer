@@ -1212,6 +1212,18 @@
   resolved "https://registry.yarnpkg.com/@enonic-types/lib-cluster/-/lib-cluster-7.11.0-B3.tgz#0308f392ef3601ab9b7f091d3cf3952c1dbeab05"
   integrity sha512-eMKO20u8fct48YIPyHr3xPURpGY53hWXPVUVw5Dw7s1p4s+FBacMNO28EZm8m0Od93Ej4O3bRD6j1T5NjPsR0g==
 
+"@enonic-types/lib-node@^7.11.0-B3":
+  version "7.11.0-B3"
+  resolved "https://registry.yarnpkg.com/@enonic-types/lib-node/-/lib-node-7.11.0-B3.tgz#88f986d161d6567673d412616061f61aa42f25dc"
+  integrity sha512-RAizB3cbKy49yYcbKzTTfVdzyJbEoo0pwDpwXVHOzx2Nd0ojy6slOIv7UhQdbX2FzlK0FgIDupCV+DAR/0lPTg==
+  dependencies:
+    "@enonic-types/core" "7.11.0-B3"
+
+"@enonic-types/lib-repo@^7.11.0-B3":
+  version "7.11.0-B3"
+  resolved "https://registry.yarnpkg.com/@enonic-types/lib-repo/-/lib-repo-7.11.0-B3.tgz#be90a0748f331de6da7135acdc856d17b023cde0"
+  integrity sha512-JKMYdbMU7s5i2cJtJosE8JatWGy7Mdb0jJY+QtEyo9b3/+2JeZ5jLDL2UBcG6hN2ckNc0k+4fXeZV9Q9t1GWIA==
+
 "@enonic-types/lib-task@^7.11.0-B3":
   version "7.11.0-B3"
   resolved "https://registry.yarnpkg.com/@enonic-types/lib-task/-/lib-task-7.11.0-B3.tgz#16f85037b4d73b3126d966594781f116bc62ab5d"

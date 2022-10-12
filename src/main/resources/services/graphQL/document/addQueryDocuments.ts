@@ -36,11 +36,12 @@ import {
 	GraphQLString,
 	Json as GraphQLJson,
 	list,
-	nonNull
+	nonNull,
+	reference
 	//@ts-ignore
 } from '/lib/graphql';
 import {
-	//createAggregation,
+	// createAggregation,
 	createFilters
 	//@ts-ignore
 } from '/lib/guillotine/util/factory';
@@ -57,6 +58,7 @@ import {
 	GQL_TYPE_DOCUMENT_QUERY_RESULT_FIELD_COUNT,
 	GQL_TYPE_DOCUMENT_QUERY_RESULT_NAME
 } from '../constants';
+import {addMatchAll} from '../inputTypes/queryDSL/addMatchAll';
 
 
 type AggregationArg = {
@@ -64,6 +66,7 @@ type AggregationArg = {
 	count ?:{
 		fields :Array<string>
 	}
+	subAggregations ?:Array<AggregationArg>
 	terms ?:{
 		field :string
 		order ?:string
@@ -72,15 +75,18 @@ type AggregationArg = {
 	}
 }
 
+type AggregationBucket = {
+	key :string
+	docCount :number
+} & AggregationRes
+
+
 type AggregationRes = Record<string,{
-	buckets :Array<{
-		key :string
-		docCount :number
-	}>
+	buckets :Array<AggregationBucket>
 }>
 
 type QueryRes = {
-	aggregations :Record<string,AggregationRes>
+	aggregations :AggregationRes
 	count :number
 	total :number
 	hits :Array<{
@@ -95,6 +101,7 @@ type QueryRes = {
 // Name must be non-null, non-empty and match [_A-Za-z][_0-9A-Za-z]*
 const FIELD_NAME_TO_PATH = {
 	collectionName: 'document_metadata.collection',
+	documentTypeName: 'document_metadata.documentType',
 	// DEBUG
 	//informationType: 'information-type',
 	//language: 'language',
@@ -115,6 +122,7 @@ function aggregationsArgToQuery({
 			/*count: {
 				fields
 			} = {},*/
+			subAggregations,
 			terms: {
 				field,
 				order,
@@ -131,6 +139,11 @@ function aggregationsArgToQuery({
 					minDocCount
 				}
 			};
+			if (subAggregations) {
+				obj[name].aggregations = aggregationsArgToQuery({
+					aggregationsArg: subAggregations
+				});
+			}
 		} /*else if (fields && fields.length) {
 			obj[name] = {
 				count: {
@@ -147,19 +160,38 @@ function processAggregationsRes({
 	aggregations = {},
 	fieldNameToPath = {}
 } :{
-	aggregations ?:Record<string,AggregationRes>
+	aggregations ?:AggregationRes
 	fieldNameToPath ?:Record<string,string>
 }) {
 	const list = [];
 	const fieldValueCounts = [];
 	const names = Object.keys(aggregations);
 	for (let i = 0; i < names.length; i++) {
-	    const name = names[i];
+		const name = names[i];
+		// log.debug('processAggregationsRes: aggregations[%s]:%s', name, toStr(aggregations[name]));
 		const {buckets, value} = aggregations[name];
 		if (buckets) {
+			//const {} = buckets;
 			list.push({
 				name,
-				buckets
+				buckets: buckets.map(({
+					key,
+					docCount,
+					...subAggregations
+				}) => {
+					const {
+						aggregations: sA
+					} = processAggregationsRes({
+						aggregations: subAggregations,
+						fieldNameToPath
+					});
+					const bucket = {
+						docCount,
+						key,
+						aggregations: sA
+					};
+					return bucket;
+				})
 			});
 		} else if (isSet(value)) {
 			const camelizedFieldKey = name.replace(FIELD_VALUE_COUNT_AGGREGATION_PREFIX, '');
@@ -193,6 +225,9 @@ export function addQueryDocuments({
 	const queryDslBooleanClauseInput = glue.addInputType({
 		name: GQL_INPUT_TYPE_QUERY_DSL_BOOLEAN_CLAUSE,
 		fields: {
+			matchAll: {
+				type: addMatchAll({glue})
+			},
 			term: {
 				type: glue.addInputType({
 					name: 'QueryDSLTermExpression',
@@ -210,7 +245,7 @@ export function addQueryDocuments({
 				}) // QueryDSLTermExpression
 			} // term
 		} // fields
-	})
+	});
 
 	const queryInput = glue.addInputType({
 		name: 'QueryDSL',
@@ -230,6 +265,9 @@ export function addQueryDocuments({
 						}
 					}
 				})
+			},
+			matchAll: {
+				type: addMatchAll({glue})
 			}
 		}
 	});
@@ -254,6 +292,9 @@ export function addQueryDocuments({
 							}
 						}
 					})},*/
+					subAggregations: {
+						type: list(reference(GQL_INPUT_TYPE_AGGREGATION))
+					},
 					terms: { type: glue.addInputType({
 						name: GQL_INPUT_TYPE_AGGREGATION_TERMS,
 						fields: {
@@ -392,16 +433,28 @@ export function addQueryDocuments({
 			const fieldNameToPath = {
 				//_allText: '_allText'
 			};
+
 			const aggregations = aggregationsArgToQuery({aggregationsArg});
 			/*aggregations[`${FIELD_VALUE_COUNT_AGGREGATION_PREFIX}_allText`] = {
 				count: {
 					field: '_allText' // _alltext/_allText just returns 0
 				}
 			}*/
+
+			// NOTE: Doesn't handle field alias enumerations ?
+			// const aggregations = {};
+			// if (aggregationsArg) {
+			// 	//log.debug('makeQueryParams aggregationsArg:%s', toStr(aggregationsArg));
+			// 	forceArray(aggregationsArg).forEach(aggregation => {
+			// 		// Modifies aggregations object
+			// 		createAggregation(aggregations, aggregation);
+			// 	});
+			// }
+
 			for (let i = 0; i < documentTypes.length; i++) {
-			    const {properties} = documentTypes[i];
+				const {properties} = documentTypes[i];
 				for (let j = 0; j < properties.length; j++) {
-				    const {
+					const {
 						name,
 						valueType
 					} = properties[j];
@@ -464,11 +517,11 @@ export function addQueryDocuments({
 				query: query ? query : '',
 				start
 			};
-			//log.debug('multiRepoQueryParams:%s', toStr(multiRepoQueryParams));
+			// log.debug('multiRepoQueryParams:%s', toStr(multiRepoQueryParams));
 
 			const queryResult = multiRepoReadConnection.query(multiRepoQueryParams) as unknown as QueryRes;
-			//log.debug('queryResult:%s', toStr(queryResult));
-			//log.debug('queryResult.aggregations:%s', toStr(queryResult.aggregations));
+			// log.debug('queryResult:%s', toStr(queryResult));
+			// log.debug('queryResult.aggregations:%s', toStr(queryResult.aggregations));
 
 			const {
 				aggregations: list,
@@ -477,6 +530,7 @@ export function addQueryDocuments({
 				aggregations: queryResult.aggregations,
 				fieldNameToPath
 			});
+			// log.debug('aggregations list:%s', toStr(list));
 
 			if (countFieldValues) {
 				fieldValueCounts.push({
@@ -506,7 +560,7 @@ export function addQueryDocuments({
 
 			return {
 				aggregations: list,
-				//aggregationsAsJson: JSON.stringify(queryResult.aggregations),
+				// aggregationsAsJson: JSON.stringify(queryResult.aggregations),
 				count: queryResult.count,
 				fieldValueCounts,
 				total: queryResult.total,
@@ -569,12 +623,13 @@ export function addQueryDocuments({
 							name: GQL_TYPE_AGGREGATION_TERMS_BUCKET_NAME,
 							fields: {
 								docCount: { type: nonNull(GraphQLInt) },
-								key: { type: nonNull(GraphQLString) }
+								key: { type: nonNull(GraphQLString) },
+								aggregations: { type: list(reference(GQL_TYPE_AGGREGATION_TERMS_NAME))}
 							}
 						}))},
 					}
 				}))},
-				//aggregationsAsJson: { type: GraphQLJson },
+				// aggregationsAsJson: { type: GraphQLJson },
 				count: { type: nonNull(GraphQLInt) },
 				fieldValueCounts: { type: list(glue.addObjectType({
 					name: GQL_TYPE_DOCUMENT_QUERY_RESULT_FIELD_COUNT,
