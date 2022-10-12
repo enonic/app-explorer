@@ -38,12 +38,12 @@ export type DocumentTypesObj = Record<string, Omit<
 > & {
 	activeProperties :DocumentType['properties']
 	activePropertyNames :Array<string>
-	collectionNames :Array<string>
-	collections :Record<string,{
-		documentsTotal :number
+	collectionsNames :Array<string>
+	collections :Array<{
+		name :string
+		docCount :number
 	}>
 	documentsInTotal :number
-	interfaceNames :Array<string>
 }>
 
 export type DocumentTypeModal = {

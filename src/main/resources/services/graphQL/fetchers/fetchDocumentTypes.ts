@@ -1,34 +1,36 @@
 import type {
 	Collection,
-	DocumentType,
-	Interface
+	DocumentType
 } from '/lib/explorer/types/index.d';
 //import type {JSONResponse}  from './index.d';
 
 
-import {GQL_QUERY_DOCUMENT_TYPES_QUERY} from '../queries/documentTypesQuery';
+import * as gql from 'gql-query-builder';
 
 
 export type QueryDocumentTypesHit = DocumentType & {
 	_referencedBy :{
 		count :number
-		hits :Array<Collection & {
-			_hasField :{
-				total :number
-			}
-			_referencedBy :{
-				count :number
-				hits :Array<Interface>
-				total :number
-			}
-		}>
+		hits :Array<Collection>
 		total :number
 	}
 };
 
 export type QueryDocumentTypesHits = Array<QueryDocumentTypesHit>;
 
+type Aggregation = {
+	name :string
+	buckets :Array<{
+		docCount :number
+		key :string
+		aggregations ?:Array<Aggregation>
+	}>
+}
+
 export type FetchQueryDocumentTypesData = {
+	queryDocuments :{
+		aggregations :Array<Aggregation>
+	}
 	queryDocumentTypes :{
 		count :number
 		hits :QueryDocumentTypesHits
@@ -49,9 +51,106 @@ export function fetchDocumentTypes({
 		headers: {
 			'Content-Type':	'application/json'
 		},
-		body: JSON.stringify({
-			query: GQL_QUERY_DOCUMENT_TYPES_QUERY
-		})
+		body: JSON.stringify(gql.query([{
+			operation: 'queryDocumentTypes',
+			fields: [{
+				hits: [
+					'_id',
+					'_name',
+					'_nodeType',
+					'_path',
+					'_versionKey',
+					'addFields',
+					'managedBy',
+					{
+						properties: [
+							'active',
+							'enabled',
+							'fulltext',
+							'includeInAllText',
+							'max',
+							'min',
+							'name',
+							'nGram',
+							'path',
+							'valueType'
+						]
+					}
+				]
+			}]
+		}, {
+			operation: 'queryDocuments',
+			variables: {
+				aggregations: {
+					list: true,
+					required: true,
+					type: 'AggregationInput',
+					value: [
+						// {
+						// 	name: 'collection',
+						// 	terms: {
+						// 		field: 'collectionName',
+						// 		order: 'count DESC',
+						// 		size: 1000,
+						// 		minDocCount: 1
+						// 	}
+						// },
+						{
+							name: 'documentType',
+							subAggregations: {
+								name: 'documentTypeCollection',
+								terms: {
+									field: 'collectionName',
+									order: 'count DESC',
+									size: 1000,
+									minDocCount: 1,
+								}
+							},
+							terms: {
+								field: 'documentTypeName',
+								order: 'count DESC',
+								size: 1000,
+								minDocCount: 1
+							}
+						}
+					]
+				},
+				count: {
+					required: false,
+					type: 'Int',
+					value: 0
+				},
+				query: {
+					required: true,
+					type: 'QueryDSL',
+					value: {
+						matchAll: {}
+					}
+				}
+			},
+			fields: [{
+				aggregations: [
+					'name',
+					{
+						buckets: [
+							'docCount',
+							'key',
+							{
+								aggregations: [
+									'name',
+									{
+										buckets: [
+											'docCount',
+											'key'
+										]
+									}
+								]
+							}
+						]
+					}
+				]
+			}]
+		}]))
 	})
 		.then(response => response.json())
 		.then(json => {

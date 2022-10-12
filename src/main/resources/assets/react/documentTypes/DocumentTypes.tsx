@@ -1,12 +1,6 @@
-import type {
-	DocumentTypeModal,
-	DocumentTypesComponentParams,
-	DocumentTypesObj
-} from './index.d';
+import type {DocumentTypesComponentParams} from './index.d';
 
 
-import moment from 'moment';
-import * as React from 'react';
 import {
 	Button,
 	Grid,
@@ -17,113 +11,33 @@ import {
 	Segment,
 	Table
 } from 'semantic-ui-react';
-
-import {fetchDocumentTypes} from '../../../services/graphQL/fetchers/fetchDocumentTypes';
-//import {fetchFields} from '../../../services/graphQL/fetchers/fetchFields';
 import {ButtonEdit} from '../components/ButtonEdit';
 import {ButtonNew} from '../components/ButtonNew';
-import {useInterval} from '../utils/useInterval';
-import {buildDocumentTypesObj} from './buildDocumentTypesObj';
 import {EditManagedDocumentTypeWarningModal} from './EditManagedDocumentTypeWarningModal';
 import {NewOrEditDocumentTypeModal} from './NewOrEditDocumentTypeModal';
 import {DeleteDocumentTypeModal} from './DeleteDocumentTypeModal';
+import {
+	getDefaultModalState,
+	useDocumentTypesState
+} from './useDocumentTypesState';
 
-
-function getDefaultModalState(open = false) :DocumentTypeModal {
-	return {
-		_id: undefined,
-		_name: undefined,
-		open
-	};
-}
 
 export function DocumentTypes({
 	servicesBaseUrl
 } :DocumentTypesComponentParams) {
-	const [updatedAt, setUpdatedAt] = React.useState(moment());
-	const [durationSinceLastUpdate, setDurationSinceLastUpdate] = React.useState('');
 
-	//const [globalFields, setGlobalFields] = React.useState([]);
-	const [isLoading, setIsLoading] = React.useState(false);
-	const [documentTypes, setDocumentTypes] = React.useState<DocumentTypesObj>({});
-	const [currentDocumentTypeName, setCurrentDocumentTypeName] = React.useState('');
-	const [editManagedDocumentTypeWarningModalOpen, setEditManagedDocumentTypeWarningModalOpen] = React.useState(false);
-
-
-	// The modal state should be handled by newOrEditDocumentTypeModal
-	const [newOrEditModalState, setNewOrEditModalState] = React.useState<DocumentTypeModal>(getDefaultModalState());
-
-	const [showAllFields, setShowAllFields] = React.useState(false);
-	//console.debug('DocumentTypes documentTypes', documentTypes);
-
-	/*const globalFieldsObj = {};
-	globalFields.forEach(({
-		_id, key, fieldType,
-		min, max,
-		decideByType, enabled, fulltext, includeInAllText, nGram, path
-	}) => {
-		globalFieldsObj[_id] = {
-			key, fieldType,
-			min, max,
-			decideByType, enabled, fulltext, includeInAllText, nGram, path
-		};
-	});*/
-	//console.debug('DocumentTypes globalFieldsObj', globalFieldsObj);
-	const memoizedUpdateState = React.useCallback(() => {
-		setIsLoading(true);
-		/*fetchFields({
-			handleData: (data) => {
-				setGlobalFields((data as any).queryFields.hits);
-			},
-			url: `${servicesBaseUrl}/graphQL`,
-			variables: {
-				includeSystemFields: false
-			}
-		});*/
-		fetchDocumentTypes({
-			handleData: (data) => {
-				setDocumentTypes(buildDocumentTypesObj(data.queryDocumentTypes.hits));
-				setUpdatedAt(moment());
-				setIsLoading(false);
-			},
-			url: `${servicesBaseUrl}/graphQL`
-		});
-	}, [
+	const {
+		currentDocumentTypeName, setCurrentDocumentTypeName,
+		documentTypes,
+		durationSinceLastUpdate,
+		editManagedDocumentTypeWarningModalOpen, setEditManagedDocumentTypeWarningModalOpen,
+		isLoading,
+		memoizedUpdateState,
+		newOrEditModalState, setNewOrEditModalState,
+		showAllFields, setShowAllFields
+	} = useDocumentTypesState({
 		servicesBaseUrl
-	]);
-
-	React.useEffect(() => {
-		// By default, useEffect() runs both after the first render and after every update.
-		// React guarantees the DOM has been updated by the time it runs the effects.
-		// React defers running useEffect until after the browser has painted, so doing extra work is less of a problem.
-		//console.debug('DocumentTypes useEffect');
-		memoizedUpdateState();
-	}, [
-		memoizedUpdateState
-	]); // Only re-run the effect if whatevers inside [] changes
-	// An empty array [] means on mount and unmount. This tells React that your effect doesn’t depend on any values from props or state.
-	// If you pass an empty array ([]), the props and state inside the effect will always have their initial values
-
-	React.useEffect(() => {
-		setDurationSinceLastUpdate(
-			moment
-				.duration(updatedAt.diff(moment()))
-				.humanize()
-		);
-	}, [
-		updatedAt
-	]);
-
-	useInterval(() => {
-		if (updatedAt) {
-			setDurationSinceLastUpdate(
-				moment
-					.duration(updatedAt.diff(moment()))
-					.humanize()
-			);
-		}
-	}, 1000);
-
+	});
 
 	return <>
 		<Segment basic className='page'>
@@ -166,8 +80,6 @@ export function DocumentTypes({
 				<Table.Row>
 					<Table.HeaderCell>Edit</Table.HeaderCell>
 					<Table.HeaderCell>Name</Table.HeaderCell>
-					{showAllFields ? <Table.HeaderCell>Used in collections</Table.HeaderCell> : null}
-					{showAllFields ? <Table.HeaderCell>Used in interfaces</Table.HeaderCell> : null}
 					<Table.HeaderCell textAlign='right'>Documents</Table.HeaderCell>
 					{showAllFields ? <Table.HeaderCell>Documents per collection</Table.HeaderCell> : null}
 					<Table.HeaderCell textAlign='right'>Field count</Table.HeaderCell>
@@ -190,10 +102,9 @@ export function DocumentTypes({
 					activeProperties,
 					activePropertyNames,
 					addFields = true,
-					collectionNames,
-					collections,
-					documentsInTotal,
-					interfaceNames,
+					collectionsNames = [],
+					collections = [],
+					documentsInTotal = 0,
 					managedBy = ''
 				}, index) => {
 					return <Table.Row key={index}>
@@ -217,30 +128,16 @@ export function DocumentTypes({
 						</Table.Cell>
 						<Table.Cell collapsing disabled={isLoading}>{_name}</Table.Cell>
 
-						{showAllFields ? <Table.Cell disabled={isLoading}><ul style={{
-							listStyleType: 'none',
-							margin: 0,
-							padding: 0
-						}}>{collectionNames.map((c, i) => <li key={i}>{c}</li>)}</ul></Table.Cell> : null}
-
-						{showAllFields ? <Table.Cell disabled={isLoading}><ul style={{
-							listStyleType: 'none',
-							margin: 0,
-							padding: 0
-						}}>{interfaceNames.sort().map((c, i) => <li key={i}>{c}</li>)}</ul></Table.Cell> : null}
-
 						<Table.Cell collapsing disabled={isLoading} textAlign='right'>{documentsInTotal}</Table.Cell>
 
-						{showAllFields ? <Table.Cell collapsing disabled={isLoading}>
-							<ul style={{
-								listStyleType: 'none',
-								margin: 0,
-								padding: 0
-							}}>
-								{Object.keys(collections).map((k, i) => <li key={i}>{k}({collections[k].documentsTotal})</li>)}
-								<li>Total: {documentsInTotal}</li>
-							</ul>
-						</Table.Cell> : null}
+						{showAllFields ? <Table.Cell disabled={isLoading}><ul style={{
+							listStyleType: 'none',
+							margin: 0,
+							padding: 0
+						}}>{collections.map(({
+								name,
+								docCount
+							}, i) => <li key={i}>{name} ({docCount})</li>)}</ul></Table.Cell> : null}
 
 						<Table.Cell collapsing disabled={isLoading} textAlign='right'>{activeProperties.length}</Table.Cell>
 						<Table.Cell collapsing disabled={isLoading}><ul style={{
@@ -266,7 +163,7 @@ export function DocumentTypes({
 												//console.debug('DeleteDocumentTypeModal afterClose');
 												memoizedUpdateState();
 											}}
-											collectionNames={collectionNames}
+											collectionNames={collectionsNames}
 											disabled={isLoading}
 											servicesBaseUrl={servicesBaseUrl}
 										/>

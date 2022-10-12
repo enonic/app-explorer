@@ -368,7 +368,7 @@ export function addQueryDocuments({
 			const collectionIdToName :Record<string,string> = {};
 			const collectionNameToId :Record<string,string> = {};
 			for (let i = 0; i < collectionIds.length; i++) {
-			    const collectionId = collectionIds[i];
+				const collectionId = collectionIds[i];
 				const collectionNode = explorerRepoReadConnection.get(collectionId);
 				if (collectionId && collectionNode._name) {
 					collectionIdToName[collectionId] = collectionNode._name;
@@ -383,7 +383,7 @@ export function addQueryDocuments({
 			//log.debug('collections:%s', toStr(collections));
 			if (collectionIdsArg && collectionIdsArg.length) {
 				for (let i = 0; i < collectionIdsArg.length; i++) {
-				    const collectionId = collectionIdsArg[i];
+					const collectionId = collectionIdsArg[i];
 					if (collectionIdToName[collectionId]) {
 						sources.push({
 							repoId: `${COLLECTION_REPO_PREFIX}${collectionIdToName[collectionId]}`,
@@ -396,7 +396,7 @@ export function addQueryDocuments({
 				}
 			} else if (collections && collections.length) { // Filter against exisiting collections
 				for (let i = 0; i < collections.length; i++) {
-				    const collectionName = collections[i];
+					const collectionName = collections[i];
 					//log.debug('i:%s collectionName:%s', i, toStr(collectionName));
 					if (collectionNameToId[collectionName]) { // Only allow exisiting collections
 						sources.push({
@@ -410,7 +410,7 @@ export function addQueryDocuments({
 				}
 			} else {
 				for (let i = 0; i < collectionIds.length; i++) {
-				    const collectionId = collectionIds[i];
+					const collectionId = collectionIds[i];
 					if (collectionIdToName[collectionId]) {
 						sources.push({
 							repoId: `${COLLECTION_REPO_PREFIX}${collectionIdToName[collectionId]}`,

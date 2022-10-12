@@ -1,60 +1,84 @@
-import type {QueryDocumentTypesHits} from '../../../services/graphQL/fetchers/fetchDocumentTypes';
+import type {FetchQueryDocumentTypesData} from '../../../services/graphQL/fetchers/fetchDocumentTypes';
 import type {DocumentTypesObj} from './index.d';
 
 
-export function buildDocumentTypesObj(hits :QueryDocumentTypesHits) {
+// import {toStr} from '@enonic/js-utils';
+
+
+export function buildDocumentTypesObj(data :FetchQueryDocumentTypesData) {
+	const {
+		queryDocuments: {
+			aggregations = []
+		},
+		queryDocumentTypes: {
+			hits: documentTypeHits
+		}
+	} = data;
+
+	const documentTypeCounts = {} as Record<string,{
+		docCount :number
+		collections :Array<{
+			name :string
+			docCount :number
+		}>
+	}>;
+
+	for (let i = 0; i < aggregations.length; i++) {
+		const {
+			name,
+			buckets = []
+		} = aggregations[i];
+		if (name === 'documentType') {
+			for (let j = 0; j < buckets.length; j++) {
+				const {
+					docCount = 0,
+					key,
+					aggregations: subAggregations = []
+				} = buckets[j];
+				let collections = [];
+				for (let k = 0; k < subAggregations.length; k++) {
+					const {
+						name: subAggregationName,
+						buckets: subAggregationBuckets
+					} = subAggregations[k];
+					if (subAggregationName === 'documentTypeCollection') {
+						collections = subAggregationBuckets.map(({
+							docCount: subAggregationDocCount = 0,
+							key: subAggregationKey
+						}) => ({
+							name: subAggregationKey,
+							docCount: subAggregationDocCount
+						}))
+					}
+				} // for subAggregations[k]
+				documentTypeCounts[key] = {
+					docCount,
+					collections
+				}
+			} // for buckets[j]
+		}
+	} // for aggregations[i]
+	// console.debug('documentTypeCounts', documentTypeCounts);
+
 	const documentTypes :DocumentTypesObj = {};
-	for (let i = 0; i < hits.length; i++) {
+	for (let i = 0; i < documentTypeHits.length; i++) {
 		const {
 			_name,
-			_referencedBy: {
-				hits: referencedByCollections
-			},
 			properties,
 			...rest
-		} = hits[i];
-		const collections = {};
-		const interfaceNames :Array<string> = [];
-		let documentsInTotal = 0;
-		referencedByCollections.forEach(({
-			_name: collectionName,
-			_nodeType,
-			_hasField: {
-				total: documentsWithNameInCollectionRepoTotal
-			},
-			_referencedBy: {
-				//count
-				hits: referencedByInterfaces
-				//total
-			}
-		}) => {
-			documentsInTotal += documentsWithNameInCollectionRepoTotal;
-			if (_nodeType === 'com.enonic.app.explorer:collection' && !collections[collectionName]) {
-				collections[collectionName] = {
-					documentsTotal: documentsWithNameInCollectionRepoTotal
-				};
-				referencedByInterfaces.forEach(({
-					_name: interfaceName,
-					_nodeType: interfaceNodeType
-				}) => {
-					if (interfaceNodeType === 'com.enonic.app.explorer:interface' && !interfaceNames.includes(interfaceName)) {
-						interfaceNames.push(interfaceName);
-					}
-				});
-			}
-		}); // forEach referencedByCollections
+		} = documentTypeHits[i];
 		const activeProperties = properties.filter(({active}) => active);
 		const activePropertyNames = activeProperties.map(({name})=>name).sort();
 		documentTypes[_name] = {
 			_name,
 			activeProperties,
 			activePropertyNames,
-			collectionNames: Object.keys(collections).sort(),
-			collections,
-			documentsInTotal,
-			interfaceNames,
+			collections: documentTypeCounts[_name] ? documentTypeCounts[_name].collections : [],
+			collectionsNames: documentTypeCounts[_name] ? documentTypeCounts[_name].collections.map(({name}) => name) : [],
+			documentsInTotal: documentTypeCounts[_name] ? documentTypeCounts[_name].docCount : 0,
 			...rest
 		};
 	} // for
+
 	return documentTypes;
 }
