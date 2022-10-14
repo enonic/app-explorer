@@ -257,7 +257,7 @@ export function Collections(props :{
 									/>{'Reindexing...'}</Table.Cell>
 								: <>
 									{showCollector ? <Table.Cell collapsing>{collector && collector.name || ''}</Table.Cell> : null}
-									{showDocumentCount ? <Table.Cell collapsing>{documentCount}</Table.Cell> : null}
+									{showDocumentCount ? <Table.Cell collapsing>{documentCount === -1 ? '' : documentCount}</Table.Cell> : null}
 									{showLanguage ? <Table.Cell collapsing>{language}</Table.Cell> : null}
 									{showDocumentType ? <Table.Cell collapsing>{shemaIdToName[documentTypeId]}</Table.Cell> : null }
 									{/*showInterfaces ? <Table.Cell collapsing>{interfaces.map((iface, i :number) => <p key={i}>
