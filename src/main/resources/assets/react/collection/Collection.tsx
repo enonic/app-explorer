@@ -98,15 +98,19 @@ export function Collection({
 			>
 				<Header as='h1' dividing content='Collection' id='collection'/>
 				<Form>
-					<Form.Input
-						error={nameError}
-						fluid
-						label='Name'
-						onBlur={() => nameOnBlur(name)}
-						onChange={nameOnChange}
-						placeholder='Please input an unique name'
-						value={name}
-					/>
+					{
+						initialValues._name
+							? null
+							: <Form.Input
+								error={nameError}
+								fluid
+								label='Name'
+								onBlur={() => nameOnBlur(name)}
+								onChange={nameOnChange}
+								placeholder='Please input an unique name'
+								value={name}
+							/>
+					}
 					<Form.Field>
 						<label>Default language</label>
 						<LanguageDropdown

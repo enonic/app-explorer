@@ -251,7 +251,7 @@ export function useCollectionState({
 		//console.debug('submit _id', _id);
 		const variables :{
 			_id ?:string
-			_name :string
+			_name ?:string
 			collector ?:{
 				configJson ?:string
 				name ?:string
@@ -267,7 +267,6 @@ export function useCollectionState({
 			documentTypeId ?:string
 			language :string
 		} = {
-			_name: name,
 			cron: cronArray,
 			doCollect,
 			language
@@ -287,7 +286,9 @@ export function useCollectionState({
 			}
 		}
 		if (_id) {
-			variables._id = _id;
+			variables._id = _id; // Update
+		} else {
+			variables._name = name; // Create
 		}
 		//console.debug('submit variables', variables);
 

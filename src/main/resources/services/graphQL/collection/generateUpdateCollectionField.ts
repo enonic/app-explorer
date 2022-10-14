@@ -22,8 +22,6 @@ export function generateUpdateCollectionField({
 	return {
 		args: {
 			_id: glue.getScalarType('_id'),
-			_name: glue.getScalarType('_name'),
-			//_path: GQL_TYPE_PATH,
 			collector: glue.getInputType(GQL_INPUT_TYPE_COLLECTION_COLLECTOR_NAME),
 			cron: list(glue.getInputType(GQL_INPUT_TYPE_COLLECTION_CRON_NAME)),
 			doCollect: GraphQLBoolean,
