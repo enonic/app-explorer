@@ -1,3 +1,5 @@
+import type {RepoConnection} from '/lib/xp/node';
+
 import type {IndexConfigObject} from '/lib/explorer/types.d';
 import type {CollectionWithCron} from '/lib/explorer/types/Collection.d';
 //import type {InterfaceNode} from '/lib/explorer/interface/types.d';
@@ -70,7 +72,7 @@ import {model12} from './model/12';
 import {model13} from './model/13';
 import {model14} from './model/14';
 import {model15} from './model/15';
-//import {model16} from './model/16';
+import {model16} from './model/16';
 import {Progress} from './Progress';
 import {applicationListener} from './applicationListener';
 
@@ -173,7 +175,7 @@ export function run() {
 
 		const writeConnection = connect({
 			principals:[PRINCIPAL_EXPLORER_WRITE]
-		});
+		}) as RepoConnection;
 
 		//──────────────────────────────────────────────────────────────────────
 		// Model 0: Initial data
@@ -670,79 +672,79 @@ export function run() {
 		//deleteJob({name:})
 		progress.finishItem();*/
 		//──────────────────────────────────────────────────────────────────────
-		/*if (isModelLessThan({
-			connection: writeConnection,
-			version: 16
-		})) {*/
 		if (isModelLessThan({
 			connection: writeConnection,
-			version: 15
+			version: 16
 		})) {
 			if (isModelLessThan({
 				connection: writeConnection,
-				version: 14
+				version: 15
 			})) {
 				if (isModelLessThan({
 					connection: writeConnection,
-					version: 13
+					version: 14
 				})) {
 					if (isModelLessThan({
 						connection: writeConnection,
-						version: 12
+						version: 13
 					})) {
 						if (isModelLessThan({
 							connection: writeConnection,
-							version: 11
+							version: 12
 						})) {
 							if (isModelLessThan({
 								connection: writeConnection,
-								version: 10
+								version: 11
 							})) {
 								if (isModelLessThan({
 									connection: writeConnection,
-									version: 9
+									version: 10
 								})) {
-									// Model 8: Add stemmed query expressions to Default interface (not needed anymore, see 9)
-									model9({ // Remove filters and query from interfaces and Add thesaurusReference to synonym nodes
+									if (isModelLessThan({
+										connection: writeConnection,
+										version: 9
+									})) {
+										// Model 8: Add stemmed query expressions to Default interface (not needed anymore, see 9)
+										model9({ // Remove filters and query from interfaces and Add thesaurusReference to synonym nodes
+											progress,
+											writeConnection
+										});
+									} // <9
+									model10({ // Change job name format
 										progress,
 										writeConnection
 									});
-								} // <9
-								model10({ // Change job name format
+								} // <10
+								model11({ // interface.collections -> interface.collectionIds
 									progress,
 									writeConnection
 								});
-							} // <10
-							model11({ // interface.collections -> interface.collectionIds
+							} // <11
+							model12({ // interface.synonyms -> interface.synonymIds
 								progress,
 								writeConnection
 							});
-						} // <11
-						model12({ // interface.synonyms -> interface.synonymIds
+						} // <12
+						model13({ // Make sure ApiKeys has correct structure
 							progress,
 							writeConnection
 						});
-					} // <12
-					model13({ // Make sure ApiKeys has correct structure
+					} // <13
+					model14({
 						progress,
 						writeConnection
 					});
-				} // <13
-				model14({
+				} // <14
+				model15({
 					progress,
 					writeConnection
 				});
-			} // <14
-			model15({
+			} // <15
+			model16({
 				progress,
 				writeConnection
 			});
-		} // <15
-		/*	model16({
-				progress,
-				writeConnection
-			});
-		} // <16*/
+		} // <16
 
 		//──────────────────────────────────────────────────────────────────────
 
