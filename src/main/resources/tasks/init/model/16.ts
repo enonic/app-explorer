@@ -1,13 +1,19 @@
-import type {WriteConnection} from '/lib/explorer/types/index.d';
-import type {SynonymNodeSpecific} from './16/modifySynonymNodeEditor';
+import type {
+	Node,
+	QueryNodeParams,
+	RepoConnection
+} from '/lib/xp/node';
+// import type {WriteConnection} from '/lib/explorer/types/index.d';
 
-
-import {toStr} from '@enonic/js-utils';
+import {
+	sanitize,
+	startsWith,
+	// toStr
+} from '@enonic/js-utils';
+import {NT_COLLECTION} from '/lib/explorer/constants';
+import {rename} from '/lib/explorer/collection/rename';
 import {setModel} from '/lib/explorer/model/setModel';
 import {Progress} from '../Progress';
-import {getSynonymsForThesaurusName} from './16/getSynonymsForThesaurusName';
-import {getThesauri} from './16/getThesauri';
-import {modifySynonymNodeEditor} from './16/modifySynonymNodeEditor';
 
 
 export function model16({
@@ -15,49 +21,73 @@ export function model16({
 	writeConnection
 } :{
 	progress :Progress
-	writeConnection :WriteConnection
+	writeConnection :RepoConnection//WriteConnection
 }) {
-	progress.addItems(1).setInfo('Get all thesauri to lookup language:{from , to}...').report().logInfo();
-	const thesauri = getThesauri(writeConnection);
-	log.debug('thesauri:%s', toStr(thesauri));
-	progress.finishItem();
+	progress.addItems(1).setInfo('Finding all collections...').report().logInfo();
+	const queryParams :QueryNodeParams = {
+		count: -1,
+		query: {
+			boolean: {
+				must: {
+					term: {
+						field: '_nodeType',
+						value: NT_COLLECTION
+					}
+				}
+			}
+		}
+	}
+	// log.debug('queryParams:%s', toStr(queryParams));
 
-	progress.addItems(thesauri.length);
-	for (let i = 0; i < thesauri.length; i++) {
-	    const {
-			thesaurusName,
-			fromLanguage,
-			toLanguage
-		} = thesauri[i];
-		progress.setInfo(`Processing thesaurus:${thesaurusName} fromLanguage:${fromLanguage} toLanguage:${toLanguage}...`).report().logInfo();
-		// Query for synonym nodes that has from and to
-		const synonyms = getSynonymsForThesaurusName({
-			thesaurusName,
-			writeConnection
-		});
-		log.debug('synonyms:%s', toStr(synonyms));
+	const collectionIds = writeConnection.query(queryParams).hits.map(({id}) => id);
+	// log.debug('collectionIds:%s', toStr(collectionIds));
 
-		progress.addItems(synonyms.length);
-		for (let j = 0; j < synonyms.length; j++) {
-		    const {
-				id: synonymId
-			} = synonyms[j];
-			progress.setInfo(`Processing synonym id:${synonymId} fromLanguage:${fromLanguage} toLanguage:${toLanguage}...`).report().logInfo();
-			writeConnection.modify<SynonymNodeSpecific>({
-				key: synonymId,
-				editor: (synonymNode) => modifySynonymNodeEditor({
-					fromLanguage,
-					synonymNode,
-					toLanguage
-				})
-			});
-			progress.finishItem();
-		} // for synonyms
+	progress.addItems(collectionIds.length).finishItem();
+
+	for (let i = 0; i < collectionIds.length; i++) {
+		const collectionId = collectionIds[i];
+		progress.setInfo(`Processing collection:${collectionId}...`).report().logInfo();
+
+		const collectionNode = writeConnection.get(collectionId) as Node;
+		// log.debug('collectionNode:%s', toStr(collectionNode));
+
+		if (!collectionNode) {
+			log.error('Collection with id:%s not found!', collectionId);
+		} else {
+			const {
+				_name: collectionName
+			} = collectionNode
+			// log.debug('collectionName:%s', collectionName);
+
+			const sanitizedCollectionName = sanitize(collectionName)
+				// sanitize allows a string to start with a digit, the GraphQL spec doesn't
+				// in addition we don't want the string to start with an underscore
+				.replace(/^[0-9_]+/, '')
+				// and we even only want lowercase chars
+				.toLowerCase();
+			// log.debug('sanitizedCollectionName:%s', sanitizedCollectionName);
+
+			if (collectionName !== sanitizedCollectionName) {
+				// log.debug('%s !== %s', collectionName, sanitizedCollectionName);
+				try {
+					rename({
+						fromName: collectionName,
+						toName: sanitizedCollectionName,
+						writeConnection
+					});
+				} catch (e) {
+					if (!startsWith(e.message, 'repo.copy: Unable to get repo with id:')) {
+						throw e;
+					}
+				}
+			}
+		}
+
 		progress.finishItem();
-	} // for thesauri
+	} // for collectionIds
 
-	/*setModel({
+	setModel({
 		connection: writeConnection,
 		version: 16
-	});*/
+	});
 }
