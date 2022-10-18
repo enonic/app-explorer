@@ -48,6 +48,7 @@
 			"@enonic/js-utils/*": ["../enonic-js-utils/*"],
 			"@enonic/semantic-ui-react-form": ["../semantic-ui-react-form/src"],
 			"/lib/explorer/*": ["../lib-explorer/src/main/resources/lib/explorer/*"],
+			// "/lib/xp/node": ["../xp/modules/lib/lib-node/src/main/resources/lib/xp/node.ts"],
 			// Production (should be commented in when commiting)
 			"@enonic/app-explorer/*": ["./src/main/resources/*"],
 			//"@enonic/js-utils": ["node_modules/@enonic/js-utils/src"],
