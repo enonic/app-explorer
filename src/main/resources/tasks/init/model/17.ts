@@ -69,12 +69,7 @@ export function model17({
 						field: '_nodeType',
 						value: NT_DOCUMENT
 					}
-				},
-				// mustNot: { // Not available before Enonic XP 7.11
-				// 	exists: {
-				// 		field: `${FIELD_PATH_META}.collection`
-				// 	}
-				// }
+				}
 			}
 		}
 	}
