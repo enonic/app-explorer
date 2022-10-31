@@ -1,6 +1,5 @@
 export const GQL_MUTATION_UPDATE_COLLECTION = `mutation UpdateCollectionMutation(
 	$_id: ID!
-	$_name: String!
 	$collector: CollectionCollectorInput
 	$cron: [CollectionCronInput]
 	$doCollect: Boolean
@@ -9,25 +8,23 @@ export const GQL_MUTATION_UPDATE_COLLECTION = `mutation UpdateCollectionMutation
 ) {
 	updateCollection(
 		_id: $_id
-		_name: $_name
-    	collector: $collector
-    	cron: $cron
+		collector: $collector
+		cron: $cron
 		doCollect: $doCollect
 		documentTypeId: $documentTypeId
 		language: $language
 	) {
 		_id
-		_name
-    	_nodeType
+		_nodeType
 		_path
-    	collector {
+		collector {
 			name
 			configJson
 		}
 		createdTime
 		creator
 		documentCount
-    	documentTypeId
+		documentTypeId
 		interfaces
 		language
 		modifiedTime
