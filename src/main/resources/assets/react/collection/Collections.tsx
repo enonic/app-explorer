@@ -14,9 +14,7 @@ import {
 	lpad,
 	rpad
 } from '@enonic/js-utils';
-
 import {parseExpression as parseCronExpression} from 'cron-parser';
-//import * as React from 'react';
 import {
 	Button, Dimmer, Grid, Header, Icon, Loader, Popup, Progress, Radio,
 	Segment, Table
@@ -24,6 +22,7 @@ import {
 import {
 	MONTH_TO_HUMAN
 } from './SchedulingSegment';
+import {CollectionCopyModal} from './CollectionCopyModal';
 import {DeleteCollectionModal} from './DeleteCollectionModal';
 import {NewOrEditCollectionModal} from './NewOrEditCollectionModal';
 import {useCollectionsState} from './useCollectionsState';
@@ -65,6 +64,7 @@ export function Collections(props :{
 		collectorOptions,
 		column,
 		contentTypeOptions,
+		copyModalCollectionId, setCopyModalCollectionId,
 		direction,
 		durationSinceLastUpdate,
 		fieldsObj,
@@ -373,14 +373,10 @@ export function Collections(props :{
 											</Button>}/>
 									}
 									<Popup
-										content={`Duplicate collection ${_name}`}
+										content={`Copy collection ${_name}`}
 										inverted
 										trigger={<Button icon onClick={() => {
-											fetch(`${servicesBaseUrl}/collectionDuplicate?name=${_name}`, {
-												method: 'POST'
-											}).then(() => {
-												memoizedFetchCollections();
-											});
+											setCopyModalCollectionId(collectionId);
 										}}><Icon color='blue' name='copy'/></Button>}/>
 									{showDelete ?<DeleteCollectionModal
 										_name={_name}
@@ -435,6 +431,17 @@ export function Collections(props :{
 				siteOptions={siteOptions}
 				totalNumberOfCollections={queryCollectionsGraph.total}
 			/>
+			{
+				copyModalCollectionId
+					? <CollectionCopyModal
+						afterSuccess={() => {memoizedFetchOnUpdate()}}
+						collectionId={copyModalCollectionId}
+						collectionNames={queryCollectionsGraph.hits.map(({_name}) => _name)}
+						servicesBaseUrl={servicesBaseUrl}
+						setCopyModalCollectionId={setCopyModalCollectionId}
+					/>
+					: null
+			}
 		</Dimmer.Dimmable>
 	</>;
 } // Collections
