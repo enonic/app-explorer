@@ -194,6 +194,7 @@ export function useCollectionsState({
 	const [showDocumentType, setShowDocumentType] = React.useState(false);
 	const [showSchedule, setShowSchedule] = React.useState(false);
 	const [tasks, setTasks] = React.useState([]);
+	const [copyModalCollectionId, setCopyModalCollectionId] = React.useState<string>();
 
 	const fieldsObj = {};
 	queryFieldsGraph.hits ? queryFieldsGraph.hits.forEach(({
@@ -446,6 +447,7 @@ export function useCollectionsState({
 		collectorOptions,
 		column,
 		contentTypeOptions,
+		copyModalCollectionId, setCopyModalCollectionId,
 		direction,
 		durationSinceLastUpdate,
 		fieldsObj,
