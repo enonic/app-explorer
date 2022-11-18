@@ -48,7 +48,7 @@ export const Collector = React.forwardRef(({
 		<Form.Input
 			error={baseUriError}
 			fluid
-			label='Uri'
+			label='URL'
 			onBlur={baseUriOnBlur}
 			onChange={baseUriOnChange}
 			required
