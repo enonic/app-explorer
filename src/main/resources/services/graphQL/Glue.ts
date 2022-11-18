@@ -452,7 +452,7 @@ export class Glue {
 		//log.debug(`getUnionTypeObj(${name})`);
 		if (!hasOwnProperty(this._unionTypes, name)) { // true also when property is set to undefined
 			if (this._uniqueNames[name]) {
-				throw new Error(`name:${name} is not an unionType! but ${this._uniqueNames[name]}`);
+				throw new Error(`name:${name} is not a unionType! but ${this._uniqueNames[name]}`);
 			}
 			throw new Error(`name:${name} not found in unionTypes, perhaps you're trying to use it before it's defined?`);
 		}
