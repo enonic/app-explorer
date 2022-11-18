@@ -132,7 +132,7 @@ export function NewOrEditDocumentType({
 												}}
 												label='Name'
 												path='_name'
-												placeholder='Please input an unique name'
+												placeholder='Please input a unique name'
 												value={name}
 												error={error}
 											/>
