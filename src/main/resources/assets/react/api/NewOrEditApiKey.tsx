@@ -92,7 +92,7 @@ export const NewOrEditApiKey = (props :{
 							}
 						}}
 						label='Name'
-						placeholder='Please input an unique name'
+						placeholder='Please input a unique name'
 						value={name}
 					/>
 				}

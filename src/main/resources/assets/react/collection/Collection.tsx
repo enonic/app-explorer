@@ -107,7 +107,7 @@ export function Collection({
 								label='Name'
 								onBlur={() => nameOnBlur(name)}
 								onChange={nameOnChange}
-								placeholder='Please input an unique name'
+								placeholder='Please input a unique name'
 								value={name}
 							/>
 					}
