@@ -117,7 +117,7 @@ function aggregationsArgToQuery({
 }) {
 	const obj = {};
 	for (let i = 0; i < aggregationsArg.length; i++) {
-	    const {
+		const {
 			name,
 			/*count: {
 				fields
@@ -486,42 +486,59 @@ export function addQueryDocuments({
 				sources
 			};
 			//log.debug('multiConnectParams:%s', toStr(multiConnectParams));
-			const multiRepoReadConnection = multiConnect(multiConnectParams); // NOTE: This now protects against empty sources array.
 
-			const staticFilters = addQueryFilter({ // Whitelist
-				clause: 'must',
-				filter: {
-					exists: {
-						field: 'document_metadata.collection'
+			let queryResult: QueryRes;
+			try {
+				// ERROR: This fails on a fresh sandbox, because there are no collection repos yet
+				const multiRepoReadConnection = multiConnect(multiConnectParams); // NOTE: This now protects against empty sources array.
+				const staticFilters = addQueryFilter({ // Whitelist
+					clause: 'must',
+					filter: {
+						exists: {
+							field: 'document_metadata.collection'
+						}
+					},
+					filters: addQueryFilter({ // Blacklist
+						clause: 'mustNot',
+						filter: hasValue('_nodeType', ['default'])
+					})
+				});
+
+				let filtersArray :Array<AnyObject>;
+				if (filtersArg) {
+					// This works magically because fieldType is an Enum?
+					filtersArray = createFilters(filtersArg);
+					//log.debug('filtersArray:%s', toStr(filtersArray));
+					filtersArray.push(staticFilters as unknown as AnyObject);
+					//log.debug('filtersArray:%s', toStr(filtersArray));
+				}
+
+				const multiRepoQueryParams = {
+					aggregations,
+					count,
+					filters: (filtersArray ? filtersArray : staticFilters) as BooleanFilter,
+					query: query ? query : '',
+					start
+				};
+				// log.debug('multiRepoQueryParams:%s', toStr(multiRepoQueryParams));
+
+				queryResult = multiRepoReadConnection.query(multiRepoQueryParams) as unknown as QueryRes;
+				// log.debug('queryResult:%s', toStr(queryResult));
+				// log.debug('queryResult.aggregations:%s', toStr(queryResult.aggregations));
+			} catch (e) {
+				if (e.message === 'multiConnect: empty sources is not allowed!') {
+					log.debug(`There are no collection repos, yet, returning empty query result.`);
+					queryResult = {
+						aggregations: {},
+						count: 0,
+						hits: [],
+						total: 0
 					}
-				},
-				filters: addQueryFilter({ // Blacklist
-					clause: 'mustNot',
-					filter: hasValue('_nodeType', ['default'])
-				})
-			});
-
-			let filtersArray :Array<AnyObject>;
-			if (filtersArg) {
-				// This works magically because fieldType is an Enum?
-				filtersArray = createFilters(filtersArg);
-				//log.debug('filtersArray:%s', toStr(filtersArray));
-				filtersArray.push(staticFilters as unknown as AnyObject);
-				//log.debug('filtersArray:%s', toStr(filtersArray));
-			}
-
-			const multiRepoQueryParams = {
-				aggregations,
-				count,
-				filters: (filtersArray ? filtersArray : staticFilters) as BooleanFilter,
-				query: query ? query : '',
-				start
-			};
-			// log.debug('multiRepoQueryParams:%s', toStr(multiRepoQueryParams));
-
-			const queryResult = multiRepoReadConnection.query(multiRepoQueryParams) as unknown as QueryRes;
-			// log.debug('queryResult:%s', toStr(queryResult));
-			// log.debug('queryResult.aggregations:%s', toStr(queryResult.aggregations));
+				} else {
+					log.error('Unhandlered error in catch: stack', e);
+					throw(e); // Rethrow
+				}
+			} // try (multiConnect) catch
 
 			const {
 				aggregations: list,
@@ -590,7 +607,7 @@ export function addQueryDocuments({
 					const obj = {};
 					const keys = Object.keys(rest);
 					for (let i = 0; i < keys.length; i++) {
-					    const key = keys[i];
+						const key = keys[i];
 						if (
 							!key.startsWith('_')
 							&& !key.startsWith(FIELD_PATH_GLOBAL)
