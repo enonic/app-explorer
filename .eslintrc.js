@@ -149,8 +149,8 @@ module.exports = {
 			// ignore who cares? no body
 			arrays: 'ignore',
 			objects: 'only-multiline',
-			imports: 'never',
-			exports: 'never',
+			imports: 'only-multiline',
+			exports: 'only-multiline',
 			functions: 'ignore'
 		}],
 		'import/extensions': ['off'],
