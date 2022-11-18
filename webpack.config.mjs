@@ -1,5 +1,4 @@
 /* eslint-disable no-console */
-import path from 'path';
 //import BrowserSyncPlugin from 'browser-sync-webpack-plugin';
 import CaseSensitivePathsPlugin from 'case-sensitive-paths-webpack-plugin';
 import { CleanWebpackPlugin } from 'clean-webpack-plugin';
@@ -9,20 +8,21 @@ import {
 	ESBuildPlugin
 } from 'esbuild-loader';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
+import path from 'path';
 import postcssPresetEnv from 'postcss-preset-env';
 import {print} from 'q-i';
 import TerserPlugin from 'terser-webpack-plugin';
-
 import webpack from 'webpack';
-
 import {
 	BOOL_LOCAL_JS_UTILS,
 	BOOL_LOCAL_LIB_EXPLORER,
 	BOOL_LOCAL_SEMANTIC_UI_REACT_FORM,
 	BOOL_MINIMIZE,
 	MODE
-} from './.webpack.constants.js';
+} from './.webpack.constants.mjs';
 
+
+const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
 // Check which version of node is used
 print({
