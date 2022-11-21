@@ -31,6 +31,27 @@ import prettyMs from 'pretty-ms'; // Fail
 // const prettyMs = require('pretty-ms'); // Fail
 //──────────────────────────────────────────────────────────────────────────────
 
+//──────────────────────────────────────────────────────────────────────────────
+// The pretty-ms causes:
+// 'Init': Task [com.enonic.app.explorer:init] not found. Missing task script
+// Downgrading to pretty-ms ^7 (7.0.1) TypeError: Number.isFinite is not a function
+
+// core-js(-pure)/es|stable|actual|full/number/is-finite
+// import 'core-js/stable/number/is-finite';
+// import 'core-js/stable/number/is-finite'; // Nope
+// import 'core-js-pure/actual/number/is-finite'; // Nope
+// import 'core-js-pure/full/number/is-finite'; // Nope
+// Number.isFinite = Number.isFinite || isFinite;
+// Math.trunc = Math.trunc || function (v) {
+// 	return v < 0 ? Math.ceil(v) : Math.floor(v);
+// };
+// Number.parseFloat = Number.parseFloat || parseFloat;
+import prettyMs from 'pretty-ms'; // Fail
+// import * as prettyMs from 'pretty-ms'; // Fail
+// import {default as prettyMs} from 'pretty-ms'; // Fail
+// const prettyMs = require('pretty-ms'); // Fail
+//──────────────────────────────────────────────────────────────────────────────
+
 //import {getField} from '/lib/explorer/field/getField';
 import {ignoreErrors} from '/lib/explorer/ignoreErrors';
 import {

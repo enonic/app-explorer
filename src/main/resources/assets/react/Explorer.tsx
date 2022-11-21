@@ -27,6 +27,27 @@ import TopBarMenu from './components/TopBarMenu';
 import {useExplorerState} from './useExplorerState';
 
 
+const handleRender: React.ComponentProps<typeof React.Profiler>["onRender"] = (
+	id,
+	phase,
+	actualDuration,
+	baseDuration,
+	startTime,
+	commitTime,
+	interactions
+) => {
+	console.debug(
+		'id:', id,
+		'phase:', phase,
+		'actualDuration:', actualDuration,
+		'baseDuration:', baseDuration,
+		'startTime:', startTime,
+		'commitTime:', commitTime,
+		'interactions:', interactions
+	);
+}
+
+
 export function Explorer({
 	basename,
 	collectorComponents,
