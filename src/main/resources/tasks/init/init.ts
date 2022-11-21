@@ -44,6 +44,7 @@ import prettyMs from 'pretty-ms'; // Fail
 // import {default as prettyMs} from 'pretty-ms'; // Fail
 // const prettyMs = require('pretty-ms'); // Fail
 //──────────────────────────────────────────────────────────────────────────────
+
 //import {getField} from '/lib/explorer/field/getField';
 import {ignoreErrors} from '/lib/explorer/ignoreErrors';
 import {
@@ -111,6 +112,12 @@ import {model16} from './model/16';
 import {model17} from './model/17';
 import {Progress} from './Progress';
 import {applicationListener} from './applicationListener';
+
+
+//@ts-ignore
+const {currentTimeMillis} = Java.type('java.lang.System') as {
+	currentTimeMillis :() => number
+};
 
 
 const FIELD_TYPE = { // TODO This should not be a system field. Remove in lib-explorer-4.0.0?
