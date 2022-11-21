@@ -13,11 +13,12 @@
 import type {Request} from '../../types/index.d';
 
 
+import {currentTimeMillis} from '/lib/explorer/time/currentTimeMillis';
 import {
 	RESPONSE_TYPE_JSON//,
 	//toStr
 } from '@enonic/js-utils';
-
+import prettyMs from 'pretty-ms';
 import {
 	execute
 	//@ts-ignore
@@ -89,7 +90,7 @@ import {createObjectTypesUsingUnionTypes} from './createObjectTypesUsingUnionTyp
 
 
 //const {currentTimeMillis} = Java.type('java.lang.System');
-
+const serviveStartTimeMs = currentTimeMillis();
 const glue = new Glue();
 
 // There is a bit of a chicken and egg problem with
@@ -303,6 +304,7 @@ export const SCHEMA = glue.schemaGenerator.createSchema({
 
 
 export function post(request :Request) {
+	const requestStartTimeMs = currentTimeMillis();
 	//log.info(`request:${toStr(request)}`);
 
 	const {body: bodyJson} = request;
@@ -328,6 +330,11 @@ export function post(request :Request) {
 	//const duration = after - before;
 	//log.debug(`Duration: ${duration}ms Query:${query}`);
 
+
+	const endTimeMs = currentTimeMillis();
+	const durationSinceServiceStartMs = endTimeMs - serviveStartTimeMs;
+	const durationSinceRequestStartMs = endTimeMs - requestStartTimeMs;
+	log.info('Since service-start:%s request-start:%s ', prettyMs(durationSinceServiceStartMs), prettyMs(durationSinceRequestStartMs));
 	return {
 		contentType: RESPONSE_TYPE_JSON,
 		body: //JSON.stringify( // TODO This is causeing problems, commenting it out until I can look at all of them.
