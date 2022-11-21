@@ -13,7 +13,8 @@ import type {
 import {
 	VALUE_TYPE_STRING,
 	addQueryFilter,
-	forceArray
+	forceArray,
+	toStr
 } from '@enonic/js-utils';
 
 //──────────────────────────────────────────────────────────────────────────────
@@ -36,7 +37,6 @@ import prettyMs from 'pretty-ms'; // Fail
 // import {default as prettyMs} from 'pretty-ms'; // Fail
 // const prettyMs = require('pretty-ms'); // Fail
 //──────────────────────────────────────────────────────────────────────────────
-
 //import {getField} from '/lib/explorer/field/getField';
 import {ignoreErrors} from '/lib/explorer/ignoreErrors';
 import {
@@ -71,20 +71,21 @@ import {runAsSu} from '/lib/explorer/runAsSu';
 import {getCollectors, createOrModifyJobsFromCollectionNode} from '/lib/explorer/scheduler/createOrModifyJobsFromCollectionNode';
 //import {listExplorerJobs} from '/lib/explorer/scheduler/listExplorerJobs';
 
+//@ts-ignore
+import {request as httpClientRequest} from '/lib/http-client';
 import {
 	addMembers,
 	createRole,
 	createUser,
 	getPrincipal//,
 	//findPrincipals
-	//@ts-ignore
 } from '/lib/xp/auth';
 //import {sanitize} from '/lib/xp/common';
-//@ts-ignore
+import {getToolUrl} from '/lib/xp/admin';
 import {send} from '/lib/xp/event';
-//@ts-ignore
 import {get as getRepo} from '/lib/xp/repo';
 //import {submitTask} from '/lib/xp/task';
+// import {list as listVhosts} from '/lib/xp/vhost';
 
 import {model9} from './model/9';
 import {model10} from './model/10';
@@ -104,7 +105,6 @@ const {currentTimeMillis} = Java.type('java.lang.System') as {
 	currentTimeMillis :() => number
 };
 
-
 const FIELD_TYPE = { // TODO This should not be a system field. Remove in lib-explorer-4.0.0?
 	key: 'type',
 	_name: 'type',
@@ -115,6 +115,19 @@ const FIELD_TYPE = { // TODO This should not be a system field. Remove in lib-ex
 	//displayName: 'Type'
 };
 
+const URI_FRAGMENTS = [
+	'home',
+	'collections',
+	'status',
+	'journal',
+	'notifications',
+	'schedule',
+	'documentTypes',
+	'stopWords',
+	'synonyms',
+	'interfaces',
+	'about'
+];
 
 export const EVENT_INIT_COMPLETE = `${APP_EXPLORER}.init.complete`;
 
@@ -803,8 +816,33 @@ export function run() {
 		//log.info(`Sending event ${toStr(event)}`);
 		send(event);
 		//submitTask({descriptor: 'test'});
+
 		const endTimeMs = currentTimeMillis();
-		const durationMs = endTimeMs - startTimeMs;
-		log.info('Init task took:%s', prettyMs(durationMs));
+		const durationInitMs = endTimeMs - startTimeMs;
+		log.info('Init:%s', prettyMs(durationInitMs));
+
+		// 2022-11-21 14:36:23,381 WARN  c.e.x.p.impl.url.PortalUrlBuilder - Portal url build failed
+		// java.lang.NullPointerException: null
+		// const homeToolUrl = getHomeToolUrl({type: 'absolute'});
+		// log.info('homeToolUrl:%s', homeToolUrl);
+
+		const toolUrl = getToolUrl(app.name, 'explorer');
+		// log.info('toolUrl:%s', toolUrl);
+
+		// This causes com.enonic.xp.task.TaskNotFoundException
+		// const vhosts = listVhosts();
+		// log.info('vhosts:%s', toStr(vhosts));
+		for (let i = 0; i < URI_FRAGMENTS.length; i++) {
+			const uriFragment = URI_FRAGMENTS[i];
+			const url = `http://localhost:8080${toolUrl}#${uriFragment}`;
+			const beforeRequestMs = currentTimeMillis();
+			httpClientRequest({
+				method: 'GET',
+				url
+			});
+			const afterRequestMs = currentTimeMillis();
+			const durationRequestMs = afterRequestMs - beforeRequestMs;
+			log.info('%s:%s', url, prettyMs(durationRequestMs));
+		}
 	}); // runAsSu
 } // export function run
