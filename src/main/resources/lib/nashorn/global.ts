@@ -79,3 +79,23 @@ global.global = global;
 } // console*/
 
 module.exports = global;
+
+//──────────────────────────────────────────────────────────────────────────────
+// core-js(-pure)/es|stable|actual|full/number/is-finite
+// require('core-js/actual/number/is-finite')
+Number.isFinite = Number.isFinite || isFinite;
+//──────────────────────────────────────────────────────────────────────────────
+// core-js(-pure)/es|stable|actual|full/math/trunc
+// import 'core-js/actual/math/trunc';
+// require('core-js/actual/math/trunc')
+Math.trunc = Math.trunc || function (v) {
+	return v < 0 ? Math.ceil(v) : Math.floor(v);
+};
+//──────────────────────────────────────────────────────────────────────────────
+// TypeError: Number.parseFloat is not a function
+// core-js(-pure)/es|stable|actual|full/parse-float
+// require('core-js/actual/parse-float')
+Number.parseFloat = Number.parseFloat || parseFloat;
+//──────────────────────────────────────────────────────────────────────────────
+// TypeError: Cannot read property "navigator" from undefined
+//──────────────────────────────────────────────────────────────────────────────

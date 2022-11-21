@@ -116,6 +116,8 @@
     "less": "^4",
     "mini-css-extract-plugin": "^2",
     "mocha": "^10",
+    "npm-build-tools": "^2.2.5",
+    "npm-run-all": "^4.1.5",
     "postcss": "^8",
     "postcss-loader": "^7",
     "postcss-preset-env": "^7",
@@ -138,6 +140,9 @@
   "scripts": {
     "babel": "npx babel --config-file ./esbuild.babelrc build/esbuild/tasks/webcrawl/webcrawl.js --out-file build/resources/main/tasks/webcrawl/webcrawl.js",
     "clean": "rm -r build 2>/dev/null;true",
+    "concat:graphql": "n-concat src/main/resources/lib/esbuild/getOwnPropertyDescriptors.js build/esbuild/services/graphQL/graphQL.js | n-pipe build/concat/services/graphQL/graphQL.js",
+    "esbuild:graphql": "npx esbuild --bundle --external:/lib/cache --external:/lib/explorer* --external:/lib/galimatias --external:/lib/graphql* --external:/lib/guillotine* --external:/lib/http-client --external:/lib/license --external:/lib/router --external:/lib/util/* --external:/lib/xp/* --format=cjs --outbase=src/main/resources --outdir=build/esbuild --tsconfig=tsconfig.esbuild.json src/main/resources/services/graphQL/graphQL.ts",
+    "esbuild:init": "npx esbuild --bundle --external:/lib/cache --external:/lib/explorer* --external:/lib/galimatias --external:/lib/graphql* --external:/lib/guillotine* --external:/lib/http-client --external:/lib/license --external:/lib/router --external:/lib/util/* --external:/lib/xp/* --format=cjs --outbase=src/main/resources --outdir=build/esbuild --tsconfig=tsconfig.esbuild.json src/main/resources/tasks/init/init.ts",
     "esbuild:webcrawl": "npx esbuild --bundle --external:/lib/cache --external:/lib/explorer* --external:/lib/galimatias --external:/lib/graphql* --external:/lib/guillotine* --external:/lib/http-client --external:/lib/license --external:/lib/router --external:/lib/util/* --external:/lib/xp/* --format=cjs --outbase=src/main/resources --outdir=build/esbuild --tsconfig=tsconfig.esbuild.json src/main/resources/tasks/webcrawl/webcrawl.ts",
     "esbuild:all": "npx esbuild --bundle --external:/lib/cache --external:/lib/explorer* --external:/lib/galimatias --external:/lib/graphql* --external:/lib/guillotine* --external:/lib/http-client --external:/lib/license --external:/lib/router --external:/lib/util/* --external:/lib/xp/* --format=cjs --outbase=src/main/resources --outdir=build/esbuild --tsconfig=tsconfig.esbuild.json $(find src/main/resources/ -name '*.ts' -a ! -name '*.d.ts')",
     "eslint": "npx eslint src/main/resources/**/*.ts src/main/resources/**/*.tsx",
@@ -145,13 +150,20 @@
     "mocha": "npx mocha",
     "prebabel": "yarn esbuild:webcrawl",
     "premocha": "yarn tsc",
-    "preswc": "yarn esbuild:webcrawl",
+    "preconcat:graphql": "yarn esbuild:graphql",
+    "preswc:graphql": "yarn concat:graphql",
+    "preswc:init": "yarn esbuild:init",
+    "preswc:webcrawl": "yarn esbuild:webcrawl",
     "pretest": "yarn tsc",
     "pretsc": "yarn clean",
-    "swc": "npx swc --config-file ./.swcrc.json build/esbuild/tasks/webcrawl/webcrawl.js -o build/resources/main/tasks/webcrawl/webcrawl.js",
+    "swc:graphql": "npx swc --config-file ./.swcrc.json build/concat/services/graphQL/graphQL.js -o build/resources/main/services/graphQL/graphQL.js",
+    "swc:init": "npx swc --config-file ./.swcrc.json build/esbuild/tasks/init/init.js -o build/resources/main/tasks/init/init.js",
+    "swc:webcrawl": "npx swc --config-file ./.swcrc.json build/esbuild/tasks/webcrawl/webcrawl.js -o build/resources/main/tasks/webcrawl/webcrawl.js",
+    "swc": "npm-run-all --parallel swc:graphql swc:init swc:webcrawl",
     "test": "npx mocha build/tsc/app-explorer/test/**/*.test.js",
     "tsc": "npx tsc --pretty",
     "watch": "node_modules/webpack-cli/bin/cli.js -w --stdin",
     "webpack": "node_modules/webpack-cli/bin/cli.js"
-  }
+  },
+  "type": "commonjs"
 }

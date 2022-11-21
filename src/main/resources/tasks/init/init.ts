@@ -16,6 +16,27 @@ import {
 	forceArray
 } from '@enonic/js-utils';
 
+//──────────────────────────────────────────────────────────────────────────────
+// The pretty-ms causes:
+// 'Init': Task [com.enonic.app.explorer:init] not found. Missing task script
+// Downgrading to pretty-ms ^7 (7.0.1) TypeError: Number.isFinite is not a function
+
+// core-js(-pure)/es|stable|actual|full/number/is-finite
+// import 'core-js/stable/number/is-finite';
+// import 'core-js/stable/number/is-finite'; // Nope
+// import 'core-js-pure/actual/number/is-finite'; // Nope
+// import 'core-js-pure/full/number/is-finite'; // Nope
+// Number.isFinite = Number.isFinite || isFinite;
+// Math.trunc = Math.trunc || function (v) {
+// 	return v < 0 ? Math.ceil(v) : Math.floor(v);
+// };
+// Number.parseFloat = Number.parseFloat || parseFloat;
+import prettyMs from 'pretty-ms'; // Fail
+// import * as prettyMs from 'pretty-ms'; // Fail
+// import {default as prettyMs} from 'pretty-ms'; // Fail
+// const prettyMs = require('pretty-ms'); // Fail
+//──────────────────────────────────────────────────────────────────────────────
+
 //import {getField} from '/lib/explorer/field/getField';
 import {ignoreErrors} from '/lib/explorer/ignoreErrors';
 import {
@@ -78,6 +99,12 @@ import {Progress} from './Progress';
 import {applicationListener} from './applicationListener';
 
 
+//@ts-ignore
+const {currentTimeMillis} = Java.type('java.lang.System') as {
+	currentTimeMillis :() => number
+};
+
+
 const FIELD_TYPE = { // TODO This should not be a system field. Remove in lib-explorer-4.0.0?
 	key: 'type',
 	_name: 'type',
@@ -100,6 +127,7 @@ export const EVENT_INIT_COMPLETE = `${APP_EXPLORER}.init.complete`;
 
 export function run() {
 	runAsSu(() => {
+		const startTimeMs = currentTimeMillis();
 		const progress = new Progress({
 			info: 'Task started',
 			//sleepMsAfterItem: 1000, // DEBUG
@@ -775,5 +803,8 @@ export function run() {
 		//log.info(`Sending event ${toStr(event)}`);
 		send(event);
 		//submitTask({descriptor: 'test'});
+		const endTimeMs = currentTimeMillis();
+		const durationMs = endTimeMs - startTimeMs;
+		log.info('Init task took:%s', prettyMs(durationMs));
 	}); // runAsSu
 } // export function run
