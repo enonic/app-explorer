@@ -13,6 +13,8 @@ import postcssPresetEnv from 'postcss-preset-env';
 import {print} from 'q-i';
 import TerserPlugin from 'terser-webpack-plugin';
 import webpack from 'webpack';
+
+//──────────────────────────────────────────────────────────────────────────────
 import {
 	BOOL_LOCAL_JS_UTILS,
 	BOOL_LOCAL_LIB_EXPLORER,
@@ -175,7 +177,6 @@ const SS_JS_CONFIG = {
 		'services/collectionDelete/collectionDelete': './services/collectionDelete/collectionDelete.ts',
 		'services/collectionDuplicate/collectionDuplicate': './services/collectionDuplicate/collectionDuplicate.ts',
 		'services/collectorStop/collectorStop': './services/collectorStop/collectorStop.ts',
-		'services/graphQL/graphQL': './services/graphQL/graphQL.ts',
 		'services/interfaceCopy/interfaceCopy': './services/interfaceCopy/interfaceCopy.ts',
 		'services/interfaceExists/interfaceExists': './services/interfaceExists/interfaceExists.ts',
 		'services/longPolling/longPolling': './services/longPolling/longPolling.ts',
@@ -187,11 +188,13 @@ const SS_JS_CONFIG = {
 		'services/uploadLicense/uploadLicense': './services/uploadLicense/uploadLicense.ts',
 		'services/ws/ws': './services/ws/ws.ts',
 		'tasks/import_csv_to_thesaurus/import_csv_to_thesaurus': './tasks/import_csv_to_thesaurus/import_csv_to_thesaurus.ts',
-		'tasks/init/init': './tasks/init/init.ts',
 		'tasks/reindexCollection/reindexCollection': './tasks/reindexCollection/reindexCollection.ts',
 		'tasks/test/test': './tasks/test/test.ts',
-		//'tasks/webcrawl/webcrawl': './tasks/webcrawl/webcrawl.ts',
 		'webapp/webapp': './webapp/webapp.ts'
+		// Handeled by esbuild and swc
+		// 'services/graphQL/graphQL': './services/graphQL/graphQL.ts',
+		// 'tasks/init/init': './tasks/init/init.ts',
+		// 'tasks/webcrawl/webcrawl': './tasks/webcrawl/webcrawl.ts',
 	},
 	externals: SS_EXTERNALS,
 	mode: MODE,
@@ -300,9 +303,40 @@ const SS_JS_CONFIG = {
 			})*/
 		] : []
 	},
-	output: {
+	output: { // https://webpack.js.org/concepts/output/
 		filename: '[name].js',
-		libraryTarget: 'commonjs',
+
+		// This has no effect on library.type 'commonjs-static', probably only when 'umd'
+		// globalObject: 'self', // Defaults to self for Web-like targets.
+		// globalObject: 'global', // ReferenceError: "global" is not defined
+		// globalObject: 'this',
+		// globalObject: "(1, eval)('this')", // This actually works :)
+
+		// library: {
+
+			// https://webpack.js.org/configuration/output/#type-commonjs
+			// NOTE: that NOT setting a output.library.name will cause all
+			// properties returned by the entry point to be assigned to the
+			// given object; there are no checks against existing property names
+
+			// name: 'MyLibrary', // exports.MyLibrary = __webpack_exports__;
+			// When name is ommited: for(var i in __webpack_exports__) __webpack_export_target__[i] = __webpack_exports__[i];
+
+			// type: 'commonjs', // exports['MyLibrary'] = _entry_return_;
+
+			// Individual exports will be set as properties on module.exports.
+			// The "static" in the name refers to the output being statically
+			// analysable, and thus named exports are importable into ESM via Node.js:
+			// type: 'commonjs-static',
+
+			// type: 'umd', // ReferenceError: "global" is not defined
+			// umdNamedDefine: false,
+		// },
+
+		// https://webpack.js.org/configuration/output/#outputlibrarytarget
+		libraryTarget: 'commonjs', // exports['MyLibrary'] = _entry_return_;
+		// libraryTarget: 'commonjs2', // module.exports = _entry_return_;
+
 		path: path.join(__dirname, DST_DIR)
 	},
 	performance: {
@@ -323,7 +357,15 @@ const SS_JS_CONFIG = {
 			//'json'
 		].map(ext => `.${ext}`)
 	},
-	stats: STATS
+	stats: STATS,
+
+	// The webpack target property is not to be confused with the output.libraryTarget property.
+	// target: 'async-node'
+	// target: 'electron-main'
+	// target: 'node'
+	// target: 'node-webkit'
+	target: 'web' // <=== can be omitted as default is 'web'
+	// target: 'webworker'
 };
 //print({SS_JS_CONFIG}, { maxItems: Infinity });
 //process.exit();
@@ -412,7 +454,8 @@ const STYLE_CONFIG = {
 	resolve: {
 		extensions: ['sass', 'scss', 'less', 'styl', 'css'].map(ext => `.${ext}`)
 	},
-	stats: STATS
+	stats: STATS,
+	target: 'web', // <=== can be omitted as default is 'web'
 };
 //print({STYLE_CONFIG}, { maxItems: Infinity });
 //process.exit();
@@ -548,7 +591,8 @@ const CLIENT_JS_CONFIG = {
 			'tsx'
 		].map(ext => `.${ext}`)
 	},
-	stats: STATS
+	stats: STATS,
+	target: 'web', // <=== can be omitted as default is 'web'
 };
 //print({CLIENT_JS_CONFIG}, { maxItems: Infinity });
 //process.exit();
@@ -651,7 +695,8 @@ const CLIENT_ES_CONFIG = {
 			'json'
 		].map(ext => `.${ext}`)
 	},
-	stats: STATS
+	stats: STATS,
+	target: 'web', // <=== can be omitted as default is 'web'
 };
 //print({CLIENT_ES_CONFIG}, { maxItems: Infinity });
 //process.exit();
