@@ -124,6 +124,16 @@ const getAttributeValue = (
 	return undefined;
 };
 
+const remove = (
+	node :Cheerio<AnyNode>,
+	selector :SelectorType
+) => {
+	const elsToRemove = querySelectorAll(node, selector);
+	elsToRemove.forEach((elToRemove) => {
+		elToRemove.remove();
+	});
+}
+
 
 //const textContent = node => node.text();
 const outerHTML = (node :Cheerio<AnyNode>) => node.clone().wrap('<div>').parent().html();
@@ -385,6 +395,7 @@ export function run({
 				DEBUG && log.debug(`title:${toStr(title)}`);
 
 				const bodyEl = querySelector(rootNode, 'body');
+				remove(bodyEl, 'script');
 				//log.debug(`bodyEl:${toStr(bodyEl)}`); // JSON.stringify got a cyclic data structure
 				//log.debug(safeStringify({body: body.html()}));
 
