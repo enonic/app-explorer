@@ -70,9 +70,15 @@ import {hasValue} from '/lib/explorer/query/hasValue';
 import {runAsSu} from '/lib/explorer/runAsSu';
 import {getCollectors, createOrModifyJobsFromCollectionNode} from '/lib/explorer/scheduler/createOrModifyJobsFromCollectionNode';
 //import {listExplorerJobs} from '/lib/explorer/scheduler/listExplorerJobs';
+import {
+	execute
+	//@ts-ignore
+} from '/lib/graphql';
+//import {getCachedSchema} from '../../services/graphQL/graphQL';
+import {getCachedSchema} from '/services/graphQL/graphQL';
 
 //@ts-ignore
-import {request as httpClientRequest} from '/lib/http-client';
+// import {request as httpClientRequest} from '/lib/http-client';
 import {
 	addMembers,
 	createRole,
@@ -81,7 +87,7 @@ import {
 	//findPrincipals
 } from '/lib/xp/auth';
 //import {sanitize} from '/lib/xp/common';
-import {getToolUrl} from '/lib/xp/admin';
+// import {getToolUrl} from '/lib/xp/admin';
 import {send} from '/lib/xp/event';
 import {get as getRepo} from '/lib/xp/repo';
 //import {submitTask} from '/lib/xp/task';
@@ -826,23 +832,47 @@ export function run() {
 		// const homeToolUrl = getHomeToolUrl({type: 'absolute'});
 		// log.info('homeToolUrl:%s', homeToolUrl);
 
-		const toolUrl = getToolUrl(app.name, 'explorer');
+		// const toolUrl = getToolUrl(app.name, 'explorer');
 		// log.info('toolUrl:%s', toolUrl);
 
 		// This causes com.enonic.xp.task.TaskNotFoundException
 		// const vhosts = listVhosts();
 		// log.info('vhosts:%s', toStr(vhosts));
-		for (let i = 0; i < URI_FRAGMENTS.length; i++) {
-			const uriFragment = URI_FRAGMENTS[i];
-			const url = `http://localhost:8080${toolUrl}#${uriFragment}`;
-			const beforeRequestMs = currentTimeMillis();
-			httpClientRequest({
-				method: 'GET',
-				url
-			});
-			const afterRequestMs = currentTimeMillis();
-			const durationRequestMs = afterRequestMs - beforeRequestMs;
-			log.info('%s:%s', url, prettyMs(durationRequestMs));
-		}
+
+		// TODO These require Admin Privleges aka Login...
+		// for (let i = 0; i < URI_FRAGMENTS.length; i++) {
+		// 	const uriFragment = URI_FRAGMENTS[i];
+		// 	const url = `http://localhost:8080${toolUrl}#${uriFragment}`;
+		// 	const beforeRequestMs = currentTimeMillis();
+		// 	httpClientRequest({
+		// 		method: 'GET',
+		// 		url
+		// 	});
+		// 	const afterRequestMs = currentTimeMillis();
+		// 	const durationRequestMs = afterRequestMs - beforeRequestMs;
+		// 	log.info('%s:%s', url, prettyMs(durationRequestMs));
+		// }
+		// //http://localhost:8080/admin/tool/com.enonic.app.explorer/explorer/
+		// const graphQLUrl = `http://localhost:8080${toolUrl}/_/service/com.enonic.app.explorer/graphQL`;
+		// const beforeRequestMs = currentTimeMillis();
+		// httpClientRequest({
+		// 	method: 'GET',
+		// 	url: graphQLUrl
+		// });
+		// const afterRequestMs = currentTimeMillis();
+		// const durationRequestMs = afterRequestMs - beforeRequestMs;
+		// log.info('%s:%s', graphQLUrl, prettyMs(durationRequestMs));
+		const query = `{
+	getLocales {
+		country
+	}
+}`;
+		const beforeExecuteMs = currentTimeMillis();
+		// const obj =
+		execute(getCachedSchema(),query,null);
+		const afterExecuteMs = currentTimeMillis();
+		const durationExecuteMs = afterExecuteMs - beforeExecuteMs;
+		log.info('execute:%s', prettyMs(durationExecuteMs));
+		// log.info('obj:%s', toStr(obj));
 	}); // runAsSu
 } // export function run
