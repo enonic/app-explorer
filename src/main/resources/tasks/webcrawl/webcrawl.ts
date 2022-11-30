@@ -13,26 +13,27 @@ import 'core-js/stable/array/from';
 import 'core-js/stable/object/assign';
 import 'core-js/stable/string/includes';
 import 'core-js/stable/string/from-code-point';
+import 'core-js/stable/string/trim-end';
 import 'core-js/stable/array/includes';
 import 'core-js/stable/array/find-index';
-//import 'core-js-pure/actual/array/from';
-//import 'core-js-pure/actual/object/assign'; // Doesn't work
+// import 'core-js-pure/actual/array/from';
+// import 'core-js-pure/actual/object/assign'; // Doesn't work
 // TypeError: Object.getOwnPropertyDescriptors is not a function
-require('object.getownpropertydescriptors').shim(); //eslint-disable-line @typescript-eslint/no-var-requires
+require('object.getownpropertydescriptors').shim(); // eslint-disable-line @typescript-eslint/no-var-requires
 
-//import 'babel-es6-polyfill'; // TypeError: Cannot read property "document" from undefined
+// import 'babel-es6-polyfill'; // TypeError: Cannot read property "document" from undefined
 
 // Polyfill Reflect to avoid "Reflect" not defined.
 // But introduces: TypeError: null has no such function "ownKeys"
-//var Reflect = require('harmony-reflect');
+// var Reflect = require('harmony-reflect');
 
-//'use strict'; // This doesn't help debugging: TypeError: Cannot read property "Symbol" from undefined
+// 'use strict'; // This doesn't help debugging: TypeError: Cannot read property "Symbol" from undefined
 
-//import 'symbol-es6'; // This does not fix: TypeError: Cannot read property "Symbol" from undefined
+// import 'symbol-es6'; // This does not fix: TypeError: Cannot read property "Symbol" from undefined
 
-require('array.prototype.find').shim(); //eslint-disable-line @typescript-eslint/no-var-requires
+require('array.prototype.find').shim(); // eslint-disable-line @typescript-eslint/no-var-requires
 import {
-	//VALUE_TYPE_STRING,
+	// VALUE_TYPE_STRING,
 	toStr
 } from '@enonic/js-utils';
 import guard from 'robots-txt-guard';
@@ -41,27 +42,28 @@ import guard from 'robots-txt-guard';
 // TypeError: Cannot read property "TYPED_ARRAY_SUPPORT" from undefined
 // And requires global to be provided by webpack.
 import cheerio from 'cheerio'; // uses Array.from
-//import cheerio from '/lib/cheerio';
+// cheerio: str.trimEnd is not a function
+// import cheerio from '/lib/cheerio';
+import pretty from 'pretty';
 
-
-//import safeStringify from 'fast-safe-stringify';
-//import {parseDOM} from 'htmlparser2';
+// import safeStringify from 'fast-safe-stringify';
+// import {parseDOM} from 'htmlparser2';
 
 // WARNING Causes TypeError: Cannot read property "Symbol" from undefined in production mode!
 /*import { // Runtime Errors with MAP and symbol?
 	normalize, parse, resolve, serialize
 } from 'uri-js/src/uri.ts';
-//'uri-js/dist/esnext/uri.js';
-//'uri-js';*/
+// 'uri-js/dist/esnext/uri.js';
+// 'uri-js';*/
 
-//import normalizeUrl from 'normalize-url'; // Uses reflect :(
-//import normalizeUri from 'normalize-uri';
-//import normalizeUrl from 'conservative-normalize-url';
-//import {resolve} from 'relative-to-absolute-iri';
-//import Uri from 'jsuri';
-//@ts-ignore
+// import normalizeUrl from 'normalize-url'; // Uses reflect :(
+// import normalizeUri from 'normalize-uri';
+// import normalizeUrl from 'conservative-normalize-url';
+// import {resolve} from 'relative-to-absolute-iri';
+// import Uri from 'jsuri';
+// @ts-ignore
 import {URL} from '/lib/galimatias';
-//@ts-ignore
+// @ts-ignore
 import {request as httpClientRequest} from '/lib/http-client';
 
 import {exists} from '/lib/explorer/node/exists';
@@ -120,7 +122,7 @@ const getAttributeValue = (
 		return attributeValue;
 	}
 
-	//throw new Error(`Could not find a string value attribute:${name}!`);
+	// throw new Error(`Could not find a string value attribute:${name}!`);
 	return undefined;
 };
 
@@ -130,14 +132,47 @@ const remove = (
 ) => {
 	const elsToRemove = querySelectorAll(node, selector);
 	elsToRemove.forEach((elToRemove) => {
+		// log.info('Removing outerHTML:%s', pretty(outerHTML(elToRemove)));
 		elToRemove.remove();
 	});
 }
 
 
-//const textContent = node => node.text();
+const removeDisplayNoneAndVisibilityHidden = (
+	node :Cheerio<AnyNode>
+) => {
+	const elsWithStyleAttribute = querySelectorAll(node, '[style]');
+	for (let i = 0; i < elsWithStyleAttribute.length; i++) {
+		const elWithStyleAttribute = elsWithStyleAttribute[i];
+		// log.info('Looking at outerHTML:%s', pretty(outerHTML(elWithStyleAttribute)));
+
+		// const styleValue = getAttributeValue(elWithStyleAttribute, 'style');
+		// log.info('styleValue:%s', toStr(styleValue));
+
+		const {
+			display,
+			visibility
+		} = elWithStyleAttribute.css(['display', 'visibility']);
+
+		// const display = elWithStyleAttribute.css('display');
+		// log.info('display:%s', toStr(display));
+
+		// const visibility = elWithStyleAttribute.css('visibility');
+		// log.info('visibility:%s', toStr(visibility));
+
+		if (
+			display === 'none'
+			|| visibility === 'hidden'
+		) {
+			// log.info('Removing outerHTML:%s', pretty(outerHTML(elWithStyleAttribute)));
+			elWithStyleAttribute.remove();
+		}
+	}
+}
+
+// const textContent = node => node.text();
 const outerHTML = (node :Cheerio<AnyNode>) => node.clone().wrap('<div>').parent().html();
-//const innerHTML = node => node.html();
+// const innerHTML = node => node.html();
 
 
 export function run({
@@ -147,11 +182,11 @@ export function run({
 	language,
 	name // Collection name
 }) {
-	log.debug('webcrawl: collectionId:%s', collectionId);
-	//log.debug('webcrawl: collectorId:%s', collectorId);
-	//log.debug('webcrawl: configJson:%s', configJson);
-	//log.debug('webcrawl: language:%s', language);
-	log.debug('webcrawl: name:%s', name);
+	// log.debug('webcrawl: collectionId:%s', collectionId);
+	// log.debug('webcrawl: collectorId:%s', collectorId);
+	// log.debug('webcrawl: configJson:%s', configJson);
+	// log.debug('webcrawl: language:%s', language);
+	// log.debug('webcrawl: name:%s', name);
 
 	const collector = new Collector<{
 		baseUri :string
@@ -228,15 +263,15 @@ export function run({
 
 	// jsuri
 	/*
-	const entryPointUrlObj = new Uri(baseUri); //log.debug(toStr({entryPointUrlObj}));
-	const domain = entryPointUrlObj.host(); //log.debug(`domain:${domain}`);
-	const scheme = entryPointUrlObj.protocol(); //log.debug(`scheme:${scheme}`);
+	const entryPointUrlObj = new Uri(baseUri); // log.debug(toStr({entryPointUrlObj}));
+	const domain = entryPointUrlObj.host(); // log.debug(`domain:${domain}`);
+	const scheme = entryPointUrlObj.protocol(); // log.debug(`scheme:${scheme}`);
 	*/
 
 	// uri-js
 	/*
 	const entryPointUrlObj = parse(baseUri)
-	const domain = entryPointUrlObj.host; //log.debug(toStr({domain}));
+	const domain = entryPointUrlObj.host; // log.debug(toStr({domain}));
 	const scheme = entryPointUrlObj.scheme;
 	*/
 
@@ -254,7 +289,7 @@ export function run({
 	};
 	DEBUG && log.debug('robotsReq:%s', toStr(robotsReq));
 
-	const robotsRes = httpClientRequest(robotsReq) as Response; //log.debug(toStr({robotsRes}));
+	const robotsRes = httpClientRequest(robotsReq) as Response; // log.debug(toStr({robotsRes}));
 	let robots :RobotsTxt;
 	if(robotsRes.status === 200 && robotsRes.contentType === 'text/plain') {
 		robots = guard(parseRobotsTxt(robotsRes.body));
@@ -291,7 +326,7 @@ export function run({
 		DEBUG && log.debug('uri:%s', uri);
 
 		const baseUrlObj = new URL(uri);
-		//log.debug(toStr({baseUrlObj}));
+		// log.debug(toStr({baseUrlObj}));
 
 		try {
 			collector.taskProgressObj.info.uri = uri; // eslint-disable-line no-param-reassign
@@ -337,7 +372,7 @@ export function run({
 				}
 
 				// X-Robots-Tag HTTP header http://www.searchtools.com/robots/x-robots-tag.html
-				//log.debug(toStr({headers: res.headers}));
+				// log.debug(toStr({headers: res.headers}));
 				let boolFollow = true;
 				let boolIndex = true;
 				if (res.headers['X-Robots-Tag']) {
@@ -352,22 +387,28 @@ export function run({
 						boolIndex = false;
 					}
 				}
-				//log.debug(toStr({boolFollow, boolIndex}));
+				// log.debug(toStr({boolFollow, boolIndex}));
 
-				//const dom = parseDOM(res.body, options);
+				// const dom = parseDOM(res.body, options);
 				const rootNode = cheerio.load(res.body, {
-					xmlMode: false
-				}).root(); //log.debug(safeStringify({rootNode})); // Huuuuuuuge!!!
-				//log.debug(safeStringify({html: rootNode.html()}));
+					// decodeEntities: true, // If set to true, entities within the document will be decoded. Defaults to true.
+					// lowerCaseAttributeNames: false,// If set to true, all attribute names will be lowercased. This has noticeable impact on speed, so it defaults to false.
+					lowerCaseTags: true, // If set to true, all tags will be lowercased. If xmlMode is disabled, this defaults to true.
+					// normalizeWhitespace: true, // Removes NEWLINES, but there are still multiple spaces
+					// scriptingEnabled: false, // Disable scripting in parse5, so noscript tags would be parsed.
+					xmlMode: false // Tags are lowercased // When xmlMode is false noscript tags are in the dom, but it's content doesn't show up in querySelector!
+					// xmlMode: true // Avoid stripping noscript tags?
+				}).root(); // log.debug(safeStringify({rootNode})); // Huuuuuuuge!!!
+				// log.debug(safeStringify({html: rootNode.html()}));
 
 				const headEl = querySelector(rootNode, 'head');
-				//log.debug(safeStringify({head: head.html()}));
+				// log.debug(safeStringify({head: head.html()}));
 
 				// Robots <META> tag http://www.searchtools.com/robots/robots-meta.html
 				const robotsMetaEl = querySelector(headEl, 'meta[name=robots]');
 				if (robotsMetaEl) {
 					const robotsMetaHtml = outerHTML(robotsMetaEl);
-					//log.debug(toStr({robotsMetaHtml}));
+					// log.debug(toStr({robotsMetaHtml}));
 					const robotsMetaContentAttr = getAttributeValue(robotsMetaEl, 'content');
 					if (robotsMetaContentAttr) {
 						const robotsMetaUc = robotsMetaContentAttr.toUpperCase();
@@ -389,15 +430,28 @@ export function run({
 				DEBUG && log.debug(`boolIndex:${toStr(boolIndex)}`);
 
 				const titleEl = querySelector(headEl, 'title');
-				//log.debug(`titleEl:${toStr(titleEl)}`); // JSON.stringify got a cyclic data structure
+				// log.debug(`titleEl:${toStr(titleEl)}`); // JSON.stringify got a cyclic data structure
 
 				const title = titleEl ? titleEl.text() : '';
 				DEBUG && log.debug(`title:${toStr(title)}`);
 
 				const bodyEl = querySelector(rootNode, 'body');
+				remove(bodyEl, 'noscript'); // This works
 				remove(bodyEl, 'script');
-				//log.debug(`bodyEl:${toStr(bodyEl)}`); // JSON.stringify got a cyclic data structure
-				//log.debug(safeStringify({body: body.html()}));
+
+				// It seems Cheerio doesn't support *= selectors
+				// remove(bodyEl, '[style*="display:none"]');
+				// remove(bodyEl, '[style*="display: none"]');
+				// remove(bodyEl, '[style*="visibility:hidden"]');
+				// remove(bodyEl, '[style*="visibility: hidden"]');
+				removeDisplayNoneAndVisibilityHidden(bodyEl);
+				// throw new Error('DEBUG');
+
+				remove(bodyEl, '[aria-hidden=true]');
+				remove(bodyEl, '[hidden]');
+
+				// log.debug(`bodyEl:${toStr(bodyEl)}`); // JSON.stringify got a cyclic data structure
+				// log.debug(safeStringify({body: body.html()}));
 
 				const uris = [];
 				if (boolFollow) {
@@ -406,7 +460,7 @@ export function run({
 					linksForLoop:
 					for (let i = 0; i < linkEls.length; i += 1) {
 						const el = linkEls[i];
-						//log.debug(`el:${safeStringify(el)}`); // JSON.stringify got a cyclic data structure
+						// log.debug(`el:${safeStringify(el)}`); // JSON.stringify got a cyclic data structure
 						const rel = getAttributeValue(el, 'rel');
 						if (rel && rel.toUpperCase().includes('NOFOLLOW')) {
 							continue linksForLoop;
@@ -431,16 +485,16 @@ export function run({
 						// jsuri
 						/*
 						const uriObj = new Uri(href);
-						const resolved = resolve(href, uri); //log.debug(toStr({resolved}));
+						const resolved = resolve(href, uri); // log.debug(toStr({resolved}));
 						const resolvedUriObj = new Uri(resolved);
-						const currentHost = resolvedUriObj.host(); //log.debug(toStr({currentHost}));
+						const currentHost = resolvedUriObj.host(); // log.debug(toStr({currentHost}));
 						*/
 
 						// uri-js
 						/*
-						const resolved = resolve(uri, href); //log.debug(toStr({resolved}));
-						const uriObj = parse(resolved); //log.debug(toStr({uriObj}));
-						const currentHost = uriObj.host; //log.debug(toStr({host}));
+						const resolved = resolve(uri, href); // log.debug(toStr({resolved}));
+						const uriObj = parse(resolved); // log.debug(toStr({uriObj}));
+						const currentHost = uriObj.host; // log.debug(toStr({host}));
 						*/
 
 						if (currentHost === domain) {
@@ -449,13 +503,13 @@ export function run({
 							DEBUG && log.debug('webcrawl: normalized:%s', toStr(normalized));
 
 							// jsuri
-							//resolvedUriObj.setAnchor('');
-							//const normalized = normalizeUrl(resolvedUriObj.toString()); log.debug(toStr({normalized}));
-							//const normalized = normalizeUri(resolvedUriObj.toString()); //log.debug(toStr({normalized}));
+							// resolvedUriObj.setAnchor('');
+							// const normalized = normalizeUrl(resolvedUriObj.toString()); log.debug(toStr({normalized}));
+							// const normalized = normalizeUri(resolvedUriObj.toString()); // log.debug(toStr({normalized}));
 
 							// uri-js
-							//delete uriObj.fragment;
-							//const normalized = normalize(serialize(uriObj)); //log.debug(toStr({normalized}));
+							// delete uriObj.fragment;
+							// const normalized = normalize(serialize(uriObj)); // log.debug(toStr({normalized}));
 
 							if (!uris.includes(normalized)) {
 								uris.push(normalized);
@@ -467,14 +521,14 @@ export function run({
 
 				if (boolIndex && (!robots || robots.isIndexable('', uri))) {
 					const documentToPersist :{
-						//displayName :string
+						// displayName :string
 						text :string
 						title :string
 						uri :string
 						uris :Array<string>
 						_id ?:string
 					} = {
-						//displayName: title, // This has no field definition by default
+						// displayName: title, // This has no field definition by default
 						text: bodyEl.text(),
 						title,
 						uri,
@@ -500,7 +554,7 @@ export function run({
 						sort: null,
 						start: null
 					});
-					//log.debug('webcrawl documentsRes:%s', toStr(documentsRes));
+					// log.debug('webcrawl documentsRes:%s', toStr(documentsRes));
 
 					if (documentsRes.total > 1) {
 						throw new Error(`Multiple documents found with uri:${uri}! uri is supposed to be unique!`);
@@ -527,15 +581,15 @@ export function run({
 	} // while
 
 
-	//──────────────────────────────────────────────────────────────────────────
+	// ─────────────────────────────────────────────────────────────────────────
 	// 6. Delete old nodes
-	//──────────────────────────────────────────────────────────────────────────
+	// ─────────────────────────────────────────────────────────────────────────
 	function deleteOldNodes() {
 		/*const filters = addQueryFilter({
 			clause: 'mustNot',
 			filter: hasValue('uri', Object.keys(seenUrisObj))
 		});*/
-		//log.debug(toStr({filters}));
+		// log.debug(toStr({filters}));
 		const res = collector.queryDocuments({
 			aggregations: null,
 			count: -1,
@@ -553,7 +607,7 @@ export function run({
 			sort: null,
 			start: null
 		});
-		//log.debug(`res:${toStr(res)}`); // Huuge!
+		// log.debug(`res:${toStr(res)}`); // Huuge!
 		TRACE && log.debug('count:%s total:%s res.hits.length:%s', res.count, res.total, res.hits.length);
 
 		if (res.hits.length) {
@@ -568,7 +622,7 @@ export function run({
 					_path :string
 					uri :string
 				}>(id);
-				//log.debug('node:%s', toStr(node));
+				// log.debug('node:%s', toStr(node));
 
 				if (node) { // Handle ghost nodes
 					const {_path, uri} = node;
@@ -577,14 +631,14 @@ export function run({
 					nodeId2Uri[id] = uri;
 				}
 			}
-			//log.debug(`nodeId2Uri:${toStr(nodeId2Uri)}`);
+			// log.debug(`nodeId2Uri:${toStr(nodeId2Uri)}`);
 
 			if (idsToDelete.length) {
 				DEBUG && log.debug('deleting ids:%s paths:%s', toStr(idsToDelete), toStr(pathsToDelete));
 				const deleteRes = collector.collection.connection.delete(idsToDelete);
-				//log.debug(toStr({deleteRes}));
+				// log.debug(toStr({deleteRes}));
 				const uris = deleteRes.map(nodeId => nodeId2Uri[nodeId]);
-				//log.debug(toStr({uris}));
+				// log.debug(toStr({uris}));
 				if (uris.length) {
 					uris.forEach((uri) => {
 						collector.journal.successes.push({message: `uri:${uri} deleted`});
