@@ -32,7 +32,7 @@ export const ApiKeys = (props :{
 		servicesBaseUrl
 	});
 
-	const [showAllFields, setShowAllFields] = React.useState(false);
+	const [showAllFields, setShowAllFields] = React.useState(true);
 
 	return <>
 		<Segment basic className="page">
@@ -111,8 +111,20 @@ export const ApiKeys = (props :{
 						<Table.Cell collapsing>{_name}</Table.Cell>
 						{showAllFields ?
 							<>
-								<Table.Cell>{collections.join(', ')}</Table.Cell>
-								<Table.Cell>{interfaces.join(', ')}</Table.Cell>
+								<Table.Cell><ul style={{
+									listStyleType: 'none',
+									margin: 0,
+									padding: 0
+								}}>
+									{collections.map((collectionName, i) => <li key={i} style={{marginBottom: 3}}>{collectionName}</li>)}
+								</ul></Table.Cell>
+								<Table.Cell><ul style={{
+									listStyleType: 'none',
+									margin: 0,
+									padding: 0
+								}}>
+									{interfaces.map((interfaceName, i) => <li key={i} style={{marginBottom: 3}}>{interfaceName}</li>)}
+								</ul></Table.Cell>
 
 								<Table.Cell collapsing>
 									<DeleteApiKeyModal
