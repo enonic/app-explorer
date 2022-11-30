@@ -8,14 +8,18 @@ import {
 } from '/lib/graphql';
 
 
-import {GQL_TYPE_COLLECTIONS_QUERY_RESULT} from '../constants';
+import {
+	GQL_QUERY_COLLECTIONS,
+	GQL_TYPE_COLLECTIONS_QUERY_RESULT
+} from '../constants';
 import {queryCollections} from './queryCollections';
 
 
-export function generateQueryCollectionsField({
+export function addQueryCollections({
 	glue
 }) {
-	return {
+	return glue.addQuery({
+		name: GQL_QUERY_COLLECTIONS,
 		args: {
 			//count: GraphQLInt, // Prefering perPage for now
 			page: GraphQLInt, // Preferring page for now
@@ -36,5 +40,5 @@ export function generateQueryCollectionsField({
 			return queryCollections(env.args);
 		},
 		type: glue.getObjectType(GQL_TYPE_COLLECTIONS_QUERY_RESULT)
-	};
+	});
 }

@@ -1,4 +1,4 @@
-import type {CollectionFormValues} from '/lib/explorer/types/index.d';
+import type {CollectionFormValues} from '@enonic-types/lib-explorer';
 import type {
 	CollectorComponents,
 	SetLicensedToFunction,
@@ -259,7 +259,15 @@ export function Collections(props :{
 									{showCollector ? <Table.Cell collapsing>{collector && collector.name || ''}</Table.Cell> : null}
 									{showDocumentCount ? <Table.Cell collapsing>{documentCount === -1 ? '' : documentCount}</Table.Cell> : null}
 									{showLanguage ? <Table.Cell collapsing>{language}</Table.Cell> : null}
-									{showDocumentType ? <Table.Cell collapsing>{shemaIdToName[documentTypeId]}</Table.Cell> : null }
+									{showDocumentType ? <Table.Cell collapsing>{
+										collector && collector.managedDocumentTypes
+											? <ul style={{
+												listStyleType: 'none',
+												margin: 0,
+												padding: 0
+											}}>{collector.managedDocumentTypes.map((mDTName, i) => <li key={i}>{mDTName} <span style={{color:'gray'}}>(managed)</span></li>)}</ul>
+											: shemaIdToName[documentTypeId]
+									}</Table.Cell> : null }
 									{/*showInterfaces ? <Table.Cell collapsing>{interfaces.map((iface, i :number) => <p key={i}>
 										{i === 0 ? null : <br/>}
 										<span style={{whiteSpace: 'nowrap'}}>{iface}</span>

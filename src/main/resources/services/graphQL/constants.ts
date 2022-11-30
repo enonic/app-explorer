@@ -109,6 +109,7 @@ export const GQL_MUTATION_THESAURUS_IMPORT_NAME = 'importThesaurus';
 //──────────────────────────────────────────────────────────────────────────────
 // Query field names
 //──────────────────────────────────────────────────────────────────────────────
+export const GQL_QUERY_COLLECTIONS = 'queryCollections';
 export const GQL_QUERY_COLLECTOR_GET_MANAGED_DOCUMENT_TYPES = 'getManagedDocumentTypes';
 export const GQL_QUERY_DOCUMENTS = 'queryDocuments';
 export const GQL_QUERY_EXPLORER_REPO_NODES_GET_NAME = 'getExplorerRepoNodes';
