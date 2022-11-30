@@ -98,7 +98,7 @@ export function addQueryQueryTasks({
 				try {
 					task.progress.infoObj = JSON.parse(task.progress.info);
 				} catch (e) {
-					log.warning(`Unable to JSON.parse task.progress.info:${task.progress.info} taskId:${taskId}`);
+					log.debug(`Unable to JSON.parse task.progress.info:${task.progress.info} taskId:${taskId}`);
 					task.progress.infoObj = {}; // satisfy nonNull
 				}
 			}
