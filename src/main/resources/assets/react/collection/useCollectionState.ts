@@ -3,11 +3,12 @@ import type {
 	AnyObject,
 	CollectionFormValues,
 	CollectorComponentImperativeHandle
-} from '/lib/explorer/types/index.d';
+} from '@enonic-types/lib-explorer';
 
 
 import {isFunction} from '@enonic/js-utils';
 import fastDeepEqual from 'fast-deep-equal/react';
+import * as gql from 'gql-query-builder';
 import * as React from 'react';
 import {GQL_MUTATION_CREATE_COLLECTION} from '../../../services/graphQL/collection/mutationCreateCollection';
 import {GQL_MUTATION_UPDATE_COLLECTION} from '../../../services/graphQL/collection/mutationUpdateCollection';
@@ -75,6 +76,7 @@ export function useCollectionState({
 	const [documentTypeId, setDocumentTypeId] = React.useState<string>(getDocumentTypeIdFromInitiaValues(initialValues));
 	const [doCollect, setDoCollect] = React.useState(initialValues.doCollect);
 	const [language, setLanguage] = React.useState(initialValues.language);
+	const [managedDocumentTypes, setManagedDocumentTypes] = React.useState<string[]|null>(null);
 	const [name, setName] = React.useState(initialValues._name);
 
 	//──────────────────────────────────────────────────────────────────────────
@@ -160,6 +162,46 @@ export function useCollectionState({
 		return valid && collectorConfigValid;
 	}, [
 		validateName
+	]);
+
+	//──────────────────────────────────────────────────────────────────────────
+	// Init and updates
+	//──────────────────────────────────────────────────────────────────────────
+	React.useEffect(() => {
+		if (collectorName) {
+			fetch(`${servicesBaseUrl}/graphQL`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(gql.query({
+					operation: 'getManagedDocumentTypes',
+					variables: {
+						collectorId: {
+							required: true,
+							type: 'ID',
+							value: collectorName
+						}
+					}/*,
+					fields: []*/
+				}))
+			})
+				.then(response => response.json())
+				.then(json => {
+					// console.debug('json', json)
+					const {
+						data: {
+							getManagedDocumentTypes
+						}
+					} = json;
+					// console.debug('setting managedDocumentTypes to', getManagedDocumentTypes);
+					setManagedDocumentTypes(getManagedDocumentTypes);
+				});
+		} else {
+			// console.debug('setting managedDocumentTypes to null');
+			setManagedDocumentTypes(null);
+		}
+	},[
+		collectorName,
+		servicesBaseUrl
 	]);
 
 	//──────────────────────────────────────────────────────────────────────────
@@ -319,6 +361,7 @@ export function useCollectionState({
 		isStateChanged,
 		language,
 		loading,
+		managedDocumentTypes,
 		name,
 		nameError,
 		nameOnBlur,

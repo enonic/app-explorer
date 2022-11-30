@@ -47,15 +47,22 @@
 			// Development (should be commented out when commiting)
 			// "@enonic/js-utils/*": ["../enonic-js-utils/src/*"],
 			// "@enonic/semantic-ui-react-form": ["../semantic-ui-react-form/src"],
-			// "/lib/explorer/*": ["../lib-explorer/src/main/resources/lib/explorer/*"],
+			// "/lib/explorer/*": ["../lib-explorer/src/main/resources/lib/explorer/*"]
 			// "/lib/xp/node": ["../xp/modules/lib/lib-node/src/main/resources/lib/xp/node.ts"],
+
 			// Production (should be commented in when commiting)
 			"@enonic/app-explorer/*": ["./src/main/resources/*"],
 			"@enonic/js-utils": ["node_modules/@enonic/js-utils/src"],
+
+			// There is no @enonic-types/lib-explorer yet, so this is a workaround
+			"@enonic-types/lib-explorer": ["../lib-explorer/src/main/resources/lib/explorer/types/index.d"],
+			"@enonic-types/lib-explorer/*": ["../lib-explorer/src/main/resources/lib/explorer/types/*"],
+
 			"/lib/xp/admin": ["node_modules/@enonic-types/lib-admin"],
 			"/lib/xp/auth": ["node_modules/@enonic-types/lib-auth"],
 			"/lib/xp/cluster": ["node_modules/@enonic-types/lib-cluster"],
 			"/lib/xp/event": ["node_modules/@enonic-types/lib-event"],
+			"/lib/xp/io": ["node_modules/@enonic-types/lib-io"],
 			"/lib/xp/node": ["node_modules/@enonic-types/lib-node"],
 			"/lib/xp/repo": ["node_modules/@enonic-types/lib-repo"],
 			"/lib/xp/task": ["node_modules/@enonic-types/lib-task"],
