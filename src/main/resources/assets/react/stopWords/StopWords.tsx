@@ -100,7 +100,13 @@ export function StopWords({
 						</Table.Cell>
 						<Table.Cell collapsing>{_name}</Table.Cell>
 						<Table.Cell collapsing>{words.length}</Table.Cell>
-						<Table.Cell collapsing>{words.join(', ')}</Table.Cell>
+						<Table.Cell collapsing><ul style={{
+							listStyleType: 'none',
+							margin: 0,
+							padding: 0
+						}}>
+							{words.map((word, i) => <li key={i} style={{marginBottom: 3}}>{word}</li>)}
+						</ul></Table.Cell>
 						{showDelete
 							? <Table.Cell collapsing>
 								<Button.Group>
