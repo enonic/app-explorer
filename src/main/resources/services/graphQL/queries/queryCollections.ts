@@ -35,3 +35,4 @@ export const queryCollections = ({
 		modifier
 	}
 }`;
+//hits.collector.managedDocumentTypes

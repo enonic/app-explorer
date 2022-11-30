@@ -3,6 +3,7 @@ import {connect} from '/lib/explorer/repo/connect';
 import {getDocumentCount} from '/lib/explorer/collection/getDocumentCount';
 import {query as qC} from '/lib/explorer/collection/query';
 import {usedInInterfaces} from '/lib/explorer/collection/usedInInterfaces';
+import {getManagedDocumentTypes} from '../collector/addGetManagedDocumentTypes';
 
 
 export function queryCollections({
@@ -76,7 +77,10 @@ export function queryCollections({
 			_path,
 			_score,
 			//collecting: !!activeCollections[_name],
-			collector,
+			collector: collector ? {
+				...collector,
+				managedDocumentTypes: getManagedDocumentTypes(collector.name)
+			} : collector,
 			documentCount: getDocumentCount(_name), // TODO this should live in own graphql resolver
 			interfaces: usedInInterfaces({connection, name: _name}), // TODO this should live in own graphql resolver
 			language,
