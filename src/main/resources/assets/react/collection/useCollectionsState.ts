@@ -3,7 +3,7 @@ import type {
 	Collector,
 	ContentTypeOptions,
 	SiteOptions
-} from '/lib/explorer/types/Collector.d';
+} from '@enonic-types/lib-explorer/Collector.d';
 import type {CollectorComponents} from '../index.d';
 import type {
 	DropdownItemsWithKeys,
@@ -33,9 +33,9 @@ const COLLECTIONS_GQL = `queryCollections(
 		collector {
 			name
 			configJson
+			managedDocumentTypes
 		}
 		documentCount
-		#interfaces
 		language
 		documentTypeId
 	}
@@ -186,13 +186,13 @@ export function useCollectionsState({
 	});
 	const [documentTypes, setDocumentTypes] = React.useState([]);
 
-	const [showCollector, setShowCollector] = React.useState(false);
-	const [showDelete, setShowDelete] = React.useState(false);
+	const [showCollector, setShowCollector] = React.useState(true);
+	const [showDelete, setShowDelete] = React.useState(true);
 	const [showDocumentCount/*, setShowDocumentCount*/] = React.useState(true);
-	const [showLanguage, setShowLanguage] = React.useState(false);
+	const [showLanguage, setShowLanguage] = React.useState(true);
 	const [showInterfaces, setShowInterfaces] = React.useState(false);
-	const [showDocumentType, setShowDocumentType] = React.useState(false);
-	const [showSchedule, setShowSchedule] = React.useState(false);
+	const [showDocumentType, setShowDocumentType] = React.useState(true);
+	const [showSchedule, setShowSchedule] = React.useState(true);
 	const [tasks, setTasks] = React.useState([]);
 	const [copyModalCollectionId, setCopyModalCollectionId] = React.useState<string>();
 

@@ -132,7 +132,11 @@ export function Collection({
 						managedDocumentTypes
 							? <>
 								<Header as='h2' dividing content='Managed document type(s)'/>
-								<ul>
+								<ul style={{
+									listStyleType: 'none',
+									margin: 0,
+									padding: 0
+								}}>
 									{managedDocumentTypes.map((documentTypeName, i) => <li key={i}>{documentTypeName}</li>)}
 								</ul>
 							</>

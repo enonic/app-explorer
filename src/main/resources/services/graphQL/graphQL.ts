@@ -18,7 +18,7 @@ import {
 	RESPONSE_TYPE_JSON//,
 	//toStr
 } from '@enonic/js-utils';
-import prettyMs from 'pretty-ms';
+// import prettyMs from 'pretty-ms';
 //@ts-ignore
 import {newCache} from '/lib/cache';
 import {
@@ -184,7 +184,6 @@ const hasField = hasFieldQuery({glue});
 
 const {
 	createCollectionField,
-	queryCollectionsField,
 	reindexCollectionsField,
 	updateCollectionField
 } = generateCollectionFields({glue});
@@ -293,7 +292,6 @@ const query = glue.schemaGenerator.createObjectType({
 		hasField,
 		listScheduledJobs,
 		queryApiKeys: queryApiKeysField,
-		queryCollections: queryCollectionsField,
 		queryCollectors,
 		queryFields: queryFieldsField,
 		queryInterfaces,
