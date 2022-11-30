@@ -141,7 +141,13 @@ export function Thesauri({
 								/>
 							</Table.Cell>
 							<Table.Cell collapsing>{_name}</Table.Cell>
-							<Table.Cell collapsing>{allowedLanguages.join(', ')}</Table.Cell>
+							<Table.Cell collapsing><ul style={{
+								listStyleType: 'none',
+								margin: 0,
+								padding: 0
+							}}>
+								{allowedLanguages.map((lang, i) => <li key={i} style={{marginBottom: 3}}>{lang}</li>)}
+							</ul></Table.Cell>
 							<Table.Cell collapsing>
 								<Popup
 									content={`Edit ${_name} synonyms`}

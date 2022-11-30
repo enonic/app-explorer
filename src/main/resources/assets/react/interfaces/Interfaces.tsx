@@ -164,7 +164,7 @@ export function Interfaces({
 							listStyleType: 'none',
 							margin: 0,
 							padding: 0
-						}}>{collectionNames.map((c, i) => <li key={i}>{c}</li>)}</ul>}</Table.Cell> : null}
+						}}>{collectionNames.map((c, i) => <li key={i} style={{marginBottom: 3}}>{c}</li>)}</ul>}</Table.Cell> : null}
 						{showFields ? <Table.Cell collapsing disabled={isLoading}><ul style={{
 							listStyleType: 'none',
 							margin: 0,
@@ -173,17 +173,17 @@ export function Interfaces({
 								boost,
 								//fieldId,
 								name
-							}, i) => <li key={i}>{`${name}${(boost && boost > 1) ? `^${boost}` : ''}`}</li>)}</ul></Table.Cell> : null}
+							}, i) => <li key={i} style={{marginBottom: 3}}>{`${name}${(boost && boost > 1) ? `^${boost}` : ''}`}</li>)}</ul></Table.Cell> : null}
 						{showSynonyms ? <Table.Cell collapsing disabled={isLoading}><ul style={{
 							listStyleType: 'none',
 							margin: 0,
 							padding: 0
-						}}>{thesaurusNames.map((c, i) => <li key={i}>{c}</li>)}</ul></Table.Cell> : null}
+						}}>{thesaurusNames.map((c, i) => <li key={i} style={{marginBottom: 3}}>{c}</li>)}</ul></Table.Cell> : null}
 						{showStopWords ? <Table.Cell collapsing disabled={isLoading}><ul style={{
 							listStyleType: 'none',
 							margin: 0,
 							padding: 0
-						}}>{stopWords.map((c, i) => <li key={i}>{c}</li>)}</ul></Table.Cell> : null}
+						}}>{stopWords.map((c, i) => <li key={i} style={{marginBottom: 3}}>{c}</li>)}</ul></Table.Cell> : null}
 						<Table.Cell collapsing>
 							<Button.Group>
 								<SearchModal

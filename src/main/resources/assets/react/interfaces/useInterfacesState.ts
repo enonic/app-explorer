@@ -149,11 +149,11 @@ export function useInterfacesState({
 	const [thesauriOptions, setThesauriOptions] = React.useState<Array<DropdownItemProps>>([]);
 
 	const [showCollectionCount/*, setShowCollectionCount*/] = React.useState(true);
-	const [showCollections, setShowCollections] = React.useState(false);
-	const [showFields, setShowFields] = React.useState(false);
-	const [showSynonyms, setShowSynonyms] = React.useState(false);
-	const [showStopWords, setShowStopWords] = React.useState(false);
-	const [showDelete, setShowDelete] = React.useState(false);
+	const [showCollections, setShowCollections] = React.useState(true);
+	const [showFields, setShowFields] = React.useState(true);
+	const [showSynonyms, setShowSynonyms] = React.useState(true);
+	const [showStopWords, setShowStopWords] = React.useState(true);
+	const [showDelete, setShowDelete] = React.useState(true);
 
 	const [isLoading, setIsLoading] = React.useState(false);
 	const [updatedAt, setUpdatedAt] = React.useState(moment());

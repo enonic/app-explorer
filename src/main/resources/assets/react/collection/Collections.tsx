@@ -265,7 +265,7 @@ export function Collections(props :{
 												listStyleType: 'none',
 												margin: 0,
 												padding: 0
-											}}>{collector.managedDocumentTypes.map((mDTName, i) => <li key={i}>{mDTName} <span style={{color:'gray'}}>(managed)</span></li>)}</ul>
+											}}>{collector.managedDocumentTypes.map((mDTName, i) => <li key={i} style={{marginBottom: 3}}>{mDTName} <span style={{color:'gray'}}>(managed)</span></li>)}</ul>
 											: shemaIdToName[documentTypeId]
 									}</Table.Cell> : null }
 									{/*showInterfaces ? <Table.Cell collapsing>{interfaces.map((iface, i :number) => <p key={i}>

@@ -39,7 +39,7 @@ export function useDocumentTypesState({
 	// The modal state should be handled by newOrEditDocumentTypeModal
 	const [newOrEditModalState, setNewOrEditModalState] = React.useState<DocumentTypeModal>(getDefaultModalState());
 
-	const [showAllFields, setShowAllFields] = React.useState(false);
+	const [showAllFields, setShowAllFields] = React.useState(true);
 	//console.debug('DocumentTypes documentTypes', documentTypes);
 
 	/*const globalFieldsObj = {};
