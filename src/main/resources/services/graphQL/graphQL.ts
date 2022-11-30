@@ -13,7 +13,7 @@
 import type {Request} from '../../types/index.d';
 
 
-import {currentTimeMillis} from '/lib/explorer/time/currentTimeMillis';
+// import {currentTimeMillis} from '/lib/explorer/time/currentTimeMillis';
 import {
 	RESPONSE_TYPE_JSON//,
 	//toStr
@@ -48,6 +48,7 @@ import {addMutationApiKeyUpdate} from './apiKey/addMutationApiKeyUpdate';
 import {generateQueryApiKeysField} from './apiKey/generateQueryApiKeysField';
 
 import {generateCollectionFields} from './collection/generateCollectionFields';
+import {addGetManagedDocumentTypes} from './collector/addGetManagedDocumentTypes';
 import {generateQueryCollectorsField} from './collector/generateQueryCollectorsField';
 import {generateFieldsField} from './field/generateFieldsField';
 import {addQueryFieldGet} from './field/addQueryFieldGet';
@@ -92,7 +93,7 @@ import {createObjectTypesUsingUnionTypes} from './createObjectTypesUsingUnionTyp
 
 
 //const {currentTimeMillis} = Java.type('java.lang.System');
-const serviveStartTimeMs = currentTimeMillis();
+// const serviveStartTimeMs = currentTimeMillis();
 
 
 const SECONDS_TO_CACHE = 3600; // One hour
@@ -232,6 +233,7 @@ const getLicense = generateGetLicenseField({glue});
 const getLocales = generateGetLocalesField({glue});
 const getSites = generateGetSitesField({glue});
 const listScheduledJobs = generateScheduledJobsListField({glue});
+addGetManagedDocumentTypes({glue});
 const queryCollectors = generateQueryCollectorsField({glue});
 
 addExplorerInterfaceTypes({glue});
@@ -326,7 +328,7 @@ export const SCHEMA = getCachedSchema();
 
 
 export function post(request :Request) {
-	const requestStartTimeMs = currentTimeMillis();
+	// const requestStartTimeMs = currentTimeMillis();
 	//log.info(`request:${toStr(request)}`);
 
 	const {body: bodyJson} = request;
@@ -353,10 +355,10 @@ export function post(request :Request) {
 	//log.debug(`Duration: ${duration}ms Query:${query}`);
 
 
-	const endTimeMs = currentTimeMillis();
-	const durationSinceServiceStartMs = endTimeMs - serviveStartTimeMs;
-	const durationSinceRequestStartMs = endTimeMs - requestStartTimeMs;
-	log.info('Since service-start:%s request-start:%s ', prettyMs(durationSinceServiceStartMs), prettyMs(durationSinceRequestStartMs));
+	// const endTimeMs = currentTimeMillis();
+	// const durationSinceServiceStartMs = endTimeMs - serviveStartTimeMs;
+	// const durationSinceRequestStartMs = endTimeMs - requestStartTimeMs;
+	// log.info('Since service-start:%s request-start:%s ', prettyMs(durationSinceServiceStartMs), prettyMs(durationSinceRequestStartMs));
 	return {
 		contentType: RESPONSE_TYPE_JSON,
 		body: //JSON.stringify( // TODO This is causeing problems, commenting it out until I can look at all of them.

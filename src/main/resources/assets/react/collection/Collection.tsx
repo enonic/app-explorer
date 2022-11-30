@@ -1,9 +1,9 @@
-import type {CollectionFormValues} from '/lib/explorer/types/index.d';
+import type {CollectionFormValues} from '@enonic-types/lib-explorer';
 import type {
 	ContentTypeOptions,
 	Fields,
 	SiteOptions
-} from '/lib/explorer/types/Collector.d';
+} from '@enonic-types/lib-explorer/Collector.d';
 import type {
 	CollectorComponents,
 	Locales
@@ -70,6 +70,7 @@ export function Collection({
 		isStateChanged,
 		language,
 		loading,
+		managedDocumentTypes,
 		name,
 		nameError,
 		nameOnBlur,
@@ -127,13 +128,21 @@ export function Collection({
 						options={collectorOptions}
 						setCollectorName={setCollectorName}
 					/>
-					{collectorName
-						? <DocumentTypeSelector
-							documentTypeId={documentTypeId}
-							servicesBaseUrl={servicesBaseUrl}
-							setDocumentTypeId={setDocumentTypeId}
-						/>
-						: null
+					{
+						managedDocumentTypes
+							? <>
+								<Header as='h2' dividing content='Managed document type(s)'/>
+								<ul>
+									{managedDocumentTypes.map((documentTypeName, i) => <li key={i}>{documentTypeName}</li>)}
+								</ul>
+							</>
+							: collectorName
+								? <DocumentTypeSelector
+									documentTypeId={documentTypeId}
+									servicesBaseUrl={servicesBaseUrl}
+									setDocumentTypeId={setDocumentTypeId}
+								/>
+								: null
 					}
 				</Form>
 			</Segment>
