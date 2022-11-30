@@ -3,12 +3,12 @@ import type {AggregationsResponseEntry} from '@enonic/js-utils/src/types/node/qu
 
 
 import {
-	RESPONSE_TYPE_JSON//,
+	RESPONSE_TYPE_JSON,
+	addQueryFilter,
 	//toStr
 } from '@enonic/js-utils';
 
 import {query as queryJournals} from '/lib/explorer/journal/query';
-import {addFilter} from '/lib/explorer/query/addFilter';
 import {hasValue} from '/lib/explorer/query/hasValue';
 
 
@@ -36,11 +36,11 @@ export function get({
 	const intPage = parseInt(page, 10);
 	const start = (intPage - 1 ) * intPerPage;
 
-	const filters = {};
+	let filters = {};
 
 	const collectionsArr = collections.split(',');
 	if(collections) {
-		addFilter({
+		filters = addQueryFilter({
 			filters,
 			filter: hasValue('name', collectionsArr)
 		});
