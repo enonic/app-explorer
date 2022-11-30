@@ -137,14 +137,14 @@ export function DocumentTypes({
 						}}>{collections.map(({
 								name,
 								docCount
-							}, i) => <li key={i}>{name} ({docCount})</li>)}</ul></Table.Cell> : null}
+							}, i) => <li key={i} style={{marginBottom: 3}}>{name} ({docCount})</li>)}</ul></Table.Cell> : null}
 
 						<Table.Cell collapsing disabled={isLoading} textAlign='right'>{activeProperties.length}</Table.Cell>
 						<Table.Cell collapsing disabled={isLoading}><ul style={{
 							listStyleType: 'none',
 							margin: 0,
 							padding: 0
-						}}>{activePropertyNames.sort().map((p, i) => <li key={i}>{p}</li>)}</ul></Table.Cell>
+						}}>{activePropertyNames.sort().map((p, i) => <li key={i} style={{marginBottom: 3}}>{p}</li>)}</ul></Table.Cell>
 
 						{showAllFields ?
 							<>
