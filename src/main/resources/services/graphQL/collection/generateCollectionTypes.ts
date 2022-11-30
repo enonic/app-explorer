@@ -1,4 +1,4 @@
-import type {AnyObject} from '/lib/explorer/types/index.d';
+import type {AnyObject} from '@enonic-types/lib-explorer';
 
 
 // import {toStr} from '@enonic/js-utils';
@@ -34,7 +34,8 @@ export function generateCollectionTypes({
 		name: GQL_TYPE_COLLECTION_COLLECTOR_NAME,
 		fields: {
 			name: { type: nonNull(GraphQLString) },
-			configJson: { type: GraphQLJson } // Can be null when no config yet...
+			configJson: { type: GraphQLJson }, // Can be null when no config yet...
+			managedDocumentTypes: { type: list(GraphQLString) }
 		}
 	});
 

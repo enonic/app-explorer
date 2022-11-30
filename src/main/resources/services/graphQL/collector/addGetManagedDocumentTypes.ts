@@ -18,6 +18,33 @@ const RESOURCE_KEY = Java.type<{ from :(resourcePath :string) => unknown}>('com.
 const FILE_PATH = 'documentTypes.json';
 
 
+export function getManagedDocumentTypes(collectorId: string) {
+	const applicationKey = collectorId.substring(0,collectorId.indexOf(':'));
+	// log.info('applicationKey:%s', applicationKey);
+
+	const resourcePath = `${applicationKey}:${FILE_PATH}`;
+	const resource = getResource(RESOURCE_KEY.from(resourcePath));
+	if (!resource.exists()) {
+		return [];
+	}
+
+	const resourceJson = readText(resource.getStream());
+	let resourceData :Array<{
+			_name :string
+			// addFields ?:boolean
+			// properties ?:DocumentTypeFields
+		}>;
+	try {
+		resourceData = JSON.parse(resourceJson);
+	} catch (e) {
+		log.error(`Something went wrong while parsing resource path:${resourcePath} json:${resourceJson}!`, e);
+		return [];
+	}
+
+	return resourceData.map(({_name}) => _name);
+}
+
+
 export function addGetManagedDocumentTypes({
 	glue
 } :{
@@ -36,29 +63,7 @@ export function addGetManagedDocumentTypes({
 					collectorId
 				}
 			} = env;
-			const applicationKey = collectorId.substring(0,collectorId.indexOf(':'));
-			// log.info('applicationKey:%s', applicationKey);
-
-			const resourcePath = `${applicationKey}:${FILE_PATH}`;
-			const resource = getResource(RESOURCE_KEY.from(resourcePath));
-			if (!resource.exists()) {
-				return [];
-			}
-
-			const resourceJson = readText(resource.getStream());
-			let resourceData :Array<{
-					_name :string
-					// addFields ?:boolean
-					// properties ?:DocumentTypeFields
-				}>;
-			try {
-				resourceData = JSON.parse(resourceJson);
-			} catch (e) {
-				log.error(`Something went wrong while parsing resource path:${resourcePath} json:${resourceJson}!`, e);
-				return [];
-			}
-
-			return resourceData.map(({_name}) => _name);
+			return getManagedDocumentTypes(collectorId);
 		},
 		type: list(GraphQLString)
 	})

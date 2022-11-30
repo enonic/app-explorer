@@ -21,17 +21,18 @@ export type DropdownItemPropsWithKey<Value extends boolean | number | string> = 
 export type DropdownItemsWithKeys<Value extends boolean | number | string> = Array<DropdownItemPropsWithKey<Value>>
 
 export type QueryCollectionsHit = {
-	_id :string
-	_name :string
-	_path :string
-	collector :{
-		name :string
-		configJson :string
+	_id: string
+	_name: string
+	_path: string
+	collector?: {
+		name: string
+		configJson: string
+		managedDocumentTypes?: string[]
 	}
-	documentCount :number
-	//interfaces :{}
-	language :string
-	documentTypeId :string
+	documentCount: number
+	// interfaces: {}
+	language: string
+	documentTypeId: string
 }
 
 export type QueryCollectionsHits = Array<QueryCollectionsHit>

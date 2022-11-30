@@ -47,7 +47,6 @@
 			// Development (should be commented out when commiting)
 			// "@enonic/js-utils/*": ["../enonic-js-utils/src/*"],
 			// "@enonic/semantic-ui-react-form": ["../semantic-ui-react-form/src"],
-			// "/lib/explorer/*": ["../lib-explorer/src/main/resources/lib/explorer/*"]
 			// "/lib/xp/node": ["../xp/modules/lib/lib-node/src/main/resources/lib/xp/node.ts"],
 
 			// Production (should be commented in when commiting)
@@ -57,6 +56,7 @@
 			// There is no @enonic-types/lib-explorer yet, so this is a workaround
 			"@enonic-types/lib-explorer": ["../lib-explorer/src/main/resources/lib/explorer/types/index.d"],
 			"@enonic-types/lib-explorer/*": ["../lib-explorer/src/main/resources/lib/explorer/types/*"],
+			"/lib/explorer/*": ["../lib-explorer/src/main/resources/lib/explorer/*"],
 
 			"/lib/xp/admin": ["node_modules/@enonic-types/lib-admin"],
 			"/lib/xp/auth": ["node_modules/@enonic-types/lib-auth"],
