@@ -19,6 +19,8 @@ import {
 	//toStr
 } from '@enonic/js-utils';
 import prettyMs from 'pretty-ms';
+//@ts-ignore
+import {newCache} from '/lib/cache';
 import {
 	execute
 	//@ts-ignore
@@ -91,6 +93,17 @@ import {createObjectTypesUsingUnionTypes} from './createObjectTypesUsingUnionTyp
 
 //const {currentTimeMillis} = Java.type('java.lang.System');
 const serviveStartTimeMs = currentTimeMillis();
+
+
+const SECONDS_TO_CACHE = 3600; // One hour
+
+
+const schemaCache = newCache({
+	size: 1,
+	expire: SECONDS_TO_CACHE
+});
+
+
 const glue = new Glue();
 
 // There is a bit of a chicken and egg problem with
@@ -295,12 +308,21 @@ const query = glue.schemaGenerator.createObjectType({
 //const objectTypes = glue.getObjectTypes();
 //const unionTypes = glue.getUnionTypes();
 
-export const SCHEMA = glue.schemaGenerator.createSchema({
-	//dictionary: Object.keys(objectTypes).map((k) => objectTypes[k]), // Necessary for types accessed through references
-	//dictionary: Object.keys(unionTypes).map((k) => unionTypes[k]), // Necessary for types accessed through references
-	mutation,
-	query
-}); // SCHEMA
+
+export function getCachedSchema() {
+	return schemaCache.get('static-key', () => {
+		//log.debug('Caching a new Interface GraphQL Schema for %s seconds', SECONDS_TO_CACHE);
+		return glue.schemaGenerator.createSchema({
+			//dictionary: Object.keys(objectTypes).map((k) => objectTypes[k]), // Necessary for types accessed through references
+			//dictionary: Object.keys(unionTypes).map((k) => unionTypes[k]), // Necessary for types accessed through references
+			mutation,
+			query
+		}); // SCHEMA
+	});
+}
+
+
+export const SCHEMA = getCachedSchema();
 
 
 export function post(request :Request) {
