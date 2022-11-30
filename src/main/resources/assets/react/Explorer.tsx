@@ -4,7 +4,7 @@ import type {
 } from './index.d';
 
 
-import * as React from 'react';
+// import * as React from 'react';
 import {Header, Grid, Icon, List, Menu, Sidebar} from 'semantic-ui-react';
 import {ApiKeys} from './api/ApiKeys';
 import {Collections} from './collection/Collections';
@@ -33,25 +33,25 @@ import {
 } from './constants';
 
 
-const handleRender: React.ComponentProps<typeof React.Profiler>["onRender"] = (
-	id,
-	phase,
-	actualDuration,
-	baseDuration,
-	startTime,
-	commitTime,
-	interactions
-) => {
-	console.debug(
-		'id:', id,
-		'phase:', phase,
-		'actualDuration:', actualDuration,
-		'baseDuration:', baseDuration,
-		'startTime:', startTime,
-		'commitTime:', commitTime,
-		'interactions:', interactions
-	);
-}
+// const handleRender: React.ComponentProps<typeof React.Profiler>["onRender"] = (
+// 	id,
+// 	phase,
+// 	actualDuration,
+// 	baseDuration,
+// 	startTime,
+// 	commitTime,
+// 	interactions
+// ) => {
+// 	console.debug(
+// 		'id:', id,
+// 		'phase:', phase,
+// 		'actualDuration:', actualDuration,
+// 		'baseDuration:', baseDuration,
+// 		'startTime:', startTime,
+// 		'commitTime:', commitTime,
+// 		'interactions:', interactions
+// 	);
+// }
 
 
 export function Explorer({
@@ -86,7 +86,8 @@ export function Explorer({
 		initialLicenseValid,
 		servicesBaseUrl
 	});
-	return <React.Profiler id="Explorer" onRender={handleRender}><>
+	// return <React.Profiler id="Explorer" onRender={handleRender}><>
+	return <>
 		<Menu
 			className="admin-ui-gray"
 			inverted
@@ -351,5 +352,6 @@ export function Explorer({
 				</>}
 			</Sidebar.Pusher>
 		</Sidebar.Pushable>
-	</></React.Profiler>;
+	</>;
+	// </></React.Profiler>;
 } // Explorer
