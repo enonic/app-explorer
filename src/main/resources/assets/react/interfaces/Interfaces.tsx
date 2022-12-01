@@ -190,6 +190,7 @@ export function Interfaces({
 									interfaceName={_name}
 									loading={isLoading}
 									fields={fields}
+									servicesBaseUrl={servicesBaseUrl}
 								/>
 								<CopyModal
 									afterClose={memoizedUpdateInterfacesCallback}
