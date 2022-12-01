@@ -7,7 +7,10 @@ import type {SearchProps} from './useSearchState';
 	setIn//,
 	//ucFirst
 } from '@enonic/js-utils';*/
-import {Form} from 'semantic-ui-react';
+import {
+	Form,
+	Segment
+} from 'semantic-ui-react';
 //import traverse from 'traverse';
 
 import {Hits} from './Hits';
@@ -21,15 +24,21 @@ import {useSearchState} from './useSearchState';
 
 export function Search(props: SearchProps) {
 	const {
+		interfaceName: interfaceNameProp = 'default'
+	} = props;
+	const {
 		boolOnChange, setBoolOnChange,
+		interfaceCollectionCount, // setInterfaceCollectionCount,
 		loading, // setLoading,
 		result, // setResult,
 		search,
+		searchedString, // setSearchedString,
 		searchString, setSearchString,
 	} = useSearchState({
 		fieldsProp: props.fields,
-		interfaceNameProp: props.interfaceName,
-		searchStringProp: props.searchString
+		interfaceNameProp,
+		searchStringProp: props.searchString,
+		servicesBaseUrl: props.servicesBaseUrl,
 	});
 	const {
 		//documentTypesAndFields = [],
@@ -45,6 +54,7 @@ export function Search(props: SearchProps) {
 		<Form>
 			<Form.Group widths='equal'>
 				<Form.Input
+					disabled={!interfaceCollectionCount}
 					fluid
 					icon='search'
 					loading={false}
@@ -68,26 +78,49 @@ export function Search(props: SearchProps) {
 						}
 					}}
 				/>
-				<Form.Checkbox
-					checked={boolOnChange}
-					label='Search on every input change?'
-					onChange={(
-						_event,
-						{checked}
-					) => setBoolOnChange(checked)}
-				/>
+				{interfaceCollectionCount
+					? <Form.Checkbox
+						checked={boolOnChange}
+						label='Search on every input change?'
+						onChange={(
+							_event,
+							{checked}
+						) => setBoolOnChange(checked)}
+					/>
+					: null
+				}
+
 			</Form.Group>
 		</Form>
-		<Accordion
-			locales={result.locales || []}
-			profiling={result.profiling || []}
-			synonyms={result.synonyms || []}
-		/>
-		<Hits
-			firstColumnWidth={firstColumnWidth}
-			hits={result.hits}
-			loading={loading}
-		/>
+		{interfaceCollectionCount
+			? <>
+				{searchedString
+					? <Segment basic>
+						You searched for <b>{searchedString}</b> in {interfaceCollectionCount} collections and found {result.total} matching documents.
+					</Segment>
+					: loading
+						? <Segment basic>Searching {interfaceCollectionCount} collections...</Segment>
+						: <Segment basic>Ready to search {interfaceCollectionCount} collections.</Segment>
+				}
+				<Accordion
+					locales={result.locales || []}
+					profiling={result.profiling || []}
+					synonyms={result.synonyms || []}
+				/>
+				{searchedString && !result.total
+					? <Segment basic>D&apos;oh! - No hits - better luck next time...</Segment>
+					: null
+				}
+				<Hits
+					firstColumnWidth={firstColumnWidth}
+					hits={result.hits}
+					loading={loading}
+				/>
+			</>
+			: interfaceNameProp === 'default'
+				? 'No collections available, create a collection to get started'
+				: `There are no collections in the ${interfaceNameProp} interface. Add collections to the interface to get started.`
+		}
 	</>;
 } // function Search
 
