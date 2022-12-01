@@ -14,6 +14,7 @@ type InterfaceName = string;
 type SearchString = string;
 
 export type SearchProps = {
+	servicesBaseUrl: string
 	//documentTypesAndFields ?:Record<string,Fields>
 	fields?: InterfaceField[]
 	firstColumnWidth?: 1|2|3|4|5|6|7|8|9|10|11|12|13|14|15
@@ -32,12 +33,14 @@ type SearchResult = {
 
 
 export function useSearchState({
-	searchStringProp,
+	servicesBaseUrl,
 	// Optional
 	fieldsProp = [],
 	interfaceNameProp = 'default',
+	searchStringProp,
 }: {
 	searchStringProp: SearchString
+	servicesBaseUrl: string
 	// Optional
 	fieldsProp?: InterfaceField[]
 	interfaceNameProp?: InterfaceName
@@ -47,11 +50,13 @@ export function useSearchState({
 
 	const [boolOnChange, setBoolOnChange] = React.useState(false);
 	//console.debug('Search boolOnChange', boolOnChange);
+	const [interfaceCollectionCount, setInterfaceCollectionCount] = React.useState<number>();
 
 	const [loading, setLoading] = React.useState(false);
 	//console.debug('Search loading', loading);
 
 	const [searchString, setSearchString] = React.useState(searchStringProp || '');
+	const [searchedString, setSearchedString] = React.useState('');
 	//console.debug('Search searchString', searchString);
 
 	//const [cache, setCache] = React.useState({} as Cache);
@@ -67,7 +72,66 @@ export function useSearchState({
 	});
 	//console.debug('Search result', result);
 
+	const getInterfaceCollectionCount = React.useCallback(() => {
+		if (interfaceNameProp === 'default') {
+			fetch(`${servicesBaseUrl}/graphQL`, {
+				method: 'POST',
+				headers: {
+					'Content-Type':	'application/json'
+				},
+				body: JSON.stringify(gql.query({
+					operation: 'queryCollections',
+					fields: ['total']
+				}))
+			})
+				.then(response => response.json())
+				.then(json => {
+					// console.debug('json', json);
+					setInterfaceCollectionCount(json.data.queryCollections.total);
+				});
+		} else {
+			fetch(`${servicesBaseUrl}/graphQL`, {
+				method: 'POST',
+				headers: {
+					'Content-Type':	'application/json'
+				},
+				body: JSON.stringify(gql.query({
+					operation: 'queryInterfaces',
+					fields: [{
+						hits: [
+							'_name',
+							'collectionIds'
+						]
+					}]
+				}))
+			})
+				.then(response => response.json())
+				.then(json => {
+					console.debug('json', json);
+					const {hits} = json.data.queryInterfaces
+					let found = false;
+					for (let i = 0; i < hits.length; i++) {
+						const {
+							_name,
+							collectionIds
+						} = hits[i];
+						if (_name === interfaceNameProp) {
+							found = true;
+							setInterfaceCollectionCount(collectionIds.length);
+						}
+					} // for
+					if (!found) {
+						setInterfaceCollectionCount(0);
+					}
+				});
+		}
+	}, [
+		interfaceNameProp,
+		servicesBaseUrl
+	]);
+
 	function search(ss :string) {
+		setSearchedString('');
 		if(!ss) {
 			setResult({
 				count: 0,
@@ -135,7 +199,7 @@ export function useSearchState({
 				searchString: {
 					list: false,
 					required: true,
-					value: searchString
+					value: ss
 				}
 			},
 			fields: [
@@ -246,17 +310,23 @@ export function useSearchState({
 						setResult(search);
 					}
 				}
+				setSearchedString(ss);
 				setLoading(false);
 			}); // fetch
 	} // function search
 
-	React.useEffect(() => search(searchString), []);
+	React.useEffect(() => {
+		getInterfaceCollectionCount();
+		search(searchString);
+	}, []); // eslint-disable-line react-hooks/exhaustive-deps
 
 	return {
 		boolOnChange, setBoolOnChange,
+		interfaceCollectionCount, setInterfaceCollectionCount,
 		loading, setLoading,
 		result, setResult,
 		search,
+		searchedString, setSearchedString,
 		searchString, setSearchString,
 	}
 }
