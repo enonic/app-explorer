@@ -29,6 +29,7 @@ export function Search(props: SearchProps) {
 	const {
 		boolOnChange, setBoolOnChange,
 		interfaceCollectionCount, // setInterfaceCollectionCount,
+		interfaceDocumentCount, // setInterfaceDocumentCount,
 		loading, // setLoading,
 		result, // setResult,
 		search,
@@ -54,7 +55,7 @@ export function Search(props: SearchProps) {
 		<Form>
 			<Form.Group widths='equal'>
 				<Form.Input
-					disabled={!interfaceCollectionCount}
+					disabled={!interfaceCollectionCount || !interfaceDocumentCount}
 					fluid
 					icon='search'
 					loading={false}
@@ -78,7 +79,7 @@ export function Search(props: SearchProps) {
 						}
 					}}
 				/>
-				{interfaceCollectionCount
+				{interfaceCollectionCount && interfaceDocumentCount
 					? <Form.Checkbox
 						checked={boolOnChange}
 						label='Search on every input change?'
@@ -93,32 +94,41 @@ export function Search(props: SearchProps) {
 			</Form.Group>
 		</Form>
 		{interfaceCollectionCount
-			? <>
-				{searchedString
-					? <Segment basic>
-						You searched for <b>{searchedString}</b> in {interfaceCollectionCount} collections and found {result.total} matching documents.
-					</Segment>
-					: loading
-						? <Segment basic>Searching {interfaceCollectionCount} collections...</Segment>
-						: <Segment basic>Ready to search {interfaceCollectionCount} collections.</Segment>
-				}
-				<Accordion
-					locales={result.locales || []}
-					profiling={result.profiling || []}
-					synonyms={result.synonyms || []}
-				/>
-				{searchedString && !result.total
-					? <Segment basic>D&apos;oh! - No hits - better luck next time...</Segment>
-					: null
-				}
-				<Hits
-					firstColumnWidth={firstColumnWidth}
-					hits={result.hits}
-					loading={loading}
-				/>
-			</>
+			? interfaceDocumentCount
+				? <>
+					{searchedString
+						? <Segment basic>
+							Searched {interfaceDocumentCount} documents
+							across {interfaceCollectionCount} collections
+							for <b>{searchedString}</b>
+							<span> and found {result.total} matching documents.</span>
+						</Segment>
+						: loading
+							? <Segment basic>Searching {interfaceDocumentCount} documents across {interfaceCollectionCount} collections...</Segment>
+							: <Segment basic>Ready to search {interfaceDocumentCount} documents across {interfaceCollectionCount} collections.</Segment>
+					}
+					<Accordion
+						locales={result.locales || []}
+						profiling={result.profiling || []}
+						synonyms={result.synonyms || []}
+					/>
+					{searchedString && !result.total
+						? <Segment basic>D&apos;oh! - No hits - better luck next time...</Segment>
+						: null
+					}
+					<Hits
+						firstColumnWidth={firstColumnWidth}
+						hits={result.hits}
+						loading={loading}
+					/>
+				</>
+				: interfaceNameProp === 'default'
+					? 'No documents available, add some documents to a collection to get started.'
+					: interfaceCollectionCount === 1
+						? `There are no documents in the ${interfaceCollectionCount} collection of the ${interfaceNameProp} interface. Add some documents to it to get started.`
+						: `There are no documents in any of the ${interfaceCollectionCount} collections of the ${interfaceNameProp} interface. Add some documents to any of them to get started.`
 			: interfaceNameProp === 'default'
-				? 'No collections available, create a collection to get started'
+				? 'No collections available, create a collection to get started.'
 				: `There are no collections in the ${interfaceNameProp} interface. Add collections to the interface to get started.`
 		}
 	</>;

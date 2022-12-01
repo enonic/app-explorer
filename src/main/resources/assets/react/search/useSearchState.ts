@@ -51,6 +51,7 @@ export function useSearchState({
 	const [boolOnChange, setBoolOnChange] = React.useState(false);
 	//console.debug('Search boolOnChange', boolOnChange);
 	const [interfaceCollectionCount, setInterfaceCollectionCount] = React.useState<number>();
+	const [interfaceDocumentCount, setInterfaceDocumentCount] = React.useState<number>();
 
 	const [loading, setLoading] = React.useState(false);
 	//console.debug('Search loading', loading);
@@ -107,7 +108,7 @@ export function useSearchState({
 			})
 				.then(response => response.json())
 				.then(json => {
-					console.debug('json', json);
+					// console.debug('json', json);
 					const {hits} = json.data.queryInterfaces
 					let found = false;
 					for (let i = 0; i < hits.length; i++) {
@@ -128,6 +129,38 @@ export function useSearchState({
 	}, [
 		interfaceNameProp,
 		servicesBaseUrl
+	]);
+
+	const getInterfaceDocumentCount = React.useCallback(() => {
+		fetch(`./explorer/api/v1/interface/${interfaceNameProp}`, {
+			method: 'POST',
+			headers: {
+				'Content-Type':	'application/json'
+			},
+			body: JSON.stringify(gql.query({
+				operation: 'search',
+				variables: {
+					count: {
+						value: 0
+					},
+					query: {
+						required: false,
+						type: 'QueryDSL',
+						value: {
+							matchAll: {}
+						}
+					}
+				},
+				fields: ['total']
+			}))
+		})
+			.then(response => response.json())
+			.then(json => {
+				// console.debug('json', json);
+				setInterfaceDocumentCount(json.data.search.total);
+			});
+	}, [
+		interfaceNameProp
 	]);
 
 	function search(ss :string) {
@@ -317,12 +350,14 @@ export function useSearchState({
 
 	React.useEffect(() => {
 		getInterfaceCollectionCount();
+		getInterfaceDocumentCount();
 		search(searchString);
 	}, []); // eslint-disable-line react-hooks/exhaustive-deps
 
 	return {
 		boolOnChange, setBoolOnChange,
 		interfaceCollectionCount, setInterfaceCollectionCount,
+		interfaceDocumentCount, setInterfaceDocumentCount,
 		loading, setLoading,
 		result, setResult,
 		search,
