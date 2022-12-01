@@ -1,276 +1,46 @@
+import type {SearchProps} from './useSearchState';
 //import type {AnyObject} from '@enonic/js-utils/src/types';
 //import type {Fields} from '/lib/explorer/types/Field.d';
-import type {InterfaceField} from '/lib/explorer/types/Interface.d';
-import type {Hit} from './Hits';
-import type {
-	Profiling,
-	Synonyms
-} from './index.d';
-
 
 /*import {
 	getIn,
 	setIn//,
 	//ucFirst
 } from '@enonic/js-utils';*/
-import * as gql from 'gql-query-builder';
-import * as React from 'react';
 import {Form} from 'semantic-ui-react';
 //import traverse from 'traverse';
 
 import {Hits} from './Hits';
 import {Accordion} from './Accordion';
+import {useSearchState} from './useSearchState';
 
-
-type InterfaceName = string;
-type SearchString = string;
 //type CacheKey = `${InterfaceName}.${SearchString}`;
-type SearchResult = {
-	count :number
-	hits :Array<Hit>
-	profiling :Array<Profiling>
-	locales :Array<string>
-	synonyms :Synonyms
-	total :number
-}
 //type Cache = Record<CacheKey,SearchResult>;
-
-
 //const forceArray = data => Array.isArray(data) ? data : [data];
 
 
-export function Search(props :{
-	//documentTypesAndFields ?:Record<string,Fields>
-	fields ?:Array<InterfaceField>
-	firstColumnWidth ?:1|2|3|4|5|6|7|8|9|10|11|12|13|14|15
-	interfaceName ?:InterfaceName
-	searchString ?:SearchString
-}) {
-
+export function Search(props: SearchProps) {
+	const {
+		boolOnChange, setBoolOnChange,
+		loading, // setLoading,
+		result, // setResult,
+		search,
+		searchString, setSearchString,
+	} = useSearchState({
+		fieldsProp: props.fields,
+		interfaceNameProp: props.interfaceName,
+		searchStringProp: props.searchString
+	});
 	const {
 		//documentTypesAndFields = [],
 		//collectionOptions = [],
-		fields = [],
 		firstColumnWidth = 2,
-		interfaceName = 'default',
 		//thesaurusOptions = []
 	} = props;
-	//console.debug('Search({fields:', fields,'})');
 	//console.debug('documentTypesAndFields', documentTypesAndFields);
-	//console.debug('Search interfaceName', interfaceName);
-
-	const [boolOnChange, setBoolOnChange] = React.useState(false);
-	//console.debug('Search boolOnChange', boolOnChange);
-
-	const [loading, setLoading] = React.useState(false);
-	//console.debug('Search loading', loading);
-
-	const [searchString, setSearchString] = React.useState(props.searchString || '');
-	//console.debug('Search searchString', searchString);
-
-	//const [cache, setCache] = React.useState({} as Cache);
-	//console.debug('Search cache', cache);
-
-	const [result, setResult] = React.useState<SearchResult>({
-		count: 0,
-		hits: [],
-		profiling: [],
-		locales: [],
-		synonyms: [],
-		total: 0
-	});
-	//console.debug('Search result', result);
-
 	//const [synonyms, setSynonyms] = React.useState([]);
 
-	function search(ss :string) {
-		if(!ss) {
-			setResult({
-				count: 0,
-				hits: [],
-				locales: [],
-				profiling: [],
-				synonyms: [],
-				total: 0
-			});
-			return;
-		}
-		/*const cachedResult = getIn(
-			cache,
-			`${interfaceName}.${ss}`
-		) as SearchResult;
-		if (cachedResult) {
-			setResult(cachedResult);
-			return;
-		}*/
-		setLoading(true);
-		const uri = `./explorer/api/v1/interface/${interfaceName}`;
-		//console.debug(uri);
-
-		const variables :Record<string, {
-			required ?:boolean
-			type ?:string
-			value :unknown
-		}> = {};
-		const fieldsHits :Array<
-			string
-			|Record<string,Array<string>>
-		> = [
-			'_collection',
-			'_documentType',
-		];
-		if (fields.length) {
-			fieldsHits.push('_highlight'); // GraphQLJson
-			variables['highlight'] = {
-				required: false,
-				type: 'InputTypeHighlight',
-				value: {
-					numberOfFragments: 1,
-					postTag: '</b>',
-					preTag: '<b>',
-					fields: fields.map(({
-						name
-					}) => ({
-						field: name
-					}))
-				}
-			}
-		}
-		fieldsHits.push('_json');
-		fieldsHits.push('_score');
-
-		const gqlQuery = gql.query({
-			operation: 'querySynonyms',
-			variables: {
-				//languages,
-				profiling: {
-					list: false,
-					required: false,
-					value: true // TODO Hardcode
-				},
-				searchString: {
-					list: false,
-					required: true,
-					value: searchString
-				}
-			},
-			fields: [
-				'languages',
-				{
-					profiling: [
-						'currentTimeMillis',
-						'label',
-						'operation'
-					]
-				},
-				{
-					synonyms: [
-						'_highlight',
-						'_score',
-						{
-							synonyms: [
-								'locale',
-								'synonym'
-							]
-						},
-						'thesaurusName'
-					]
-				},
-				{
-					operation: 'search',
-					fields: [
-						'count',
-						{
-							hits: fieldsHits
-						},
-						{
-							profiling: [
-								'currentTimeMillis',
-								'label',
-								'operation'
-							]
-						},
-						'total'
-					],
-					variables
-				}
-			]
-		}, null, {
-			operationName: 'InterfaceSearch'
-		});
-		//console.debug('Search() gqlQuery:', gqlQuery);
-
-		fetch(uri, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(gqlQuery)
-		})
-			.then(response => response.json())
-			.then(aResult => {
-				//console.debug('fetch aResult', aResult);
-				if (aResult && aResult.data && aResult.data.querySynonyms) {
-					const {
-						languages,
-						profiling,
-						search,
-						synonyms
-					} = aResult.data.querySynonyms;
-					const profilingArray = [];
-					const currentTimeMillisStart = profiling[0].currentTimeMillis;
-					//if(profiling) {
-						for (let i = 0; i < profiling.length - 1; i += 1) {
-							const durationMs = profiling[i + 1].currentTimeMillis - profiling[i].currentTimeMillis;
-							profiling[i + 1].durationMs = durationMs;
-							const durationSinceLocalStartMs = profiling[i + 1].currentTimeMillis - profiling[0].currentTimeMillis;
-							profiling[i + 1].durationSinceLocalStartMs = durationSinceLocalStartMs;
-							profiling[i + 1].durationSinceTotalStartMs = durationSinceLocalStartMs;
-							profilingArray.push(profiling[i + 1]);
-						}
-						//console.log('querySynonyms profiling', profiling);
-					//}
-					if (search) {
-						const {
-							profiling
-						} = search;
-						//if(profiling) {
-							for (let i = 0; i < profiling.length - 1; i += 1) {
-								const durationMs = profiling[i + 1].currentTimeMillis - profiling[i].currentTimeMillis;
-								profiling[i + 1].durationMs = durationMs;
-								const durationSinceLocalStartMs = profiling[i + 1].currentTimeMillis - profiling[0].currentTimeMillis;
-								profiling[i + 1].durationSinceLocalStartMs = durationSinceLocalStartMs;
-								const durationSinceTotalStartMs = profiling[i + 1].currentTimeMillis - currentTimeMillisStart;
-								profiling[i + 1].durationSinceTotalStartMs = durationSinceTotalStartMs;
-								profilingArray.push(profiling[i + 1]);
-							}
-							//console.log('search profiling', profiling);
-						//}
-						//console.log('search profilingArray', profilingArray);
-						search.locales = languages;
-						search.profiling = profilingArray;
-
-						//if (synonyms) {
-							search.synonyms = synonyms;
-						//}
-						/*setCache(prev => {
-							//console.debug('setCache prev', prev);
-							const deref = JSON.parse(JSON.stringify(prev));
-							if (synonyms) {
-								deref.synonyms = synonyms;
-							}
-							setIn(deref, `${interfaceName}.${ss}`, search);
-							return deref;
-						});*/
-						setResult(search);
-					}
-				}
-				setLoading(false);
-			}); // fetch
-	} // function search
-
-	React.useEffect(() => search(searchString), []);
-
 	// NOTE: If you hold a key down, onKeyDown and onKeyPress happens multiple times!
-
 	return <>
 		<Form>
 			<Form.Group widths='equal'>
