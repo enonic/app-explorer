@@ -18,6 +18,11 @@ export function useJournalsState({
 } :{
 	servicesBaseUrl :string
 }) {
+	const [collectionsPopupOpen, setCollectionsPopupOpen] = React.useState(false);
+	const [columnsPopupOpen, setColumnsPopupOpen] = React.useState(false);
+	const [errorsPopupOpen, setErrorsPopupOpen] = React.useState(false);
+	const [perPagePopupOpen, setPerPagePopupOpen] = React.useState(false);
+	// const [showFilters, setShowFilters] = React.useState(false);
 	const [columns, setColumns] = React.useState({
 		name: true,
 		startTime: true,
@@ -226,11 +231,14 @@ export function useJournalsState({
 
 	return {
 		aggregations,
+		collectionsPopupOpen, setCollectionsPopupOpen,
 		column,
 		columns,
+		columnsPopupOpen, setColumnsPopupOpen,
 		direction,
 		durationSinceLastUpdate,
 		end,
+		errorsPopupOpen, setErrorsPopupOpen,
 		handleCheckboxChange,
 		handleInputChange,
 		handlePaginationChange,
@@ -240,6 +248,8 @@ export function useJournalsState({
 		memoizedSearchJournals,
 		page,
 		params,
+		perPagePopupOpen, setPerPagePopupOpen,
+		// showFilters, setShowFilters,
 		start,
 		total,
 		totalPages

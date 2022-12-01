@@ -1,0 +1,24 @@
+// I have to overcome these:
+// .ui.checkbox input:focus ~ label {
+//   color: rgba(0, 0, 0, 0.95)
+// }
+// .ui.toggle.checkbox input:checked ~ .box,
+// .ui.toggle.checkbox input:checked ~ label {
+//   color: rgba(0, 0, 0, 0.95) !important
+// }
+// .ui.toggle.checkbox .box,
+// .ui.toggle.checkbox label {
+//   color: rgba(0, 0, 0, 0.87)
+// }
+
+.ui.popup.inverted
+	.ui.toggle.checkbox
+		.box,
+		label
+			color: rgba(255, 255, 255, 0.9)
+		input:checked ~
+			.box,
+			label
+				color: rgba(255, 255, 255, 0.9) !important
+		input:focus ~ label
+			color: rgba(255, 255, 255, 0.9)
