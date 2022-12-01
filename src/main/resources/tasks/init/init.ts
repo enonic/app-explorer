@@ -1,3 +1,10 @@
+log.info('Init task read into memory');
+//@ts-ignore
+const {currentTimeMillis} = Java.type('java.lang.System') as {
+	currentTimeMillis :() => number
+};
+const startTimeLoadMs = currentTimeMillis();
+
 import type {RepoConnection} from '/lib/xp/node';
 
 import type {IndexConfigObject} from '/lib/explorer/types.d';
@@ -14,7 +21,7 @@ import {
 	VALUE_TYPE_STRING,
 	addQueryFilter,
 	forceArray,
-	toStr
+	// toStr
 } from '@enonic/js-utils';
 
 //──────────────────────────────────────────────────────────────────────────────
@@ -106,11 +113,6 @@ import {Progress} from './Progress';
 import {applicationListener} from './applicationListener';
 
 
-//@ts-ignore
-const {currentTimeMillis} = Java.type('java.lang.System') as {
-	currentTimeMillis :() => number
-};
-
 const FIELD_TYPE = { // TODO This should not be a system field. Remove in lib-explorer-4.0.0?
 	key: 'type',
 	_name: 'type',
@@ -145,8 +147,9 @@ export const EVENT_INIT_COMPLETE = `${APP_EXPLORER}.init.complete`;
 // However we have ensured it only runs once by surrounding it's submitTask with isMaster.
 
 export function run() {
+	log.info('Init task run() called!');
 	runAsSu(() => {
-		const startTimeMs = currentTimeMillis();
+		const startTimeRunMs = currentTimeMillis();
 		const progress = new Progress({
 			info: 'Task started',
 			//sleepMsAfterItem: 1000, // DEBUG
@@ -824,8 +827,9 @@ export function run() {
 		//submitTask({descriptor: 'test'});
 
 		const endTimeMs = currentTimeMillis();
-		const durationInitMs = endTimeMs - startTimeMs;
-		log.info('Init:%s', prettyMs(durationInitMs));
+		const durationSinceLoadMs = endTimeMs - startTimeLoadMs
+		const durationSinceRunMs = endTimeMs - startTimeRunMs;
+		log.info('Init since load:%s run:%s', prettyMs(durationSinceLoadMs), prettyMs(durationSinceRunMs));
 
 		// 2022-11-21 14:36:23,381 WARN  c.e.x.p.impl.url.PortalUrlBuilder - Portal url build failed
 		// java.lang.NullPointerException: null
