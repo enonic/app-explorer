@@ -271,6 +271,7 @@ export function Explorer({
 						fields={defaultInterfaceFields}
 						interfaceName='default'
 						searchString=''
+						servicesBaseUrl={servicesBaseUrl}
 					/>
 				</>}
 				{licenseValid && page === 'api' && <ApiKeys

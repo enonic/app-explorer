@@ -11,6 +11,7 @@ import {Search} from '../search/Search';
 export function SearchModal({
 	// Required
 	interfaceName,
+	servicesBaseUrl,
 	// Optional
 	afterClose = () => {/**/},
 	beforeOpen = () => {/**/},
@@ -19,7 +20,8 @@ export function SearchModal({
 	loading = false
 } :{
 	// Required
-	interfaceName :string
+	interfaceName: string
+	servicesBaseUrl: string
 	// Optional
 	afterClose ?:() => void
 	beforeOpen ?:() => void
@@ -62,6 +64,7 @@ export function SearchModal({
 				firstColumnWidth={3}
 				fields={fields}
 				interfaceName={interfaceName}
+				servicesBaseUrl={servicesBaseUrl}
 			/>
 		</Modal.Content>
 		<Modal.Actions>
