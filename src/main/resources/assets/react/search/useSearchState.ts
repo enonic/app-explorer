@@ -48,7 +48,7 @@ export function useSearchState({
 	//console.debug('Search({fields:', fieldsProp,'})');
 	//console.debug('Search interfaceName', interfaceNameProp);
 
-	const [boolOnChange, setBoolOnChange] = React.useState(false);
+	// const [boolOnChange, setBoolOnChange] = React.useState(false);
 	//console.debug('Search boolOnChange', boolOnChange);
 	const [interfaceCollectionCount, setInterfaceCollectionCount] = React.useState<number>();
 	const [interfaceDocumentCount, setInterfaceDocumentCount] = React.useState<number>();
@@ -355,7 +355,7 @@ export function useSearchState({
 	}, []); // eslint-disable-line react-hooks/exhaustive-deps
 
 	return {
-		boolOnChange, setBoolOnChange,
+		// boolOnChange, setBoolOnChange,
 		interfaceCollectionCount, setInterfaceCollectionCount,
 		interfaceDocumentCount, setInterfaceDocumentCount,
 		loading, setLoading,
