@@ -143,13 +143,13 @@ export function useSearchState({
 					count: {
 						value: 0
 					},
-					query: {
-						required: false,
-						type: 'QueryDSL',
-						value: {
-							matchAll: {}
-						}
-					}
+					// query: {
+					// 	required: false,
+					// 	type: 'QueryDSL',
+					// 	value: {
+					// 		matchAll: {}
+					// 	}
+					// }
 				},
 				fields: ['total']
 			}))
