@@ -8,7 +8,9 @@ import type {SearchProps} from './useSearchState';
 	//ucFirst
 } from '@enonic/js-utils';*/
 import {
+	Container,
 	Form,
+	Header,
 	Segment
 } from 'semantic-ui-react';
 //import traverse from 'traverse';
@@ -51,7 +53,7 @@ export function Search(props: SearchProps) {
 	//const [synonyms, setSynonyms] = React.useState([]);
 
 	// NOTE: If you hold a key down, onKeyDown and onKeyPress happens multiple times!
-	return <>
+	return <Container>
 		<Form>
 			<Form.Group widths='equal'>
 				<Form.Input
@@ -107,13 +109,14 @@ export function Search(props: SearchProps) {
 							? <Segment basic>Searching {interfaceDocumentCount} documents across {interfaceCollectionCount} collections...</Segment>
 							: <Segment basic>Ready to search {interfaceDocumentCount} documents across {interfaceCollectionCount} collections.</Segment>
 					}
-					<Accordion
-						locales={result.locales || []}
-						profiling={result.profiling || []}
-						synonyms={result.synonyms || []}
-					/>
+
 					{searchedString && !result.total
-						? <Segment basic>D&apos;oh! - No hits - better luck next time...</Segment>
+						? <Segment basic className='c-lgr' size='massive' textAlign='center'>
+							<Header as='h1' content='D&apos;oh!' size='huge' style={{
+								marginBottom: 14
+							}}/>
+							No hits - better luck next time...
+						</Segment>
 						: null
 					}
 					<Hits
@@ -121,6 +124,14 @@ export function Search(props: SearchProps) {
 						hits={result.hits}
 						loading={loading}
 					/>
+					{interfaceNameProp === 'default'
+						? null
+						: searchedString ? <Accordion
+							locales={result.locales || []}
+							profiling={result.profiling || []}
+							synonyms={result.synonyms || []}
+						/> : null
+					}
 				</>
 				: interfaceNameProp === 'default'
 					? 'No documents available, add some documents to a collection to get started.'
@@ -131,7 +142,7 @@ export function Search(props: SearchProps) {
 				? 'No collections available, create a collection to get started.'
 				: `There are no collections in the ${interfaceNameProp} interface. Add collections to the interface to get started.`
 		}
-	</>;
+	</Container>;
 } // function Search
 
 /*
