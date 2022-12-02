@@ -27,7 +27,7 @@ export function Search(props: SearchProps) {
 		interfaceName: interfaceNameProp = 'default'
 	} = props;
 	const {
-		boolOnChange, setBoolOnChange,
+		// boolOnChange, setBoolOnChange,
 		interfaceCollectionCount, // setInterfaceCollectionCount,
 		interfaceDocumentCount, // setInterfaceDocumentCount,
 		loading, // setLoading,
@@ -74,12 +74,12 @@ export function Search(props: SearchProps) {
 					) => {
 						//console.debug('onChange value',value);
 						setSearchString(value);
-						if (boolOnChange) {
-							search(value);
-						}
+						// if (boolOnChange) {
+						// 	search(value);
+						// }
 					}}
 				/>
-				{interfaceCollectionCount && interfaceDocumentCount
+				{/*interfaceCollectionCount && interfaceDocumentCount
 					? <Form.Checkbox
 						checked={boolOnChange}
 						label='Search on every input change?'
@@ -89,7 +89,7 @@ export function Search(props: SearchProps) {
 						) => setBoolOnChange(checked)}
 					/>
 					: null
-				}
+				*/}
 
 			</Form.Group>
 		</Form>
