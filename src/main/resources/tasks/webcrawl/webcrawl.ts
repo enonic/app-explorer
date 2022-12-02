@@ -435,27 +435,31 @@ export function run({
 				const title = titleEl ? titleEl.text() : '';
 				DEBUG && log.debug(`title:${toStr(title)}`);
 
-				const bodyEl = querySelector(rootNode, 'body');
-				remove(bodyEl, 'noscript'); // This works
-				remove(bodyEl, 'script');
+				const bodyElWithNothingRemoved = querySelector(rootNode, 'body');
+				const cleanedBodyEl = bodyElWithNothingRemoved.clone();
+				remove(cleanedBodyEl, 'aside');
+				remove(cleanedBodyEl, 'footer');
+				remove(cleanedBodyEl, 'noscript'); // This works
+				remove(cleanedBodyEl, 'nav');
+				remove(cleanedBodyEl, 'script');
 
 				// It seems Cheerio doesn't support *= selectors
-				// remove(bodyEl, '[style*="display:none"]');
-				// remove(bodyEl, '[style*="display: none"]');
-				// remove(bodyEl, '[style*="visibility:hidden"]');
-				// remove(bodyEl, '[style*="visibility: hidden"]');
-				removeDisplayNoneAndVisibilityHidden(bodyEl);
+				// remove(cleanedBodyEl, '[style*="display:none"]');
+				// remove(cleanedBodyEl, '[style*="display: none"]');
+				// remove(cleanedBodyEl, '[style*="visibility:hidden"]');
+				// remove(cleanedBodyEl, '[style*="visibility: hidden"]');
+				removeDisplayNoneAndVisibilityHidden(cleanedBodyEl);
 				// throw new Error('DEBUG');
 
-				remove(bodyEl, '[aria-hidden=true]');
-				remove(bodyEl, '[hidden]');
+				remove(cleanedBodyEl, '[aria-hidden=true]');
+				remove(cleanedBodyEl, '[hidden]');
 
-				// log.debug(`bodyEl:${toStr(bodyEl)}`); // JSON.stringify got a cyclic data structure
+				// log.debug(`cleanedBodyEl:${toStr(cleanedBodyEl)}`); // JSON.stringify got a cyclic data structure
 				// log.debug(safeStringify({body: body.html()}));
 
 				const uris = [];
 				if (boolFollow) {
-					const linkEls = querySelectorAll(bodyEl, "a[href]:not([href^='#']):not([href^='mailto:']):not([href^='tel:'])");
+					const linkEls = querySelectorAll(bodyElWithNothingRemoved, "a[href]:not([href^='#']):not([href^='mailto:']):not([href^='tel:'])");
 					DEBUG && log.debug('linkEls.length:%s', linkEls.length);
 					linksForLoop:
 					for (let i = 0; i < linkEls.length; i += 1) {
@@ -529,7 +533,7 @@ export function run({
 						_id ?:string
 					} = {
 						// displayName: title, // This has no field definition by default
-						text: bodyEl.text(),
+						text: cleanedBodyEl.text(),
 						title,
 						uri,
 						uris // This has no field definition by default
