@@ -13,6 +13,7 @@ import {Interfaces} from './interfaces/Interfaces';
 import {Journals} from './journal/Journals';
 import {Notifications} from './notifications/Notifications';
 import {Schedule} from './schedule/Schedule';
+import {Documents} from './document/Documents';
 import {DocumentTypes} from './documentTypes/DocumentTypes';
 import {Search} from './search/Search';
 import {Status} from './Status';
@@ -194,10 +195,16 @@ export function Explorer({
 
 				<Menu.Item
 					as='a'
+					href='#documents'
+					active={page === 'documents'}
+					onClick={() => setPage('documents')}
+				><Icon name='file' style={ICON_STYLE}/> Documents</Menu.Item>
+				<Menu.Item
+					as='a'
 					href='#documentTypes'
 					active={page === 'documentTypes'}
 					onClick={() => setPage('documentTypes')}
-				><Icon name='file' style={ICON_STYLE}/> Document types</Menu.Item>
+				><Icon name='file code' style={ICON_STYLE}/> Document types</Menu.Item>
 
 				{/*[
 					'documentTypes',
@@ -294,6 +301,9 @@ export function Explorer({
 					servicesBaseUrl={servicesBaseUrl}
 				/>}
 				{page === 'schedule' && <Schedule
+					servicesBaseUrl={servicesBaseUrl}
+				/>}
+				{page === 'documents' && <Documents
 					servicesBaseUrl={servicesBaseUrl}
 				/>}
 				{page === 'documentTypes' && <DocumentTypes
