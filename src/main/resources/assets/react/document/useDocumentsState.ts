@@ -1,6 +1,9 @@
 import * as gql from 'gql-query-builder';
 import * as React from 'react';
 
+// import {FIELD_PATH_META} from '/lib/explorer/constants'; // TODO setup build system so this import works
+const FIELD_PATH_META = 'document_metadata';
+
 
 export function useDocumentsState({
 	servicesBaseUrl
@@ -30,7 +33,8 @@ export function useDocumentsState({
 					{
 						hits: [
 							'_id',
-							'_json'
+							'_json',
+							FIELD_PATH_META
 						]
 					}
 				]
