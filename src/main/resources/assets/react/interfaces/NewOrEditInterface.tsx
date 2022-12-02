@@ -13,6 +13,7 @@ import {SubmitButton} from '../components/SubmitButton';
 import {fetchInterfaceCreate} from '../../../services/graphQL/fetchers/fetchInterfaceCreate';
 import {fetchInterfaceUpdate} from '../../../services/graphQL/fetchers/fetchInterfaceUpdate';
 import {FieldSelector} from './FieldSelector';
+import {BoostBuilder} from './boost/BoostBuilder';
 import {useNewOrEditInterfaceState} from './useNewOrEditInterfaceState';
 
 
@@ -32,6 +33,7 @@ export function NewOrEditInterface({
 	//console.debug('NewOrEditInterface thesauriOptions', thesauriOptions);
 	const {
 		anyError,
+		boost, setBoost,
 		collectionIds,
 		isDefaultInterface,
 		isLoading,
@@ -107,7 +109,18 @@ export function NewOrEditInterface({
 					value={fields}
 				/>
 				<Header
-					as='h2'
+					as='h3'
+					content='Additional boosting'
+					disabled={isLoading || isDefaultInterface}
+					dividing
+					id='boosting'
+				/>
+				<BoostBuilder
+					boost={boost}
+					setBoost={setBoost}
+				/>
+				<Header
+					as='h3'
 					content='Synonyms'
 					disabled={isLoading || isDefaultInterface}
 					dividing
