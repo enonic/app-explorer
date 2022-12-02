@@ -7,6 +7,10 @@ import {
 import {TypedReactJson} from '../search/TypedReactJson';
 import {useDocumentsState} from './useDocumentsState';
 
+// import {FIELD_PATH_META} from '/lib/explorer/constants'; // TODO setup build system so this import works
+const FIELD_PATH_META = 'document_metadata';
+
+
 export function Documents({
 	servicesBaseUrl
 } :{
@@ -24,12 +28,18 @@ export function Documents({
 			<Table.Header>
 				<Table.Row>
 					<Table.HeaderCell collapsing>Document ID</Table.HeaderCell>
+					<Table.HeaderCell collapsing>Collection</Table.HeaderCell>
+					<Table.HeaderCell collapsing>Document type</Table.HeaderCell>
+					<Table.HeaderCell collapsing>Language</Table.HeaderCell>
 					<Table.HeaderCell collapsing>JSON</Table.HeaderCell>
 				</Table.Row>
 			</Table.Header>
 			<Table.Body>
-				{documentsRes.hits.map(({_id,_json}, i) => <Table.Row key={i}>
+				{documentsRes.hits.map(({_id, _json, ...rest}, i) => <Table.Row key={i}>
 					<Table.Cell collapsing>{_id}</Table.Cell>
+					<Table.Cell collapsing>{rest[FIELD_PATH_META].collection}</Table.Cell>
+					<Table.Cell collapsing>{rest[FIELD_PATH_META].documentType}</Table.Cell>
+					<Table.Cell collapsing>{rest[FIELD_PATH_META].language}</Table.Cell>
 					<Table.Cell collapsing>
 						<Button
 							icon='code'

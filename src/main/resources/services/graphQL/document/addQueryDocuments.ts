@@ -619,12 +619,15 @@ export function addQueryDocuments({
 					//log.debug('obj:%s', toStr(obj));
 
 					return {
+						// _collection: documentNode[FIELD_PATH_META].collection,
+						// _documentType: documentNode[FIELD_PATH_META].documentType,
 						_id,
 						_json: JSON.stringify(obj),
 						_name,
 						_nodeType,
 						_path,
-						_versionKey
+						_versionKey,
+						[FIELD_PATH_META]: documentNode[FIELD_PATH_META],
 					};
 				}) // hits.map
 			}; // return
@@ -659,6 +662,9 @@ export function addQueryDocuments({
 				hits: { type: list(glue.addObjectType({
 					name: GQL_TYPE_DOCUMENT_NAME,
 					fields: {
+						// _collection: { type: GraphQLString },
+						// _documentType: { type: GraphQLString },
+						[FIELD_PATH_META]: { type: GraphQLJson },
 						_id: { type: glue.getScalarType('_id') },
 						_json: { type: GraphQLJson },
 						_name: { type: glue.getScalarType('_name') },
