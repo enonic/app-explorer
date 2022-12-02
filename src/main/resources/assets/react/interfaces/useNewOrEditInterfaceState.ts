@@ -1,4 +1,12 @@
 import type {
+	TermDslExpression,
+	InDslExpression,
+	LikeDslExpression,
+	RangeDslExpression,
+	PathMatchDslExpression,
+	// ExistsDslExpression,
+} from '/lib/xp/node';
+import type {
 	Interface,
 	InterfaceField
 } from '/lib/explorer/types/Interface.d';
@@ -16,6 +24,21 @@ import {mustStartWithALowercaseLetter} from '../utils/mustStartWithALowercaseLet
 import {notDoubleUnderscore} from '../utils/notDoubleUnderscore';
 import {onlyLowercaseAsciiLettersDigitsAndUnderscores} from '../utils/onlyLowercaseAsciiLettersDigitsAndUnderscores';
 import {required} from '../utils/required';
+
+
+export type BoostDSL = {
+	// exists: ExistsDslExpression;
+// } | {
+	pathMatch: PathMatchDslExpression;
+} | {
+	range: RangeDslExpression;
+} | {
+	like: LikeDslExpression;
+} | {
+	in: InDslExpression;
+} | {
+	term: TermDslExpression;
+}
 
 
 function buildGetInterfaceQueryObject({
@@ -121,6 +144,7 @@ export function useNewOrEditInterfaceState({
 	const [collectionIds, setCollectionIds] = React.useState<Array<string>>([]);
 	const [fieldOptions, setFieldOptions] = React.useState<Array<DropdownItemProps>>([]);
 	const [fields, setFields] = React.useState<Array<InterfaceField>>(DEFAULT_INTERFACE_FIELDS);
+	const [boost, setBoost] = React.useState<BoostDSL[]>([]);
 	const [isLoading, setIsLoading] = React.useState(true);
 	const [stopWords, setStopWords] = React.useState<Array<string>>([]);
 	const [synonymIds, setSynonymIds] = React.useState<Array<string>>([]);
@@ -371,6 +395,7 @@ export function useNewOrEditInterfaceState({
 
 	return {
 		anyError,
+		boost, setBoost,
 		collectionIds,
 		currentState: {
 			name,
