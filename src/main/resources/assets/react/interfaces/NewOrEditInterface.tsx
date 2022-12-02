@@ -78,6 +78,7 @@ export function NewOrEditInterface({
 					disabled={isLoading || isDefaultInterface}
 					dividing
 					id='collections'
+					size='medium'
 				/>
 				<Form.Dropdown
 					disabled={isLoading || isDefaultInterface}
@@ -92,11 +93,12 @@ export function NewOrEditInterface({
 					value={collectionIds}
 				/>
 				<Header
-					as='h3'
+					as='h2'
 					content='Fields'
 					disabled={isLoading || isDefaultInterface}
 					dividing
 					id='fields'
+					size='medium'
 				/>
 				<FieldSelector
 					disabled={isLoading || isDefaultInterface}
@@ -105,11 +107,12 @@ export function NewOrEditInterface({
 					value={fields}
 				/>
 				<Header
-					as='h3'
+					as='h2'
 					content='Synonyms'
 					disabled={isLoading || isDefaultInterface}
 					dividing
 					id='synonyms'
+					size='medium'
 				/>
 				<Form.Dropdown
 					disabled={isLoading || isDefaultInterface}
@@ -124,11 +127,12 @@ export function NewOrEditInterface({
 					value={synonymIds}
 				/>
 				<Header
-					as='h3'
+					as='h2'
 					content='Stop words'
 					disabled={isLoading || isDefaultInterface}
 					dividing
 					id='stopwords'
+					size='medium'
 				/>
 				<Form.Dropdown
 					disabled={isLoading || isDefaultInterface}
