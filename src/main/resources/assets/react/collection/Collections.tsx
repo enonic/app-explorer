@@ -194,6 +194,8 @@ export function Collections(props :{
 						);
 						//console.debug('busy', busy);
 
+						const collectorNameOrEmpty = collector && collector.name || '';
+
 						const editEnabled = intInitializedCollectorComponents
 							&& (boolCollectorSelectedAndInitialized || !boolCollectorSelected)
 							&& !busy;
@@ -256,7 +258,7 @@ export function Collections(props :{
 										value={objCollectionsBeingReindexed[collectionId].current}
 									/>{'Reindexing...'}</Table.Cell>
 								: <>
-									{showCollector ? <Table.Cell collapsing>{collector && collector.name || ''}</Table.Cell> : null}
+									{showCollector ? <Table.Cell collapsing>{collectorNameOrEmpty}</Table.Cell> : null}
 									{showDocumentCount ? <Table.Cell collapsing>{documentCount === -1 ? '' : documentCount}</Table.Cell> : null}
 									{showLanguage ? <Table.Cell collapsing>{language}</Table.Cell> : null}
 									{showDocumentType ? <Table.Cell collapsing>{
@@ -273,19 +275,24 @@ export function Collections(props :{
 										<span style={{whiteSpace: 'nowrap'}}>{iface}</span>
 									</p>)}</Table.Cell> : null*/}
 									{showSchedule ? <Table.Cell>{
-										jobsObj[collectionId]
-											? jobsObj[collectionId].map(({enabled, value}, i :number) => {
-												const interval = parseCronExpression(value);
-												const fields = JSON.parse(JSON.stringify(interval.fields)); // Fields is immutable
-												return <pre key={`${_name}.cron.${i}`} style={{color:enabled ? 'auto' : 'gray'}}>
-													{`${Cron.hourToHuman(fields.hour)}:${
-														Cron.minuteToHuman(fields.minute)} ${
-														Cron.dayOfWeekToHuman(fields.dayOfWeek)} in ${
-														rpad(MONTH_TO_HUMAN[fields.month.length === 12 ? '*' : fields.month[0]], 11)} (dayOfMonth:${
-														lpad(fields.dayOfMonth.length === 31 ? '*' : fields.dayOfMonth)})`}
-												</pre>;
-											})
-											: 'Not scheduled'
+										collectorNameOrEmpty
+											? jobsObj[collectionId]
+												? jobsObj[collectionId].map(({enabled, value}, i :number) => {
+													if (jobsObj[collectionId].length === 1 && !enabled) {
+														return 'Inactive';
+													}
+													const interval = parseCronExpression(value);
+													const fields = JSON.parse(JSON.stringify(interval.fields)); // Fields is immutable
+													return <pre key={`${_name}.cron.${i}`} style={{color:enabled ? 'auto' : 'gray'}}>
+														{`${Cron.hourToHuman(fields.hour)}:${
+															Cron.minuteToHuman(fields.minute)} ${
+															Cron.dayOfWeekToHuman(fields.dayOfWeek)} in ${
+															rpad(MONTH_TO_HUMAN[fields.month.length === 12 ? '*' : fields.month[0]], 11)} (dayOfMonth:${
+															lpad(fields.dayOfMonth.length === 31 ? '*' : fields.dayOfMonth)})`}
+													</pre>;
+												})
+												: 'Not scheduled'
+											: 'N/A'
 									}</Table.Cell> : null}
 								</>
 							}
