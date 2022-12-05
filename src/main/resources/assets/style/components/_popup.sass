@@ -1,24 +1,52 @@
-// I have to overcome these:
-// .ui.checkbox input:focus ~ label {
-//   color: rgba(0, 0, 0, 0.95)
-// }
-// .ui.toggle.checkbox input:checked ~ .box,
-// .ui.toggle.checkbox input:checked ~ label {
-//   color: rgba(0, 0, 0, 0.95) !important
-// }
-// .ui.toggle.checkbox .box,
-// .ui.toggle.checkbox label {
-//   color: rgba(0, 0, 0, 0.87)
-// }
+// NOTE: The original values are the commented out ones.
+
+$color-black: #1B1C1D
+$color-gray: #767676
+$color-white: #FFFFFF
 
 .ui.popup.inverted
+	//──────────────────────────────────────────────────────────────────────────
+	// Might affect multiple components
+	//──────────────────────────────────────────────────────────────────────────
+	input
+		// color: fieldtext // User Agent Stylesheet
+		color: $color-white
+	//──────────────────────────────────────────────────────────────────────────
+	// Dropdown (inside inverted popup)
+	//──────────────────────────────────────────────────────────────────────────
+	select.ui.dropdown
+		// border: 1px solid rgba(34, 36, 38, 0.15)
+		border-color: $color-white
+	.ui.dropdown .menu
+		// background: #FFFFFF
+		background: $color-black
+		> .item
+			color: rgba(0, 0, 0, 0.87)
+			color: $color-white
+		> .message:not(.ui)
+			// color: rgba(0, 0, 0, 0.4)
+			color: $color-white
+	.ui.selection.dropdown
+		// background: #FFFFFF
+		background: $color-black
+		// border: 1px solid rgba(34, 36, 38, 0.15)
+		border-color: $color-white
+		// color: rgba(0, 0, 0, 0.87)
+		color: $color-white
+
+	//──────────────────────────────────────────────────────────────────────────
+	// Checkbox (inside inverted popup)
+	//──────────────────────────────────────────────────────────────────────────
 	.ui.toggle.checkbox
 		.box,
 		label
+			// color: rgba(0, 0, 0, 0.87)
 			color: rgba(255, 255, 255, 0.9)
 		input:checked ~
 			.box,
 			label
+				// color: rgba(0, 0, 0, 0.95) !important
 				color: rgba(255, 255, 255, 0.9) !important
 		input:focus ~ label
+			// color: rgba(0, 0, 0, 0.95)
 			color: rgba(255, 255, 255, 0.9)
