@@ -3,8 +3,10 @@ import type {
 } from 'semantic-ui-react';
 
 
+// import {isNumber} from '@enonic/js-utils';
 import * as gql from 'gql-query-builder';
 import * as React from 'react';
+import traverse from 'traverse';
 
 // import {FIELD_PATH_META} from '/lib/explorer/constants'; // TODO setup build system so this import works
 const FIELD_PATH_META = 'document_metadata';
@@ -15,7 +17,15 @@ export const COLUMN_NAME_ID = '_id';
 export const COLUMN_NAME_JSON = '_json';
 export const COLUMN_NAME_LANGUAGE = '_language';
 
-const OPTIONS_COLUMNS_DEFAULT = [{
+export const SELECTED_COLUMNS_DEFAULT = [
+	COLUMN_NAME_COLLECTION,
+	COLUMN_NAME_DOCUMENT_TYPE,
+	COLUMN_NAME_LANGUAGE,
+	COLUMN_NAME_ID,
+	COLUMN_NAME_JSON,
+];
+
+const OPTIONS_COLUMNS_DEFAULT: DropdownItemProps[] = [{
 	text: 'Collection',
 	value: COLUMN_NAME_COLLECTION, // 'document_metadata.collection'
 },{
@@ -44,25 +54,25 @@ export function useDocumentsState({
 		hits: []
 	});
 
-	const [jsonModalState, setJsonModalState] = React.useState({
+	const [jsonModalState, setJsonModalState] = React.useState<{
+		open: boolean
+		id: string
+		parsedJson: Record<string,unknown>
+	}>({
 		open: false,
 		id: '',
-		json: '',
+		parsedJson: undefined,
 	});
 
 	const [columnOptions, setColumnOptions] = React.useState<
 		DropdownItemProps[]
 	>(OPTIONS_COLUMNS_DEFAULT);
 
-	const [selectedColumns, setSelectedColumns] = React.useState([
-		COLUMN_NAME_COLLECTION,
-		COLUMN_NAME_DOCUMENT_TYPE,
-		COLUMN_NAME_LANGUAGE,
-		COLUMN_NAME_ID,
-		COLUMN_NAME_JSON
-	]);
+	const [selectedColumns, setSelectedColumns] = React.useState(SELECTED_COLUMNS_DEFAULT);
 
 	const [columnsHoverOpen, setColumnsHoverOpen] = React.useState(false);
+
+	// const [fields, setFields] = React.useState([]);
 
 	const queryDocuments = React.useCallback(() => {
 		fetch(`${servicesBaseUrl}/graphQL`, {
@@ -84,7 +94,59 @@ export function useDocumentsState({
 		})
 			.then(res => res.json())
 			.then(json => {
-				console.log('json', json);
+				// console.log('json', json);
+				const {hits = []} = json.data.queryDocuments;
+				const fields: string[] = [];
+				for (let i = 0; i < hits.length; i++) {
+					const {_json} = hits[i];
+					let obj = {};
+					try {
+						obj = JSON.parse(_json);
+						// console.log('_json', _json);
+
+						const paths = traverse(obj).paths();
+						// console.log('paths', paths);
+
+						for (let j = 0; j < paths.length; j++) {
+							const pathParts = paths[j];
+							// console.log('pathParts', pathParts);
+
+							let path = '';
+							partsLoop: for (let k = 0; k < pathParts.length; k++) {
+								const part = pathParts[k];
+								if (parseInt(part, 10).toString() === part) {
+									// console.log('isNumber', part);
+									path = pathParts.slice(0,k).join('.');
+									break partsLoop;
+								}
+							} // for partsLoop
+
+							if (!path) {
+								path = pathParts.join('.');
+							}
+
+							if (path && !fields.includes(path)) {
+								// console.log('path', path);
+								fields.push(path);
+							}
+						} // for json obj paths
+					} catch(e) {
+						//no-op
+					}
+					json.data.queryDocuments.hits[i].parsedJson = obj; // Could do this instead of then TypedReactJson.src
+				} // for hits
+				fields.sort();
+				// console.log('fields', fields);
+				// setFields(fields);
+				const newColumnOptions = OPTIONS_COLUMNS_DEFAULT.concat(
+					fields.map((field) => ({
+						text: field,
+						value: field
+					}))
+				);
+				// console.log('newColumnOptions', newColumnOptions);
+				setColumnOptions(newColumnOptions);
+
 				setDocumentsRes(json.data.queryDocuments);
 			});
 	},[
@@ -98,8 +160,9 @@ export function useDocumentsState({
 
 	return {
 		columnsHoverOpen, setColumnsHoverOpen,
-		columnOptions, setColumnOptions,
-		documentsRes, setDocumentsRes,
+		columnOptions, // setColumnOptions,
+		documentsRes, // setDocumentsRes,
+		// fields, setFields,
 		jsonModalState, setJsonModalState,
 		selectedColumns, setSelectedColumns,
 	};
