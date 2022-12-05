@@ -3,10 +3,10 @@ import type {
 } from 'semantic-ui-react';
 
 
-// import {isNumber} from '@enonic/js-utils';
 import * as gql from 'gql-query-builder';
 import * as React from 'react';
 import traverse from 'traverse';
+import {useUpdateEffect} from '../utils/useUpdateEffect';
 
 // import {FIELD_PATH_META} from '/lib/explorer/constants'; // TODO setup build system so this import works
 const FIELD_PATH_META = 'document_metadata';
@@ -49,6 +49,9 @@ export function useDocumentsState({
 }) {
 	// console.debug('servicesBaseUrl', servicesBaseUrl);
 
+	//──────────────────────────────────────────────────────────────────────────
+	// State
+	//──────────────────────────────────────────────────────────────────────────
 	const [documentsRes, setDocumentsRes] = React.useState({
 		total: 0,
 		hits: []
@@ -64,23 +67,108 @@ export function useDocumentsState({
 		parsedJson: undefined,
 	});
 
+	const [collectionOptions, setCollectionOptions] = React.useState<
+		DropdownItemProps[]
+	>([]);
+	// const [collectionsFilter, setCollectionsFilter] = React.useState([]);
+	const [collectionsHoverOpen, setCollectionsHoverOpen] = React.useState(false);
+
 	const [columnOptions, setColumnOptions] = React.useState<
 		DropdownItemProps[]
 	>(OPTIONS_COLUMNS_DEFAULT);
 
-	const [selectedColumns, setSelectedColumns] = React.useState(SELECTED_COLUMNS_DEFAULT);
 
 	const [columnsHoverOpen, setColumnsHoverOpen] = React.useState(false);
 
-	// const [fields, setFields] = React.useState([]);
+	const [documentTypeOptions, setDocumentTypeOptions] = React.useState<
+		DropdownItemProps[]
+	>([]);
 
-	const queryDocuments = React.useCallback(() => {
+	const [documentTypesHoverOpen, setDocumentTypesHoverOpen] = React.useState(false);
+
+	const [selectedCollections, setSelectedCollections] = React.useState<string[]>([]);
+	const [selectedColumns, setSelectedColumns] = React.useState(SELECTED_COLUMNS_DEFAULT);
+	const [selectedDocumentTypes, setSelectedDocumentTypes] = React.useState<string[]>([]);
+
+	//──────────────────────────────────────────────────────────────────────────
+	// Callbacks
+	//──────────────────────────────────────────────────────────────────────────
+	const queryDocuments = React.useCallback(({
+		collectionsFilter = [],
+		documentsTypesFilter = [],
+		updateSelectedCollections = false,
+		updateSelectedDocumentTypes = false,
+	}: {
+		collectionsFilter?: string[]
+		documentsTypesFilter?: string[]
+		updateSelectedCollections?: boolean
+		updateSelectedDocumentTypes?: boolean
+	} = {}) => {
+		const filters = [];
+		if (collectionsFilter.length) {
+			filters.push({
+				hasValue: {
+					field: 'document_metadata.collection',
+					stringValues: collectionsFilter
+				}
+			})
+		}
+		if (documentsTypesFilter.length) {
+			filters.push({
+				hasValue: {
+					field: 'document_metadata.documentType',
+					stringValues: documentsTypesFilter
+				}
+			})
+		}
+
 		fetch(`${servicesBaseUrl}/graphQL`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify(gql.query({
 				operation: 'queryDocuments',
+				variables: {
+					aggregations: {
+						list: true,
+						required: false,
+						type: 'AggregationInput',
+						value: [{
+							name: 'collections',
+							terms: {
+								field: 'collectionName',
+								order: '_count DESC',
+								size: 100,
+								minDocCount: 0,
+							}
+						},{
+							name: 'documentTypes',
+							terms: {
+								field: 'documentTypeName',
+								order: '_count DESC',
+								size: 100,
+								minDocCount: 0,
+							}
+						}]
+					},
+					filters: {
+						list: true,
+						required: false,
+						type: 'FilterInput',
+						value: filters
+					}
+				}, // variables
 				fields: [
+					{
+						aggregations: [
+							'name',
+							{
+								buckets: [
+									'docCount',
+									'key'
+								]
+							}
+						]
+					},
 					'total',
 					{
 						hits: [
@@ -95,7 +183,48 @@ export function useDocumentsState({
 			.then(res => res.json())
 			.then(json => {
 				// console.log('json', json);
-				const {hits = []} = json.data.queryDocuments;
+				const {
+					aggregations = [],
+					hits = []
+				} = json.data.queryDocuments;
+
+				for (let i = 0; i < aggregations.length; i++) {
+					const {
+						name,
+						buckets = []
+					} = aggregations[i];
+					if (name === 'collections') {
+						const newSelectedCollections = [];
+						const newCollectionOptions = buckets.map(({docCount,key}) => {
+							newSelectedCollections.push(key);
+							return {
+								text: `${key} (${docCount})`,
+								value: key
+							};
+						});
+						setCollectionOptions(newCollectionOptions);
+						// console.log('newSelectedCollections', newSelectedCollections);
+						if (updateSelectedCollections) {
+							setSelectedCollections(newSelectedCollections);
+						}
+					}
+					if (name === 'documentTypes') {
+						const newSelectedDocumentTypes = [];
+						const newDocumentTypeOptions = buckets.map(({docCount,key}) => {
+							newSelectedDocumentTypes.push(key);
+							return {
+								text: `${key} (${docCount})`,
+								value: key
+							};
+						});
+						setDocumentTypeOptions(newDocumentTypeOptions);
+						// console.log('newSelectedDocumentTypes', newSelectedDocumentTypes);
+						if (updateSelectedDocumentTypes) {
+							setSelectedDocumentTypes(newSelectedDocumentTypes);
+						}
+					}
+				} // for aggregations
+
 				const fields: string[] = [];
 				for (let i = 0; i < hits.length; i++) {
 					const {_json} = hits[i];
@@ -137,7 +266,6 @@ export function useDocumentsState({
 				} // for hits
 				fields.sort();
 				// console.log('fields', fields);
-				// setFields(fields);
 				const newColumnOptions = OPTIONS_COLUMNS_DEFAULT.concat(
 					fields.map((field) => ({
 						text: field,
@@ -154,16 +282,41 @@ export function useDocumentsState({
 		setDocumentsRes,
 	]);
 
-	React.useEffect(() => queryDocuments(), [
+	//──────────────────────────────────────────────────────────────────────────
+	// Effects
+	//──────────────────────────────────────────────────────────────────────────
+	React.useEffect(() => queryDocuments({
+		updateSelectedCollections: true,
+		updateSelectedDocumentTypes: true
+	}), [
 		queryDocuments
 	]); // Only once
 
+	useUpdateEffect(() => {
+		// console.log('selectedCollections or selectedDocumentTypes changed', selectedCollections, selectedDocumentTypes);
+		queryDocuments({
+			collectionsFilter: selectedCollections,
+			documentsTypesFilter: selectedDocumentTypes
+		});
+	}, [
+		selectedCollections,
+		selectedDocumentTypes
+	]);
+
+	//──────────────────────────────────────────────────────────────────────────
+	// Returns
+	//──────────────────────────────────────────────────────────────────────────
 	return {
+		collectionOptions, // setCollectionOptions,
+		collectionsHoverOpen, setCollectionsHoverOpen,
 		columnsHoverOpen, setColumnsHoverOpen,
 		columnOptions, // setColumnOptions,
 		documentsRes, // setDocumentsRes,
-		// fields, setFields,
+		documentTypeOptions, // setDocumentTypeOptions,
+		documentTypesHoverOpen, setDocumentTypesHoverOpen,
 		jsonModalState, setJsonModalState,
+		selectedCollections, setSelectedCollections,
 		selectedColumns, setSelectedColumns,
+		selectedDocumentTypes, setSelectedDocumentTypes,
 	};
 }
