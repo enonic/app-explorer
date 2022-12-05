@@ -31,6 +31,7 @@ import {connect} from '/lib/explorer/repo/connect';
 import {multiConnect} from '/lib/explorer/repo/multiConnect';
 import {
 	GraphQLBoolean,
+	GraphQLFloat,
 	GraphQLID,
 	GraphQLInt,
 	GraphQLString,
@@ -222,28 +223,39 @@ export function addQueryDocuments({
 }) {
 	const filterInput = addFilterInput({glue});
 
+	const fulltextInputType = glue.addInputType({
+		name: 'QueryDSLExpressionFulltext',
+		fields: {
+			//field: { type: nonNull(GraphQLString) },
+			fields: { type: nonNull(list(GraphQLString)) },
+			query: { type: nonNull(GraphQLString) },
+			// Optional
+			operator: { type: GraphQLString }, // "AND" || "OR"
+			boost: { type: GraphQLFloat },
+		}
+	});
+
+	const termInputType = glue.addInputType({
+		name: 'QueryDSLTermExpression',
+		fields: {
+			boost: {
+				type: GraphQLInt
+			},
+			field: {
+				type: nonNull(GraphQLString)
+			},
+			value: {
+				type: GraphQLString // TODO
+			}
+		} // fields
+	});
+
 	const queryDslBooleanClauseInput = glue.addInputType({
 		name: GQL_INPUT_TYPE_QUERY_DSL_BOOLEAN_CLAUSE,
 		fields: {
-			matchAll: {
-				type: addMatchAll({glue})
-			},
-			term: {
-				type: glue.addInputType({
-					name: 'QueryDSLTermExpression',
-					fields: {
-						boost: {
-							type: GraphQLInt
-						},
-						field: {
-							type: nonNull(GraphQLString)
-						},
-						value: {
-							type: GraphQLString // TODO
-						}
-					} // fields
-				}) // QueryDSLTermExpression
-			} // term
+			fulltext: { type: fulltextInputType },
+			matchAll: { type: addMatchAll({glue}) },
+			term: { type: termInputType }
 		} // fields
 	});
 
@@ -266,7 +278,7 @@ export function addQueryDocuments({
 					}
 				})
 			},
-			matchAll: {
+			matchAll: { // Can't remove, it's in use
 				type: addMatchAll({glue})
 			}
 		}
