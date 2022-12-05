@@ -1,12 +1,12 @@
-import type {
-	DropdownItemProps,
-} from 'semantic-ui-react';
+import type {DslOperator} from '/lib/xp/node';
+import type {DropdownItemProps} from 'semantic-ui-react';
 
 
+import {QUERY_OPERATOR_OR} from '@enonic/js-utils';
 import * as gql from 'gql-query-builder';
+import {difference} from 'lodash';
 import * as React from 'react';
 import traverse from 'traverse';
-import {useUpdateEffect} from '../utils/useUpdateEffect';
 
 // import {FIELD_PATH_META} from '/lib/explorer/constants'; // TODO setup build system so this import works
 const FIELD_PATH_META = 'document_metadata';
@@ -70,7 +70,6 @@ export function useDocumentsState({
 	const [collectionOptions, setCollectionOptions] = React.useState<
 		DropdownItemProps[]
 	>([]);
-	// const [collectionsFilter, setCollectionsFilter] = React.useState([]);
 	const [collectionsHoverOpen, setCollectionsHoverOpen] = React.useState(false);
 
 	const [columnOptions, setColumnOptions] = React.useState<
@@ -86,6 +85,9 @@ export function useDocumentsState({
 
 	const [documentTypesHoverOpen, setDocumentTypesHoverOpen] = React.useState(false);
 
+	const [operatorState, setOperatorState] = React.useState<DslOperator>(QUERY_OPERATOR_OR);
+	const [query, setQuery] = React.useState<string>('');
+
 	const [selectedCollections, setSelectedCollections] = React.useState<string[]>([]);
 	const [selectedColumns, setSelectedColumns] = React.useState(SELECTED_COLUMNS_DEFAULT);
 	const [selectedDocumentTypes, setSelectedDocumentTypes] = React.useState<string[]>([]);
@@ -96,14 +98,21 @@ export function useDocumentsState({
 	const queryDocuments = React.useCallback(({
 		collectionsFilter = [],
 		documentsTypesFilter = [],
+		operator = QUERY_OPERATOR_OR,
+		query = '',
+		selectedColumns = SELECTED_COLUMNS_DEFAULT,
 		updateSelectedCollections = false,
 		updateSelectedDocumentTypes = false,
 	}: {
 		collectionsFilter?: string[]
 		documentsTypesFilter?: string[]
+		operator?: DslOperator
+		query?: string
+		selectedColumns?: string[]
 		updateSelectedCollections?: boolean
 		updateSelectedDocumentTypes?: boolean
-	} = {}) => {
+	}) => {
+		// console.debug('queryDocuments');
 		const filters = [];
 		if (collectionsFilter.length) {
 			filters.push({
@@ -120,6 +129,30 @@ export function useDocumentsState({
 					stringValues: documentsTypesFilter
 				}
 			})
+		}
+
+		let queryValue = null;
+		if (query) {
+			const jsonColumns = difference(selectedColumns, SELECTED_COLUMNS_DEFAULT);
+			const fields = jsonColumns.length ? jsonColumns.map(f => `${f}^3`): [];
+			fields.push(
+				'document_metadata.collection^2',
+				'document_metadata.documentType^2',
+				'document_metadata.language^2',
+				'_allText', // WARNING: Frequently fields are not duplicated into _allText
+			)
+			queryValue = {
+				boolean: {
+					must: {
+						fulltext: {
+							fields,
+							operator,
+							query
+						}
+					}
+				}
+			}
+			// console.log('queryValue', queryValue);
 		}
 
 		fetch(`${servicesBaseUrl}/graphQL`, {
@@ -155,6 +188,12 @@ export function useDocumentsState({
 						required: false,
 						type: 'FilterInput',
 						value: filters
+					},
+					query: {
+						list: false,
+						required: false,
+						type: 'QueryDSL',
+						value: queryValue
 					}
 				}, // variables
 				fields: [
@@ -287,21 +326,10 @@ export function useDocumentsState({
 	//──────────────────────────────────────────────────────────────────────────
 	React.useEffect(() => queryDocuments({
 		updateSelectedCollections: true,
-		updateSelectedDocumentTypes: true
+		updateSelectedDocumentTypes: true,
 	}), [
-		queryDocuments
+		queryDocuments // changes if servicesBaseUrl or setDocumentsRes changes
 	]); // Only once
-
-	useUpdateEffect(() => {
-		// console.log('selectedCollections or selectedDocumentTypes changed', selectedCollections, selectedDocumentTypes);
-		queryDocuments({
-			collectionsFilter: selectedCollections,
-			documentsTypesFilter: selectedDocumentTypes
-		});
-	}, [
-		selectedCollections,
-		selectedDocumentTypes
-	]);
 
 	//──────────────────────────────────────────────────────────────────────────
 	// Returns
@@ -315,6 +343,9 @@ export function useDocumentsState({
 		documentTypeOptions, // setDocumentTypeOptions,
 		documentTypesHoverOpen, setDocumentTypesHoverOpen,
 		jsonModalState, setJsonModalState,
+		operatorState, setOperatorState,
+		query, setQuery,
+		queryDocuments,
 		selectedCollections, setSelectedCollections,
 		selectedColumns, setSelectedColumns,
 		selectedDocumentTypes, setSelectedDocumentTypes,
