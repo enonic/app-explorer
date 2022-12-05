@@ -1,3 +1,4 @@
+import {getIn} from '@enonic/js-utils';
 import {
 	Button,
 	Dropdown,
@@ -13,6 +14,7 @@ import {
 	COLUMN_NAME_LANGUAGE,
 	COLUMN_NAME_ID,
 	COLUMN_NAME_JSON,
+	SELECTED_COLUMNS_DEFAULT,
 	useDocumentsState
 } from './useDocumentsState';
 
@@ -42,6 +44,60 @@ export function Documents({
 				onChange={(
 					_event :React.ChangeEvent<HTMLInputElement>,
 					{value}
+				) => {/*setSelectedColumns(value as string[])*/}}
+				search
+				selection
+				style={{marginTop:6}}
+				value={undefined}
+			/>}
+			header='Collections'
+			icon='database'
+			open={false}
+			setOpen={()=>{/*todo*/}}
+		/>
+		<HoverPopup
+			content={<Dropdown
+				multiple
+				options={columnOptions}
+				onChange={(
+					_event :React.ChangeEvent<HTMLInputElement>,
+					{value}
+				) => {/*setSelectedColumns(value as string[])*/}}
+				search
+				selection
+				style={{marginTop:6}}
+				value={undefined}
+			/>}
+			header='Document types'
+			icon='file code'
+			open={false}
+			setOpen={()=>{/*todo*/}}
+		/>
+		<HoverPopup
+			content={<Dropdown
+				multiple
+				options={columnOptions}
+				onChange={(
+					_event :React.ChangeEvent<HTMLInputElement>,
+					{value}
+				) => {/*setSelectedColumns(value as string[])*/}}
+				search
+				selection
+				style={{marginTop:6}}
+				value={undefined}
+			/>}
+			header='Languages'
+			icon='language'
+			open={false}
+			setOpen={()=>{/*todo*/}}
+		/>
+		<HoverPopup
+			content={<Dropdown
+				multiple
+				options={columnOptions}
+				onChange={(
+					_event :React.ChangeEvent<HTMLInputElement>,
+					{value}
 				) => {setSelectedColumns(value as string[])}}
 				search
 				selection
@@ -49,7 +105,7 @@ export function Documents({
 				value={selectedColumns}
 			/>}
 			header='Columns'
-			icon='database'
+			icon='columns'
 			open={columnsHoverOpen}
 			setOpen={setColumnsHoverOpen}
 		/>
@@ -63,7 +119,12 @@ export function Documents({
 				</Table.Row>
 			</Table.Header>
 			<Table.Body>
-				{documentsRes.hits.map(({_id, _json, ...rest}, i) => <Table.Row key={i}>
+				{documentsRes.hits.map(({
+					_id,
+					// _json,
+					parsedJson,
+					...rest
+				}, i) => <Table.Row key={i}>
 					{selectedColumns.includes(COLUMN_NAME_COLLECTION)
 						? <Table.Cell collapsing>{rest[FIELD_PATH_META].collection}</Table.Cell>
 						: null
@@ -88,14 +149,20 @@ export function Documents({
 									setJsonModalState({
 										open: true,
 										id: _id,
-										json: _json,
+										parsedJson: parsedJson,
 									})
 								}}
 							/>
 						</Table.Cell>
 						: null
 					}
-
+					{
+						selectedColumns.map((selectedColumnName, j) => {
+							if (!SELECTED_COLUMNS_DEFAULT.includes(selectedColumnName)) {
+								return <Table.Cell collapsing key={`${i}.${j}`}>{getIn(parsedJson, selectedColumnName)}</Table.Cell>;
+							}
+						}).filter(x=>x)
+					}
 				</Table.Row>)}
 			</Table.Body>
 		</Table>
@@ -104,12 +171,12 @@ export function Documents({
 			onClose={() => setJsonModalState({
 				open: false,
 				id: '',
-				json: '',
+				parsedJson: undefined,
 			})}
 		>
 			<Modal.Header content={jsonModalState.id}/>
 			<Modal.Content>
-				{jsonModalState.json
+				{jsonModalState.parsedJson
 					? <TypedReactJson
 						enableClipboard={false}
 						displayArrayKey={false}
@@ -119,7 +186,7 @@ export function Documents({
 						name={null}
 						quotesOnKeys={false}
 						sortKeys={true}
-						src={JSON.parse(jsonModalState.json)}
+						src={jsonModalState.parsedJson}
 					/>
 					: null}
 			</Modal.Content>
