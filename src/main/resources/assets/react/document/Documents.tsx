@@ -1,9 +1,16 @@
-import {getIn} from '@enonic/js-utils';
+import {
+	QUERY_OPERATOR_AND,
+	QUERY_OPERATOR_OR,
+	getIn
+} from '@enonic/js-utils';
 import {
 	Button,
 	Dropdown,
+	Form,
 	Header,
+	Input,
 	Modal,
+	Radio,
 	Table,
 } from 'semantic-ui-react';
 import {TypedReactJson} from '../search/TypedReactJson';
@@ -36,6 +43,9 @@ export function Documents({
 		documentTypeOptions, // setDocumentTypeOptions,
 		documentTypesHoverOpen, setDocumentTypesHoverOpen,
 		jsonModalState, setJsonModalState,
+		operatorState, setOperatorState,
+		query, setQuery,
+		queryDocuments,
 		selectedCollections, setSelectedCollections,
 		selectedColumns, setSelectedColumns,
 		selectedDocumentTypes, setSelectedDocumentTypes,
@@ -43,86 +53,175 @@ export function Documents({
 		servicesBaseUrl
 	})
 	return <>
-		<HoverPopup
-			content={<Dropdown
-				clearable
-				multiple
-				name='collections'
-				onChange={(
-					_event :React.ChangeEvent<HTMLInputElement>,
-					{value}
-				) => {setSelectedCollections(value as string[])}}
-				options={collectionOptions}
-				search
-				selection
-				style={{marginTop:6}}
-				value={selectedCollections}
-			/>}
-			header='Collections'
-			icon='database'
-			open={collectionsHoverOpen}
-			setOpen={setCollectionsHoverOpen}
-		/>
-		<HoverPopup
-			content={<Dropdown
-				clearable
-				multiple
-				name='documentTypes'
-				onChange={(
-					_event :React.ChangeEvent<HTMLInputElement>,
-					{value}
-				) => {setSelectedDocumentTypes(value as string[])}}
-				options={documentTypeOptions}
-				search
-				selection
-				style={{marginTop:6}}
-				value={selectedDocumentTypes}
-			/>}
-			header='Document types'
-			icon='file code'
-			open={documentTypesHoverOpen}
-			setOpen={setDocumentTypesHoverOpen}
-		/>
-		{/*<HoverPopup
-			content={<Dropdown
-				clearable
-				multiple
-				options={columnOptions}
-				onChange={(
-					_event :React.ChangeEvent<HTMLInputElement>,
-					{value}
-				) => {}}
-				search
-				selection
-				style={{marginTop:6}}
-				value={undefined}
-			/>}
-			header='Languages'
-			icon='language'
-			open={false}
-			setOpen={()=>{}}
-		/>*/}
-		<HoverPopup
-			content={<Dropdown
-				defaultValue={[]}
-				multiple
-				name='columns'
-				onChange={(
-					_event :React.ChangeEvent<HTMLInputElement>,
-					{value}
-				) => {setSelectedColumns(value as string[])}}
-				options={columnOptions}
-				search
-				selection
-				style={{marginTop:6}}
-				value={selectedColumns}
-			/>}
-			header='Columns'
-			icon='columns'
-			open={columnsHoverOpen}
-			setOpen={setColumnsHoverOpen}
-		/>
 		<Header as='h1' content='Documents'/>
+		<Form>
+			<Form.Group>
+				<Input
+					icon='search'
+					onChange={(
+						_event :React.ChangeEvent<HTMLInputElement>,
+						{value}
+					) => {setQuery(value as string)}}
+					onKeyUp={(event :{
+						which :number
+					}) => {
+						//console.debug('onKeyUp event.which',event.which);
+						if(event.which == 10 || event.which == 13) {
+							//console.debug('onKeyUp searchString',searchString);
+							queryDocuments({
+								collectionsFilter: selectedCollections,
+								documentsTypesFilter: selectedDocumentTypes,
+								query,
+								operator: operatorState,
+								selectedColumns
+							});
+						}
+					}}
+					value={query}
+				/>
+				<Form.Field>
+					<Table basic collapsing compact>
+						<Table.Body>
+							<Table.Row verticalAlign='middle'>
+								<Table.Cell collapsing>
+									<Radio
+										label={operatorState}
+										onChange={(
+											_event :React.ChangeEvent<HTMLInputElement>,
+											{checked}
+										) => {
+											// console.debug('checked', checked);
+											const newOperator = checked ? QUERY_OPERATOR_AND : QUERY_OPERATOR_OR;
+											setOperatorState(newOperator);
+											queryDocuments({
+												collectionsFilter: selectedCollections,
+												documentsTypesFilter: selectedDocumentTypes,
+												query,
+												operator: newOperator,
+												selectedColumns
+											});
+										}}
+										toggle
+										checked={operatorState === QUERY_OPERATOR_AND}
+									/>
+								</Table.Cell>
+							</Table.Row>
+						</Table.Body>
+					</Table>
+				</Form.Field>
+				<Form.Field>
+					<HoverPopup
+						content={<Dropdown
+							clearable
+							multiple
+							name='collections'
+							onChange={(
+								_event :React.ChangeEvent<HTMLInputElement>,
+								{value}
+							) => {
+								const newSelectedCollections = value as string[];
+								setSelectedCollections(newSelectedCollections);
+								queryDocuments({
+									collectionsFilter: newSelectedCollections,
+									documentsTypesFilter: selectedDocumentTypes,
+									operator: operatorState,
+									query,
+									selectedColumns
+								});
+							}}
+							options={collectionOptions}
+							search
+							selection
+							style={{marginTop:6}}
+							value={selectedCollections}
+						/>}
+						header='Collections'
+						icon='database'
+						open={collectionsHoverOpen}
+						setOpen={setCollectionsHoverOpen}
+					/>
+					<HoverPopup
+						content={<Dropdown
+							clearable
+							multiple
+							name='documentTypes'
+							onChange={(
+								_event :React.ChangeEvent<HTMLInputElement>,
+								{value}
+							) => {
+								const newSelectedDocumentTypes = value as string[];
+								setSelectedDocumentTypes(newSelectedDocumentTypes);
+								queryDocuments({
+									collectionsFilter: selectedCollections,
+									documentsTypesFilter: newSelectedDocumentTypes,
+									operator: operatorState,
+									query,
+									selectedColumns
+								});
+							}}
+							options={documentTypeOptions}
+							search
+							selection
+							style={{marginTop:6}}
+							value={selectedDocumentTypes}
+						/>}
+						header='Document types'
+						icon='file code'
+						open={documentTypesHoverOpen}
+						setOpen={setDocumentTypesHoverOpen}
+					/>
+					{/*<HoverPopup
+						content={<Dropdown
+							clearable
+							multiple
+							options={columnOptions}
+							onChange={(
+								_event :React.ChangeEvent<HTMLInputElement>,
+								{value}
+							) => {}}
+							search
+							selection
+							style={{marginTop:6}}
+							value={undefined}
+						/>}
+						header='Languages'
+						icon='language'
+						open={false}
+						setOpen={()=>{}}
+					/>*/}
+					<HoverPopup
+						content={<Dropdown
+							defaultValue={[]}
+							multiple
+							name='columns'
+							onChange={(
+								_event :React.ChangeEvent<HTMLInputElement>,
+								{value}
+							) => {
+								const newSelectedColumns = value as string[];
+								setSelectedColumns(newSelectedColumns);
+								queryDocuments({
+									collectionsFilter: selectedCollections,
+									documentsTypesFilter: selectedDocumentTypes,
+									operator: operatorState,
+									query,
+									selectedColumns: newSelectedColumns
+								});
+							}}
+							options={columnOptions}
+							search
+							selection
+							style={{marginTop:6}}
+							value={selectedColumns}
+						/>}
+						header='Columns'
+						icon='columns'
+						open={columnsHoverOpen}
+						setOpen={setColumnsHoverOpen}
+					/>
+				</Form.Field>
+			</Form.Group>
+		</Form>
 		<Table celled collapsing compact selectable singleLine striped>
 			<Table.Header>
 				<Table.Row>
