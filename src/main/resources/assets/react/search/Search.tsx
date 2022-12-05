@@ -11,8 +11,6 @@ import {
 	Form,
 	Segment
 } from 'semantic-ui-react';
-//import traverse from 'traverse';
-
 import {Hits} from './Hits';
 import {Accordion} from './Accordion';
 import {useSearchState} from './useSearchState';
