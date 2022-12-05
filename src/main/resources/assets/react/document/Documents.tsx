@@ -28,59 +28,70 @@ export function Documents({
 	servicesBaseUrl: string
 }) {
 	const {
+		collectionOptions, // setCollectionOptions,
+		collectionsHoverOpen, setCollectionsHoverOpen,
 		columnsHoverOpen, setColumnsHoverOpen,
 		columnOptions, // setColumnOptions,
 		documentsRes, // setDocumentsRes,
+		documentTypeOptions, // setDocumentTypeOptions,
+		documentTypesHoverOpen, setDocumentTypesHoverOpen,
 		jsonModalState, setJsonModalState,
+		selectedCollections, setSelectedCollections,
 		selectedColumns, setSelectedColumns,
+		selectedDocumentTypes, setSelectedDocumentTypes,
 	} = useDocumentsState({
 		servicesBaseUrl
 	})
 	return <>
 		<HoverPopup
 			content={<Dropdown
+				clearable
 				multiple
-				options={columnOptions}
+				name='collections'
 				onChange={(
 					_event :React.ChangeEvent<HTMLInputElement>,
 					{value}
-				) => {/*setSelectedColumns(value as string[])*/}}
+				) => {setSelectedCollections(value as string[])}}
+				options={collectionOptions}
 				search
 				selection
 				style={{marginTop:6}}
-				value={undefined}
+				value={selectedCollections}
 			/>}
 			header='Collections'
 			icon='database'
-			open={false}
-			setOpen={()=>{/*todo*/}}
+			open={collectionsHoverOpen}
+			setOpen={setCollectionsHoverOpen}
 		/>
 		<HoverPopup
 			content={<Dropdown
+				clearable
 				multiple
-				options={columnOptions}
+				name='documentTypes'
 				onChange={(
 					_event :React.ChangeEvent<HTMLInputElement>,
 					{value}
-				) => {/*setSelectedColumns(value as string[])*/}}
+				) => {setSelectedDocumentTypes(value as string[])}}
+				options={documentTypeOptions}
 				search
 				selection
 				style={{marginTop:6}}
-				value={undefined}
+				value={selectedDocumentTypes}
 			/>}
 			header='Document types'
 			icon='file code'
-			open={false}
-			setOpen={()=>{/*todo*/}}
+			open={documentTypesHoverOpen}
+			setOpen={setDocumentTypesHoverOpen}
 		/>
-		<HoverPopup
+		{/*<HoverPopup
 			content={<Dropdown
+				clearable
 				multiple
 				options={columnOptions}
 				onChange={(
 					_event :React.ChangeEvent<HTMLInputElement>,
 					{value}
-				) => {/*setSelectedColumns(value as string[])*/}}
+				) => {}}
 				search
 				selection
 				style={{marginTop:6}}
@@ -89,16 +100,18 @@ export function Documents({
 			header='Languages'
 			icon='language'
 			open={false}
-			setOpen={()=>{/*todo*/}}
-		/>
+			setOpen={()=>{}}
+		/>*/}
 		<HoverPopup
 			content={<Dropdown
+				defaultValue={[]}
 				multiple
-				options={columnOptions}
+				name='columns'
 				onChange={(
 					_event :React.ChangeEvent<HTMLInputElement>,
 					{value}
 				) => {setSelectedColumns(value as string[])}}
+				options={columnOptions}
 				search
 				selection
 				style={{marginTop:6}}
