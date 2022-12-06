@@ -47,6 +47,7 @@ export function Interfaces({
 		//collectionIdToFieldKeys,
 		collectionOptions,
 		durationSinceLastUpdate,
+		fieldNameToValueTypesState, // setFieldNameToValueTypesState,
 		//fieldOptions,
 		//globalFieldsObj,
 		interfaceNamesObj,
@@ -147,6 +148,7 @@ export function Interfaces({
 								_name={_name}
 								afterClose={() => memoizedUpdateInterfacesCallback()}
 								collectionOptions={collectionOptions}
+								fieldNameToValueTypesState={fieldNameToValueTypesState}
 								interfaceNamesObj={interfaceNamesObj/* Currently not allowed to edit _name anyway */}
 								licenseValid={licenseValid}
 								loading={isLoading}
@@ -215,6 +217,7 @@ export function Interfaces({
 		<NewOrEditInterfaceModal
 			afterClose={memoizedUpdateInterfacesCallback}
 			collectionOptions={collectionOptions}
+			fieldNameToValueTypesState={fieldNameToValueTypesState}
 			interfaceNamesObj={interfaceNamesObj}
 			licenseValid={licenseValid}
 			loading={isLoading}
