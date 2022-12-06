@@ -12,13 +12,13 @@ import {ResetButton} from '../components/ResetButton';
 import {SubmitButton} from '../components/SubmitButton';
 import {fetchInterfaceCreate} from '../../../services/graphQL/fetchers/fetchInterfaceCreate';
 import {fetchInterfaceUpdate} from '../../../services/graphQL/fetchers/fetchInterfaceUpdate';
-import {FieldSelector} from './FieldSelector';
 import {BoostBuilder} from './boost/BoostBuilder';
 import {useNewOrEditInterfaceState} from './useNewOrEditInterfaceState';
 
 
 export function NewOrEditInterface({
 	// Required
+	fieldNameToValueTypesState,
 	servicesBaseUrl,
 	stopWordOptions,
 	thesauriOptions,
@@ -33,24 +33,24 @@ export function NewOrEditInterface({
 	//console.debug('NewOrEditInterface thesauriOptions', thesauriOptions);
 	const {
 		anyError,
-		boost, setBoost,
+		// boost, setBoost,
 		collectionIds,
 		isDefaultInterface,
 		isLoading,
 		isStateChanged,
 		fieldOptions,
-		fields,
+		fields, setFields,
 		name,
 		nameError,
 		resetState,
 		setCollectionIds,
-		setFields,
 		setName,
 		setNameVisited,
 		setStopWords,
 		setSynonymIds,
 		stopWords,
-		synonymIds
+		synonymIds,
+		termQueries, setTermQueries,
 	} = useNewOrEditInterfaceState({
 		_id,
 		interfaceNamesObj,
@@ -94,30 +94,15 @@ export function NewOrEditInterface({
 					selection
 					value={collectionIds}
 				/>
-				<Header
-					as='h2'
-					content='Fields'
-					disabled={isLoading || isDefaultInterface}
-					dividing
-					id='fields'
-					size='medium'
-				/>
-				<FieldSelector
-					disabled={isLoading || isDefaultInterface}
-					fieldOptions={fieldOptions}
-					setFields={setFields}
-					value={fields}
-				/>
-				<Header
-					as='h3'
-					content='Additional boosting'
-					disabled={isLoading || isDefaultInterface}
-					dividing
-					id='boosting'
-				/>
 				<BoostBuilder
-					boost={boost}
-					setBoost={setBoost}
+					fieldNameToValueTypesState={fieldNameToValueTypesState}
+					fieldOptions={fieldOptions}
+					fields={fields}
+					isLoading={isLoading}
+					isDefaultInterface={isDefaultInterface}
+					termQueries={termQueries}
+					setFields={setFields}
+					setTermQueries={setTermQueries}
 				/>
 				<Header
 					as='h3'

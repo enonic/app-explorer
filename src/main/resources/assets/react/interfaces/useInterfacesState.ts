@@ -1,8 +1,9 @@
 import type {InterfaceField} from '/lib/explorer/types/Interface';
 import type {DropdownItemProps} from 'semantic-ui-react/index.d';
 import type {
-	//GlobalFieldObject,
-	InterfaceNamesObj
+	FieldNameToValueTypes,
+	// GlobalFieldObject,
+	InterfaceNamesObj,
 } from './index.d';
 
 
@@ -28,6 +29,7 @@ type Interface = {
 	stopWords :Array<string>
 	thesaurusNames :Array<string>
 }
+
 
 const GQL_COLLECTIONS = `queryCollections(
 	perPage: -1
@@ -141,6 +143,7 @@ export function useInterfacesState({
 	/*const [globalFieldsObj, setGlobalFieldsObj] = React.useState<GlobalFieldObject>({
 		'_allText': true // TODO: Hardcode
 	});*/
+	const [fieldNameToValueTypesState, setFieldNameToValueTypesState] = React.useState<FieldNameToValueTypes>({});
 	const [interfaces, setInterfaces] = React.useState<Array<Interface>>([]);
 	const [interfaceNamesObj, setInterfaceNamesObj] = React.useState({} as InterfaceNamesObj);
 	const [interfacesTotal, setInterfacesTotal] = React.useState(0);
@@ -305,6 +308,7 @@ export function useInterfacesState({
 					path :boolean
 					valueType :string // TODO?
 				}>> = {};
+				const fieldNameToValueTypes: FieldNameToValueTypes = {};
 				//const documentTypeIdToName :Record<string,string> = {};
 				data.queryDocumentTypes.hits.forEach(({
 					_id,
@@ -319,11 +323,16 @@ export function useInterfacesState({
 						includeInAllText,
 						max,
 						min,*/
-						name/*,
-						nGram,
-						path,
-						valueType*/
+						name,
+						// nGram,
+						// path,
+						valueType,
 					}) => {
+						if (!fieldNameToValueTypes[name]) {
+							fieldNameToValueTypes[name] = [valueType]
+						} else if (!fieldNameToValueTypes[name].includes(valueType)) {
+							fieldNameToValueTypes[name].push(valueType);
+						}
 						uniqueFieldsObj[name] = true;
 					});
 					documentTypeIdToFieldKeys[_id] = Object.keys(uniqueFieldsObj);
@@ -331,6 +340,8 @@ export function useInterfacesState({
 					//documentTypeIdToName[_id] = _name;
 				});
 				//console.debug('documentTypeIdToFieldKeys', documentTypeIdToFieldKeys);
+				// console.debug('fieldNameToValueTypes', fieldNameToValueTypes);
+				setFieldNameToValueTypesState(fieldNameToValueTypes);
 
 				//const collectionIdToDocumentTypeIds = {};
 				const collectionIdToFieldKeys = {};
@@ -475,6 +486,7 @@ export function useInterfacesState({
 		//collectionIdToFieldKeys,
 		collectionOptions,
 		durationSinceLastUpdate,
+		fieldNameToValueTypesState, // setFieldNameToValueTypesState,
 		//fieldOptions,
 		//globalFieldsObj,
 		interfaceNamesObj,

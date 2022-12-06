@@ -3,7 +3,10 @@ import type {
 	SetLicensedToFunction,
 	SetLicenseValidFunction
 } from '../index.d';
-import type {InterfaceNamesObj} from './index.d';
+import type {
+	FieldNameToValueTypes,
+	InterfaceNamesObj
+} from './index.d';
 
 
 import * as React from 'react';
@@ -20,6 +23,7 @@ type NewOrEditInterfaceModalProps = {
 	beforeOpen? :() => void
 	collectionOptions :Array<DropdownItemProps>
 	disabled? :boolean
+	fieldNameToValueTypesState: FieldNameToValueTypes
 	interfaceNamesObj :InterfaceNamesObj
 	licenseValid :boolean
 	loading ?:boolean
@@ -40,6 +44,7 @@ export function NewOrEditInterfaceModal(props :NewOrEditInterfaceModalProps) {
 		beforeOpen = () => {/**/},
 		collectionOptions = [],
 		disabled = false,
+		fieldNameToValueTypesState,
 		interfaceNamesObj = {},
 		licenseValid,
 		loading = false,
@@ -72,7 +77,7 @@ export function NewOrEditInterfaceModal(props :NewOrEditInterfaceModalProps) {
 		closeOnDimmerClick={false}
 		onClose={doClose}
 		open={open}
-		size='small'
+		size='large'
 		trigger={<Popup
 			content={header}
 			inverted
@@ -104,6 +109,7 @@ export function NewOrEditInterfaceModal(props :NewOrEditInterfaceModalProps) {
 					_id={_id}
 					collectionOptions={collectionOptions}
 					doClose={doClose}
+					fieldNameToValueTypesState={fieldNameToValueTypesState}
 					interfaceNamesObj={interfaceNamesObj}
 					servicesBaseUrl={servicesBaseUrl}
 					stopWordOptions={stopWordOptions}
