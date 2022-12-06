@@ -1,9 +1,9 @@
 import type {
 	TermDslExpression,
-	InDslExpression,
-	LikeDslExpression,
-	RangeDslExpression,
-	PathMatchDslExpression,
+	// InDslExpression,
+	// LikeDslExpression,
+	// RangeDslExpression,
+	// PathMatchDslExpression,
 	// ExistsDslExpression,
 } from '/lib/xp/node';
 import type {
@@ -15,7 +15,13 @@ import type {DropdownItemProps} from 'semantic-ui-react/index.d';
 import type {InterfaceNamesObj} from './index.d';
 
 
-import {isSet} from '@enonic/js-utils';
+import {
+	VALUE_TYPE_BOOLEAN,
+	VALUE_TYPE_DOUBLE,
+	VALUE_TYPE_LONG,
+	VALUE_TYPE_STRING,
+	isSet
+} from '@enonic/js-utils';
 import fastDeepEqual from 'fast-deep-equal/react';
 import * as gql from 'gql-query-builder';
 import * as React from 'react';
@@ -26,20 +32,38 @@ import {onlyLowercaseAsciiLettersDigitsAndUnderscores} from '../utils/onlyLowerc
 import {required} from '../utils/required';
 
 
-export type BoostDSL = {
-	// exists: ExistsDslExpression;
-// } | {
-	pathMatch: PathMatchDslExpression;
-} | {
-	range: RangeDslExpression;
-} | {
-	like: LikeDslExpression;
-} | {
-	in: InDslExpression;
-} | {
-	term: TermDslExpression;
+export type TermQuery = {
+	boost?: TermDslExpression['boost']
+	field?: TermDslExpression['field']
+	type?:
+		| typeof VALUE_TYPE_BOOLEAN
+		| typeof VALUE_TYPE_DOUBLE
+		| typeof VALUE_TYPE_LONG
+		// | 'number' // covers VALUE_TYPE_DOUBLE and VALUE_TYPE_LONG
+		| typeof VALUE_TYPE_STRING
+	value?: TermDslExpression['value']
 }
 
+// export type BoostDSL = {
+// 	// exists: ExistsDslExpression;
+// // } | {
+// 	pathMatch: PathMatchDslExpression;
+// } | {
+// 	range: RangeDslExpression;
+// } | {
+// 	like: LikeDslExpression;
+// } | {
+// 	in: InDslExpression;
+// } | {
+// 	term: TermDslExpression;
+// }
+
+export const QUERY_VALUE_TYPE_OPTIONS = [
+	VALUE_TYPE_BOOLEAN,
+	VALUE_TYPE_DOUBLE,
+	VALUE_TYPE_LONG,
+	VALUE_TYPE_STRING
+].map((text) => ({text, value:text}) as DropdownItemProps)
 
 function buildGetInterfaceQueryObject({
 	_id
@@ -142,9 +166,12 @@ export function useNewOrEditInterfaceState({
 	const [nameError, setNameError] = React.useState<string>();
 	const [nameVisited, setNameVisited] = React.useState(false);
 	const [collectionIds, setCollectionIds] = React.useState<Array<string>>([]);
-	const [fieldOptions, setFieldOptions] = React.useState<Array<DropdownItemProps>>([]);
-	const [fields, setFields] = React.useState<Array<InterfaceField>>(DEFAULT_INTERFACE_FIELDS);
-	const [boost, setBoost] = React.useState<BoostDSL[]>([]);
+	const [fieldOptions, setFieldOptions] = React.useState<DropdownItemProps[]>([]);
+	const [fields, setFields] = React.useState<InterfaceField[]>(DEFAULT_INTERFACE_FIELDS);
+
+	// const [boost, setBoost] = React.useState<BoostDSL[]>([]);
+	const [termQueries, setTermQueries] = React.useState<TermQuery[]>([]);
+
 	const [isLoading, setIsLoading] = React.useState(true);
 	const [stopWords, setStopWords] = React.useState<Array<string>>([]);
 	const [synonymIds, setSynonymIds] = React.useState<Array<string>>([]);
@@ -395,7 +422,7 @@ export function useNewOrEditInterfaceState({
 
 	return {
 		anyError,
-		boost, setBoost,
+		// boost, setBoost,
 		collectionIds,
 		currentState: {
 			name,
@@ -404,7 +431,7 @@ export function useNewOrEditInterfaceState({
 			stopWords,
 			synonymIds
 		},
-		fields,
+		fields, setFields,
 		fieldOptions,
 		initialState,
 		isDefaultInterface: name === 'default',
@@ -414,12 +441,12 @@ export function useNewOrEditInterfaceState({
 		nameError,
 		resetState,
 		setCollectionIds,
-		setFields,
 		setName,
 		setNameVisited,
 		setStopWords,
 		setSynonymIds,
 		stopWords,
-		synonymIds
+		synonymIds,
+		termQueries, setTermQueries,
 	};
 }

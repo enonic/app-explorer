@@ -11,10 +11,10 @@ import {
 	Table
 } from 'semantic-ui-react';
 //import {DEFAULT_INTERFACE_FIELDS} from '../../../constants';
-import {DeleteItemButton} from '../components/DeleteItemButton';
-import {InsertButton} from '../components/InsertButton';
-import {MoveDownButton} from '../components/MoveDownButton';
-import {MoveUpButton} from '../components/MoveUpButton';
+import {DeleteItemButton} from '../../components/DeleteItemButton';
+import {InsertButton} from '../../components/InsertButton';
+import {MoveDownButton} from '../../components/MoveDownButton';
+import {MoveUpButton} from '../../components/MoveUpButton';
 
 
 export function FieldSelector(props :{
