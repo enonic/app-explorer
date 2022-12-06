@@ -47,7 +47,8 @@ import {
 	//@ts-ignore
 } from '/lib/guillotine/util/factory';
 import {
-	GQL_ENUM_FIELD_KEYS_FOR_AGGREGATIONS,
+	FIELD_SHORTCUT_COLLECTION,
+	FIELD_SHORTCUT_DOCUMENT_TYPE,
 	GQL_INPUT_TYPE_AGGREGATION,
 	//GQL_INPUT_TYPE_AGGREGATION_COUNT,
 	GQL_INPUT_TYPE_AGGREGATION_TERMS,
@@ -101,12 +102,8 @@ type QueryRes = {
 
 // Name must be non-null, non-empty and match [_A-Za-z][_0-9A-Za-z]*
 const FIELD_NAME_TO_PATH = {
-	collectionName: 'document_metadata.collection',
-	documentTypeName: 'document_metadata.documentType',
-	// DEBUG
-	//informationType: 'information-type',
-	//language: 'language',
-	//source: 'source'
+	[FIELD_SHORTCUT_COLLECTION]: `${FIELD_PATH_META}.collection`,
+	[FIELD_SHORTCUT_DOCUMENT_TYPE]: `${FIELD_PATH_META}.documentType`,
 };
 
 const FIELD_VALUE_COUNT_AGGREGATION_PREFIX = '_count_Field_';
@@ -134,7 +131,7 @@ function aggregationsArgToQuery({
 		if (field) {
 			obj[name] = {
 				terms: {
-					field: FIELD_NAME_TO_PATH[field],
+					field: FIELD_NAME_TO_PATH[field] ? FIELD_NAME_TO_PATH[field] : field,
 					order,
 					size,
 					minDocCount
@@ -284,11 +281,6 @@ export function addQueryDocuments({
 		}
 	});
 
-	glue.addEnumType({
-		name: GQL_ENUM_FIELD_KEYS_FOR_AGGREGATIONS,
-		values: Object.keys(FIELD_NAME_TO_PATH)
-	});
-
 	glue.addQuery({
 		name: GQL_QUERY_DOCUMENTS,
 		args: {
@@ -300,7 +292,7 @@ export function addQueryDocuments({
 						name: GQL_INPUT_TYPE_AGGREGATION_COUNT,
 						fields: {
 							fields: {
-								type: nonNull(list(glue.getEnumType(GQL_ENUM_FIELD_KEYS_FOR_AGGREGATIONS)))
+								type: nonNull(list(GraphQLString))
 							}
 						}
 					})},*/
@@ -311,8 +303,7 @@ export function addQueryDocuments({
 						name: GQL_INPUT_TYPE_AGGREGATION_TERMS,
 						fields: {
 							field: {
-								type: nonNull(glue.getEnumType(GQL_ENUM_FIELD_KEYS_FOR_AGGREGATIONS))
-								//type: nonNull(GraphQLString) // DEBUG
+								type: nonNull(GraphQLString)
 							},
 							order: {
 								type: GraphQLString

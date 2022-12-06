@@ -9,6 +9,7 @@ import type {
 
 import moment from 'moment';
 import * as React from 'react';
+import {FIELD_SHORTCUT_COLLECTION} from '../../../services/graphQL/constants';
 import {useInterval} from '../utils/useInterval';
 
 
@@ -42,14 +43,13 @@ const GQL_COLLECTIONS = `queryCollections(
 }`;
 
 const GQL_DOCUMENTS = `queryDocuments(
-    aggregations: [{
-    	name: "collections"
-    	terms: {
-			field: collectionName
+	aggregations: [{
+		name: "collections"
+		terms: {
+			field: "${FIELD_SHORTCUT_COLLECTION}"
 		}
 	}]
-    count: 0
-	#countFieldValues: true
+	count: 0
 )
 {
 	aggregations {
@@ -57,12 +57,8 @@ const GQL_DOCUMENTS = `queryDocuments(
 		buckets {
 			docCount
 			key
-    	}
-    }
-	#fieldValueCounts {
-	#	count
-	#	fieldPath
-    #}
+		}
+	}
 }`
 
 const GQL_DOCUMENT_TYPES = `queryDocumentTypes {

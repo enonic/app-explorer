@@ -1,6 +1,8 @@
 // [_A-Za-z][_0-9A-Za-z]*
 
-export const GQL_ENUM_FIELD_KEYS_FOR_AGGREGATIONS = 'EnumFieldsKeysForAggreations';
+export const FIELD_SHORTCUT_COLLECTION = '_collectionName';
+export const FIELD_SHORTCUT_DOCUMENT_TYPE = '_documentTypeName';
+
 export const GQL_ENUM_TASK_STATES = 'EnumTaskStates';
 
 export const GQL_FIELDS_DOCUMENT_TYPE_PROPERTY_NAME = 'DocumentTypePropertyFields';
