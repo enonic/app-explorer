@@ -6,7 +6,10 @@ import type {
 
 
 import * as gql from 'gql-query-builder';
-
+import {
+	FIELD_SHORTCUT_COLLECTION,
+	FIELD_SHORTCUT_DOCUMENT_TYPE
+} from '../constants';
 
 export type QueryDocumentTypesHit = DocumentType & {
 	_referencedBy :{
@@ -100,14 +103,14 @@ export function fetchDocumentTypes({
 							subAggregations: {
 								name: 'documentTypeCollection',
 								terms: {
-									field: 'collectionName',
+									field: FIELD_SHORTCUT_COLLECTION,
 									order: 'count DESC',
 									size: 1000,
 									minDocCount: 1,
 								}
 							},
 							terms: {
-								field: 'documentTypeName',
+								field: FIELD_SHORTCUT_DOCUMENT_TYPE,
 								order: 'count DESC',
 								size: 1000,
 								minDocCount: 1
