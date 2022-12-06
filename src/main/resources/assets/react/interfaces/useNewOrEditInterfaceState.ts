@@ -25,6 +25,7 @@ import {
 import fastDeepEqual from 'fast-deep-equal/react';
 import * as gql from 'gql-query-builder';
 import * as React from 'react';
+import {FIELD_SHORTCUT_COLLECTION} from '../../../services/graphQL/constants';
 import {DEFAULT_INTERFACE_FIELDS} from '../constants';
 import {mustStartWithALowercaseLetter} from '../utils/mustStartWithALowercaseLetter';
 import {notDoubleUnderscore} from '../utils/notDoubleUnderscore';
@@ -131,7 +132,7 @@ function buildQueryDocumentsObject({
 				value: [{
 					name: 'collections',
 					terms: {
-						field: 'collectionName'
+						field: FIELD_SHORTCUT_COLLECTION
 					}
 				}]
 			},

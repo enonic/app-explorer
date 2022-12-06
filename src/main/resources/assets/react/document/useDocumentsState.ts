@@ -7,6 +7,10 @@ import * as gql from 'gql-query-builder';
 import {difference} from 'lodash';
 import * as React from 'react';
 import traverse from 'traverse';
+import {
+	FIELD_SHORTCUT_COLLECTION,
+	FIELD_SHORTCUT_DOCUMENT_TYPE,
+} from '../../../services/graphQL/constants';
 
 // import {FIELD_PATH_META} from '/lib/explorer/constants'; // TODO setup build system so this import works
 const FIELD_PATH_META = 'document_metadata';
@@ -168,7 +172,7 @@ export function useDocumentsState({
 						value: [{
 							name: 'collections',
 							terms: {
-								field: 'collectionName',
+								field: FIELD_SHORTCUT_COLLECTION,
 								order: '_count DESC',
 								size: 100,
 								minDocCount: 0,
@@ -176,7 +180,7 @@ export function useDocumentsState({
 						},{
 							name: 'documentTypes',
 							terms: {
-								field: 'documentTypeName',
+								field: FIELD_SHORTCUT_DOCUMENT_TYPE,
 								order: '_count DESC',
 								size: 100,
 								minDocCount: 0,
