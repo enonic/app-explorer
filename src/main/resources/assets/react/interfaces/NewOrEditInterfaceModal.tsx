@@ -97,6 +97,7 @@ export function NewOrEditInterfaceModal(props :NewOrEditInterfaceModalProps) {
 					size='massive'
 					style={{
 						bottom: 13.5,
+						margin: 0,
 						position: 'fixed',
 						right: 13.5
 					}}><Icon
