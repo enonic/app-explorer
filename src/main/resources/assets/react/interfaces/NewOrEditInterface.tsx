@@ -177,7 +177,8 @@ export function NewOrEditInterface({
 							collectionIds,
 							fields,
 							stopWords,
-							synonymIds
+							synonymIds,
+							termQueries
 						}
 					});
 				}}

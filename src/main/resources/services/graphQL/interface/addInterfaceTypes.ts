@@ -7,9 +7,12 @@ import {
 	coerseInterfaceTypeCollectionIds,
 	coerseInterfaceTypeFields,
 	coerseInterfaceTypeStopWords,
-	coerseInterfaceTypeSynonymIds
+	coerseInterfaceTypeSynonymIds,
+	coerseInterfaceTypeTermQueries,
 } from '/lib/explorer/interface/coerseInterfaceType';
 import {
+	GraphQLBoolean,
+	GraphQLFloat,
 	GraphQLID,
 	GraphQLInt,
 	GraphQLString,
@@ -20,9 +23,11 @@ import {
 
 import {
 	GQL_INPUT_TYPE_INTERFACE_FIELD_NAME,
+	GQL_INPUT_TYPE_INTERFACE_TERM_QUERY_NAME,
 	GQL_INTERFACE_NODE_NAME,
 	GQL_TYPE_INTERFACE_FIELD_NAME,
-	GQL_TYPE_INTERFACE_NAME
+	GQL_TYPE_INTERFACE_NAME,
+	GQL_TYPE_INTERFACE_TERM_QUERY_NAME,
 } from '../constants';
 
 
@@ -31,7 +36,20 @@ export function addInterfaceTypes({glue}) {
 		name: GQL_INPUT_TYPE_INTERFACE_FIELD_NAME,
 		fields: {
 			name: { type: nonNull(GraphQLString) },
-			boost: { type: GraphQLInt } // null allowed
+			boost: { type: GraphQLFloat } // null allowed
+		}
+	});
+
+	glue.addInputType({
+		name: GQL_INPUT_TYPE_INTERFACE_TERM_QUERY_NAME,
+		fields: {
+			boost: { type: GraphQLFloat }, // null allowed
+			field: { type: nonNull(GraphQLString) },
+			type: { type: GraphQLString }, // TODO Enum?
+			booleanValue: { type: GraphQLBoolean },
+			doubleValue: { type: GraphQLFloat },
+			longValue: { type: GraphQLInt },
+			stringValue: { type: GraphQLString },
 		}
 	});
 
@@ -39,7 +57,20 @@ export function addInterfaceTypes({glue}) {
 		name: GQL_TYPE_INTERFACE_FIELD_NAME,
 		fields: {
 			name: { type: nonNull(GraphQLString) },
-			boost: { type: GraphQLInt } // null allowed
+			boost: { type: GraphQLFloat } // null allowed
+		}
+	});
+
+	glue.addObjectType({
+		name: GQL_TYPE_INTERFACE_TERM_QUERY_NAME,
+		fields: {
+			boost: { type: GraphQLFloat }, // null allowed
+			field: { type: nonNull(GraphQLString) },
+			type: { type: GraphQLString }, // TODO Enum?
+			booleanValue: { type: GraphQLBoolean },
+			doubleValue: { type: GraphQLFloat },
+			longValue: { type: GraphQLInt },
+			stringValue: { type: GraphQLString },
 		}
 	});
 
@@ -67,7 +98,11 @@ export function addInterfaceTypes({glue}) {
 			},
 			synonymIds: {
 				resolve: (env) => coerseInterfaceTypeSynonymIds(env.source.synonymIds),
-				type: list(GraphQLID) } // null allowed
+				type: list(GraphQLID) }, // null allowed
+			termQueries: {
+				resolve: (env) => coerseInterfaceTypeTermQueries(env.source.termQueries),
+				type: list(glue.getObjectType(GQL_TYPE_INTERFACE_TERM_QUERY_NAME))
+			}, // null allowed
 		},
 		interfaces: [interfaceNodeType]
 	});

@@ -109,6 +109,7 @@ export function FieldSelector(props :{
 											}
 											setFields(deref);
 										}}
+										step={0.1}
 										type='number'
 										value={boost}
 									/>

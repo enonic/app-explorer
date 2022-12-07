@@ -1,3 +1,5 @@
+import type {TermQuery} from '/lib/explorer/types/Interface.d';
+
 //import {toStr} from '@enonic/js-utils';
 import {coerseInterfaceType} from '/lib/explorer/interface/coerseInterfaceType';
 import {PRINCIPAL_EXPLORER_WRITE} from '/lib/explorer/model/2/constants';
@@ -6,13 +8,14 @@ import {connect} from '/lib/explorer/repo/connect';
 import {
 	GraphQLID,
 	GraphQLString,
-	list
+	list,
 	//@ts-ignore
 } from '/lib/graphql';
 import {
 	GQL_INPUT_TYPE_INTERFACE_FIELD_NAME,
+	GQL_INPUT_TYPE_INTERFACE_TERM_QUERY_NAME,
 	GQL_MUTATION_INTERFACE_CREATE_NAME,
-	GQL_TYPE_INTERFACE_NAME
+	GQL_TYPE_INTERFACE_NAME,
 } from '../constants';
 
 
@@ -25,18 +28,20 @@ export function addMutationInterfaceCreate({glue}) {
 			fields: list(glue.getInputType(GQL_INPUT_TYPE_INTERFACE_FIELD_NAME)), // null allowed
 			//stopWordIds: list(GraphQLID), // null allowed
 			stopWords: list(GraphQLString), // null allowed
-			synonymIds: list(GraphQLID) // null allowed
+			synonymIds: list(GraphQLID), // null allowed
+			termQueries: list(glue.getInputType(GQL_INPUT_TYPE_INTERFACE_TERM_QUERY_NAME)),
 		},
-		resolve(env :{
-			args :{
-				_name :string
-				collectionIds :Array<string>
-				fields :Array<{
-					boost ?:number
-					name :string
-				}>
-				stopWords :Array<string>
-				synonymIds :Array<string>
+		resolve(env: {
+			args: {
+				_name: string
+				collectionIds: string[]
+				fields: {
+					boost?: number
+					name: string
+				}[]
+				stopWords: string[]
+				synonymIds: string[]
+				termQueries: TermQuery[]
 			}
 		}) {
 			//log.debug(`env:${toStr(env)}`);
@@ -47,7 +52,8 @@ export function addMutationInterfaceCreate({glue}) {
 					fields = [],
 					//stopWordIds = [],
 					stopWords = [],
-					synonymIds = []
+					synonymIds = [],
+					termQueries = [],
 				}
 			} = env;
 			const createdNode = create({ // Model applies forceArray and reference
@@ -56,7 +62,8 @@ export function addMutationInterfaceCreate({glue}) {
 				fields,
 				//stopWordIds: stopWordIds.map((stopWordId) => reference(stopWordId)), // empty array allowed
 				stopWords,
-				synonymIds // empty array allowed
+				synonymIds, // empty array allowed
+				termQueries, // empty array allowed
 			}, {
 				writeConnection: connect({principals: [PRINCIPAL_EXPLORER_WRITE]})
 			});
