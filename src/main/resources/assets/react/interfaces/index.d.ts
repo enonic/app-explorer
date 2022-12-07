@@ -3,6 +3,10 @@ import type {DropdownItemProps} from 'semantic-ui-react/index.d';
 
 
 export type FieldNameToValueTypes = Record<string, string[]>
+export type FieldPathToValueOptions = Record<string, {
+	text: string
+	value: string
+}[]>
 
 export type GlobalFieldObject = Record<string, true>;
 
