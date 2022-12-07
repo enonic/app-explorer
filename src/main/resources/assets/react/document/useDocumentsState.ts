@@ -7,18 +7,22 @@ import * as gql from 'gql-query-builder';
 import {difference} from 'lodash';
 import * as React from 'react';
 import traverse from 'traverse';
-import {
-	FIELD_PATH_META_COLLECTION,
-	FIELD_PATH_META_DOCUMENT_TYPE,
-	FIELD_PATH_META_LANGUAGE
-} from '/lib/explorer/constants';
+// import {
+// 	FIELD_PATH_META,
+// 	FIELD_PATH_META_COLLECTION,
+// 	FIELD_PATH_META_DOCUMENT_TYPE,
+// 	FIELD_PATH_META_LANGUAGE
+// } from '/lib/explorer/constants'; // WARNING lib explorer can't be imported client-side because the files only exists inside the jar...
 import {
 	FIELD_SHORTCUT_COLLECTION,
 	FIELD_SHORTCUT_DOCUMENT_TYPE,
 } from '../../../services/graphQL/constants';
 
-// import {FIELD_PATH_META} from '/lib/explorer/constants'; // TODO setup build system so this import works
-const FIELD_PATH_META = 'document_metadata';
+
+const FIELD_PATH_META = 'document_metadata' as const; // TODO _meta ?
+const FIELD_PATH_META_COLLECTION = `${FIELD_PATH_META}.collection` as const;
+const FIELD_PATH_META_DOCUMENT_TYPE = `${FIELD_PATH_META}.documentType` as const;
+const FIELD_PATH_META_LANGUAGE = `${FIELD_PATH_META}.language` as const;
 
 export const COLUMN_NAME_COLLECTION = '_collection';
 export const COLUMN_NAME_DOCUMENT_TYPE = '_documentType';
