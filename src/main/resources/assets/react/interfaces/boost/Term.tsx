@@ -1,5 +1,8 @@
 import type {DropdownItemProps} from 'semantic-ui-react';
-import type {FieldNameToValueTypes} from '../index.d';
+import type {
+	FieldNameToValueTypes,
+	FieldPathToValueOptions,
+} from '../index.d';
 import type {TermQuery} from '../useNewOrEditInterfaceState';
 
 
@@ -60,18 +63,24 @@ export function Term({
 	disabled = false,
 	fieldNameToValueTypesState,
 	fieldOptions,
+	fieldValueOptions,
+	getFieldValues,
 	isDefaultInterface,
 	isLoading,
 	termQueries,
 	setTermQueries,
+	setFieldValueOptions,
 }: {
 	disabled?: boolean
 	fieldNameToValueTypesState: FieldNameToValueTypes
 	fieldOptions: DropdownItemProps[]
+	fieldValueOptions: FieldPathToValueOptions
+	getFieldValues: (field: string) => void
 	isLoading: boolean
 	isDefaultInterface: boolean
 	termQueries: TermQuery[]
 	setTermQueries: React.Dispatch<React.SetStateAction<TermQuery[]>>
+	setFieldValueOptions: React.Dispatch<React.SetStateAction<FieldPathToValueOptions>>
 }) {
 	if (!termQueries.length) {
 		return <></>;
@@ -109,6 +118,9 @@ export function Term({
 								fluid
 								options={fieldOptions}
 								onChange={(_e,{value:newField}: {value: string}) => {
+									if (!fieldValueOptions[newField]) {
+										getFieldValues(newField);
+									}
 									//console.debug('newName', newName);
 									const deref = JSON.parse(JSON.stringify(termQueries));
 									const newType = fieldNameToValueTypesState[newField] && fieldNameToValueTypesState[newField].length === 1
@@ -185,38 +197,70 @@ export function Term({
 											}}
 											checked={value as boolean}
 										/>
-										: <Input
-											disabled={disabled}
-											fluid
-											onChange={(_e,{value:newValue}) => {
-												//console.debug('newBoost', newBoost);
-												const deref = JSON.parse(JSON.stringify(termQueries));
-												deref[index] = {
-													boost: isSet(boost) ? boost : 1,
-													field,
-													type,
-													value: newValue
+										: type === VALUE_TYPE_STRING
+											? <Dropdown
+												allowAdditions
+												disabled={disabled}
+												fluid
+												options={
+													fieldValueOptions[field] || []
+													// ? fieldValueOptions[field].map((text) => ({text, value: text}))
+													// : []
 												}
-												setTermQueries(deref);
-											}}
-											placeholder={
-												type === VALUE_TYPE_STRING
-													? 'Please input a value'
-													: null
-											}
-											step={
-												type === VALUE_TYPE_DOUBLE
-													? '0.1'
-													: type === VALUE_TYPE_LONG
-														? '1'
-														: null
-											}
-											type={[
-												VALUE_TYPE_DOUBLE,
-												VALUE_TYPE_LONG
-											].includes(type) ? 'number' : 'text'}
-											value={value}
-										/>
+												onAddItem={(_e,{value: newValue}: {value: string}) => {
+													// console.debug('onAddItem newValue', newValue);
+													setFieldValueOptions(prev => {
+														const deref = JSON.parse(JSON.stringify(prev)) as typeof prev;
+														deref[field].push({
+															text: `${newValue} (unknown)`,
+															value: newValue
+														})
+														return deref;
+													});
+												}}
+												onChange={(_e,{value: newValue}: {value: string}) => {
+													//console.debug('newValue', newValue);
+													const deref = JSON.parse(JSON.stringify(termQueries)) as typeof termQueries;
+													deref[index] = {
+														boost, // : isSet(boost) ? boost : 1,
+														field,
+														type,
+														value: newValue
+													}
+													setTermQueries(deref);
+												}}
+												placeholder='Please select or input a value'
+												search
+												selection
+												value={value as string}
+											/>
+											: <Input
+												disabled={disabled}
+												fluid
+												onChange={(_e,{value:newValue}) => {
+													//console.debug('newBoost', newBoost);
+													const deref = JSON.parse(JSON.stringify(termQueries));
+													deref[index] = {
+														boost: isSet(boost) ? boost : 1,
+														field,
+														type,
+														value: newValue
+													}
+													setTermQueries(deref);
+												}}
+												step={
+													type === VALUE_TYPE_DOUBLE
+														? '0.1'
+														: type === VALUE_TYPE_LONG
+															? '1'
+															: null
+												}
+												type={/*[
+													VALUE_TYPE_DOUBLE,
+													VALUE_TYPE_LONG
+												].includes(type) ? */'number'/* : 'text'*/}
+												value={value}
+											/>
 									: null
 							}
 						</Table.Cell>
