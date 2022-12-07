@@ -1,14 +1,7 @@
 import type {
-	TermDslExpression,
-	// InDslExpression,
-	// LikeDslExpression,
-	// RangeDslExpression,
-	// PathMatchDslExpression,
-	// ExistsDslExpression,
-} from '/lib/xp/node';
-import type {
 	Interface,
-	InterfaceField
+	InterfaceField,
+	TermQuery
 } from '/lib/explorer/types/Interface.d';
 import type IQueryBuilderOptions from 'gql-query-builder/build/IQueryBuilderOptions.d';
 import type {DropdownItemProps} from 'semantic-ui-react/index.d';
@@ -35,32 +28,6 @@ import {notDoubleUnderscore} from '../utils/notDoubleUnderscore';
 import {onlyLowercaseAsciiLettersDigitsAndUnderscores} from '../utils/onlyLowercaseAsciiLettersDigitsAndUnderscores';
 import {required} from '../utils/required';
 
-
-export type TermQuery = {
-	boost?: TermDslExpression['boost']
-	field?: TermDslExpression['field']
-	type?:
-		| typeof VALUE_TYPE_BOOLEAN
-		| typeof VALUE_TYPE_DOUBLE
-		| typeof VALUE_TYPE_LONG
-		// | 'number' // covers VALUE_TYPE_DOUBLE and VALUE_TYPE_LONG
-		| typeof VALUE_TYPE_STRING
-	value?: TermDslExpression['value']
-}
-
-// export type BoostDSL = {
-// 	// exists: ExistsDslExpression;
-// // } | {
-// 	pathMatch: PathMatchDslExpression;
-// } | {
-// 	range: RangeDslExpression;
-// } | {
-// 	like: LikeDslExpression;
-// } | {
-// 	in: InDslExpression;
-// } | {
-// 	term: TermDslExpression;
-// }
 
 export const QUERY_VALUE_TYPE_OPTIONS = [
 	VALUE_TYPE_BOOLEAN,
