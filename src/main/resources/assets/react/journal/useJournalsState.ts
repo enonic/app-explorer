@@ -22,7 +22,6 @@ export function useJournalsState({
 	const [columnsPopupOpen, setColumnsPopupOpen] = React.useState(false);
 	const [errorsPopupOpen, setErrorsPopupOpen] = React.useState(false);
 	const [perPagePopupOpen, setPerPagePopupOpen] = React.useState(false);
-	// const [showFilters, setShowFilters] = React.useState(false);
 	const [columns, setColumns] = React.useState({
 		name: true,
 		startTime: true,
@@ -249,7 +248,6 @@ export function useJournalsState({
 		page,
 		params,
 		perPagePopupOpen, setPerPagePopupOpen,
-		// showFilters, setShowFilters,
 		start,
 		total,
 		totalPages
