@@ -82,6 +82,7 @@ export function generateQueryInterfacesField({
 			fields
 			stopWordIds
 			synonymIds
+			termQueries
 		}
 	}
 }

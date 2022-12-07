@@ -1,9 +1,9 @@
 import type {DropdownItemProps} from 'semantic-ui-react';
+import type {TermQuery} from '/lib/explorer/types/Interface.d';
 import type {
 	FieldNameToValueTypes,
 	FieldPathToValueOptions,
 } from '../index.d';
-import type {TermQuery} from '../useNewOrEditInterfaceState';
 
 
 import {
@@ -110,7 +110,10 @@ export function Term({
 						boost = 1,
 						field,
 						type,
-						value,
+						booleanValue,
+						doubleValue,
+						longValue,
+						stringValue,
 					}, index) => <Table.Row key={index}>
 						<Table.Cell>
 							<Dropdown
@@ -126,15 +129,41 @@ export function Term({
 									const newType = fieldNameToValueTypesState[newField] && fieldNameToValueTypesState[newField].length === 1
 										? fieldNameToValueTypesState[newField][0] as TermQuery['type']
 										: undefined;
+									const newValue = changedValue({
+										newType,
+										oldType: type,
+										oldValue: newType === VALUE_TYPE_BOOLEAN
+											? booleanValue
+											: newType === VALUE_TYPE_DOUBLE
+												? doubleValue
+												: newType === VALUE_TYPE_LONG
+													? longValue
+													: stringValue
+									});
 									deref[index] = {
 										boost, // : isSet(boost) ? boost : 1,
 										field: newField,
 										type: newType,
-										value: changedValue({
-											newType,
-											oldType: type,
-											oldValue: value
-										})
+										booleanValue: isSet(booleanValue)
+											? booleanValue
+											: newType === VALUE_TYPE_BOOLEAN
+												? newValue
+												: undefined,
+										doubleValue: isSet(doubleValue)
+											? doubleValue
+											: newType === VALUE_TYPE_DOUBLE
+												? newValue
+												: undefined,
+										longValue: isSet(longValue)
+											? longValue
+											: newType === VALUE_TYPE_LONG
+												? newValue
+												: undefined,
+										stringValue: isSet(stringValue)
+											? stringValue
+											: newType === VALUE_TYPE_STRING
+												? newValue
+												: undefined,
 									}
 									setTermQueries(deref);
 								}}
@@ -158,15 +187,41 @@ export function Term({
 										onChange={(_e,{value: newType}: {value: TermQuery['type']}) => {
 											//console.debug('newName', newName);
 											const deref = JSON.parse(JSON.stringify(termQueries)) as typeof termQueries;
+											const newValue = changedValue({
+												newType,
+												oldType: type,
+												oldValue: newType === VALUE_TYPE_BOOLEAN
+													? booleanValue
+													: newType === VALUE_TYPE_DOUBLE
+														? doubleValue
+														: newType === VALUE_TYPE_LONG
+															? longValue
+															: stringValue
+											})
 											deref[index] = {
 												boost, // : isSet(boost) ? boost : 1,
 												field,
 												type: newType,
-												value: changedValue({
-													newType,
-													oldType: type,
-													oldValue: value
-												})
+												booleanValue: isSet(booleanValue)
+													? booleanValue
+													: newType === VALUE_TYPE_BOOLEAN
+														? newValue
+														: undefined,
+												doubleValue: isSet(doubleValue)
+													? doubleValue
+													: newType === VALUE_TYPE_DOUBLE
+														? newValue
+														: undefined,
+												longValue: isSet(longValue)
+													? longValue
+													: newType === VALUE_TYPE_LONG
+														? newValue
+														: undefined,
+												stringValue: isSet(stringValue)
+													? stringValue
+													: newType === VALUE_TYPE_STRING
+														? newValue
+														: undefined,
 											}
 											setTermQueries(deref);
 										}}
@@ -191,11 +246,14 @@ export function Term({
 													boost,
 													field,
 													type,
-													value: newValue
+													booleanValue: newValue,
+													doubleValue,
+													longValue,
+													stringValue,
 												}
 												setTermQueries(deref);
 											}}
-											checked={value as boolean}
+											checked={booleanValue}
 										/>
 										: type === VALUE_TYPE_STRING
 											? <Dropdown
@@ -209,14 +267,17 @@ export function Term({
 												}
 												onAddItem={(_e,{value: newValue}: {value: string}) => {
 													// console.debug('onAddItem newValue', newValue);
-													setFieldValueOptions(prev => {
-														const deref = JSON.parse(JSON.stringify(prev)) as typeof prev;
-														deref[field].push({
-															text: `${newValue} (unknown)`,
-															value: newValue
-														})
-														return deref;
-													});
+													const options = fieldValueOptions[field] || [];
+													if (!options.map(({value}) => value).includes(newValue)) {
+														setFieldValueOptions(prev => {
+															const deref = JSON.parse(JSON.stringify(prev)) as typeof prev;
+															deref[field].push({
+																text: `${newValue} (unknown)`,
+																value: newValue
+															})
+															return deref;
+														});
+													}
 												}}
 												onChange={(_e,{value: newValue}: {value: string}) => {
 													//console.debug('newValue', newValue);
@@ -225,41 +286,51 @@ export function Term({
 														boost, // : isSet(boost) ? boost : 1,
 														field,
 														type,
-														value: newValue
+														booleanValue,
+														doubleValue,
+														longValue,
+														stringValue: newValue
 													}
 													setTermQueries(deref);
 												}}
 												placeholder='Please select or input a value'
 												search
 												selection
-												value={value as string}
+												value={stringValue}
 											/>
 											: <Input
 												disabled={disabled}
 												fluid
-												onChange={(_e,{value:newValue}) => {
-													//console.debug('newBoost', newBoost);
+												onChange={(_e,{value: newStringValue}: {value: string}) => {
+													// console.debug('newStringValue', newStringValue);
 													const deref = JSON.parse(JSON.stringify(termQueries));
+													const newNumberValue = VALUE_TYPE_DOUBLE
+														? parseFloat(newStringValue)
+														: parseInt(newStringValue, 10)
+													// console.debug('newNumberValue', newNumberValue);
 													deref[index] = {
 														boost: isSet(boost) ? boost : 1,
 														field,
 														type,
-														value: newValue
+														booleanValue,
+														doubleValue: type === VALUE_TYPE_DOUBLE ? newNumberValue : doubleValue,
+														longValue: type === VALUE_TYPE_LONG ? newNumberValue : longValue,
+														stringValue
 													}
 													setTermQueries(deref);
 												}}
 												step={
 													type === VALUE_TYPE_DOUBLE
-														? '0.1'
+														? 0.1
 														: type === VALUE_TYPE_LONG
-															? '1'
+															? 1
 															: null
 												}
 												type={/*[
 													VALUE_TYPE_DOUBLE,
 													VALUE_TYPE_LONG
 												].includes(type) ? */'number'/* : 'text'*/}
-												value={value}
+												value={type === VALUE_TYPE_DOUBLE ? doubleValue : longValue}
 											/>
 									: null
 							}
@@ -269,18 +340,23 @@ export function Term({
 								disabled={disabled}
 								fluid
 								min={0.1}
-								onChange={(_e,{value:newBoost}) => {
-									//console.debug('newBoost', newBoost);
+								onChange={(_e,{value: newStringBoost}: {value: string}) => {
+									// console.debug('newStringBoost', newStringBoost);
+									const newNumberBoost = parseFloat(newStringBoost);
+									// console.debug('newNumberBoost', newNumberBoost);
 									const deref = JSON.parse(JSON.stringify(termQueries));
 									deref[index] = {
-										boost: newBoost,
+										boost: newNumberBoost,
 										field,
 										type,
-										value
+										booleanValue,
+										doubleValue,
+										longValue,
+										stringValue,
 									}
 									setTermQueries(deref);
 								}}
-								step='0.1'
+								step={0.1}
 								type='number'
 								value={boost}
 							/>

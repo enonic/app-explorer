@@ -23,6 +23,7 @@ export const GQL_INPUT_TYPE_FILTERS_NAME = 'Filters';
 export const GQL_INPUT_TYPE_FILTERS_BOOLEAN_NAME = 'FiltersBoolean';
 
 export const GQL_INPUT_TYPE_INTERFACE_FIELD_NAME = 'InterfaceFieldInput';
+export const GQL_INPUT_TYPE_INTERFACE_TERM_QUERY_NAME = 'InterfaceTermQueryInput';
 
 export const GQL_INPUT_TYPE_QUERY_DSL_BOOLEAN_CLAUSE = 'QueryDSLBooleanClause';
 
@@ -65,6 +66,7 @@ export const GQL_TYPE_HAS_FIELD_QUERY_RESULT_NAME = 'HasFieldQueryResult';
 
 export const GQL_TYPE_INTERFACE_NAME = 'Interface';
 export const GQL_TYPE_INTERFACE_FIELD_NAME = 'InterfaceField';
+export const GQL_TYPE_INTERFACE_TERM_QUERY_NAME = 'InterfaceTermQuery';
 
 export const GQL_TYPE_JOB_NAME = 'ScheduledJob';
 export const GQL_TYPE_NODE_DELETED_NAME = 'NodeDeleted';

@@ -1,10 +1,12 @@
 import type {DropdownItemProps} from 'semantic-ui-react';
-import type {InterfaceField} from '/lib/explorer/types/Interface.d';
+import type {
+	InterfaceField,
+	TermQuery,
+} from '/lib/explorer/types/Interface.d';
 import type {
 	FieldNameToValueTypes,
 	FieldPathToValueOptions,
 } from '../index.d';
-import type {TermQuery} from '../useNewOrEditInterfaceState';
 
 
 // import {VALUE_TYPE_STRING} from '@enonic/js-utils';
