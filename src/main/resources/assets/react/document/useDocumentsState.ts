@@ -8,6 +8,11 @@ import {difference} from 'lodash';
 import * as React from 'react';
 import traverse from 'traverse';
 import {
+	FIELD_PATH_META_COLLECTION,
+	FIELD_PATH_META_DOCUMENT_TYPE,
+	FIELD_PATH_META_LANGUAGE
+} from '/lib/explorer/constants';
+import {
 	FIELD_SHORTCUT_COLLECTION,
 	FIELD_SHORTCUT_DOCUMENT_TYPE,
 } from '../../../services/graphQL/constants';
@@ -140,9 +145,9 @@ export function useDocumentsState({
 			const jsonColumns = difference(selectedColumns, SELECTED_COLUMNS_DEFAULT);
 			const fields = jsonColumns.length ? jsonColumns.map(f => `${f}^3`): [];
 			fields.push(
-				'document_metadata.collection^2',
-				'document_metadata.documentType^2',
-				'document_metadata.language^2',
+				`${FIELD_PATH_META_COLLECTION}^2`,
+				`${FIELD_PATH_META_DOCUMENT_TYPE}^2`,
+				`${FIELD_PATH_META_LANGUAGE}^2`,
 				'_allText', // WARNING: Frequently fields are not duplicated into _allText
 			)
 			queryValue = {
