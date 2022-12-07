@@ -3,7 +3,6 @@ import {
 	Button,
 	Checkbox,
 	Dimmer,
-	// Divider,
 	Dropdown,
 	Form,
 	Grid,
@@ -12,10 +11,8 @@ import {
 	Loader,
 	Pagination,
 	Popup,
-	// Radio,
 	Segment,
 	Table,
-	// Transition,
 } from 'semantic-ui-react';
 import {useJournalsState} from './useJournalsState';
 
@@ -45,7 +42,6 @@ export function Journals({
 		page,
 		params,
 		perPagePopupOpen, setPerPagePopupOpen,
-		// showFilters, setShowFilters,
 		start,
 		total,
 		totalPages
@@ -207,26 +203,6 @@ export function Journals({
 								size='medium'
 							/>}
 						/>
-						{/*<Table basic collapsing compact>
-							<Table.Body>
-								<Table.Row verticalAlign='middle'>
-									<Table.Cell collapsing>
-										<Radio
-											label={'Show filters'}
-											checked={showFilters}
-											onChange={(
-												_event,
-												{ checked }
-											) => {
-												setShowFilters(checked);
-											}}
-											toggle
-										/>
-									</Table.Cell>
-								</Table.Row>
-							</Table.Body>
-						</Table>
-						*/}
 					</Grid.Column>
 					<Grid.Column mobile={16} tablet={8} computer={8}>
 						<Button
@@ -237,128 +213,6 @@ export function Journals({
 							onClick={memoizedSearchJournals}><Icon className='refresh'/>Last updated: {durationSinceLastUpdate}</Button>
 					</Grid.Column>
 				</Grid.Row>
-				{/*<Transition.Group animation='slide down' duration={500}>
-					{showFilters && (
-						<Grid.Row>
-							<Grid.Column mobile={16} tablet={8} computer={4}>
-								<Segment>
-									<Form>
-										<Form.Field>
-											<Header as='h4'><Icon name='database'/> Collections</Header>
-											<Dropdown
-												defaultValue={params.collections}
-												fluid
-												multiple={true}
-												name='collections'
-												onChange={handleInputChange}
-												options={aggregations.collection.buckets.map(({key, docCount}) => ({key, text: `${key} (${docCount})`, value: key}))}
-												search
-												selection
-											/>
-										</Form.Field>
-									</Form>
-								</Segment>
-								<Divider hidden/>
-							</Grid.Column>
-							<Grid.Column mobile={16} tablet={8} computer={4}>
-								<Segment>
-									<Form>
-										<Form.Field>
-											<Header as='h4'><Icon name='resize vertical'/> Per page</Header>
-											<Dropdown
-												defaultValue={params.perPage}
-												fluid
-												name='perPage'
-												onChange={handleInputChange}
-												options={[5,10,25,50,100].map(key => ({key, text: `${key}`, value: key}))}
-												selection
-											/>
-										</Form.Field>
-									</Form>
-								</Segment>
-								<Divider hidden/>
-							</Grid.Column>
-							<Grid.Column mobile={16} tablet={8} computer={4}>
-								<Segment>
-									<Form>
-										<Form.Field>
-											<Header as='h4'><Icon name='filter'/> Errors</Header>
-											<Checkbox
-												checked={params.showWithoutErrors}
-												label='Show journals without errors'
-												name='showWithoutErrors'
-												onChange={handleCheckboxChange}
-												toggle
-											/>
-										</Form.Field>
-									</Form>
-								</Segment>
-								<Divider hidden/>
-							</Grid.Column>
-							<Grid.Column mobile={16} tablet={8} computer={4}>
-								<Segment>
-									<Header as='h4'><Icon name='columns'/> Columns</Header>
-									<Form>
-										<Form.Field>
-											<Checkbox
-												checked={columns.name}
-												label='Collection'
-												name='name'
-												onChange={handleCheckboxChange}
-												toggle
-											/>
-										</Form.Field>
-										<Form.Field>
-											<Checkbox
-												checked={columns.startTime}
-												label='Start time'
-												name='startTime'
-												onChange={handleCheckboxChange}
-												toggle
-											/>
-										</Form.Field>
-										<Form.Field>
-											<Checkbox
-												checked={columns.endTime}
-												label='End time'
-												name='endTime'
-												onChange={handleCheckboxChange}
-												toggle
-											/>
-										</Form.Field>
-										<Form.Field>
-											<Checkbox
-												checked={columns.duration}
-												label='Duration'
-												name='duration'
-												onChange={handleCheckboxChange}
-												toggle
-											/>
-										</Form.Field>
-										<Form.Field>
-											<Checkbox
-												checked={columns.errorCount}
-												label='Errors'
-												name='errorCount'
-												onChange={handleCheckboxChange}
-												toggle
-											/>
-										</Form.Field>
-										<Form.Field>
-											<Checkbox
-												checked={columns.successCount}
-												label='Successes'
-												name='successCount'
-												onChange={handleCheckboxChange}
-												toggle
-											/>
-										</Form.Field>
-									</Form>
-								</Segment>
-							</Grid.Column>
-						</Grid.Row>
-					)}
-				</Transition.Group>*/}
 				<Grid.Row>
 					<Grid.Column width={16}>
 						<Header
