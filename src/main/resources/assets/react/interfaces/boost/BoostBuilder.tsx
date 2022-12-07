@@ -1,10 +1,13 @@
 import type {DropdownItemProps} from 'semantic-ui-react';
 import type {InterfaceField} from '/lib/explorer/types/Interface.d';
-import type {FieldNameToValueTypes} from '../index.d';
+import type {
+	FieldNameToValueTypes,
+	FieldPathToValueOptions,
+} from '../index.d';
 import type {TermQuery} from '../useNewOrEditInterfaceState';
 
 
-import {VALUE_TYPE_STRING} from '@enonic/js-utils';
+// import {VALUE_TYPE_STRING} from '@enonic/js-utils';
 import {
 	Button,
 	Header,
@@ -17,17 +20,23 @@ export function BoostBuilder({
 	fieldNameToValueTypesState,
 	fieldOptions,
 	fields, setFields,
+	fieldValueOptions,
+	getFieldValues,
 	isDefaultInterface,
 	isLoading,
 	termQueries,
+	setFieldValueOptions,
 	setTermQueries,
 }: {
 	fieldNameToValueTypesState: FieldNameToValueTypes
 	fieldOptions: DropdownItemProps[]
 	fields: InterfaceField[]
+	fieldValueOptions: FieldPathToValueOptions
+	getFieldValues: (field: string) => void
 	isDefaultInterface: boolean
 	isLoading: boolean
 	setFields: React.Dispatch<React.SetStateAction<InterfaceField[]>>
+	setFieldValueOptions: React.Dispatch<React.SetStateAction<FieldPathToValueOptions>>
 	setTermQueries: React.Dispatch<React.SetStateAction<TermQuery[]>>
 	termQueries: TermQuery[]
 }) {
@@ -108,10 +117,13 @@ export function BoostBuilder({
 		<Term
 			fieldNameToValueTypesState={fieldNameToValueTypesState}
 			fieldOptions={fieldOptions}
+			fieldValueOptions={fieldValueOptions}
+			getFieldValues={getFieldValues}
 			isDefaultInterface={isDefaultInterface}
 			isLoading={isLoading}
 			termQueries={termQueries}
 			setTermQueries={setTermQueries}
+			setFieldValueOptions={setFieldValueOptions}
 		/>
 	</>;
 }

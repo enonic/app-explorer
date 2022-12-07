@@ -12,7 +12,10 @@ import type {
 } from '/lib/explorer/types/Interface.d';
 import type IQueryBuilderOptions from 'gql-query-builder/build/IQueryBuilderOptions.d';
 import type {DropdownItemProps} from 'semantic-ui-react/index.d';
-import type {InterfaceNamesObj} from './index.d';
+import type {
+	FieldPathToValueOptions,
+	InterfaceNamesObj,
+} from './index.d';
 
 
 import {
@@ -169,7 +172,7 @@ export function useNewOrEditInterfaceState({
 	const [collectionIds, setCollectionIds] = React.useState<Array<string>>([]);
 	const [fieldOptions, setFieldOptions] = React.useState<DropdownItemProps[]>([]);
 	const [fields, setFields] = React.useState<InterfaceField[]>(DEFAULT_INTERFACE_FIELDS);
-
+	const [fieldValueOptions, setFieldValueOptions] = React.useState<FieldPathToValueOptions>({});
 	// const [boost, setBoost] = React.useState<BoostDSL[]>([]);
 	const [termQueries, setTermQueries] = React.useState<TermQuery[]>([]);
 
@@ -190,7 +193,11 @@ export function useNewOrEditInterfaceState({
 		synonymIds: []
 	});
 	const [isStateChanged, setIsStateChanged] = React.useState(false);
+	const [anyError, setAnyError] = React.useState(false);
 
+	//──────────────────────────────────────────────────────────────────────────
+	// Callbacks
+	//──────────────────────────────────────────────────────────────────────────
 	const memoizedMustBeUnique = React.useCallback((v :string) => {
 		if (interfaceNamesObj[v]) {
 			return `Name must be unique: Name '${v}' is already in use!`;
@@ -198,6 +205,71 @@ export function useNewOrEditInterfaceState({
 	},[
 		interfaceNamesObj
 	]);
+
+	const getFieldValues = React.useCallback((field: string) => {
+		setIsLoading(true);
+		fetch(`${servicesBaseUrl}/graphQL`, {
+			method: 'POST',
+			headers: {
+				'Content-Type':	'application/json'
+			},
+			body: JSON.stringify(gql.query({
+				operation: 'queryDocuments',
+				variables: {
+					aggregations: {
+						list: true,
+						type: 'AggregationInput',
+						value: [{
+							name: field,
+							terms: {
+								field,
+								minDocCount: 2,
+								order: '_count DESC',
+								size: 100
+							}
+						}]
+					},
+					count: {
+						value: 0
+					}
+				},
+				fields: [
+					{
+						aggregations: [
+							'name',
+							{
+								buckets: [
+									'docCount',
+									'key'
+								]
+							}
+						]
+					},
+				],
+			}))
+		})
+			.then(response => response.json())
+			.then(obj => {
+				// console.debug('obj', obj);
+				// console.debug('obj.data.queryDocuments.aggregations', obj.data.queryDocuments.aggregations);
+				const {buckets} = obj.data.queryDocuments.aggregations[0];
+				setFieldValueOptions(prev => {
+					const deref = JSON.parse(JSON.stringify(prev)) as typeof prev;
+					deref[field] = buckets.map(({docCount, key}) => ({
+						text: `${key} (${docCount})`,
+						value: key
+					}));
+					return deref;
+				});
+				setIsLoading(false);
+			});
+	}, [
+		servicesBaseUrl
+	]);
+
+	//──────────────────────────────────────────────────────────────────────────
+	// Effects
+	//──────────────────────────────────────────────────────────────────────────
 	React.useEffect(() => {
 		const newNameError = nameVisited
 			? (
@@ -224,7 +296,6 @@ export function useNewOrEditInterfaceState({
 		nameVisited
 	]);
 
-	const [anyError, setAnyError] = React.useState(false);
 	React.useEffect(() => {
 		const newAnyError = !!nameError;
 		if (newAnyError !== anyError) {
@@ -434,6 +505,8 @@ export function useNewOrEditInterfaceState({
 		},
 		fields, setFields,
 		fieldOptions,
+		fieldValueOptions, setFieldValueOptions,
+		getFieldValues,
 		initialState,
 		isDefaultInterface: name === 'default',
 		isLoading,

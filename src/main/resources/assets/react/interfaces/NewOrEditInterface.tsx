@@ -40,6 +40,8 @@ export function NewOrEditInterface({
 		isStateChanged,
 		fieldOptions,
 		fields, setFields,
+		fieldValueOptions, setFieldValueOptions,
+		getFieldValues,
 		name,
 		nameError,
 		resetState,
@@ -98,10 +100,13 @@ export function NewOrEditInterface({
 					fieldNameToValueTypesState={fieldNameToValueTypesState}
 					fieldOptions={fieldOptions}
 					fields={fields}
+					fieldValueOptions={fieldValueOptions}
+					getFieldValues={getFieldValues}
 					isLoading={isLoading}
 					isDefaultInterface={isDefaultInterface}
 					termQueries={termQueries}
 					setFields={setFields}
+					setFieldValueOptions={setFieldValueOptions}
 					setTermQueries={setTermQueries}
 				/>
 				<Header
