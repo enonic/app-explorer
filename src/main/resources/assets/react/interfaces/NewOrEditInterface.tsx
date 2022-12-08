@@ -38,6 +38,7 @@ export function NewOrEditInterface({
 		isDefaultInterface,
 		isLoading,
 		isStateChanged,
+		fieldButtonVisible, setFieldButtonVisible,
 		fieldOptions,
 		fields, setFields,
 		fieldValueOptions, setFieldValueOptions,
@@ -53,6 +54,7 @@ export function NewOrEditInterface({
 		stopWords,
 		synonymIds,
 		termQueries, setTermQueries,
+		termButtonVisible, setTermButtonVisible,
 	} = useNewOrEditInterfaceState({
 		_id,
 		interfaceNamesObj,
@@ -98,6 +100,7 @@ export function NewOrEditInterface({
 				/>
 				<BoostBuilder
 					fieldNameToValueTypesState={fieldNameToValueTypesState}
+					fieldButtonVisible={fieldButtonVisible}
 					fieldOptions={fieldOptions}
 					fields={fields}
 					fieldValueOptions={fieldValueOptions}
@@ -105,9 +108,12 @@ export function NewOrEditInterface({
 					isLoading={isLoading}
 					isDefaultInterface={isDefaultInterface}
 					termQueries={termQueries}
+					setFieldButtonVisible={setFieldButtonVisible}
 					setFields={setFields}
 					setFieldValueOptions={setFieldValueOptions}
 					setTermQueries={setTermQueries}
+					termButtonVisible={termButtonVisible}
+					setTermButtonVisible={setTermButtonVisible}
 				/>
 				<Header
 					as='h3'

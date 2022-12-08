@@ -22,7 +22,7 @@ import fastDeepEqual from 'fast-deep-equal/react';
 import * as gql from 'gql-query-builder';
 import * as React from 'react';
 import {FIELD_SHORTCUT_COLLECTION} from '../../../services/graphQL/constants';
-import {DEFAULT_INTERFACE_FIELDS} from '../constants';
+// import {DEFAULT_INTERFACE_FIELDS} from '../constants';
 import {mustStartWithALowercaseLetter} from '../utils/mustStartWithALowercaseLetter';
 import {notDoubleUnderscore} from '../utils/notDoubleUnderscore';
 import {onlyLowercaseAsciiLettersDigitsAndUnderscores} from '../utils/onlyLowercaseAsciiLettersDigitsAndUnderscores';
@@ -148,8 +148,9 @@ export function useNewOrEditInterfaceState({
 	const [nameError, setNameError] = React.useState<string>();
 	const [nameVisited, setNameVisited] = React.useState(false);
 	const [collectionIds, setCollectionIds] = React.useState<string[]>([]);
+	const [fieldButtonVisible, setFieldButtonVisible] = React.useState(_id ? false : true);
 	const [fieldOptions, setFieldOptions] = React.useState<DropdownItemProps[]>([]);
-	const [fields, setFields] = React.useState<InterfaceField[]>(DEFAULT_INTERFACE_FIELDS);
+	const [fields, setFields] = React.useState<InterfaceField[]>([]);
 	const [fieldValueOptions, setFieldValueOptions] = React.useState<FieldPathToValueOptions>({});
 	// const [boost, setBoost] = React.useState<BoostDSL[]>([]);
 	const [termQueries, setTermQueries] = React.useState<TermQuery[]>([]);
@@ -157,6 +158,7 @@ export function useNewOrEditInterfaceState({
 	const [isLoading, setIsLoading] = React.useState(true);
 	const [stopWords, setStopWords] = React.useState<string[]>([]);
 	const [synonymIds, setSynonymIds] = React.useState<string[]>([]);
+	const [termButtonVisible, setTermButtonVisible] = React.useState(_id ? false : true);
 	const [initialState, setInitialState] = React.useState<{
 		name: string
 		collectionIds: string[]
@@ -167,7 +169,7 @@ export function useNewOrEditInterfaceState({
 	}>({
 		name: '',
 		collectionIds: [],
-		fields: DEFAULT_INTERFACE_FIELDS,
+		fields: [], // DEFAULT_INTERFACE_FIELDS,
 		stopWords: [],
 		synonymIds: [],
 		termQueries: []
@@ -394,13 +396,17 @@ export function useNewOrEditInterfaceState({
 					if (isSet(initialFields)) {
 						if (!Array.isArray(initialFields)) {
 							setFields([initialFields]);
+							setFieldButtonVisible(false);
 						} else if (initialFields.length) { // non-empty array
 							setFields(initialFields);
+							setFieldButtonVisible(false);
 						} else { // initialFields is an empty array
-							setFields(DEFAULT_INTERFACE_FIELDS);
+							setFields([]/*DEFAULT_INTERFACE_FIELDS*/);
+							setFieldButtonVisible(true);
 						}
 					} else {
-						setFields(DEFAULT_INTERFACE_FIELDS);
+						setFields([]/*DEFAULT_INTERFACE_FIELDS*/);
+						setFieldButtonVisible(true);
 					}
 					setStopWords(initialStopWords);
 					setSynonymIds(initialSynonymIds);
@@ -542,6 +548,7 @@ export function useNewOrEditInterfaceState({
 			stopWords,
 			synonymIds
 		},
+		fieldButtonVisible, setFieldButtonVisible,
 		fields, setFields,
 		fieldOptions,
 		fieldValueOptions, setFieldValueOptions,
@@ -560,6 +567,7 @@ export function useNewOrEditInterfaceState({
 		setSynonymIds,
 		stopWords,
 		synonymIds,
+		termButtonVisible, setTermButtonVisible,
 		termQueries, setTermQueries,
 	};
 }
