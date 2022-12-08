@@ -20,10 +20,10 @@ export function DeleteItemButton<ArrayItemType>({
 	StrictButtonProps,'onClick'|'type'
 > & {
 	// Required
-	array :Array<ArrayItemType>
-	setArrayFunction :(array :Array<ArrayItemType>) => void
+	array: ArrayItemType[]
+	setArrayFunction: (array: ArrayItemType[]) => void
 	// Optional
-	index ?:number
+	index?: number
 }) {
 	return <Button
 		{...rest}
