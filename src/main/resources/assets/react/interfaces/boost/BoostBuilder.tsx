@@ -1,4 +1,7 @@
-import type {DropdownItemProps} from 'semantic-ui-react';
+import type {
+	DropdownItemProps,
+	TRANSITION_STATUSES as TransitionStatuses,
+} from 'semantic-ui-react';
 import type {
 	InterfaceField,
 	TermQuery,
@@ -13,12 +16,19 @@ import type {
 import {
 	Button,
 	Header,
+	Segment,
+	Transition,
 } from 'semantic-ui-react';
-import {FieldSelector} from './FieldSelector';
-import {Term} from './Term'
+import {Fields} from './Fields';
+import {Term} from './Term';
+
+
+const DURATION_BUTTON_HIDE = 250;
+const DURATION_BUTTON_SHOW = 500;
 
 
 export function BoostBuilder({
+	fieldButtonVisible,
 	fieldNameToValueTypesState,
 	fieldOptions,
 	fields, setFields,
@@ -26,10 +36,14 @@ export function BoostBuilder({
 	getFieldValues,
 	isDefaultInterface,
 	isLoading,
-	termQueries,
+	setFieldButtonVisible,
 	setFieldValueOptions,
+	setTermButtonVisible,
 	setTermQueries,
+	termButtonVisible,
+	termQueries,
 }: {
+	fieldButtonVisible: boolean
 	fieldNameToValueTypesState: FieldNameToValueTypes
 	fieldOptions: DropdownItemProps[]
 	fields: InterfaceField[]
@@ -37,9 +51,12 @@ export function BoostBuilder({
 	getFieldValues: (field: string) => void
 	isDefaultInterface: boolean
 	isLoading: boolean
+	setFieldButtonVisible: React.Dispatch<React.SetStateAction<boolean>>
 	setFields: React.Dispatch<React.SetStateAction<InterfaceField[]>>
 	setFieldValueOptions: React.Dispatch<React.SetStateAction<FieldPathToValueOptions>>
+	setTermButtonVisible: React.Dispatch<React.SetStateAction<boolean>>
 	setTermQueries: React.Dispatch<React.SetStateAction<TermQuery[]>>
+	termButtonVisible: boolean
 	termQueries: TermQuery[]
 }) {
 	return <>
@@ -51,81 +68,125 @@ export function BoostBuilder({
 			id='boosting'
 			size='medium'
 		/>
-		{termQueries.length ? null : <Button
-			content='Term'
-			icon={{
-				color: 'green',
-				name: 'plus'
-			}}
-			onClick={()=>{setTermQueries(prev => {
-				prev.push({
-					// boost: 1,
-					// field: '',
-					// type: VALUE_TYPE_STRING,
-					// value: ''
-				});
-				return prev;
-			})}}
-		/>}
-		<Button
-			content='In'
-			icon={{
-				color: 'green',
-				name: 'plus'
-			}}
-		/>
-		<Button
-			content='Like'
-			icon={{
-				color: 'green',
-				name: 'plus'
-			}}
-		/>
-		<Button
-			content='Range'
-			icon={{
-				color: 'green',
-				name: 'plus'
-			}}
-		/>
-		<Button
-			content='PathMatch'
-			icon={{
-				color: 'green',
-				name: 'plus'
-			}}
-		/>
-		<Button
-			content='Exists'
-			icon={{
-				color: 'green',
-				name: 'plus'
-			}}
-		/>
-		<Header
-			as='h4'
-			content='Fields'
-			disabled={isLoading || isDefaultInterface}
-			dividing
-			id='fields'
-			size='small'
-		/>
-		<FieldSelector
-			disabled={isLoading || isDefaultInterface}
-			fieldOptions={fieldOptions}
-			setFields={setFields}
-			value={fields}
-		/>
-		<Term
-			fieldNameToValueTypesState={fieldNameToValueTypesState}
-			fieldOptions={fieldOptions}
-			fieldValueOptions={fieldValueOptions}
-			getFieldValues={getFieldValues}
-			isDefaultInterface={isDefaultInterface}
-			isLoading={isLoading}
-			termQueries={termQueries}
-			setTermQueries={setTermQueries}
-			setFieldValueOptions={setFieldValueOptions}
-		/>
+		<Segment basic style={{padding: '0 0 0 14'}}>
+			<Transition
+				animation='fade down'
+				duration={{
+					hide: DURATION_BUTTON_HIDE,
+					show: DURATION_BUTTON_SHOW
+				}}
+				onStart={(_null,{status} :{status: TransitionStatuses}) => {
+					// console.debug('button onStart', status);
+					if (status === 'EXITING') {
+						// setTimeout(() => {
+						// 	setSegmentVisible(true);
+						// }, DELAY_SEGMENT_SHOW)
+					}
+				}}
+				visible={fieldButtonVisible}
+			>
+				<Button
+					content='Field'
+					icon={{
+						color: 'green',
+						name: 'plus'
+					}}
+					onClick={() => {
+						setFieldButtonVisible(false);
+						setTimeout(() => {
+							setFields([{
+								boost: 1,
+								name: ''
+							}]);
+						}, DURATION_BUTTON_HIDE);
+					}}
+				/>
+			</Transition>
+			<Transition
+				animation='fade down'
+				duration={{
+					hide: DURATION_BUTTON_HIDE,
+					show: DURATION_BUTTON_SHOW
+				}}
+				visible={termButtonVisible}
+			>
+				<Button
+					content='Term'
+					icon={{
+						color: 'green',
+						name: 'plus'
+					}}
+					onClick={()=>{
+						setTermButtonVisible(false);
+						setTermQueries(prev => {
+							prev.push({
+								// boost: 1,
+								// field: '',
+								// type: VALUE_TYPE_STRING,
+								// value: ''
+							});
+							return prev;
+						})
+					}}
+				/>
+			</Transition>
+			{/*
+			<Button
+				content='In'
+				icon={{
+					color: 'green',
+					name: 'plus'
+				}}
+			/>
+			<Button
+				content='Like'
+				icon={{
+					color: 'green',
+					name: 'plus'
+				}}
+			/>
+			<Button
+				content='Range'
+				icon={{
+					color: 'green',
+					name: 'plus'
+				}}
+			/>
+			<Button
+				content='PathMatch'
+				icon={{
+					color: 'green',
+					name: 'plus'
+				}}
+			/>
+			<Button
+				content='Exists'
+				icon={{
+					color: 'green',
+					name: 'plus'
+				}}
+			/>
+			*/}
+			<Fields
+				fields={fields}
+				fieldOptions={fieldOptions}
+				isDefaultInterface={isDefaultInterface}
+				isLoading={isLoading}
+				setFields={setFields}
+				setFieldButtonVisible={setFieldButtonVisible}
+			/>
+			<Term
+				fieldNameToValueTypesState={fieldNameToValueTypesState}
+				fieldOptions={fieldOptions}
+				fieldValueOptions={fieldValueOptions}
+				getFieldValues={getFieldValues}
+				isDefaultInterface={isDefaultInterface}
+				isLoading={isLoading}
+				termQueries={termQueries}
+				setTermQueries={setTermQueries}
+				setFieldValueOptions={setFieldValueOptions}
+				setTermButtonVisible={setTermButtonVisible}
+			/>
+		</Segment>
 	</>;
 }
