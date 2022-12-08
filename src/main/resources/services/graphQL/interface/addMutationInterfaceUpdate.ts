@@ -1,3 +1,6 @@
+import type {TermQuery} from '/lib/explorer/types/Interface.d';
+
+
 import {coerseInterfaceType} from '/lib/explorer/interface/coerseInterfaceType';
 import {PRINCIPAL_EXPLORER_WRITE} from '/lib/explorer/model/2/constants';
 import {update} from '/lib/explorer/interface/update';
@@ -11,6 +14,7 @@ import {
 
 import {
 	GQL_INPUT_TYPE_INTERFACE_FIELD_NAME,
+	GQL_INPUT_TYPE_INTERFACE_TERM_QUERY_NAME,
 	GQL_MUTATION_INTERFACE_UPDATE_NAME,
 	GQL_TYPE_INTERFACE_NAME
 } from '../constants';
@@ -26,7 +30,8 @@ export function addMutationInterfaceUpdate({glue}) {
 			fields: list(glue.getInputType(GQL_INPUT_TYPE_INTERFACE_FIELD_NAME)), // null allowed
 			//stopWordIds: list(GraphQLID), // null allowed
 			stopWords: list(GraphQLString), // null allowed
-			synonymIds: list(GraphQLID) // null allowed
+			synonymIds: list(GraphQLID), // null allowed
+			termQueries: list(glue.getInputType(GQL_INPUT_TYPE_INTERFACE_TERM_QUERY_NAME)),
 		},
 		resolve(env :{
 			args :{
@@ -39,6 +44,7 @@ export function addMutationInterfaceUpdate({glue}) {
 				}>
 				stopWords ?:Array<string>
 				synonymIds ?:Array<string>
+				termQueries: TermQuery[]
 			}
 		}) {
 			//log.debug(`env:${toStr(env)}`);
@@ -50,7 +56,8 @@ export function addMutationInterfaceUpdate({glue}) {
 					fields = [],
 					//stopWordIds = [],
 					stopWords = [],
-					synonymIds = []
+					synonymIds = [],
+					termQueries = [],
 				}
 			} = env;
 			const writeConnection = connect({
@@ -77,7 +84,8 @@ export function addMutationInterfaceUpdate({glue}) {
 				fields,
 				//stopWordIds, // empty array allowed
 				stopWords,
-				synonymIds // empty array allowed
+				synonymIds, // empty array allowed
+				termQueries, // empty array allowed
 			}, {
 				writeConnection
 			});
