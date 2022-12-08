@@ -65,6 +65,7 @@ function buildGetInterfaceQueryObject({
 					'doubleValue',
 					'longValue',
 					'stringValue',
+					'type',
 				]
 			},
 		],
@@ -234,10 +235,39 @@ export function useNewOrEditInterfaceState({
 				const {buckets} = obj.data.queryDocuments.aggregations[0];
 				setFieldValueOptions(prev => {
 					const deref = JSON.parse(JSON.stringify(prev)) as typeof prev;
-					deref[field] = buckets.map(({docCount, key}) => ({
-						text: `${key} (${docCount})`,
-						value: key
-					}));
+					if (deref[field]) {
+						// We already have some field value options for this field.
+						for (let i = 0; i < buckets.length; i++) {
+							const {docCount, key} = buckets[i];
+							let foundIndex = -1;
+							for (let j = 0; j < deref[field].length; j++) {
+								const {value: existingKey} = deref[field][j];
+								// Check all new values against old ones
+								if (key === existingKey) {
+									foundIndex = j;
+								}
+							}
+							if (foundIndex === -1) {
+								// Add missing values
+								deref[field].push({
+									text: `${key} (${docCount})`,
+									value: key
+								});
+							} else {
+								// Update docCount on existing values
+								deref[field][foundIndex].text = `${key} (${docCount})`;
+							}
+						}
+					} else {
+						// We don't have any field value options for this field yet
+						// So simply add all.
+						deref[field] = buckets.map(
+							({ docCount, key }) => ({
+								text: `${key} (${docCount})`,
+								value: key
+							})
+						);
+					}
 					return deref;
 				});
 				setIsLoading(false);
@@ -331,12 +361,36 @@ export function useNewOrEditInterfaceState({
 						fields: initialFields,
 						stopWords: initialStopWords,
 						synonymIds: initialSynonymIds,
-						termQueries: initialTermQueries,
+						termQueries: initialTermQueries = [],
 
 					} = data.getInterface;
 					setName(initialName);
 					setCollectionIds(initialCollectionIds);
 					setTermQueries(initialTermQueries);
+					for (let i = 0; i < initialTermQueries.length; i++) {
+						const {
+							field,
+							// booleanValue,
+							// doubleValue,
+							// longValue,
+							stringValue,
+							type,
+						} = initialTermQueries[i];
+						if (type === VALUE_TYPE_STRING) {
+							// Add stringValue in case getFieldValues doesn't (docCount less then 2)
+							setFieldValueOptions(prev => {
+								const deref = JSON.parse(JSON.stringify(prev)) as typeof prev;
+								if (!deref[field]) {
+									deref[field] = [{
+										text: `${stringValue} (unknown)`, // getFieldValues will update docCount
+										value: stringValue
+									}]
+								}
+								return deref;
+							});
+						}
+						getFieldValues(field);
+					}
 					if (isSet(initialFields)) {
 						if (!Array.isArray(initialFields)) {
 							setFields([initialFields]);
