@@ -56,7 +56,17 @@ function buildGetInterfaceQueryObject({
 				]
 			},
 			'stopWords',
-			'synonymIds'
+			'synonymIds',
+			{
+				termQueries: [
+					'boost',
+					'field',
+					'booleanValue',
+					'doubleValue',
+					'longValue',
+					'stringValue',
+				]
+			},
 		],
 		variables: {
 			_id: {
@@ -72,7 +82,7 @@ function buildGetInterfaceQueryObject({
 function buildQueryDocumentsObject({
 	collectionIds = []
 } :{
-	collectionIds ?:Array<string>
+	collectionIds ?:string[]
 }) {
 	return {
 		operation: 'queryDocuments',
@@ -136,7 +146,7 @@ export function useNewOrEditInterfaceState({
 	const [name, setName] = React.useState('');
 	const [nameError, setNameError] = React.useState<string>();
 	const [nameVisited, setNameVisited] = React.useState(false);
-	const [collectionIds, setCollectionIds] = React.useState<Array<string>>([]);
+	const [collectionIds, setCollectionIds] = React.useState<string[]>([]);
 	const [fieldOptions, setFieldOptions] = React.useState<DropdownItemProps[]>([]);
 	const [fields, setFields] = React.useState<InterfaceField[]>(DEFAULT_INTERFACE_FIELDS);
 	const [fieldValueOptions, setFieldValueOptions] = React.useState<FieldPathToValueOptions>({});
@@ -144,20 +154,22 @@ export function useNewOrEditInterfaceState({
 	const [termQueries, setTermQueries] = React.useState<TermQuery[]>([]);
 
 	const [isLoading, setIsLoading] = React.useState(true);
-	const [stopWords, setStopWords] = React.useState<Array<string>>([]);
-	const [synonymIds, setSynonymIds] = React.useState<Array<string>>([]);
+	const [stopWords, setStopWords] = React.useState<string[]>([]);
+	const [synonymIds, setSynonymIds] = React.useState<string[]>([]);
 	const [initialState, setInitialState] = React.useState<{
-		name :string
-		collectionIds :Array<string>
-		fields :Array<InterfaceField>
-		stopWords :Array<string>
-		synonymIds :Array<string>
+		name: string
+		collectionIds: string[]
+		fields: InterfaceField[]
+		stopWords: string[]
+		synonymIds: string[]
+		termQueries: TermQuery[]
 	}>({
 		name: '',
 		collectionIds: [],
 		fields: DEFAULT_INTERFACE_FIELDS,
 		stopWords: [],
-		synonymIds: []
+		synonymIds: [],
+		termQueries: []
 	});
 	const [isStateChanged, setIsStateChanged] = React.useState(false);
 	const [anyError, setAnyError] = React.useState(false);
@@ -277,7 +289,7 @@ export function useNewOrEditInterfaceState({
 	// OnMount
 	React.useEffect(() => {
 		if (!_id) {return;}
-		const queries :Array<IQueryBuilderOptions> = [/*buildQueryDocumentsObject({
+		const queries :IQueryBuilderOptions[] = [/*buildQueryDocumentsObject({
 			collectionIds
 		})*/];
 		if (_id) {
@@ -318,10 +330,13 @@ export function useNewOrEditInterfaceState({
 						collectionIds: initialCollectionIds,
 						fields: initialFields,
 						stopWords: initialStopWords,
-						synonymIds: initialSynonymIds
+						synonymIds: initialSynonymIds,
+						termQueries: initialTermQueries,
+
 					} = data.getInterface;
 					setName(initialName);
 					setCollectionIds(initialCollectionIds);
+					setTermQueries(initialTermQueries);
 					if (isSet(initialFields)) {
 						if (!Array.isArray(initialFields)) {
 							setFields([initialFields]);
@@ -340,13 +355,14 @@ export function useNewOrEditInterfaceState({
 						collectionIds: initialCollectionIds,
 						fields: initialFields,
 						stopWords: initialStopWords,
-						synonymIds: initialSynonymIds
+						synonymIds: initialSynonymIds,
+						termQueries: initialTermQueries,
 					})
 				}
-				/*const newFieldOptions :Array<DropdownItemProps> = [];
+				/*const newFieldOptions :DropdownItemProps[] = [];
 				if (data.queryDocuments.fieldValueCounts && data.queryDocuments.fieldValueCounts.length) {
 					for (let i = 0; i < data.queryDocuments.fieldValueCounts.length; i++) {
-					    const {
+						const {
 							count,
 							fieldPath
 						} = data.queryDocuments.fieldValueCounts[i];
@@ -420,7 +436,7 @@ export function useNewOrEditInterfaceState({
 					}
 				};
 				//console.debug('data', data);
-				const newFieldOptions :Array<DropdownItemProps> = [];
+				const newFieldOptions :DropdownItemProps[] = [];
 				if (data.queryDocuments.fieldValueCounts && data.queryDocuments.fieldValueCounts.length) {
 					for (let i = 0; i < data.queryDocuments.fieldValueCounts.length; i++) {
 						const {
@@ -450,10 +466,12 @@ export function useNewOrEditInterfaceState({
 			collectionIds: initialCollectionIds,
 			fields: initialFields,
 			stopWords: initialStopWords,
-			synonymIds: initialSynonymIds
+			synonymIds: initialSynonymIds,
+			termQueries: initialTermQueries,
 		} = initialState;
 		setName(initialName);
 		setCollectionIds(initialCollectionIds);
+		setTermQueries(initialTermQueries);
 		setFields(initialFields);
 		setStopWords(initialStopWords);
 		setSynonymIds(initialSynonymIds);
