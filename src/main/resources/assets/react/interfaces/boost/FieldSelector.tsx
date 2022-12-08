@@ -19,11 +19,12 @@ import {MoveUpButton} from '../../components/MoveUpButton';
 
 export function FieldSelector(props :{
 	// Required
-	fieldOptions :Array<DropdownItemProps>
-	setFields :(fields:Array<InterfaceField>) => void
+	fieldOptions: DropdownItemProps[]
+	setFields: (fields: InterfaceField[]) => void
+	// setSegmentVisible: React.Dispatch<React.SetStateAction<boolean>>
 	// Optional
-	disabled ?:boolean
-	value ?:Array<InterfaceField>
+	disabled?: boolean
+	value?: InterfaceField[]
 }) {
 	const {
 		disabled = false,
@@ -139,7 +140,7 @@ export function FieldSelector(props :{
 									/>
 									<DeleteItemButton
 										array={fieldsArray}
-										disabled={disabled || fieldsArray.length < 2}
+										disabled={disabled}
 										index={index}
 										setArrayFunction={setFields}
 									/>
