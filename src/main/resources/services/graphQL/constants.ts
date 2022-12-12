@@ -119,4 +119,6 @@ export const GQL_QUERY_DOCUMENTS = 'queryDocuments';
 export const GQL_QUERY_EXPLORER_REPO_NODES_GET_NAME = 'getExplorerRepoNodes';
 export const GQL_QUERY_INTERFACE_GET_NAME = 'getInterface';
 export const GQL_QUERY_FIELD_GET_NAME = 'getField';
+export const GQL_QUERY_PROFILE_GET_NAME = 'getProfile';
+export const GQL_QUERY_PROFILE_MODIFY_NAME = 'modifyProfile';
 export const GQL_QUERY_SYNONYMS_NAME = 'querySynonyms';
