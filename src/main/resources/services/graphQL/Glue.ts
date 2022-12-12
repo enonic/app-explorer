@@ -1,14 +1,16 @@
 import type {AnyObject} from '/lib/explorer/types/index.d';
 
-import {
-	hasOwnProperty//,
-	//toStr
-} from '@enonic/js-utils';
 
+import {
+	hasOwnProperty,
+	isSet,
+	//toStr,
+} from '@enonic/js-utils';
 import {
 	newSchemaGenerator
 	//@ts-ignore
 } from '/lib/graphql';
+
 
 type Fields = AnyObject;
 
@@ -31,6 +33,7 @@ export class Glue {
 	_enumTypes :Record<string,EnumType> = {};
 	_fields :Record<string,Fields> = {};
 	_inputTypes :Record<string,InputObjectType> = {};
+	_inputFields: Record<string, AnyObject> =  {};
 	_interfaceTypes :Record<string,{
 		fields :Fields
 		type :InterfaceType
@@ -126,6 +129,33 @@ export class Glue {
 		this._fields[name] = fields;
 		return fields;
 	}
+
+	//──────────────────────────────────────────────────────────────────────────────
+	// InputFields
+	//──────────────────────────────────────────────────────────────────────────────
+	addInputFields<InputFields extends AnyObject = AnyObject>({
+		name,
+		fields
+	} : {
+		name: string
+		fields: InputFields
+	}) {
+		if (isSet(this._inputFields[name])) {
+			//log.debug(`InputFields ${name} already added :)`);
+			return this._inputFields[name];
+			//throw new Error(`InputFields ${name} already added!`);
+		}
+		this._inputFields[name] = fields;
+		return this._inputFields[name];
+	}
+
+	getInputFields(name: string) {
+		return this._inputFields[name];
+	}
+
+	//──────────────────────────────────────────────────────────────────────────────
+	// InputType
+	//──────────────────────────────────────────────────────────────────────────────
 
 	addInputType({
 		fields,

@@ -62,6 +62,9 @@ import {addMutationInterfaceUpdate} from './interface/addMutationInterfaceUpdate
 import {addQueryInterfaceGet} from './interface/addQueryInterfaceGet';
 import {generateQueryInterfacesField} from './interface/generateQueryInterfacesField';
 
+import {addGetProfile} from './profile/addGetProfile';
+import {addModifyProfile} from './profile/addModifyProfile';
+
 import {generateScheduledJobsListField} from './scheduler/generateScheduledJobsListField';
 import {generateSchedulerTypes} from './scheduler/generateSchedulerTypes';
 import {generateDocumentTypeFields} from './documentType/generateDocumentTypeFields';
@@ -187,6 +190,9 @@ const {
 	reindexCollectionsField,
 	updateCollectionField
 } = generateCollectionFields({glue});
+
+addGetProfile({glue});
+addModifyProfile({glue});
 
 addQueryDocuments({glue});
 
