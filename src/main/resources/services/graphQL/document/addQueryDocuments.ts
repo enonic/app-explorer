@@ -8,6 +8,9 @@ import type {
 import type {
 	AnyObject
 } from '/lib/explorer/types/index.d';
+import type {
+	Highlight
+} from '/lib/explorer/types/GraphQL.d';
 
 
 import {
@@ -26,6 +29,8 @@ import {
 } from '/lib/explorer/constants';
 import {queryDocumentTypes} from '/lib/explorer/documentType/queryDocumentTypes';
 import {addFilterInput} from '/lib/explorer/interface/graphql/filters/guillotine/input/addFilterInput';
+import {addInputTypeHighlight} from '/lib/explorer/interface/graphql/highlight/input/addInputTypeHighlight';
+import {highlightGQLArgToEnonicXPQuery} from '/lib/explorer/interface/graphql/highlight/input/highlightGQLArgToEnonicXPQuery';
 import {hasValue} from '/lib/explorer/query/hasValue';
 import {connect} from '/lib/explorer/repo/connect';
 import {multiConnect} from '/lib/explorer/repo/multiConnect';
@@ -323,6 +328,7 @@ export function addQueryDocuments({
 			count: GraphQLInt,
 			countFieldValues :GraphQLBoolean,
 			filters: list(filterInput),
+			highlight: addInputTypeHighlight({glue}),
 			query: queryInput,
 			start: GraphQLInt
 		},
@@ -333,7 +339,8 @@ export function addQueryDocuments({
 				countFieldValues ?:boolean
 				collectionIds ?:Array<string>
 				collections ?:Array<string>
-				filters ?:Guillotine.BooleanFilter
+				filters?: Guillotine.BooleanFilter
+				highlight?: Highlight
 				query ?:QueryDSL|string
 				start ?:number
 			}
@@ -348,6 +355,7 @@ export function addQueryDocuments({
 					count = 10,
 					countFieldValues = false,
 					filters: filtersArg,
+					highlight: highlightArg,
 					query,
 					start = 0
 				}
@@ -520,13 +528,16 @@ export function addQueryDocuments({
 					aggregations,
 					count,
 					filters: (filtersArray ? filtersArray : staticFilters) as BooleanFilter,
+					highlight: highlightArg
+						? highlightGQLArgToEnonicXPQuery({highlightArg})
+						: null,
 					query: query ? query : '',
 					start
 				};
 				// log.debug('multiRepoQueryParams:%s', toStr(multiRepoQueryParams));
 
 				queryResult = multiRepoReadConnection.query(multiRepoQueryParams) as unknown as QueryRes;
-				// log.debug('queryResult:%s', toStr(queryResult));
+				log.info('queryResult:%s', toStr(queryResult));
 				// log.debug('queryResult.aggregations:%s', toStr(queryResult.aggregations));
 			} catch (e) {
 				if (e.message === 'multiConnect: empty sources is not allowed!') {
@@ -587,6 +598,7 @@ export function addQueryDocuments({
 				hits: queryResult.hits.map(({
 					branch,
 					id,
+					highlight,
 					repoId//,
 					//score
 				}) => {
@@ -624,6 +636,7 @@ export function addQueryDocuments({
 					return {
 						// _collection: documentNode[FIELD_PATH_META].collection,
 						// _documentType: documentNode[FIELD_PATH_META].documentType,
+						_highlight: highlight,
 						_id,
 						_json: JSON.stringify(obj),
 						_name,
@@ -668,6 +681,7 @@ export function addQueryDocuments({
 						// _collection: { type: GraphQLString },
 						// _documentType: { type: GraphQLString },
 						[FIELD_PATH_META]: { type: GraphQLJson },
+						_highlight: { type: GraphQLJson },
 						_id: { type: glue.getScalarType('_id') },
 						_json: { type: GraphQLJson },
 						_name: { type: glue.getScalarType('_name') },
