@@ -363,7 +363,6 @@ export function Term({
 								<Input
 									disabled={disabled}
 									fluid
-									min={0.1}
 									onChange={(_e,{value: newStringBoost}: {value: string}) => {
 										// console.debug('newStringBoost', newStringBoost);
 										const newNumberBoost = parseFloat(newStringBoost);
