@@ -237,6 +237,31 @@ export function addQueryDocuments({
 		}
 	});
 
+	const ngramInputType = glue.addInputType({
+		name: 'QueryDSLExpressionNgram',
+		fields: {
+			//field: { type: nonNull(GraphQLString) },
+			fields: { type: nonNull(list(GraphQLString)) },
+			query: { type: nonNull(GraphQLString) },
+			// Optional
+			operator: { type: GraphQLString }, // "AND" || "OR"
+			boost: { type: GraphQLFloat },
+		}
+	});
+
+	const stemmedInputType = glue.addInputType({
+		name: 'QueryDSLExpressionStemmed',
+		fields: {
+			//field: { type: nonNull(GraphQLString) },
+			fields: { type: nonNull(list(GraphQLString)) },
+			query: { type: nonNull(GraphQLString) },
+			language: { type: nonNull(GraphQLString) },
+			// Optional
+			operator: { type: GraphQLString }, // "AND" || "OR"
+			boost: { type: GraphQLFloat },
+		}
+	});
+
 	const termInputType = glue.addInputType({
 		name: 'QueryDSLTermExpression',
 		fields: {
@@ -257,6 +282,8 @@ export function addQueryDocuments({
 		fields: {
 			fulltext: { type: fulltextInputType },
 			matchAll: { type: addMatchAll({glue}) },
+			ngram: { type: ngramInputType },
+			stemmed: { type: stemmedInputType },
 			term: { type: termInputType }
 		} // fields
 	});
