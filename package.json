@@ -37,7 +37,8 @@
     "semantic-ui-react": "^2",
     "serialize-javascript": "^5",
     "traverse": "^0",
-    "uri-js": "^4"
+    "uri-js": "^4",
+    "use-debounce": "^9.0.2"
   },
   "devDependencies": {
     "@babel/cli": "^7",
