@@ -47,7 +47,7 @@ export function Documents({
 		query, setQuery,
 		queryDocuments,
 		selectedCollections, setSelectedCollections,
-		selectedColumns, setSelectedColumns,
+		selectedColumns, persistSelectedColumns,
 		selectedDocumentTypes, setSelectedDocumentTypes,
 	} = useDocumentsState({
 		servicesBaseUrl
@@ -199,7 +199,7 @@ export function Documents({
 								{value}
 							) => {
 								const newSelectedColumns = value as string[];
-								setSelectedColumns(newSelectedColumns);
+								persistSelectedColumns(newSelectedColumns);
 								queryDocuments({
 									collectionsFilter: selectedCollections,
 									documentsTypesFilter: selectedDocumentTypes,

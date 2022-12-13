@@ -1,7 +1,8 @@
+import type {AnyObject} from '/lib/explorer/types/index.d';
 import type {Glue} from '../Glue';
 
 
-// import {toStr} from '@enonic/js-utils';
+import {toStr} from '@enonic/js-utils';
 import {
 	Json as GraphQLJson,
 	GraphQLString,
@@ -21,21 +22,22 @@ export function addModifyProfile({
 	glue: Glue
 }) {
 	return glue.addMutation<{
-		json: string
+		object: AnyObject
+		scope?: string
 	}>({
 		args: {
-			json: nonNull(GraphQLString)
+			object: nonNull(GraphQLJson),
+			scope: GraphQLString
 		},
 		name: GQL_QUERY_PROFILE_MODIFY_NAME,
 		resolve(env) {
 			const {
 				args: {
-					json
+					object,
+					scope
 				}
 			} = env;
-
-			const obj = JSON.parse(json);
-			// log.info('obj:%s', toStr(obj));
+			// log.info('object:%s', toStr(object));
 
 			const user = getUser();
 			// log.info('user:%s', toStr(user));
@@ -43,13 +45,16 @@ export function addModifyProfile({
 			const {key} = user;
 			// log.info('user key:%s', toStr(key));
 
+			const fullScope = scope ? `${app.name}.${scope}` : app.name;
+			// log.info('fullScope:%s', fullScope);
+
 			const modifiedExplorerProfile = modifyProfile({
 				key,
-				scope: app.name,
+				scope: fullScope,
 				editor: (/*explorerProfile*/) => {
 					// log.info('explorerProfile:%s', toStr(explorerProfile));
 					// return explorerProfile;
-					return obj;
+					return object;
 				}
 			});
 			// log.info('modifiedExplorerProfile:%s', toStr(modifiedExplorerProfile));

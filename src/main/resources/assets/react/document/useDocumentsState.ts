@@ -17,6 +17,7 @@ import {
 	FIELD_SHORTCUT_COLLECTION,
 	FIELD_SHORTCUT_DOCUMENT_TYPE,
 } from '../../../services/graphQL/constants';
+import type {JSONResponse} from '../../../services/graphQL/fetchers/index.d';
 
 
 const FIELD_PATH_META = 'document_metadata' as const; // TODO _meta ?
@@ -232,7 +233,12 @@ export function useDocumentsState({
 				]
 			}))
 		})
-			.then(res => res.json())
+			.then(res => res.json() /*as JSONResponse<{ // TODO
+				queryDocuments: {
+					aggregations:
+					hits:
+				}
+			}>*/)
 			.then(json => {
 				// console.log('json', json);
 				const {
@@ -334,14 +340,84 @@ export function useDocumentsState({
 		setDocumentsRes,
 	]);
 
+	const persistSelectedColumns = React.useCallback((newSelectedColumns: string[]) => {
+		// setStateSelectedColumns(newSelectedColumns);
+		fetch(`${servicesBaseUrl}/graphQL`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(gql.mutation({
+				operation: 'modifyProfile',
+				variables: {
+					object: {
+						list: false,
+						required: true,
+						type: 'JSON',
+						value: {
+							columns: newSelectedColumns
+						}
+					},
+					scope: {
+						list: false,
+						required: true,
+						type: 'String',
+						value: 'documents'
+					}
+				}
+			}))
+		})
+			.then(res => res.json() as JSONResponse<{
+				modifyProfile: {
+					columns: string[]
+				}
+			}>)
+			.then(json => {
+				// console.log('json', json);
+				const {
+					columns
+				} = json.data.modifyProfile;
+				// console.log('columns', columns);
+				setSelectedColumns(columns);
+			});
+	}, [
+		servicesBaseUrl
+	]);
+
 	//──────────────────────────────────────────────────────────────────────────
 	// Effects
 	//──────────────────────────────────────────────────────────────────────────
-	React.useEffect(() => queryDocuments({
-		updateSelectedCollections: true,
-		updateSelectedDocumentTypes: true,
-	}), [
-		queryDocuments // changes if servicesBaseUrl or setDocumentsRes changes
+	React.useEffect(() => {
+		fetch(`${servicesBaseUrl}/graphQL`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(gql.query({
+				operation: 'getProfile'
+			}))
+		})
+			.then(res => res.json() as JSONResponse<{
+				getProfile: {
+					documents: {
+						columns: string[]
+					}
+				}
+			}>)
+			.then(object => {
+				// console.log('object', object);
+				const {
+					documents: {
+						columns = SELECTED_COLUMNS_DEFAULT
+					} = {}
+				} = object.data.getProfile || {};
+				// console.log('columns', columns);
+				setSelectedColumns(columns);
+				queryDocuments({
+					selectedColumns: columns,
+					updateSelectedCollections: true,
+					updateSelectedDocumentTypes: true,
+				});
+			});
+	}, [
+		queryDocuments, // changes if servicesBaseUrl or setDocumentsRes changes
+		servicesBaseUrl
 	]); // Only once
 
 	//──────────────────────────────────────────────────────────────────────────
@@ -360,7 +436,7 @@ export function useDocumentsState({
 		query, setQuery,
 		queryDocuments,
 		selectedCollections, setSelectedCollections,
-		selectedColumns, setSelectedColumns,
+		selectedColumns, persistSelectedColumns,
 		selectedDocumentTypes, setSelectedDocumentTypes,
 	};
 }

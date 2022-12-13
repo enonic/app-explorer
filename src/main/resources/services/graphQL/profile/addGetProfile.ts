@@ -3,7 +3,9 @@ import type {Glue} from '../Glue';
 
 // import {toStr} from '@enonic/js-utils';
 import {
-	Json as GraphQLJson
+	Json as GraphQLJson,
+	GraphQLString,
+	// nonNull
 	//@ts-ignore
 } from '/lib/graphql';
 import {
@@ -18,10 +20,20 @@ export function addGetProfile({
 }: {
 	glue: Glue
 }) {
-	return glue.addQuery({
-		args: {},
+	return glue.addQuery<{
+		scope?: string
+	}>({
+		args: {
+			scope: GraphQLString
+		},
 		name: GQL_QUERY_PROFILE_GET_NAME,
-		resolve(/*_env*/) {
+		resolve(env) {
+			const {
+				args: {
+					scope
+				}
+			} = env;
+
 			const user = getUser();
 			// log.info('user:%s', toStr(user));
 
@@ -35,7 +47,7 @@ export function addGetProfile({
 
 			const explorerProfile = getProfile({
 				key,
-				scope: app.name
+				scope: scope ? `${app.name}.${scope}` : app.name
 			});
 			// log.info('explorerProfile:%s', toStr(explorerProfile)); // can be null
 			return explorerProfile;
