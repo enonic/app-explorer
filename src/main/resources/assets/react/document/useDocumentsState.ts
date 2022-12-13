@@ -1,10 +1,16 @@
 import type {DslOperator} from '/lib/xp/node';
 import type {DropdownItemProps} from 'semantic-ui-react';
+import type {JSONResponse} from '../../../services/graphQL/fetchers/index.d';
 
 
-import {QUERY_OPERATOR_OR} from '@enonic/js-utils';
+import {
+	QUERY_OPERATOR_OR,
+	// storage
+} from '@enonic/js-utils';
+import {useDebounce} from 'use-debounce';
 import * as gql from 'gql-query-builder';
 import {difference} from 'lodash';
+import moment from 'moment';
 import * as React from 'react';
 import traverse from 'traverse';
 // import {
@@ -17,19 +23,29 @@ import {
 	FIELD_SHORTCUT_COLLECTION,
 	FIELD_SHORTCUT_DOCUMENT_TYPE,
 } from '../../../services/graphQL/constants';
-import type {JSONResponse} from '../../../services/graphQL/fetchers/index.d';
+import {useInterval} from '../utils/useInterval';
+
+
+// const bool = storage.query.dsl.bool;
+// const fulltext = storage.query.dsl.fulltext;
+// const ngram = storage.query.dsl.ngram;
+// const or = storage.query.dsl.or;
+// const stemmed = storage.query.dsl.stemmed;
 
 
 const FIELD_PATH_META = 'document_metadata' as const; // TODO _meta ?
-const FIELD_PATH_META_COLLECTION = `${FIELD_PATH_META}.collection` as const;
-const FIELD_PATH_META_DOCUMENT_TYPE = `${FIELD_PATH_META}.documentType` as const;
-const FIELD_PATH_META_LANGUAGE = `${FIELD_PATH_META}.language` as const;
+export const FIELD_PATH_META_COLLECTION = `${FIELD_PATH_META}.collection` as const;
+export const FIELD_PATH_META_DOCUMENT_TYPE = `${FIELD_PATH_META}.documentType` as const;
+export const FIELD_PATH_META_LANGUAGE = `${FIELD_PATH_META}.language` as const;
+const GQL_INPUT_TYPE_HIGHLIGHT = 'InputTypeHighlight';
+
 
 export const COLUMN_NAME_COLLECTION = '_collection';
 export const COLUMN_NAME_DOCUMENT_TYPE = '_documentType';
 export const COLUMN_NAME_ID = '_id';
 export const COLUMN_NAME_JSON = '_json';
 export const COLUMN_NAME_LANGUAGE = '_language';
+export const FRAGMENT_SIZE_DEFAULT = 150;
 
 export const SELECTED_COLUMNS_DEFAULT = [
 	COLUMN_NAME_COLLECTION,
@@ -70,7 +86,6 @@ export function useDocumentsState({
 		total: 0,
 		hits: []
 	});
-
 	const [jsonModalState, setJsonModalState] = React.useState<{
 		open: boolean
 		id: string
@@ -80,31 +95,30 @@ export function useDocumentsState({
 		id: '',
 		parsedJson: undefined,
 	});
-
 	const [collectionOptions, setCollectionOptions] = React.useState<
 		DropdownItemProps[]
 	>([]);
 	const [collectionsHoverOpen, setCollectionsHoverOpen] = React.useState(false);
-
 	const [columnOptions, setColumnOptions] = React.useState<
 		DropdownItemProps[]
 	>(OPTIONS_COLUMNS_DEFAULT);
-
-
 	const [columnsHoverOpen, setColumnsHoverOpen] = React.useState(false);
-
 	const [documentTypeOptions, setDocumentTypeOptions] = React.useState<
 		DropdownItemProps[]
 	>([]);
-
 	const [documentTypesHoverOpen, setDocumentTypesHoverOpen] = React.useState(false);
+	const [durationSinceLastUpdate, setDurationSinceLastUpdate] = React.useState('');
 
+	const [fragmentSize, setFragmentSize] = React.useState(FRAGMENT_SIZE_DEFAULT);
+	const [deBouncedFragmentSize] = useDebounce(fragmentSize, 200);
+
+	const [loading, setLoading] = React.useState(false);
 	const [operatorState, setOperatorState] = React.useState<DslOperator>(QUERY_OPERATOR_OR);
 	const [query, setQuery] = React.useState<string>('');
-
 	const [selectedCollections, setSelectedCollections] = React.useState<string[]>([]);
 	const [selectedColumns, setSelectedColumns] = React.useState(SELECTED_COLUMNS_DEFAULT);
 	const [selectedDocumentTypes, setSelectedDocumentTypes] = React.useState<string[]>([]);
+	const [updatedAt, setUpdatedAt] = React.useState(moment());
 
 	//──────────────────────────────────────────────────────────────────────────
 	// Callbacks
@@ -112,6 +126,7 @@ export function useDocumentsState({
 	const queryDocuments = React.useCallback(({
 		collectionsFilter = [],
 		documentsTypesFilter = [],
+		fragmentSize = FRAGMENT_SIZE_DEFAULT,
 		operator = QUERY_OPERATOR_OR,
 		query = '',
 		selectedColumns = SELECTED_COLUMNS_DEFAULT,
@@ -120,12 +135,14 @@ export function useDocumentsState({
 	}: {
 		collectionsFilter?: string[]
 		documentsTypesFilter?: string[]
+		fragmentSize?: number
 		operator?: DslOperator
 		query?: string
 		selectedColumns?: string[]
 		updateSelectedCollections?: boolean
 		updateSelectedDocumentTypes?: boolean
 	}) => {
+		setLoading(true);
 		// console.debug('queryDocuments');
 		const filters = [];
 		if (collectionsFilter.length) {
@@ -145,9 +162,10 @@ export function useDocumentsState({
 			})
 		}
 
+		const jsonColumns = difference(selectedColumns, SELECTED_COLUMNS_DEFAULT);
+
 		let queryValue = null;
 		if (query) {
-			const jsonColumns = difference(selectedColumns, SELECTED_COLUMNS_DEFAULT);
 			const fields = jsonColumns.length ? jsonColumns.map(f => `${f}^3`): [];
 			fields.push(
 				`${FIELD_PATH_META_COLLECTION}^2`,
@@ -155,19 +173,80 @@ export function useDocumentsState({
 				`${FIELD_PATH_META_LANGUAGE}^2`,
 				'_allText', // WARNING: Frequently fields are not duplicated into _allText
 			)
+			// queryValue = bool(or(
+			// 	fulltext(fields, query, operator, 1.1),
+			// 	stemmed(fields, query, operator, 'en'),
+			// 	stemmed(fields, query, operator, 'no'),
+			// 	ngram(fields, query, operator, 0.9)
+			// ));
 			queryValue = {
 				boolean: {
-					must: {
+					should: [{
 						fulltext: {
+							boost: 1.1,
+							fields,
+							operator,
+							query
+						},
+					},{
+						stemmed: {
+							fields,
+							operator,
+							query,
+							language: 'en' // TODO hardcode
+						},
+					},{
+						stemmed: {
+							fields,
+							operator,
+							query,
+							language: 'no' // TODO hardcode
+						},
+					},{
+						ngram: {
+							boost: 0.9,
 							fields,
 							operator,
 							query
 						}
-					}
+					}]
 				}
 			}
 			// console.log('queryValue', queryValue);
 		}
+
+		const highlight = {
+			list: false,
+			required: false,
+			type: GQL_INPUT_TYPE_HIGHLIGHT,
+			value: {
+				encoder: 'html',
+				fields: [].concat(
+					[{
+					// 	field: '_allText',
+					// 	numberOfFragments: 99999 // _allText is an array, one per added field
+					// },{
+						field: FIELD_PATH_META_COLLECTION
+					},{
+						field: FIELD_PATH_META_DOCUMENT_TYPE
+					},{
+						field: FIELD_PATH_META_LANGUAGE
+					}],
+					jsonColumns.map(
+						field => ({
+							field
+						})
+					)
+				),
+				fragmentSize,
+				// noMatchSize: fragmentSize // FRAGMENT_SIZE_DEFAULT, // The amount of characters you want to return from the beginning of the property if there are no matching fragments to highlight. Defaults to 0 (nothing is returned).
+				numberOfFragments: 1,
+				order: 'score',
+				postTag: '</b>',
+				preTag: '<b class="bgc-y">'
+			}
+		};
+		// console.log('highlight', highlight);
 
 		fetch(`${servicesBaseUrl}/graphQL`, {
 			method: 'POST',
@@ -203,6 +282,7 @@ export function useDocumentsState({
 						type: 'FilterInput',
 						value: filters
 					},
+					highlight,
 					query: {
 						list: false,
 						required: false,
@@ -225,6 +305,7 @@ export function useDocumentsState({
 					'total',
 					{
 						hits: [
+							'_highlight',
 							'_id',
 							'_json',
 							FIELD_PATH_META
@@ -334,6 +415,8 @@ export function useDocumentsState({
 				setColumnOptions(newColumnOptions);
 
 				setDocumentsRes(json.data.queryDocuments);
+				setUpdatedAt(moment());
+				setLoading(false);
 			});
 	},[
 		servicesBaseUrl,
@@ -341,7 +424,7 @@ export function useDocumentsState({
 	]);
 
 	const persistSelectedColumns = React.useCallback((newSelectedColumns: string[]) => {
-		// setStateSelectedColumns(newSelectedColumns);
+		setLoading(true);
 		fetch(`${servicesBaseUrl}/graphQL`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
@@ -377,6 +460,7 @@ export function useDocumentsState({
 				} = json.data.modifyProfile;
 				// console.log('columns', columns);
 				setSelectedColumns(columns);
+				setLoading(false);
 			});
 	}, [
 		servicesBaseUrl
@@ -386,6 +470,7 @@ export function useDocumentsState({
 	// Effects
 	//──────────────────────────────────────────────────────────────────────────
 	React.useEffect(() => {
+		setLoading(true);
 		fetch(`${servicesBaseUrl}/graphQL`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
@@ -420,6 +505,44 @@ export function useDocumentsState({
 		servicesBaseUrl
 	]); // Only once
 
+	React.useEffect(() => {
+		setDurationSinceLastUpdate(
+			moment
+				.duration(updatedAt.diff(moment()))
+				.humanize()
+		);
+	}, [
+		updatedAt
+	]);
+
+	useInterval(() => {
+		setDurationSinceLastUpdate(
+			moment
+				.duration(updatedAt.diff(moment()))
+				.humanize()
+		);
+	}, 5000);
+
+	React.useEffect(() => {
+		// console.debug('deBouncedFragmentSize', deBouncedFragmentSize);
+		queryDocuments({
+			collectionsFilter: selectedCollections,
+			documentsTypesFilter: selectedDocumentTypes,
+			fragmentSize: deBouncedFragmentSize,
+			operator: operatorState,
+			query,
+			selectedColumns
+		});
+	}, [
+		deBouncedFragmentSize,
+		// operatorState,
+		// query,
+		queryDocuments,
+		// selectedCollections,
+		// selectedColumns,
+		// selectedDocumentTypes,
+	]);
+
 	//──────────────────────────────────────────────────────────────────────────
 	// Returns
 	//──────────────────────────────────────────────────────────────────────────
@@ -431,12 +554,16 @@ export function useDocumentsState({
 		documentsRes, // setDocumentsRes,
 		documentTypeOptions, // setDocumentTypeOptions,
 		documentTypesHoverOpen, setDocumentTypesHoverOpen,
+		durationSinceLastUpdate, // setDurationSinceLastUpdate,
+		fragmentSize, setFragmentSize,
 		jsonModalState, setJsonModalState,
+		loading, // setLoading,
 		operatorState, setOperatorState,
 		query, setQuery,
 		queryDocuments,
 		selectedCollections, setSelectedCollections,
 		selectedColumns, persistSelectedColumns,
 		selectedDocumentTypes, setSelectedDocumentTypes,
+		// updatedAt, setUpdatedAt,
 	};
 }
