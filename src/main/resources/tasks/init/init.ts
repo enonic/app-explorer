@@ -9,28 +9,7 @@ import type {RepoConnection} from '/lib/xp/node';
 
 
 // import {toStr} from '@enonic/js-utils';
-
-//──────────────────────────────────────────────────────────────────────────────
-// The pretty-ms causes:
-// 'Init': Task [com.enonic.app.explorer:init] not found. Missing task script
-// Downgrading to pretty-ms ^7 (7.0.1) TypeError: Number.isFinite is not a function
-
-// core-js(-pure)/es|stable|actual|full/number/is-finite
-// import 'core-js/stable/number/is-finite';
-// import 'core-js/stable/number/is-finite'; // Nope
-// import 'core-js-pure/actual/number/is-finite'; // Nope
-// import 'core-js-pure/full/number/is-finite'; // Nope
-// Number.isFinite = Number.isFinite || isFinite;
-// Math.trunc = Math.trunc || function (v) {
-// 	return v < 0 ? Math.ceil(v) : Math.floor(v);
-// };
-// Number.parseFloat = Number.parseFloat || parseFloat;
-import prettyMs from 'pretty-ms'; // Fail
-// import * as prettyMs from 'pretty-ms'; // Fail
-// import {default as prettyMs} from 'pretty-ms'; // Fail
-// const prettyMs = require('pretty-ms'); // Fail
-//──────────────────────────────────────────────────────────────────────────────
-//import {getField} from '/lib/explorer/field/getField';
+// import prettyMs from 'pretty-ms'; // Adds to bundle size and thus makes things take more time
 import {ignoreErrors} from '/lib/explorer/ignoreErrors';
 import {
 	APP_EXPLORER,
@@ -49,12 +28,11 @@ import {connect} from '/lib/explorer/repo/connect';
 import {init as initRepo} from '/lib/explorer/repo/init';
 import {runAsSu} from '/lib/explorer/runAsSu';
 //import {listExplorerJobs} from '/lib/explorer/scheduler/listExplorerJobs';
-import {
-	execute
-	//@ts-ignore
-} from '/lib/graphql';
-//import {getCachedSchema} from '../../services/graphQL/graphQL';
-import {getCachedSchema} from '/services/graphQL/graphQL';
+// import {
+// 	execute
+// 	//@ts-ignore
+// } from '/lib/graphql';
+// import {getCachedSchema} from '/services/graphQL/graphQL';
 
 //@ts-ignore
 // import {request as httpClientRequest} from '/lib/http-client';
@@ -213,55 +191,22 @@ export function run() {
 			const endTimeMs = currentTimeMillis();
 			const durationSinceLoadMs = endTimeMs - startTimeLoadMs
 			const durationSinceRunMs = endTimeMs - startTimeRunMs;
-			log.info('Init since load:%s run:%s', prettyMs(durationSinceLoadMs), prettyMs(durationSinceRunMs));
+			log.info('Init since load:%s run:%s', durationSinceLoadMs, durationSinceRunMs);
+			// log.info('Init since load:%s run:%s', prettyMs(durationSinceLoadMs), prettyMs(durationSinceRunMs));
 
-			// 2022-11-21 14:36:23,381 WARN  c.e.x.p.impl.url.PortalUrlBuilder - Portal url build failed
-			// java.lang.NullPointerException: null
-			// const homeToolUrl = getHomeToolUrl({type: 'absolute'});
-			// log.info('homeToolUrl:%s', homeToolUrl);
-
-			// const toolUrl = getToolUrl(app.name, 'explorer');
-			// log.info('toolUrl:%s', toolUrl);
-
-			// This causes com.enonic.xp.task.TaskNotFoundException
-			// const vhosts = listVhosts();
-			// log.info('vhosts:%s', toStr(vhosts));
-
-			// TODO These require Admin Privleges aka Login...
-			// for (let i = 0; i < URI_FRAGMENTS.length; i++) {
-			// 	const uriFragment = URI_FRAGMENTS[i];
-			// 	const url = `http://localhost:8080${toolUrl}#${uriFragment}`;
-			// 	const beforeRequestMs = currentTimeMillis();
-			// 	httpClientRequest({
-			// 		method: 'GET',
-			// 		url
-			// 	});
-			// 	const afterRequestMs = currentTimeMillis();
-			// 	const durationRequestMs = afterRequestMs - beforeRequestMs;
-			// 	log.info('%s:%s', url, prettyMs(durationRequestMs));
-			// }
-			// //http://localhost:8080/admin/tool/com.enonic.app.explorer/explorer/
-			// const graphQLUrl = `http://localhost:8080${toolUrl}/_/service/com.enonic.app.explorer/graphQL`;
-			// const beforeRequestMs = currentTimeMillis();
-			// httpClientRequest({
-			// 	method: 'GET',
-			// 	url: graphQLUrl
-			// });
-			// const afterRequestMs = currentTimeMillis();
-			// const durationRequestMs = afterRequestMs - beforeRequestMs;
-			// log.info('%s:%s', graphQLUrl, prettyMs(durationRequestMs));
-			const query = `{
-		getLocales {
-			country
-		}
-	}`;
-			const beforeExecuteMs = currentTimeMillis();
-			// const obj =
-			execute(getCachedSchema(),query,null);
-			const afterExecuteMs = currentTimeMillis();
-			const durationExecuteMs = afterExecuteMs - beforeExecuteMs;
-			log.info('execute:%s', prettyMs(durationExecuteMs));
-			// log.info('obj:%s', toStr(obj));
+			// 		const query = `{
+			// 	getLocales {
+			// 		country
+			// 	}
+			// }`;
+			// 		const beforeExecuteMs = currentTimeMillis();
+			// 		// const obj =
+			// 		execute(getCachedSchema(),query,null);
+			// 		const afterExecuteMs = currentTimeMillis();
+			// 		const durationExecuteMs = afterExecuteMs - beforeExecuteMs;
+			// 		log.info('execute:%s', durationExecuteMs);
+			// 		// log.info('execute:%s', prettyMs(durationExecuteMs));
+			// 		// log.info('obj:%s', toStr(obj));
 		}
 	}); // runAsSu
 } // export function run
