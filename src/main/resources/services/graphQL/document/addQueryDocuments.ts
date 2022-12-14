@@ -564,7 +564,7 @@ export function addQueryDocuments({
 				// log.debug('multiRepoQueryParams:%s', toStr(multiRepoQueryParams));
 
 				queryResult = multiRepoReadConnection.query(multiRepoQueryParams) as unknown as QueryRes;
-				log.info('queryResult:%s', toStr(queryResult));
+				// log.debug('queryResult:%s', toStr(queryResult));
 				// log.debug('queryResult.aggregations:%s', toStr(queryResult.aggregations));
 			} catch (e) {
 				if (e.message === 'multiConnect: empty sources is not allowed!') {
