@@ -1,4 +1,5 @@
 {
+	"minify": true,
 	"module": {
 		"type": "commonjs"
 	}
