@@ -273,7 +273,7 @@ export function Explorer({
 				/>*/}
 
 				{page === 'home' && <>
-					<Header as='h1' content='Explorer'/>
+					<Header as='h1' content='Explorer' textAlign='center'/>
 					<Search
 						fields={defaultInterfaceFields}
 						interfaceName='default'
