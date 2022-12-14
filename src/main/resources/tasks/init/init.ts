@@ -172,7 +172,7 @@ export function run() {
 
 		USERS.forEach(({name, displayName, idProvider, roles = []}) => {
 			//progress.addItems(1); Already in total
-			progress.setInfo(`Checking for role ${displayName}...`).report();//.debug();
+			progress.setInfo(`Checking for user ${displayName}...`).report();//.debug();
 			const principal = getPrincipal(`user:${idProvider}:${name}`);
 			//log.debug(`principal:${toStr(principal)}`);
 			progress.finishItem();
