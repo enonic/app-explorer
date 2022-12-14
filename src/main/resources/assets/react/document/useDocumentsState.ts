@@ -119,9 +119,18 @@ export function useDocumentsState({
 	const [loading, setLoading] = React.useState(false);
 	const [operatorState, setOperatorState] = React.useState<DslOperator>(QUERY_OPERATOR_OR);
 	const [query, setQuery] = React.useState<string>('');
-	const [selectedCollections, setSelectedCollections] = React.useState<string[]>([]);
+	const [urlSearchParams] = React.useState(new URLSearchParams(document.location.search));
+	const [selectedCollections, setSelectedCollections] = React.useState<string[]>(
+		urlSearchParams.get('collection')
+			? [urlSearchParams.get('collection')]
+			: []
+	);
 	const [selectedColumns, setSelectedColumns] = React.useState(SELECTED_COLUMNS_DEFAULT);
-	const [selectedDocumentTypes, setSelectedDocumentTypes] = React.useState<string[]>([]);
+	const [selectedDocumentTypes, setSelectedDocumentTypes] = React.useState<string[]>(
+		urlSearchParams.get('documentType')
+			? [urlSearchParams.get('documentType')]
+			: []
+	);
 	const [updatedAt, setUpdatedAt] = React.useState(moment());
 
 	//──────────────────────────────────────────────────────────────────────────
@@ -347,7 +356,7 @@ export function useDocumentsState({
 						});
 						setCollectionOptions(newCollectionOptions);
 						// console.log('newSelectedCollections', newSelectedCollections);
-						if (updateSelectedCollections) {
+						if (updateSelectedCollections && !collectionsFilter.length) {
 							setSelectedCollections(newSelectedCollections);
 						}
 					}
@@ -362,7 +371,7 @@ export function useDocumentsState({
 						});
 						setDocumentTypeOptions(newDocumentTypeOptions);
 						// console.log('newSelectedDocumentTypes', newSelectedDocumentTypes);
-						if (updateSelectedDocumentTypes) {
+						if (updateSelectedDocumentTypes && !documentsTypesFilter.length) {
 							setSelectedDocumentTypes(newSelectedDocumentTypes);
 						}
 					}
@@ -500,13 +509,17 @@ export function useDocumentsState({
 				const newSelectedColumns = forceArray(columns);
 				setSelectedColumns(newSelectedColumns);
 				queryDocuments({
+					collectionsFilter: selectedCollections,
+					documentsTypesFilter: selectedDocumentTypes,
 					selectedColumns: newSelectedColumns,
 					updateSelectedCollections: true,
 					updateSelectedDocumentTypes: true,
 				});
 			});
-	}, [
+	}, [ // eslint-disable-line react-hooks/exhaustive-deps
 		queryDocuments, // changes if servicesBaseUrl or setDocumentsRes changes
+		// selectedCollections,
+		// selectedDocumentTypes,
 		servicesBaseUrl
 	]); // Only once
 
@@ -538,7 +551,7 @@ export function useDocumentsState({
 			query,
 			selectedColumns
 		});
-	}, [
+	}, [  // eslint-disable-line react-hooks/exhaustive-deps
 		deBouncedFragmentSize,
 		// operatorState,
 		// query,
