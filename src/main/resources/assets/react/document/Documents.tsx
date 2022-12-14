@@ -108,6 +108,8 @@ export function Documents({
 		jsonModalState, setJsonModalState,
 		loading, // setLoading,
 		operatorState, setOperatorState,
+		perPage, setPerPage,
+		perPageHoverOpen, setPerPageHoverOpen,
 		query, setQuery,
 		queryDocuments,
 		searchedString, // setSearchedString,
@@ -144,6 +146,7 @@ export function Documents({
 											fragmentSize,
 											query,
 											operator: operatorState,
+											perPage,
 											selectedColumns
 										});
 									}
@@ -175,6 +178,7 @@ export function Documents({
 															fragmentSize,
 															query,
 															operator: newOperator,
+															perPage,
 															selectedColumns
 														});
 													}}
@@ -226,6 +230,7 @@ export function Documents({
 												documentsTypesFilter: selectedDocumentTypes,
 												fragmentSize,
 												operator: operatorState,
+												perPage,
 												query,
 												selectedColumns
 											});
@@ -257,6 +262,7 @@ export function Documents({
 												documentsTypesFilter: newSelectedDocumentTypes,
 												fragmentSize,
 												operator: operatorState,
+												perPage,
 												query,
 												selectedColumns
 											});
@@ -307,6 +313,7 @@ export function Documents({
 												documentsTypesFilter: selectedDocumentTypes,
 												fragmentSize,
 												operator: operatorState,
+												perPage,
 												query,
 												selectedColumns: newSelectedColumns
 											});
@@ -321,6 +328,34 @@ export function Documents({
 									icon='columns'
 									open={columnsHoverOpen}
 									setOpen={setColumnsHoverOpen}
+								/>
+								<HoverPopup
+									content={<Dropdown
+										name='perPage'
+										onChange={(
+											_event :React.ChangeEvent<HTMLInputElement>,
+											{value: newPerPage}: {value: number}
+										) => {
+											setPerPage(newPerPage);
+											queryDocuments({
+												collectionsFilter: selectedCollections,
+												documentsTypesFilter: selectedDocumentTypes,
+												fragmentSize,
+												operator: operatorState,
+												perPage: newPerPage,
+												query,
+												selectedColumns
+											});
+										}}
+										options={[5,10,25,50,100].map(key => ({key, text: `${key}`, value: key}))}
+										selection
+										style={{marginTop:6}}
+										value={perPage}
+									/>}
+									header='Per page'
+									icon='resize vertical'
+									open={perPageHoverOpen}
+									setOpen={setPerPageHoverOpen}
 								/>
 							</Form.Field>
 						</Form.Group>
