@@ -47,7 +47,7 @@ export const COLUMN_NAME_ID = '_id';
 export const COLUMN_NAME_JSON = '_json';
 export const COLUMN_NAME_LANGUAGE = '_language';
 export const FRAGMENT_SIZE_DEFAULT = 150;
-
+const PER_PAGE_DEFAULT = 25;
 export const POST_TAG = '</b>';
 export const PRE_TAG = '<b class="bgc-y">';
 
@@ -114,6 +114,8 @@ export function useDocumentsState({
 		DropdownItemProps[]
 	>(OPTIONS_COLUMNS_DEFAULT);
 	const [columnsHoverOpen, setColumnsHoverOpen] = React.useState(false);
+	const [perPage, setPerPage] = React.useState(PER_PAGE_DEFAULT);
+	const [perPageHoverOpen, setPerPageHoverOpen] = React.useState(false);
 	const [documentTypeOptions, setDocumentTypeOptions] = React.useState<
 		DropdownItemProps[]
 	>([]);
@@ -149,6 +151,7 @@ export function useDocumentsState({
 		documentsTypesFilter = [],
 		fragmentSize = FRAGMENT_SIZE_DEFAULT,
 		operator = QUERY_OPERATOR_OR,
+		perPage = PER_PAGE_DEFAULT,
 		query = '',
 		selectedColumns = SELECTED_COLUMNS_DEFAULT,
 		// updateSelectedCollections = false,
@@ -158,6 +161,7 @@ export function useDocumentsState({
 		documentsTypesFilter?: string[]
 		fragmentSize?: number
 		operator?: DslOperator
+		perPage?: number
 		query?: string
 		selectedColumns?: string[]
 		// updateSelectedCollections?: boolean
@@ -298,6 +302,12 @@ export function useDocumentsState({
 								minDocCount: 0,
 							}
 						}]
+					},
+					count: {
+						list: false,
+						required: false,
+						type: 'Int',
+						value: perPage
 					},
 					filters: {
 						list: true,
@@ -528,6 +538,7 @@ export function useDocumentsState({
 							collectionsFilter: selectedCollections,
 							documentsTypesFilter: selectedDocumentTypes,
 							query,
+							// perPage,
 							selectedColumns: newSelectedColumns,
 							// updateSelectedCollections: true,
 							// updateSelectedDocumentTypes: true,
@@ -537,6 +548,7 @@ export function useDocumentsState({
 	}, [ // eslint-disable-line react-hooks/exhaustive-deps
 		// query,
 		queryDocuments,
+		// perPage,
 		// selectedCollections,
 		// selectedDocumentTypes,
 		servicesBaseUrl
@@ -648,6 +660,8 @@ export function useDocumentsState({
 		jsonModalState, setJsonModalState,
 		loading, // setLoading,
 		operatorState, setOperatorState,
+		perPage, setPerPage,
+		perPageHoverOpen, setPerPageHoverOpen,
 		query, setQuery,
 		queryDocuments,
 		searchedString, // setSearchedString,
