@@ -1,4 +1,5 @@
 import {
+	ELLIPSIS,
 	QUERY_OPERATOR_AND,
 	QUERY_OPERATOR_OR,
 	getIn,
@@ -30,6 +31,8 @@ import {
 	FIELD_PATH_META_DOCUMENT_TYPE,
 	FIELD_PATH_META_LANGUAGE,
 	FRAGMENT_SIZE_DEFAULT,
+	POST_TAG,
+	PRE_TAG,
 	SELECTED_COLUMNS_DEFAULT,
 	useDocumentsState
 } from './useDocumentsState';
@@ -40,7 +43,7 @@ const FIELD_PATH_META = 'document_metadata';
 
 function getHighlightedHtml({
 	_highlight,
-	fallback,
+	fallback = '',
 	fieldPath,
 	fragmentSize,
 }: {
@@ -50,13 +53,42 @@ function getHighlightedHtml({
 	fragmentSize: number
 }) {
 	const lcFieldPath = fieldPath.toLowerCase();
-	return _highlight[lcFieldPath]
+	let highlightedHtml = _highlight[lcFieldPath]
 		? _highlight[lcFieldPath][0]
 		: _highlight[`${lcFieldPath}._stemmed_en`] // TODO Hardcode
 			? _highlight[`${lcFieldPath}._stemmed_en`][0]
 			: _highlight[`${lcFieldPath}._stemmed_no`]
 				? _highlight[`${lcFieldPath}._stemmed_no`][0]
-				: isString(fallback) ? fallback.substring(0, fragmentSize): fallback;
+				: isString(fallback)
+					? fallback.length > fragmentSize
+						? `${fallback.substring(0, fragmentSize)}${ELLIPSIS}`
+						: fallback
+					: fallback;
+	const strippedHighlight = highlightedHtml.replace(new RegExp(PRE_TAG,'g'), '').replace(new RegExp(POST_TAG,'g'), '');
+	if (
+		strippedHighlight !== fallback
+	) {
+		const startOfFieldWithSameLengthAsStrippedHighlight = fallback.substring(0, strippedHighlight.length);
+		const endOfFieldWithSameLengthAsStrippedHighlight = fallback.substring(fallback.length - strippedHighlight.length);
+		// console.debug({
+		// 	fallback,
+		// 	'fallback.length': fallback.length,
+		// 	fragmentSize,
+		// 	highlightedHtml,
+		// 	strippedHighlight,
+		// 	'strippedHighlight.length': strippedHighlight.length,
+		// 	startOfFieldWithSameLengthAsStrippedHighlight,
+		// 	endOfFieldWithSameLengthAsStrippedHighlight,
+		// });
+		if (strippedHighlight === startOfFieldWithSameLengthAsStrippedHighlight) {
+			highlightedHtml = `${highlightedHtml}${ELLIPSIS}`;
+		} else if (strippedHighlight === endOfFieldWithSameLengthAsStrippedHighlight) {
+			highlightedHtml = `${ELLIPSIS}${highlightedHtml}`;
+		} else {
+			highlightedHtml = `${ELLIPSIS}${highlightedHtml}${ELLIPSIS}`;
+		}
+	}
+	return highlightedHtml;
 }
 
 
