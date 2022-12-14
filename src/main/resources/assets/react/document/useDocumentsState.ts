@@ -5,6 +5,7 @@ import type {JSONResponse} from '../../../services/graphQL/fetchers/index.d';
 
 import {
 	QUERY_OPERATOR_OR,
+	forceArray,
 	// storage
 } from '@enonic/js-utils';
 import {useDebounce} from 'use-debounce';
@@ -46,6 +47,9 @@ export const COLUMN_NAME_ID = '_id';
 export const COLUMN_NAME_JSON = '_json';
 export const COLUMN_NAME_LANGUAGE = '_language';
 export const FRAGMENT_SIZE_DEFAULT = 150;
+
+export const POST_TAG = '</b>';
+export const PRE_TAG = '<b class="bgc-y">';
 
 export const SELECTED_COLUMNS_DEFAULT = [
 	COLUMN_NAME_COLLECTION,
@@ -242,8 +246,8 @@ export function useDocumentsState({
 				// noMatchSize: fragmentSize // FRAGMENT_SIZE_DEFAULT, // The amount of characters you want to return from the beginning of the property if there are no matching fragments to highlight. Defaults to 0 (nothing is returned).
 				numberOfFragments: 1,
 				order: 'score',
-				postTag: '</b>',
-				preTag: '<b class="bgc-y">'
+				postTag: POST_TAG,
+				preTag: PRE_TAG
 			}
 		};
 		// console.log('highlight', highlight);
@@ -456,10 +460,10 @@ export function useDocumentsState({
 			.then(json => {
 				// console.log('json', json);
 				const {
-					columns
+					columns = SELECTED_COLUMNS_DEFAULT
 				} = json.data.modifyProfile;
 				// console.log('columns', columns);
-				setSelectedColumns(columns);
+				setSelectedColumns(forceArray(columns));
 				setLoading(false);
 			});
 	}, [
@@ -493,9 +497,10 @@ export function useDocumentsState({
 					} = {}
 				} = object.data.getProfile || {};
 				// console.log('columns', columns);
-				setSelectedColumns(columns);
+				const newSelectedColumns = forceArray(columns);
+				setSelectedColumns(newSelectedColumns);
 				queryDocuments({
-					selectedColumns: columns,
+					selectedColumns: newSelectedColumns,
 					updateSelectedCollections: true,
 					updateSelectedDocumentTypes: true,
 				});
