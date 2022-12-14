@@ -15,7 +15,8 @@ import type {Request} from '../../types/index.d';
 
 // import {currentTimeMillis} from '/lib/explorer/time/currentTimeMillis';
 import {
-	RESPONSE_TYPE_JSON//,
+	RESPONSE_TYPE_JSON,
+	sortKeys,
 	//toStr
 } from '@enonic/js-utils';
 // import prettyMs from 'pretty-ms';
@@ -263,51 +264,53 @@ const {
 	queryDocumentTypesField
 } = createObjectTypesUsingUnionTypes({glue});
 
-//const mutation = glue.addObjectType({
-const mutation = glue.schemaGenerator.createObjectType({
-	name: 'Mutation',
-	fields: {
-		...glue.getMutations(),
-		createCollection: createCollectionField,
-		createDocumentType: createDocumentTypeField,
-		createField: createFieldField,
+const sortedMutationsObj = sortKeys({
+	...glue.getMutations(),
+	createCollection: createCollectionField,
+	createDocumentType: createDocumentTypeField,
+	createField: createFieldField,
 
-		deleteDocumentType: deleteDocumentTypeField,
-		deleteField: deleteFieldField,
-		deleteSynonym: deleteSynonymField,
-		deleteThesaurus: deleteThesaurusField,
+	deleteDocumentType: deleteDocumentTypeField,
+	deleteField: deleteFieldField,
+	deleteSynonym: deleteSynonymField,
+	deleteThesaurus: deleteThesaurusField,
 
-		updateCollection: updateCollectionField,
-		updateDocumentType: updateDocumentTypeField,
-		updateField: updateFieldField,
+	updateCollection: updateCollectionField,
+	updateDocumentType: updateDocumentTypeField,
+	updateField: updateFieldField,
 
-		reindexCollections: reindexCollectionsField
-	}
+	reindexCollections: reindexCollectionsField
 });
 
-//const query = glue.addObjectType({
+const mutation = glue.schemaGenerator.createObjectType({
+	name: 'Mutation',
+	fields: sortedMutationsObj
+});
+
+const sortedQueriesObj = sortKeys({
+	...glue.getQueries(),
+	getContentTypes: getContentTypesField,
+	getLicense,
+	getLocales,
+	getDocumentType: getDocumentTypeField,
+	getSites,
+	hasField,
+	listScheduledJobs,
+	queryApiKeys: queryApiKeysField,
+	queryCollectors,
+	queryFields: queryFieldsField,
+	queryInterfaces,
+	queryJournals,
+	queryStopWords,
+	queryDocumentTypes: queryDocumentTypesField,
+	queryThesauri: queryThesauriField,
+	referencedBy
+});
+
 const query = glue.schemaGenerator.createObjectType({
 	name: 'Query',
-	fields: {
-		...glue.getQueries(),
-		getContentTypes: getContentTypesField,
-		getLicense,
-		getLocales,
-		getDocumentType: getDocumentTypeField,
-		getSites,
-		hasField,
-		listScheduledJobs,
-		queryApiKeys: queryApiKeysField,
-		queryCollectors,
-		queryFields: queryFieldsField,
-		queryInterfaces,
-		queryJournals,
-		queryStopWords,
-		queryDocumentTypes: queryDocumentTypesField,
-		queryThesauri: queryThesauriField,
-		referencedBy
-	} // fields
-}); // query
+	fields: sortedQueriesObj
+});
 
 //log.debug(`glue.getSortedObjectTypeNames():${toStr(glue.getSortedObjectTypeNames())}`);
 
