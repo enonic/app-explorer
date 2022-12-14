@@ -23,7 +23,7 @@ import {
 	forceArray,
 	// toStr
 } from '@enonic/js-utils';
-import prettyMs from 'pretty-ms';
+// import prettyMs from 'pretty-ms'; // Adds to bundle size and thus makes things take more time
 import {ignoreErrors} from '/lib/explorer/ignoreErrors';
 import {
 	FOLDERS,
@@ -685,5 +685,6 @@ export function run() {
 	const endTimeMs = currentTimeMillis();
 	const durationSinceLoadMs = endTimeMs - startTimeLoadMs
 	const durationSinceRunMs = endTimeMs - startTimeRunMs;
-	log.info('Migrate since load:%s run:%s', prettyMs(durationSinceLoadMs), prettyMs(durationSinceRunMs));
+	// log.info('Migrate since load:%s run:%s', prettyMs(durationSinceLoadMs), prettyMs(durationSinceRunMs));
+	log.info('Migrate since load:%s run:%s', durationSinceLoadMs, durationSinceRunMs);
 }

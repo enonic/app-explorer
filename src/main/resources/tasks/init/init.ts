@@ -50,12 +50,11 @@ import {connect} from '/lib/explorer/repo/connect';
 import {init as initRepo} from '/lib/explorer/repo/init';
 import {runAsSu} from '/lib/explorer/runAsSu';
 //import {listExplorerJobs} from '/lib/explorer/scheduler/listExplorerJobs';
-import {
-	execute
-	//@ts-ignore
-} from '/lib/graphql';
-//import {getCachedSchema} from '../../services/graphQL/graphQL';
-import {getCachedSchema} from '/services/graphQL/graphQL';
+// import {
+// 	execute
+// 	//@ts-ignore
+// } from '/lib/graphql';
+// import {getCachedSchema} from '/services/graphQL/graphQL';
 
 //@ts-ignore
 // import {request as httpClientRequest} from '/lib/http-client';
@@ -244,55 +243,22 @@ export function run() {
 			const endTimeMs = currentTimeMillis();
 			const durationSinceLoadMs = endTimeMs - startTimeLoadMs
 			const durationSinceRunMs = endTimeMs - startTimeRunMs;
-			log.info('Init since load:%s run:%s', prettyMs(durationSinceLoadMs), prettyMs(durationSinceRunMs));
+			log.info('Init since load:%s run:%s', durationSinceLoadMs, durationSinceRunMs);
+			// log.info('Init since load:%s run:%s', prettyMs(durationSinceLoadMs), prettyMs(durationSinceRunMs));
 
-			// 2022-11-21 14:36:23,381 WARN  c.e.x.p.impl.url.PortalUrlBuilder - Portal url build failed
-			// java.lang.NullPointerException: null
-			// const homeToolUrl = getHomeToolUrl({type: 'absolute'});
-			// log.info('homeToolUrl:%s', homeToolUrl);
-
-			// const toolUrl = getToolUrl(app.name, 'explorer');
-			// log.info('toolUrl:%s', toolUrl);
-
-			// This causes com.enonic.xp.task.TaskNotFoundException
-			// const vhosts = listVhosts();
-			// log.info('vhosts:%s', toStr(vhosts));
-
-			// TODO These require Admin Privleges aka Login...
-			// for (let i = 0; i < URI_FRAGMENTS.length; i++) {
-			// 	const uriFragment = URI_FRAGMENTS[i];
-			// 	const url = `http://localhost:8080${toolUrl}#${uriFragment}`;
-			// 	const beforeRequestMs = currentTimeMillis();
-			// 	httpClientRequest({
-			// 		method: 'GET',
-			// 		url
-			// 	});
-			// 	const afterRequestMs = currentTimeMillis();
-			// 	const durationRequestMs = afterRequestMs - beforeRequestMs;
-			// 	log.info('%s:%s', url, prettyMs(durationRequestMs));
-			// }
-			// //http://localhost:8080/admin/tool/com.enonic.app.explorer/explorer/
-			// const graphQLUrl = `http://localhost:8080${toolUrl}/_/service/com.enonic.app.explorer/graphQL`;
-			// const beforeRequestMs = currentTimeMillis();
-			// httpClientRequest({
-			// 	method: 'GET',
-			// 	url: graphQLUrl
-			// });
-			// const afterRequestMs = currentTimeMillis();
-			// const durationRequestMs = afterRequestMs - beforeRequestMs;
-			// log.info('%s:%s', graphQLUrl, prettyMs(durationRequestMs));
-			const query = `{
-		getLocales {
-			country
-		}
-	}`;
-			const beforeExecuteMs = currentTimeMillis();
-			// const obj =
-			execute(getCachedSchema(),query,null);
-			const afterExecuteMs = currentTimeMillis();
-			const durationExecuteMs = afterExecuteMs - beforeExecuteMs;
-			log.info('execute:%s', prettyMs(durationExecuteMs));
-			// log.info('obj:%s', toStr(obj));
+			// 		const query = `{
+			// 	getLocales {
+			// 		country
+			// 	}
+			// }`;
+			// 		const beforeExecuteMs = currentTimeMillis();
+			// 		// const obj =
+			// 		execute(getCachedSchema(),query,null);
+			// 		const afterExecuteMs = currentTimeMillis();
+			// 		const durationExecuteMs = afterExecuteMs - beforeExecuteMs;
+			// 		log.info('execute:%s', durationExecuteMs);
+			// 		// log.info('execute:%s', prettyMs(durationExecuteMs));
+			// 		// log.info('obj:%s', toStr(obj));
 		}
 	}); // runAsSu
 } // export function run
