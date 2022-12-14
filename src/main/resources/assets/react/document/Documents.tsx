@@ -17,6 +17,7 @@ import {
 	Input,
 	Modal,
 	Radio,
+	Segment,
 	Table,
 } from 'semantic-ui-react';
 import {TypedReactJson} from '../search/TypedReactJson';
@@ -27,9 +28,6 @@ import {
 	COLUMN_NAME_LANGUAGE,
 	COLUMN_NAME_ID,
 	COLUMN_NAME_JSON,
-	FIELD_PATH_META_COLLECTION,
-	FIELD_PATH_META_DOCUMENT_TYPE,
-	FIELD_PATH_META_LANGUAGE,
 	FRAGMENT_SIZE_DEFAULT,
 	POST_TAG,
 	PRE_TAG,
@@ -112,6 +110,7 @@ export function Documents({
 		operatorState, setOperatorState,
 		query, setQuery,
 		queryDocuments,
+		searchedString, // setSearchedString,
 		selectedCollections, setSelectedCollections,
 		selectedColumns, persistSelectedColumns,
 		selectedDocumentTypes, setSelectedDocumentTypes,
@@ -338,6 +337,9 @@ export function Documents({
 				</Grid.Column>
 			</Grid.Row>
 		</Grid>
+		{searchedString
+			? <Segment basic>Searched for <b>{searchedString}</b> and found {documentsRes.total} matching documents.</Segment>
+			: null}
 		<Table celled collapsing compact selectable singleLine striped>
 			<Table.Header>
 				<Table.Row>
@@ -345,6 +347,7 @@ export function Documents({
 					{/*columnOptions
 						.filter(({value}) => selectedColumns.includes(value as string))
 						.map(({text},i) => <Table.HeaderCell collapsing content={text} key={i}/>)*/}
+					{searchedString ? <Table.HeaderCell collapsing content='_allText'/> : null}
 				</Table.Row>
 			</Table.Header>
 			<Table.Body>
@@ -354,77 +357,76 @@ export function Documents({
 					// _json,
 					parsedJson,
 					...rest
-				}, i) => <Table.Row key={i}>
-					{selectedColumns.includes(COLUMN_NAME_COLLECTION)
-						? <Table.Cell collapsing>
-							{ReactHtmlParser(getHighlightedHtml({
-								_highlight,
-								fallback: rest[FIELD_PATH_META].collection,
-								fieldPath: FIELD_PATH_META_COLLECTION,
-								fragmentSize,
-							}))}
-						</Table.Cell>
-						: null
-					}
-					{selectedColumns.includes(COLUMN_NAME_DOCUMENT_TYPE)
-						? <Table.Cell collapsing>
-							{ReactHtmlParser(getHighlightedHtml({
-								_highlight,
-								fallback: rest[FIELD_PATH_META].documentType,
-								fieldPath: FIELD_PATH_META_DOCUMENT_TYPE,
-								fragmentSize,
-							}))}
-						</Table.Cell>
-						: null
-					}
-					{selectedColumns.includes(COLUMN_NAME_LANGUAGE)
-						? <Table.Cell collapsing>
-							{ReactHtmlParser(getHighlightedHtml({
-								_highlight,
-								fallback: rest[FIELD_PATH_META].language,
-								fieldPath: FIELD_PATH_META_LANGUAGE,
-								fragmentSize,
-							}))}
-						</Table.Cell>
-						: null
-					}
-					{selectedColumns.includes(COLUMN_NAME_ID)
-						? <Table.Cell collapsing>{_id}</Table.Cell>
-						: null
-					}
-					{selectedColumns.includes(COLUMN_NAME_JSON)
-						? <Table.Cell collapsing>
-							<Button
-								icon='code'
-								onClick={() => {
-									setJsonModalState({
-										open: true,
-										id: _id,
-										parsedJson: parsedJson,
-									})
-								}}
-							/>
-						</Table.Cell>
-						: null
-					}
-					{
-						selectedColumns.map((selectedColumnName, j) => {
-							if (!SELECTED_COLUMNS_DEFAULT.includes(selectedColumnName)) {
-								const htmlString = getHighlightedHtml({
-									_highlight,
-									fallback: getIn(parsedJson, selectedColumnName),
-									fieldPath: selectedColumnName,
-									fragmentSize,
-								});
-								// console.debug('htmlString', htmlString);
-								return <Table.Cell
-									collapsing
-									key={`${i}.${j}`}
-								>{ReactHtmlParser(htmlString)}</Table.Cell>;
-							}
-						}).filter(x=>x)
-					}
-				</Table.Row>)}
+				}, i) => {
+					return <Table.Row key={i}>
+						{selectedColumns.includes(COLUMN_NAME_COLLECTION)
+							? <Table.Cell collapsing>
+								{rest[FIELD_PATH_META].collection}
+							</Table.Cell>
+							: null
+						}
+						{selectedColumns.includes(COLUMN_NAME_DOCUMENT_TYPE)
+							? <Table.Cell collapsing>
+								{rest[FIELD_PATH_META].documentType}
+							</Table.Cell>
+							: null
+						}
+						{selectedColumns.includes(COLUMN_NAME_LANGUAGE)
+							? <Table.Cell collapsing>
+								{rest[FIELD_PATH_META].language}
+							</Table.Cell>
+							: null
+						}
+						{selectedColumns.includes(COLUMN_NAME_ID)
+							? <Table.Cell collapsing>{_id}</Table.Cell>
+							: null
+						}
+						{selectedColumns.includes(COLUMN_NAME_JSON)
+							? <Table.Cell collapsing>
+								<Button
+									icon='code'
+									onClick={() => {
+										setJsonModalState({
+											open: true,
+											id: _id,
+											parsedJson: parsedJson,
+										})
+									}}
+								/>
+							</Table.Cell>
+							: null
+						}
+						{
+							selectedColumns.map((selectedColumnName, j) => {
+								if (!SELECTED_COLUMNS_DEFAULT.includes(selectedColumnName)) {
+									const htmlString = getHighlightedHtml({
+										_highlight,
+										fallback: getIn(parsedJson, selectedColumnName),
+										fieldPath: selectedColumnName,
+										fragmentSize,
+									});
+									// console.debug('htmlString', htmlString);
+									return <Table.Cell
+										collapsing
+										key={`${i}.${j}`}
+									>{ReactHtmlParser(htmlString)}</Table.Cell>;
+								}
+							}).filter(x=>x)
+						}
+						{searchedString ? <Table.Cell collapsing>
+							{_highlight['_alltext'] && _highlight['_alltext'].length
+								? <ul style={{
+									listStyleType: 'none',
+									margin: 0,
+									padding: 0
+								}}>
+									{_highlight['_alltext'].map((htmlString, j) => <li key={j}>
+										{ReactHtmlParser(htmlString)}
+									</li>)}
+								</ul>
+								: null}
+						</Table.Cell> : null}
+					</Table.Row>})}
 			</Table.Body>
 		</Table>
 		<Modal
