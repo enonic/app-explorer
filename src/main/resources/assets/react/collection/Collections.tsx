@@ -15,6 +15,7 @@ import {
 	rpad
 } from '@enonic/js-utils';
 import {parseExpression as parseCronExpression} from 'cron-parser';
+import {Link} from 'react-router-dom';
 import {
 	Button, Dimmer, Grid, Header, Icon, Loader, Popup, Progress, Radio,
 	Segment, Table
@@ -54,7 +55,7 @@ export function Collections(props :{
 		licenseValid,
 		servicesBaseUrl,
 		setLicensedTo,
-		setLicenseValid
+		setLicenseValid,
 	} = props;
 
 	const {
@@ -259,7 +260,15 @@ export function Collections(props :{
 									/>{'Reindexing...'}</Table.Cell>
 								: <>
 									{showCollector ? <Table.Cell collapsing>{collectorNameOrEmpty}</Table.Cell> : null}
-									{showDocumentCount ? <Table.Cell collapsing>{documentCount === -1 ? '' : documentCount}</Table.Cell> : null}
+									{showDocumentCount ? <Table.Cell collapsing>{
+										documentCount === -1
+											? ''
+											: documentCount > 1
+												? <Link
+													to={`/documents?collection=${_name}`}
+												>{documentCount}</Link>
+												: '0'
+									}</Table.Cell> : null}
 									{showLanguage ? <Table.Cell collapsing>{language}</Table.Cell> : null}
 									{showDocumentType ? <Table.Cell collapsing>{
 										collector && collector.managedDocumentTypes

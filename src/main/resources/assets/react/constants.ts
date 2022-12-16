@@ -21,31 +21,6 @@ export const ICON_STYLE = {
 };
 
 
-/*const SIDEBAR_WIDTH_NAME_TO_PX = {
-	'very thin': 60,
-	'thin': 150,
-	undefined: 260,
-	'wide': 350,
-	'very wide': 475
-};*/
-//const SIDEBAR_WIDTH = 'very thin';
-const SIDEBAR_WIDTH_PX = 260; // 157
-export const PUSHER_WIDTH = `calc(100% - ${SIDEBAR_WIDTH_PX}px)`;
-
-/*const PUSHER_STYLE_SIDEBAR_HIDE = {
-	padding: '54px 14px 14px',
-	transform: 'none',
-	'-webkit-transform': 'none',
-	width: 'auto'
-};
-
-const PUSHER_STYLE_SIDEBAR_SHOW = {
-	padding: '54px 14px 14px',
-	transform: `translate3d(${SIDEBAR_WIDTH_PX}px, 0, 0)`,
-	'-webkit-transform': `translate3d(${SIDEBAR_WIDTH_PX}px, 0, 0)`,
-	width: PUSHER_WIDTH
-};*/
-
 export const LICENSE_BSD_2_CLAUSE :LicenseBsd2Clause = 'BSD 2-Clause';
 export const LICENSE_BSD_3_CLAUSE :LicenseBsd3Clause = 'BSD 3-Clause';
 export const LICENSE_MIT :LicenseMit = 'MIT';

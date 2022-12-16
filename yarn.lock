@@ -1199,6 +1199,11 @@
   resolved "https://registry.yarnpkg.com/@enonic-types/core/-/core-7.11.0.tgz#f307e1803656452bb93d8760374563f305175e1a"
   integrity sha512-05u/BLlOaZK9zaqjCTV+w9gsrLkhwnp6oy0/14VXFKOkg3vCWNbqSsuStNAfguGqLSJOB0/nVU0yvbD1g5FT9Q==
 
+"@enonic-types/core@7.11.1":
+  version "7.11.1"
+  resolved "https://registry.yarnpkg.com/@enonic-types/core/-/core-7.11.1.tgz#9e28f89df22fe134873dac718abfc5c0a5a7cc83"
+  integrity sha512-zT0dtdAFurx1Kmwc4IoyKz4MCOGOXgn2hcr80IffPFTmkVt5l5imyC4r7+MwusR6yAPoMCvu1qRokAkx93uwQA==
+
 "@enonic-types/global@^7":
   version "7.11.0"
   resolved "https://registry.yarnpkg.com/@enonic-types/global/-/global-7.11.0.tgz#17fd8890f0bae4041fc472a4f6cbf61d369e9eee"
@@ -1239,6 +1244,13 @@
   integrity sha512-oqCktyegqnhj6ChELRCJZQJTTPfOnZpQCvMonNFPRSkACBz5bzuJvzAmjs+WTDhOYIliqkfJW1+at0uhPS8gnw==
   dependencies:
     "@enonic-types/core" "7.11.0"
+
+"@enonic-types/lib-portal@^7.11.1":
+  version "7.11.1"
+  resolved "https://registry.yarnpkg.com/@enonic-types/lib-portal/-/lib-portal-7.11.1.tgz#3d6707ffce05e0219d4f94f2393964242521ed46"
+  integrity sha512-tCA4dO+2p2m9Lu9v4K9cbpvQr/FI+vUn7Z39d8tfrZ8bE0oSz5l3TXSXLf5yEnFgRybD9LnDpPymmZ35ETF4Yg==
+  dependencies:
+    "@enonic-types/core" "7.11.1"
 
 "@enonic-types/lib-repo@^7":
   version "7.11.0"
@@ -1419,6 +1431,11 @@
   version "2.11.6"
   resolved "https://registry.yarnpkg.com/@popperjs/core/-/core-2.11.6.tgz#cee20bd55e68a1720bdab363ecf0c821ded4cd45"
   integrity sha512-50/17A98tWUfQ176raKiOGXuYpLyyVMkxxG6oylzL3BPOlA6ADGdK7EYunSa4I064xerltq9TGXs8HmOk5E+vw==
+
+"@remix-run/router@1.0.5":
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/@remix-run/router/-/router-1.0.5.tgz#d5c65626add4c3c185a89aa5bd38b1e42daec075"
+  integrity sha512-my0Mycd+jruq/1lQuO5LBB6WTlL/e8DTCYWp44DfMTDcXz8DcTlgF0ISaLsGewt+ctHN+yA8xMq3q/N7uWJPug==
 
 "@semantic-ui-react/event-stack@^3.1.3":
   version "3.1.3"
@@ -6772,6 +6789,21 @@ react-popper@^2.3.0:
   dependencies:
     react-fast-compare "^3.0.1"
     warning "^4.0.2"
+
+react-router-dom@^6.4.5:
+  version "6.4.5"
+  resolved "https://registry.yarnpkg.com/react-router-dom/-/react-router-dom-6.4.5.tgz#4fdb12efef4f3848c693a76afbeaed1f6ca02047"
+  integrity sha512-a7HsgikBR0wNfroBHcZUCd9+mLRqZS8R5U1Z1mzLWxFXEkUT3vR1XXmSIVoVpxVX8Bar0nQYYYc9Yipq8dWwAA==
+  dependencies:
+    "@remix-run/router" "1.0.5"
+    react-router "6.4.5"
+
+react-router@6.4.5:
+  version "6.4.5"
+  resolved "https://registry.yarnpkg.com/react-router/-/react-router-6.4.5.tgz#73f382af2c8b9a86d74e761a7c5fc3ce7cb0024d"
+  integrity sha512-1RQJ8bM70YEumHIlNUYc6mFfUDoWa5EgPDenK/fq0bxD8DYpQUi/S6Zoft+9DBrh2xmtg92N5HMAJgGWDhKJ5Q==
+  dependencies:
+    "@remix-run/router" "1.0.5"
 
 react-semantic-ui-datepickers@^2:
   version "2.17.2"
