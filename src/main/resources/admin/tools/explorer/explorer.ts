@@ -5,7 +5,6 @@
 //──────────────────────────────────────────────────────────────────────────────
 //@ts-ignore
 import newRouter from '/lib/router';
-//@ts-ignore
 import {hasRole} from '/lib/xp/auth';
 
 //──────────────────────────────────────────────────────────────────────────────
@@ -50,6 +49,8 @@ router.post('/api/v1/interface/{interfaceName}', (r) => interfacePost(
 	r,
 	() => false // false means always authorized
 ));
+
+router.all('{path:.+}', (r) => htmlResponse(r)); // Doens't cover '/' ?
 
 // NOTE https://github.com/enonic/xp/issues/6793
 

@@ -1,0 +1,56 @@
+@import '../_variables.sass'
+
+// Making sure there won't be nested scrollbars
+html,
+body,
+#explorerPushable
+	height: 100%
+	margin: 0
+	padding: 0
+	overflow: hidden
+
+.ui.fixed.top.menu
+	height: $top-bar-height
+	// .ui.overlay.sidebar has 102
+	zIndex: 103
+
+#explorerPushable
+	// So position: fixed can work on children
+	transform: none
+
+#mySidebar
+	// Make the sidebar "stretch" to the end of the viewport
+	bottom: 0
+
+	// In order for the scrollbar to appear at the correct viewport height,
+	// the value added to top, must be subtracted from height
+	height: calc(100% - $top-bar-height) !important
+
+	// When the sidebar menu is taller than the viewport, overlay a vertical scrollbar
+	overflow-y: overlay !important
+
+	// The sidebar is positioned absolute by default, but we want it fixed to the viewport
+	position: fixed
+
+	// See height comment
+	top: $top-bar-height
+
+#myPusher
+	// In order for the scrollbar to appear at the correct viewport height,
+	// the value added to margin-top or top, must be subtracted from height
+	height: calc(100% - $top-bar-height)
+
+	// margin-top and top affects the vertical position of a scrollbar
+	// margin-top: $top-bar-height
+
+	// This is needed so tall content doesn't flow below the "scrollport"
+	padding-bottom: $top-bar-height
+
+	padding-top: $padding-vertical-default
+
+	// When the content of the pusher is taller than the viewport overlay a vertical scrollbar
+	overflow-y: overlay
+
+	// The pusher is positioned relative by default, so we can use top
+	// margin-top and top affects the vertical position of a scrollbar
+	top: $top-bar-height

@@ -1,6 +1,7 @@
 import type {DocumentTypesComponentParams} from './index.d';
 
 
+import {Link} from 'react-router-dom';
 import {
 	Button,
 	Grid,
@@ -128,7 +129,11 @@ export function DocumentTypes({
 						</Table.Cell>
 						<Table.Cell collapsing disabled={isLoading}>{_name}</Table.Cell>
 
-						<Table.Cell collapsing disabled={isLoading} textAlign='right'>{documentsInTotal}</Table.Cell>
+						<Table.Cell collapsing disabled={isLoading} textAlign='right'>{documentsInTotal > 0
+							? <Link
+								to={`/documents?documentType=${_name}`}
+							>{documentsInTotal}</Link>
+							: 0}</Table.Cell>
 
 						{showAllFields ? <Table.Cell disabled={isLoading}><ul style={{
 							listStyleType: 'none',
