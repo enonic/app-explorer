@@ -64,6 +64,7 @@
 			"/lib/xp/event": ["node_modules/@enonic-types/lib-event"],
 			"/lib/xp/io": ["node_modules/@enonic-types/lib-io"],
 			"/lib/xp/node": ["node_modules/@enonic-types/lib-node"],
+			"/lib/xp/portal": ["node_modules/@enonic-types/lib-portal"],
 			"/lib/xp/repo": ["node_modules/@enonic-types/lib-repo"],
 			"/lib/xp/task": ["node_modules/@enonic-types/lib-task"],
 			"/lib/xp/vhost": ["node_modules/@enonic-types/lib-vhost"],

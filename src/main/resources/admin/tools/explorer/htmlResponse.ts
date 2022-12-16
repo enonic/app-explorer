@@ -1,15 +1,16 @@
+import type {TaskInfo} from '/lib/xp/task';
+import type {ExplorerProps} from '/index.d';
+
+
 //import {toStr} from '@enonic/js-utils';
 import serialize from 'serialize-javascript';
 //@ts-ignore
 import {isLicenseValid, getIssuedTo} from '/lib/licensing';
-/*import {
-	getBaseUri,
-	getLauncherPath,
-	getLauncherUrl
-} from '/lib/xp/admin';*/
-//@ts-ignore
-import {assetUrl, serviceUrl} from '/lib/xp/portal';
-//@ts-ignore
+import {getToolUrl} from '/lib/xp/admin';
+import {
+	assetUrl,
+	serviceUrl,
+} from '/lib/xp/portal';
 import {getLauncherPath} from '/lib/xp/admin';
 
 import {
@@ -18,12 +19,12 @@ import {
 } from '/lib/explorer/model/2/constants';
 import {connect} from '/lib/explorer/repo/connect';
 import {query as queryCollectors} from '/lib/explorer/collector/query';
-//@ts-ignore
 import {get as getRepo} from '/lib/xp/repo';
-//@ts-ignore
 import {list as listTasks} from '/lib/xp/task';
 
 const ID_REACT_EXPLORER_CONTAINER = 'reactExplorerContainer';
+
+const EXPLORER_URL = getToolUrl(app.name, 'explorer');
 
 //const {currentTimeMillis} = Java.type('java.lang.System');
 
@@ -33,13 +34,13 @@ export function htmlResponse({
 	// On first startup repos are not yet created.
 	// There is a init task, but it takes a little while to start it.
 
-	let initTask;
+	let initTask :TaskInfo;
 	if (!getRepo(REPO_ID_EXPLORER)) {
 		initTask = {
 			progress: {
 				current: 0,
 				info: 'Starting task...',
-				total: '15'
+				total: 15
 			},
 			state: 'STARTING'
 		};
@@ -62,7 +63,7 @@ export function htmlResponse({
 			state
 		} = initTask;
 		//const remainingCount = total - current;
-		if(['STARTING', 'RUNNING','WAITING'].includes(state)) {
+		if(['STARTING', 'RUNNING', 'WAITING'].includes(state)) {
 			return {
 				body: `<!DOCTYPE html>
 <html>
@@ -110,7 +111,8 @@ export function htmlResponse({
 	}
 	//log.info(toStr({path}));
 
-	const propsObj = {
+	const propsObj: Partial<ExplorerProps> = {
+		basename: EXPLORER_URL,
 		licensedTo: getIssuedTo(),
 		licenseValid: isLicenseValid(),
 		servicesBaseUrl: serviceUrl({service: ''}),
@@ -231,6 +233,7 @@ services: {}, // Workaround for i18nUrl BUG
 	return {
 		body: `<html>
 	<head>
+		<meta name="robots" content="noindex,nofollow">
 		<script type="text/javascript" src="${assetUrl({path: 'react/react.development.js'})}"></script>
 		<script type="text/javascript" src="${assetUrl({path: 'react-dom/react-dom.development.js'})}"></script>
 		<link rel="shortcut icon" href="${assetUrl({path: 'favicon.ico'})}">
