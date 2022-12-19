@@ -16,6 +16,7 @@ import {
 	Icon,
 	Input,
 	Modal,
+	Pagination,
 	Radio,
 	Segment,
 	Table,
@@ -103,11 +104,14 @@ export function Documents({
 		documentsRes, // setDocumentsRes,
 		documentTypeOptions, // setDocumentTypeOptions,
 		documentTypesHoverOpen, setDocumentTypesHoverOpen,
+		doing, // setDoing,
 		durationSinceLastUpdate, // setDurationSinceLastUpdate,
 		fragmentSize, setFragmentSize,
+		handlePaginationChange,
 		jsonModalState, setJsonModalState,
 		loading, // setLoading,
 		operatorState, setOperatorState,
+		page, // setPage,
 		perPage, setPerPage,
 		perPageHoverOpen, setPerPageHoverOpen,
 		query, setQuery,
@@ -116,7 +120,7 @@ export function Documents({
 		selectedCollections, setSelectedCollections,
 		selectedColumns, persistSelectedColumns,
 		selectedDocumentTypes, setSelectedDocumentTypes,
-		// updatedAt, setUpdatedAt,
+		start, setStart,
 	} = useDocumentsState({
 		servicesBaseUrl
 	})
@@ -147,7 +151,8 @@ export function Documents({
 											query,
 											operator: operatorState,
 											perPage,
-											selectedColumns
+											selectedColumns,
+											start: 0 // Explicitly reset to 0 when query changes
 										});
 									}
 								}}
@@ -179,7 +184,8 @@ export function Documents({
 															query,
 															operator: newOperator,
 															perPage,
-															selectedColumns
+															selectedColumns,
+															start: 0 // Explicitly reset to 0 when operator changes
 														});
 													}}
 													toggle
@@ -232,7 +238,8 @@ export function Documents({
 												operator: operatorState,
 												perPage,
 												query,
-												selectedColumns
+												selectedColumns,
+												start: 0 // Explicitly reset to 0 when collections changes
 											});
 										}}
 										options={collectionOptions}
@@ -264,7 +271,8 @@ export function Documents({
 												operator: operatorState,
 												perPage,
 												query,
-												selectedColumns
+												selectedColumns,
+												start: 0 // Explicitly reset to 0 when documentTypes changes
 											});
 										}}
 										options={documentTypeOptions}
@@ -315,7 +323,8 @@ export function Documents({
 												operator: operatorState,
 												perPage,
 												query,
-												selectedColumns: newSelectedColumns
+												selectedColumns: newSelectedColumns,
+												start // Keep start when columns changes
 											});
 										}}
 										options={columnOptions}
@@ -337,6 +346,9 @@ export function Documents({
 											{value: newPerPage}: {value: number}
 										) => {
 											setPerPage(newPerPage);
+											if (start !== 0) {
+												setStart(0); // Explicitly reset to 0 when perPage changes
+											}
 											queryDocuments({
 												collectionsFilter: selectedCollections,
 												documentsTypesFilter: selectedDocumentTypes,
@@ -344,7 +356,8 @@ export function Documents({
 												operator: operatorState,
 												perPage: newPerPage,
 												query,
-												selectedColumns
+												selectedColumns,
+												start: 0 // Explicitly reset to 0 when perPage changes
 											});
 										}}
 										options={[5,10,25,50,100].map(key => ({key, text: `${key}`, value: key}))}
@@ -364,11 +377,26 @@ export function Documents({
 				<Grid.Column mobile={16} tablet={16} computer={5} style={{padding:0}}>
 					<Button
 						basic
-						disabled
+						disabled={loading}
 						floated='right'
 						color='blue'
-						loading={loading}
-						onClick={() => {/*fetchOnUpdate()*/}}><Icon className='refresh'/>Last updated: {durationSinceLastUpdate}</Button>
+						onClick={() => {
+							queryDocuments({
+								collectionsFilter: selectedCollections,
+								documentsTypesFilter: selectedDocumentTypes,
+								fragmentSize,
+								operator: operatorState,
+								perPage,
+								query,
+								selectedColumns,
+								start,
+							});
+						}}>{doing
+							? doing
+							: <>
+								<Icon className='refresh'/>Last updated: {durationSinceLastUpdate}
+							</>
+						}</Button>
 				</Grid.Column>
 			</Grid.Row>
 		</Grid>
@@ -464,6 +492,40 @@ export function Documents({
 					</Table.Row>})}
 			</Table.Body>
 		</Table>
+		<Pagination
+			disabled={loading || !documentsRes.total}
+			pointing
+			secondary
+			size='mini'
+			style={{
+				marginBottom: 14,
+				marginTop: 14
+			}}
+
+			activePage={page}
+			boundaryRange={1}
+			siblingRange={1}
+			totalPages={Math.ceil(documentsRes.total / perPage)}
+
+			ellipsisItem={{content: <Icon name='ellipsis horizontal' />, icon: true}}
+			firstItem={{content: <Icon name='angle double left' />, icon: true}}
+			prevItem={{content: <Icon name='angle left' />, icon: true}}
+			nextItem={{content: <Icon name='angle right' />, icon: true}}
+			lastItem={{content: <Icon name='angle double right' />, icon: true}}
+
+			onPageChange={handlePaginationChange}
+		/>
+		{documentsRes.total
+			? <p className={loading ? 'disabled' : ''}>Displaying {(() => {
+				const begin = start + 1;
+				const end = Math.min(start + perPage, documentsRes.total);
+				if (end === begin) {
+					return begin;
+				}
+				return `${begin}-${end} of ${documentsRes.total}`;
+			})()}</p>
+			: null
+		}
 		<Modal
 			open={jsonModalState.open}
 			onClose={() => setJsonModalState({

@@ -1,5 +1,8 @@
 import type {DslOperator} from '/lib/xp/node';
-import type {DropdownItemProps} from 'semantic-ui-react';
+import type {
+	DropdownItemProps,
+	PaginationProps,
+} from 'semantic-ui-react';
 import type {JSONResponse} from '../../../services/graphQL/fetchers/index.d';
 
 
@@ -8,6 +11,7 @@ import {
 	forceArray,
 	// storage
 } from '@enonic/js-utils';
+import {useWhenInit} from "@seamusleahy/init-hooks";
 import {useDebounce} from 'use-debounce';
 import * as gql from 'gql-query-builder';
 import {difference} from 'lodash';
@@ -25,6 +29,7 @@ import {
 	FIELD_SHORTCUT_DOCUMENT_TYPE,
 } from '../../../services/graphQL/constants';
 import {useInterval} from '../utils/useInterval';
+import {useUpdateEffect} from '../utils/useUpdateEffect';
 
 
 // const bool = storage.query.dsl.bool;
@@ -33,6 +38,8 @@ import {useInterval} from '../utils/useInterval';
 // const or = storage.query.dsl.or;
 // const stemmed = storage.query.dsl.stemmed;
 
+
+const DEBUG_DEPENDENCIES = false;
 
 const FIELD_PATH_META = 'document_metadata' as const; // TODO _meta ?
 // export const FIELD_PATH_META_COLLECTION = `${FIELD_PATH_META}.collection` as const;
@@ -47,7 +54,7 @@ export const COLUMN_NAME_ID = '_id';
 export const COLUMN_NAME_JSON = '_json';
 export const COLUMN_NAME_LANGUAGE = '_language';
 export const FRAGMENT_SIZE_DEFAULT = 150;
-const PER_PAGE_DEFAULT = 25;
+const PER_PAGE_DEFAULT = 10;
 export const POST_TAG = '</b>';
 export const PRE_TAG = '<b class="bgc-y">';
 
@@ -114,6 +121,7 @@ export function useDocumentsState({
 		DropdownItemProps[]
 	>(OPTIONS_COLUMNS_DEFAULT);
 	const [columnsHoverOpen, setColumnsHoverOpen] = React.useState(false);
+	const [doing, setDoing] = React.useState('Initializing...');
 	const [perPage, setPerPage] = React.useState(PER_PAGE_DEFAULT);
 	const [perPageHoverOpen, setPerPageHoverOpen] = React.useState(false);
 	const [documentTypeOptions, setDocumentTypeOptions] = React.useState<
@@ -127,6 +135,7 @@ export function useDocumentsState({
 
 	const [loading, setLoading] = React.useState(false);
 	const [operatorState, setOperatorState] = React.useState<DslOperator>(QUERY_OPERATOR_OR);
+	const [page, setPage] = React.useState(1);
 	const [urlSearchParams] = React.useState(new URLSearchParams(document.location.search));
 	const [query, setQuery] = React.useState<string>(urlSearchParams.get('q') || '');
 	const [searchedString, setSearchedString] = React.useState<string>('');
@@ -141,34 +150,38 @@ export function useDocumentsState({
 			? [urlSearchParams.get('documentType')]
 			: []
 	);
+	const [start, setStart] = React.useState(0);
 	const [updatedAt, setUpdatedAt] = React.useState(moment());
 
 	//──────────────────────────────────────────────────────────────────────────
-	// Callbacks
+	// Callbacks (should only depend on props, not state)
 	//──────────────────────────────────────────────────────────────────────────
 	const queryDocuments = React.useCallback(({
-		collectionsFilter = [],
-		documentsTypesFilter = [],
-		fragmentSize = FRAGMENT_SIZE_DEFAULT,
-		operator = QUERY_OPERATOR_OR,
-		perPage = PER_PAGE_DEFAULT,
-		query = '',
-		selectedColumns = SELECTED_COLUMNS_DEFAULT,
+		collectionsFilter, // = [],
+		documentsTypesFilter, // = [],
+		fragmentSize, // = FRAGMENT_SIZE_DEFAULT,
+		operator, // = QUERY_OPERATOR_OR,
+		perPage, // = PER_PAGE_DEFAULT,
+		query, // = '',
+		selectedColumns, // = SELECTED_COLUMNS_DEFAULT,
+		start, // = 0,
 		// updateSelectedCollections = false,
 		// updateSelectedDocumentTypes = false,
 	}: {
-		collectionsFilter?: string[]
-		documentsTypesFilter?: string[]
-		fragmentSize?: number
-		operator?: DslOperator
-		perPage?: number
-		query?: string
-		selectedColumns?: string[]
-		// updateSelectedCollections?: boolean
-		// updateSelectedDocumentTypes?: boolean
+		collectionsFilter: string[]
+		documentsTypesFilter: string[]
+		fragmentSize: number
+		operator: DslOperator
+		perPage: number
+		query: string
+		selectedColumns: string[]
+		start: number
+		// updateSelectedCollections: boolean
+		// updateSelectedDocumentTypes: boolean
 	}) => {
+		DEBUG_DEPENDENCIES && console.debug('queryDocuments callback called');
+		setDoing('Querying documents...');
 		setLoading(true);
-		// console.debug('queryDocuments');
 		const filters = [];
 		if (collectionsFilter.length) {
 			filters.push({
@@ -321,7 +334,13 @@ export function useDocumentsState({
 						required: false,
 						type: 'QueryDSL',
 						value: queryValue
-					}
+					},
+					start: {
+						list: false,
+						required: false,
+						type: 'Int',
+						value: start
+					},
 				}, // variables
 				fields: [
 					{
@@ -449,15 +468,25 @@ export function useDocumentsState({
 
 				setDocumentsRes(json.data.queryDocuments);
 				setSearchedString(query);
-				setUpdatedAt(moment());
+
+				const newUpdatedAt = moment();
+				setDurationSinceLastUpdate(
+					moment
+						.duration(0)
+						.humanize()
+				);
+				setUpdatedAt(newUpdatedAt);
+
+				setDoing('');
 				setLoading(false);
 			});
-	},[
+	},[ // The callback is not executed when it's deps changes. Only the reference to the callback is updated.
 		servicesBaseUrl,
-		setDocumentsRes,
 	]);
 
 	const getDocumentTypes = React.useCallback(() => {
+		DEBUG_DEPENDENCIES && console.debug('getDocumentTypes callback called');
+		setDoing('Getting documentTypes...');
 		setLoading(true);
 		fetch(`${servicesBaseUrl}/graphQL`, {
 			method: 'POST',
@@ -510,6 +539,7 @@ export function useDocumentsState({
 						}))
 					)
 				);
+				setDoing('Getting profile...');
 				fetch(`${servicesBaseUrl}/graphQL`, {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
@@ -537,24 +567,65 @@ export function useDocumentsState({
 						queryDocuments({
 							collectionsFilter: selectedCollections,
 							documentsTypesFilter: selectedDocumentTypes,
+							fragmentSize,
+							operator: operatorState,
+							perPage,
 							query,
-							// perPage,
 							selectedColumns: newSelectedColumns,
+							start, // Keep start when columns changes
 							// updateSelectedCollections: true,
 							// updateSelectedDocumentTypes: true,
 						});
 					});
 			});
-	}, [ // eslint-disable-line react-hooks/exhaustive-deps
-		// query,
+	}, [ // The callback is not executed when it's deps changes. Only the reference to the callback is updated.
+		fragmentSize,
+		operatorState,
+		perPage,
+		query,
 		queryDocuments,
-		// perPage,
-		// selectedCollections,
-		// selectedDocumentTypes,
-		servicesBaseUrl
+		selectedCollections,
+		selectedDocumentTypes,
+		servicesBaseUrl,
+		start
+	]);
+
+	const handlePaginationChange = React.useCallback((
+		_event: React.MouseEvent<HTMLAnchorElement>,
+		data: PaginationProps
+	) => {
+		const {activePage: newPage} = data;
+		DEBUG_DEPENDENCIES && console.debug('handlePaginationChange callback called. newPage:', newPage);
+		setPage(newPage as number);
+		const newStart = (newPage as number - 1 ) * perPage;
+		if (newStart !== start) {
+			setStart(newStart)
+		}
+		queryDocuments({
+			collectionsFilter: selectedCollections,
+			documentsTypesFilter: selectedDocumentTypes,
+			fragmentSize,
+			operator: operatorState,
+			perPage,
+			query,
+			selectedColumns,
+			start: newStart
+		});
+	}, [ // The callback is not executed when it's deps changes. Only the reference to the callback is updated.
+		fragmentSize,
+		operatorState,
+		perPage,
+		query,
+		queryDocuments,
+		selectedCollections,
+		selectedColumns,
+		selectedDocumentTypes,
+		start
 	]);
 
 	const persistSelectedColumns = React.useCallback((newSelectedColumns: string[]) => {
+		DEBUG_DEPENDENCIES && console.debug('persistSelectedColumns callback called');
+		setDoing('Persisting selected columns...');
 		setLoading(true);
 		fetch(`${servicesBaseUrl}/graphQL`, {
 			method: 'POST',
@@ -591,58 +662,62 @@ export function useDocumentsState({
 				} = json.data.modifyProfile;
 				// console.log('columns', columns);
 				setSelectedColumns(forceArray(columns));
+				setDoing('');
 				setLoading(false);
 			});
-	}, [
+	}, [ // The callback is not executed when it's deps changes. Only the reference to the callback is updated.
 		servicesBaseUrl
 	]);
 
 	//──────────────────────────────────────────────────────────────────────────
-	// Effects
+	// Init
 	//──────────────────────────────────────────────────────────────────────────
-	React.useEffect(() => {
+	useWhenInit(() => {
+		DEBUG_DEPENDENCIES && console.debug('init');
 		getDocumentTypes()
+	});
+
+	//──────────────────────────────────────────────────────────────────────────
+	// Effects (init and changes)
+	//──────────────────────────────────────────────────────────────────────────
+	// React.useEffect(() => {
+	// 	console.debug('doing', doing);
+	// }, [
+	// 	doing
+	// ]);
+
+	//──────────────────────────────────────────────────────────────────────────
+	// Updates (changes, not init)
+	//──────────────────────────────────────────────────────────────────────────
+	useUpdateEffect(() => {
+		DEBUG_DEPENDENCIES && console.debug('deBouncedFragmentSize updateEffect trigged. deBouncedFragmentSize', deBouncedFragmentSize);
+		queryDocuments({
+			collectionsFilter: selectedCollections,
+			documentsTypesFilter: selectedDocumentTypes,
+			fragmentSize: deBouncedFragmentSize,
+			operator: operatorState,
+			perPage,
+			query,
+			selectedColumns,
+			start // Keep start when fragmentSize changes
+		});
 	}, [
-		getDocumentTypes
+		deBouncedFragmentSize,
+		queryDocuments,
+		// So, this used the initial perPage, maybe because queryDocuments doesn't depend on perPage?
 	]);
 
-	React.useEffect(() => {
-		setDurationSinceLastUpdate(
-			moment
-				.duration(updatedAt.diff(moment()))
-				.humanize()
-		);
-	}, [
-		updatedAt
-	]);
-
+	//──────────────────────────────────────────────────────────────────────────
+	// Intervals
+	//──────────────────────────────────────────────────────────────────────────
 	useInterval(() => {
+		// DEBUG_DEPENDENCIES && console.debug('useInterval triggered');
 		setDurationSinceLastUpdate(
 			moment
 				.duration(updatedAt.diff(moment()))
 				.humanize()
 		);
 	}, 5000);
-
-	React.useEffect(() => {
-		// console.debug('deBouncedFragmentSize', deBouncedFragmentSize);
-		queryDocuments({
-			collectionsFilter: selectedCollections,
-			documentsTypesFilter: selectedDocumentTypes,
-			fragmentSize: deBouncedFragmentSize,
-			operator: operatorState,
-			query,
-			selectedColumns
-		});
-	}, [ // eslint-disable-line react-hooks/exhaustive-deps
-		deBouncedFragmentSize,
-		// operatorState,
-		// query,
-		queryDocuments,
-		// selectedCollections,
-		// selectedColumns,
-		// selectedDocumentTypes,
-	]);
 
 	//──────────────────────────────────────────────────────────────────────────
 	// Returns
@@ -655,11 +730,14 @@ export function useDocumentsState({
 		documentsRes, // setDocumentsRes,
 		documentTypeOptions, // setDocumentTypeOptions,
 		documentTypesHoverOpen, setDocumentTypesHoverOpen,
+		doing, // setDoing,
 		durationSinceLastUpdate, // setDurationSinceLastUpdate,
 		fragmentSize, setFragmentSize,
+		handlePaginationChange,
 		jsonModalState, setJsonModalState,
 		loading, // setLoading,
 		operatorState, setOperatorState,
+		page, setPage,
 		perPage, setPerPage,
 		perPageHoverOpen, setPerPageHoverOpen,
 		query, setQuery,
@@ -668,6 +746,6 @@ export function useDocumentsState({
 		selectedCollections, setSelectedCollections,
 		selectedColumns, persistSelectedColumns,
 		selectedDocumentTypes, setSelectedDocumentTypes,
-		// updatedAt, setUpdatedAt,
+		start, setStart,
 	};
 }

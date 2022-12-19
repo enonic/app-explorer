@@ -3,6 +3,7 @@
   "dependencies": {
     "@enonic/js-utils": "^0",
     "@enonic/semantic-ui-react-form": "^2",
+    "@seamusleahy/init-hooks": "^1.0.2",
     "array.prototype.find": "^2",
     "cheerio": "1.0.0-rc.12",
     "classnames": "^2",
