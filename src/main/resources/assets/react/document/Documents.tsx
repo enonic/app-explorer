@@ -8,7 +8,9 @@ import {
 import ReactHtmlParser from 'react-html-parser';
 import {Slider} from 'react-semantic-ui-range';
 import {
+	Breadcrumb,
 	Button,
+	Divider,
 	Dropdown,
 	Form,
 	Grid,
@@ -37,6 +39,8 @@ import {
 } from './useDocumentsState';
 
 // import {FIELD_PATH_META} from '/lib/explorer/constants'; // TODO setup build system so this import works
+
+
 const FIELD_PATH_META = 'document_metadata';
 
 
@@ -133,6 +137,7 @@ export function Documents({
 						<Form.Group style={{margin:0}}>
 							<Input
 								icon
+								disabled={loading}
 								loading={loading}
 								onChange={(
 									_event :React.ChangeEvent<HTMLInputElement>,
@@ -169,6 +174,7 @@ export function Documents({
 										<Table.Row verticalAlign='middle'>
 											<Table.Cell collapsing>
 												<Radio
+													disabled={loading}
 													label={operatorState}
 													onChange={(
 														_event :React.ChangeEvent<HTMLInputElement>,
@@ -248,6 +254,7 @@ export function Documents({
 										style={{marginTop:6}}
 										value={selectedCollections}
 									/>}
+									disabled={loading}
 									header='Collections'
 									icon='database'
 									open={collectionsHoverOpen}
@@ -275,6 +282,7 @@ export function Documents({
 												start: 0 // Explicitly reset to 0 when documentTypes changes
 											});
 										}}
+										disabled={loading}
 										options={documentTypeOptions}
 										search
 										selection
@@ -300,6 +308,7 @@ export function Documents({
 										style={{marginTop:6}}
 										value={undefined}
 									/>}
+									disabled={loading}
 									header='Languages'
 									icon='language'
 									open={false}
@@ -327,6 +336,7 @@ export function Documents({
 												start // Keep start when columns changes
 											});
 										}}
+										disabled={loading}
 										options={columnOptions}
 										search
 										selection
@@ -360,6 +370,7 @@ export function Documents({
 												start: 0 // Explicitly reset to 0 when perPage changes
 											});
 										}}
+										disabled={loading}
 										options={[5,10,25,50,100].map(key => ({key, text: `${key}`, value: key}))}
 										selection
 										style={{marginTop:6}}
@@ -400,9 +411,104 @@ export function Documents({
 				</Grid.Column>
 			</Grid.Row>
 		</Grid>
-		{searchedString
-			? <Segment basic>Searched for <b>{searchedString}</b> and found {documentsRes.total} matching documents.</Segment>
-			: null}
+		{
+			searchedString
+				? <Segment basic>Searched for <b>{searchedString}</b> and found {documentsRes.total} matching documents.</Segment>
+				: null
+		}
+		{
+			selectedCollections.length || selectedDocumentTypes.length
+				? <Table basic compact className='bls-n brs-n'>
+					<Table.Body>
+						<Table.Row verticalAlign='middle'>
+							<Table.Cell collapsing><Icon name='filter'/></Table.Cell>
+							<Table.Cell>
+								{(() => {
+									const sections = [];
+									for (let i = 0; i < selectedCollections.length; i++) {
+										const collectionName = selectedCollections[i];
+										sections.push({
+											content: <Button
+												className='translucent'
+												compact
+												content={collectionName}
+												icon='database'
+												onClick={() => {
+													const newSelectedCollections = JSON.parse(JSON.stringify(selectedCollections)) as typeof selectedCollections;
+													newSelectedCollections.splice(newSelectedCollections.indexOf(collectionName), 1);
+													setSelectedCollections(newSelectedCollections);
+													queryDocuments({
+														collectionsFilter: newSelectedCollections,
+														documentsTypesFilter: selectedDocumentTypes,
+														fragmentSize,
+														operator: operatorState,
+														perPage,
+														query,
+														selectedColumns,
+														start,
+													});
+												}}
+												size='small'/>,
+											key: `collection-${collectionName}`
+										});
+									} // for
+									for (let i = 0; i < selectedDocumentTypes.length; i++) {
+										const documentTypeName = selectedDocumentTypes[i];
+										sections.push({
+											content: <Button
+												className='translucent'
+												compact
+												content={documentTypeName}
+												icon='code file'
+												onClick={() => {
+													const newSelectedDocumentTypes = JSON.parse(JSON.stringify(selectedDocumentTypes)) as typeof selectedDocumentTypes;
+													newSelectedDocumentTypes.splice(newSelectedDocumentTypes.indexOf(documentTypeName), 1);
+													setSelectedDocumentTypes(newSelectedDocumentTypes);
+													queryDocuments({
+														collectionsFilter: selectedDocumentTypes,
+														documentsTypesFilter: newSelectedDocumentTypes,
+														fragmentSize,
+														operator: operatorState,
+														perPage,
+														query,
+														selectedColumns,
+														start,
+													});
+												}}
+												size='small'/>,
+											key: `documentType-${documentTypeName}`
+										});
+									} // for
+									return <Breadcrumb
+										icon='right angle'
+										sections={sections}
+									/>;
+								})()}
+							</Table.Cell>
+							<Table.Cell collapsing><Button
+								className='translucent'
+								compact
+								icon='close'
+								onClick={() => {
+									setSelectedCollections([]);
+									setSelectedDocumentTypes([]);
+									queryDocuments({
+										collectionsFilter: [],
+										documentsTypesFilter: [],
+										fragmentSize,
+										operator: operatorState,
+										perPage,
+										query,
+										selectedColumns,
+										start,
+									});
+								}}
+								size='small'/></Table.Cell>
+						</Table.Row>
+					</Table.Body>
+				</Table>
+				: null
+		}
 		<Table celled collapsing compact selectable singleLine striped>
 			<Table.Header>
 				<Table.Row>
