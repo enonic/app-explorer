@@ -5,12 +5,13 @@ import {
 	getIn,
 	isString,
 } from '@enonic/js-utils';
+import {DndProvider} from 'react-dnd';
+import {HTML5Backend} from 'react-dnd-html5-backend'
 import ReactHtmlParser from 'react-html-parser';
 import {Slider} from 'react-semantic-ui-range';
 import {
 	Breadcrumb,
 	Button,
-	Divider,
 	Dropdown,
 	Form,
 	Grid,
@@ -25,6 +26,7 @@ import {
 } from 'semantic-ui-react';
 import {TypedReactJson} from '../search/TypedReactJson';
 import {HoverPopup} from '../components/HoverPopup';
+import DragAndDropableHeaderCell from './DragAndDropableHeaderCell';
 import {
 	COLUMN_NAME_COLLECTION,
 	COLUMN_NAME_DOCUMENT_TYPE,
@@ -111,6 +113,7 @@ export function Documents({
 		doing, // setDoing,
 		durationSinceLastUpdate, // setDurationSinceLastUpdate,
 		fragmentSize, setFragmentSize,
+		handleDroppedColumn,
 		handlePaginationChange,
 		jsonModalState, setJsonModalState,
 		loading, // setLoading,
@@ -122,7 +125,7 @@ export function Documents({
 		queryDocuments,
 		searchedString, // setSearchedString,
 		selectedCollections, setSelectedCollections,
-		selectedColumns, persistSelectedColumns,
+		selectedColumnsState, persistSelectedColumns,
 		selectedDocumentTypes, setSelectedDocumentTypes,
 		start, setStart,
 	} = useDocumentsState({
@@ -156,7 +159,7 @@ export function Documents({
 											query,
 											operator: operatorState,
 											perPage,
-											selectedColumns,
+											selectedColumns: selectedColumnsState,
 											start: 0 // Explicitly reset to 0 when query changes
 										});
 									}
@@ -190,7 +193,7 @@ export function Documents({
 															query,
 															operator: newOperator,
 															perPage,
-															selectedColumns,
+															selectedColumns: selectedColumnsState,
 															start: 0 // Explicitly reset to 0 when operator changes
 														});
 													}}
@@ -208,6 +211,7 @@ export function Documents({
 										<Table.Row verticalAlign='middle'>
 											<Table.Cell style={{width:103}}>
 												<Slider
+													color='blue'
 													disabled={loading}
 													inverted
 													settings={{
@@ -244,7 +248,7 @@ export function Documents({
 												operator: operatorState,
 												perPage,
 												query,
-												selectedColumns,
+												selectedColumns: selectedColumnsState,
 												start: 0 // Explicitly reset to 0 when collections changes
 											});
 										}}
@@ -278,7 +282,7 @@ export function Documents({
 												operator: operatorState,
 												perPage,
 												query,
-												selectedColumns,
+												selectedColumns: selectedColumnsState,
 												start: 0 // Explicitly reset to 0 when documentTypes changes
 											});
 										}}
@@ -341,7 +345,7 @@ export function Documents({
 										search
 										selection
 										style={{marginTop:6}}
-										value={selectedColumns}
+										value={selectedColumnsState}
 									/>}
 									header='Columns'
 									icon='columns'
@@ -366,7 +370,7 @@ export function Documents({
 												operator: operatorState,
 												perPage: newPerPage,
 												query,
-												selectedColumns,
+												selectedColumns: selectedColumnsState,
 												start: 0 // Explicitly reset to 0 when perPage changes
 											});
 										}}
@@ -399,7 +403,7 @@ export function Documents({
 								operator: operatorState,
 								perPage,
 								query,
-								selectedColumns,
+								selectedColumns: selectedColumnsState,
 								start,
 							});
 						}}>{doing
@@ -444,7 +448,7 @@ export function Documents({
 														operator: operatorState,
 														perPage,
 														query,
-														selectedColumns,
+														selectedColumns: selectedColumnsState,
 														start,
 													});
 												}}
@@ -471,7 +475,7 @@ export function Documents({
 														operator: operatorState,
 														perPage,
 														query,
-														selectedColumns,
+														selectedColumns: selectedColumnsState,
 														start,
 													});
 												}}
@@ -499,7 +503,7 @@ export function Documents({
 										operator: operatorState,
 										perPage,
 										query,
-										selectedColumns,
+										selectedColumns: selectedColumnsState,
 										start,
 									});
 								}}
@@ -509,95 +513,120 @@ export function Documents({
 				</Table>
 				: null
 		}
-		<Table celled collapsing compact selectable singleLine striped>
-			<Table.Header>
-				<Table.Row>
-					{selectedColumns.map((columnName, i) => <Table.HeaderCell collapsing content={columnName} key={i}/>)}
-					{/*columnOptions
-						.filter(({value}) => selectedColumns.includes(value as string))
-						.map(({text},i) => <Table.HeaderCell collapsing content={text} key={i}/>)*/}
-					{searchedString ? <Table.HeaderCell collapsing content='_allText'/> : null}
-				</Table.Row>
-			</Table.Header>
-			<Table.Body>
-				{documentsRes.hits.map(({
-					_highlight = {},
-					_id,
-					// _json,
-					parsedJson,
-					...rest
-				}, i) => {
-					return <Table.Row key={i}>
-						{selectedColumns.includes(COLUMN_NAME_COLLECTION)
-							? <Table.Cell collapsing>
-								{rest[FIELD_PATH_META].collection}
-							</Table.Cell>
-							: null
-						}
-						{selectedColumns.includes(COLUMN_NAME_DOCUMENT_TYPE)
-							? <Table.Cell collapsing>
-								{rest[FIELD_PATH_META].documentType}
-							</Table.Cell>
-							: null
-						}
-						{selectedColumns.includes(COLUMN_NAME_LANGUAGE)
-							? <Table.Cell collapsing>
-								{rest[FIELD_PATH_META].language}
-							</Table.Cell>
-							: null
-						}
-						{selectedColumns.includes(COLUMN_NAME_ID)
-							? <Table.Cell collapsing>{_id}</Table.Cell>
-							: null
-						}
-						{selectedColumns.includes(COLUMN_NAME_JSON)
-							? <Table.Cell collapsing>
-								<Button
-									icon='code'
-									onClick={() => {
-										setJsonModalState({
-											open: true,
-											id: _id,
-											parsedJson: parsedJson,
-										})
-									}}
-								/>
-							</Table.Cell>
-							: null
-						}
-						{
-							selectedColumns.map((selectedColumnName, j) => {
-								if (!SELECTED_COLUMNS_DEFAULT.includes(selectedColumnName)) {
-									const htmlString = getHighlightedHtml({
-										_highlight,
-										fallback: getIn(parsedJson, selectedColumnName),
-										fieldPath: selectedColumnName,
-										fragmentSize,
-									});
-									// console.debug('htmlString', htmlString);
-									return <Table.Cell
-										collapsing
-										key={`${i}.${j}`}
-									>{ReactHtmlParser(htmlString)}</Table.Cell>;
-								}
-							}).filter(x=>x)
-						}
-						{searchedString ? <Table.Cell collapsing>
-							{_highlight['_alltext'] && _highlight['_alltext'].length
-								? <ul style={{
-									listStyleType: 'none',
-									margin: 0,
-									padding: 0
-								}}>
-									{_highlight['_alltext'].map((htmlString, j) => <li key={j}>
-										{ReactHtmlParser(htmlString)}
-									</li>)}
-								</ul>
-								: null}
-						</Table.Cell> : null}
-					</Table.Row>})}
-			</Table.Body>
-		</Table>
+		<DndProvider backend={HTML5Backend}>
+			<Table celled collapsing compact selectable singleLine striped>
+				<Table.Header>
+					<Table.Row>
+						{selectedColumnsState.map((columnName, i) => <DragAndDropableHeaderCell
+							collapsing
+							content={
+								columnName === COLUMN_NAME_COLLECTION
+									? 'Collection'
+									: columnName === COLUMN_NAME_DOCUMENT_TYPE
+										? 'Document type'
+										: columnName === COLUMN_NAME_LANGUAGE
+											? 'Language'
+											: columnName === COLUMN_NAME_ID
+												? 'Document ID'
+												: columnName === COLUMN_NAME_JSON
+													? 'Document'
+													: columnName
+							}
+							key={i}
+							onDrop={({
+								fromIndex,
+								toIndex
+							}) => handleDroppedColumn({
+								fromIndex,
+								selectedColumns: selectedColumnsState,
+								toIndex
+							})}
+							index={i}
+						/>)}
+						{/*columnOptions
+							.filter(({value}) => selectedColumns.includes(value as string))
+							.map(({text},i) => <Table.HeaderCell collapsing content={text} key={i}/>)*/}
+						{searchedString ? <Table.HeaderCell collapsing content='_allText'/> : null}
+					</Table.Row>
+				</Table.Header>
+				<Table.Body>
+					{documentsRes.hits.map(({
+						_highlight = {},
+						_id,
+						// _json,
+						parsedJson,
+						...rest
+					}, i) => {
+						return <Table.Row key={i}>
+							{
+								selectedColumnsState.map((selectedColumnName, j) => {
+									const key = `${i}.${j}`;
+									if (selectedColumnName === COLUMN_NAME_COLLECTION) {
+										return <Table.Cell collapsing key={key}>
+											{rest[FIELD_PATH_META].collection}
+										</Table.Cell>;
+									} else if (selectedColumnName === COLUMN_NAME_DOCUMENT_TYPE) {
+										return <Table.Cell collapsing key={key}>
+											{rest[FIELD_PATH_META].documentType}
+										</Table.Cell>;
+									} else if (selectedColumnName === COLUMN_NAME_LANGUAGE) {
+										return <Table.Cell collapsing key={key}>
+											{rest[FIELD_PATH_META].language}
+										</Table.Cell>;
+									} else if (selectedColumnName === COLUMN_NAME_ID) {
+										return <Table.Cell collapsing key={key}>{_id}</Table.Cell>;
+									} else if (selectedColumnName === COLUMN_NAME_JSON) {
+										return <Table.Cell collapsing key={key}>
+											<Button
+												icon='code'
+												onClick={() => {
+													setJsonModalState({
+														open: true,
+														id: _id,
+														parsedJson: parsedJson,
+													})
+												}}
+											/>
+										</Table.Cell>;
+									} else if (!SELECTED_COLUMNS_DEFAULT.includes(selectedColumnName)) {
+										const htmlString = getHighlightedHtml({
+											_highlight,
+											fallback: getIn(parsedJson, selectedColumnName),
+											fieldPath: selectedColumnName,
+											fragmentSize,
+										});
+										// console.debug('htmlString', htmlString);
+										return <Table.Cell
+											collapsing
+											key={key}
+										>{ReactHtmlParser(htmlString)}</Table.Cell>;
+									} else {
+										console.error('Unhandeled selectedColumnName', selectedColumnName);
+										return <Table.Cell
+											collapsing
+											key={key}
+										/>;
+									}
+								})
+								// .filter(x => x) // Overcome error, not needed and can cause scewed index between headerCell and cell
+							}
+							{searchedString ? <Table.Cell collapsing>
+								{_highlight['_alltext'] && _highlight['_alltext'].length
+									? <ul style={{
+										listStyleType: 'none',
+										margin: 0,
+										padding: 0
+									}}>
+										{_highlight['_alltext'].map((htmlString, j) => <li key={j}>
+											{ReactHtmlParser(htmlString)}
+										</li>)}
+									</ul>
+									: null}
+							</Table.Cell> : null}
+						</Table.Row>})}
+				</Table.Body>
+			</Table>
+		</DndProvider>
 		<Pagination
 			disabled={loading || !documentsRes.total}
 			pointing
