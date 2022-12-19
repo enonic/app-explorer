@@ -27,7 +27,6 @@ export function HoverPopup ({
 		trigger={<Button
 			basic={!open}
 			circular
-			color='black'
 			icon={icon}
 			size='medium'
 		/>}
