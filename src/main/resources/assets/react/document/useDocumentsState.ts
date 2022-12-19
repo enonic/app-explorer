@@ -144,7 +144,7 @@ export function useDocumentsState({
 			? [urlSearchParams.get('collection')]
 			: []
 	);
-	const [selectedColumns, setSelectedColumns] = React.useState(SELECTED_COLUMNS_DEFAULT);
+	const [selectedColumnsState, setSelectedColumnsState] = React.useState([]/*SELECTED_COLUMNS_DEFAULT*/); // Empty until loaded from profile
 	const [selectedDocumentTypes, setSelectedDocumentTypes] = React.useState<string[]>(
 		urlSearchParams.get('documentType')
 			? [urlSearchParams.get('documentType')]
@@ -558,12 +558,12 @@ export function useDocumentsState({
 						// console.log('object', object);
 						const {
 							documents: {
-								columns = SELECTED_COLUMNS_DEFAULT
+								columns = SELECTED_COLUMNS_DEFAULT // When there is no profile, use defaults
 							} = {}
 						} = object.data.getProfile || {};
 						// console.log('columns', columns);
 						const newSelectedColumns = forceArray(columns);
-						setSelectedColumns(newSelectedColumns);
+						setSelectedColumnsState(JSON.parse(JSON.stringify(newSelectedColumns))); // NOTE: dereffing: trying to make it work with dragNdrop columns
 						queryDocuments({
 							collectionsFilter: selectedCollections,
 							documentsTypesFilter: selectedDocumentTypes,
@@ -608,7 +608,7 @@ export function useDocumentsState({
 			operator: operatorState,
 			perPage,
 			query,
-			selectedColumns,
+			selectedColumns: selectedColumnsState,
 			start: newStart
 		});
 	}, [ // The callback is not executed when it's deps changes. Only the reference to the callback is updated.
@@ -618,7 +618,7 @@ export function useDocumentsState({
 		query,
 		queryDocuments,
 		selectedCollections,
-		selectedColumns,
+		selectedColumnsState,
 		selectedDocumentTypes,
 		start
 	]);
@@ -626,6 +626,7 @@ export function useDocumentsState({
 	const persistSelectedColumns = React.useCallback((newSelectedColumns: string[]) => {
 		DEBUG_DEPENDENCIES && console.debug('persistSelectedColumns callback called');
 		setDoing('Persisting selected columns...');
+		setSelectedColumnsState(JSON.parse(JSON.stringify(newSelectedColumns)));
 		setLoading(true);
 		fetch(`${servicesBaseUrl}/graphQL`, {
 			method: 'POST',
@@ -655,18 +656,45 @@ export function useDocumentsState({
 					columns: string[]
 				}
 			}>)
-			.then(json => {
+			.then((/*json*/) => {
 				// console.log('json', json);
-				const {
-					columns = SELECTED_COLUMNS_DEFAULT
-				} = json.data.modifyProfile;
-				// console.log('columns', columns);
-				setSelectedColumns(forceArray(columns));
+				// const {
+				// 	columns = SELECTED_COLUMNS_DEFAULT // This will reset to default when all columns are removed
+				// } = json.data.modifyProfile;
+				// const returnedSelectedColumns = forceArray(columns);
+				// console.log('returnedSelectedColumns', returnedSelectedColumns);
+				// // ERROR: For some reason this does play with the dragNdrop columns
+				// setSelectedColumnsState(
+				// 	JSON.parse(JSON.stringify(returnedSelectedColumns)) // Let's see if dereffing will fix it!
+				// );
 				setDoing('');
 				setLoading(false);
 			});
 	}, [ // The callback is not executed when it's deps changes. Only the reference to the callback is updated.
-		servicesBaseUrl
+		servicesBaseUrl,
+	]);
+
+	const handleDroppedColumn = React.useCallback(({
+		fromIndex,
+		selectedColumns,
+		toIndex
+	}: {
+		fromIndex: number
+		selectedColumns: string[],
+		toIndex: number
+	}) => {
+		DEBUG_DEPENDENCIES && console.debug('handleDroppedColumn fromIndex', fromIndex, 'toIndex', toIndex, 'selectedColumns', selectedColumns);
+		console.debug('fromIndex', fromIndex, 'toIndex', toIndex, 'selectedColumns', selectedColumns);
+		const newSelectedColumns = JSON.parse(JSON.stringify(selectedColumns)) as typeof selectedColumns; // deref was a bad idea?
+		const element = newSelectedColumns[fromIndex];
+		console.debug('newSelectedColumns before', newSelectedColumns, 'element', element);
+		newSelectedColumns.splice(fromIndex, 1); // Remove 1 element from array
+		console.debug('newSelectedColumns underway', newSelectedColumns);
+		newSelectedColumns.splice(toIndex, 0, element); // Insert element at new position
+		console.debug('newSelectedColumns after', newSelectedColumns);
+		persistSelectedColumns(newSelectedColumns);
+	}, [
+		persistSelectedColumns
 	]);
 
 	//──────────────────────────────────────────────────────────────────────────
@@ -698,7 +726,7 @@ export function useDocumentsState({
 			operator: operatorState,
 			perPage,
 			query,
-			selectedColumns,
+			selectedColumns: selectedColumnsState,
 			start // Keep start when fragmentSize changes
 		});
 	}, [
@@ -733,6 +761,7 @@ export function useDocumentsState({
 		doing, // setDoing,
 		durationSinceLastUpdate, // setDurationSinceLastUpdate,
 		fragmentSize, setFragmentSize,
+		handleDroppedColumn,
 		handlePaginationChange,
 		jsonModalState, setJsonModalState,
 		loading, // setLoading,
@@ -744,7 +773,7 @@ export function useDocumentsState({
 		queryDocuments,
 		searchedString, // setSearchedString,
 		selectedCollections, setSelectedCollections,
-		selectedColumns, persistSelectedColumns,
+		selectedColumnsState, persistSelectedColumns,
 		selectedDocumentTypes, setSelectedDocumentTypes,
 		start, setStart,
 	};
