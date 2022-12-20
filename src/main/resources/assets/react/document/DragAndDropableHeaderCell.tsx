@@ -5,7 +5,7 @@ import type {
 
 
 interface Item {
-	id: number
+	id: string
 }
 
 
@@ -36,13 +36,14 @@ function Overlay({color}: {color: string}) {
 
 export default function DragAndDropableHeaderCell(
 	props: StrictTableHeaderCellProps & {
+		id: string
 		index: number
 		onDrop: ({
-			fromIndex,
-			toIndex
+			fromId,
+			toId
 		}: {
-			fromIndex: number
-			toIndex: number
+			fromId: string
+			toId: string
 		}) => void
 		style?: React.CSSProperties // "missing" from StrictTableHeaderCellProps
 	}
@@ -50,7 +51,7 @@ export default function DragAndDropableHeaderCell(
 	const {
 		children,
 		content,
-		index,
+		id: idProp,
 		onDrop = () => {/* default no-op dummy just in case */},
 		style = {},
 		...tableHeaderCellPropsExceptChildrenOrContentOrStyle
@@ -61,20 +62,22 @@ export default function DragAndDropableHeaderCell(
 	}>(() => ({
 		type: 'HeaderCell',
 		// canDrag: (monitor)=> {
-		// 	console.debug('on canDrag monitor', monitor, 'index', index);
+		// 	console.debug('on canDrag monitor', monitor);
 		// 	return true;
 		// },
 		collect: monitor => ({
 			isDragging: !!monitor.isDragging(),
 		}),
 		// end: (item, monitor) => {
-		// 	console.debug('on drag end item', item, 'monitor', monitor, 'index', index);
+		// 	console.debug('on drag end item', item, 'monitor', monitor);
 		// },
 		// isDragging: (monitor) => {
-		// 	console.debug('on isDragging monitor', monitor, 'index', index);
+		// 	console.debug('on isDragging monitor', monitor);
 		// 	return true;
 		// },
-		item: { id: index },
+		item: {
+			id: idProp,
+		},
 		// options: {
 		// 	dropEffect: 'copy',
 		// 	// dropEffect: 'move',
@@ -86,7 +89,13 @@ export default function DragAndDropableHeaderCell(
 		// 	offsetX: 0,
 		// 	offsetY: 0,
 		// },
-	}));
+	}),
+	// A dependency array used for memoization.
+	// This behaves like the built-in useMemoReact hook.
+	// The default value is an empty array for function spec,
+	// and an array containing the spec for an object spec.
+	// []
+	);
 	// console.debug('dragProps', dragProps);
 	const { isDragging } = dragProps;
 
@@ -97,17 +106,22 @@ export default function DragAndDropableHeaderCell(
 		() => ({
 			accept: 'HeaderCell',
 			canDrop: (item/*, monitor*/) => {
-				// console.debug('on canDrop item', item, 'monitor', monitor, 'index', index);
-				const {id} = item;
-				return id !== index;
+				// console.debug('on canDrop item', item, 'idProp', idProp);
+				// console.debug('on canDrop monitor', monitor);
+				const {
+					id,
+				} = item;
+				return id !== idProp;
 			},
 			drop: (item/*, monitor*/) => {
-				// console.debug('on drop item', item, 'monitor', monitor, 'index', index);
-				const {id} = item; // The dropped item
-				// index is the target index
+				// console.debug('on drop item', item, 'idProp', idProp);
+				// console.debug('on drop monitor', monitor);
+				const {
+					id,
+				} = item; // The dropped item
 				onDrop({
-					fromIndex: id,
-					toIndex: index
+					fromId: id,
+					toId: idProp
 				});
 			},
 			collect: (monitor) => ({
@@ -115,12 +129,18 @@ export default function DragAndDropableHeaderCell(
 				isOver: !!monitor.isOver(),
 			}),
 			// hover: (item, monitor) => {
-			// 	console.debug('on hover item', item, 'monitor', monitor, 'index', index);
+			// 	console.debug('on hover item', item, 'monitor', monitor);
 			// },
-			item: { id: index },
+			item: {
+				id: idProp,
+			},
 			// options: {}
 		}),
-		[index]
+		// A dependency array used for memoization.
+		// This behaves like the built-in useMemoReact hook.
+		// The default value is an empty array for function spec,
+		// and an array containing the spec for an object spec.
+		// []
 	);
 	// console.debug('dropProps', dropProps);
 	const { canDrop, isOver } = dropProps;
@@ -135,7 +155,7 @@ export default function DragAndDropableHeaderCell(
 						style={{
 							...style,
 							cursor: 'grabbing',
-							opacity: 0,
+							opacity: 0.5,
 						}}
 					>
 						{

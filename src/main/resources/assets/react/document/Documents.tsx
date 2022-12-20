@@ -26,17 +26,19 @@ import {
 } from 'semantic-ui-react';
 import {TypedReactJson} from '../search/TypedReactJson';
 import {HoverPopup} from '../components/HoverPopup';
-import DragAndDropableHeaderCell from './DragAndDropableHeaderCell';
 import {
 	COLUMN_NAME_COLLECTION,
 	COLUMN_NAME_DOCUMENT_TYPE,
 	COLUMN_NAME_LANGUAGE,
 	COLUMN_NAME_ID,
 	COLUMN_NAME_JSON,
+	SELECTED_COLUMNS_DEFAULT
+} from './constants';
+import DragAndDropableHeaderCell from './DragAndDropableHeaderCell';
+import {
 	FRAGMENT_SIZE_DEFAULT,
 	POST_TAG,
 	PRE_TAG,
-	SELECTED_COLUMNS_DEFAULT,
 	useDocumentsState
 } from './useDocumentsState';
 
@@ -125,7 +127,7 @@ export function Documents({
 		queryDocuments,
 		searchedString, // setSearchedString,
 		selectedCollections, setSelectedCollections,
-		selectedColumnsState, persistSelectedColumns,
+		selectedColumnsState, setSelectedColumnsState,
 		selectedDocumentTypes, setSelectedDocumentTypes,
 		start, setStart,
 	} = useDocumentsState({
@@ -328,7 +330,7 @@ export function Documents({
 											{value}
 										) => {
 											const newSelectedColumns = value as string[];
-											persistSelectedColumns(newSelectedColumns);
+											setSelectedColumnsState(newSelectedColumns);
 											queryDocuments({
 												collectionsFilter: selectedCollections,
 												documentsTypesFilter: selectedDocumentTypes,
@@ -532,16 +534,16 @@ export function Documents({
 													? 'Document'
 													: columnName
 							}
-							key={i}
-							onDrop={({
-								fromIndex,
-								toIndex
-							}) => handleDroppedColumn({
-								fromIndex,
-								selectedColumns: selectedColumnsState,
-								toIndex
-							})}
+							id={columnName}
 							index={i}
+							key={`column-${columnName}`}
+							onDrop={({
+								fromId,
+								toId
+							}) => handleDroppedColumn({
+								fromId,
+								toId
+							})}
 						/>)}
 						{/*columnOptions
 							.filter(({value}) => selectedColumns.includes(value as string))
