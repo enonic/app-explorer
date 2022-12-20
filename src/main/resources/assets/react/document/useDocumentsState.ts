@@ -3,12 +3,10 @@ import type {
 	DropdownItemProps,
 	PaginationProps,
 } from 'semantic-ui-react';
-import type {JSONResponse} from '../../../services/graphQL/fetchers/index.d';
 
 
 import {
 	QUERY_OPERATOR_OR,
-	forceArray,
 	// storage
 } from '@enonic/js-utils';
 import {useWhenInit} from "@seamusleahy/init-hooks";
@@ -30,6 +28,16 @@ import {
 } from '../../../services/graphQL/constants';
 import {useInterval} from '../utils/useInterval';
 import {useUpdateEffect} from '../utils/useUpdateEffect';
+import {
+	COLUMN_NAME_COLLECTION,
+	COLUMN_NAME_DOCUMENT_TYPE,
+	COLUMN_NAME_LANGUAGE,
+	COLUMN_NAME_ID,
+	COLUMN_NAME_JSON,
+	SELECTED_COLUMNS_DEFAULT
+} from './constants';
+import {getColumns} from './getColumns';
+import {persistColumns} from './persistColumns';
 
 
 // const bool = storage.query.dsl.bool;
@@ -48,23 +56,11 @@ const FIELD_PATH_META = 'document_metadata' as const; // TODO _meta ?
 const GQL_INPUT_TYPE_HIGHLIGHT = 'InputTypeHighlight';
 
 
-export const COLUMN_NAME_COLLECTION = '_collection';
-export const COLUMN_NAME_DOCUMENT_TYPE = '_documentType';
-export const COLUMN_NAME_ID = '_id';
-export const COLUMN_NAME_JSON = '_json';
-export const COLUMN_NAME_LANGUAGE = '_language';
 export const FRAGMENT_SIZE_DEFAULT = 150;
 const PER_PAGE_DEFAULT = 10;
 export const POST_TAG = '</b>';
 export const PRE_TAG = '<b class="bgc-y">';
 
-export const SELECTED_COLUMNS_DEFAULT = [
-	COLUMN_NAME_COLLECTION,
-	COLUMN_NAME_DOCUMENT_TYPE,
-	COLUMN_NAME_LANGUAGE,
-	COLUMN_NAME_ID,
-	COLUMN_NAME_JSON,
-];
 
 const OPTIONS_COLUMNS_DEFAULT: DropdownItemProps[] = [{
 	text: 'Collection',
@@ -81,7 +77,7 @@ const OPTIONS_COLUMNS_DEFAULT: DropdownItemProps[] = [{
 },{
 	text: 'JSON',
 	value: COLUMN_NAME_JSON
-}]
+}];
 
 export function useDocumentsState({
 	servicesBaseUrl
@@ -540,43 +536,22 @@ export function useDocumentsState({
 					)
 				);
 				setDoing('Getting profile...');
-				fetch(`${servicesBaseUrl}/graphQL`, {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify(gql.query({
-						operation: 'getProfile'
-					}))
-				})
-					.then(res => res.json() as JSONResponse<{
-						getProfile: {
-							documents: {
-								columns: string[]
-							}
-						}
-					}>)
-					.then(object => {
-						// console.log('object', object);
-						const {
-							documents: {
-								columns = SELECTED_COLUMNS_DEFAULT // When there is no profile, use defaults
-							} = {}
-						} = object.data.getProfile || {};
-						// console.log('columns', columns);
-						const newSelectedColumns = forceArray(columns);
-						setSelectedColumnsState(JSON.parse(JSON.stringify(newSelectedColumns))); // NOTE: dereffing: trying to make it work with dragNdrop columns
-						queryDocuments({
-							collectionsFilter: selectedCollections,
-							documentsTypesFilter: selectedDocumentTypes,
-							fragmentSize,
-							operator: operatorState,
-							perPage,
-							query,
-							selectedColumns: newSelectedColumns,
-							start, // Keep start when columns changes
-							// updateSelectedCollections: true,
-							// updateSelectedDocumentTypes: true,
-						});
+				getColumns({servicesBaseUrl}).then(columns => {
+					// console.debug('columns', columns);
+					setSelectedColumnsState(JSON.parse(JSON.stringify(columns))); // NOTE: dereffing: trying to make it work with dragNdrop columns
+					queryDocuments({
+						collectionsFilter: selectedCollections,
+						documentsTypesFilter: selectedDocumentTypes,
+						fragmentSize,
+						operator: operatorState,
+						perPage,
+						query,
+						selectedColumns: columns,
+						start, // Keep start when columns changes
+						// updateSelectedCollections: true,
+						// updateSelectedDocumentTypes: true,
 					});
+				});
 			});
 	}, [ // The callback is not executed when it's deps changes. Only the reference to the callback is updated.
 		fragmentSize,
@@ -626,76 +601,48 @@ export function useDocumentsState({
 	const persistSelectedColumns = React.useCallback((newSelectedColumns: string[]) => {
 		DEBUG_DEPENDENCIES && console.debug('persistSelectedColumns callback called');
 		setDoing('Persisting selected columns...');
-		setSelectedColumnsState(JSON.parse(JSON.stringify(newSelectedColumns)));
+		// setSelectedColumnsState(JSON.parse(JSON.stringify(newSelectedColumns)));
 		setLoading(true);
-		fetch(`${servicesBaseUrl}/graphQL`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(gql.mutation({
-				operation: 'modifyProfile',
-				variables: {
-					object: {
-						list: false,
-						required: true,
-						type: 'JSON',
-						value: {
-							columns: newSelectedColumns
-						}
-					},
-					scope: {
-						list: false,
-						required: true,
-						type: 'String',
-						value: 'documents'
-					}
-				}
-			}))
-		})
-			.then(res => res.json() as JSONResponse<{
-				modifyProfile: {
-					columns: string[]
-				}
-			}>)
-			.then((/*json*/) => {
-				// console.log('json', json);
-				// const {
-				// 	columns = SELECTED_COLUMNS_DEFAULT // This will reset to default when all columns are removed
-				// } = json.data.modifyProfile;
-				// const returnedSelectedColumns = forceArray(columns);
-				// console.log('returnedSelectedColumns', returnedSelectedColumns);
-				// // ERROR: For some reason this does play with the dragNdrop columns
-				// setSelectedColumnsState(
-				// 	JSON.parse(JSON.stringify(returnedSelectedColumns)) // Let's see if dereffing will fix it!
-				// );
-				setDoing('');
-				setLoading(false);
-			});
+		persistColumns({
+			columns: newSelectedColumns,
+			getColumns,
+			servicesBaseUrl
+		}).then((/*columns*/) => {
+			setDoing('');
+			setLoading(false);
+		});
 	}, [ // The callback is not executed when it's deps changes. Only the reference to the callback is updated.
 		servicesBaseUrl,
 	]);
 
-	const handleDroppedColumn = React.useCallback(({
-		fromIndex,
-		selectedColumns,
-		toIndex
+	function handleDroppedColumn({
+		fromId,
+		toId
 	}: {
-		fromIndex: number
-		selectedColumns: string[],
-		toIndex: number
-	}) => {
-		DEBUG_DEPENDENCIES && console.debug('handleDroppedColumn fromIndex', fromIndex, 'toIndex', toIndex, 'selectedColumns', selectedColumns);
-		console.debug('fromIndex', fromIndex, 'toIndex', toIndex, 'selectedColumns', selectedColumns);
-		const newSelectedColumns = JSON.parse(JSON.stringify(selectedColumns)) as typeof selectedColumns; // deref was a bad idea?
-		const element = newSelectedColumns[fromIndex];
-		console.debug('newSelectedColumns before', newSelectedColumns, 'element', element);
-		newSelectedColumns.splice(fromIndex, 1); // Remove 1 element from array
-		console.debug('newSelectedColumns underway', newSelectedColumns);
-		newSelectedColumns.splice(toIndex, 0, element); // Insert element at new position
-		console.debug('newSelectedColumns after', newSelectedColumns);
-		persistSelectedColumns(newSelectedColumns);
-	}, [
-		persistSelectedColumns
-	]);
+		fromId: string
+		toId: string
+	}) {
+		setSelectedColumnsState(prev => {
+			const fromIndex = prev.indexOf(fromId);
+			const toIndex = prev.indexOf(toId);
+			DEBUG_DEPENDENCIES && console.debug(
+				'handleDroppedColumn fromId', fromId,
+				'fromIndex', fromIndex,
+				'toId', toId,
+				'toIndex', toIndex,
+				'prev', prev,
+				// 'selectedColumnsState', selectedColumnsState // WARNING: For some reason this doesn't change !!!
+			);
+			const newSelectedColumns = JSON.parse(JSON.stringify(prev)) as typeof prev; // deref was a bad idea?
+			const element = newSelectedColumns[fromIndex];
+			// console.debug('newSelectedColumns before', newSelectedColumns, 'element', element);
+			newSelectedColumns.splice(fromIndex, 1); // Remove 1 element from array
+			// console.debug('newSelectedColumns underway', newSelectedColumns);
+			newSelectedColumns.splice(toIndex, 0, element); // Insert element at new position
+			// console.debug('newSelectedColumns after', newSelectedColumns);
+			return newSelectedColumns;
+		});
+	}
 
 	//──────────────────────────────────────────────────────────────────────────
 	// Init
@@ -718,7 +665,14 @@ export function useDocumentsState({
 	// Updates (changes, not init)
 	//──────────────────────────────────────────────────────────────────────────
 	useUpdateEffect(() => {
-		DEBUG_DEPENDENCIES && console.debug('deBouncedFragmentSize updateEffect trigged. deBouncedFragmentSize', deBouncedFragmentSize);
+		DEBUG_DEPENDENCIES && console.debug('updateEffect[selectedColumnsState] triggered. selectedColumnsState', selectedColumnsState);
+		persistSelectedColumns(selectedColumnsState);
+	}, [
+		selectedColumnsState
+	])
+
+	useUpdateEffect(() => {
+		DEBUG_DEPENDENCIES && console.debug('updateEffect[deBouncedFragmentSize] triggered. deBouncedFragmentSize', deBouncedFragmentSize);
 		queryDocuments({
 			collectionsFilter: selectedCollections,
 			documentsTypesFilter: selectedDocumentTypes,
@@ -732,7 +686,6 @@ export function useDocumentsState({
 	}, [
 		deBouncedFragmentSize,
 		queryDocuments,
-		// So, this used the initial perPage, maybe because queryDocuments doesn't depend on perPage?
 	]);
 
 	//──────────────────────────────────────────────────────────────────────────
@@ -773,7 +726,7 @@ export function useDocumentsState({
 		queryDocuments,
 		searchedString, // setSearchedString,
 		selectedCollections, setSelectedCollections,
-		selectedColumnsState, persistSelectedColumns,
+		selectedColumnsState, setSelectedColumnsState,
 		selectedDocumentTypes, setSelectedDocumentTypes,
 		start, setStart,
 	};
