@@ -7,7 +7,7 @@ import {
 	Routes,
 } from 'react-router-dom';
 import {
-	Container, Header, Sidebar
+	Header, Sidebar
 } from 'semantic-ui-react';
 import {ApiKeys} from './api/ApiKeys';
 import {Collections} from './collection/Collections';
@@ -64,70 +64,68 @@ export function Explorer({
 				<Sidebar.Pusher
 					id='myPusher'
 				>
-					<Container>
-						<Routes>
-							<Route path="/" element={<>
-								<Header as='h1' content='Explorer' textAlign='center'/>
-								<Search
-									fields={defaultInterfaceFields}
-									interfaceName='default'
-									searchString=''
-									servicesBaseUrl={servicesBaseUrl}
-								/>
-							</>}/>
-							{licenseValid
-								? <Route path="/api" element={<ApiKeys
-									servicesBaseUrl={servicesBaseUrl}
-								/>}/>
-								: null
-							}
-							<Route path="/collections" element={<Collections
-								collectorComponents={collectorComponents}
-								licenseValid={licenseValid}
+					<Routes>
+						<Route path="/" element={<>
+							<Header as='h1' content='Explorer' textAlign='center'/>
+							<Search
+								fields={defaultInterfaceFields}
+								interfaceName='default'
+								searchString=''
 								servicesBaseUrl={servicesBaseUrl}
-								setLicensedTo={setLicensedTo}
-								setLicenseValid={setLicenseValid}
-							/>}/>
-							<Route path="/collections/status" element={<Status
+							/>
+						</>}/>
+						{licenseValid
+							? <Route path="/api" element={<ApiKeys
 								servicesBaseUrl={servicesBaseUrl}
 							/>}/>
-							<Route path="/collections/journal" element={<Journals
-								servicesBaseUrl={servicesBaseUrl}
-							/>}/>
-							<Route path="/collections/notifications" element={<Notifications
-								servicesBaseUrl={servicesBaseUrl}
-							/>}/>
-							<Route path="/collections/schedule" element={<Schedule
-								servicesBaseUrl={servicesBaseUrl}
-							/>}/>
-							<Route path="/documents" element={<Documents
-								servicesBaseUrl={servicesBaseUrl}
-							/>}/>
-							<Route path="/documentTypes" element={<DocumentTypes
-								servicesBaseUrl={servicesBaseUrl}
-							/>}/>
-							<Route path="/stopWords" element={<StopWords
-								servicesBaseUrl={servicesBaseUrl}
-							/>}/>
-							<Route path="/synonyms" element={<Thesauri
-								licenseValid={licenseValid}
-								servicesBaseUrl={servicesBaseUrl}
-								setLicensedTo={setLicensedTo}
-								setLicenseValid={setLicenseValid}
-							/>}/>
-							<Route path="/interfaces" element={<Interfaces
-								licenseValid={licenseValid}
-								servicesBaseUrl={servicesBaseUrl}
-								setLicensedTo={setLicensedTo}
-								setLicenseValid={setLicenseValid}
-							/>}/>
-							<Route path="/about" element={<About
-								showWhichLicense={showWhichLicense}
-								setShowWhichLicense={setShowWhichLicense}
-							/>}/>
-							<Route element={<Header content="URL doesn't exist"/>}/>
-						</Routes>
-					</Container>
+							: null
+						}
+						<Route path="/collections" element={<Collections
+							collectorComponents={collectorComponents}
+							licenseValid={licenseValid}
+							servicesBaseUrl={servicesBaseUrl}
+							setLicensedTo={setLicensedTo}
+							setLicenseValid={setLicenseValid}
+						/>}/>
+						<Route path="/collections/status" element={<Status
+							servicesBaseUrl={servicesBaseUrl}
+						/>}/>
+						<Route path="/collections/journal" element={<Journals
+							servicesBaseUrl={servicesBaseUrl}
+						/>}/>
+						<Route path="/collections/notifications" element={<Notifications
+							servicesBaseUrl={servicesBaseUrl}
+						/>}/>
+						<Route path="/collections/schedule" element={<Schedule
+							servicesBaseUrl={servicesBaseUrl}
+						/>}/>
+						<Route path="/documents" element={<Documents
+							servicesBaseUrl={servicesBaseUrl}
+						/>}/>
+						<Route path="/documentTypes" element={<DocumentTypes
+							servicesBaseUrl={servicesBaseUrl}
+						/>}/>
+						<Route path="/stopWords" element={<StopWords
+							servicesBaseUrl={servicesBaseUrl}
+						/>}/>
+						<Route path="/synonyms" element={<Thesauri
+							licenseValid={licenseValid}
+							servicesBaseUrl={servicesBaseUrl}
+							setLicensedTo={setLicensedTo}
+							setLicenseValid={setLicenseValid}
+						/>}/>
+						<Route path="/interfaces" element={<Interfaces
+							licenseValid={licenseValid}
+							servicesBaseUrl={servicesBaseUrl}
+							setLicensedTo={setLicensedTo}
+							setLicenseValid={setLicenseValid}
+						/>}/>
+						<Route path="/about" element={<About
+							showWhichLicense={showWhichLicense}
+							setShowWhichLicense={setShowWhichLicense}
+						/>}/>
+						<Route element={<Header content="URL doesn't exist"/>}/>
+					</Routes>
 				</Sidebar.Pusher>
 			</Router>
 		</Sidebar.Pushable>

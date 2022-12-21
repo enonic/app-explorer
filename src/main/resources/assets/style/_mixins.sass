@@ -1,0 +1,54 @@
+@import './_variables.sass'
+
+// @mixin max-width($width)
+// 	@media only screen and (max-width: $width)
+// 		@content
+
+@mixin mobileDown
+	@media only screen and (max-width: $largestMobileScreen)
+		@content
+
+@mixin tabletUp
+	@media only screen and (min-width: $tabletBreakpoint)
+		@content
+
+@mixin widescreenUp
+	@media only screen and (min-width: $widescreenMonitorBreakpoint)
+		@content
+
+//──────────────────────────────────────────────────────────────────────────────
+// These are all the @media I could find in Semantic-UI
+//──────────────────────────────────────────────────────────────────────────────
+
+// Tablet (or wider)
+// @media only screen and (min-width: $tabletBreakpoint)
+
+// Computer (or wider)
+// @media only screen and (min-width: $computerBreakpoint)
+
+// Large monitor (or wider)
+// @media only screen and (min-width: $largeMonitorBreakpoint)
+
+// Widescreen (or wider)
+// @media only screen and (min-width: $widescreenMonitorBreakpoint)
+
+// Mobile only
+// @media only screen and (min-width: $mobileBreakpoint) and (max-width: $largestMobileScreen)
+
+// Tablet only
+// @media only screen and (min-width: $tabletBreakpoint) and (max-width: $largestTabletScreen)
+
+// Small monitor only
+// @media only screen and (min-width: $computerBreakpoint) and (max-width: $largestSmallMonitor)
+
+// Large monitor only
+// @media only screen and (min-width: $largeMonitorBreakpoint) and (max-width: $largestLargeMonitor)
+
+// Mobile (or thinner)
+// @media only screen and (max-width: $largestMobileScreen)
+
+// Tablet (or thinner)
+// @media only screen and (max-width: $largestTabletScreen)
+
+// Special
+// @media all and (-ms-high-contrast: none)
