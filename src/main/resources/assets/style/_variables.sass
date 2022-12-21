@@ -1,2 +1,44 @@
+// Most of these are copied directly from Semantic-UI (written in less)
+//──────────────────────────────────────────────────────────────────────────────
+// Global
+//──────────────────────────────────────────────────────────────────────────────
+$emSize: 13px
+//$relative8px: unit( (8 / $emSize), em)
+$relative8px: 0.78571429em // Hardcode as internet is down :(
+$inputVerticalPadding: $relative8px
+
+$scrollbarWidth: 17px
+
+//──────────────────────────────────────────────────────────────────────────────
+// Breakpoints (Semantic-UI/src/themes/default/globals/site.variables)
+//──────────────────────────────────────────────────────────────────────────────
+$mobileBreakpoint            : 320px
+$tabletBreakpoint            : 768px
+$computerBreakpoint          : 992px
+$largeMonitorBreakpoint      : 1200px
+$widescreenMonitorBreakpoint : 1920px
+
+$largestMobileScreen : $tabletBreakpoint - 1px
+$largestTabletScreen : $computerBreakpoint - 1px
+$largestSmallMonitor : $largeMonitorBreakpoint - 1px
+$largestLargeMonitor : $widescreenMonitorBreakpoint - 1px
+
+//──────────────────────────────────────────────────────────────────────────────
+// Button
+//──────────────────────────────────────────────────────────────────────────────
+$buttonVerticalPadding: $inputVerticalPadding
+$buttonHorizontalPadding: 1.5em
+
+//──────────────────────────────────────────────────────────────────────────────
+// Container
+//──────────────────────────────────────────────────────────────────────────────
+// $mobileGutter: 1em
+$widescreenMonitorMinimumGutter: ($emSize  * 2)
+$widescreenMonitorWidth: $widescreenMonitorBreakpoint - ($widescreenMonitorMinimumGutter * 2) - $scrollbarWidth
+// $widescreenMonitorGutter: auto
+
+//──────────────────────────────────────────────────────────────────────────────
+// Explorer
+//──────────────────────────────────────────────────────────────────────────────
 $top-bar-height: 44px
 $padding-vertical-default: 14px

@@ -1,0 +1,27 @@
+@import '../_variables.sass'
+
+.d-f
+	display: flex
+
+.jc-c
+	justify-content: center
+
+.jc-sb
+	justify-content: space-between
+
+.ovx-o
+	overflow-x: overlay
+
+.ovy-v
+	overflow-y: visible
+
+.w-ma-fullExceptGutters
+	max-width: calc(100% - $emSize - $emSize)
+
+@include mobileDown
+	.w-fullExceptGutters-mobileDown
+		width: calc(100% - $emSize - $emSize)
+
+@include tabletUp
+	.w-mi-tabletExceptGutters-tabletUp
+		min-width: $tabletBreakpoint - $emSize - $emSize

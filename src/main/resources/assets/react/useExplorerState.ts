@@ -43,7 +43,7 @@ export function useExplorerState({
 	const [menuIconName, setMenuIconName] = React.useState<SemanticICONS>('close');
 	const [defaultInterfaceFields, setDefaultInterfaceFields] = React.useState<Array<InterfaceField>>([]);
 	//const [pusherStyle, setPusherStyle] = React.useState(PUSHER_STYLE_SIDEBAR_SHOW);
-	const [sideBarVisible, setSideBarVisible] = React.useState(true);
+	const [sideBarVisible, setSideBarVisible] = React.useState(false); // DEBUG
 	const [showWhichLicense, setShowWhichLicense] = React.useState<License>();
 
 	//const [websocket, setWebsocket] = React.useState(null);
