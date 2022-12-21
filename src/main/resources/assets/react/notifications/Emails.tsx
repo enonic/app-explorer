@@ -28,7 +28,7 @@ export function Emails({
 		</Form.Field>;
 	}
 
-	return <Table celled collapsing compact selectable singleLine sortable striped>
+	return <Table celled compact selectable singleLine sortable striped>
 		<Table.Header>
 			<Table.Row>
 				<Table.HeaderCell>Email</Table.HeaderCell>

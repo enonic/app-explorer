@@ -1,3 +1,5 @@
+@import '../_mixins.sass'
+
 .ui.table
 	&,
 	&.basic
@@ -5,3 +7,18 @@
 			border-left-style: none
 		&.brs-n
 			border-right-style: none
+
+// Semantic-UI default styling
+//
+// .ui.table // 0.2.0
+//   width: 100%
+//
+// .ui.table.collapsing // 0.3.0
+//     width: auto
+
+// Media queries doesn't affect specificity.
+// When specificity is equal the latest rule will win.
+// 0.4.0
+.ui.table.collapsing.explorer-responsive
+	@include mobileDown
+		width: 100%

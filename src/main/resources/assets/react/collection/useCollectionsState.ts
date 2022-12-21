@@ -15,6 +15,7 @@ import {COLON_SIGN} from '@enonic/js-utils';
 import moment from 'moment';
 import * as React from 'react';
 import {useInterval} from '../utils/useInterval';
+import {useUpdateEffect} from '../utils/useUpdateEffect';
 
 
 const COLLECTIONS_GQL = `queryCollections(
@@ -179,6 +180,7 @@ export function useCollectionsState({
 		hits: [],
 		total: 0
 	});
+	const [collectorIdToDisplayName, setCollectorIdToDisplayName] = React.useState({});
 	const [queryFieldsGraph, setQueryFieldsGraph] = React.useState({
 		count: 0,
 		hits: [],
@@ -440,10 +442,30 @@ export function useCollectionsState({
 		shemaIdToName[_id] = _name;
 	});
 
+	//──────────────────────────────────────────────────────────────────────────
+	// Update effects (changes not init)
+	//──────────────────────────────────────────────────────────────────────────
+	useUpdateEffect(() => {
+		const {hits} = queryCollectorsGraph;
+		const newCollectors = {};
+		for (let i = 0; i < hits.length; i++) {
+			const {
+				appName,
+				displayName,
+				taskName
+			} = hits[i];
+			newCollectors[`${appName}:${taskName}`] = displayName;
+		}
+		setCollectorIdToDisplayName(newCollectors);
+	}, [
+		queryCollectorsGraph
+	])
+
 	return {
 		anyReindexTaskWithoutCollectionId,
 		anyTaskWithoutCollectionName,
 		collectionsTaskState,
+		collectorIdToDisplayName, // setCollectorIdToDisplayName,
 		collectorOptions,
 		column,
 		contentTypeOptions,
