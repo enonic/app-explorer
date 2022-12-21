@@ -14,7 +14,7 @@ import moment from 'moment';
 import prettyMs from 'pretty-ms';
 import * as React from 'react';
 import {Dropdown, Form, Header, Table} from 'semantic-ui-react';
-
+import Flex from './components/Flex';
 import {useInterval} from './utils/useInterval';
 
 
@@ -241,172 +241,184 @@ export function Status (props :{
 		});
 	}; // sortGen
 
-	return <>
-		<Header as='h1' content='Status'/>
-		<Table celled compact selectable sortable striped>
-			<Table.Header>
-				<Table.Row>
-					<Table.HeaderCell
-						onClick={sortGen('collection')}
-						sorted={column === 'collection' ? direction : null}
-					>Collection</Table.HeaderCell>
+	return <Flex
+		justifyContent='center'>
+		<Flex.Item
+			className='w-ma-fullExceptGutters w-fullExceptGutters-mobileDown'
+			overflowX='overlay'
+		>
+			<Header as='h1' content='Status'/>
+			<Table
+				celled
+				compact
+				selectable
+				sortable
+				striped
+			>
+				<Table.Header>
+					<Table.Row>
+						<Table.HeaderCell
+							onClick={sortGen('collection')}
+							sorted={column === 'collection' ? direction : null}
+						>Collection</Table.HeaderCell>
 
-					<Table.HeaderCell
-						onClick={sortGen('state')}
-						sorted={column === 'state' ? direction : null}
-					>State</Table.HeaderCell>
+						<Table.HeaderCell
+							onClick={sortGen('state')}
+							sorted={column === 'state' ? direction : null}
+						>State</Table.HeaderCell>
 
-					<Table.HeaderCell
-						onClick={sortGen('current')}
-						sorted={column === 'current' ? direction : null}
-					>Current</Table.HeaderCell>
+						<Table.HeaderCell
+							onClick={sortGen('current')}
+							sorted={column === 'current' ? direction : null}
+						>Current</Table.HeaderCell>
 
-					<Table.HeaderCell
-						onClick={sortGen('remainingCount')}
-						sorted={column === 'remainingCount' ? direction : null}
-					>Remaining</Table.HeaderCell>
+						<Table.HeaderCell
+							onClick={sortGen('remainingCount')}
+							sorted={column === 'remainingCount' ? direction : null}
+						>Remaining</Table.HeaderCell>
 
-					<Table.HeaderCell
-						onClick={sortGen('total')}
-						sorted={column === 'total' ? direction : null}
-					>Total</Table.HeaderCell>
+						<Table.HeaderCell
+							onClick={sortGen('total')}
+							sorted={column === 'total' ? direction : null}
+						>Total</Table.HeaderCell>
 
-					<Table.HeaderCell
-						onClick={sortGen('percent')}
-						sorted={column === 'percent' ? direction : null}
-					>Percent</Table.HeaderCell>
+						<Table.HeaderCell
+							onClick={sortGen('percent')}
+							sorted={column === 'percent' ? direction : null}
+						>Percent</Table.HeaderCell>
 
-					<Table.HeaderCell
-						onClick={sortGen('startTime')}
-						sorted={column === 'startTime' ? direction : null}
-					>Start time</Table.HeaderCell>
+						<Table.HeaderCell
+							onClick={sortGen('startTime')}
+							sorted={column === 'startTime' ? direction : null}
+						>Start time</Table.HeaderCell>
 
-					<Table.HeaderCell
-						onClick={sortGen('durationMs')}
-						sorted={column === 'durationMs' ? direction : null}
-					>Duration</Table.HeaderCell>
+						<Table.HeaderCell
+							onClick={sortGen('durationMs')}
+							sorted={column === 'durationMs' ? direction : null}
+						>Duration</Table.HeaderCell>
 
-					<Table.HeaderCell
-						onClick={sortGen('averageMs')}
-						sorted={column === 'averageMs' ? direction : null}
-					>Average</Table.HeaderCell>
+						<Table.HeaderCell
+							onClick={sortGen('averageMs')}
+							sorted={column === 'averageMs' ? direction : null}
+						>Average</Table.HeaderCell>
 
-					<Table.HeaderCell
-						onClick={sortGen('remainingMs')}
-						sorted={column === 'remainingMs' ? direction : null}
-					>Time left</Table.HeaderCell>
+						<Table.HeaderCell
+							onClick={sortGen('remainingMs')}
+							sorted={column === 'remainingMs' ? direction : null}
+						>Time left</Table.HeaderCell>
 
-					<Table.HeaderCell
-						onClick={sortGen('etaMs')}
-						sorted={column === 'etaMs' ? direction : null}
-					>Eta</Table.HeaderCell>
+						<Table.HeaderCell
+							onClick={sortGen('etaMs')}
+							sorted={column === 'etaMs' ? direction : null}
+						>Eta</Table.HeaderCell>
 
-					<Table.HeaderCell
-						onClick={sortGen('currentTime')}
-						sorted={column === 'currentTime' ? direction : null}
-					>End time</Table.HeaderCell>
-				</Table.Row>
-			</Table.Header>
-			<Table.Body>
-				{collectors.map(({
-					averageMs,
-					collection,
-					current,
-					currentTime,
-					durationMs,
-					etaMs,
-					message,
-					percent,
-					remainingCount,
-					remainingMs,
-					startTime,
-					state,
-					total
-				}, index) => {
-					moment.locale('nb'); // TODO use locale from backend?
-					return <React.Fragment key={index}>
-						<Table.Row>
-							<Table.Cell>{collection}</Table.Cell>
-							<Table.Cell>{state}</Table.Cell>
+						<Table.HeaderCell
+							onClick={sortGen('currentTime')}
+							sorted={column === 'currentTime' ? direction : null}
+						>End time</Table.HeaderCell>
+					</Table.Row>
+				</Table.Header>
+				<Table.Body>
+					{collectors.map(({
+						averageMs,
+						collection,
+						current,
+						currentTime,
+						durationMs,
+						etaMs,
+						message,
+						percent,
+						remainingCount,
+						remainingMs,
+						startTime,
+						state,
+						total
+					}, index) => {
+						moment.locale('nb'); // TODO use locale from backend?
+						return <React.Fragment key={index}>
+							<Table.Row>
+								<Table.Cell>{collection}</Table.Cell>
+								<Table.Cell>{state}</Table.Cell>
 
-							<Table.Cell>{current}</Table.Cell>
-							<Table.Cell>{remainingCount}</Table.Cell>
-							<Table.Cell>{total}</Table.Cell>
-							<Table.Cell>{percent}</Table.Cell>
+								<Table.Cell>{current}</Table.Cell>
+								<Table.Cell>{remainingCount}</Table.Cell>
+								<Table.Cell>{total}</Table.Cell>
+								<Table.Cell>{percent}</Table.Cell>
 
-							<Table.Cell>{moment(new Date(startTime)).format(FORMAT)}</Table.Cell>
-							<Table.Cell>{prettyMs(durationMs, {
-								//formatSubMilliseconds: true,
-								separateMilliseconds: true
-							})}</Table.Cell>
+								<Table.Cell>{moment(new Date(startTime)).format(FORMAT)}</Table.Cell>
+								<Table.Cell>{prettyMs(durationMs, {
+									//formatSubMilliseconds: true,
+									separateMilliseconds: true
+								})}</Table.Cell>
 
-							<Table.Cell>{prettyMs(averageMs, {
-								//formatSubMilliseconds: true,
-								separateMilliseconds: true
-							})}</Table.Cell>
-							<Table.Cell>{state === TASK_STATE_RUNNING ? prettyMs(remainingMs, {
-								//formatSubMilliseconds: true,
-								separateMilliseconds: true
-							}) : null}</Table.Cell>
-							<Table.Cell>{state === TASK_STATE_RUNNING ? moment(new Date(etaMs)).format(FORMAT) : null}</Table.Cell>
-							{/* End time */}
-							<Table.Cell>{state === TASK_STATE_RUNNING ? '' : moment(new Date(currentTime)).format(FORMAT)}</Table.Cell>
+								<Table.Cell>{prettyMs(averageMs, {
+									//formatSubMilliseconds: true,
+									separateMilliseconds: true
+								})}</Table.Cell>
+								<Table.Cell>{state === TASK_STATE_RUNNING ? prettyMs(remainingMs, {
+									//formatSubMilliseconds: true,
+									separateMilliseconds: true
+								}) : null}</Table.Cell>
+								<Table.Cell>{state === TASK_STATE_RUNNING ? moment(new Date(etaMs)).format(FORMAT) : null}</Table.Cell>
+								{/* End time */}
+								<Table.Cell>{state === TASK_STATE_RUNNING ? '' : moment(new Date(currentTime)).format(FORMAT)}</Table.Cell>
 
-							{/*<Table.Cell>{message}</Table.Cell>*/}
-						</Table.Row>
-						<Table.Row>
-							<Table.Cell colSpan='12'><div
-								className={classNames(
-									'ui',
-									'progress',
-									taskStateToProgressClassName(state)
-								)}
-								data-percent={percent}
-								data-total={total}
-								data-value={current}
-							>
-								<div className="bar" style={{
-									width: `${percent}%`
-								}}>
-									<div className="progress">{percent}%</div>
-								</div>
-								<div className="label">{message}</div>
-							</div></Table.Cell>
-						</Table.Row>
-					</React.Fragment>;})}
-			</Table.Body>
-		</Table>
-		<Form>
-			<Form.Field>Update every</Form.Field>
-			<Form.Field>
-				<Dropdown
-					fluid
-					selection
-					onChange={(
-						//@ts-ignore
-						event,
-						{value}
-					) => setDelay(value as number)}
-					options={[{
-						key: 1000,
-						text: 'second',
-						value: 1000
-					},{
-						key: 2500,
-						text: '2,5 seconds',
-						value: 2500
-					},{
-						key: 5000,
-						text: '5 seconds',
-						value: 5000
-					},{
-						key: 10000,
-						text: '10 seconds',
-						value: 10000
-					}]}
-					value={delay}
-				/>
-			</Form.Field>
-		</Form>
-	</>;
+								{/*<Table.Cell>{message}</Table.Cell>*/}
+							</Table.Row>
+							<Table.Row>
+								<Table.Cell colSpan='12'><div
+									className={classNames(
+										'ui',
+										'progress',
+										taskStateToProgressClassName(state)
+									)}
+									data-percent={percent}
+									data-total={total}
+									data-value={current}
+								>
+									<div className="bar" style={{
+										width: `${percent}%`
+									}}>
+										<div className="progress">{percent}%</div>
+									</div>
+									<div className="label">{message}</div>
+								</div></Table.Cell>
+							</Table.Row>
+						</React.Fragment>;})}
+				</Table.Body>
+			</Table>
+			<Form>
+				<Form.Field>Update every</Form.Field>
+				<Form.Field>
+					<Dropdown
+						fluid
+						selection
+						onChange={(
+							//@ts-ignore
+							event,
+							{value}
+						) => setDelay(value as number)}
+						options={[{
+							key: 1000,
+							text: 'second',
+							value: 1000
+						},{
+							key: 2500,
+							text: '2,5 seconds',
+							value: 2500
+						},{
+							key: 5000,
+							text: '5 seconds',
+							value: 5000
+						},{
+							key: 10000,
+							text: '10 seconds',
+							value: 10000
+						}]}
+						value={delay}
+					/>
+				</Form.Field>
+			</Form>
+		</Flex.Item>
+	</Flex>;
 } // function Status
