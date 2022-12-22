@@ -1,5 +1,5 @@
 log.info('Init task read into memory');
-//@ts-ignore
+// @ts-ignore
 const {currentTimeMillis} = Java.type('java.lang.System') as {
 	currentTimeMillis :() => number
 };
@@ -97,36 +97,6 @@ import {submitTask} from '/lib/xp/task';
 import {Progress} from './Progress';
 import {applicationListener} from './applicationListener';
 
-
-//@ts-ignore
-const {currentTimeMillis} = Java.type('java.lang.System') as {
-	currentTimeMillis :() => number
-};
-
-
-const FIELD_TYPE = { // TODO This should not be a system field. Remove in lib-explorer-4.0.0?
-	key: 'type',
-	_name: 'type',
-	fieldType: VALUE_TYPE_STRING,
-	indexConfig: 'minimal',
-	max: 1,
-	min: 0
-	//displayName: 'Type'
-};
-
-const URI_FRAGMENTS = [
-	'home',
-	'collections',
-	'status',
-	'journal',
-	'notifications',
-	'schedule',
-	'documentTypes',
-	'stopWords',
-	'synonyms',
-	'interfaces',
-	'about'
-];
 
 export const EVENT_INIT_COMPLETE = `${APP_EXPLORER}.init.complete`;
 
