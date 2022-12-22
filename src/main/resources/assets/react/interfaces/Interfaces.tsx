@@ -6,13 +6,13 @@ import type {
 
 import {
 	Button,
-	Grid,
 	Header,
 	Icon,
 	Radio,
 	Segment,
 	Table
 } from 'semantic-ui-react';
+import Flex from '../components/Flex';
 import {NewOrEditInterfaceModal} from './NewOrEditInterfaceModal';
 import {CopyModal} from './CopyModal';
 import {DeleteModal} from './DeleteModal';
@@ -71,162 +71,168 @@ export function Interfaces({
 	} = useInterfacesState({
 		servicesBaseUrl
 	});
-	return <>
-		<Segment basic className='page'>
-			<Grid>
-				<Grid.Column floated='left' width={3}>
-					<Table basic collapsing compact>
-						<Table.Body>
-							<Table.Row verticalAlign='middle'>
-								<Table.Cell collapsing>
-									<Radio
-										label={"Show all fields"}
-										checked={showCollections}
-										onChange={(
-											_event,
-											{checked}
-										) => {
-											// setShowCollectionCount(checked);
-											setShowCollections(checked);
-											setShowFields(checked);
-											setShowSynonyms(checked);
-											setShowStopWords(checked);
-											setShowDelete(checked);
-										}}
-										toggle
-									/>
-								</Table.Cell>
-							</Table.Row>
-						</Table.Body>
-					</Table>
-				</Grid.Column>
-				<Grid.Column floated='right' width={4}>
+	return <Flex
+		justifyContent='center'
+	>
+		<Flex.Item
+			className={[
+				'w-ma-fullExceptGutters',
+				'w-mi-tabletExceptGutters-tabletUp',
+				'w-fullExceptGutters-mobileDown',
+			].join(' ')}
+			overflowX='overlay'
+		>
+			<Flex
+				justifyContent='space-between'
+				gap
+				marginBottom
+			>
+				<Flex.Item>
+					<Segment className='button'>
+						<Radio
+							label={"Show all fields"}
+							checked={showCollections}
+							onChange={(
+								_event,
+								{checked}
+							) => {
+								// setShowCollectionCount(checked);
+								setShowCollections(checked);
+								setShowFields(checked);
+								setShowSynonyms(checked);
+								setShowStopWords(checked);
+								setShowDelete(checked);
+							}}
+							toggle
+						/>
+					</Segment>
+				</Flex.Item>
+				<Flex.Item>
 					<Button
 						basic
-						floated='right'
 						color='blue'
 						loading={isLoading}
 						onClick={memoizedUpdateInterfacesCallback}><Icon className='refresh'/>Last updated: {durationSinceLastUpdate}</Button>
-				</Grid.Column>
-			</Grid>
-		</Segment>
-		<Header
-			as='h1'
-			content='Interfaces'
-			disabled={isLoading}
-		/>
-		<Table celled collapsing compact selectable singleLine striped>
-			<Table.Header>
-				<Table.Row>
-					<Table.HeaderCell>Edit</Table.HeaderCell>
-					<Table.HeaderCell>Name</Table.HeaderCell>
-					{showCollectionCount ? <Table.HeaderCell>Collection count</Table.HeaderCell> : null}
-					{showCollections ? <Table.HeaderCell>Collection(s)</Table.HeaderCell> : null}
-					{showFields ? <Table.HeaderCell>Field(s)</Table.HeaderCell> : null}
-					{showSynonyms ? <Table.HeaderCell>Synonyms</Table.HeaderCell> : null}
-					{showStopWords ? <Table.HeaderCell>Stopwords</Table.HeaderCell> : null}
-					<Table.HeaderCell>Actions</Table.HeaderCell>
-				</Table.Row>
-			</Table.Header>
-			<Table.Body>
-				{interfaces.map((initialValues, index :number) => {
-					const {
-						_id,
-						_name,
-						collectionNames = [],
-						//documentTypesAndFields,
-						fields = [],
-						stopWords = [],
-						//stopWordIds = [],
-						thesaurusNames = []
-					} = initialValues;
-					//console.debug({_name, index});
-					return <Table.Row key={index}>
-						<Table.Cell collapsing>
-							<NewOrEditInterfaceModal
-								_id={_id}
-								_name={_name}
-								afterClose={() => memoizedUpdateInterfacesCallback()}
-								collectionOptions={collectionOptions}
-								fieldNameToValueTypesState={fieldNameToValueTypesState}
-								interfaceNamesObj={interfaceNamesObj/* Currently not allowed to edit _name anyway */}
-								licenseValid={licenseValid}
-								loading={isLoading}
-								servicesBaseUrl={servicesBaseUrl}
-								setLicensedTo={setLicensedTo}
-								setLicenseValid={setLicenseValid}
-								stopWordOptions={stopWordOptions}
-								thesauriOptions={thesauriOptions}
-								total={interfacesTotal}
-							/>
-						</Table.Cell>
-						<Table.Cell collapsing disabled={isLoading}>{_name}</Table.Cell>
-						{showCollectionCount ? <Table.Cell collapsing disabled={isLoading}>{_name === 'default' ? '∞' : collectionNames.length}</Table.Cell> : null}
-						{showCollections ? <Table.Cell collapsing disabled={isLoading}>{_name === 'default' ? '∞' : <ul style={{
-							listStyleType: 'none',
-							margin: 0,
-							padding: 0
-						}}>{collectionNames.map((c, i) => <li key={i} style={{marginBottom: 3}}>{c}</li>)}</ul>}</Table.Cell> : null}
-						{showFields ? <Table.Cell collapsing disabled={isLoading}><ul style={{
-							listStyleType: 'none',
-							margin: 0,
-							padding: 0
-						}}>{fields.map(({
-								boost,
-								//fieldId,
-								name
-							}, i) => <li key={i} style={{marginBottom: 3}}>{`${name}${(boost && boost > 1) ? `^${boost}` : ''}`}</li>)}</ul></Table.Cell> : null}
-						{showSynonyms ? <Table.Cell collapsing disabled={isLoading}><ul style={{
-							listStyleType: 'none',
-							margin: 0,
-							padding: 0
-						}}>{thesaurusNames.map((c, i) => <li key={i} style={{marginBottom: 3}}>{c}</li>)}</ul></Table.Cell> : null}
-						{showStopWords ? <Table.Cell collapsing disabled={isLoading}><ul style={{
-							listStyleType: 'none',
-							margin: 0,
-							padding: 0
-						}}>{stopWords.map((c, i) => <li key={i} style={{marginBottom: 3}}>{c}</li>)}</ul></Table.Cell> : null}
-						<Table.Cell collapsing>
-							<Button.Group>
-								<SearchModal
-									interfaceName={_name}
-									loading={isLoading}
-									fields={fields}
-									servicesBaseUrl={servicesBaseUrl}
-								/>
-								<CopyModal
-									afterClose={memoizedUpdateInterfacesCallback}
-									loading={isLoading}
-									name={_name}
-									servicesBaseUrl={servicesBaseUrl}
-								/>
-								{showDelete ? <DeleteModal
-									afterClose={memoizedUpdateInterfacesCallback}
+				</Flex.Item>
+			</Flex>
+			<Header
+				as='h1'
+				content='Interfaces'
+				disabled={isLoading}
+			/>
+			<Table celled compact singleLine striped>
+				<Table.Header>
+					<Table.Row>
+						<Table.HeaderCell>Edit</Table.HeaderCell>
+						<Table.HeaderCell>Name</Table.HeaderCell>
+						{showCollectionCount ? <Table.HeaderCell>Collection count</Table.HeaderCell> : null}
+						{showCollections ? <Table.HeaderCell>Collection(s)</Table.HeaderCell> : null}
+						{showFields ? <Table.HeaderCell>Field(s)</Table.HeaderCell> : null}
+						{showSynonyms ? <Table.HeaderCell>Synonyms</Table.HeaderCell> : null}
+						{showStopWords ? <Table.HeaderCell>Stopwords</Table.HeaderCell> : null}
+						<Table.HeaderCell>Actions</Table.HeaderCell>
+					</Table.Row>
+				</Table.Header>
+				<Table.Body>
+					{interfaces.map((initialValues, index :number) => {
+						const {
+							_id,
+							_name,
+							collectionNames = [],
+							//documentTypesAndFields,
+							fields = [],
+							stopWords = [],
+							//stopWordIds = [],
+							thesaurusNames = []
+						} = initialValues;
+						//console.debug({_name, index});
+						return <Table.Row key={index}>
+							<Table.Cell collapsing>
+								<NewOrEditInterfaceModal
 									_id={_id}
 									_name={_name}
-									disabled={_name === 'default'}
+									afterClose={() => memoizedUpdateInterfacesCallback()}
+									collectionOptions={collectionOptions}
+									fieldNameToValueTypesState={fieldNameToValueTypesState}
+									interfaceNamesObj={interfaceNamesObj/* Currently not allowed to edit _name anyway */}
+									licenseValid={licenseValid}
 									loading={isLoading}
 									servicesBaseUrl={servicesBaseUrl}
-								/> : null}
-							</Button.Group>
-						</Table.Cell>
-					</Table.Row>;
-				})}
-			</Table.Body>
-		</Table>
-		<NewOrEditInterfaceModal
-			afterClose={memoizedUpdateInterfacesCallback}
-			collectionOptions={collectionOptions}
-			fieldNameToValueTypesState={fieldNameToValueTypesState}
-			interfaceNamesObj={interfaceNamesObj}
-			licenseValid={licenseValid}
-			loading={isLoading}
-			servicesBaseUrl={servicesBaseUrl}
-			setLicensedTo={setLicensedTo}
-			setLicenseValid={setLicenseValid}
-			stopWordOptions={stopWordOptions}
-			thesauriOptions={thesauriOptions}
-			total={interfacesTotal}
-		/>
-	</>;
+									setLicensedTo={setLicensedTo}
+									setLicenseValid={setLicenseValid}
+									stopWordOptions={stopWordOptions}
+									thesauriOptions={thesauriOptions}
+									total={interfacesTotal}
+								/>
+							</Table.Cell>
+							<Table.Cell collapsing disabled={isLoading}>{_name}</Table.Cell>
+							{showCollectionCount ? <Table.Cell collapsing disabled={isLoading}>{_name === 'default' ? '∞' : collectionNames.length}</Table.Cell> : null}
+							{showCollections ? <Table.Cell collapsing disabled={isLoading}>{_name === 'default' ? '∞' : <ul style={{
+								listStyleType: 'none',
+								margin: 0,
+								padding: 0
+							}}>{collectionNames.map((c, i) => <li key={i} style={{marginBottom: 3}}>{c}</li>)}</ul>}</Table.Cell> : null}
+							{showFields ? <Table.Cell collapsing disabled={isLoading}><ul style={{
+								listStyleType: 'none',
+								margin: 0,
+								padding: 0
+							}}>{fields.map(({
+									boost,
+									//fieldId,
+									name
+								}, i) => <li key={i} style={{marginBottom: 3}}>{`${name}${(boost && boost > 1) ? `^${boost}` : ''}`}</li>)}</ul></Table.Cell> : null}
+							{showSynonyms ? <Table.Cell collapsing disabled={isLoading}><ul style={{
+								listStyleType: 'none',
+								margin: 0,
+								padding: 0
+							}}>{thesaurusNames.map((c, i) => <li key={i} style={{marginBottom: 3}}>{c}</li>)}</ul></Table.Cell> : null}
+							{showStopWords ? <Table.Cell collapsing disabled={isLoading}><ul style={{
+								listStyleType: 'none',
+								margin: 0,
+								padding: 0
+							}}>{stopWords.map((c, i) => <li key={i} style={{marginBottom: 3}}>{c}</li>)}</ul></Table.Cell> : null}
+							<Table.Cell collapsing>
+								<Button.Group>
+									<SearchModal
+										interfaceName={_name}
+										loading={isLoading}
+										fields={fields}
+										servicesBaseUrl={servicesBaseUrl}
+									/>
+									<CopyModal
+										afterClose={memoizedUpdateInterfacesCallback}
+										loading={isLoading}
+										name={_name}
+										servicesBaseUrl={servicesBaseUrl}
+									/>
+									{showDelete ? <DeleteModal
+										afterClose={memoizedUpdateInterfacesCallback}
+										_id={_id}
+										_name={_name}
+										disabled={_name === 'default'}
+										loading={isLoading}
+										servicesBaseUrl={servicesBaseUrl}
+									/> : null}
+								</Button.Group>
+							</Table.Cell>
+						</Table.Row>;
+					})}
+				</Table.Body>
+			</Table>
+			<NewOrEditInterfaceModal
+				afterClose={memoizedUpdateInterfacesCallback}
+				collectionOptions={collectionOptions}
+				fieldNameToValueTypesState={fieldNameToValueTypesState}
+				interfaceNamesObj={interfaceNamesObj}
+				licenseValid={licenseValid}
+				loading={isLoading}
+				servicesBaseUrl={servicesBaseUrl}
+				setLicensedTo={setLicensedTo}
+				setLicenseValid={setLicenseValid}
+				stopWordOptions={stopWordOptions}
+				thesauriOptions={thesauriOptions}
+				total={interfacesTotal}
+			/>
+		</Flex.Item>
+	</Flex>;
 } // function Interfaces
