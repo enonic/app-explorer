@@ -64,7 +64,7 @@ export const ApiKeys = (props :{
 				</Flex.Item>
 			</Flex>
 			<Header as='h1' disabled={isLoading}>API Keys</Header>
-			<Table celled compact selectable sortable striped>
+			<Table celled compact striped>
 				<Table.Header>
 					<Table.Row>
 						<Table.HeaderCell>Edit</Table.HeaderCell>

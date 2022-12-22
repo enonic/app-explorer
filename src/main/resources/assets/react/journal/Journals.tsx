@@ -225,7 +225,7 @@ export function Journals({
 					<Loader>Loading</Loader>
 				</Dimmer>
 				<>
-					<Table celled compact selectable sortable striped>
+					<Table celled compact sortable striped>
 						<Table.Header>
 							<Table.Row className={loading ? 'disabled' : ''}>
 								{columns.name ? <Table.HeaderCell

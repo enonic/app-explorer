@@ -14,7 +14,6 @@ import {
 	Button,
 	Dropdown,
 	Form,
-	Grid,
 	Header,
 	Icon,
 	Input,
@@ -24,8 +23,9 @@ import {
 	Segment,
 	Table,
 } from 'semantic-ui-react';
-import {TypedReactJson} from '../search/TypedReactJson';
+import Flex from '../components/Flex';
 import {HoverPopup} from '../components/HoverPopup';
+import {TypedReactJson} from '../search/TypedReactJson';
 import {
 	COLUMN_NAME_COLLECTION,
 	COLUMN_NAME_DOCUMENT_TYPE,
@@ -133,11 +133,24 @@ export function Documents({
 	} = useDocumentsState({
 		servicesBaseUrl
 	})
-	return <>
-		<Header as='h1' content='Documents'/>
-		<Grid style={{padding:'0 14'}}>
-			<Grid.Row reversed='mobile'>
-				<Grid.Column mobile={16} tablet={16} computer={11} style={{padding:0}}>
+	return <Flex
+		justifyContent='center'>
+		<Flex.Item
+			className={[
+				'w-ma-fullExceptGutters',
+				'w-ma-widescreenExceptGutters-widescreenUp',
+				'w-mi-tabletExceptGutters-tabletUp',
+				'w-fullExceptGutters-mobileDown',
+			].join(' ')}
+			overflowX='hidden'
+		>
+			<Header as='h1' content='Documents'/>
+			<Flex
+				justifyContent='space-between'
+				gap
+				marginBottom
+			>
+				<Flex.Item>
 					<Form style={{margin:0}}>
 						<Form.Group style={{margin:0}}>
 							<Input
@@ -174,62 +187,74 @@ export function Documents({
 								<Icon name='search'/>
 							</Input>
 							<Form.Field>
-								<Table basic collapsing compact>
-									<Table.Body>
-										<Table.Row verticalAlign='middle'>
-											<Table.Cell collapsing>
-												<Radio
-													disabled={loading}
-													label={operatorState}
-													onChange={(
-														_event :React.ChangeEvent<HTMLInputElement>,
-														{checked}
-													) => {
-														// console.debug('checked', checked);
-														const newOperator = checked ? QUERY_OPERATOR_AND : QUERY_OPERATOR_OR;
-														setOperatorState(newOperator);
-														queryDocuments({
-															collectionsFilter: selectedCollections,
-															documentsTypesFilter: selectedDocumentTypes,
-															fragmentSize,
-															query,
-															operator: newOperator,
-															perPage,
-															selectedColumns: selectedColumnsState,
-															start: 0 // Explicitly reset to 0 when operator changes
-														});
-													}}
-													toggle
-													checked={operatorState === QUERY_OPERATOR_AND}
-												/>
-											</Table.Cell>
-										</Table.Row>
-									</Table.Body>
-								</Table>
+								<Segment style={{
+									height: 38
+								}}>
+									<Radio
+										checked={operatorState === QUERY_OPERATOR_AND}
+										disabled={loading}
+										label={operatorState}
+										onChange={(
+											_event :React.ChangeEvent<HTMLInputElement>,
+											{checked}
+										) => {
+											// console.debug('checked', checked);
+											const newOperator = checked ? QUERY_OPERATOR_AND : QUERY_OPERATOR_OR;
+											setOperatorState(newOperator);
+											queryDocuments({
+												collectionsFilter: selectedCollections,
+												documentsTypesFilter: selectedDocumentTypes,
+												fragmentSize,
+												query,
+												operator: newOperator,
+												perPage,
+												selectedColumns: selectedColumnsState,
+												start: 0 // Explicitly reset to 0 when operator changes
+											});
+										}}
+										style={{
+											top: '50%',
+											transform: 'translate(0%, -50%)'
+										}}
+										toggle
+									/>
+								</Segment>
 							</Form.Field>
 							<Form.Field>
-								<Table basic collapsing compact>
+								<Segment style={{
+									height: 38,
+									width: 200
+								}}>
+									<div style={{
+										position: 'relative',
+										top: '50%',
+										transform: 'translate(0%, -50%)'
+									}}>
+										<Slider
+											color='blue'
+											disabled={loading}
+											inverted
+											settings={{
+												min: 10,
+												max: 255,
+												start: FRAGMENT_SIZE_DEFAULT,
+												step: 1,
+												onChange: (value: number) => setFragmentSize(value)
+											}}
+
+											value={fragmentSize}
+										/>
+									</div>
+								</Segment>
+								{/*<Table basic collapsing compact>
 									<Table.Body>
 										<Table.Row verticalAlign='middle'>
-											<Table.Cell style={{width:103}}>
-												<Slider
-													color='blue'
-													disabled={loading}
-													inverted
-													settings={{
-														min: 10,
-														max: 255,
-														start: FRAGMENT_SIZE_DEFAULT,
-														step: 1,
-														onChange: (value: number) => setFragmentSize(value)
-													}}
-													value={fragmentSize}
-												/>
+											<Table.Cell >
+
 											</Table.Cell>
 										</Table.Row>
 									</Table.Body>
-								</Table>
-
+								</Table>*/}
 							</Form.Field>
 							<Form.Field>
 								<HoverPopup
@@ -390,12 +415,11 @@ export function Documents({
 							</Form.Field>
 						</Form.Group>
 					</Form>
-				</Grid.Column>
-				<Grid.Column mobile={16} tablet={16} computer={5} style={{padding:0}}>
+				</Flex.Item>
+				<Flex.Item>
 					<Button
 						basic
 						disabled={loading}
-						floated='right'
 						color='blue'
 						onClick={() => {
 							queryDocuments({
@@ -414,279 +438,281 @@ export function Documents({
 								<Icon className='refresh'/>Last updated: {durationSinceLastUpdate}
 							</>
 						}</Button>
-				</Grid.Column>
-			</Grid.Row>
-		</Grid>
-		{
-			searchedString
-				? <Segment basic>Searched for <b>{searchedString}</b> and found {documentsRes.total} matching documents.</Segment>
-				: null
-		}
-		{
-			selectedCollections.length || selectedDocumentTypes.length
-				? <Table basic compact className='bls-n brs-n'>
-					<Table.Body>
-						<Table.Row verticalAlign='middle'>
-							<Table.Cell collapsing><Icon name='filter'/></Table.Cell>
-							<Table.Cell>
-								{(() => {
-									const sections = [];
-									for (let i = 0; i < selectedCollections.length; i++) {
-										const collectionName = selectedCollections[i];
-										sections.push({
-											content: <Button
-												className='translucent'
-												compact
-												content={collectionName}
-												icon='database'
-												onClick={() => {
-													const newSelectedCollections = JSON.parse(JSON.stringify(selectedCollections)) as typeof selectedCollections;
-													newSelectedCollections.splice(newSelectedCollections.indexOf(collectionName), 1);
-													setSelectedCollections(newSelectedCollections);
-													queryDocuments({
-														collectionsFilter: newSelectedCollections,
-														documentsTypesFilter: selectedDocumentTypes,
-														fragmentSize,
-														operator: operatorState,
-														perPage,
-														query,
-														selectedColumns: selectedColumnsState,
-														start,
-													});
-												}}
-												size='small'/>,
-											key: `collection-${collectionName}`
-										});
-									} // for
-									for (let i = 0; i < selectedDocumentTypes.length; i++) {
-										const documentTypeName = selectedDocumentTypes[i];
-										sections.push({
-											content: <Button
-												className='translucent'
-												compact
-												content={documentTypeName}
-												icon='code file'
-												onClick={() => {
-													const newSelectedDocumentTypes = JSON.parse(JSON.stringify(selectedDocumentTypes)) as typeof selectedDocumentTypes;
-													newSelectedDocumentTypes.splice(newSelectedDocumentTypes.indexOf(documentTypeName), 1);
-													setSelectedDocumentTypes(newSelectedDocumentTypes);
-													queryDocuments({
-														collectionsFilter: selectedDocumentTypes,
-														documentsTypesFilter: newSelectedDocumentTypes,
-														fragmentSize,
-														operator: operatorState,
-														perPage,
-														query,
-														selectedColumns: selectedColumnsState,
-														start,
-													});
-												}}
-												size='small'/>,
-											key: `documentType-${documentTypeName}`
-										});
-									} // for
-									return <Breadcrumb
-										icon='right angle'
-										sections={sections}
-									/>;
-								})()}
-							</Table.Cell>
-							<Table.Cell collapsing><Button
-								className='translucent'
-								compact
-								icon='close'
-								onClick={() => {
-									setSelectedCollections([]);
-									setSelectedDocumentTypes([]);
-									queryDocuments({
-										collectionsFilter: [],
-										documentsTypesFilter: [],
-										fragmentSize,
-										operator: operatorState,
-										perPage,
-										query,
-										selectedColumns: selectedColumnsState,
-										start,
-									});
-								}}
-								size='small'/></Table.Cell>
-						</Table.Row>
-					</Table.Body>
-				</Table>
-				: null
-		}
-		<DndProvider backend={HTML5Backend}>
-			<Table celled collapsing compact selectable singleLine striped>
-				<Table.Header>
-					<Table.Row>
-						{selectedColumnsState.map((columnName, i) => <DragAndDropableHeaderCell
-							collapsing
-							content={
-								columnName === COLUMN_NAME_COLLECTION
-									? 'Collection'
-									: columnName === COLUMN_NAME_DOCUMENT_TYPE
-										? 'Document type'
-										: columnName === COLUMN_NAME_LANGUAGE
-											? 'Language'
-											: columnName === COLUMN_NAME_ID
-												? 'Document ID'
-												: columnName === COLUMN_NAME_JSON
-													? 'Document'
-													: columnName
-							}
-							id={columnName}
-							index={i}
-							key={`column-${columnName}`}
-							onDrop={({
-								fromId,
-								toId
-							}) => handleDroppedColumn({
-								fromId,
-								toId
-							})}
-						/>)}
-						{/*columnOptions
-							.filter(({value}) => selectedColumns.includes(value as string))
-							.map(({text},i) => <Table.HeaderCell collapsing content={text} key={i}/>)*/}
-						{searchedString ? <Table.HeaderCell collapsing content='_allText'/> : null}
-					</Table.Row>
-				</Table.Header>
-				<Table.Body>
-					{documentsRes.hits.map(({
-						_highlight = {},
-						_id,
-						// _json,
-						parsedJson,
-						...rest
-					}, i) => {
-						return <Table.Row key={i}>
-							{
-								selectedColumnsState.map((selectedColumnName, j) => {
-									const key = `${i}.${j}`;
-									if (selectedColumnName === COLUMN_NAME_COLLECTION) {
-										return <Table.Cell collapsing key={key}>
-											{rest[FIELD_PATH_META].collection}
-										</Table.Cell>;
-									} else if (selectedColumnName === COLUMN_NAME_DOCUMENT_TYPE) {
-										return <Table.Cell collapsing key={key}>
-											{rest[FIELD_PATH_META].documentType}
-										</Table.Cell>;
-									} else if (selectedColumnName === COLUMN_NAME_LANGUAGE) {
-										return <Table.Cell collapsing key={key}>
-											{rest[FIELD_PATH_META].language}
-										</Table.Cell>;
-									} else if (selectedColumnName === COLUMN_NAME_ID) {
-										return <Table.Cell collapsing key={key}>{_id}</Table.Cell>;
-									} else if (selectedColumnName === COLUMN_NAME_JSON) {
-										return <Table.Cell collapsing key={key}>
-											<Button
-												icon='code'
-												onClick={() => {
-													setJsonModalState({
-														open: true,
-														id: _id,
-														parsedJson: parsedJson,
-													})
-												}}
-											/>
-										</Table.Cell>;
-									} else if (!SELECTED_COLUMNS_DEFAULT.includes(selectedColumnName)) {
-										const htmlString = getHighlightedHtml({
-											_highlight,
-											fallback: getIn(parsedJson, selectedColumnName),
-											fieldPath: selectedColumnName,
-											fragmentSize,
-										});
-										// console.debug('htmlString', htmlString);
-										return <Table.Cell
-											collapsing
-											key={key}
-										>{ReactHtmlParser(htmlString)}</Table.Cell>;
-									} else {
-										console.error('Unhandeled selectedColumnName', selectedColumnName);
-										return <Table.Cell
-											collapsing
-											key={key}
+				</Flex.Item>
+			</Flex>
+			{
+				searchedString
+					? <Segment basic>Searched for <b>{searchedString}</b> and found {documentsRes.total} matching documents.</Segment>
+					: null
+			}
+			{
+				selectedCollections.length || selectedDocumentTypes.length
+					? <Table basic compact className='bls-n brs-n'>
+						<Table.Body>
+							<Table.Row verticalAlign='middle'>
+								<Table.Cell collapsing><Icon name='filter'/></Table.Cell>
+								<Table.Cell>
+									{(() => {
+										const sections = [];
+										for (let i = 0; i < selectedCollections.length; i++) {
+											const collectionName = selectedCollections[i];
+											sections.push({
+												content: <Button
+													className='translucent'
+													compact
+													content={collectionName}
+													icon='database'
+													onClick={() => {
+														const newSelectedCollections = JSON.parse(JSON.stringify(selectedCollections)) as typeof selectedCollections;
+														newSelectedCollections.splice(newSelectedCollections.indexOf(collectionName), 1);
+														setSelectedCollections(newSelectedCollections);
+														queryDocuments({
+															collectionsFilter: newSelectedCollections,
+															documentsTypesFilter: selectedDocumentTypes,
+															fragmentSize,
+															operator: operatorState,
+															perPage,
+															query,
+															selectedColumns: selectedColumnsState,
+															start,
+														});
+													}}
+													size='small'/>,
+												key: `collection-${collectionName}`
+											});
+										} // for
+										for (let i = 0; i < selectedDocumentTypes.length; i++) {
+											const documentTypeName = selectedDocumentTypes[i];
+											sections.push({
+												content: <Button
+													className='translucent'
+													compact
+													content={documentTypeName}
+													icon='code file'
+													onClick={() => {
+														const newSelectedDocumentTypes = JSON.parse(JSON.stringify(selectedDocumentTypes)) as typeof selectedDocumentTypes;
+														newSelectedDocumentTypes.splice(newSelectedDocumentTypes.indexOf(documentTypeName), 1);
+														setSelectedDocumentTypes(newSelectedDocumentTypes);
+														queryDocuments({
+															collectionsFilter: selectedDocumentTypes,
+															documentsTypesFilter: newSelectedDocumentTypes,
+															fragmentSize,
+															operator: operatorState,
+															perPage,
+															query,
+															selectedColumns: selectedColumnsState,
+															start,
+														});
+													}}
+													size='small'/>,
+												key: `documentType-${documentTypeName}`
+											});
+										} // for
+										return <Breadcrumb
+											icon='right angle'
+											sections={sections}
 										/>;
+									})()}
+								</Table.Cell>
+								<Table.Cell collapsing><Button
+									className='translucent'
+									compact
+									icon='close'
+									onClick={() => {
+										setSelectedCollections([]);
+										setSelectedDocumentTypes([]);
+										queryDocuments({
+											collectionsFilter: [],
+											documentsTypesFilter: [],
+											fragmentSize,
+											operator: operatorState,
+											perPage,
+											query,
+											selectedColumns: selectedColumnsState,
+											start,
+										});
+									}}
+									size='small'/></Table.Cell>
+							</Table.Row>
+						</Table.Body>
+					</Table>
+					: null
+			}
+			<DndProvider backend={HTML5Backend}>
+				<div className='ovx-o'>
+					<Table celled compact striped>
+						<Table.Header>
+							<Table.Row>
+								{selectedColumnsState.map((columnName, i) => <DragAndDropableHeaderCell
+									collapsing
+									content={
+										columnName === COLUMN_NAME_COLLECTION
+											? 'Collection'
+											: columnName === COLUMN_NAME_DOCUMENT_TYPE
+												? 'Document type'
+												: columnName === COLUMN_NAME_LANGUAGE
+													? 'Language'
+													: columnName === COLUMN_NAME_ID
+														? 'Document ID'
+														: columnName === COLUMN_NAME_JSON
+															? 'Document'
+															: columnName
 									}
-								})
-								// .filter(x => x) // Overcome error, not needed and can cause scewed index between headerCell and cell
-							}
-							{searchedString ? <Table.Cell collapsing>
-								{_highlight['_alltext'] && _highlight['_alltext'].length
-									? <ul style={{
-										listStyleType: 'none',
-										margin: 0,
-										padding: 0
-									}}>
-										{_highlight['_alltext'].map((htmlString, j) => <li key={j}>
-											{ReactHtmlParser(htmlString)}
-										</li>)}
-									</ul>
-									: null}
-							</Table.Cell> : null}
-						</Table.Row>})}
-				</Table.Body>
-			</Table>
-		</DndProvider>
-		<Pagination
-			disabled={loading || !documentsRes.total}
-			pointing
-			secondary
-			size='mini'
-			style={{
-				marginBottom: 14,
-				marginTop: 14
-			}}
+									id={columnName}
+									index={i}
+									key={`column-${columnName}`}
+									onDrop={({
+										fromId,
+										toId
+									}) => handleDroppedColumn({
+										fromId,
+										toId
+									})}
+								/>)}
+								{/*columnOptions
+									.filter(({value}) => selectedColumns.includes(value as string))
+									.map(({text},i) => <Table.HeaderCell collapsing content={text} key={i}/>)*/}
+								{searchedString ? <Table.HeaderCell collapsing content='_allText'/> : null}
+							</Table.Row>
+						</Table.Header>
+						<Table.Body>
+							{documentsRes.hits.map(({
+								_highlight = {},
+								_id,
+								// _json,
+								parsedJson,
+								...rest
+							}, i) => {
+								return <Table.Row key={i}>
+									{
+										selectedColumnsState.map((selectedColumnName, j) => {
+											const key = `${i}.${j}`;
+											if (selectedColumnName === COLUMN_NAME_COLLECTION) {
+												return <Table.Cell collapsing key={key}>
+													{rest[FIELD_PATH_META].collection}
+												</Table.Cell>;
+											} else if (selectedColumnName === COLUMN_NAME_DOCUMENT_TYPE) {
+												return <Table.Cell collapsing key={key}>
+													{rest[FIELD_PATH_META].documentType}
+												</Table.Cell>;
+											} else if (selectedColumnName === COLUMN_NAME_LANGUAGE) {
+												return <Table.Cell collapsing key={key}>
+													{rest[FIELD_PATH_META].language}
+												</Table.Cell>;
+											} else if (selectedColumnName === COLUMN_NAME_ID) {
+												return <Table.Cell collapsing key={key}>{_id}</Table.Cell>;
+											} else if (selectedColumnName === COLUMN_NAME_JSON) {
+												return <Table.Cell collapsing key={key}>
+													<Button
+														icon='code'
+														onClick={() => {
+															setJsonModalState({
+																open: true,
+																id: _id,
+																parsedJson: parsedJson,
+															})
+														}}
+													/>
+												</Table.Cell>;
+											} else if (!SELECTED_COLUMNS_DEFAULT.includes(selectedColumnName)) {
+												const htmlString = getHighlightedHtml({
+													_highlight,
+													fallback: getIn(parsedJson, selectedColumnName),
+													fieldPath: selectedColumnName,
+													fragmentSize,
+												});
+												// console.debug('htmlString', htmlString);
+												return <Table.Cell
+													collapsing
+													key={key}
+												>{ReactHtmlParser(htmlString)}</Table.Cell>;
+											} else {
+												console.error('Unhandeled selectedColumnName', selectedColumnName);
+												return <Table.Cell
+													collapsing
+													key={key}
+												/>;
+											}
+										})
+										// .filter(x => x) // Overcome error, not needed and can cause scewed index between headerCell and cell
+									}
+									{searchedString ? <Table.Cell collapsing>
+										{_highlight['_alltext'] && _highlight['_alltext'].length
+											? <ul style={{
+												listStyleType: 'none',
+												margin: 0,
+												padding: 0
+											}}>
+												{_highlight['_alltext'].map((htmlString, j) => <li key={j}>
+													{ReactHtmlParser(htmlString)}
+												</li>)}
+											</ul>
+											: null}
+									</Table.Cell> : null}
+								</Table.Row>})}
+						</Table.Body>
+					</Table>
+				</div>
+			</DndProvider>
+			<Pagination
+				disabled={loading || !documentsRes.total}
+				pointing
+				secondary
+				size='mini'
+				style={{
+					marginBottom: 14,
+					marginTop: 14
+				}}
 
-			activePage={page}
-			boundaryRange={1}
-			siblingRange={1}
-			totalPages={Math.ceil(documentsRes.total / perPage)}
+				activePage={page}
+				boundaryRange={1}
+				siblingRange={1}
+				totalPages={Math.ceil(documentsRes.total / perPage)}
 
-			ellipsisItem={{content: <Icon name='ellipsis horizontal' />, icon: true}}
-			firstItem={{content: <Icon name='angle double left' />, icon: true}}
-			prevItem={{content: <Icon name='angle left' />, icon: true}}
-			nextItem={{content: <Icon name='angle right' />, icon: true}}
-			lastItem={{content: <Icon name='angle double right' />, icon: true}}
+				ellipsisItem={{content: <Icon name='ellipsis horizontal' />, icon: true}}
+				firstItem={{content: <Icon name='angle double left' />, icon: true}}
+				prevItem={{content: <Icon name='angle left' />, icon: true}}
+				nextItem={{content: <Icon name='angle right' />, icon: true}}
+				lastItem={{content: <Icon name='angle double right' />, icon: true}}
 
-			onPageChange={handlePaginationChange}
-		/>
-		{documentsRes.total
-			? <p className={loading ? 'disabled' : ''}>Displaying {(() => {
-				const begin = start + 1;
-				const end = Math.min(start + perPage, documentsRes.total);
-				if (end === begin) {
-					return begin;
-				}
-				return `${begin}-${end} of ${documentsRes.total}`;
-			})()}</p>
-			: null
-		}
-		<Modal
-			open={jsonModalState.open}
-			onClose={() => setJsonModalState({
-				open: false,
-				id: '',
-				parsedJson: undefined,
-			})}
-		>
-			<Modal.Header content={jsonModalState.id}/>
-			<Modal.Content>
-				{jsonModalState.parsedJson
-					? <TypedReactJson
-						enableClipboard={false}
-						displayArrayKey={false}
-						displayDataTypes={false}
-						displayObjectSize={false}
-						indentWidth={2}
-						name={null}
-						quotesOnKeys={false}
-						sortKeys={true}
-						src={jsonModalState.parsedJson}
-					/>
-					: null}
-			</Modal.Content>
-		</Modal>
-	</>;
+				onPageChange={handlePaginationChange}
+			/>
+			{documentsRes.total
+				? <p className={loading ? 'disabled' : ''}>Displaying {(() => {
+					const begin = start + 1;
+					const end = Math.min(start + perPage, documentsRes.total);
+					if (end === begin) {
+						return begin;
+					}
+					return `${begin}-${end} of ${documentsRes.total}`;
+				})()}</p>
+				: null
+			}
+			<Modal
+				open={jsonModalState.open}
+				onClose={() => setJsonModalState({
+					open: false,
+					id: '',
+					parsedJson: undefined,
+				})}
+			>
+				<Modal.Header content={jsonModalState.id}/>
+				<Modal.Content>
+					{jsonModalState.parsedJson
+						? <TypedReactJson
+							enableClipboard={false}
+							displayArrayKey={false}
+							displayDataTypes={false}
+							displayObjectSize={false}
+							indentWidth={2}
+							name={null}
+							quotesOnKeys={false}
+							sortKeys={true}
+							src={jsonModalState.parsedJson}
+						/>
+						: null}
+				</Modal.Content>
+			</Modal>
+		</Flex.Item>
+	</Flex>;
 }
