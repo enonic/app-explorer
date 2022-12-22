@@ -29,6 +29,10 @@ export function HoverPopup ({
 			circular
 			icon={icon}
 			size='medium'
+			style={{
+				height: 38,
+				width: 38
+			}}
 		/>}
 		{...rest}
 	/>;

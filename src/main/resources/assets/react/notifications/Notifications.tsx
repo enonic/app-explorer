@@ -32,10 +32,18 @@ export function Notifications({
 		justifyContent='center'
 	>
 		<Flex.Item
-			className='w-ma-fullExceptGutters w-fullExceptGutters-mobileDown w-mi-tabletExceptGutters-tabletUp'
+			className={[
+				'w-ma-fullExceptGutters',
+				'w-mi-tabletExceptGutters-tabletUp',
+				'w-fullExceptGutters-mobileDown',
+			].join(' ')}
 			overflowX='overlay'
 		>
-			<Flex justifyContent='space-between' style={{gap:13}}>
+			<Flex
+				justifyContent='space-between'
+				gap
+				marginBottom
+			>
 				<Flex.Item>
 					<Header as='h1'>Notifications</Header>
 				</Flex.Item>

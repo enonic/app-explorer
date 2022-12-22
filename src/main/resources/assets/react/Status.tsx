@@ -251,7 +251,6 @@ export function Status (props :{
 			<Table
 				celled
 				compact
-				selectable
 				sortable
 				striped
 			>
