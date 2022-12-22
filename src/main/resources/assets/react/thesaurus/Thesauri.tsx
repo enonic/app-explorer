@@ -75,11 +75,10 @@ export function Thesauri({
 				<Flex.Item>
 					<Segment className='button'>
 						<Radio
-							label={"Show delete"}
+							label='Show delete'
 							checked={showDelete}
 							onChange={(
-								//@ts-ignore error TS6133: 'event' is declared but its value is never read.
-								event :unknown,
+								_event :unknown,
 								{checked}
 							) => {
 								setShowDelete(checked);
