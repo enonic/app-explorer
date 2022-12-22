@@ -1,53 +1,57 @@
 import type {
-	PaginationProps,
+	// PaginationProps,
 	StrictTableHeaderCellProps
 } from 'semantic-ui-react';
 import type {QueriedSynonym} from '/lib/explorer/types/index.d';
 
-
 //import {isSet} from '@enonic/js-utils';
+import {useWhenInit} from '@seamusleahy/init-hooks';
 import * as React from 'react';
 import {fetchSynonymsQuery} from '../../../../services/graphQL/fetchers/fetchSynonymsQuery';
+import {useUpdateEffect} from '../../utils/useUpdateEffect';
 
 
 type EditSynonymsState = {
 	aggregations: {
 		thesaurus: {
 			buckets: Array<{
-				docCount :number
-				key :string
+				docCount: number
+				key: string
 			}>
 		}
 	},
-	count :number
-	end :number
-	hits :Array<QueriedSynonym>
-	localeToStemmingLanguage :Record<string,string>
-	page :number
-	start :number
-	total :number
-	totalPages :number
+	count: number
+	end: number
+	hits: QueriedSynonym[]
+	localeToStemmingLanguage: Record<string,string>
+	page: number
+	start: number
+	total: number
+	totalPages: number
 }
+
+
+const DEBUG_DEPENDENCIES = false;
 
 
 export function useEditSynonymsState({
 	servicesBaseUrl,
 	thesaurusName
-} :{
+}: {
 	servicesBaseUrl: string
 	thesaurusName?: string
 }) {
 	//──────────────────────────────────────────────────────────────────────────
 	// State
 	//──────────────────────────────────────────────────────────────────────────
-	const [languages, setLanguages] = React.useState([]);
+	const [languagesState, setLanguagesState] = React.useState([]);
 	const [column, setColumn] = React.useState('_score');
 	const [direction, setDirection] = React.useState<StrictTableHeaderCellProps['sorted']>('ascending');
-	const [from, setFrom] = React.useState('');
+	const [fromState, setFromState] = React.useState('');
 	const [isLoading, setIsLoading] = React.useState(false);
-	const [perPage, setPerPage] = React.useState(10);
-	const [page, setPage] = React.useState<PaginationProps['activePage']>(1);
-	const [sort, setSort] = React.useState('_score ASC');
+	const [perPageState, setPerPageState] = React.useState(10);
+	const [pageState, setPageState] = React.useState<number/*PaginationProps['activePage']*/>(1);
+	const [sortState, setSortState] = React.useState('_score ASC');
 	const [state, setState] = React.useState<EditSynonymsState>({
 		aggregations: {
 			thesaurus: {
@@ -63,14 +67,14 @@ export function useEditSynonymsState({
 		total: 0,
 		totalPages: 0
 	});
-	const [thesauri, setThesauri] = React.useState(thesaurusName ? [thesaurusName] : []);
-	const [to, setTo] = React.useState('');
+	const [thesauriState, setThesauriState] = React.useState(thesaurusName ? [thesaurusName] : []);
+	const [toState, setToState] = React.useState('');
 
 	//──────────────────────────────────────────────────────────────────────────
 	// Functions
 	//──────────────────────────────────────────────────────────────────────────
 	// Since this function has no dependencies, there is no point in memoizing it.
-	const sortAfterColumnClick = (clickedColumn :string, currentColumn :string, currentDirection :string) => {
+	const sortAfterColumnClick = (clickedColumn: string, currentColumn: string, currentDirection: string) => {
 		//console.debug('sortAfterColumnClick(%s, %s, %s)', clickedColumn, currentColumn, currentDirection)
 		//console.debug('handleSortGenerator clickedColumn', clickedColumn, 'column', column, 'direction', direction);
 		if (clickedColumn === currentColumn) {
@@ -86,17 +90,40 @@ export function useEditSynonymsState({
 	//──────────────────────────────────────────────────────────────────────────
 	// Callbacks
 	//──────────────────────────────────────────────────────────────────────────
-	const memoizedQuerySynonyms = React.useCallback(() => {
+	const memoizedQuerySynonyms = React.useCallback(({
+		from,
+		languages,
+		page,
+		perPage,
+		sort,
+		to,
+	}: {
+		from: string
+		languages: string[]
+		page: number
+		perPage: number
+		sort: string
+		to: string
+	}) => {
+		DEBUG_DEPENDENCIES && console.debug('callback memoizedQuerySynonyms params', {
+			languages,
+			page,
+			perPage,
+			sort,
+		}, 'state', {
+			servicesBaseUrl,
+			thesauriState
+		});
 		//console.debug('querySynonyms params1', params, 'state', state);
 		setIsLoading(true);
 
 		const variables = {
 			from,
 			languages,
-			page: page as number,
+			page,
 			perPage,
 			sort,
-			thesauri,
+			thesauri: thesauriState,
 			to
 		};
 
@@ -110,33 +137,72 @@ export function useEditSynonymsState({
 			}
 		});
 	}, [
-		from,
-		languages,
-		page,
-		perPage,
 		servicesBaseUrl,
-		sort,
-		thesauri,
-		to
+		thesauriState
 	]); // memoizedQuerySynonyms
+
+	//──────────────────────────────────────────────────────────────────────────
+	// Init
+	//──────────────────────────────────────────────────────────────────────────
+	useWhenInit(() => {
+		DEBUG_DEPENDENCIES && console.debug('init');
+		memoizedQuerySynonyms({
+			from: fromState,
+			languages: languagesState,
+			page: pageState,
+			perPage: perPageState,
+			sort: sortState,
+			to: toState,
+		});
+	});
 
 	//──────────────────────────────────────────────────────────────────────────
 	// Effects
 	//──────────────────────────────────────────────────────────────────────────
 	React.useEffect(() => {
+		DEBUG_DEPENDENCIES && console.debug('useEffect', {
+			column,
+			direction,
+			sortState
+		});
 		const newSort = `${column} ${direction === 'ascending' ? 'ASC' : 'DESC'}`;
-		if (newSort !== sort) {
-			setSort(newSort);
+		if (newSort !== sortState) {
+			setSortState(newSort);
 		}
 	}, [
 		column,
 		direction,
-		sort
+		sortState
 	]);
 
-	React.useEffect(() => memoizedQuerySynonyms(), [
-		memoizedQuerySynonyms
-	]);
+	//──────────────────────────────────────────────────────────────────────────
+	// Updates (not init)
+	//──────────────────────────────────────────────────────────────────────────
+	useUpdateEffect(() => {
+		DEBUG_DEPENDENCIES && console.debug('useUpdateEffect', {
+			languagesState,
+			pageState,
+			perPageState,
+			sortState,
+			thesauriState,
+		});
+		memoizedQuerySynonyms({
+			from: fromState,
+			languages: languagesState,
+			page: pageState,
+			perPage: perPageState,
+			sort: sortState,
+			to: toState,
+		});
+	}, [
+		// fromState, // No we don't want to search on every change in fromState
+		languagesState,
+		pageState,
+		perPageState,
+		sortState,
+		thesauriState,
+		// toState, // No we don't want to search on every change in toState
+	])
 
 	//──────────────────────────────────────────────────────────────────────────
 	// Return
@@ -154,17 +220,18 @@ export function useEditSynonymsState({
 		column, setColumn,
 		direction, setDirection,
 		end,
-		from, setFrom,
+		fromState, setFromState,
 		isLoading,
-		languages, setLanguages,
+		languagesState, setLanguagesState,
 		memoizedQuerySynonyms,
-		page, setPage,
-		perPage, setPerPage,
+		pageState, setPageState,
+		perPageState, setPerPageState,
 		result: state,
 		sortAfterColumnClick,
+		sortState, // setSortState,
 		start,
-		thesauri, setThesauri,
-		to, setTo,
+		thesauriState, setThesauriState,
+		toState, setToState,
 		total,
 		totalPages
 	};
