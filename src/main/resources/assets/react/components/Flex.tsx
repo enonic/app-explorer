@@ -34,18 +34,18 @@ for (let i = 0; i < justifyContentAbbrs.length; i++) {
 }
 
 export const CSS_OVERFLOW_VALUES_ABBR = {
-  // Global values https://developer.mozilla.org/en-US/docs/Web/CSS/all
-  i: 'initial',
-  n: 'inherit',
-  u: 'unset',
-  r: 'revert',
-  // Overflow https://developer.mozilla.org/en-US/docs/Web/CSS/overflow#Values
-  a: 'auto',
-  h: 'hidden',
-  o: 'overlay',
-  s: 'scroll',
-  v: 'visible'
-  //clip
+	// Global values https://developer.mozilla.org/en-US/docs/Web/CSS/all
+	i: 'initial',
+	n: 'inherit',
+	u: 'unset',
+	r: 'revert',
+	// Overflow https://developer.mozilla.org/en-US/docs/Web/CSS/overflow#Values
+	a: 'auto',
+	h: 'hidden',
+	o: 'overlay',
+	s: 'scroll',
+	v: 'visible'
+	//clip
 };
 
 const OVERFLOW_VALUE_TO_ABBR = {};
@@ -59,18 +59,28 @@ function Flex({
 	children,
 	className,
 	justifyContent,
+	gap,
+	marginBottom,
 	...rest
 }: {
 	children: any
 	className?: string
 	justifyContent: 'center'|'space-between' // React.CSSProperties['justifyContent']
+	gap?: true, // 'normal'|number|``,React.CSSProperties['gap']
+	marginBottom?: true,
 	style?: React.CSSProperties
 }) {
 	const classesArray = [
 		'd-f'
 	];
 	if (justifyContent) {
-		classesArray.push(`jc-${JUSTIFY_CONTENT_VALUE_TO_ABBR[justifyContent]}`)
+		classesArray.push(`jc-${JUSTIFY_CONTENT_VALUE_TO_ABBR[justifyContent]}`);
+	}
+	if (gap === true) {
+		classesArray.push('g-1rem');
+	}
+	if (marginBottom === true) {
+		classesArray.push('mb-1rem');
 	}
 	classesArray.push(className);
 	const classes = cx(...classesArray);
@@ -90,19 +100,33 @@ function Item({
 }: {
 	children: any
 	className?: string
-	overflowX?: 'overlay' // | React.CSSProperties['overflowX']
-	overflowY?: 'visible' // | React.CSSProperties['overflowY']
+	overflowX?: boolean|'hidden'|'overlay'|'visible' // | React.CSSProperties['overflowX']
+	overflowY?: boolean|'hidden'|'visible' // | React.CSSProperties['overflowY']
 	style?: React.CSSProperties
 }) {
 	const classesArray = [];
+
+	if (overflowX === true) {
+		overflowX = 'visible';
+	} else if (overflowX === false) {
+		overflowX = 'hidden';
+	}
 	if (overflowX) {
 		classesArray.push(`ovx-${OVERFLOW_VALUE_TO_ABBR[overflowX]}`);
+	}
+
+	if (overflowY === true) {
+		overflowY = 'visible';
+	} else if (overflowY === false) {
+		overflowY = 'hidden';
 	}
 	if (overflowY) {
 		classesArray.push(`ovy-${OVERFLOW_VALUE_TO_ABBR[overflowY]}`);
 	}
+
 	classesArray.push(className);
 	const classes = cx(...classesArray);
+
 	return (
 		<div {...rest} className={classes}>
 			{children}

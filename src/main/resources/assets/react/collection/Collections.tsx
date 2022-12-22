@@ -153,8 +153,6 @@ export function Collections(props :{
 					celled
 					compact
 					disabled={isLoading}
-					selectable
-					sortable
 					striped
 				>
 					<Table.Header>
@@ -163,7 +161,7 @@ export function Collections(props :{
 							<Table.HeaderCell>Edit</Table.HeaderCell>
 							<Table.HeaderCell
 								onClick={null/*handleSortGenerator('displayName')*/}
-								sorted={column === '_name' ? direction : null}
+								sorted={/*column === '_name' ? direction : */null}
 							>Name</Table.HeaderCell>
 							{showCollector ? <Table.HeaderCell>Collector</Table.HeaderCell> : null}
 							{showDocumentCount ? <Table.HeaderCell>Documents</Table.HeaderCell> : null}
