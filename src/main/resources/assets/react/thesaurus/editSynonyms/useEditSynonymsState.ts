@@ -34,8 +34,8 @@ export function useEditSynonymsState({
 	servicesBaseUrl,
 	thesaurusName
 } :{
-	servicesBaseUrl :string
-	thesaurusName ?:string
+	servicesBaseUrl: string
+	thesaurusName?: string
 }) {
 	//──────────────────────────────────────────────────────────────────────────
 	// State
@@ -151,28 +151,20 @@ export function useEditSynonymsState({
 	//console.debug('EditSynonyms result', result);
 	return {
 		aggregations,
-		column,
-		direction,
+		column, setColumn,
+		direction, setDirection,
 		end,
-		from,
+		from, setFrom,
 		isLoading,
-		languages,
+		languages, setLanguages,
 		memoizedQuerySynonyms,
-		page,
-		perPage,
+		page, setPage,
+		perPage, setPerPage,
 		result: state,
-		setColumn,
-		setDirection,
-		setFrom,
-		setLanguages,
-		setPage,
-		setPerPage,
-		setThesauri,
-		setTo,
 		sortAfterColumnClick,
 		start,
-		thesauri,
-		to,
+		thesauri, setThesauri,
+		to, setTo,
 		total,
 		totalPages
 	};
