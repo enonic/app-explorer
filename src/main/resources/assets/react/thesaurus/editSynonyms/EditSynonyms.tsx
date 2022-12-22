@@ -35,23 +35,18 @@ export function EditSynonyms({
 		column,
 		direction,
 		end,
-		from,
+		fromState, setFromState,
 		isLoading,
-		languages,
+		languagesState, setLanguagesState,
 		memoizedQuerySynonyms,
-		page,
-		perPage,
+		pageState, setPageState,
+		perPageState, setPerPageState,
 		result,
-		setFrom,
-		setLanguages,
-		setPage,
-		setPerPage,
-		setThesauri,
-		setTo,
 		sortAfterColumnClick,
+		sortState, // setSortState,
 		start,
-		thesauri,
-		to,
+		thesauriState, setThesauriState,
+		toState, setToState,
 		total,
 		totalPages
 	} = useEditSynonymsState({
@@ -65,16 +60,44 @@ export function EditSynonyms({
 				<Form.Input
 					fluid={true}
 					label='From'
-					onChange={({target:{value}}) => setFrom(value)}
+					onChange={({target:{value}}) => setFromState(value)}
+					onKeyUp={(event :{
+						which :number
+					}) => {
+						if(event.which == 10 || event.which == 13) {
+							memoizedQuerySynonyms({
+								from: fromState,
+								languages: languagesState,
+								page: pageState,
+								perPage: perPageState,
+								sort: sortState,
+								to: toState,
+							});
+						}
+					}}
 					placeholder='From'
-					value={from}
+					value={fromState}
 				/>
 				<Form.Input
 					fluid={true}
 					label='To'
-					onChange={({target:{value}}) => setTo(value)}
+					onChange={({target:{value}}) => setToState(value)}
+					onKeyUp={(event :{
+						which :number
+					}) => {
+						if(event.which == 10 || event.which == 13) {
+							memoizedQuerySynonyms({
+								from: fromState,
+								languages: languagesState,
+								page: pageState,
+								perPage: perPageState,
+								sort: sortState,
+								to: toState,
+							});
+						}
+					}}
 					placeholder='To'
-					value={to}
+					value={toState}
 				/>
 				{/*
 				<Form.Input
@@ -96,12 +119,12 @@ export function EditSynonyms({
 					clearable={true}
 					disabled={isLoading}
 					includeANoneOption={false}
-					language={languages}
+					language={languagesState}
 					loading={isLoading}
 					locales={locales}
 					multiple={true}
 					placeholder='Select languages'
-					setLanguage={(newLanguages) => setLanguages(newLanguages as Array<string>)}
+					setLanguage={(newLanguages) => setLanguagesState(newLanguages as string[])}
 				/>
 			</Form.Field>
 		</Form>
@@ -112,19 +135,19 @@ export function EditSynonyms({
 				<Form.Field>
 					<label>Thesauri</label>
 					<Dropdown
-						defaultValue={thesauri}
+						clearable
+						defaultValue={thesauriState}
 						fluid
 						multiple={true}
 						name='thesauri'
 						onChange={(
-							//@ts-ignore
-							event :unknown,
+							_event :unknown,
 							{
 								value
 							} :{
 								value :Array<string>
 							}
-						) => setThesauri(value)}
+						) => setThesauriState(value)}
 						options={aggregations.thesaurus.buckets.map(({key, docCount}) => {
 							const tName = key.replace('/thesauri/', '');
 							return {
@@ -143,17 +166,16 @@ export function EditSynonyms({
 		<Header as='h4'><Icon name='resize vertical'/> Per page</Header>
 		<Form>
 			<Form.Dropdown
-				defaultValue={perPage}
+				defaultValue={perPageState}
 				fluid
 				onChange={(
-					//@ts-ignore
-					event :unknown,
+					_event :unknown,
 					{
 						value
 					} :{
 						value :number
 					}
-				) => setPerPage(value)}
+				) => setPerPageState(value)}
 				options={[5,10,25,50,100].map(key => ({key, text: `${key}`, value: key}))}
 				selection
 			/>
@@ -219,7 +241,14 @@ export function EditSynonyms({
 							return <Table.Row key={i}>
 								<Table.Cell collapsing><NewOrEditSynonym
 									_id={_id}
-									afterClose={memoizedQuerySynonyms}
+									afterClose={() => memoizedQuerySynonyms({
+										from: fromState,
+										languages: languagesState,
+										page: pageState,
+										perPage: perPageState,
+										sort: sortState,
+										to: toState,
+									})}
 									locales={locales}
 									servicesBaseUrl={servicesBaseUrl}
 									thesaurusId={thesaurusReference}
@@ -245,7 +274,14 @@ export function EditSynonyms({
 									<DeleteSynonym
 										_id={_id}
 										from={synonymsObj.from}
-										afterClose={memoizedQuerySynonyms}
+										afterClose={() => memoizedQuerySynonyms({
+											from: fromState,
+											languages: languagesState,
+											page: pageState,
+											perPage: perPageState,
+											sort: sortState,
+											to: toState,
+										})}
 										servicesBaseUrl={servicesBaseUrl}
 										to={synonymsObj.to}
 									/>
@@ -258,7 +294,7 @@ export function EditSynonyms({
 					fluid
 					size='mini'
 
-					activePage={page}
+					activePage={pageState}
 					boundaryRange={1}
 					siblingRange={1}
 					totalPages={totalPages}
@@ -270,16 +306,22 @@ export function EditSynonyms({
 					lastItem={{content: <Icon name='angle double right' />, icon: true}}
 
 					onPageChange={(
-						//@ts-ignore
-						event :unknown,
+						_event :unknown,
 						{
 							activePage
 						} :PaginationProps
-					) => setPage(activePage)}
+					) => setPageState(parseInt(`${activePage}`, 10))}
 				/>
 				<p>Displaying {start}-{end} of {total}</p>
 				{thesaurusId && <NewOrEditSynonym
-					afterClose={memoizedQuerySynonyms}
+					afterClose={() => memoizedQuerySynonyms({
+						from: fromState,
+						languages: languagesState,
+						page: pageState,
+						perPage: perPageState,
+						sort: sortState,
+						to: toState,
+					})}
 					locales={locales}
 					servicesBaseUrl={servicesBaseUrl}
 					thesaurusId={thesaurusId}
