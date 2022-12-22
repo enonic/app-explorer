@@ -9,8 +9,20 @@
 .jc-sb
 	justify-content: space-between
 
+.g-1rem
+	gap: 1rem
+
+.mb-1rem
+	margin-bottom: 1rem
+
+.ovx-h
+	overflow-x: hidden
+
 .ovx-o
 	overflow-x: overlay
+
+.ovy-h
+	overflow-y: hidden
 
 .ovy-v
 	overflow-y: visible
@@ -25,3 +37,17 @@
 @include tabletUp
 	.w-mi-tabletExceptGutters-tabletUp
 		min-width: $tabletBreakpoint - $emSize - $emSize
+
+@include computerUp
+	.w-mi-computerExceptGutters-computerUp
+		min-width: $computerBreakpoint - $emSize - $emSize
+
+@include largeUp
+	.w-mi-largeExceptGutters-largeUp
+		min-width: $largeMonitorBreakpoint - $emSize - $emSize
+
+@include widescreenUp
+	.w-ma-widescreenExceptGutters-widescreenUp
+		max-width: $widescreenMonitorBreakpoint - $emSize - $emSize
+	.w-mi-widescreenExceptGutters-widescreenUp
+		min-width: $widescreenMonitorBreakpoint - $emSize - $emSize

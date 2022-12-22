@@ -12,6 +12,14 @@
 	@media only screen and (min-width: $tabletBreakpoint)
 		@content
 
+@mixin computerUp
+	@media only screen and (min-width: $computerBreakpoint)
+		@content
+
+@mixin largeUp
+	@media only screen and (min-width: $largeMonitorBreakpoint)
+		@content
+
 @mixin widescreenUp
 	@media only screen and (min-width: $widescreenMonitorBreakpoint)
 		@content
