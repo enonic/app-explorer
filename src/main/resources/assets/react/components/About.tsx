@@ -2,7 +2,9 @@ import type {License} from '../index.d';
 
 
 import {
-	Header, Grid, Icon, List
+	Header,
+	Icon,
+	List,
 } from 'semantic-ui-react';
 import {
 	LICENSE_BSD_2_CLAUSE,
@@ -13,6 +15,7 @@ import {
 	LICENSE_TEXT_MIT,
 	NODE_MODULES,
 } from '../constants';
+import Flex from '../components/Flex';
 
 
 export default function About({
@@ -21,11 +24,28 @@ export default function About({
 	showWhichLicense: License
 	setShowWhichLicense: React.Dispatch<React.SetStateAction<License>>
 }) {
-	return <>
-		<Header as='h1' content='Licenses'/>
-		<Grid columns={3} divided>
-			<Grid.Row>
-				<Grid.Column>
+	return <Flex
+		justifyContent='center'
+	>
+		<Flex.Item
+			className={[
+				'w-ma-fullExceptGutters',
+				'w-mi-tabletExceptGutters-tabletUp',
+				'w-mi-computerExceptGutters-computerUp',
+				'w-mi-largeExceptGutters-largeUp',
+				// 'w-mi-widescreenExceptGutters-widescreenUp',
+				'w-fullExceptGutters-mobileDown',
+			].join(' ')}
+			overflowX='overlay'
+			overflowY={false}
+		>
+			<Header as='h1' content='Licenses'/>
+			<Flex
+				justifyContent='space-between'
+				gap
+				marginBottom
+			>
+				<Flex.Item>
 					<List animated divided relaxed selection>
 						{NODE_MODULES.map(({
 							description = LICENSE_MIT,
@@ -42,8 +62,8 @@ export default function About({
 							</List.Content>
 						</List.Item>)}
 					</List>
-				</Grid.Column>
-				<Grid.Column>
+				</Flex.Item>
+				<Flex.Item>
 					<pre>{showWhichLicense === LICENSE_MIT
 						? LICENSE_TEXT_MIT
 						: showWhichLicense === LICENSE_BSD_3_CLAUSE
@@ -51,8 +71,8 @@ export default function About({
 							: showWhichLicense === LICENSE_BSD_2_CLAUSE
 								? LICENSE_TEXT_BSD_2_CLAUSE
 								: ''}</pre>
-				</Grid.Column>
-			</Grid.Row>
-		</Grid>
-	</>
+				</Flex.Item>
+			</Flex>
+		</Flex.Item>
+	</Flex>
 }

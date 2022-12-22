@@ -28,7 +28,7 @@ export function Emails({
 		</Form.Field>;
 	}
 
-	return <Table celled compact selectable singleLine sortable striped>
+	return <Table celled compact singleLine striped>
 		<Table.Header>
 			<Table.Row>
 				<Table.HeaderCell>Email</Table.HeaderCell>
@@ -57,7 +57,7 @@ export function Emails({
 						value={email}
 					/>
 				</Table.Cell>
-				<Table.Cell>
+				<Table.Cell collapsing>
 					<Button.Group icon>
 						<InsertButton
 							array={emails}
