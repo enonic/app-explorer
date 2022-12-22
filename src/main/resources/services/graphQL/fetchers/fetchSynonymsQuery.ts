@@ -60,8 +60,8 @@ export async function fetchSynonymsQuery({
 			return handleData(data);
 		} else {
 			// handle the graphql errors
-    		const error = new Error(errors?.map(e => e.message).join('\n') ?? 'unknown');
-    		return Promise.reject(error);
+			const error = new Error(errors?.map(e => e.message).join('\n') ?? 'unknown');
+			return Promise.reject(error);
 		}
 	}
 } :{
