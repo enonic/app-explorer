@@ -8,8 +8,9 @@ import type {Glue} from '../Glue';
 
 import {
 	addQueryFilter,
-	storage//,
-	//toStr
+	arrayIncludes,
+	storage,
+	// toStr,
 } from '@enonic/js-utils';
 import {PRINCIPAL_EXPLORER_READ} from '/lib/explorer/constants';
 import {hasValue} from '/lib/explorer/query/hasValue';
@@ -109,8 +110,8 @@ export function addQuerySynonymsField({
 						_name: thesaurusName
 					});
 					for (let i = 0; i < allowedLanguages.length; i++) {
-					    const locale = allowedLanguages[i];
-						if (!highlightLocales.includes(locale)) {
+						const locale = allowedLanguages[i];
+						if (!arrayIncludes(highlightLocales, locale)) {
 							highlightLocales.push(locale);
 						}
 						if (locale !== 'zxx' && !localeToStemmingLanguage[locale]) {
@@ -125,12 +126,12 @@ export function addQuerySynonymsField({
 					getSynonymsCount: false
 				});
 				for (let i = 0; i < hits.length; i++) { // TODO Refactor
-				    const {
+					const {
 						allowedLanguages
 					} = hits[i];
 					for (let j = 0; j < allowedLanguages.length; j++) {
-					    const locale = allowedLanguages[j];
-						if (!highlightLocales.includes(locale)) {
+						const locale = allowedLanguages[j];
+						if (!arrayIncludes(highlightLocales, locale)) {
 							highlightLocales.push(locale);
 						}
 						if (locale !== 'zxx' && !localeToStemmingLanguage[locale]) {
@@ -139,12 +140,12 @@ export function addQuerySynonymsField({
 					}
 				}
 			}
-			//log.debug('highlightLocales:%s', toStr(highlightLocales));
+			// log.debug('highlightLocales:%s', toStr(highlightLocales));
 			//log.debug('localeToStemmingLanguage:%s', toStr(localeToStemmingLanguage));
 
 			if (languages && languages.length) {
 				for (let i = 0; i < languages.length; i++) {
-				    const locale = languages[i];
+					const locale = languages[i];
 					filters = addQueryFilter({
 						clause: 'must',
 						filters,
