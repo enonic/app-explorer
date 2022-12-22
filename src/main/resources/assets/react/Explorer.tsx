@@ -80,6 +80,7 @@ export function Explorer({
 			<Router basename={basename}>
 				<SideBarMenu
 					licenseValid={licenseValid}
+					setSideBarVisible={setSideBarVisible}
 					sideBarVisible={sideBarVisible}
 				/>
 				<Sidebar.Pusher
