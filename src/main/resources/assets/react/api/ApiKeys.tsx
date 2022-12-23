@@ -40,7 +40,7 @@ export const ApiKeys = (props :{
 		>
 			<Flex justifyContent='space-between'>
 				<Flex.Item>
-					<Segment className='button'>
+					<Segment className='button-padding'>
 						<Radio
 							label={"Show all fields"}
 							checked={showAllFields}

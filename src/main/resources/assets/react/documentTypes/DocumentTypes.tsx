@@ -57,7 +57,7 @@ export function DocumentTypes({
 				marginBottom
 			>
 				<Flex.Item>
-					<Segment className='button'>
+					<Segment className='button-padding'>
 						<Radio
 							label={'Show all fields'}
 							checked={showAllFields}

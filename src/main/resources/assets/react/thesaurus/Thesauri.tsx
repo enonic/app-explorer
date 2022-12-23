@@ -73,7 +73,7 @@ export function Thesauri({
 				marginBottom
 			>
 				<Flex.Item>
-					<Segment className='button'>
+					<Segment className='button-padding'>
 						<Radio
 							label='Show delete'
 							checked={showDelete}

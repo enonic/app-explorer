@@ -73,10 +73,10 @@ export function Collections(props :{
 		collectionsTaskState,
 		collectorIdToDisplayName, // setCollectorIdToDisplayName,
 		collectorOptions,
-		column,
+		// column,
 		contentTypeOptions,
 		copyModalCollectionId, setCopyModalCollectionId,
-		direction,
+		// direction,
 		durationSinceLastUpdate,
 		fieldsObj,
 		intInitializedCollectorComponents,
@@ -115,7 +115,7 @@ export function Collections(props :{
 			className='w-ma-fullExceptGutters w-fullExceptGutters-mobileDown'
 			overflowX='overlay'
 		>
-			<Segment className='button' floated='left'>
+			<Segment className='button-padding' floated='left'>
 				<Radio
 					label='Show all fields'
 					checked={showCollector}
