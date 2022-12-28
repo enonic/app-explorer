@@ -1,8 +1,13 @@
+import type {User} from '/lib/xp/auth';
 import type {
 	SemanticICONS,
 } from 'semantic-ui-react';
 
 
+import {
+	Link,
+	useLocation,
+} from 'react-router-dom';
 import {
 	Icon,
 	Menu,
@@ -17,6 +22,7 @@ export default function TopBarMenu({
 	setLicensedTo,
 	setLicenseValid,
 	sideBarVisible, setSideBarVisible,
+	userState,
 }: {
 	licensedTo: string
 	licenseValid: boolean
@@ -26,7 +32,9 @@ export default function TopBarMenu({
 	setLicenseValid: React.Dispatch<React.SetStateAction<boolean>>
 	setSideBarVisible: React.Dispatch<React.SetStateAction<boolean>>
 	sideBarVisible: boolean
+	userState: User
 }) {
+	const location = useLocation();
 	return <Menu
 		className="admin-ui-gray"
 		inverted
@@ -43,5 +51,17 @@ export default function TopBarMenu({
 			setLicensedTo={setLicensedTo}
 			setLicenseValid={setLicenseValid}
 		/>
+		<Menu.Menu position='right' style={{
+			marginRight: 44
+		}}>
+			<Menu.Item
+				active={location.pathname === '/user'}
+				as={Link}
+				to='/user'
+			>
+				<Icon name='user'/>
+				{userState?.displayName}
+			</Menu.Item>
+		</Menu.Menu>
 	</Menu>;
 }

@@ -1,10 +1,13 @@
 import type {SemanticICONS} from 'semantic-ui-react/src/generic.d';
 import type {InterfaceField} from '/lib/explorer/types/Interface.d';
+import type {User} from '/lib/xp/auth';
 import type {License} from './index.d';
 
 
+import {useWhenInit} from '@seamusleahy/init-hooks';
 import * as gql from 'gql-query-builder';
 import * as React from 'react';
+import fetchUser from './fetchers/fetchUser';
 
 
 const GQL_BODY_QUERY_INTERFACES_DEFAULT = JSON.stringify(gql.query({
@@ -35,16 +38,20 @@ export function useExplorerState({
 	initialLicenseValid :boolean
 	servicesBaseUrl :string
 }) {
+	//──────────────────────────────────────────────────────────────────────────
+	// State
+	//──────────────────────────────────────────────────────────────────────────
 	//console.debug('Explorer initialLicenseValid', initialLicenseValid);
 	//const [wsColor, setWsColor] = React.useState('#888888');
 	//const [wsStatus, setWsStatus] = React.useState('');
 	const [licenseValid, setLicenseValid] = React.useState(initialLicenseValid);
 	const [licensedTo, setLicensedTo] = React.useState(initialLicensedTo);
-	const [menuIconName, setMenuIconName] = React.useState<SemanticICONS>('close');
 	const [defaultInterfaceFields, setDefaultInterfaceFields] = React.useState<Array<InterfaceField>>([]);
 	//const [pusherStyle, setPusherStyle] = React.useState(PUSHER_STYLE_SIDEBAR_SHOW);
-	const [sideBarVisible, setSideBarVisible] = React.useState(false); // DEBUG
+	const [sideBarVisible, setSideBarVisible] = React.useState(false);
+	const [menuIconName, setMenuIconName] = React.useState<SemanticICONS>(sideBarVisible ? 'close' : 'bars');
 	const [showWhichLicense, setShowWhichLicense] = React.useState<License>();
+	const [userState, setUserState] = React.useState<User>();
 
 	//const [websocket, setWebsocket] = React.useState(null);
 	//const [queryCollectorsGraph, setQueryCollectorsGraph] = React.useState({});
@@ -52,6 +59,9 @@ export function useExplorerState({
 	//const [tasks, setTasks] = React.useState([]);
 	//console.debug('Explorer tasks', tasks);
 
+	//──────────────────────────────────────────────────────────────────────────
+	// Callbacks
+	//──────────────────────────────────────────────────────────────────────────
 	const memoizedQueryInterfacesDefault = React.useCallback(() => {
 		fetch(`${servicesBaseUrl}/graphQL`, {
 			method: 'POST',
@@ -67,9 +77,18 @@ export function useExplorerState({
 			});
 	}, [servicesBaseUrl]); // memoizedQueryInterfacesDefault
 
-	React.useEffect(() => {
+	//──────────────────────────────────────────────────────────────────────────
+	// Init
+	//──────────────────────────────────────────────────────────────────────────
+	useWhenInit(() => {
+		fetchUser({
+			url: `${servicesBaseUrl}/graphQL`
+		}).then(object => {
+			setUserState(object.data.getUser);
+		})
 		memoizedQueryInterfacesDefault();
-	}, [memoizedQueryInterfacesDefault]);
+	});
+
 	//console.debug('defaultInterfaceFields', defaultInterfaceFields);
 
 	// React.useEffect(() => {
@@ -193,5 +212,6 @@ export function useExplorerState({
 		menuIconName,
 		showWhichLicense, setShowWhichLicense,
 		sideBarVisible, setSideBarVisible,
+		userState, // setUserState,
 	};
 }

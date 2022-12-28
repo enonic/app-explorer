@@ -1,4 +1,9 @@
-import type {AnyObject} from '/lib/explorer/types/index.d';
+import type {Brand} from '@enonic-types/core'
+import type {
+	AnyObject,
+	EmptyObject,
+	OneOrMore,
+} from '/lib/explorer/types/index.d';
 
 
 import {
@@ -7,82 +12,153 @@ import {
 	//toStr,
 } from '@enonic/js-utils';
 import {
+	// GraphQLBoolean,
+	// GraphQLString,
 	newSchemaGenerator
 	//@ts-ignore
 } from '/lib/graphql';
 
 
-type Fields = AnyObject;
+export type GraphQLFields<T> = {
+	[P in keyof T] :{
+		type :T[P]
+	}
+}
 
-type EnumType = AnyObject;
-type InputObjectType = AnyObject;
-type InterfaceType = AnyObject;
-type ObjectType = AnyObject;
-type ScalarType = AnyObject;
+type GraphQLArgs<T> = {
+	[P in keyof T] :{
+		type :T[P]
+	}
+}
+
+// type List<T extends object> = T & {
+// 	'__list__': true
+// };
+
+
+// type ArgumentType =
+// 	| typeof GraphQLBoolean
+// 	| typeof GraphQLString
+//
+// type QueryArgs = Record<string, OneOrMore<ArgumentType>>;
+
+type Fields<T extends object = EmptyObject> = GraphQLFields<T>;
+
+type EnumType = Brand<object,'GraphQLEnumType'>;
+type InputObjectType = Brand<object,'GraphQLInputObjectType'>;
+type InterfaceType<T extends object = object> = Brand<T,'GraphQLInterfaceType'>;
+export type ObjectType<T extends object = object> = Brand<T,'GraphQLObjectType'>;
+type ScalarType = Brand<string,'GraphQLString'>;
+type UnionType<T extends object = object> = Brand<T,'GraphQLUnionType'>;
+
+type TypeResolver<T extends object> = (object: T) => ObjectType<T>
+
+type UnionTypes<T extends object = object> = {
+	[name: string]: {
+		type: Record<string, UnionType<T>>
+		typeResolver: TypeResolver<T>
+		types: Reference<ObjectType<T>|InterfaceType<T>>[]
+	}
+}
+
+// reference
+// Returns a special type that allows an object/interface type to reference a
+// type by its key. Necessary for self reference.
+export type Reference<
+	OI extends ObjectType|InterfaceType
+> = Brand<Omit<OI,'__type__'>, 'GraphQLReference'> & {
+	'__objectOrInterfaceType__': OI['__type__']
+}; // Bascially rebrand, but keep around original brand
+
+interface EnvObject {
+	args: object
+	context?: object
+	source?: object
+}
+
+// type Env<
+// 	Args extends object = EmptyObject,
+// 	Context extends object = EmptyObject,
+// 	Source extends null|object = null
+// > = {
+// 	args: Args
+// 	context?: Context
+// 	source?: Source
+// }
 
 type FieldResolver<
-	Env extends AnyObject = AnyObject,
+	Env extends EnvObject,
 	ResultGraph = unknown
-> = (env :Env) => ResultGraph
+> = (env: Env) => ResultGraph
 
-type TypeResolver = () => ObjectType
 
-export class Glue {
+// type Queries<T extends object = object> = {
+// 	[name: string]: {
+// 		args: AnyObject
+// 		resolve: FieldResolver
+// 		type: OneOrMore<ObjectType<T>|UnionType<T>>
+// 	}
+// }
+
+export class Glue<Context extends object = EmptyObject> {
 
 	// Private fields
-	_enumTypes :Record<string,EnumType> = {};
-	_fields :Record<string,Fields> = {};
-	_inputTypes :Record<string,InputObjectType> = {};
+	_enumTypes: Record<string,EnumType> = {};
+	_fields: Record<string, Fields> = {};
+	_inputTypes: Record<string,InputObjectType> = {};
 	_inputFields: Record<string, AnyObject> =  {};
-	_interfaceTypes :Record<string,{
-		fields :Fields
-		type :InterfaceType
+	_interfaceTypes: Record<string,{
+		fields: Fields
+		type: InterfaceType
 	}> = {};
-	_mutations :Record<string,{
-		args :AnyObject
-		resolve :FieldResolver
-		type :unknown
+	_mutations: Record<string,{
+		args: AnyObject
+		resolve: FieldResolver
+		type: unknown
 	}> = {};
-	_objectTypes :Record<string,ObjectType> = {};
-	_queries :Record<string,{
-		args :AnyObject
-		resolve :FieldResolver
-		type :unknown
+	_objectTypes: Record<string, ObjectType> = {};
+	_queries: Record<string,{
+		args: AnyObject
+		resolve: FieldResolver
+		type: OneOrMore<ObjectType|UnionType>
 	}> = {};
-	_scalarTypes :Record<string,ScalarType> = {};
-	_uniqueFieldNames :AnyObject = {}; // mutation and query field names should be unique?
-	_uniqueNames :AnyObject = {};
-	_unionTypes :AnyObject = {};
+	_scalarTypes: Record<string,ScalarType> = {};
+	_uniqueFieldNames: AnyObject = {}; // mutation and query field names should be unique?
+	_uniqueNames: AnyObject = {};
+	_unionTypes: UnionTypes = {};
 
 	// Public fields
-	schemaGenerator :{
-		createEnumType :(params :{
-			name :string
-			values :Array<string>
+	schemaGenerator: {
+		createEnumType: (params: {
+			name: string
+			values: string[]
 		}) => EnumType,
-		createInputObjectType :(params :{
-			fields :unknown
-			name :string
+		createInputObjectType: (params: {
+			fields: unknown
+			name: string
 		}) => InputObjectType
-		createInterfaceType :(params :{
-			fields :unknown
-			name :string
-			typeResolver :TypeResolver
+		createInterfaceType: (params: {
+			fields: unknown
+			name: string
+			typeResolver: TypeResolver
 		}) => InterfaceType
-		createObjectType :(params :{
-			fields :AnyObject
-			interfaces ?:Array<unknown>
-			name :string
-		}) => ObjectType
-		createSchema :(params :{
-			mutation :ObjectType
-			query :ObjectType
+		createObjectType: <T extends object = EmptyObject>(params: {
+			fields: Fields<T>
+			interfaces?: InterfaceType[]
+			name: string
+		}) => ObjectType<T>
+		createSchema: (params: {
+			mutation: ObjectType
+			query: ObjectType
 		}) => unknown
-		createUnionType :(params :{
-			name :string
-			typeResolver :TypeResolver
-			types :Array<unknown>
-		}) => unknown
+		createUnionType: <
+			T extends object,
+			OI extends ObjectType<T>|InterfaceType<T>
+		>(params: {
+			name: string
+			typeResolver: TypeResolver<T>
+			types: Reference<OI>
+		}) => UnionType<T>
 	};
 
 	constructor() {
@@ -92,9 +168,9 @@ export class Glue {
 	addEnumType({
 		name,
 		values
-	} :{
-		name :string
-		values :Array<string>
+	}: {
+		name: string
+		values: string[]
 	}) {
 		//log.debug(`addEnumType({name:${name}})`);
 		if(this._enumTypes[name]) {
@@ -114,9 +190,9 @@ export class Glue {
 	addFields({
 		name,
 		fields
-	} :{
-		name :string
-		fields :Fields
+	}: {
+		name: string
+		fields: Fields
 	}) {
 		//log.debug(`addEnumType({name:${name}})`);
 		if(this._fields[name]) {
@@ -136,7 +212,7 @@ export class Glue {
 	addInputFields<InputFields extends AnyObject = AnyObject>({
 		name,
 		fields
-	} : {
+	}:  {
 		name: string
 		fields: InputFields
 	}) {
@@ -160,9 +236,9 @@ export class Glue {
 	addInputType({
 		fields,
 		name
-	} :{
-		fields :Fields
-		name :string
+	}: {
+		fields: Fields
+		name: string
 	}) {
 		//log.debug(`addInputType({name:${name},fields:${toStr(fields)}})`);
 		//log.debug(`addInputType({name:${name}})`);
@@ -182,14 +258,16 @@ export class Glue {
 		return this._inputTypes[name];
 	}
 
-	addInterfaceType({
+	addInterfaceType<
+		T extends object = EmptyObject
+	>({
 		fields,
 		name,
 		typeResolver
-	} :{
-		fields :Fields
-		name :string
-		typeResolver :TypeResolver
+	}: {
+		fields: GraphQLFields<T>
+		name: string
+		typeResolver: TypeResolver<T>
 	}) {
 		//log.debug(`addInterfaceType({name:${name},fields:${toStr(fields)}})`);
 		//log.debug(`addInterfaceType({name:${name}})`);
@@ -212,14 +290,14 @@ export class Glue {
 		return this._interfaceTypes[name].type;
 	}
 
-	addObjectType({
+	addObjectType<T extends object = EmptyObject>({
 		fields,
 		interfaces = [],
 		name
-	} :{
-		fields :Fields
-		interfaces ?:Array<unknown>
-		name :string
+	}: {
+		fields: GraphQLFields<T>
+		interfaces?: InterfaceType[]
+		name: string
 	}) {
 		//log.debug(`addObjectType({name:${name},fields:${toStr(fields)})`);
 		//log.debug(`addObjectType({name:${name}})`);
@@ -230,7 +308,7 @@ export class Glue {
 			throw new Error(`Name ${name} already used as ${this._uniqueNames[name]}!`);
 		}
 		this._uniqueNames[name] = 'objectType';
-		this._objectTypes[name] = this.schemaGenerator.createObjectType({
+		this._objectTypes[name] = this.schemaGenerator.createObjectType<T>({
 			fields,
 			interfaces,
 			name
@@ -244,13 +322,13 @@ export class Glue {
 		name,
 		resolve,
 		type
-	} :{
-		args :AnyObject
-		name :string
-		resolve :FieldResolver<{
+	}: {
+		args: AnyObject
+		name: string
+		resolve: FieldResolver<{
 			args: Args
 		}>
-		type :ObjectType
+		type: ObjectType
 	}) {
 		//log.debug(`addEnumType({name:${name}})`);
 		if(this._mutations[name]) {
@@ -268,19 +346,24 @@ export class Glue {
 		return this._mutations[name];
 	}
 
-	addQuery<Args extends AnyObject = AnyObject>({
-		//@ts-ignore
-		args = {} as AnyObject,
+	addQuery<
+		Args extends object = EmptyObject,
+		Source extends null|object = null,
+		Type extends OneOrMore<ObjectType|UnionType>
+	>({
+		args = {},
 		name,
 		resolve,
 		type
-	} :{
-		args :AnyObject
-		name :string
-		resolve :FieldResolver<{
-			args: Args
+	}: {
+		args: GraphQLArgs<Args>
+		name: string
+		resolve: FieldResolver<{
+			args: Args,
+			context: Context,
+			source: Source
 		}>
-		type :ObjectType
+		type: Type
 	}) {
 		//log.debug(`addEnumType({name:${name}})`);
 		if(this._queries[name]) {
@@ -301,9 +384,9 @@ export class Glue {
 	addScalarType({
 		name,
 		type
-	} :{
-		name :string
-		type :ScalarType
+	}: {
+		name: string
+		type: ScalarType
 	}) {
 		//log.debug(`addScalarType({name:${name}})`);
 		if(this._scalarTypes[name]) {
@@ -317,15 +400,18 @@ export class Glue {
 		return this._scalarTypes[name];
 	}
 
-	addUnionType({
+	addUnionType<
+		T extends object,
+		OI extends ObjectType<T>|InterfaceType<T>
+	>({
 		name,
 		typeResolver,
 		types = []
-	} :{
-		name :string
-		typeResolver :TypeResolver
-		types :Array<unknown>
-	}) {
+	}: {
+		name: string
+		typeResolver: TypeResolver<T>
+		types: Reference<OI>[]
+	}): UnionType<T> {
 		//log.debug(`addUnionType({name:${name}})`);
 		if(this._unionTypes[name]) {
 			throw new Error(`Union type ${name} already defined!`);
@@ -335,7 +421,7 @@ export class Glue {
 		}
 		this._uniqueNames[name] = 'unionType';
 		this._unionTypes[name] = {
-			type: this.schemaGenerator.createUnionType({
+			type: this.schemaGenerator.createUnionType<T, OI>({
 				name,
 				typeResolver,
 				types
@@ -346,14 +432,14 @@ export class Glue {
 		return this._unionTypes[name];
 	}
 
-	getEnumType(name :string) {
+	getEnumType(name: string) {
 		if (!hasOwnProperty(this._enumTypes, name)) { // true also when property is set to undefined
 			throw new Error(`enumTypes[${name}] not found! Perhaps you're trying to use it before it's defined?`);
 		}
 		return this._enumTypes[name];
 	}
 
-	getFields(name :string) {
+	getFields(name: string) {
 		//log.debug(`getFields(${name})`);
 		if (!hasOwnProperty(this._fields, name)) { // true also when property is set to undefined
 			/*if (this._uniqueNames[name]) {
@@ -369,7 +455,7 @@ export class Glue {
 		return fields;
 	}
 
-	getInputType(name :string) {
+	getInputType(name: string) {
 		//log.debug(`getInputType(${name})`);
 		if (!hasOwnProperty(this._inputTypes, name)) { // true also when property is set to undefined
 			if (this._uniqueNames[name]) {
@@ -385,7 +471,7 @@ export class Glue {
 		return type;
 	}
 
-	getInterfaceType(name :string) {
+	getInterfaceType(name: string) {
 		//log.debug(`getInterfaceType(${name})`);
 		if (!hasOwnProperty(this._interfaceTypes, name)) { // true also when property is set to undefined
 			if (this._uniqueNames[name]) {
@@ -401,7 +487,7 @@ export class Glue {
 		return type;
 	}
 
-	getInterfaceTypeFields(name :string) {
+	getInterfaceTypeFields(name: string) {
 		//log.debug(`getInterfaceTypeFields(${name})`);
 		if (!hasOwnProperty(this._interfaceTypes, name)) { // true also when property is set to undefined
 			throw new Error(`interfaceTypes[${name}] not found! Perhaps you're trying to use it before it's defined?`);
@@ -414,7 +500,7 @@ export class Glue {
 		return fields;
 	}
 
-	getInterfaceTypeObj(name :string) {
+	getInterfaceTypeObj(name: string) {
 		//log.debug(`getInterfaceTypeObj(${name})`);
 		if (!hasOwnProperty(this._interfaceTypes, name)) { // true also when property is set to undefined
 			if (this._uniqueNames[name]) {
@@ -438,7 +524,7 @@ export class Glue {
 		return this._queries;
 	}
 
-	getObjectType(name :string) {
+	getObjectType(name: string) {
 		//log.debug(`getobjectType(${name})`);
 		if (!hasOwnProperty(this._objectTypes, name)) { // true also when property is set to undefined
 			if (this._uniqueNames[name]) {
@@ -458,7 +544,7 @@ export class Glue {
 		return this._objectTypes;
 	}
 
-	getScalarType(name :string) {
+	getScalarType(name: string) {
 		//log.debug(`getScalarType(${name})`);
 		if (!hasOwnProperty(this._scalarTypes, name)) { // true also when property is set to undefined
 			if (this._uniqueNames[name]) {
@@ -478,7 +564,7 @@ export class Glue {
 		return Object.keys(this._objectTypes).sort();
 	}
 
-	getUnionTypeObj(name :string) {
+	getUnionTypeObj(name: string) {
 		//log.debug(`getUnionTypeObj(${name})`);
 		if (!hasOwnProperty(this._unionTypes, name)) { // true also when property is set to undefined
 			if (this._uniqueNames[name]) {

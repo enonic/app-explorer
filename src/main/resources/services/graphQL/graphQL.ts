@@ -63,6 +63,8 @@ import {addMutationInterfaceUpdate} from './interface/addMutationInterfaceUpdate
 import {addQueryInterfaceGet} from './interface/addQueryInterfaceGet';
 import {generateQueryInterfacesField} from './interface/generateQueryInterfacesField';
 
+import addGetUser from './auth/addGetUser';
+import addGetMemberships from './auth/addGetMemberships'
 import {addGetProfile} from './profile/addGetProfile';
 import {addModifyProfile} from './profile/addModifyProfile';
 
@@ -192,6 +194,8 @@ const {
 	updateCollectionField
 } = generateCollectionFields({glue});
 
+addGetMemberships({glue});
+addGetUser({glue});
 addGetProfile({glue});
 addModifyProfile({glue});
 
