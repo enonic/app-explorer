@@ -1,9 +1,19 @@
-import type {User as UserType} from '/lib/xp/auth';
+import type {
+	// Group,
+	Principal,
+	// Role,
+	User as UserType
+} from '/lib/xp/auth';
 
+type ExtendedPrincipal = Principal & {
+	inherited: boolean
+	parent?: ExtendedPrincipal
+}
 
 import {
 	Card,
 	Header,
+	List,
 	Segment,
 } from 'semantic-ui-react';
 import Flex from '../components/Flex';
@@ -15,12 +25,15 @@ function User({
 	userState
 }: {
 	servicesBaseUrl: string
-	userState: UserType
+	userState: UserType & {
+		memberships: ExtendedPrincipal[]
+	}
 }) {
 	const {
 		displayName,
 		email,
-		login
+		login,
+		memberships = [],
 	} = userState || {};
 
 	const {
@@ -49,6 +62,49 @@ function User({
 					</Card.Content>
 				</Card>
 			</Segment>
+			<Flex
+				justifyContent='flex-start'
+				gap
+			>
+				<Flex.Item>
+					<Header as='h2' content="Groups"/>
+					<List items={memberships.filter(({type}) => type === 'group').map(({
+						displayName,
+						inherited,
+						parent,
+					}, i) => ({
+						icon: 'group',
+						content: inherited
+							? <>
+								{`${displayName} `}
+								<span className='c-gr'>
+									{`(inherited${parent ? ` from ${parent.displayName}` : ''})`}
+								</span>
+							</>
+							: displayName,
+						key: i,
+					}))}/>
+				</Flex.Item>
+				<Flex.Item>
+					<Header as='h2' content="Roles"/>
+					<List items={memberships.filter(({type}) => type === 'role').map(({
+						displayName,
+						inherited,
+						parent,
+					}, i) => ({
+						icon: 'student', // 'user secret'
+						content: inherited
+							? <>
+								{`${displayName} `}
+								<span className='c-gr'>
+									{`(inherited${parent ? ` from ${parent.displayName}` : ''})`}
+								</span>
+							</>
+							: displayName,
+						key: i,
+					}))}/>
+				</Flex.Item>
+			</Flex>
 			<Header as='h2' content="Settings"/>
 			<Header as='h3' content="Document page"/>
 			<Header as='h4' content="Columns"/>

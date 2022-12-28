@@ -37,6 +37,7 @@ export const GQL_TYPE_API_KEY_NAME = 'ApiKey';
 // Interface type names
 //──────────────────────────────────────────────────────────────────────────────
 export const GQL_INTERFACE_NODE_NAME = 'Node';
+export const GQL_INTERFACE_PRINCIPAL_NAME = 'PrincipalInterface';
 export const GQL_INTERFACE_QUERY_RESULT_NAME = 'QueryResult';
 
 //──────────────────────────────────────────────────────────────────────────────
@@ -72,6 +73,8 @@ export const GQL_TYPE_INTERFACE_TERM_QUERY_NAME = 'InterfaceTermQuery';
 
 export const GQL_TYPE_JOB_NAME = 'ScheduledJob';
 export const GQL_TYPE_NODE_DELETED_NAME = 'NodeDeleted';
+
+export const GQL_TYPE_PRINCIPAL_NAME = 'Principal';
 
 export const GQL_TYPE_REFERENCED_BY_NAME = 'ReferencedBy';
 export const GQL_TYPE_ROLE_NAME = 'Role';
@@ -124,6 +127,7 @@ export const GQL_QUERY_DOCUMENTS = 'queryDocuments';
 export const GQL_QUERY_EXPLORER_REPO_NODES_GET_NAME = 'getExplorerRepoNodes';
 export const GQL_QUERY_INTERFACE_GET_NAME = 'getInterface';
 export const GQL_QUERY_FIELD_GET_NAME = 'getField';
+export const GQL_QUERY_MEMBERS_GET_NAME = 'getMembers';
 export const GQL_QUERY_MEMBERSHIPS_GET_NAME = 'getMemberships';
 export const GQL_QUERY_PROFILE_GET_NAME = 'getProfile';
 export const GQL_QUERY_PROFILE_MODIFY_NAME = 'modifyProfile';
