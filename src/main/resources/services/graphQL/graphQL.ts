@@ -10,6 +10,7 @@
      ^               ^                                        Loose│
      └───────────────┴─────────────────────────────────────────────┘
 */
+import type {EmptyObject} from '/lib/explorer/types/index.d';
 import type {Request} from '../../types/index.d';
 
 
@@ -111,7 +112,7 @@ const schemaCache = newCache({
 });
 
 
-const glue = new Glue();
+const glue = new Glue<EmptyObject>();
 
 // There is a bit of a chicken and egg problem with
 // interface-, and object-types as they can use each other.
