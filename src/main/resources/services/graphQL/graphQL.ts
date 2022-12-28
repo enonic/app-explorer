@@ -65,6 +65,7 @@ import {addQueryInterfaceGet} from './interface/addQueryInterfaceGet';
 import {generateQueryInterfacesField} from './interface/generateQueryInterfacesField';
 
 import addGetUser from './auth/addGetUser';
+import addGetMembers from './auth/addGetMembers'
 import addGetMemberships from './auth/addGetMemberships'
 import {addGetProfile} from './profile/addGetProfile';
 import {addModifyProfile} from './profile/addModifyProfile';
@@ -195,6 +196,7 @@ const {
 	updateCollectionField
 } = generateCollectionFields({glue});
 
+addGetMembers({glue});
 addGetMemberships({glue});
 addGetUser({glue});
 addGetProfile({glue});

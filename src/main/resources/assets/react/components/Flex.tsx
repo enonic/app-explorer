@@ -65,7 +65,7 @@ function Flex({
 }: {
 	children: any
 	className?: string
-	justifyContent: 'center'|'space-between' // React.CSSProperties['justifyContent']
+	justifyContent: 'center'|'flex-start'|'space-between' // React.CSSProperties['justifyContent']
 	gap?: true, // 'normal'|number|``,React.CSSProperties['gap']
 	marginBottom?: true,
 	style?: React.CSSProperties

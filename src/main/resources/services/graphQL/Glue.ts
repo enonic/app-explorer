@@ -21,13 +21,22 @@ import {
 
 export type GraphQLFields<T> = {
 	[P in keyof T] :{
-		type :T[P]
+		resolve?: ({
+			args,
+			context,
+			source
+		}: {
+			args?: object
+			context?: object
+			source?: object
+		}) => T
+		type: T[P]
 	}
 }
 
 type GraphQLArgs<T> = {
 	[P in keyof T] :{
-		type :T[P]
+		type: T[P]
 	}
 }
 
@@ -49,16 +58,18 @@ type InputObjectType = Brand<object,'GraphQLInputObjectType'>;
 type InterfaceType<T extends object = object> = Brand<T,'GraphQLInterfaceType'>;
 export type ObjectType<T extends object = object> = Brand<T,'GraphQLObjectType'>;
 type ScalarType = Brand<string,'GraphQLString'>;
-type UnionType<T extends object = object> = Brand<T,'GraphQLUnionType'>;
+export type UnionType<T extends object = object> = Brand<T,'GraphQLUnionType'>;
 
 type TypeResolver<T extends object> = (object: T) => ObjectType<T>
 
-type UnionTypes<T extends object = object> = {
-	[name: string]: {
-		type: Record<string, UnionType<T>>
-		typeResolver: TypeResolver<T>
-		types: Reference<ObjectType<T>|InterfaceType<T>>[]
-	}
+type UnionTypesItem<T extends object = EmptyObject> = {
+	type: UnionType<T>
+	typeResolver: TypeResolver<T>
+	types: Reference<ObjectType<T>|InterfaceType<T>>[]
+}
+
+type UnionTypes<T extends object = EmptyObject> = {
+	[name: string]: UnionTypesItem<T>
 }
 
 // reference
@@ -92,19 +103,19 @@ type FieldResolver<
 > = (env: Env) => ResultGraph
 
 
-interface QueriesItem<
+export type QueriesItem<
 	Args extends object = object,
 	Context extends object = object	,
 	Source extends object = object,
 	//Source extends null|object = null,
 	T extends object = object
-> {
+> = {
 	args?: GraphQLArgs<Args>
 	resolve: FieldResolver<{
 		args?: Args
 		context?: Context
 		source?: Source
-	},OneOrMore<T>>
+	}, OneOrMore<T>>
 	type: OneOrMore<ObjectType<T>|UnionType<T>>
 }
 
@@ -310,7 +321,8 @@ export class Glue<Context extends object = EmptyObject> {
 		//log.debug(`addObjectType({name:${name},fields:${toStr(fields)})`);
 		//log.debug(`addObjectType({name:${name}})`);
 		if(this._objectTypes[name]) {
-			throw new Error(`Object type ${name} already defined!`);
+			return this._objectTypes[name];
+			// throw new Error(`Object type ${name} already defined!`);
 		}
 		if(this._uniqueNames[name]) {
 			throw new Error(`Name ${name} already used as ${this._uniqueNames[name]}!`);
@@ -321,7 +333,7 @@ export class Glue<Context extends object = EmptyObject> {
 			interfaces,
 			name
 		});
-		return this._objectTypes[name];
+		return this._objectTypes[name] as ObjectType<T>;
 	}
 
 	addMutation<Args extends AnyObject = AnyObject>({
@@ -375,7 +387,8 @@ export class Glue<Context extends object = EmptyObject> {
 	}) {
 		//log.debug(`addEnumType({name:${name}})`);
 		if(this._queries[name]) {
-			throw new Error(`Query ${name} already defined!`);
+			return this._queries[name];
+			// throw new Error(`Query ${name} already defined!`);
 		}
 		/*if(this._uniqueFieldNames[name]) {
 			throw new Error(`Name ${name} already used as ${this._uniqueFieldNames[name]}!`);
@@ -386,7 +399,7 @@ export class Glue<Context extends object = EmptyObject> {
 			resolve,
 			type
 		};
-		return this._queries[name].type as QueriesItem<Args, Context, Source, T>['type'];
+		return this._queries[name] as QueriesItem<Args, Context, Source, T>;
 	}
 
 	addScalarType({
@@ -418,8 +431,8 @@ export class Glue<Context extends object = EmptyObject> {
 	}: {
 		name: string
 		typeResolver: TypeResolver<T>
-		types: Reference<OI>[]
-	}): UnionType<T> {
+		types: (OI|Reference<OI>)[]
+	}) {
 		//log.debug(`addUnionType({name:${name}})`);
 		if(this._unionTypes[name]) {
 			throw new Error(`Union type ${name} already defined!`);
@@ -428,16 +441,17 @@ export class Glue<Context extends object = EmptyObject> {
 			throw new Error(`Name ${name} already used as ${this._uniqueNames[name]}!`);
 		}
 		this._uniqueNames[name] = 'unionType';
+		const type = this.schemaGenerator.createUnionType<T, OI>({
+			name,
+			typeResolver,
+			types
+		});
 		this._unionTypes[name] = {
-			type: this.schemaGenerator.createUnionType<T, OI>({
-				name,
-				typeResolver,
-				types
-			}),
+			type,
 			typeResolver,
 			types
 		};
-		return this._unionTypes[name].type;
+		return type;
 	}
 
 	getEnumType(name: string) {
@@ -532,7 +546,7 @@ export class Glue<Context extends object = EmptyObject> {
 		return this._queries;
 	}
 
-	getObjectType(name: string) {
+	getObjectType<T extends object = EmptyObject>(name: string) {
 		//log.debug(`getobjectType(${name})`);
 		if (!hasOwnProperty(this._objectTypes, name)) { // true also when property is set to undefined
 			if (this._uniqueNames[name]) {
@@ -545,7 +559,7 @@ export class Glue<Context extends object = EmptyObject> {
 			throw new Error(`objectType name:${name} is falsy!`);
 		}
 		//log.debug(`getobjectType(${name}) --> ${typeof type}`);
-		return type;
+		return type as ObjectType<T>;
 	}
 
 	getObjectTypes() {
@@ -572,7 +586,7 @@ export class Glue<Context extends object = EmptyObject> {
 		return Object.keys(this._objectTypes).sort();
 	}
 
-	getUnionTypeObj(name: string) {
+	getUnionTypeObj<T extends object = EmptyObject>(name: string) {
 		//log.debug(`getUnionTypeObj(${name})`);
 		if (!hasOwnProperty(this._unionTypes, name)) { // true also when property is set to undefined
 			if (this._uniqueNames[name]) {
@@ -585,7 +599,7 @@ export class Glue<Context extends object = EmptyObject> {
 			throw new Error(`unionType[${name}].type is falsy!`);
 		}
 		//log.debug(`getUnionTypeObj(${name}) --> ${typeof type}`);
-		return obj;
+		return obj as UnionTypesItem<T>;
 	}
 
 	getUnionTypes() {
