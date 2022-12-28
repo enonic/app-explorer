@@ -1,9 +1,10 @@
 import type {JSONResponse} from '../../../services/graphQL/fetchers/index.d';
+import type {Profile} from '../../..';
 
 type GetProfileResponse = JSONResponse<{
 	getProfile: {
-		documents: {
-			columns: string[]|string
+		documents?: {
+			columns?: string[]|string
 		}
 	}
 }>
@@ -12,15 +13,15 @@ type GetProfileResponse = JSONResponse<{
 import {forceArray} from '@enonic/js-utils';
 import * as gql from 'gql-query-builder';
 import {GQL_QUERY_PROFILE_GET_NAME} from '../../../services/graphQL/constants';
-import {SELECTED_COLUMNS_DEFAULT} from './constants';
+import {SELECTED_COLUMNS_DEFAULT} from '../document/constants';
 
 
-export async function getColumns({
-	servicesBaseUrl
+async function fetchProfile({
+	url
 }: {
-	servicesBaseUrl: string
-}) {
-	return fetch(`${servicesBaseUrl}/graphQL`, {
+	url: string
+}): Promise<Profile> {
+	return fetch(url, {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		body: JSON.stringify(gql.query({
@@ -36,6 +37,13 @@ export async function getColumns({
 				} = {}
 			} = object.data.getProfile || {};
 			// console.log('columns', columns);
-			return forceArray(columns);
+			return {
+				documents: {
+					columns: forceArray(columns)
+				}
+			};
 		});
 }
+
+
+export default fetchProfile;

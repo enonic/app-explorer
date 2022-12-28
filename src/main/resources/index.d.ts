@@ -29,6 +29,11 @@ export interface ExplorerProps {
 	wsBaseUrl: string
 }
 
+export interface Profile {
+	documents: {
+		columns: string[]
+	}
+}
 
 // Global-modifying module, should be placed in moduleRoot/index.d.ts
 declare global {

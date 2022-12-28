@@ -9,7 +9,7 @@ import {
 	QUERY_OPERATOR_OR,
 	// storage
 } from '@enonic/js-utils';
-import {useWhenInit} from "@seamusleahy/init-hooks";
+import {useWhenInit} from '@seamusleahy/init-hooks';
 import {useDebounce} from 'use-debounce';
 import * as gql from 'gql-query-builder';
 import {difference} from 'lodash';
