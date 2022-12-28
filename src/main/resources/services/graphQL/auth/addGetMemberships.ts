@@ -79,8 +79,8 @@ function addGetMemberships({
 			key: { type: nonNull(GraphQLString) },
 			type: { type: nonNull(GraphQLString) },
 		},
-		// typeResolver: groupOrRoleTypeResolver
-		typeResolver: glue.getUnionTypeObj(GQL_UNION_TYPE_GROUP_OR_ROLE).typeResolver
+		typeResolver: groupOrRoleTypeResolver
+		// typeResolver: glue.getUnionTypeObj(GQL_UNION_TYPE_GROUP_OR_ROLE).typeResolver
 	});
 
 	// const groupType =
@@ -110,8 +110,10 @@ function addGetMemberships({
 	});
 
 	const query = glue.addQuery<{
-			principalKey: UserKey | GroupKey
-		}
+			principalKey?: UserKey | GroupKey
+		}, {
+			principalKey?: UserKey | GroupKey
+		}, Group|Role
 	>({
 		args: {
 			principalKey: GraphQLString

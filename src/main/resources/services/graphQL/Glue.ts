@@ -71,7 +71,7 @@ export type Reference<
 }; // Bascially rebrand, but keep around original brand
 
 interface EnvObject {
-	args: object
+	args?: object
 	context?: object
 	source?: object
 }
@@ -92,13 +92,25 @@ type FieldResolver<
 > = (env: Env) => ResultGraph
 
 
-// type Queries<T extends object = object> = {
-// 	[name: string]: {
-// 		args: AnyObject
-// 		resolve: FieldResolver
-// 		type: OneOrMore<ObjectType<T>|UnionType<T>>
-// 	}
-// }
+interface QueriesItem<
+	Args extends object = object,
+	Context extends object = object	,
+	Source extends object = object,
+	//Source extends null|object = null,
+	T extends object = object
+> {
+	args?: GraphQLArgs<Args>
+	resolve: FieldResolver<{
+		args?: Args
+		context?: Context
+		source?: Source
+	},OneOrMore<T>>
+	type: OneOrMore<ObjectType<T>|UnionType<T>>
+}
+
+type Queries = {
+	[name: string]: QueriesItem
+}
 
 export class Glue<Context extends object = EmptyObject> {
 
@@ -117,11 +129,7 @@ export class Glue<Context extends object = EmptyObject> {
 		type: unknown
 	}> = {};
 	_objectTypes: Record<string, ObjectType> = {};
-	_queries: Record<string,{
-		args: AnyObject
-		resolve: FieldResolver
-		type: OneOrMore<ObjectType|UnionType>
-	}> = {};
+	_queries: Queries = {};
 	_scalarTypes: Record<string,ScalarType> = {};
 	_uniqueFieldNames: AnyObject = {}; // mutation and query field names should be unique?
 	_uniqueNames: AnyObject = {};
@@ -349,9 +357,9 @@ export class Glue<Context extends object = EmptyObject> {
 	addQuery<
 		Args extends object = EmptyObject,
 		Source extends null|object = null,
-		Type extends OneOrMore<ObjectType|UnionType>
+		T extends object = object
 	>({
-		args = {},
+		args,
 		name,
 		resolve,
 		type
@@ -362,8 +370,8 @@ export class Glue<Context extends object = EmptyObject> {
 			args: Args,
 			context: Context,
 			source: Source
-		}>
-		type: Type
+		}, OneOrMore<T>>
+		type: OneOrMore<ObjectType<T>|UnionType<T>>
 	}) {
 		//log.debug(`addEnumType({name:${name}})`);
 		if(this._queries[name]) {
@@ -378,7 +386,7 @@ export class Glue<Context extends object = EmptyObject> {
 			resolve,
 			type
 		};
-		return this._queries[name];
+		return this._queries[name].type as QueriesItem<Args, Context, Source, T>['type'];
 	}
 
 	addScalarType({
@@ -429,7 +437,7 @@ export class Glue<Context extends object = EmptyObject> {
 			typeResolver,
 			types
 		};
-		return this._unionTypes[name];
+		return this._unionTypes[name].type;
 	}
 
 	getEnumType(name: string) {
