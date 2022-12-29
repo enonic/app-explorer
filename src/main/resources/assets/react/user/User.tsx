@@ -70,15 +70,15 @@ function User({
 					<Header as='h2' content="Groups"/>
 					<List items={getMemberships.filter(({type}) => type === 'group').map(({
 						displayName,
-						inherited,
+						// inherited,
 						parent,
 					}, i) => ({
 						icon: 'group',
-						content: inherited
+						content: parent
 							? <>
 								{`${displayName} `}
 								<span className='c-gr'>
-									{`(inherited${parent ? ` from ${parent.displayName}` : ''})`}
+									{`(via ${parent.displayName})`}
 								</span>
 							</>
 							: displayName,
@@ -89,15 +89,15 @@ function User({
 					<Header as='h2' content="Roles"/>
 					<List items={getMemberships.filter(({type}) => type === 'role').map(({
 						displayName,
-						inherited,
+						// inherited,
 						parent,
 					}, i) => ({
 						icon: 'student', // 'user secret'
-						content: inherited
+						content: parent
 							? <>
 								{`${displayName} `}
 								<span className='c-gr'>
-									{`(inherited${parent ? ` from ${parent.displayName}` : ''})`}
+									{`(via ${parent.displayName})`}
 								</span>
 							</>
 							: displayName,
