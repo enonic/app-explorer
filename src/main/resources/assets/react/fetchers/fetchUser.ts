@@ -1,3 +1,4 @@
+import type Fields from 'gql-query-builder/build/Fields';
 import type {
 	// Group,
 	Principal,
@@ -31,7 +32,16 @@ async function fetchUser({
 		// 'key',
 		'login',
 		{
-			memberships: [
+			operation: 'getMemberships',
+			variables: {
+				transitive: {
+					list: false,
+					required: false,
+					type: 'Boolean',
+					value: true
+				}
+			},
+			fields: [
 				// 'description',
 				'displayName',
 				'inherited',
@@ -51,15 +61,16 @@ async function fetchUser({
 	],
 	url
 }: {
-	fields?: (
-		keyof User|{
-			memberships: (
-				keyof ExtendedPrincipal|{
-					parent: (keyof ExtendedPrincipal)[]
-				}
-			)[]
-		}
-	)[]
+	fields?: Fields
+	// fields?: (
+	// 	keyof User|{
+	// 		memberships: (
+	// 			keyof ExtendedPrincipal|{
+	// 				parent: (keyof ExtendedPrincipal)[]
+	// 			}
+	// 		)[]
+	// 	}
+	// )[]
 	url: string
 }) {
 	return fetch(url, {

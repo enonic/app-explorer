@@ -30,7 +30,7 @@ import addGetMemberships from './addGetMemberships'
 
 type ExtendedUser = User & {
 	// memberships: (ObjectType<Principal>|UnionType<Principal>)[]
-	memberships: OneOrMore<ObjectType<Principal>|UnionType<Principal>>
+	getMemberships: OneOrMore<ObjectType<Principal>|UnionType<Principal>>
 }
 
 
@@ -59,8 +59,14 @@ function addGetUser({
 				idProvider: { type: nonNull(GraphQLString) },
 				key: { type: nonNull(GraphQLString) },
 				login: { type: nonNull(GraphQLString) },
-				memberships: {
+				getMemberships: {
+					args: {
+						transitive: GraphQLBoolean
+					},
 					resolve({
+						args: {
+							transitive = false
+						},
 						source: {
 							key
 						}
@@ -71,7 +77,8 @@ function addGetUser({
 					}) {
 						return membershipsResolver({
 							args: {
-								principalKey: key
+								principalKey: key,
+								transitive
 							}
 						});
 					},

@@ -26,14 +26,14 @@ function User({
 }: {
 	servicesBaseUrl: string
 	userState: UserType & {
-		memberships: ExtendedPrincipal[]
+		getMemberships: ExtendedPrincipal[]
 	}
 }) {
 	const {
 		displayName,
 		email,
 		login,
-		memberships = [],
+		getMemberships = [],
 	} = userState || {};
 
 	const {
@@ -68,7 +68,7 @@ function User({
 			>
 				<Flex.Item>
 					<Header as='h2' content="Groups"/>
-					<List items={memberships.filter(({type}) => type === 'group').map(({
+					<List items={getMemberships.filter(({type}) => type === 'group').map(({
 						displayName,
 						inherited,
 						parent,
@@ -87,7 +87,7 @@ function User({
 				</Flex.Item>
 				<Flex.Item>
 					<Header as='h2' content="Roles"/>
-					<List items={memberships.filter(({type}) => type === 'role').map(({
+					<List items={getMemberships.filter(({type}) => type === 'role').map(({
 						displayName,
 						inherited,
 						parent,
