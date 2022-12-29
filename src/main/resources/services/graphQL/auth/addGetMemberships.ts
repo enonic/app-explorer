@@ -22,7 +22,7 @@ import {
 	// toStr,
 } from '@enonic/js-utils';
 import {
-	// GraphQLBoolean,
+	GraphQLBoolean,
 	GraphQLString,
 	list,
 	// nonNull,
@@ -57,13 +57,73 @@ type ExtendedPrincipal = Principal & {
 	parent?: ExtendedPrincipal
 }
 
-function getAllGroupsAndRole({
+//──────────────────────────────────────────────────────────────────────────────
+// Using DTB I can look at the nodes stored for users, groups, and roles?
+// A user node has no reference to groups or roles.
+// A group node has a member field with a list of members (users and groups)
+// A role node has a member field with a list of members (users and groups)
+//
+// The language of member and membership works fine between users and
+//  (user-)groups, but gets confusing when talking about the relationship to roles.
+// It's better to say that a user "has" a role,
+//  than a user "is" (a member of) a role.
+// Likewise members of a group "have" a role.
+//
+// a user can be a member of groups and roles
+// a group can be a member of groups and roles
+// a role cannot be a member of anything
+//
+// getMembers() (no need to recurse on users)
+// role ┐
+//      ├─ group ┐
+//      │        └─ group ┐
+//      │        │        └─ user
+//      │        └─ user
+//      └─ user
+//
+// getMemberships() (no need to recurse on roles)
+// user ┐
+//      ├─ group ┐
+//      │        └─ group ┐
+//      │        │        └─ role
+//      │        └─ role
+//      └─ role
+//
+// Since a user can be a member of multiple groups, the same role may be
+//  "inherited" multiple times, aka appear multiple times in the graph.
+// This also means that a role can have multiple "parents".
+//  groups can also have multiple "parents".
+// Since groups can be members of groups, the graph can be cyclical!
+//
+// user ┐
+//      ├─ role                   (direct membership)
+//      └─ group ┐                (direct membership)
+//               ├─ role          (transitive membership)
+//               └─ group ┐       (transitive membership)
+//                        └─ role (transitive membership)
+//
+//                 ┌──────┐
+//                 ▼      │
+// ┌──────┐    ┌───────┐  │
+// │ User ├─┬─►│ Group ├──┤ (transitive)
+// └──────┘ │  └───────┘  │
+// (direct) │  ┌──────┐   │
+//          └─►│ Role │◄──┘
+//             └──────┘
+//──────────────────────────────────────────────────────────────────────────────
+
+// parent, ancestor (guardian, source, root, origin, forebear)
+// child, descendant (heir, offspring, kin, seed)
+// In order to find all the direct parents or all ancestors of a role, or group, the whole "tree" must be traversed.
+// There's no point in informing about relationships which doesn't lead directly to the user.
+function getAllGroupsAndRoles({
 	principalKey,
 	inherited = false,
 	allMembershipsRef = [],
 	parent,
 	seenGroupsRef = [],
 	seenRolesRef = [],
+	transitive = false,
 }: {
 	principalKey: UserKey|GroupKey
 	inherited?: boolean
@@ -71,6 +131,7 @@ function getAllGroupsAndRole({
 	parent?: ExtendedPrincipal
 	seenGroupsRef?: GroupKey[]
 	seenRolesRef?: RoleKey[]
+	transitive?: boolean
 }) {
 	// I don't need to find other users in groups...
 	const localMemberShips = [];
@@ -90,14 +151,17 @@ function getAllGroupsAndRole({
 				// const {
 				// 	localMemberShips: childMemberships
 				// } =
-				getAllGroupsAndRole({ // Recurse
-					parent: aMemberShip,
-					principalKey: key,
-					inherited: true,
-					allMembershipsRef,
-					seenGroupsRef,
-					seenRolesRef
-				});
+				if (transitive) {
+					getAllGroupsAndRoles({ // Recurse
+						parent: aMemberShip, // WARNING! A group or role can have multiple parents so this is flaud!
+						principalKey: key,
+						inherited: true,
+						allMembershipsRef,
+						seenGroupsRef,
+						seenRolesRef,
+						transitive
+					});
+				}
 				const decoratedMembership = {
 					...aMemberShip,
 					inherited,
@@ -240,22 +304,23 @@ function addGetMemberships<Context extends object = EmptyObject>({
 
 	const query = glue.addQuery<{
 			principalKey?: GroupKey|UserKey
+			transitive?: boolean
 		}, undefined, Principal
 	>({
 		args: {
-			principalKey: GraphQLString
+			principalKey: GraphQLString,
+			transitive: GraphQLBoolean
 		},
 		name: GQL_QUERY_MEMBERSHIPS_GET_NAME,
 		resolve({
 			args: {
-				principalKey//: principalKeyArg
+				principalKey,
+				transitive = false
 			},
-			// source: {
-			// 	principalKey = principalKeyArg
-			// }
 		}) {
-			const { allMembershipsRef: memberships } = getAllGroupsAndRole({
-				principalKey
+			const { allMembershipsRef: memberships } = getAllGroupsAndRoles({
+				principalKey,
+				transitive
 			});
 			// log.info('memberships:%s', toStr(memberships));
 			return memberships;
