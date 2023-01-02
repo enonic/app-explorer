@@ -94,7 +94,7 @@ export function fetchDocumentTypes({
 						// 	terms: {
 						// 		field: 'collectionName',
 						// 		order: 'count DESC',
-						// 		size: 1000,
+						// 		size: 0, // Seems to mean infinite (undocumented)
 						// 		minDocCount: 1
 						// 	}
 						// },
@@ -105,14 +105,14 @@ export function fetchDocumentTypes({
 								terms: {
 									field: FIELD_SHORTCUT_COLLECTION,
 									order: 'count DESC',
-									size: 1000,
+									size: 0, // Seems to mean infinite (undocumented)
 									minDocCount: 1,
 								}
 							},
 							terms: {
 								field: FIELD_SHORTCUT_DOCUMENT_TYPE,
 								order: 'count DESC',
-								size: 1000,
+								size: 0, // Seems to mean infinite (undocumented)
 								minDocCount: 1
 							}
 						}

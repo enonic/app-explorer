@@ -113,7 +113,11 @@ function buildQueryDocumentsObject({
 				value: [{
 					name: 'collections',
 					terms: {
-						field: FIELD_SHORTCUT_COLLECTION
+						field: FIELD_SHORTCUT_COLLECTION,
+						minDocCount: 0,
+						order: '_term ASC',
+						// Has to be the greater than or equal to the number of collections.
+						size: 0 // Seems to mean infinite (undocumented)
 					}
 				}]
 			},
@@ -207,7 +211,7 @@ export function useNewOrEditInterfaceState({
 								field,
 								minDocCount: 2,
 								order: '_count DESC',
-								size: 100
+								size: 0 // Seems to mean infinite (undocumented)
 							}
 						}]
 					},
