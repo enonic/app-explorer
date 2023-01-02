@@ -35,7 +35,9 @@ export const Collector = React.forwardRef(({
 		baseUriOnBlur,
 		baseUriOnChange,
 		excludesArray,
+		keepHtml,
 		setExcludesArray,
+		setKeepHtml,
 		setUserAgent,
 		userAgent
 	} = useWebCrawlerState({
@@ -120,6 +122,11 @@ export const Collector = React.forwardRef(({
 				</Button>
 			</Form.Field>
 		}
+		<Form.Checkbox
+			checked={keepHtml}
+			label='Keep a copy of the HTML source? (not recommended)'
+			onChange={(_event, {checked}) => setKeepHtml(checked)}
+		/>
 		<Form.Input
 			fluid
 			label='Custom User-Agent'

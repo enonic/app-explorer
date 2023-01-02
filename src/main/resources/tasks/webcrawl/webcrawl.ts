@@ -3,6 +3,7 @@ import type {
 	Cheerio,
 	SelectorType
 } from 'cheerio';
+import type { DataNode } from 'domhandler';
 import type {
 	HttpClientRequest,
 	Response
@@ -44,6 +45,7 @@ import guard from 'robots-txt-guard';
 import cheerio from 'cheerio'; // uses Array.from
 // cheerio: str.trimEnd is not a function
 // import cheerio from '/lib/cheerio';
+import { ElementType } from "domelementtype";
 import pretty from 'pretty';
 
 // import safeStringify from 'fast-safe-stringify';
@@ -171,9 +173,34 @@ const removeDisplayNoneAndVisibilityHidden = (
 }
 
 // const textContent = node => node.text();
-const outerHTML = (node :Cheerio<AnyNode>) => node.clone().wrap('<div>').parent().html();
+const outerHTML = (node: Cheerio<AnyNode>) => node.clone().wrap('<div>').parent().html();
 // const innerHTML = node => node.html();
 
+function isCommentFilter(_index: number, node: AnyNode) {
+	return node.type === ElementType.Comment;
+}
+
+
+const REPLACEMENT = '&#129'; // HOP illegal in html :)
+const REPLACE_ALL_REPLACEMENT_REGEXP = new RegExp(`${REPLACEMENT}+`, 'g');
+function getText(node: Cheerio<AnyNode>) {
+	// Note that while textContent gets the content of all elements, including <script> and <style> elements, innerText, doesn't.
+	// innerText is also aware of style and will not return the text of hidden elements, whereas textContent will.
+	// log.info('textContent:%s', node.prop('textContent'));
+	// log.info('innerText:%s', node.prop('innerText')); // These doesn't seem to be differences in whitespace between textContent and innerText
+	// log.info('innerHTML:%s', node.prop('innerHTML'));
+	// return node.prop('innerText').replace(/(\r\n|\n|\r)/gm, ' '); // No whitespace bewteen elements :(
+ 	return node
+ 		// .text() // No whitespace bewteen elements :(
+		// .html() // is this the same as innerHTML or outerHTML ?
+		.prop('innerHTML')
+ 		//.replaceAll(/<\/?[a-zA-Z0-9=" ]*>/g, ' ') // This doesn't handle <!-- --> and more
+		// How to handle tags inside comments... <!-- <div></div> -->
+		.replace(/<\/?[^>]+>/g, REPLACEMENT)
+		//.replace(/\s\s+/g, ' ') // This will replace newlines, tabs etc...
+		.replace(REPLACE_ALL_REPLACEMENT_REGEXP, ' ')
+		.trim();
+}
 
 export function run({
 	collectionId,
@@ -189,10 +216,11 @@ export function run({
 	// log.debug('webcrawl: name:%s', name);
 
 	const collector = new Collector<{
-		baseUri :string
-		excludes ?:Array<string>
-		resume ?:boolean
-		userAgent ?:string
+		baseUri: string
+		excludes?: string[]
+		keepHtml?: boolean
+		resume?: boolean
+		userAgent?: string
 	}>({
 		collectionId,
 		collectorId,
@@ -242,8 +270,10 @@ export function run({
 	const {
 		resume = false,
 		excludes = [],
+		keepHtml = false,
 		userAgent = DEFAULT_UA
 	} = collector.config;
+	DEBUG && log.debug('keepHtml:%s', keepHtml);
 	DEBUG && log.debug('userAgent:%s', userAgent);
 
 	const excludeRegExps = excludes.map(str => new RegExp(str));
@@ -432,11 +462,19 @@ export function run({
 				const titleEl = querySelector(headEl, 'title');
 				// log.debug(`titleEl:${toStr(titleEl)}`); // JSON.stringify got a cyclic data structure
 
-				const title = titleEl ? titleEl.text() : '';
+				const title = titleEl ? getText(titleEl) : '';
 				DEBUG && log.debug(`title:${toStr(title)}`);
 
 				const bodyElWithNothingRemoved = querySelector(rootNode, 'body');
 				const cleanedBodyEl = bodyElWithNothingRemoved.clone();
+
+				// Remove all elements except tags and text
+				cleanedBodyEl.find('*').contents().filter((_i, el) => !(
+						el.type === ElementType.Tag
+						|| el.type === ElementType.Text
+					)
+				).remove();
+
 				remove(cleanedBodyEl, 'aside');
 				remove(cleanedBodyEl, 'footer');
 				remove(cleanedBodyEl, 'noscript'); // This works
@@ -526,18 +564,22 @@ export function run({
 				if (boolIndex && (!robots || robots.isIndexable('', uri))) {
 					const documentToPersist :{
 						// displayName :string
-						text :string
-						title :string
-						uri :string
-						uris :Array<string>
+						text: string
+						title: string
+						uri: string
+						uris: string[]
 						_id ?:string
+						html?: string
 					} = {
 						// displayName: title, // This has no field definition by default
-						text: cleanedBodyEl.text(),
+						text: getText(cleanedBodyEl),
 						title,
 						uri,
 						uris // This has no field definition by default
 					};
+					if (keepHtml) {
+						documentToPersist.html = res.body;
+					}
 					TRACE && log.debug('documentToPersist:%s', toStr(documentToPersist));
 
 					// Check if any document with uri exists
