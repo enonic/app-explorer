@@ -42,11 +42,15 @@ const GQL_COLLECTIONS = `queryCollections(
 	}
 }`;
 
+// size: 0 // Seems to mean infinite (undocumented)
 const GQL_DOCUMENTS = `queryDocuments(
 	aggregations: [{
 		name: "collections"
 		terms: {
 			field: "${FIELD_SHORTCUT_COLLECTION}"
+			minDocCount: 0
+			order: "_term ASC"
+			size: 0
 		}
 	}]
 	count: 0

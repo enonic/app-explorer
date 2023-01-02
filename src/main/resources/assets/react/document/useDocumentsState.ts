@@ -299,7 +299,7 @@ export function useDocumentsState({
 							terms: {
 								field: FIELD_SHORTCUT_COLLECTION,
 								order: '_count DESC',
-								size: 100,
+								size: 0, // Seems to mean infinite (undocumented)
 								minDocCount: 0,
 							}
 						},{
@@ -307,7 +307,7 @@ export function useDocumentsState({
 							terms: {
 								field: FIELD_SHORTCUT_DOCUMENT_TYPE,
 								order: '_count DESC',
-								size: 100,
+								size: 0, // Seems to mean infinite (undocumented)
 								minDocCount: 0,
 							}
 						}]

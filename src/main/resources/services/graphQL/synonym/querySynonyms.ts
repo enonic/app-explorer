@@ -64,7 +64,7 @@ export function querySynonyms({
 				terms: {
 					field: '_parentPath',
 					order: '_count desc',
-					size: 100
+					size: 0, // Seems to mean infinite (undocumented)
 				}
 			}
 		},

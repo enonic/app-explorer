@@ -37,21 +37,21 @@ export function hasField({
 				terms: {
 					field: 'branch',
 					order: '_count desc',
-					size: 100
+					size: 0, // Seems to mean infinite (undocumented)
 				}
 			},
 			repoId: {
 				terms: {
 					field: 'repoId',
 					order: '_count desc',
-					size: 100
+					size: 0, // Seems to mean infinite (undocumented)
 				},
 				aggregations: {
 					branch: {
 						terms: {
 							field: 'branch',
 							order: '_count desc',
-							size: 100
+							size: 0, // Seems to mean infinite (undocumented)
 						}
 					}
 				}
