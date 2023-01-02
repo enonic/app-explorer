@@ -5,15 +5,19 @@ import type {
 } from '/lib/explorer/types/index.d';
 
 
-import {forceArray} from '@enonic/js-utils';
+import {
+	forceArray,
+	isSet,
+} from '@enonic/js-utils';
 import * as React from 'react';
 import {useUpdateEffect} from './utils/useUpdateEffect';
 
 
 export type CollectorConfig = {
-	baseUri ?:string
-	excludes ?:string|Array<string>
-	userAgent ?:string
+	baseUri?: string
+	excludes?: string|string[]
+	keepHtml?: boolean
+	userAgent?: string
 }
 
 
@@ -43,6 +47,16 @@ export function useWebCrawlerState({
 		return {
 			...prevCollectorConfig,
 			excludes: newExcludesArray
+		};
+	});
+
+	const keepHtml = collectorConfig && isSet(collectorConfig.keepHtml)
+		? collectorConfig.keepHtml
+		: false;
+	const setKeepHtml = (newKeepHtml: boolean) => setCollectorConfig(prevCollectorConfig => {
+		return {
+			...prevCollectorConfig,
+			keepHtml: newKeepHtml
 		};
 	});
 
@@ -143,7 +157,9 @@ export function useWebCrawlerState({
 		baseUriOnChange,
 		baseUriError,
 		excludesArray,
+		keepHtml,
 		setExcludesArray,
+		setKeepHtml,
 		setUserAgent,
 		userAgent
 	};

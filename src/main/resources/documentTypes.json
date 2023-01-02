@@ -4,6 +4,17 @@
 	"properties": [{
 		"active": true,
 		"enabled": true,
+		"fulltext": false,
+		"includeInAllText": false,
+		"max": 1,
+		"min": 0,
+		"name": "html",
+		"nGram": false,
+		"path": false,
+		"valueType": "string"
+	},{
+		"active": true,
+		"enabled": true,
 		"fulltext": true,
 		"includeInAllText": true,
 		"max": 1,
