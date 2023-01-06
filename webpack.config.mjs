@@ -66,7 +66,10 @@ const SS_ALIAS = {
 			: path.resolve(__dirname, './node_modules/@enonic/js-utils/dist/cjs/index.js')
 		: BOOL_LOCAL_JS_UTILS
 			? path.resolve(__dirname, '../enonic-js-utils/src/index.ts')
-			: path.resolve(__dirname, './node_modules/@enonic/js-utils/src/index.ts') // This is used in production build
+			: path.resolve(__dirname, './node_modules/@enonic/js-utils/src/index.ts'), // This is used in production build
+	// '@enonic/explorer-utils': BOOL_LOCAL_LIB_EXPLORER
+	// 	? path.resolve(__dirname, '../explorer-utils/index.mts')
+	// 	: path.resolve(__dirname, './node_modules/@enonic/explorer/utils') // /index.mts
 };
 
 // Avoid bundling and transpile library files seperately.
@@ -346,15 +349,16 @@ const SS_JS_CONFIG = {
 	resolve: {
 		alias: SS_ALIAS,
 		extensions: [
+			'mts', // @enonic/lib-explorer
 			//'mjs', // NOTE ECMAScript Modules doesn't support named imports :(
 			'es', // Needed to resolve "local" imports starting with / which are .es files
 			//'esm', // NOTE ECMAScript Modules doesn't support named imports :(
 			//'es6',
 			'js', // Needed to resolve node_modules
 			//'jsx', // Client-side only
-			'ts'//,
+			'ts',
 			//'tsx', // Client-side only
-			//'json'
+			//'json',
 		].map(ext => `.${ext}`)
 	},
 	stats: STATS,
@@ -452,7 +456,13 @@ const STYLE_CONFIG = {
 		})
 	],
 	resolve: {
-		extensions: ['sass', 'scss', 'less', 'styl', 'css'].map(ext => `.${ext}`)
+		extensions: [
+			'sass',
+			'scss',
+			'less',
+			'styl',
+			'css',
+		].map(ext => `.${ext}`)
 	},
 	stats: STATS,
 	target: 'web', // <=== can be omitted as default is 'web'
@@ -583,12 +593,13 @@ const CLIENT_JS_CONFIG = {
 			'/lib/explorer': path.resolve(__dirname, '../lib-explorer/src/main/resources/lib/explorer/')
 		},*/
 		extensions: [
+			'mts', // @enonic/lib-explorer
 			'mjs',
 			'es',
 			'js',
 			'jsx',
 			'ts',
-			'tsx'
+			'tsx',
 		].map(ext => `.${ext}`)
 	},
 	stats: STATS,
@@ -684,6 +695,7 @@ const CLIENT_ES_CONFIG = {
 			//'/lib/explorer': path.resolve(__dirname, '../lib-explorer/src/main/resources/lib/explorer/')
 		},
 		extensions: [
+			'mts', // @enonic/lib-explorer
 			'tsx',
 			'ts',
 			'mjs',
@@ -692,7 +704,7 @@ const CLIENT_ES_CONFIG = {
 			'es',
 			'es6',
 			'js',
-			'json'
+			'json',
 		].map(ext => `.${ext}`)
 	},
 	stats: STATS,

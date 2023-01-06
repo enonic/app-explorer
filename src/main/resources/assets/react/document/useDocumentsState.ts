@@ -3,12 +3,17 @@ import type {
 	DropdownItemProps,
 	PaginationProps,
 } from 'semantic-ui-react';
+import type {
+	JsonModalState,
+	QueryDocumentsResult,
+} from './';
 
 
 import {
 	QUERY_OPERATOR_OR,
 	// storage
 } from '@enonic/js-utils';
+import {FieldPath} from '@enonic/explorer-utils';
 import {useWhenInit} from '@seamusleahy/init-hooks';
 import {useDebounce} from 'use-debounce';
 import * as gql from 'gql-query-builder';
@@ -16,12 +21,6 @@ import {difference} from 'lodash';
 import moment from 'moment';
 import * as React from 'react';
 // import traverse from 'traverse';
-// import {
-// 	FIELD_PATH_META,
-// 	FIELD_PATH_META_COLLECTION,
-// 	FIELD_PATH_META_DOCUMENT_TYPE,
-// 	FIELD_PATH_META_LANGUAGE
-// } from '/lib/explorer/constants'; // WARNING lib explorer can't be imported client-side because the files only exists inside the jar...
 import {
 	FIELD_SHORTCUT_COLLECTION,
 	FIELD_SHORTCUT_DOCUMENT_TYPE,
@@ -29,12 +28,10 @@ import {
 import {useInterval} from '../utils/useInterval';
 import {useUpdateEffect} from '../utils/useUpdateEffect';
 import {
-	COLUMN_NAME_COLLECTION,
-	COLUMN_NAME_DOCUMENT_TYPE,
-	COLUMN_NAME_LANGUAGE,
-	COLUMN_NAME_ID,
-	COLUMN_NAME_JSON,
-	SELECTED_COLUMNS_DEFAULT
+	POST_TAG,
+	PRE_TAG,
+	SELECTED_COLUMNS_DEFAULT,
+	Column,
 } from './constants';
 import {getColumns} from './getColumns';
 import {persistColumns} from './persistColumns';
@@ -49,34 +46,29 @@ import {persistColumns} from './persistColumns';
 
 const DEBUG_DEPENDENCIES = false;
 
-const FIELD_PATH_META = 'document_metadata' as const; // TODO _meta ?
-// export const FIELD_PATH_META_COLLECTION = `${FIELD_PATH_META}.collection` as const;
-// export const FIELD_PATH_META_DOCUMENT_TYPE = `${FIELD_PATH_META}.documentType` as const;
-// export const FIELD_PATH_META_LANGUAGE = `${FIELD_PATH_META}.language` as const;
 const GQL_INPUT_TYPE_HIGHLIGHT = 'InputTypeHighlight';
 
 
 export const FRAGMENT_SIZE_DEFAULT = 150;
 const PER_PAGE_DEFAULT = 10;
-export const POST_TAG = '</b>';
-export const PRE_TAG = '<b class="bgc-y">';
+
 
 
 const OPTIONS_COLUMNS_DEFAULT: DropdownItemProps[] = [{
 	text: 'Collection',
-	value: COLUMN_NAME_COLLECTION, // 'document_metadata.collection'
+	value: Column.COLLECTION, // 'document_metadata.collection'
 },{
 	text: 'Document type',
-	value: COLUMN_NAME_DOCUMENT_TYPE, // 'document_metadata.documentType'
+	value: Column.DOCUMENT_TYPE, // 'document_metadata.documentType'
 },{
 	text: 'Language',
-	value: COLUMN_NAME_LANGUAGE, // 'document_metadata.language'
+	value: Column.LANGUAGE, // 'document_metadata.language'
 },{
 	text: 'Document ID',
-	value: COLUMN_NAME_ID
+	value: Column.ID
 },{
 	text: 'JSON',
-	value: COLUMN_NAME_JSON
+	value: Column.JSON
 }];
 
 export function useDocumentsState({
@@ -89,22 +81,11 @@ export function useDocumentsState({
 	//──────────────────────────────────────────────────────────────────────────
 	// State
 	//──────────────────────────────────────────────────────────────────────────
-	const [documentsRes, setDocumentsRes] = React.useState<{
-		total: number
-		hits: {
-			_id: string
-			_highlight: Record<string,string[]>
-			parsedJson: Record<string,unknown>
-		}[]
-	}>({
+	const [documentsRes, setDocumentsRes] = React.useState<QueryDocumentsResult>({
 		total: 0,
 		hits: []
 	});
-	const [jsonModalState, setJsonModalState] = React.useState<{
-		open: boolean
-		id: string
-		parsedJson: Record<string,unknown>
-	}>({
+	const [jsonModalState, setJsonModalState] = React.useState<JsonModalState>({
 		open: false,
 		id: '',
 		parsedJson: undefined,
@@ -356,7 +337,7 @@ export function useDocumentsState({
 							'_highlight',
 							'_id',
 							'_json',
-							FIELD_PATH_META
+							FieldPath.META
 						]
 					}
 				]
