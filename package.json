@@ -97,6 +97,7 @@
     "@enonic-types/lib-repo": "^7",
     "@enonic-types/lib-task": "^7",
     "@enonic-types/lib-vhost": "^7",
+    "@enonic/explorer-utils": "^0",
     "@swc/cli": "^0",
     "@swc/core": "^1",
     "@types/jquery": "^3",

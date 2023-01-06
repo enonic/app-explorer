@@ -48,12 +48,13 @@
 			// "@enonic/js-utils/*": ["../enonic-js-utils/src/*"],
 			// "@enonic/semantic-ui-react-form": ["../semantic-ui-react-form/src"],
 			// "/lib/xp/node": ["../xp/modules/lib/lib-node/src/main/resources/lib/xp/node.ts"],
-
+			
 			// Production (should be commented in when commiting)
 			"@enonic/app-explorer/*": ["./src/main/resources/*"],
 			"@enonic/js-utils": ["node_modules/@enonic/js-utils/src"],
-
-			// There is no @enonic-types/lib-explorer yet, so this is a workaround
+			
+			// There is no @enonic-types/lib-explorer yet, so these are workarounds
+			// "@enonic/explorer-utils": ["../explorer-utils"],
 			"@enonic-types/lib-explorer": ["../lib-explorer/src/main/resources/lib/explorer/types/index.d"],
 			"@enonic-types/lib-explorer/*": ["../lib-explorer/src/main/resources/lib/explorer/types/*"],
 			"/lib/explorer/*": ["../lib-explorer/src/main/resources/lib/explorer/*"],

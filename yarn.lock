@@ -1258,6 +1258,11 @@
   resolved "https://registry.yarnpkg.com/@enonic-types/lib-vhost/-/lib-vhost-7.11.1.tgz#c40a6386b7b6e205ff8d17082974d5c592c0d12e"
   integrity sha512-a1pvmHkZbOXnYo3QkhYJSoqJBwjLs9uiN/41RNX+i9WBsGq2is4oVBsWQPhRfwATTzWOCwwXdNkdIA+5bH5iDw==
 
+"@enonic/explorer-utils@^0":
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/@enonic/explorer-utils/-/explorer-utils-0.0.1.tgz#d7832932c2b3830c0fb9b5550fab995c4f5e7b0c"
+  integrity sha512-3+9JqFyZBnI/mOqI7J8HTP4WhamEoneRvPaHrx7wrxOQFqKYu33z8EErIZPGFNKzSdWG4nCc73l/WpZKh0kC/Q==
+
 "@enonic/js-utils@^0":
   version "0.44.1"
   resolved "https://registry.yarnpkg.com/@enonic/js-utils/-/js-utils-0.44.1.tgz#f6178758c8b4c3c33b185d32cf3b91cac0d64549"
