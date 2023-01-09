@@ -1,9 +1,3 @@
-export interface JsonModalState {
-    open: boolean
-    id: string
-    parsedJson: Record<string,unknown>
-}
-
 export interface QueryDocumentsResult {
     total: number
     hits: {

@@ -10,20 +10,16 @@ import {
 	Form,
 	Header,
 	Icon,
-	Input,
-	Modal,
 	Radio,
 	Segment,
 	Table,
 } from 'semantic-ui-react';
 import Flex from '../components/Flex';
 import {HoverPopup} from '../components/HoverPopup';
-import {TypedReactJson} from '../search/TypedReactJson';
-import {
-	FRAGMENT_SIZE_DEFAULT,
-	useDocumentsState
-} from './useDocumentsState';
+import SearchInput from '../components/inputs/SearchInput';
+import {useDocumentsState} from './useDocumentsState';
 import DocumentsTable from './DocumentsTable';
+import {FRAGMENT_SIZE_DEFAULT} from './constants';
 
 // import {FIELD_PATH_META} from '/lib/explorer/constants'; // TODO setup build system so this import works
 
@@ -85,8 +81,7 @@ export function Documents({
 				<Flex.Item>
 					<Form style={{margin:0}}>
 						<Form.Group style={{margin:0}}>
-							<Input
-								icon
+							<SearchInput
 								disabled={loading}
 								loading={loading}
 								onChange={(
@@ -112,12 +107,7 @@ export function Documents({
 									}
 								}}
 								value={query}
-							>
-								<input style={{
-									borderRadius: 19
-								}}/>
-								<Icon name='search'/>
-							</Input>
+							/>
 							<Form.Field>
 								<Segment style={{
 									height: 38
@@ -472,9 +462,11 @@ export function Documents({
 			}
 			<DocumentsTable
 				documentsRes={documentsRes}
+				dragAndDropColumnsProp={true}
 				fragmentSize={fragmentSize}
 				handleDroppedColumn={handleDroppedColumn}
 				handlePaginationChange={handlePaginationChange}
+				jsonModalState={jsonModalState}
 				loading={loading}
 				page={page}
 				perPage={perPage}
@@ -483,31 +475,6 @@ export function Documents({
 				setJsonModalState={setJsonModalState}
 				start={start}
 			/>
-			<Modal
-				open={jsonModalState.open}
-				onClose={() => setJsonModalState({
-					open: false,
-					id: '',
-					parsedJson: undefined,
-				})}
-			>
-				<Modal.Header content={jsonModalState.id}/>
-				<Modal.Content>
-					{jsonModalState.parsedJson
-						? <TypedReactJson
-							enableClipboard={false}
-							displayArrayKey={false}
-							displayDataTypes={false}
-							displayObjectSize={false}
-							indentWidth={2}
-							name={null}
-							quotesOnKeys={false}
-							sortKeys={true}
-							src={jsonModalState.parsedJson}
-						/>
-						: null}
-				</Modal.Content>
-			</Modal>
 		</Flex.Item>
 	</Flex>;
 }

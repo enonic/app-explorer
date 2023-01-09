@@ -1,10 +1,8 @@
 import type {
 	PaginationProps,
 } from 'semantic-ui-react';
-import type {
-	JsonModalState,
-	QueryDocumentsResult,
-} from './';
+import type JsonModalState from '../components/modals/JsonModalState.d';
+import type {QueryDocumentsResult} from './';
 
 
 import {
@@ -22,7 +20,10 @@ import {
 	Pagination,
 	Table,
 } from 'semantic-ui-react';
+import JsonModal from '../components/modals/JsonModal';
 import {
+	FRAGMENT_SIZE_DEFAULT,
+	PER_PAGE_DEFAULT,
 	POST_TAG,
 	PRE_TAG,
 	SELECTED_COLUMNS_DEFAULT,
@@ -82,34 +83,52 @@ function getHighlightedHtml({
 	return highlightedHtml;
 }
 
+function columnNameToDisplayName(columnName: string) {
+	return columnName === Column.COLLECTION
+		? 'Collection'
+		: columnName === Column.DOCUMENT_TYPE
+			? 'Document type'
+			: columnName === Column.LANGUAGE
+				? 'Language'
+				: columnName === Column.ID
+					? 'Document ID'
+					: columnName === Column.JSON
+						? 'Document'
+						: columnName;
+}
+
 
 function DocumentsTable({
 	documentsRes,
-	fragmentSize,
-	handleDroppedColumn,
+	dragAndDropColumnsProp = false,
+	fragmentSize = FRAGMENT_SIZE_DEFAULT,
+	handleDroppedColumn = ({}) => undefined,
 	handlePaginationChange,
+	jsonModalState,
 	loading,
 	page,
-	perPage,
+	perPage = PER_PAGE_DEFAULT,
 	searchedString,
-	selectedColumnsState,
+	selectedColumnsState = [...SELECTED_COLUMNS_DEFAULT],
 	setJsonModalState,
 	start,
 }: {
-    documentsRes: QueryDocumentsResult,
-    fragmentSize: number
-    handleDroppedColumn: ({fromId, toId}: {fromId: string, toId: string}) => void
-    handlePaginationChange: (
+	documentsRes: QueryDocumentsResult,
+	dragAndDropColumnsProp?: boolean,
+	fragmentSize?: number
+	handleDroppedColumn?: ({fromId, toId}: {fromId: string, toId: string}) => void
+	handlePaginationChange: (
 		_event: React.MouseEvent<HTMLAnchorElement>,
 		data: PaginationProps
 	) => void,
-    loading: boolean
-    page: number
-    perPage: number
-    searchedString: string
-    selectedColumnsState: string[]
-    setJsonModalState: React.Dispatch<React.SetStateAction<JsonModalState>>
-    start: number
+	jsonModalState: JsonModalState
+	loading: boolean
+	page: number
+	perPage?: number
+	searchedString: string
+	selectedColumnsState?: string[]
+	setJsonModalState: React.Dispatch<React.SetStateAction<JsonModalState>>
+	start: number
 }) {
 	return <>
 		<DndProvider backend={HTML5Backend}>
@@ -117,32 +136,26 @@ function DocumentsTable({
 				<Table celled compact striped>
 					<Table.Header>
 						<Table.Row>
-							{selectedColumnsState.map((columnName, i) => <DragAndDropableHeaderCell
-								collapsing
-								content={
-									columnName === Column.COLLECTION
-										? 'Collection'
-										: columnName === Column.DOCUMENT_TYPE
-											? 'Document type'
-											: columnName === Column.LANGUAGE
-												? 'Language'
-												: columnName === Column.ID
-													? 'Document ID'
-													: columnName === Column.JSON
-														? 'Document'
-														: columnName
-								}
-								id={columnName}
-								index={i}
-								key={`column-${columnName}`}
-								onDrop={({
-									fromId,
-									toId
-								}) => handleDroppedColumn({
-									fromId,
-									toId
-								})}
-							/>)}
+							{dragAndDropColumnsProp
+								? selectedColumnsState.map((columnName, i) => <DragAndDropableHeaderCell
+									collapsing
+									content={columnNameToDisplayName(columnName)}
+									id={columnName}
+									index={i}
+									key={`column-${columnName}`}
+									onDrop={({
+										fromId,
+										toId
+									}) => handleDroppedColumn({
+										fromId,
+										toId
+									})}
+								/>)
+								: selectedColumnsState.map((columnName, i) => <Table.HeaderCell
+									content={columnNameToDisplayName(columnName)}
+									key={i}
+								/>)
+							}
 							{/*columnOptions
 								.filter(({value}) => selectedColumns.includes(value as string))
 								.map(({text},i) => <Table.HeaderCell collapsing content={text} key={i}/>)*/}
@@ -163,15 +176,15 @@ function DocumentsTable({
 										const key = `${i}.${j}`;
 										if (selectedColumnName === Column.COLLECTION) {
 											return <Table.Cell collapsing key={key}>
-												{rest[FieldPath.META].collection}
+												{rest[FieldPath.META] && rest[FieldPath.META].collection || rest['_collection']}
 											</Table.Cell>;
 										} else if (selectedColumnName === Column.DOCUMENT_TYPE) {
 											return <Table.Cell collapsing key={key}>
-												{rest[FieldPath.META].documentType}
+												{rest[FieldPath.META] && rest[FieldPath.META].documentType || rest['_documentType']}
 											</Table.Cell>;
 										} else if (selectedColumnName === Column.LANGUAGE) {
 											return <Table.Cell collapsing key={key}>
-												{rest[FieldPath.META].language}
+												{rest[FieldPath.META] && rest[FieldPath.META].language || rest['_language']}
 											</Table.Cell>;
 										} else if (selectedColumnName === Column.ID) {
 											return <Table.Cell collapsing key={key}>{_id}</Table.Cell>;
@@ -182,8 +195,8 @@ function DocumentsTable({
 													onClick={() => {
 														setJsonModalState({
 															open: true,
-															id: _id,
-															parsedJson: parsedJson,
+															header: _id,
+															parsedJson: parsedJson || rest['_json'],
 														})
 													}}
 												/>
@@ -229,7 +242,7 @@ function DocumentsTable({
 			</div>
 		</DndProvider>
 		<Pagination
-			disabled={loading || !documentsRes.total}
+			disabled={loading || !documentsRes.total}
 			pointing
 			secondary
 			size='mini'
@@ -262,6 +275,10 @@ function DocumentsTable({
 			})()}</p>
 			: null
 		}
+		<JsonModal
+			state={jsonModalState}
+			setState={setJsonModalState}
+		/>
 	</>;
 }
 
