@@ -41,33 +41,35 @@ export function NewOrEditCollectionModal({
 	_name,
 	afterClose = () => {/**/},
 	beforeOpen = () => {/**/},
+	defaultOpen = false,
 	disabled = false,
 	loading = false,
-} :{
+}: {
 	// Required
-	collections :QueryCollectionsHits
-	collectorComponents :CollectorComponents
-	collectorOptions :DropdownItemsWithKeys<string>
-	contentTypeOptions :ContentTypeOptions
-	fields :Fields
-	initialValues :CollectionFormValues
-	licenseValid :boolean
-	locales :Locales
-	servicesBaseUrl :string
-	setLicensedTo :SetLicensedToFunction
-	setLicenseValid :SetLicenseValidFunction
-	siteOptions :SiteOptions
-	totalNumberOfCollections :number
+	collections: QueryCollectionsHits
+	collectorComponents: CollectorComponents
+	collectorOptions: DropdownItemsWithKeys<string>
+	contentTypeOptions: ContentTypeOptions
+	fields: Fields
+	initialValues: CollectionFormValues
+	licenseValid: boolean
+	locales: Locales
+	servicesBaseUrl: string
+	setLicensedTo: SetLicensedToFunction
+	setLicenseValid: SetLicenseValidFunction
+	siteOptions: SiteOptions
+	totalNumberOfCollections: number
 	// Optional
-	_name ?:string
-	afterClose ?:() => void
-	beforeOpen ?:() => void
-	disabled ?:boolean
-	loading ?:boolean
+	_name?: string
+	afterClose?: () => void
+	beforeOpen?: () => void
+	defaultOpen?: boolean
+	disabled?: boolean
+	loading?: boolean
 }) {
 	//console.debug('totalNumberOfCollections',totalNumberOfCollections);
 	const [state, setState] = React.useState({
-		open: false
+		open: defaultOpen
 	});
 	//console.debug('NewOrEditModal', {props, state});
 

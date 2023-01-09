@@ -8,6 +8,9 @@ import type {SearchProps} from './useSearchState';
 	//ucFirst
 } from '@enonic/js-utils';*/
 import {
+	Link
+} from 'react-router-dom';
+import {
 	Container,
 	Form,
 	Header,
@@ -174,7 +177,12 @@ export function Search(props: SearchProps) {
 						? `There are no documents in the ${interfaceCollectionCount} collection of the ${interfaceNameProp} interface. Add some documents to it to get started.`
 						: `There are no documents in any of the ${interfaceCollectionCount} collections of the ${interfaceNameProp} interface. Add some documents to any of them to get started.`
 			: interfaceNameProp === 'default'
-				? 'No collections available, create a collection to get started.'
+				? <Segment basic className='c-lgr' size='massive' textAlign='center'>
+					<Header as='h1' content='D&apos;oh!' size='huge' style={{
+						marginBottom: 14
+					}}/>
+					No collections available, <Link to='/collections/create'>create a collection</Link> to get started.
+				</Segment>
 				: `There are no collections in the ${interfaceNameProp} interface. Add collections to the interface to get started.`
 		}
 	</Container>;
