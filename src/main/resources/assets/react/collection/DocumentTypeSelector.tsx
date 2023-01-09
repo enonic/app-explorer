@@ -81,7 +81,7 @@ export function DocumentTypeSelector({
 	//console.debug('DocumentTypeSelector documentTypeOptions', documentTypeOptions);
 
 	return <>
-		<Header as='h2' dividing content='Default document type'/>
+		<Header as='h3' dividing content='Default document type'/>
 		<Dropdown
 			clearable={true}
 			fluid
