@@ -33,6 +33,9 @@ import {
 import DragAndDropableHeaderCell from './DragAndDropableHeaderCell';
 import React from 'react';
 
+const ROW_HEIGHT = 34;
+const JSON_ICON_HEIGHT = 20;
+const JSON_BUTTON_PADDING = (ROW_HEIGHT - JSON_ICON_HEIGHT)/2;
 
 function getHighlightedHtml({
 	_highlight,
@@ -94,7 +97,7 @@ function columnNameToDisplayName(columnName: string) {
 				: columnName === Column.ID
 					? 'Document ID'
 					: columnName === Column.JSON
-						? 'Document'
+						? 'JSON'
 						// : columnName === HIGHLIGHT_FIELD_ALLTEXT
 						// ? '_alltext'
 						: columnName;
@@ -200,7 +203,6 @@ function DocumentsTable({
 										} else if (selectedColumnName === Column.JSON) {
 											return <Table.Cell collapsing key={key}>
 												<Button
-													icon='code'
 													onClick={() => {
 														setJsonModalState({
 															open: true,
@@ -208,7 +210,14 @@ function DocumentsTable({
 															parsedJson: parsedJson || rest['_json'],
 														})
 													}}
-												/>
+													style={{
+														padding: JSON_BUTTON_PADDING
+													}}
+												>
+													<svg width={JSON_ICON_HEIGHT} height={JSON_ICON_HEIGHT} version="2.0">
+														<use href="#json" />
+													</svg>
+												</Button>
 											</Table.Cell>;
 										} else if (selectedColumnName === HIGHLIGHT_FIELD_ALLTEXT) {
 											return searchedString ? <Table.Cell collapsing>
