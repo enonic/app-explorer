@@ -4,7 +4,7 @@ import type JsonModalState from './JsonModalState.d';
 
 import React from 'react';
 import {Modal} from 'semantic-ui-react';
-import {TypedReactJson} from '../../search/TypedReactJson';
+import {TypedReactJson} from '../../interfaces/search/TypedReactJson';
 
 
 function JsonModal({

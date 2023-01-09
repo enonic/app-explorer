@@ -33,15 +33,17 @@ import {useInterfacesState} from './useInterfacesState';
  Thus we need to keep a list of all collectionId to fieldKeys (via documentType), so we can lookup when needed.
 */
 export function Interfaces({
+	basename,
 	licenseValid,
 	servicesBaseUrl,
 	setLicensedTo,
 	setLicenseValid
 } :{
-	licenseValid :boolean
-	servicesBaseUrl :string
-	setLicensedTo :SetLicensedToFunction
-	setLicenseValid :SetLicenseValidFunction
+	basename: string
+	licenseValid: boolean
+	servicesBaseUrl: string
+	setLicensedTo: SetLicensedToFunction
+	setLicenseValid: SetLicenseValidFunction
 }) {
 	const {
 		//collectionIdToFieldKeys,
@@ -194,6 +196,7 @@ export function Interfaces({
 							<Table.Cell collapsing>
 								<Button.Group>
 									<SearchModal
+										basename={basename}
 										interfaceName={_name}
 										loading={isLoading}
 										fields={fields}

@@ -1,7 +1,7 @@
 import type {
 	Profiling,
 	Synonyms
-} from './index.d';
+} from '.';
 
 
 import {

@@ -17,7 +17,7 @@ import {Notifications} from './notifications/Notifications';
 import {Schedule} from './schedule/Schedule';
 import {Documents} from './document/Documents';
 import {DocumentTypes} from './documentTypes/DocumentTypes';
-import {Search} from './search/Search';
+import {Search} from './interfaces/search/Search';
 import {Status} from './Status';
 import {StopWords} from './stopWords/StopWords';
 import {Thesauri} from './thesaurus/Thesauri';
@@ -56,6 +56,7 @@ export function Explorer({
 	licenseValid: initialLicenseValid,
 	servicesBaseUrl,
 }: ExplorerProps) {
+	// console.debug('basename', basename);
 	const {
 		defaultInterfaceFields,
 		licensedTo, setLicensedTo,
@@ -92,6 +93,7 @@ export function Explorer({
 					<Route path="/" element={<>
 						<Header as='h1' content='Explorer' textAlign='center'/>
 						<Search
+							basename={basename}
 							fields={defaultInterfaceFields}
 							interfaceName='default'
 							searchString=''
@@ -139,6 +141,7 @@ export function Explorer({
 						setLicenseValid={setLicenseValid}
 					/>}/>
 					<Route path="/interfaces" element={<Interfaces
+						basename={basename}
 						licenseValid={licenseValid}
 						servicesBaseUrl={servicesBaseUrl}
 						setLicensedTo={setLicensedTo}

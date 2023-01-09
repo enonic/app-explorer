@@ -13,12 +13,12 @@ import {
 	Header,
 	Segment
 } from 'semantic-ui-react';
-import SearchInput from '../components/inputs/SearchInput';
-import DocumentsTable from '../document/DocumentsTable';
+import SearchInput from '../../components/inputs/SearchInput';
+import DocumentsTable from '../../document/DocumentsTable';
 // import {Hits} from './Hits';
 import {Accordion} from './Accordion';
 import {useSearchState} from './useSearchState';
-import { Column } from '../document/constants';
+import { Column } from '../../document/constants';
 
 //type CacheKey = `${InterfaceName}.${SearchString}`;
 //type Cache = Record<CacheKey,SearchResult>;
@@ -27,6 +27,7 @@ import { Column } from '../document/constants';
 
 export function Search(props: SearchProps) {
 	const {
+		basename,
 		interfaceName: interfaceNameProp = 'default'
 	} = props;
 	const {
@@ -44,11 +45,14 @@ export function Search(props: SearchProps) {
 		searchString, setSearchString,
 		start, // setStart,
 	} = useSearchState({
+		basename,
 		fieldsProp: props.fields,
 		interfaceNameProp,
 		searchStringProp: props.searchString,
 		servicesBaseUrl: props.servicesBaseUrl,
 	});
+	// console.debug('interfaceCollectionCount', interfaceCollectionCount);
+	// console.debug('interfaceDocumentCount', interfaceDocumentCount);
 	const {
 		// documentTypesAndFields = [],
 		// collectionOptions = [],
@@ -64,9 +68,8 @@ export function Search(props: SearchProps) {
 			<Form.Group widths='equal'>
 				<Form.Field>
 					<SearchInput
-						disabled={!interfaceCollectionCount || !interfaceDocumentCount}
+						disabled={!interfaceCollectionCount || !interfaceDocumentCount}
 						fluid
-						icon='search'
 						loading={false}
 						onKeyUp={(event :{
 							which :number
@@ -146,6 +149,7 @@ export function Search(props: SearchProps) {
 							Column.JSON,
 							Column.COLLECTION,
 							Column.DOCUMENT_TYPE,
+							...props.fields.map(({name}) => name)
 						]}
 						setJsonModalState={setJsonModalState}
 						start={start}
@@ -158,9 +162,9 @@ export function Search(props: SearchProps) {
 					{interfaceNameProp === 'default'
 						? null
 						: searchedStringState ? <Accordion
-							locales={resultState.locales || []}
-							profiling={resultState.profiling || []}
-							synonyms={resultState.synonyms || []}
+							locales={resultState.locales || []}
+							profiling={resultState.profiling || []}
+							synonyms={resultState.synonyms || []}
 						/> : null
 					}
 				</>

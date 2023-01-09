@@ -115,7 +115,7 @@ export function useDocumentsState({
 			? [urlSearchParams.get('collection')]
 			: []
 	);
-	const [selectedColumnsState, setSelectedColumnsState] = React.useState([]/*SELECTED_COLUMNS_DEFAULT*/); // Empty until loaded from profile
+	const [selectedColumnsState, setSelectedColumnsState] = React.useState<string[]>([]/*SELECTED_COLUMNS_DEFAULT*/); // Empty until loaded from profile
 	const [selectedDocumentTypes, setSelectedDocumentTypes] = React.useState<string[]>(
 		urlSearchParams.get('documentType')
 			? [urlSearchParams.get('documentType')]

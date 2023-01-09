@@ -1,9 +1,9 @@
 import type {InterfaceField} from '/lib/explorer/types/Interface.d';
-import type {Hit} from '../Search/Hits';
+import type {Hit} from './search/Hits';
 import type {
 	Profiling,
 	Synonyms
-} from '../Search/index.d';
+} from './search';
 
 
 import * as gql from 'gql-query-builder';
@@ -21,10 +21,12 @@ type SearchResult = {
 
 
 function useSearchInterface({
+	basename,
 	interfaceName,
 	setLoading,
 	fieldsProp
 } :{
+	basename: string
 	interfaceName: string
 	setLoading: React.Dispatch<React.SetStateAction<boolean>>
 	fieldsProp?: InterfaceField[]
@@ -70,8 +72,8 @@ function useSearchInterface({
 			return;
 		}*/
 		setLoading(true);
-		const uri = `./explorer/api/v1/interface/${interfaceName}`;
-		//console.debug(uri);
+		const uri = `${basename}/api/v1/interface/${interfaceName}`;
+		// console.debug(uri);
 
 		const variables :Record<string, {
 			list?: boolean
@@ -233,11 +235,11 @@ function useSearchInterface({
 							setIn(deref, `${interfaceName}.${searchString}`, search);
 							return deref;
 						});*/
-						console.debug(`before setResultState()`, search);
+						// console.debug(`before setResultState()`, search);
 						setResultState(search);
 					}
 				}
-				console.debug(`before setSearchedStringState(${searchString})`);
+				// console.debug(`before setSearchedStringState(${searchString})`);
 				setSearchedStringState(searchString);
 				setLoading(false);
 			}); // fetch
