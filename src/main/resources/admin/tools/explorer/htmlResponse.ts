@@ -256,6 +256,20 @@ services: {}, // Workaround for i18nUrl BUG
 				font-family: Icons;
 			}
 		</style>
+		<svg style="display: none" version="2.0">
+		<defs>
+			<symbol id="json" viewbox="0 0 24 24">
+				<g transform="translate(0 -1028.362)">
+					<path style="fill:none;fill-rule:evenodd;stroke:#000;stroke-width:2.01073027;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" d="M2.026 1040.272s1.865-.048 2.412.51c1.984 2.03-1.575 5.852.41 7.883.6.615 2.139.595 2.139.595"/>
+					<path d="M2.026 1040.356s1.865.048 2.412-.511c1.984-2.03-1.575-5.852.41-7.883.6-.614 2.139-.594 2.139-.594M21.974 1040.272s-1.865-.048-2.412.51c-1.985 2.03 1.575 5.852-.41 7.883-.6.615-2.139.595-2.139.595" style="fill:none;fill-rule:evenodd;stroke:#000;stroke-width:2.01073027;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"/>
+					<path style="fill:none;fill-rule:evenodd;stroke:#000;stroke-width:2.01073027;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" d="M21.974 1040.356s-1.865.048-2.412-.511c-1.985-2.03 1.575-5.852-.41-7.883-.6-.614-2.139-.594-2.139-.594"/>
+					<circle r="2" cy="1037.362" cx="12" style="opacity:1;fill:#000;fill-opacity:1;stroke:none;stroke-width:0;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"/>
+					<circle style="opacity:1;fill:#000;fill-opacity:1;stroke:none;stroke-width:0;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" cx="12" cy="1043.362" r="2"/>
+					<path d="M12.98 1043.429s.242 2.059-.766 3.244c-.814.956-2.186.907-2.186.907" style="fill:none;fill-rule:evenodd;stroke:#000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"/>
+				</g>
+			</symbol>
+		</defs>
+	</svg>
 	</head>
 	<body style="background-color: white !important;">
 		<div id="${ID_REACT_EXPLORER_CONTAINER}"/>
