@@ -3,7 +3,6 @@ import type {
 	Cheerio,
 	SelectorType
 } from 'cheerio';
-import type { DataNode } from 'domhandler';
 import type {
 	HttpClientRequest,
 	Response
@@ -35,6 +34,7 @@ require('object.getownpropertydescriptors').shim(); // eslint-disable-line @type
 require('array.prototype.find').shim(); // eslint-disable-line @typescript-eslint/no-var-requires
 import {
 	// VALUE_TYPE_STRING,
+	forceArray,
 	toStr
 } from '@enonic/js-utils';
 import guard from 'robots-txt-guard';
@@ -46,7 +46,7 @@ import cheerio from 'cheerio'; // uses Array.from
 // cheerio: str.trimEnd is not a function
 // import cheerio from '/lib/cheerio';
 import { ElementType } from "domelementtype";
-import pretty from 'pretty';
+// import pretty from 'pretty';
 
 // import safeStringify from 'fast-safe-stringify';
 // import {parseDOM} from 'htmlparser2';
@@ -176,11 +176,6 @@ const removeDisplayNoneAndVisibilityHidden = (
 const outerHTML = (node: Cheerio<AnyNode>) => node.clone().wrap('<div>').parent().html();
 // const innerHTML = node => node.html();
 
-function isCommentFilter(_index: number, node: AnyNode) {
-	return node.type === ElementType.Comment;
-}
-
-
 const REPLACEMENT = '&#129'; // HOP illegal in html :)
 const REPLACE_ALL_REPLACEMENT_REGEXP = new RegExp(`${REPLACEMENT}+`, 'g');
 function getText(node: Cheerio<AnyNode>) {
@@ -225,39 +220,6 @@ export function run({
 		collectionId,
 		collectorId,
 		configJson,
-		/*documentTypeObj: {
-			properties: [{
-				enabled: true,
-				fulltext: true,
-				includeInAllText: true,
-				max: 0,
-				min: 0,
-				name: 'text',
-				nGram: true,
-				path: false,
-				valueType: VALUE_TYPE_STRING
-			}, {
-				enabled: true,
-				fulltext: true,
-				includeInAllText: true,
-				max: 0,
-				min: 0,
-				name: 'title',
-				nGram: true,
-				path: false,
-				valueType: VALUE_TYPE_STRING
-			}, {
-				enabled: true,
-				fulltext: true,
-				includeInAllText: true,
-				max: 0,
-				min: 0,
-				name: 'uri',
-				nGram: true,
-				path: false,
-				valueType: VALUE_TYPE_STRING
-			}]
-		},*/
 		language,
 		name
 	});
@@ -352,47 +314,47 @@ export function run({
 		if (collector.shouldStop()) {
 			break whileQueueLoop;
 		}
-		const uri = queueArr.shift(); // Normalized before added to queue
-		DEBUG && log.debug('uri:%s', uri);
+		const url = queueArr.shift(); // Normalized before added to queue
+		DEBUG && log.debug('url:%s', url);
 
-		const baseUrlObj = new URL(uri);
+		const baseUrlObj = new URL(url);
 		// log.debug(toStr({baseUrlObj}));
 
 		try {
-			collector.taskProgressObj.info.uri = uri; // eslint-disable-line no-param-reassign
+			collector.taskProgressObj.info.uri = url; // eslint-disable-line no-param-reassign
 			if (resume) {
-				collector.taskProgressObj.info.message = `Resuming ${uri}`;
+				collector.taskProgressObj.info.message = `Resuming ${url}`;
 				collector.progress();
 				collector.taskProgressObj.current += 1; // eslint-disable-line no-param-reassign
-				const nodeName = hash(uri);
+				const nodeName = hash(url);
 				if (exists({
 					connection: collector.collection.connection,
 					_parentPath: '/',
 					_name: nodeName
 				})) {
 					const node = get<{
-						uris :Array<string>
+						links: string[]|string
 					}>({
 						connection: collector.collection.connection,
 						_name: nodeName
 					});
-					const {uris} = node;
-					uris.forEach(normalized => handleNormalizedUri(normalized));
+					const {links} = node;
+					forceArray(links).forEach(normalized => handleNormalizedUri(normalized));
 				} // exists
 			} else { // !resume
-				collector.taskProgressObj.info.message = `Processing ${uri}`;
+				collector.taskProgressObj.info.message = `Processing ${url}`;
 				collector.progress();
 				collector.taskProgressObj.current += 1; // eslint-disable-line no-param-reassign
-				if (robots && !robots.isAllowed('', uri)) {
+				if (robots && !robots.isAllowed('', url)) {
 					throw new Error('Not allowed in robots.txt');
 				}
-				throwIfExcluded(uri);
+				throwIfExcluded(url);
 				const res = httpClientRequest({
 					followRedirects: true, // https://www.enonic.com uses 302
 					headers: {
 						'User-Agent': userAgent
 					},
-					url: uri
+					url
 				}) as Response; TRACE && log.debug('res:%s', toStr(res));
 				if (res.status != 200) {
 					throw new Error(`Status: ${res.status}!`);
@@ -469,7 +431,8 @@ export function run({
 				const cleanedBodyEl = bodyElWithNothingRemoved.clone();
 
 				// Remove all elements except tags and text
-				cleanedBodyEl.find('*').contents().filter((_i, el) => !(
+				cleanedBodyEl.find('*').contents().filter(
+					(_i, el) => !(
 						el.type === ElementType.Tag
 						|| el.type === ElementType.Text
 					)
@@ -495,7 +458,7 @@ export function run({
 				// log.debug(`cleanedBodyEl:${toStr(cleanedBodyEl)}`); // JSON.stringify got a cyclic data structure
 				// log.debug(safeStringify({body: body.html()}));
 
-				const uris = [];
+				const links = [];
 				if (boolFollow) {
 					const linkEls = querySelectorAll(bodyElWithNothingRemoved, "a[href]:not([href^='#']):not([href^='mailto:']):not([href^='tel:'])");
 					DEBUG && log.debug('linkEls.length:%s', linkEls.length);
@@ -527,14 +490,14 @@ export function run({
 						// jsuri
 						/*
 						const uriObj = new Uri(href);
-						const resolved = resolve(href, uri); // log.debug(toStr({resolved}));
+						const resolved = resolve(href, url); // log.debug(toStr({resolved}));
 						const resolvedUriObj = new Uri(resolved);
 						const currentHost = resolvedUriObj.host(); // log.debug(toStr({currentHost}));
 						*/
 
 						// uri-js
 						/*
-						const resolved = resolve(uri, href); // log.debug(toStr({resolved}));
+						const resolved = resolve(url, href); // log.debug(toStr({resolved}));
 						const uriObj = parse(resolved); // log.debug(toStr({uriObj}));
 						const currentHost = uriObj.host; // log.debug(toStr({host}));
 						*/
@@ -553,36 +516,36 @@ export function run({
 							// delete uriObj.fragment;
 							// const normalized = normalize(serialize(uriObj)); // log.debug(toStr({normalized}));
 
-							if (!uris.includes(normalized)) {
-								uris.push(normalized);
+							if (!links.includes(normalized)) {
+								links.push(normalized);
 							}
 							handleNormalizedUri(normalized);
 						}
 					} // for linkEls
 				} // boolFollow
 
-				if (boolIndex && (!robots || robots.isIndexable('', uri))) {
+				if (boolIndex && (!robots || robots.isIndexable('', url))) {
 					const documentToPersist :{
 						// displayName :string
+						links?: string[]
 						text: string
 						title: string
-						uri: string
-						uris: string[]
-						_id ?:string
+						url: string
+						_id?: string
 						html?: string
 					} = {
 						// displayName: title, // This has no field definition by default
+						links,
 						text: getText(cleanedBodyEl),
 						title,
-						uri,
-						uris // This has no field definition by default
+						url,
 					};
 					if (keepHtml) {
 						documentToPersist.html = res.body;
 					}
 					TRACE && log.debug('documentToPersist:%s', toStr(documentToPersist));
 
-					// Check if any document with uri exists
+					// Check if any document with url exists
 					const documentsRes = collector.queryDocuments({
 						aggregations: null,
 						count: 1,
@@ -591,8 +554,8 @@ export function run({
 							boolean: {
 								must: {
 									term: {
-										field: 'uri',
-										value: uri
+										field: 'url',
+										value: url
 									}
 								}
 							}
@@ -603,7 +566,7 @@ export function run({
 					// log.debug('webcrawl documentsRes:%s', toStr(documentsRes));
 
 					if (documentsRes.total > 1) {
-						throw new Error(`Multiple documents found with uri:${uri}! uri is supposed to be unique!`);
+						throw new Error(`Multiple documents found with url:${url}! url is supposed to be unique!`);
 					} else if (documentsRes.total === 1) {
 						// Provide which document node to update (rather than creating a new document node)
 						documentToPersist._id = documentsRes.hits[0].id;
@@ -618,11 +581,11 @@ export function run({
 					DEBUG && log.debug('persistedDocument:%s', toStr(persistedDocument));
 				} // indexable
 			} // resume ... else
-			log.debug(`success uri:${toStr(uri)}`);
-			collector.addSuccess({message: uri});
+			log.debug(`success url:${toStr(url)}`);
+			collector.addSuccess({message: url});
 		} catch (e) {
-			log.error(`uri:${uri} message:${e.message}`, e);
-			collector.addError({message: `uri:${uri} ${e.message}`});
+			log.error(`url:${url} message:${e.message}`, e);
+			collector.addError({message: `url:${url} ${e.message}`});
 		} // try ... catch
 	} // while
 
@@ -633,7 +596,7 @@ export function run({
 	function deleteOldNodes() {
 		/*const filters = addQueryFilter({
 			clause: 'mustNot',
-			filter: hasValue('uri', Object.keys(seenUrisObj))
+			filter: hasValue('url', Object.keys(seenUrisObj))
 		});*/
 		// log.debug(toStr({filters}));
 		const res = collector.queryDocuments({
@@ -644,7 +607,7 @@ export function run({
 				boolean: {
 					mustNot: {
 						in: {
-							field: 'uri',
+							field: 'url',
 							values: Object.keys(seenUrisObj)
 						}
 					}
@@ -658,23 +621,23 @@ export function run({
 
 		if (res.hits.length) {
 			TRACE && log.debug(`res.hits[0]:${toStr(res.hits[0])}`);
-			const idsToDelete = [];
-			const pathsToDelete = [];
-			const nodeId2Uri = {};
+			const idsToDelete: string[] = [];
+			const pathsToDelete: string[] = [];
+			const nodeId2Uri: Record<string,string> = {};
 			for (let i = 0; i < res.hits.length; i += 1) {
 				const {id} = res.hits[i];
 
 				const node = collector.collection.connection.get<{
 					_path :string
-					uri :string
+					url :string
 				}>(id);
 				// log.debug('node:%s', toStr(node));
 
 				if (node) { // Handle ghost nodes
-					const {_path, uri} = node;
+					const {_path, url} = node;
 					idsToDelete.push(id);
 					pathsToDelete.push(_path);
-					nodeId2Uri[id] = uri;
+					nodeId2Uri[id] = url;
 				}
 			}
 			// log.debug(`nodeId2Uri:${toStr(nodeId2Uri)}`);
@@ -683,11 +646,11 @@ export function run({
 				DEBUG && log.debug('deleting ids:%s paths:%s', toStr(idsToDelete), toStr(pathsToDelete));
 				const deleteRes = collector.collection.connection.delete(idsToDelete);
 				// log.debug(toStr({deleteRes}));
-				const uris = deleteRes.map(nodeId => nodeId2Uri[nodeId]);
+				const urls = deleteRes.map(nodeId => nodeId2Uri[nodeId]);
 				// log.debug(toStr({uris}));
-				if (uris.length) {
-					uris.forEach((uri) => {
-						collector.journal.successes.push({message: `uri:${uri} deleted`});
+				if (urls.length) {
+					urls.forEach((url) => {
+						collector.journal.successes.push({message: `url:${url} deleted`});
 					});
 				}
 				collector.collection.connection.refresh();

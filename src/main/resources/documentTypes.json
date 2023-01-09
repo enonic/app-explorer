@@ -16,6 +16,17 @@
 		"active": true,
 		"enabled": true,
 		"fulltext": true,
+		"includeInAllText": false,
+		"max": 0,
+		"min": 0,
+		"name": "links",
+		"nGram": false,
+		"path": false,
+		"valueType": "string"
+	},{
+		"active": true,
+		"enabled": true,
+		"fulltext": true,
 		"includeInAllText": true,
 		"max": 1,
 		"min": 0,
@@ -41,7 +52,7 @@
 		"includeInAllText": false,
 		"max": 1,
 		"min": 1,
-		"name": "uri",
+		"name": "url",
 		"nGram": false,
 		"path": false,
 		"valueType": "string"
