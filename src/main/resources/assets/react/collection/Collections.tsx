@@ -55,6 +55,7 @@ const GQL_MUTATION_COLLECTIONS_REINDEX = `mutation ReindexMutation(
 export function Collections(props :{
 	collectorComponents :CollectorComponents
 	licenseValid :boolean
+	newCollectionModalOpen?: boolean
 	servicesBaseUrl :string
 	setLicensedTo :SetLicensedToFunction
 	setLicenseValid :SetLicenseValidFunction
@@ -62,6 +63,7 @@ export function Collections(props :{
 	const {
 		collectorComponents,
 		licenseValid,
+		newCollectionModalOpen = false,
 		servicesBaseUrl,
 		setLicensedTo,
 		setLicenseValid,
@@ -426,6 +428,7 @@ export function Collections(props :{
 					collectorComponents={collectorComponents}
 					contentTypeOptions={contentTypeOptions}
 					disabled={!intInitializedCollectorComponents || isLoading}
+					defaultOpen={newCollectionModalOpen}
 					loading={isLoading}
 					fields={fieldsObj}
 					initialValues={{
