@@ -6,15 +6,16 @@ import type {InterfaceField} from '/lib/explorer/types/Interface.d';
 import {useWhenInit} from '@seamusleahy/init-hooks';
 import * as gql from 'gql-query-builder';
 import * as React from 'react';
-import useJsonModalState from '../components/modals/useJsonModalState';
-import useSearchInterface from '../interfaces/useSearchInterface';
-import {useUpdateEffect} from '../utils/useUpdateEffect';
+import useJsonModalState from '../../components/modals/useJsonModalState';
+import useSearchInterface from '../useSearchInterface';
+import {useUpdateEffect} from '../../utils/useUpdateEffect';
 
 
 type InterfaceName = string;
 type SearchString = string;
 
 export type SearchProps = {
+	basename: string
 	servicesBaseUrl: string
 	//documentTypesAndFields ?:Record<string,Fields>
 	fields?: InterfaceField[]
@@ -28,12 +29,14 @@ export type SearchProps = {
 const DEBUG_DEPENDENCIES = false;
 
 export function useSearchState({
+	basename,
 	servicesBaseUrl,
 	// Optional
 	fieldsProp = [],
 	interfaceNameProp = 'default',
 	searchStringProp,
 }: {
+	basename: string
 	searchStringProp: SearchString
 	servicesBaseUrl: string
 	// Optional
@@ -74,6 +77,7 @@ export function useSearchState({
 		searchedStringState,
 		searchFunction,
 	} = useSearchInterface({
+		basename,
 		fieldsProp,
 		interfaceName: interfaceNameProp,
 		setLoading
@@ -141,7 +145,8 @@ export function useSearchState({
 	]);
 
 	const getInterfaceDocumentCount = React.useCallback(() => {
-		fetch(`./explorer/api/v1/interface/${interfaceNameProp}`, {
+		// console.debug('getInterfaceDocumentCount interfaceNameProp:', interfaceNameProp);
+		fetch(`${basename}/api/v1/interface/${interfaceNameProp}`, {
 			method: 'POST',
 			headers: {
 				'Content-Type':	'application/json'
@@ -166,9 +171,11 @@ export function useSearchState({
 			.then(response => response.json())
 			.then(json => {
 				// console.debug('json', json);
+				// console.debug('setInterfaceDocumentCount:', json.data.search.total);
 				setInterfaceDocumentCount(json.data.search.total);
 			});
 	}, [
+		basename,
 		interfaceNameProp
 	]);
 

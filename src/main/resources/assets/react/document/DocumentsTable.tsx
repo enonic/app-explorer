@@ -8,6 +8,7 @@ import type {QueryDocumentsResult} from './';
 import {
 	ELLIPSIS,
 	getIn,
+	HIGHLIGHT_FIELD_ALLTEXT,
 	isString,
 } from '@enonic/js-utils';
 import {FieldPath} from '@enonic/explorer-utils';
@@ -94,6 +95,8 @@ function columnNameToDisplayName(columnName: string) {
 					? 'Document ID'
 					: columnName === Column.JSON
 						? 'Document'
+						// : columnName === HIGHLIGHT_FIELD_ALLTEXT
+						// ? '_alltext'
 						: columnName;
 }
 
@@ -136,30 +139,36 @@ function DocumentsTable({
 				<Table celled compact striped>
 					<Table.Header>
 						<Table.Row>
-							{dragAndDropColumnsProp
-								? selectedColumnsState.map((columnName, i) => <DragAndDropableHeaderCell
-									collapsing
-									content={columnNameToDisplayName(columnName)}
-									id={columnName}
-									index={i}
-									key={`column-${columnName}`}
-									onDrop={({
-										fromId,
-										toId
-									}) => handleDroppedColumn({
-										fromId,
-										toId
-									})}
-								/>)
-								: selectedColumnsState.map((columnName, i) => <Table.HeaderCell
-									content={columnNameToDisplayName(columnName)}
-									key={i}
-								/>)
+							{selectedColumnsState.map((columnName, i) => columnName === HIGHLIGHT_FIELD_ALLTEXT
+								? searchedString
+									? <Table.HeaderCell
+										content={columnNameToDisplayName(columnName)}
+										key={i}
+									/>
+									: null
+								: dragAndDropColumnsProp
+									? <DragAndDropableHeaderCell
+										collapsing
+										content={columnNameToDisplayName(columnName)}
+										id={columnName}
+										index={i}
+										key={`column-${columnName}`}
+										onDrop={({
+											fromId,
+											toId
+										}) => handleDroppedColumn({
+											fromId,
+											toId
+										})}
+									/>
+									: <Table.HeaderCell
+										content={columnNameToDisplayName(columnName)}
+										key={i}
+									/>)
 							}
 							{/*columnOptions
 								.filter(({value}) => selectedColumns.includes(value as string))
 								.map(({text},i) => <Table.HeaderCell collapsing content={text} key={i}/>)*/}
-							{searchedString ? <Table.HeaderCell collapsing content='_allText'/> : null}
 						</Table.Row>
 					</Table.Header>
 					<Table.Body>
@@ -201,6 +210,20 @@ function DocumentsTable({
 													}}
 												/>
 											</Table.Cell>;
+										} else if (selectedColumnName === HIGHLIGHT_FIELD_ALLTEXT) {
+											return searchedString ? <Table.Cell collapsing>
+												{_highlight['_alltext'] && _highlight['_alltext'].length
+													? <ul style={{
+														listStyleType: 'none',
+														margin: 0,
+														padding: 0
+													}}>
+														{_highlight['_alltext'].map((htmlString, j) => <li key={j}>
+															{ReactHtmlParser(htmlString)}
+														</li>)}
+													</ul>
+													: null}
+											</Table.Cell> : null;
 										} else if (!SELECTED_COLUMNS_DEFAULT.includes(selectedColumnName as Column)) {
 											const htmlString = getHighlightedHtml({
 												_highlight,
@@ -223,19 +246,6 @@ function DocumentsTable({
 									})
 									// .filter(x => x) // Overcome error, not needed and can cause scewed index between headerCell and cell
 								}
-								{searchedString ? <Table.Cell collapsing>
-									{_highlight['_alltext'] && _highlight['_alltext'].length
-										? <ul style={{
-											listStyleType: 'none',
-											margin: 0,
-											padding: 0
-										}}>
-											{_highlight['_alltext'].map((htmlString, j) => <li key={j}>
-												{ReactHtmlParser(htmlString)}
-											</li>)}
-										</ul>
-										: null}
-								</Table.Cell> : null}
 							</Table.Row>})}
 					</Table.Body>
 				</Table>

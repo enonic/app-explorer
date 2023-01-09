@@ -5,11 +5,12 @@ import type {InterfaceField} from '/lib/explorer/types/Interface.d';
 import * as React from 'react';
 import {Button, Icon, Modal} from 'semantic-ui-react';
 
-import {Search} from '../search/Search';
+import {Search} from './search/Search';
 
 
 export function SearchModal({
 	// Required
+	basename,
 	interfaceName,
 	servicesBaseUrl,
 	// Optional
@@ -20,6 +21,7 @@ export function SearchModal({
 	loading = false
 } :{
 	// Required
+	basename: string
 	interfaceName: string
 	servicesBaseUrl: string
 	// Optional
@@ -49,7 +51,7 @@ export function SearchModal({
 		closeOnDimmerClick={false}
 		onClose={doClose}
 		open={open}
-		size='large'
+		size='fullscreen'
 		trigger={<Button
 			compact
 			disabled={loading}
@@ -61,6 +63,7 @@ export function SearchModal({
 		<Modal.Header>Search interface: {interfaceName}</Modal.Header>
 		<Modal.Content>
 			<Search
+				basename={basename}
 				firstColumnWidth={3}
 				fields={fields}
 				interfaceName={interfaceName}

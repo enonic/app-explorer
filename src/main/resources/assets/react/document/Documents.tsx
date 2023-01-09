@@ -1,4 +1,5 @@
 import {
+	HIGHLIGHT_FIELD_ALLTEXT,
 	QUERY_OPERATOR_AND,
 	QUERY_OPERATOR_OR,
 } from '@enonic/js-utils';
@@ -471,7 +472,7 @@ export function Documents({
 				page={page}
 				perPage={perPage}
 				searchedString={searchedString}
-				selectedColumnsState={selectedColumnsState}
+				selectedColumnsState={selectedColumnsState.concat(HIGHLIGHT_FIELD_ALLTEXT)}
 				setJsonModalState={setJsonModalState}
 				start={start}
 			/>

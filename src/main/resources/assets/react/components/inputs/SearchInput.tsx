@@ -1,5 +1,5 @@
 import type {
-	InputOnChangeData,
+	StrictInputProps,
 } from 'semantic-ui-react';
 
 
@@ -14,7 +14,7 @@ function SearchInput({
 	borderRadius = 19,
 	onKeyUp = () => undefined,
 	...rest
-}: Omit<InputOnChangeData, 'icon'> & {
+}: Omit<StrictInputProps, 'icon'> & {
 	borderRadius?: number
 	onKeyUp?: (event: React.KeyboardEvent<HTMLInputElement>) => void
 }) {
