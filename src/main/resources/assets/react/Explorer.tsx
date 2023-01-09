@@ -113,6 +113,14 @@ export function Explorer({
 						setLicensedTo={setLicensedTo}
 						setLicenseValid={setLicenseValid}
 					/>}/>
+					<Route path="/collections/create" element={<Collections
+						collectorComponents={collectorComponents}
+						licenseValid={licenseValid}
+						newCollectionModalOpen={true}
+						servicesBaseUrl={servicesBaseUrl}
+						setLicensedTo={setLicensedTo}
+						setLicenseValid={setLicenseValid}
+					/>}/>
 					<Route path="/collections/status" element={<Status
 						servicesBaseUrl={servicesBaseUrl}
 					/>}/>
