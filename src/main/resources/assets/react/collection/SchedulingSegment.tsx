@@ -29,7 +29,7 @@ export function SchedulingSegment({
 	setCronArray :(cronArray :Array<Cron>) => void
 	setDoCollect :(doCollect :boolean) => void
 }) {
-	return <Segment color='green' disabled={loading}>
+	return <Segment disabled={loading}>
 		<Header as='h2' dividing content='Scheduling' id='cron'/>
 		<Checkbox
 			checked={doCollect}
