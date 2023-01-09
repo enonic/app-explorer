@@ -94,7 +94,6 @@ export function Collection({
 	return <>
 		<Modal.Content>
 			<Segment
-				color='black'
 				disabled={loading}
 			>
 				<Header as='h1' dividing content='Collection' id='collection'/>
@@ -122,6 +121,12 @@ export function Collection({
 							setLanguage={(l) => setLanguage(l as string)}
 						/>
 					</Form.Field>
+				</Form>
+			</Segment>
+			<Segment
+				disabled={loading}
+			>
+				<Form>
 					<Header as='h2' dividing content='Collector'/>
 					<CollectorSelector
 						collectorName={collectorName}
@@ -131,7 +136,7 @@ export function Collection({
 					{
 						managedDocumentTypes
 							? <>
-								<Header as='h2' dividing content='Managed document type(s)'/>
+								<Header as='h3' dividing content='Managed document type(s)'/>
 								<ul style={{
 									listStyleType: 'none',
 									margin: 0,
@@ -149,20 +154,20 @@ export function Collection({
 								: null
 					}
 				</Form>
+				<CollectorOptions
+					collectorComponentRef={collectorComponentRef}
+					collectorComponents={collectorComponents}
+					collectorConfig={collectorConfig}
+					collectorName={collectorName}
+					contentTypeOptions={contentTypeOptions}
+					fields={fields}
+					initialCollectorConfig={initialCollectorConfig}
+					loading={loading}
+					siteOptions={siteOptions}
+					setCollectorConfig={setCollectorConfig}
+					setCollectorConfigErrorCount={setCollectorConfigErrorCount}
+				/>
 			</Segment>
-			<CollectorOptions
-				collectorComponentRef={collectorComponentRef}
-				collectorComponents={collectorComponents}
-				collectorConfig={collectorConfig}
-				collectorName={collectorName}
-				contentTypeOptions={contentTypeOptions}
-				fields={fields}
-				initialCollectorConfig={initialCollectorConfig}
-				loading={loading}
-				siteOptions={siteOptions}
-				setCollectorConfig={setCollectorConfig}
-				setCollectorConfigErrorCount={setCollectorConfigErrorCount}
-			/>
 			{(collectorName && collectorName !== '_none')
 				? <SchedulingSegment
 					cronArray={cronArray}

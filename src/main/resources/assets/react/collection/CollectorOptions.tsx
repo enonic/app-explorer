@@ -46,8 +46,8 @@ export function CollectorOptions({
 
 	const Collector = collectorComponents[collectorName];
 
-	return <Segment color='pink' disabled={loading}>
-		<Header as='h2' dividing content={collectorName} id='collector'/>
+	return <>
+		<Header as='h3' dividing content='Configuration' id='collector'/>
 		<Collector
 			collectorConfig={collectorConfig}
 			initialCollectorConfig={initialCollectorConfig}
@@ -60,5 +60,5 @@ export function CollectorOptions({
 			}}
 			ref={collectorComponentRef}
 		/>
-	</Segment>;
+	</>;
 } // function CollectorOptions
