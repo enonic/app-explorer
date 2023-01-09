@@ -13,9 +13,12 @@ import {
 	Header,
 	Segment
 } from 'semantic-ui-react';
-import {Hits} from './Hits';
+import SearchInput from '../components/inputs/SearchInput';
+import DocumentsTable from '../document/DocumentsTable';
+// import {Hits} from './Hits';
 import {Accordion} from './Accordion';
 import {useSearchState} from './useSearchState';
+import { Column } from '../document/constants';
 
 //type CacheKey = `${InterfaceName}.${SearchString}`;
 //type Cache = Record<CacheKey,SearchResult>;
@@ -30,11 +33,16 @@ export function Search(props: SearchProps) {
 		// boolOnChange, setBoolOnChange,
 		interfaceCollectionCount, // setInterfaceCollectionCount,
 		interfaceDocumentCount, // setInterfaceDocumentCount,
+		jsonModalState, setJsonModalState,
+		handlePaginationChange,
 		loading, // setLoading,
-		result, // setResult,
-		search,
-		searchedString, // setSearchedString,
+		page, setPage,
+		perPage, // setPerPage,
+		resultState,
+		searchedStringState,
+		searchFunction,
 		searchString, setSearchString,
+		start, // setStart,
 	} = useSearchState({
 		fieldsProp: props.fields,
 		interfaceNameProp,
@@ -42,10 +50,10 @@ export function Search(props: SearchProps) {
 		servicesBaseUrl: props.servicesBaseUrl,
 	});
 	const {
-		//documentTypesAndFields = [],
-		//collectionOptions = [],
-		firstColumnWidth = 2,
-		//thesaurusOptions = []
+		// documentTypesAndFields = [],
+		// collectionOptions = [],
+		// firstColumnWidth = 2,
+		// thesaurusOptions = []
 	} = props;
 	//console.debug('documentTypesAndFields', documentTypesAndFields);
 	//const [synonyms, setSynonyms] = React.useState([]);
@@ -54,31 +62,39 @@ export function Search(props: SearchProps) {
 	return <Container>
 		<Form>
 			<Form.Group widths='equal'>
-				<Form.Input
-					disabled={!interfaceCollectionCount || !interfaceDocumentCount}
-					fluid
-					icon='search'
-					loading={false}
-					onKeyUp={(event :{
-						which :number
-					}) => {
-						//console.debug('onKeyUp event.which',event.which);
-						if(event.which == 10 || event.which == 13) {
-							//console.debug('onKeyUp searchString',searchString);
-							search(searchString);
-						}
-					}}
-					onChange={(
-						_event,
-						{value}
-					) => {
-						//console.debug('onChange value',value);
-						setSearchString(value);
-						// if (boolOnChange) {
-						// 	search(value);
-						// }
-					}}
-				/>
+				<Form.Field>
+					<SearchInput
+						disabled={!interfaceCollectionCount || !interfaceDocumentCount}
+						fluid
+						icon='search'
+						loading={false}
+						onKeyUp={(event :{
+							which :number
+						}) => {
+							//console.debug('onKeyUp event.which',event.which);
+							if(event.which == 10 || event.which == 13) {
+								//console.debug('onKeyUp searchString',searchString);
+								setPage(1);
+								// setStart(0);
+								searchFunction({
+									searchString,
+									start: 0
+								});
+							}
+						}}
+						onChange={(
+							_event,
+							{value}
+						) => {
+							//console.debug('onChange value',value);
+							setSearchString(value);
+							// if (boolOnChange) {
+							// 	search(value);
+							// }
+						}}
+					/>
+				</Form.Field>
+
 				{/*interfaceCollectionCount && interfaceDocumentCount
 					? <Form.Checkbox
 						checked={boolOnChange}
@@ -96,19 +112,19 @@ export function Search(props: SearchProps) {
 		{interfaceCollectionCount
 			? interfaceDocumentCount
 				? <>
-					{searchedString
+					{searchedStringState
 						? <Segment basic>
 							Searched {interfaceDocumentCount} documents
 							across {interfaceCollectionCount} collections
-							for <b>{searchedString}</b>
-							<span> and found {result.total} matching documents.</span>
+							for <b>{searchedStringState}</b>
+							<span> and found {resultState.total} matching documents.</span>
 						</Segment>
 						: loading
 							? <Segment basic>Searching {interfaceDocumentCount} documents across {interfaceCollectionCount} collections...</Segment>
 							: <Segment basic>Ready to search {interfaceDocumentCount} documents across {interfaceCollectionCount} collections.</Segment>
 					}
 
-					{searchedString && !result.total
+					{searchedStringState && !resultState.total
 						? <Segment basic className='c-lgr' size='massive' textAlign='center'>
 							<Header as='h1' content='D&apos;oh!' size='huge' style={{
 								marginBottom: 14
@@ -117,17 +133,34 @@ export function Search(props: SearchProps) {
 						</Segment>
 						: null
 					}
-					<Hits
+					<DocumentsTable
+						documentsRes={resultState}
+						dragAndDropColumnsProp={false}
+						handlePaginationChange={handlePaginationChange}
+						jsonModalState={jsonModalState}
+						loading={loading}
+						page={page}
+						perPage={perPage}
+						searchedString={searchedStringState}
+						selectedColumnsState={[
+							Column.JSON,
+							Column.COLLECTION,
+							Column.DOCUMENT_TYPE,
+						]}
+						setJsonModalState={setJsonModalState}
+						start={start}
+					/>
+					{/*<Hits
 						firstColumnWidth={firstColumnWidth}
 						hits={result.hits}
 						loading={loading}
-					/>
+					/>*/}
 					{interfaceNameProp === 'default'
 						? null
-						: searchedString ? <Accordion
-							locales={result.locales || []}
-							profiling={result.profiling || []}
-							synonyms={result.synonyms || []}
+						: searchedStringState ? <Accordion
+							locales={resultState.locales || []}
+							profiling={resultState.profiling || []}
+							synonyms={resultState.synonyms || []}
 						/> : null
 					}
 				</>

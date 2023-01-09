@@ -3,10 +3,7 @@ import type {
 	DropdownItemProps,
 	PaginationProps,
 } from 'semantic-ui-react';
-import type {
-	JsonModalState,
-	QueryDocumentsResult,
-} from './';
+import type {QueryDocumentsResult} from './';
 
 
 import {
@@ -25,9 +22,12 @@ import {
 	FIELD_SHORTCUT_COLLECTION,
 	FIELD_SHORTCUT_DOCUMENT_TYPE,
 } from '../../../services/graphQL/constants';
+import useJsonModalState from '../components/modals/useJsonModalState';
 import {useInterval} from '../utils/useInterval';
 import {useUpdateEffect} from '../utils/useUpdateEffect';
 import {
+	FRAGMENT_SIZE_DEFAULT,
+	PER_PAGE_DEFAULT,
 	POST_TAG,
 	PRE_TAG,
 	SELECTED_COLUMNS_DEFAULT,
@@ -47,11 +47,6 @@ import {persistColumns} from './persistColumns';
 const DEBUG_DEPENDENCIES = false;
 
 const GQL_INPUT_TYPE_HIGHLIGHT = 'InputTypeHighlight';
-
-
-export const FRAGMENT_SIZE_DEFAULT = 150;
-const PER_PAGE_DEFAULT = 10;
-
 
 
 const OPTIONS_COLUMNS_DEFAULT: DropdownItemProps[] = [{
@@ -85,11 +80,10 @@ export function useDocumentsState({
 		total: 0,
 		hits: []
 	});
-	const [jsonModalState, setJsonModalState] = React.useState<JsonModalState>({
-		open: false,
-		id: '',
-		parsedJson: undefined,
-	});
+	const {
+		state: jsonModalState,
+		setState: setJsonModalState
+	} = useJsonModalState();
 	const [collectionOptions, setCollectionOptions] = React.useState<
 		DropdownItemProps[]
 	>([]);

@@ -1,13 +1,14 @@
+import type {PaginationProps} from 'semantic-ui-react';
 import type {InterfaceField} from '/lib/explorer/types/Interface.d';
-import type {Hit} from './Hits';
-import type {
-	Profiling,
-	Synonyms
-} from './index.d';
 
 
+
+import {useWhenInit} from '@seamusleahy/init-hooks';
 import * as gql from 'gql-query-builder';
 import * as React from 'react';
+import useJsonModalState from '../components/modals/useJsonModalState';
+import useSearchInterface from '../interfaces/useSearchInterface';
+import {useUpdateEffect} from '../utils/useUpdateEffect';
 
 
 type InterfaceName = string;
@@ -22,15 +23,9 @@ export type SearchProps = {
 	searchString?: SearchString
 }
 
-type SearchResult = {
-	count :number
-	hits :Array<Hit>
-	profiling :Array<Profiling>
-	locales :Array<string>
-	synonyms :Synonyms
-	total :number
-}
 
+
+const DEBUG_DEPENDENCIES = false;
 
 export function useSearchState({
 	servicesBaseUrl,
@@ -48,31 +43,45 @@ export function useSearchState({
 	//console.debug('Search({fields:', fieldsProp,'})');
 	//console.debug('Search interfaceName', interfaceNameProp);
 
+	//──────────────────────────────────────────────────────────────────────────
+	// State
+	//──────────────────────────────────────────────────────────────────────────
 	// const [boolOnChange, setBoolOnChange] = React.useState(false);
 	//console.debug('Search boolOnChange', boolOnChange);
 	const [interfaceCollectionCount, setInterfaceCollectionCount] = React.useState<number>();
 	const [interfaceDocumentCount, setInterfaceDocumentCount] = React.useState<number>();
+	const [page, setPage] = React.useState(1);
+	const {
+		state: jsonModalState,
+		setState: setJsonModalState
+	} = useJsonModalState();
 
 	const [loading, setLoading] = React.useState(false);
 	//console.debug('Search loading', loading);
-
+	const [
+		perPage,
+		// setPerPage,
+	] = React.useState(10);
 	const [searchString, setSearchString] = React.useState(searchStringProp || '');
-	const [searchedString, setSearchedString] = React.useState('');
-	//console.debug('Search searchString', searchString);
 
 	//const [cache, setCache] = React.useState({} as Cache);
 	//console.debug('Search cache', cache);
 
-	const [result, setResult] = React.useState<SearchResult>({
-		count: 0,
-		hits: [],
-		profiling: [],
-		locales: [],
-		synonyms: [],
-		total: 0
-	});
-	//console.debug('Search result', result);
+	const [start, setStart] = React.useState(0);
 
+	const {
+		resultState,
+		searchedStringState,
+		searchFunction,
+	} = useSearchInterface({
+		fieldsProp,
+		interfaceName: interfaceNameProp,
+		setLoading
+	});
+
+	//──────────────────────────────────────────────────────────────────────────
+	// Callbacks
+	//──────────────────────────────────────────────────────────────────────────
 	const getInterfaceCollectionCount = React.useCallback(() => {
 		if (interfaceNameProp === 'default') {
 			fetch(`${servicesBaseUrl}/graphQL`, {
@@ -163,205 +172,71 @@ export function useSearchState({
 		interfaceNameProp
 	]);
 
-	function search(ss :string) {
-		setSearchedString('');
-		if(!ss) {
-			setResult({
-				count: 0,
-				hits: [],
-				locales: [],
-				profiling: [],
-				synonyms: [],
-				total: 0
-			});
-			return;
-		}
-		/*const cachedResult = getIn(
-			cache,
-			`${interfaceName}.${ss}`
-		) as SearchResult;
-		if (cachedResult) {
-			setResult(cachedResult);
-			return;
-		}*/
-		setLoading(true);
-		const uri = `./explorer/api/v1/interface/${interfaceNameProp}`;
-		//console.debug(uri);
-
-		const variables :Record<string, {
-			required ?:boolean
-			type ?:string
-			value :unknown
-		}> = {};
-		const fieldsHits :Array<
-			string
-			|Record<string,Array<string>>
-		> = [
-			'_collection',
-			'_documentType',
-		];
-		if (fieldsProp.length) {
-			fieldsHits.push('_highlight'); // GraphQLJson
-			variables['highlight'] = {
-				required: false,
-				type: 'InputTypeHighlight',
-				value: {
-					numberOfFragments: 1,
-					postTag: '</b>',
-					preTag: '<b>',
-					fields: fieldsProp.map(({
-						name
-					}) => ({
-						field: name
-					}))
-				}
-			}
-		}
-		fieldsHits.push('_json');
-		fieldsHits.push('_score');
-
-		const gqlQuery = gql.query({
-			operation: 'querySynonyms',
-			variables: {
-				//languages,
-				profiling: {
-					list: false,
-					required: false,
-					value: true // TODO Hardcode
-				},
-				searchString: {
-					list: false,
-					required: true,
-					value: ss
-				}
-			},
-			fields: [
-				'languages',
-				{
-					profiling: [
-						'currentTimeMillis',
-						'label',
-						'operation'
-					]
-				},
-				{
-					synonyms: [
-						'_highlight',
-						'_score',
-						{
-							synonyms: [
-								'locale',
-								'synonym'
-							]
-						},
-						'thesaurusName'
-					]
-				},
-				{
-					operation: 'search',
-					fields: [
-						'count',
-						{
-							hits: fieldsHits
-						},
-						{
-							profiling: [
-								'currentTimeMillis',
-								'label',
-								'operation'
-							]
-						},
-						'total'
-					],
-					variables
-				}
-			]
-		}, null, {
-			operationName: 'InterfaceSearch'
+	const handlePaginationChange = React.useCallback((
+		_event: React.MouseEvent<HTMLAnchorElement>,
+		data: PaginationProps
+	) => {
+		const {activePage: newPage} = data;
+		DEBUG_DEPENDENCIES && console.debug('handlePaginationChange callback called. newPage:', newPage);
+		setPage(newPage as number);
+		const newStart = (newPage as number - 1 ) * perPage;
+		// if (newStart !== start) {
+		// 	setStart(newStart)
+		// }
+		searchFunction({
+			searchString,
+			start: newStart
 		});
-		//console.debug('Search() gqlQuery:', gqlQuery);
-		fetch(uri, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(gqlQuery)
-		})
-			.then(response => response.json())
-			.then(aResult => {
-				//console.debug('fetch aResult', aResult);
-				if (aResult && aResult.data && aResult.data.querySynonyms) {
-					const {
-						languages,
-						profiling,
-						search,
-						synonyms
-					} = aResult.data.querySynonyms;
-					const profilingArray = [];
-					const currentTimeMillisStart = profiling[0].currentTimeMillis;
-					//if(profiling) {
-					for (let i = 0; i < profiling.length - 1; i += 1) {
-						const durationMs = profiling[i + 1].currentTimeMillis - profiling[i].currentTimeMillis;
-						profiling[i + 1].durationMs = durationMs;
-						const durationSinceLocalStartMs = profiling[i + 1].currentTimeMillis - profiling[0].currentTimeMillis;
-						profiling[i + 1].durationSinceLocalStartMs = durationSinceLocalStartMs;
-						profiling[i + 1].durationSinceTotalStartMs = durationSinceLocalStartMs;
-						profilingArray.push(profiling[i + 1]);
-					}
-					//console.log('querySynonyms profiling', profiling);
-					//}
-					if (search) {
-						const {
-							profiling
-						} = search;
-						//if(profiling) {
-						for (let i = 0; i < profiling.length - 1; i += 1) {
-							const durationMs = profiling[i + 1].currentTimeMillis - profiling[i].currentTimeMillis;
-							profiling[i + 1].durationMs = durationMs;
-							const durationSinceLocalStartMs = profiling[i + 1].currentTimeMillis - profiling[0].currentTimeMillis;
-							profiling[i + 1].durationSinceLocalStartMs = durationSinceLocalStartMs;
-							const durationSinceTotalStartMs = profiling[i + 1].currentTimeMillis - currentTimeMillisStart;
-							profiling[i + 1].durationSinceTotalStartMs = durationSinceTotalStartMs;
-							profilingArray.push(profiling[i + 1]);
-						}
-						//console.log('search profiling', profiling);
-						//}
-						//console.log('search profilingArray', profilingArray);
-						search.locales = languages;
-						search.profiling = profilingArray;
+	}, [ // The callback is not executed when it's deps changes. Only the reference to the callback is updated.
+		perPage,
+		searchFunction,
+		searchString,
+		// start
+	]);
 
-						//if (synonyms) {
-						search.synonyms = synonyms;
-						//}
-						/*setCache(prev => {
-							//console.debug('setCache prev', prev);
-							const deref = JSON.parse(JSON.stringify(prev));
-							if (synonyms) {
-								deref.synonyms = synonyms;
-							}
-							setIn(deref, `${interfaceName}.${ss}`, search);
-							return deref;
-						});*/
-						setResult(search);
-					}
-				}
-				setSearchedString(ss);
-				setLoading(false);
-			}); // fetch
-	} // function search
-
-	React.useEffect(() => {
+	//──────────────────────────────────────────────────────────────────────────
+	// Init only
+	//──────────────────────────────────────────────────────────────────────────
+	useWhenInit(() => {
 		getInterfaceCollectionCount();
 		getInterfaceDocumentCount();
-		search(searchString);
-	}, []); // eslint-disable-line react-hooks/exhaustive-deps
+		searchFunction({
+			searchString,
+			start: 0
+		});
+	});
 
+	//──────────────────────────────────────────────────────────────────────────
+	// Update only (not init)
+	//──────────────────────────────────────────────────────────────────────────
+	useUpdateEffect(() => {
+		console.debug('update page:', page, 'perPage:', perPage, 'start:', start);
+		const newStart = (page as number - 1 ) * perPage;
+		if (newStart !== start) {
+			setStart(newStart)
+		}
+	}, [
+		page,
+		perPage,
+		start
+	])
+
+	//──────────────────────────────────────────────────────────────────────────
+	// Returns
+	//──────────────────────────────────────────────────────────────────────────
 	return {
 		// boolOnChange, setBoolOnChange,
 		interfaceCollectionCount, setInterfaceCollectionCount,
 		interfaceDocumentCount, setInterfaceDocumentCount,
+		handlePaginationChange,
+		jsonModalState, setJsonModalState,
 		loading, setLoading,
-		result, setResult,
-		search,
-		searchedString, setSearchedString,
+		page, setPage,
+		perPage, // setPerPage,
+		resultState,
+		searchFunction,
+		searchedStringState,
 		searchString, setSearchString,
+		start, // setStart,
 	}
 }
