@@ -7,6 +7,7 @@ import type {
 } from './index.d';
 
 
+import {isSet} from '@enonic/js-utils';
 import moment from 'moment';
 import * as React from 'react';
 import {FIELD_SHORTCUT_COLLECTION} from '../../../services/graphQL/constants';
@@ -259,14 +260,14 @@ export function useInterfacesState({
 				const collectionNameToDocCount = {};
 				if (data.queryDocuments.aggregations && data.queryDocuments.aggregations.length) {
 					for (let i = 0; i < data.queryDocuments.aggregations.length; i++) {
-					    const aggregation = data.queryDocuments.aggregations[i];
+						const aggregation = data.queryDocuments.aggregations[i];
 						const {
 							name,
 							buckets
 						} = aggregation;
 						if (name === 'collections') {
 							for (let i = 0; i < buckets.length; i++) {
-							    const bucket = buckets[i];
+								const bucket = buckets[i];
 								const {
 									docCount,
 									key
@@ -424,7 +425,11 @@ export function useInterfacesState({
 						_id,
 						_name,
 						//boostableFieldKeys: Object.keys(boostableFieldsObj).sort(),
-						collectionNames: Object.keys(collectionNamesObj).sort(),
+						collectionNames: Object.keys(collectionNamesObj).sort().map(collectionName => `${collectionName}${
+							isSet(collectionNameToDocCount[collectionName])
+								? ` (${collectionNameToDocCount[collectionName]})`
+								: ''
+						}`),
 						//documentTypesAndFields,
 						fields,
 						stopWords,
