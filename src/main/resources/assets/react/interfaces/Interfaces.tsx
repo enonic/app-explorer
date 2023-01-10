@@ -63,7 +63,7 @@ export function Interfaces({
 		setShowStopWords,
 		setShowSynonyms,
 		showCollections,
-		showCollectionCount,
+		// showCollectionCount,
 		showDelete,
 		showFields,
 		showStopWords,
@@ -127,9 +127,9 @@ export function Interfaces({
 					<Table.Row>
 						<Table.HeaderCell>Edit</Table.HeaderCell>
 						<Table.HeaderCell>Name</Table.HeaderCell>
-						{showCollectionCount ? <Table.HeaderCell>Collection count</Table.HeaderCell> : null}
+						{/*showCollectionCount ? <Table.HeaderCell>Collection count</Table.HeaderCell> : null*/}
 						{showCollections ? <Table.HeaderCell>Collection(s)</Table.HeaderCell> : null}
-						{showFields ? <Table.HeaderCell>Field(s)</Table.HeaderCell> : null}
+						{showFields ? <Table.HeaderCell>Boosting</Table.HeaderCell> : null}
 						{showSynonyms ? <Table.HeaderCell>Synonyms</Table.HeaderCell> : null}
 						{showStopWords ? <Table.HeaderCell>Stopwords</Table.HeaderCell> : null}
 						<Table.HeaderCell>Actions</Table.HeaderCell>
@@ -147,6 +147,9 @@ export function Interfaces({
 							//stopWordIds = [],
 							thesaurusNames = []
 						} = initialValues;
+						if (_name === 'default') {
+							return null;
+						}
 						//console.debug({_name, index});
 						return <Table.Row key={index}>
 							<Table.Cell collapsing>
@@ -168,7 +171,7 @@ export function Interfaces({
 								/>
 							</Table.Cell>
 							<Table.Cell collapsing disabled={isLoading}>{_name}</Table.Cell>
-							{showCollectionCount ? <Table.Cell collapsing disabled={isLoading}>{_name === 'default' ? '∞' : collectionNames.length}</Table.Cell> : null}
+							{/*showCollectionCount ? <Table.Cell collapsing disabled={isLoading}>{_name === 'default' ? '∞' : collectionNames.length}</Table.Cell> : null*/}
 							{showCollections ? <Table.Cell collapsing disabled={isLoading}>{_name === 'default' ? '∞' : <ul style={{
 								listStyleType: 'none',
 								margin: 0,
@@ -219,7 +222,9 @@ export function Interfaces({
 								</Button.Group>
 							</Table.Cell>
 						</Table.Row>;
-					})}
+					})
+						.filter(x => x) // Remove the default interface
+					}
 				</Table.Body>
 			</Table>
 			<NewOrEditInterfaceModal
