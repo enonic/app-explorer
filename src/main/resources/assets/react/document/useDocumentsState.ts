@@ -688,7 +688,7 @@ export function useDocumentsState({
 		documentTypesHoverOpen, setDocumentTypesHoverOpen,
 		doing, // setDoing,
 		durationSinceLastUpdate, // setDurationSinceLastUpdate,
-		fragmentSize, setFragmentSize,
+		fragmentSize, // setFragmentSize,
 		handleDroppedColumn,
 		handlePaginationChange,
 		jsonModalState, setJsonModalState,
