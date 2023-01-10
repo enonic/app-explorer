@@ -11,7 +11,7 @@ import {
 	// storage
 } from '@enonic/js-utils';
 import {FieldPath} from '@enonic/explorer-utils';
-import {useWhenInit} from '@seamusleahy/init-hooks';
+import {useWhenInitAsync} from '@seamusleahy/init-hooks';
 import {useDebounce} from 'use-debounce';
 import * as gql from 'gql-query-builder';
 import {difference} from 'lodash';
@@ -67,9 +67,15 @@ const OPTIONS_COLUMNS_DEFAULT: DropdownItemProps[] = [{
 }];
 
 export function useDocumentsState({
-	servicesBaseUrl
+	servicesBaseUrl,
+	setBottomBarMessage,
+	setBottomBarMessageHeader,
+	setBottomBarVisible,
 } :{
 	servicesBaseUrl: string
+	setBottomBarMessage: React.Dispatch<React.SetStateAction<string>>
+	setBottomBarMessageHeader: React.Dispatch<React.SetStateAction<string>>
+	setBottomBarVisible: React.Dispatch<React.SetStateAction<boolean>>
 }) {
 	// console.debug('servicesBaseUrl', servicesBaseUrl);
 
@@ -101,7 +107,10 @@ export function useDocumentsState({
 	const [documentTypesHoverOpen, setDocumentTypesHoverOpen] = React.useState(false);
 	const [durationSinceLastUpdate, setDurationSinceLastUpdate] = React.useState('');
 
-	const [fragmentSize, setFragmentSize] = React.useState(FRAGMENT_SIZE_DEFAULT);
+	const [
+		fragmentSize,
+		// setFragmentSize
+	] = React.useState(FRAGMENT_SIZE_DEFAULT);
 	const [deBouncedFragmentSize] = useDebounce(fragmentSize, 200);
 
 	const [loading, setLoading] = React.useState(false);
@@ -152,6 +161,9 @@ export function useDocumentsState({
 	}) => {
 		DEBUG_DEPENDENCIES && console.debug('queryDocuments callback called');
 		setDoing('Querying documents...');
+		setBottomBarMessageHeader('Search');
+		setBottomBarMessage(`Searching for ${query}...`);
+		setBottomBarVisible(true);
 		setLoading(true);
 		const filters = [];
 		if (collectionsFilter.length) {
@@ -450,14 +462,21 @@ export function useDocumentsState({
 
 				setDoing('');
 				setLoading(false);
+				setBottomBarVisible(false);
 			});
 	},[ // The callback is not executed when it's deps changes. Only the reference to the callback is updated.
 		servicesBaseUrl,
+		setBottomBarMessage,
+		setBottomBarMessageHeader,
+		setBottomBarVisible,
 	]);
 
 	const getDocumentTypes = React.useCallback(() => {
 		DEBUG_DEPENDENCIES && console.debug('getDocumentTypes callback called');
 		setDoing('Getting documentTypes...');
+		setBottomBarMessageHeader('Initialize');
+		setBottomBarMessage('Fetching documentTypes...');
+		setBottomBarVisible(true);
 		setLoading(true);
 		fetch(`${servicesBaseUrl}/graphQL`, {
 			method: 'POST',
@@ -537,6 +556,9 @@ export function useDocumentsState({
 		selectedCollections,
 		selectedDocumentTypes,
 		servicesBaseUrl,
+		setBottomBarMessage,
+		setBottomBarMessageHeader,
+		setBottomBarVisible,
 		start
 	]);
 
@@ -575,6 +597,9 @@ export function useDocumentsState({
 
 	const persistSelectedColumns = React.useCallback((newSelectedColumns: string[]) => {
 		DEBUG_DEPENDENCIES && console.debug('persistSelectedColumns callback called');
+		setBottomBarMessageHeader('Settings');
+		setBottomBarMessage('Storing selected columns...');
+		setBottomBarVisible(true);
 		setDoing('Persisting selected columns...');
 		// setSelectedColumnsState(JSON.parse(JSON.stringify(newSelectedColumns)));
 		setLoading(true);
@@ -585,9 +610,13 @@ export function useDocumentsState({
 		}).then((/*columns*/) => {
 			setDoing('');
 			setLoading(false);
+			setBottomBarVisible(false);
 		});
 	}, [ // The callback is not executed when it's deps changes. Only the reference to the callback is updated.
 		servicesBaseUrl,
+		setBottomBarMessage,
+		setBottomBarMessageHeader,
+		setBottomBarVisible,
 	]);
 
 	function handleDroppedColumn({
@@ -622,7 +651,7 @@ export function useDocumentsState({
 	//──────────────────────────────────────────────────────────────────────────
 	// Init
 	//──────────────────────────────────────────────────────────────────────────
-	useWhenInit(() => {
+	useWhenInitAsync(() => {
 		DEBUG_DEPENDENCIES && console.debug('init');
 		getDocumentTypes()
 	});

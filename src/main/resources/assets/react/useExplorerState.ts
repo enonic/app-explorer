@@ -4,10 +4,13 @@ import type {User} from '/lib/xp/auth';
 import type {License} from './index.d';
 
 
-import {useWhenInit} from '@seamusleahy/init-hooks';
+import {useWhenInitAsync} from '@seamusleahy/init-hooks';
 import * as gql from 'gql-query-builder';
 import * as React from 'react';
+import LoadingModal from './components/modals/LoadingModal';
+import useBottomOverlayBarState from './components/useBottomOverlayBarState';
 import fetchUser from './fetchers/fetchUser';
+
 
 
 const GQL_BODY_QUERY_INTERFACES_DEFAULT = JSON.stringify(gql.query({
@@ -38,6 +41,22 @@ export function useExplorerState({
 	initialLicenseValid :boolean
 	servicesBaseUrl :string
 }) {
+	const {
+		state: loadingModalState,
+		setState: setLoadingModalState,
+	} = LoadingModal.useLoadingModalState();
+	const {
+		icon: bottomBarIcon,
+		// setIcon: setBottomBarIcon,
+		iconLoading: bottomBarIconLoading,
+		// setIconLoading: setBottomBarIconLoading,
+		message: bottomBarMessage,
+		setMessage: setBottomBarMessage,
+		messageHeader: bottomBarMessageHeader,
+		setMessageHeader: setBottomBarMessageHeader,
+		visible: bottomBarVisible,
+		setVisible: setBottomBarVisible,
+	} = useBottomOverlayBarState();
 	//──────────────────────────────────────────────────────────────────────────
 	// State
 	//──────────────────────────────────────────────────────────────────────────
@@ -74,18 +93,37 @@ export function useExplorerState({
 			.then(json => {
 				//console.debug(json);
 				setDefaultInterfaceFields(json.data.queryInterfaces.hits[0].fields);
+				setBottomBarVisible(false);
+				setLoadingModalState(prev => {
+					const deref = {...prev};
+					deref.open = false;
+					return deref;
+				});
 			});
-	}, [servicesBaseUrl]); // memoizedQueryInterfacesDefault
+	}, [
+		servicesBaseUrl,
+		setBottomBarVisible,
+		setLoadingModalState,
+	]);
 
 	//──────────────────────────────────────────────────────────────────────────
 	// Init
 	//──────────────────────────────────────────────────────────────────────────
-	useWhenInit(() => {
+	useWhenInitAsync(() => {
+		setLoadingModalState(prev => {
+			const deref = {...prev};
+			deref.open = true;
+			return deref;
+		});
+		setBottomBarMessageHeader('Initialize');
+		setBottomBarMessage('Fetching user information...');
+		setBottomBarVisible(true);
 		fetchUser({
 			url: `${servicesBaseUrl}/graphQL`
 		}).then(object => {
 			setUserState(object.data.getUser);
 		})
+		setBottomBarMessage('Fetching query information...');
 		memoizedQueryInterfacesDefault();
 	});
 
@@ -206,9 +244,15 @@ export function useExplorerState({
 	}, [sideBarVisible]);
 
 	return {
+		bottomBarIcon, // setBottomBarIcon,
+		bottomBarIconLoading, // setBottomBarIconLoading,
+		bottomBarMessage, setBottomBarMessage,
+		bottomBarMessageHeader, setBottomBarMessageHeader,
+		bottomBarVisible, setBottomBarVisible,
 		defaultInterfaceFields,
 		licensedTo, setLicensedTo,
 		licenseValid, setLicenseValid,
+		loadingModalState, setLoadingModalState,
 		menuIconName,
 		showWhichLicense, setShowWhichLicense,
 		sideBarVisible, setSideBarVisible,

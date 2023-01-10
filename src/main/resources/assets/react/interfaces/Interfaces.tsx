@@ -36,12 +36,18 @@ export function Interfaces({
 	basename,
 	licenseValid,
 	servicesBaseUrl,
+	setBottomBarMessage,
+	setBottomBarMessageHeader,
+	setBottomBarVisible,
 	setLicensedTo,
 	setLicenseValid
 } :{
 	basename: string
 	licenseValid: boolean
 	servicesBaseUrl: string
+	setBottomBarMessage: React.Dispatch<React.SetStateAction<string>>
+	setBottomBarMessageHeader: React.Dispatch<React.SetStateAction<string>>
+	setBottomBarVisible: React.Dispatch<React.SetStateAction<boolean>>
 	setLicensedTo: SetLicensedToFunction
 	setLicenseValid: SetLicenseValidFunction
 }) {
@@ -204,6 +210,9 @@ export function Interfaces({
 										loading={isLoading}
 										fields={fields}
 										servicesBaseUrl={servicesBaseUrl}
+										setBottomBarMessage={setBottomBarMessage}
+										setBottomBarMessageHeader={setBottomBarMessageHeader}
+										setBottomBarVisible={setBottomBarVisible}
 									/>
 									<CopyModal
 										afterClose={memoizedUpdateInterfacesCallback}

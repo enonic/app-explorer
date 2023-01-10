@@ -23,12 +23,19 @@ type SearchResult = {
 function useSearchInterface({
 	basename,
 	interfaceName,
+	setBottomBarMessage,
+	setBottomBarMessageHeader,
+	setBottomBarVisible,
 	setLoading,
 	fieldsProp
 } :{
 	basename: string
 	interfaceName: string
+	setBottomBarMessage: React.Dispatch<React.SetStateAction<string>>
+	setBottomBarMessageHeader: React.Dispatch<React.SetStateAction<string>>
+	setBottomBarVisible: React.Dispatch<React.SetStateAction<boolean>>
 	setLoading: React.Dispatch<React.SetStateAction<boolean>>
+	// Optional
 	fieldsProp?: InterfaceField[]
 }) {
 	const [resultState, setResultState] = React.useState<SearchResult>({
@@ -61,7 +68,10 @@ function useSearchInterface({
 				synonyms: [],
 				total: 0
 			});
-			return;
+			setBottomBarVisible(false);
+			return new Promise((resolve/*, reject*/) => {
+				resolve(undefined);
+			});
 		}
 		/*const cachedResult = getIn(
 			cache,
@@ -71,6 +81,9 @@ function useSearchInterface({
 			setResult(cachedResult);
 			return;
 		}*/
+		setBottomBarMessageHeader('Search');
+		setBottomBarMessage(`Searching for ${searchString}`);
+		setBottomBarVisible(true);
 		setLoading(true);
 		const uri = `${basename}/api/v1/interface/${interfaceName}`;
 		// console.debug(uri);
@@ -175,7 +188,7 @@ function useSearchInterface({
 			operationName: 'InterfaceSearch'
 		});
 		//console.debug('Search() gqlQuery:', gqlQuery);
-		fetch(uri, {
+		return fetch(uri, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify(gqlQuery)
@@ -242,6 +255,7 @@ function useSearchInterface({
 				// console.debug(`before setSearchedStringState(${searchString})`);
 				setSearchedStringState(searchString);
 				setLoading(false);
+				setBottomBarVisible(false);
 			}); // fetch
 	} // function search
 	return {

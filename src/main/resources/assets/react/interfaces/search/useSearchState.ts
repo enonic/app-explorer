@@ -3,7 +3,7 @@ import type {InterfaceField} from '/lib/explorer/types/Interface.d';
 
 
 
-import {useWhenInit} from '@seamusleahy/init-hooks';
+import {useWhenInitAsync} from '@seamusleahy/init-hooks';
 import * as gql from 'gql-query-builder';
 import * as React from 'react';
 import useJsonModalState from '../../components/modals/useJsonModalState';
@@ -22,8 +22,10 @@ export type SearchProps = {
 	firstColumnWidth?: 1|2|3|4|5|6|7|8|9|10|11|12|13|14|15
 	interfaceName?: InterfaceName
 	searchString?: SearchString
+	setBottomBarMessage: React.Dispatch<React.SetStateAction<string>>
+	setBottomBarMessageHeader: React.Dispatch<React.SetStateAction<string>>
+	setBottomBarVisible: React.Dispatch<React.SetStateAction<boolean>>
 }
-
 
 
 const DEBUG_DEPENDENCIES = false;
@@ -35,10 +37,16 @@ export function useSearchState({
 	fieldsProp = [],
 	interfaceNameProp = 'default',
 	searchStringProp,
+	setBottomBarMessage,
+	setBottomBarMessageHeader,
+	setBottomBarVisible,
 }: {
 	basename: string
 	searchStringProp: SearchString
 	servicesBaseUrl: string
+	setBottomBarMessage: React.Dispatch<React.SetStateAction<string>>
+	setBottomBarMessageHeader: React.Dispatch<React.SetStateAction<string>>
+	setBottomBarVisible: React.Dispatch<React.SetStateAction<boolean>>
 	// Optional
 	fieldsProp?: InterfaceField[]
 	interfaceNameProp?: InterfaceName
@@ -51,6 +59,7 @@ export function useSearchState({
 	//──────────────────────────────────────────────────────────────────────────
 	// const [boolOnChange, setBoolOnChange] = React.useState(false);
 	//console.debug('Search boolOnChange', boolOnChange);
+	const [initializing, setInitializing] = React.useState(true);
 	const [interfaceCollectionCount, setInterfaceCollectionCount] = React.useState<number>();
 	const [interfaceDocumentCount, setInterfaceDocumentCount] = React.useState<number>();
 	const [page, setPage] = React.useState(1);
@@ -80,6 +89,9 @@ export function useSearchState({
 		basename,
 		fieldsProp,
 		interfaceName: interfaceNameProp,
+		setBottomBarMessage,
+		setBottomBarMessageHeader,
+		setBottomBarVisible,
 		setLoading
 	});
 
@@ -88,7 +100,7 @@ export function useSearchState({
 	//──────────────────────────────────────────────────────────────────────────
 	const getInterfaceCollectionCount = React.useCallback(() => {
 		if (interfaceNameProp === 'default') {
-			fetch(`${servicesBaseUrl}/graphQL`, {
+			return fetch(`${servicesBaseUrl}/graphQL`, {
 				method: 'POST',
 				headers: {
 					'Content-Type':	'application/json'
@@ -104,7 +116,7 @@ export function useSearchState({
 					setInterfaceCollectionCount(json.data.queryCollections.total);
 				});
 		} else {
-			fetch(`${servicesBaseUrl}/graphQL`, {
+			return fetch(`${servicesBaseUrl}/graphQL`, {
 				method: 'POST',
 				headers: {
 					'Content-Type':	'application/json'
@@ -146,7 +158,8 @@ export function useSearchState({
 
 	const getInterfaceDocumentCount = React.useCallback(() => {
 		// console.debug('getInterfaceDocumentCount interfaceNameProp:', interfaceNameProp);
-		fetch(`${basename}/api/v1/interface/${interfaceNameProp}`, {
+		setBottomBarMessage('Getting document count...');
+		return fetch(`${basename}/api/v1/interface/${interfaceNameProp}`, {
 			method: 'POST',
 			headers: {
 				'Content-Type':	'application/json'
@@ -176,7 +189,8 @@ export function useSearchState({
 			});
 	}, [
 		basename,
-		interfaceNameProp
+		interfaceNameProp,
+		setBottomBarMessage,
 	]);
 
 	const handlePaginationChange = React.useCallback((
@@ -204,13 +218,20 @@ export function useSearchState({
 	//──────────────────────────────────────────────────────────────────────────
 	// Init only
 	//──────────────────────────────────────────────────────────────────────────
-	useWhenInit(() => {
-		getInterfaceCollectionCount();
-		getInterfaceDocumentCount();
-		searchFunction({
-			searchString,
-			start: 0
-		});
+	useWhenInitAsync(() => {
+		setBottomBarMessageHeader('Initialize');
+		setBottomBarMessage('Getting collection count...');
+		setBottomBarVisible(true);
+		Promise.all([
+			getInterfaceCollectionCount(),
+			getInterfaceDocumentCount(),
+			searchFunction({
+				searchString,
+				start: 0
+			})
+		]).then(() => {
+			setInitializing(false);
+		})
 	});
 
 	//──────────────────────────────────────────────────────────────────────────
@@ -236,6 +257,7 @@ export function useSearchState({
 		interfaceCollectionCount, setInterfaceCollectionCount,
 		interfaceDocumentCount, setInterfaceDocumentCount,
 		handlePaginationChange,
+		initializing,
 		jsonModalState, setJsonModalState,
 		loading, setLoading,
 		page, setPage,

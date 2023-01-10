@@ -5,7 +5,7 @@ import type {
 import type {QueriedSynonym} from '/lib/explorer/types/index.d';
 
 //import {isSet} from '@enonic/js-utils';
-import {useWhenInit} from '@seamusleahy/init-hooks';
+import {useWhenInitAsync} from '@seamusleahy/init-hooks';
 import * as React from 'react';
 import {fetchSynonymsQuery} from '../../../../services/graphQL/fetchers/fetchSynonymsQuery';
 import {useUpdateEffect} from '../../utils/useUpdateEffect';
@@ -144,7 +144,7 @@ export function useEditSynonymsState({
 	//──────────────────────────────────────────────────────────────────────────
 	// Init
 	//──────────────────────────────────────────────────────────────────────────
-	useWhenInit(() => {
+	useWhenInitAsync(() => {
 		DEBUG_DEPENDENCIES && console.debug('init');
 		memoizedQuerySynonyms({
 			from: fromState,

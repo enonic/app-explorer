@@ -13,6 +13,9 @@ export function SearchModal({
 	basename,
 	interfaceName,
 	servicesBaseUrl,
+	setBottomBarMessage,
+	setBottomBarMessageHeader,
+	setBottomBarVisible,
 	// Optional
 	afterClose = () => {/**/},
 	beforeOpen = () => {/**/},
@@ -24,6 +27,9 @@ export function SearchModal({
 	basename: string
 	interfaceName: string
 	servicesBaseUrl: string
+	setBottomBarMessage: React.Dispatch<React.SetStateAction<string>>
+	setBottomBarMessageHeader: React.Dispatch<React.SetStateAction<string>>
+	setBottomBarVisible: React.Dispatch<React.SetStateAction<boolean>>
 	// Optional
 	afterClose ?:() => void
 	beforeOpen ?:() => void
@@ -68,6 +74,9 @@ export function SearchModal({
 				fields={fields}
 				interfaceName={interfaceName}
 				servicesBaseUrl={servicesBaseUrl}
+				setBottomBarMessage={setBottomBarMessage}
+				setBottomBarMessageHeader={setBottomBarMessageHeader}
+				setBottomBarVisible={setBottomBarVisible}
 			/>
 		</Modal.Content>
 		<Modal.Actions>

@@ -21,7 +21,10 @@ import {Search} from './interfaces/search/Search';
 import {Status} from './Status';
 import {StopWords} from './stopWords/StopWords';
 import {Thesauri} from './thesaurus/Thesauri';
+
 import About from './components/About';
+import BottomOverlayBar from './components/BottomOverlayBar';
+import LoadingModal from './components/modals/LoadingModal';
 import SideBarMenu from './components/SideBarMenu';
 import TopBarMenu from './components/TopBarMenu';
 import User from './user/User';
@@ -58,9 +61,15 @@ export function Explorer({
 }: ExplorerProps) {
 	// console.debug('basename', basename);
 	const {
+		bottomBarIcon, // setBottomBarIcon,
+		bottomBarIconLoading, // setBottomBarIconLoading,
+		bottomBarMessage, setBottomBarMessage,
+		bottomBarMessageHeader, setBottomBarMessageHeader,
+		bottomBarVisible, setBottomBarVisible,
 		defaultInterfaceFields,
 		licensedTo, setLicensedTo,
 		licenseValid, setLicenseValid,
+		loadingModalState, setLoadingModalState,
 		menuIconName,
 		showWhichLicense, setShowWhichLicense,
 		sideBarVisible, setSideBarVisible,
@@ -86,6 +95,13 @@ export function Explorer({
 				setSideBarVisible={setSideBarVisible}
 				sideBarVisible={sideBarVisible}
 			/>
+			<BottomOverlayBar
+				icon={bottomBarIcon}
+				iconLoading={bottomBarIconLoading}
+				message={bottomBarMessage}
+				messageHeader={bottomBarMessageHeader}
+				visible={bottomBarVisible}
+			/>
 			<Sidebar.Pusher
 				id='myPusher'
 			>
@@ -98,6 +114,9 @@ export function Explorer({
 							interfaceName='default'
 							searchString=''
 							servicesBaseUrl={servicesBaseUrl}
+							setBottomBarMessage={setBottomBarMessage}
+							setBottomBarMessageHeader={setBottomBarMessageHeader}
+							setBottomBarVisible={setBottomBarVisible}
 						/>
 					</>}/>
 					{licenseValid
@@ -135,6 +154,9 @@ export function Explorer({
 					/>}/>
 					<Route path="/documents" element={<Documents
 						servicesBaseUrl={servicesBaseUrl}
+						setBottomBarMessage={setBottomBarMessage}
+						setBottomBarMessageHeader={setBottomBarMessageHeader}
+						setBottomBarVisible={setBottomBarVisible}
 					/>}/>
 					<Route path="/documentTypes" element={<DocumentTypes
 						servicesBaseUrl={servicesBaseUrl}
@@ -152,6 +174,9 @@ export function Explorer({
 						basename={basename}
 						licenseValid={licenseValid}
 						servicesBaseUrl={servicesBaseUrl}
+						setBottomBarMessage={setBottomBarMessage}
+						setBottomBarMessageHeader={setBottomBarMessageHeader}
+						setBottomBarVisible={setBottomBarVisible}
 						setLicensedTo={setLicensedTo}
 						setLicenseValid={setLicenseValid}
 					/>}/>
@@ -167,5 +192,9 @@ export function Explorer({
 				</Routes>
 			</Sidebar.Pusher>
 		</Sidebar.Pushable>
+		<LoadingModal
+			state={loadingModalState}
+			setState={setLoadingModalState}
+		/>
 	</Router>;
 }
