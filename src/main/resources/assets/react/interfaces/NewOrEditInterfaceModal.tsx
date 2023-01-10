@@ -103,7 +103,9 @@ export function NewOrEditInterfaceModal(props :NewOrEditInterfaceModalProps) {
 					}}><Icon
 						name='plus'
 					/></Button>}/>}
-	>{licenseValid || total <= 1 // This means it will be allowed to create interface number 2, but not number 3
+	>{licenseValid
+		|| (!_id && total <= 1) // Allowed to create interface number 2, but not number 3
+		|| (_id && total <= 2) // Allowed to edit interface number 2, but not number 3
 			? <>
 				<Modal.Header>{header}</Modal.Header>
 				<NewOrEditInterface

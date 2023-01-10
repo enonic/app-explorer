@@ -151,7 +151,7 @@ export function useInterfacesState({
 	const [stopWordOptions, setStopWordOptions] = React.useState<Array<DropdownItemProps>>([]);
 	const [thesauriOptions, setThesauriOptions] = React.useState<Array<DropdownItemProps>>([]);
 
-	const [showCollectionCount/*, setShowCollectionCount*/] = React.useState(true);
+	// const [showCollectionCount/*, setShowCollectionCount*/] = React.useState(true);
 	const [showCollections, setShowCollections] = React.useState(true);
 	const [showFields, setShowFields] = React.useState(true);
 	const [showSynonyms, setShowSynonyms] = React.useState(true);
@@ -500,7 +500,7 @@ export function useInterfacesState({
 		setShowStopWords,
 		setShowSynonyms,
 		showCollections,
-		showCollectionCount,
+		// showCollectionCount,
 		showDelete,
 		showFields,
 		showStopWords,
