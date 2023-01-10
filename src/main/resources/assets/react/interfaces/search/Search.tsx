@@ -37,6 +37,7 @@ export function Search(props: SearchProps) {
 		// boolOnChange, setBoolOnChange,
 		interfaceCollectionCount, // setInterfaceCollectionCount,
 		interfaceDocumentCount, // setInterfaceDocumentCount,
+		initializing,
 		jsonModalState, setJsonModalState,
 		handlePaginationChange,
 		loading, // setLoading,
@@ -53,6 +54,9 @@ export function Search(props: SearchProps) {
 		interfaceNameProp,
 		searchStringProp: props.searchString,
 		servicesBaseUrl: props.servicesBaseUrl,
+		setBottomBarMessage: props.setBottomBarMessage,
+		setBottomBarMessageHeader: props.setBottomBarMessageHeader,
+		setBottomBarVisible: props.setBottomBarVisible,
 	});
 	// console.debug('interfaceCollectionCount', interfaceCollectionCount);
 	// console.debug('interfaceDocumentCount', interfaceDocumentCount);
@@ -115,75 +119,77 @@ export function Search(props: SearchProps) {
 
 			</Form.Group>
 		</Form>
-		{interfaceCollectionCount
-			? interfaceDocumentCount
-				? <>
-					{searchedStringState
-						? <Segment basic>
-							Searched {interfaceDocumentCount} documents
-							across {interfaceCollectionCount} collections
-							for <b>{searchedStringState}</b>
-							<span> and found {resultState.total} matching documents.</span>
-						</Segment>
-						: loading
-							? <Segment basic>Searching {interfaceDocumentCount} documents across {interfaceCollectionCount} collections...</Segment>
-							: <Segment basic>Ready to search {interfaceDocumentCount} documents across {interfaceCollectionCount} collections.</Segment>
-					}
+		{initializing
+			? null
+			: interfaceCollectionCount
+				? interfaceDocumentCount
+					? <>
+						{searchedStringState
+							? <Segment basic>
+								Searched {interfaceDocumentCount} documents
+								across {interfaceCollectionCount} collections
+								for <b>{searchedStringState}</b>
+								<span> and found {resultState.total} matching documents.</span>
+							</Segment>
+							: loading
+								? <Segment basic>Searching {interfaceDocumentCount} documents across {interfaceCollectionCount} collections...</Segment>
+								: <Segment basic>Ready to search {interfaceDocumentCount} documents across {interfaceCollectionCount} collections.</Segment>
+						}
 
-					{searchedStringState && !resultState.total
-						? <Segment basic className='c-lgr' size='massive' textAlign='center'>
-							<Header as='h1' content='D&apos;oh!' size='huge' style={{
-								marginBottom: 14
-							}}/>
-							No hits - better luck next time...
-						</Segment>
-						: null
-					}
-					<DocumentsTable
-						documentsRes={resultState}
-						dragAndDropColumnsProp={false}
-						handlePaginationChange={handlePaginationChange}
-						jsonModalState={jsonModalState}
-						loading={loading}
-						page={page}
-						perPage={perPage}
-						searchedString={searchedStringState}
-						selectedColumnsState={[
-							Column.JSON,
-							Column.COLLECTION,
-							Column.DOCUMENT_TYPE,
-							...props.fields.map(({name}) => name)
-						]}
-						setJsonModalState={setJsonModalState}
-						start={start}
-					/>
-					{/*<Hits
-						firstColumnWidth={firstColumnWidth}
-						hits={result.hits}
-						loading={loading}
-					/>*/}
-					{interfaceNameProp === 'default'
-						? null
-						: searchedStringState ? <Accordion
-							locales={resultState.locales || []}
-							profiling={resultState.profiling || []}
-							synonyms={resultState.synonyms || []}
-						/> : null
-					}
-				</>
+						{searchedStringState && !resultState.total
+							? <Segment basic className='c-lgr' size='massive' textAlign='center'>
+								<Header as='h1' content='D&apos;oh!' size='huge' style={{
+									marginBottom: 14
+								}}/>
+								No hits - better luck next time...
+							</Segment>
+							: null
+						}
+						<DocumentsTable
+							documentsRes={resultState}
+							dragAndDropColumnsProp={false}
+							handlePaginationChange={handlePaginationChange}
+							jsonModalState={jsonModalState}
+							loading={loading}
+							page={page}
+							perPage={perPage}
+							searchedString={searchedStringState}
+							selectedColumnsState={[
+								Column.JSON,
+								Column.COLLECTION,
+								Column.DOCUMENT_TYPE,
+								...props.fields.map(({name}) => name)
+							]}
+							setJsonModalState={setJsonModalState}
+							start={start}
+						/>
+						{/*<Hits
+							firstColumnWidth={firstColumnWidth}
+							hits={result.hits}
+							loading={loading}
+						/>*/}
+						{interfaceNameProp === 'default'
+							? null
+							: searchedStringState ? <Accordion
+								locales={resultState.locales || []}
+								profiling={resultState.profiling || []}
+								synonyms={resultState.synonyms || []}
+							/> : null
+						}
+					</>
+					: interfaceNameProp === 'default'
+						? 'No documents available, add some documents to a collection to get started.'
+						: interfaceCollectionCount === 1
+							? `There are no documents in the ${interfaceCollectionCount} collection of the ${interfaceNameProp} interface. Add some documents to it to get started.`
+							: `There are no documents in any of the ${interfaceCollectionCount} collections of the ${interfaceNameProp} interface. Add some documents to any of them to get started.`
 				: interfaceNameProp === 'default'
-					? 'No documents available, add some documents to a collection to get started.'
-					: interfaceCollectionCount === 1
-						? `There are no documents in the ${interfaceCollectionCount} collection of the ${interfaceNameProp} interface. Add some documents to it to get started.`
-						: `There are no documents in any of the ${interfaceCollectionCount} collections of the ${interfaceNameProp} interface. Add some documents to any of them to get started.`
-			: interfaceNameProp === 'default'
-				? <Segment basic className='c-lgr' size='massive' textAlign='center'>
-					<Header as='h1' content='D&apos;oh!' size='huge' style={{
-						marginBottom: 14
-					}}/>
-					No collections available, <Link to='/collections/create'>create a collection</Link> to get started.
-				</Segment>
-				: `There are no collections in the ${interfaceNameProp} interface. Add collections to the interface to get started.`
+					? <Segment basic className='c-lgr' size='massive' textAlign='center'>
+						<Header as='h1' content='D&apos;oh!' size='huge' style={{
+							marginBottom: 14
+						}}/>
+						No collections available, <Link to='/collections/create'>create a collection</Link> to get started.
+					</Segment>
+					: `There are no collections in the ${interfaceNameProp} interface. Add collections to the interface to get started.`
 		}
 	</Container>;
 } // function Search

@@ -29,8 +29,14 @@ import DocumentsTable from './DocumentsTable';
 
 
 export function Documents({
+	setBottomBarMessage,
+	setBottomBarMessageHeader,
+	setBottomBarVisible,
 	servicesBaseUrl
 } :{
+	setBottomBarMessage: React.Dispatch<React.SetStateAction<string>>
+	setBottomBarMessageHeader: React.Dispatch<React.SetStateAction<string>>
+	setBottomBarVisible: React.Dispatch<React.SetStateAction<boolean>>
 	servicesBaseUrl: string
 }) {
 	const {
@@ -60,7 +66,10 @@ export function Documents({
 		selectedDocumentTypes, setSelectedDocumentTypes,
 		start, setStart,
 	} = useDocumentsState({
-		servicesBaseUrl
+		servicesBaseUrl,
+		setBottomBarMessage,
+		setBottomBarMessageHeader,
+		setBottomBarVisible,
 	})
 	return <Flex
 		justifyContent='center'>
