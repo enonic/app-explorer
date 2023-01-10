@@ -3,7 +3,7 @@ import {
 	QUERY_OPERATOR_AND,
 	QUERY_OPERATOR_OR,
 } from '@enonic/js-utils';
-import {Slider} from 'react-semantic-ui-range';
+// import {Slider} from 'react-semantic-ui-range';
 import {
 	Breadcrumb,
 	Button,
@@ -20,7 +20,7 @@ import {HoverPopup} from '../components/HoverPopup';
 import SearchInput from '../components/inputs/SearchInput';
 import {useDocumentsState} from './useDocumentsState';
 import DocumentsTable from './DocumentsTable';
-import {FRAGMENT_SIZE_DEFAULT} from './constants';
+// import {FRAGMENT_SIZE_DEFAULT} from './constants';
 
 // import {FIELD_PATH_META} from '/lib/explorer/constants'; // TODO setup build system so this import works
 
@@ -43,7 +43,7 @@ export function Documents({
 		documentTypesHoverOpen, setDocumentTypesHoverOpen,
 		doing, // setDoing,
 		durationSinceLastUpdate, // setDurationSinceLastUpdate,
-		fragmentSize, setFragmentSize,
+		fragmentSize, // setFragmentSize,
 		handleDroppedColumn,
 		handlePaginationChange,
 		jsonModalState, setJsonModalState,
@@ -143,7 +143,7 @@ export function Documents({
 									/>
 								</Segment>
 							</Form.Field>
-							<Form.Field>
+							{/*<Form.Field>
 								<Segment style={{
 									height: 38,
 									width: 200
@@ -169,16 +169,7 @@ export function Documents({
 										/>
 									</div>
 								</Segment>
-								{/*<Table basic collapsing compact>
-									<Table.Body>
-										<Table.Row verticalAlign='middle'>
-											<Table.Cell >
-
-											</Table.Cell>
-										</Table.Row>
-									</Table.Body>
-								</Table>*/}
-							</Form.Field>
+							</Form.Field>*/}
 							<Form.Field>
 								<HoverPopup
 									content={<Dropdown
