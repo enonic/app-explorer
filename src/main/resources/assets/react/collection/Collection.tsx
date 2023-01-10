@@ -136,7 +136,7 @@ export function Collection({
 					{
 						managedDocumentTypes
 							? <>
-								<Header as='h3' dividing content='Managed document type(s)'/>
+								<Header as='h5' content='Managed document type(s)'/>
 								<ul style={{
 									listStyleType: 'none',
 									margin: 0,
