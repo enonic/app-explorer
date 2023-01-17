@@ -14,8 +14,8 @@ import moment from 'moment';
 import prettyMs from 'pretty-ms';
 import * as React from 'react';
 import {Dropdown, Form, Header, Table} from 'semantic-ui-react';
-import Flex from './components/Flex';
-import {useInterval} from './utils/useInterval';
+import Flex from '../components/Flex';
+import {useInterval} from '../utils/useInterval';
 
 
 const DIRECTION_ASCENDING = 'ascending';
@@ -242,6 +242,7 @@ export function Status (props :{
 	}; // sortGen
 
 	return <Flex
+		className='mt-1rem'
 		justifyContent='center'>
 		<Flex.Item
 			className='w-ma-fullExceptGutters w-fullExceptGutters-mobileDown'

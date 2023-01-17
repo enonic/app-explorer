@@ -18,12 +18,13 @@ import {Schedule} from './schedule/Schedule';
 import {Documents} from './document/Documents';
 import {DocumentTypes} from './documentTypes/DocumentTypes';
 import {Search} from './interfaces/search/Search';
-import {Status} from './Status';
+import {Status} from './collection/Status';
 import {StopWords} from './stopWords/StopWords';
 import {Thesauri} from './thesaurus/Thesauri';
 
 import About from './components/About';
 import BottomOverlayBar from './components/BottomOverlayBar';
+import GraphiQL from './components/GraphiQL';
 import LoadingModal from './components/modals/LoadingModal';
 import SideBarMenu from './components/SideBarMenu';
 import TopBarMenu from './components/TopBarMenu';
@@ -107,7 +108,12 @@ export function Explorer({
 			>
 				<Routes>
 					<Route path="/" element={<>
-						<Header as='h1' content='Explorer' textAlign='center'/>
+						<Header
+							as='h1'
+							className='mt-1rem'
+							content='Explorer'
+							textAlign='center'
+						/>
 						<Search
 							basename={basename}
 							fields={defaultInterfaceFields}
@@ -160,6 +166,9 @@ export function Explorer({
 					/>}/>
 					<Route path="/documentTypes" element={<DocumentTypes
 						servicesBaseUrl={servicesBaseUrl}
+					/>}/>
+					<Route path="/graphiql" element={<GraphiQL
+						url={`${basename}/api/v1/interface/default`}
 					/>}/>
 					<Route path="/stopWords" element={<StopWords
 						servicesBaseUrl={servicesBaseUrl}
