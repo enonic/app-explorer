@@ -13,6 +13,7 @@
 @import '/components/_table.sass'
 @import '/components/_transition.sass'
 @import '/features/_layout.sass'
+@import '_variables.sass'
 
 // Global variables used by css (not compile time)
 ::root
@@ -62,6 +63,13 @@ th.disabled
 // 0.1.0 .c-lgr
 .c-lgr
 	color: lightgray
+
+.ui.header.mt-1rem, // 0.3.0
+.mt-1rem
+	margin-top: $padding-vertical-default
+
+.pt-1rem
+	padding-top: $padding-vertical-default
 
 // 0.3.0 .ui.segment.c-lgr
 // 0.5.0 .ui.segment.c-lgr .ui.header

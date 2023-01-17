@@ -41,6 +41,7 @@ export function DocumentTypes({
 	});
 
 	return <Flex
+		className='mt-1rem'
 		justifyContent='center'
 	>
 		<Flex.Item

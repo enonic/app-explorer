@@ -57,6 +57,7 @@ export function Thesauri({
 		servicesBaseUrl
 	});
 	return <Flex
+		className='mt-1rem'
 		justifyContent='center'
 	>
 		<Flex.Item

@@ -72,7 +72,9 @@ export function Documents({
 		setBottomBarVisible,
 	})
 	return <Flex
-		justifyContent='center'>
+		className='mt-1rem'
+		justifyContent='center'
+	>
 		<Flex.Item
 			className={[
 				'w-ma-fullExceptGutters',

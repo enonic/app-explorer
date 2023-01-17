@@ -568,6 +568,7 @@ const CLIENT_JS_CONFIG = {
 				//{ context: NODE_MODULES_CONTEXT, from: 'fomantic-ui-css/themes', to: 'semantic-ui-css/themes'}, // Fonts
 
 				//{ context: NODE_MODULES_CONTEXT, from: 'frappe-gantt/dist/*', to: 'frappe-gantt/[name].[ext]' },
+				{ context: NODE_MODULES_CONTEXT, from: 'graphiql/graphiql.min.css', to: 'graphiql//graphiql.min.css' },
 				{ context: NODE_MODULES_CONTEXT, from: 'nice-react-gantt/lib/css/style.css', to: 'nice-react-gantt/style.css' },
 				//{ context: NODE_MODULES_CONTEXT, from: 'jquery/dist', to: 'jquery'},
 				{ context: NODE_MODULES_CONTEXT, from: 'react/umd/react.*.js', to: 'react/[name][ext]' },
@@ -613,7 +614,8 @@ WEBPACK_CONFIG.push(CLIENT_JS_CONFIG);
 //──────────────────────────────────────────────────────────────────────────────
 // Clientside Ecmascript modules
 //──────────────────────────────────────────────────────────────────────────────
-const ESBUILD_TARGET = 'es2015';
+//const ESBUILD_TARGET = 'es2015'; // ERROR: Transforming async generator functions to the configured target environment ("es2015") is not supported yet
+const ESBUILD_TARGET = 'esnext'; // ERROR: Transforming async generator functions to the configured target environment ("es2015") is not supported yet
 const CLIENT_ES_CONFIG = {
 	context: path.join(__dirname, SRC_ASSETS_DIR, 'react'),
 	devtool: MODE === 'production' ? false : 'eval-source-map', // https://webpack.js.org/configuration/devtool/#devtool

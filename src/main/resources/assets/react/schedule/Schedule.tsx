@@ -60,6 +60,7 @@ export const Schedule = ({
 
 	return <>
 		<Flex
+			className='mt-1rem'
 			justifyContent='center'>
 			<Flex.Item
 				className='w-ma-fullExceptGutters w-fullExceptGutters-mobileDown w-mi-tabletExceptGutters-tabletUp'
