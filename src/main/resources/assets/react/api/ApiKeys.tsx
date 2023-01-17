@@ -33,7 +33,9 @@ export const ApiKeys = (props :{
 	const [showAllFields, setShowAllFields] = React.useState(true);
 
 	return <Flex
-		justifyContent='center'>
+		className='mt-1rem'
+		justifyContent='center'
+	>
 		<Flex.Item
 			className='w-ma-fullExceptGutters w-fullExceptGutters-mobileDown w-mi-tabletExceptGutters-tabletUp'
 			overflowX='overlay'

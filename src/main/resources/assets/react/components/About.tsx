@@ -25,6 +25,7 @@ export default function About({
 	setShowWhichLicense: React.Dispatch<React.SetStateAction<License>>
 }) {
 	return <Flex
+		className='mt-1rem'
 		justifyContent='center'
 	>
 		<Flex.Item

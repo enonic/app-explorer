@@ -48,6 +48,7 @@ export function Journals({
 		servicesBaseUrl
 	});
 	return <Flex
+		className='mt-1rem'
 		justifyContent='center'>
 		<Flex.Item
 			className='w-ma-fullExceptGutters w-fullExceptGutters-mobileDown'
