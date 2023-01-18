@@ -3,6 +3,7 @@ import type {InterfaceField} from '/lib/explorer/types/Interface.d';
 
 
 
+import {HTTP_HEADERS} from '@enonic/explorer-utils';
 import {useWhenInitAsync} from '@seamusleahy/init-hooks';
 import * as gql from 'gql-query-builder';
 import * as React from 'react';
@@ -159,10 +160,11 @@ export function useSearchState({
 	const getInterfaceDocumentCount = React.useCallback(() => {
 		// console.debug('getInterfaceDocumentCount interfaceNameProp:', interfaceNameProp);
 		setBottomBarMessage('Getting document count...');
-		return fetch(`${basename}/api/v1/interface/${interfaceNameProp}`, {
+		return fetch(`${basename}/api/v1/interface`, {
 			method: 'POST',
 			headers: {
-				'Content-Type':	'application/json'
+				'Content-Type':	'application/json',
+				[HTTP_HEADERS.EXPLORER_INTERFACE_NAME]: interfaceNameProp,
 			},
 			body: JSON.stringify(gql.query({
 				operation: 'search',

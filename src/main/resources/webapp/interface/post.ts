@@ -7,9 +7,10 @@ import type {
 
 
 import 'reflect-metadata'; // Must be imported only once per WebPack Bundle (Required by setIn)
+import {HTTP_HEADERS} from '@enonic/explorer-utils/src'; // Adding "src" fixes the empty AbstractParser error
 import {
-	RESPONSE_TYPE_JSON//,
-	//toStr
+	RESPONSE_TYPE_JSON,
+	// toStr,
 } from '@enonic/js-utils';
 //@ts-ignore
 import {execute} from '/lib/graphql';
@@ -25,9 +26,7 @@ import {connect} from '/lib/explorer/repo/connect';
 import {getCachedSchema} from '/lib/explorer/interface/graphql/getCachedSchema';
 
 
-export type InterfaceRequest = EnonicXpRequest<EmptyObject,{
-	interfaceName :string
-}>
+export type InterfaceRequest = EnonicXpRequest<EmptyObject>
 
 
 const AUTHORIZATION_PREFIX = 'Explorer-Api-Key ';
@@ -126,18 +125,17 @@ function isUnauthorized({
 } // isUnauthorized
 
 
-export function overrideable(request :InterfaceRequest, fn = isUnauthorized) {
-	//log.debug('overrideable request:%s', toStr(request));
+export function overrideable(request: InterfaceRequest, fn = isUnauthorized) {
+	// log.debug('overrideable request:%s', toStr(request));
+
 	const {
 		body: bodyJson = '{}',
 		headers: {
+			[HTTP_HEADERS.EXPLORER_INTERFACE_NAME]: interfaceName,
 			'Explorer-Log-Query': logQueryHeader, // '1'
 			'Explorer-Log-Synonyms-Query': logSynonymsQueryHeader, // '1'
 			'Explorer-Log-Synonyms-Query-Result': logSynonymsQueryResultHeader // '1'
-		},
-		pathParams: {
-			interfaceName// = 'default'
-		} = {}
+		}
 	} = request;
 
 	if (!interfaceName) {
