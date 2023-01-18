@@ -26,7 +26,6 @@ import {
 } from './collection';
 import {all as documentResponse} from './collection/document';
 import {
-	list as listInterfaces,
 	post as interfacePost
 } from './interface';
 import {
@@ -73,7 +72,7 @@ router.all(`${ROUTER_PATH_COLLECTIONS_API}/v1`, (r :EnonicXpRequest) => listColl
 router.all(`${ROUTER_PATH_COLLECTIONS_API}/v1/collection/{collection}`, (r :GetCollectionRequest) => getCollection(r));
 router.all(`${ROUTER_PATH_COLLECTIONS_API}/v1/collection/{collection}/documents`, (r :AllDocumentRequest) => documentResponse(r));
 
-router.all(`${ROUTER_PATH_INTERFACES_API}/v1`, (r :InterfaceRequest) => listInterfaces(r));
-router.post(`${ROUTER_PATH_INTERFACES_API}/v1/interface/{interfaceName}`, (r :InterfaceRequest) => interfacePost(r));
+//router.all(`${ROUTER_PATH_INTERFACES_API}/v1`, (r :InterfaceRequest) => listInterfaces(r)); // TODO GraphiQL instead
+router.post(`${ROUTER_PATH_INTERFACES_API}/v1/interface`, (r :InterfaceRequest) => interfacePost(r));
 
 export const all = (r :Request) => router.dispatch(r);

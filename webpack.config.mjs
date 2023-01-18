@@ -67,9 +67,10 @@ const SS_ALIAS = {
 		: BOOL_LOCAL_JS_UTILS
 			? path.resolve(__dirname, '../enonic-js-utils/src/index.ts')
 			: path.resolve(__dirname, './node_modules/@enonic/js-utils/src/index.ts'), // This is used in production build
-	// '@enonic/explorer-utils': BOOL_LOCAL_LIB_EXPLORER
-	// 	? path.resolve(__dirname, '../explorer-utils/index.mts')
-	// 	: path.resolve(__dirname, './node_modules/@enonic/explorer/utils') // /index.mts
+	// '@enonic/explorer-utils': // BOOL_LOCAL_LIB_EXPLORER
+	// ? path.resolve(__dirname, '../explorer-utils/index.mts')
+	// :
+	// path.resolve(__dirname, './node_modules/@enonic/explorer-utils/index.mts') // This woudl fix the empty AbstractParser error, but importing directly from src also fixed it
 };
 
 // Avoid bundling and transpile library files seperately.
@@ -287,7 +288,20 @@ const SS_JS_CONFIG = {
 						]
 					]
 				} // options
-			}/*, { // RUNTIME ERROR: ES6 destructuring is not yet implemented
+			}/*, { // com.enonic.xp.web.WebException: null
+				loader: 'swc-loader',
+				options: {
+					jsc: {
+						parser: {
+							syntax: 'typescript'
+						}
+					},
+					module: {
+						type: 'commonjs'
+					},
+					sync: true, // Run syncronously to get correct error messages
+				}
+			}, { // RUNTIME ERROR: ES6 destructuring is not yet implemented
 				loader: 'esbuild-loader',
 				options: {
 					format: 'cjs', // Does this option exist? At least it doesn't complain
