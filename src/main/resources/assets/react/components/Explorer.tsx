@@ -24,7 +24,7 @@ import {Thesauri} from '../thesaurus/Thesauri';
 
 import About from './About';
 import BottomOverlayBar from './BottomOverlayBar';
-import GraphiQL from './GraphiQL';
+import GraphiQLRouted from './GraphiQLRouted';
 import LoadingModal from './modals/LoadingModal';
 import SideBarMenu from './SideBarMenu';
 import TopBarMenu from './TopBarMenu';
@@ -169,8 +169,8 @@ function Explorer({
 					<Route path="/documentTypes" element={<DocumentTypes
 						servicesBaseUrl={servicesBaseUrl}
 					/>}/>
-					<Route path="/graphiql" element={<GraphiQL
-						url={`${basename}/api/v1/interface/default`}
+					<Route path="/graphiql" element={<GraphiQLRouted
+						basename={basename}
 					/>}/>
 					<Route path="/stopWords" element={<StopWords
 						servicesBaseUrl={servicesBaseUrl}
