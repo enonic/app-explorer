@@ -4,11 +4,19 @@ import * as React from 'react';
 
 
 function GraphiQL({
-	url
+	headers = {},
+	url,
 }: {
+	headers?: Record<string,string>
 	url: string
 }) {
-	const fetcher = createGraphiQLFetcher({url}); // GraphiQL fails if this is converted to state
+
+	// GraphiQL fails if this is converted to state
+	const fetcher = createGraphiQLFetcher({
+		headers,
+		url
+	});
+
 	return <GraphiQLOrig fetcher={fetcher}/>
 }
 
