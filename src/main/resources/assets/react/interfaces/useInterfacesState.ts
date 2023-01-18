@@ -1,5 +1,7 @@
 import type {InterfaceField} from '/lib/explorer/types/Interface';
+import type {FetchData} from 'graphql-hooks';
 import type {DropdownItemProps} from 'semantic-ui-react/index.d';
+import type {QueryInterfacesResponseData} from '../components/useExplorerState';
 import type {
 	FieldNameToValueTypes,
 	// GlobalFieldObject,
@@ -135,9 +137,11 @@ const GQL_ALL = `{
 
 
 export function useInterfacesState({
-	servicesBaseUrl
+	fetchInterfaces,
+	servicesBaseUrl,
 } :{
-	servicesBaseUrl :string
+	servicesBaseUrl: string
+	fetchInterfaces: FetchData<QueryInterfacesResponseData>
 }) {
 	const [collections, setCollections] = React.useState<Array<Collection>>([]);
 	//const [collectionIdToFieldKeys, setCollectionIdToFieldKeys] = React.useState({});
@@ -165,6 +169,7 @@ export function useInterfacesState({
 
 	const memoizedUpdateInterfacesCallback = React.useCallback(() => {
 		setIsLoading(true);
+		fetchInterfaces();
 		fetch(`${servicesBaseUrl}/graphQL`, {
 			method: 'POST',
 			headers: {

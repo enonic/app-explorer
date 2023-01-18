@@ -1,4 +1,7 @@
-import type {PaginationProps} from 'semantic-ui-react';
+import type {
+	StrictDropdownItemProps,
+	PaginationProps,
+} from 'semantic-ui-react';
 import type {InterfaceField} from '/lib/explorer/types/Interface.d';
 
 
@@ -22,6 +25,7 @@ export type SearchProps = {
 	fields?: InterfaceField[]
 	firstColumnWidth?: 1|2|3|4|5|6|7|8|9|10|11|12|13|14|15
 	interfaceName?: InterfaceName
+	interfaceOptions?: StrictDropdownItemProps[]
 	searchString?: SearchString
 	setBottomBarMessage: React.Dispatch<React.SetStateAction<string>>
 	setBottomBarMessageHeader: React.Dispatch<React.SetStateAction<string>>
@@ -60,6 +64,7 @@ export function useSearchState({
 	//──────────────────────────────────────────────────────────────────────────
 	// const [boolOnChange, setBoolOnChange] = React.useState(false);
 	//console.debug('Search boolOnChange', boolOnChange);
+	const [interfaceNameState, setInterfaceNameState] = React.useState(interfaceNameProp);
 	const [initializing, setInitializing] = React.useState(true);
 	const [interfaceCollectionCount, setInterfaceCollectionCount] = React.useState<number>();
 	const [interfaceDocumentCount, setInterfaceDocumentCount] = React.useState<number>();
@@ -89,7 +94,7 @@ export function useSearchState({
 	} = useSearchInterface({
 		basename,
 		fieldsProp,
-		interfaceName: interfaceNameProp,
+		interfaceName: interfaceNameState,
 		setBottomBarMessage,
 		setBottomBarMessageHeader,
 		setBottomBarVisible,
@@ -100,7 +105,7 @@ export function useSearchState({
 	// Callbacks
 	//──────────────────────────────────────────────────────────────────────────
 	const getInterfaceCollectionCount = React.useCallback(() => {
-		if (interfaceNameProp === 'default') {
+		if (interfaceNameState === 'default') {
 			return fetch(`${servicesBaseUrl}/graphQL`, {
 				method: 'POST',
 				headers: {
@@ -142,7 +147,7 @@ export function useSearchState({
 							_name,
 							collectionIds
 						} = hits[i];
-						if (_name === interfaceNameProp) {
+						if (_name === interfaceNameState) {
 							found = true;
 							setInterfaceCollectionCount(collectionIds.length);
 						}
@@ -153,18 +158,18 @@ export function useSearchState({
 				});
 		}
 	}, [
-		interfaceNameProp,
+		interfaceNameState,
 		servicesBaseUrl
 	]);
 
 	const getInterfaceDocumentCount = React.useCallback(() => {
-		// console.debug('getInterfaceDocumentCount interfaceNameProp:', interfaceNameProp);
+		// console.debug('getInterfaceDocumentCount interfaceNameState:', interfaceNameState);
 		setBottomBarMessage('Getting document count...');
 		return fetch(`${basename}/api/v1/interface`, {
 			method: 'POST',
 			headers: {
 				'Content-Type':	'application/json',
-				[HTTP_HEADERS.EXPLORER_INTERFACE_NAME]: interfaceNameProp,
+				[HTTP_HEADERS.EXPLORER_INTERFACE_NAME]: interfaceNameState,
 			},
 			body: JSON.stringify(gql.query({
 				operation: 'search',
@@ -191,7 +196,7 @@ export function useSearchState({
 			});
 	}, [
 		basename,
-		interfaceNameProp,
+		interfaceNameState,
 		setBottomBarMessage,
 	]);
 
@@ -249,15 +254,26 @@ export function useSearchState({
 		page,
 		perPage,
 		start
-	])
+	]);
+
+	useUpdateEffect(() => {
+		getInterfaceCollectionCount();
+		getInterfaceDocumentCount();
+		searchFunction({
+			searchString,
+			start: 0
+		})
+	},[interfaceNameState]);
 
 	//──────────────────────────────────────────────────────────────────────────
 	// Returns
 	//──────────────────────────────────────────────────────────────────────────
 	return {
 		// boolOnChange, setBoolOnChange,
+
 		interfaceCollectionCount, setInterfaceCollectionCount,
 		interfaceDocumentCount, setInterfaceDocumentCount,
+		interfaceNameState, setInterfaceNameState,
 		handlePaginationChange,
 		initializing,
 		jsonModalState, setJsonModalState,

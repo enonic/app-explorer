@@ -634,7 +634,7 @@ const CLIENT_ES_CONFIG = {
 	context: path.join(__dirname, SRC_ASSETS_DIR, 'react'),
 	devtool: MODE === 'production' ? false : 'eval-source-map', // https://webpack.js.org/configuration/devtool/#devtool
 	entry: {
-		'Explorer': './Explorer.tsx',
+		'Explorer': './App.tsx',
 		'WebCrawler': './WebCrawler.tsx'
 	},
 	externals: CS_EXTERNALS,
