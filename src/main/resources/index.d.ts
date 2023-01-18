@@ -26,7 +26,7 @@ export interface ExplorerProps {
 	licensedTo: string
 	licenseValid: boolean
 	servicesBaseUrl: string
-	wsBaseUrl: string
+	// wsBaseUrl: string
 }
 
 export interface Profile {

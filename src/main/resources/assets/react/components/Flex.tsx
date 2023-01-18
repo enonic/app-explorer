@@ -94,17 +94,26 @@ function Flex({
 function Item({
 	children,
 	className,
+	flexGrow,
 	overflowX,
 	overflowY,
 	...rest
 }: {
 	children: any
 	className?: string
+	flexGrow?: boolean|1
 	overflowX?: boolean|'hidden'|'overlay'|'visible' // | React.CSSProperties['overflowX']
 	overflowY?: boolean|'hidden'|'visible' // | React.CSSProperties['overflowY']
 	style?: React.CSSProperties
 }) {
 	const classesArray = [];
+
+	if (flexGrow === true) {
+		flexGrow = 1
+	}
+	if (flexGrow) {
+		classesArray.push(`fx-g-${flexGrow}`);
+	}
 
 	if (overflowX === true) {
 		overflowX = 'visible';
