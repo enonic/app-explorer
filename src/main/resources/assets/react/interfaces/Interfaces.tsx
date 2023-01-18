@@ -1,7 +1,9 @@
+import type {FetchData} from 'graphql-hooks';
 import type {
 	SetLicensedToFunction,
 	SetLicenseValidFunction
 } from '../index.d';
+import type {QueryInterfacesResponseData} from '../components/useExplorerState';
 
 
 import {
@@ -34,6 +36,7 @@ import {useInterfacesState} from './useInterfacesState';
 */
 export function Interfaces({
 	basename,
+	fetchInterfaces,
 	licenseValid,
 	servicesBaseUrl,
 	setBottomBarMessage,
@@ -43,6 +46,7 @@ export function Interfaces({
 	setLicenseValid
 } :{
 	basename: string
+	fetchInterfaces: FetchData<QueryInterfacesResponseData>
 	licenseValid: boolean
 	servicesBaseUrl: string
 	setBottomBarMessage: React.Dispatch<React.SetStateAction<string>>
@@ -77,7 +81,8 @@ export function Interfaces({
 		stopWordOptions,
 		thesauriOptions
 	} = useInterfacesState({
-		servicesBaseUrl
+		fetchInterfaces,
+		servicesBaseUrl,
 	});
 	return <Flex
 		className='mt-1rem'
