@@ -6,6 +6,7 @@ import type {
 } from './search';
 
 
+import {HTTP_HEADERS} from '@enonic/explorer-utils';
 import * as gql from 'gql-query-builder';
 import * as React from 'react';
 
@@ -85,7 +86,7 @@ function useSearchInterface({
 		setBottomBarMessage(`Searching for ${searchString}`);
 		setBottomBarVisible(true);
 		setLoading(true);
-		const uri = `${basename}/api/v1/interface/${interfaceName}`;
+		const uri = `${basename}/api/v1/interface`;
 		// console.debug(uri);
 
 		const variables :Record<string, {
@@ -190,7 +191,10 @@ function useSearchInterface({
 		//console.debug('Search() gqlQuery:', gqlQuery);
 		return fetch(uri, {
 			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
+			headers: {
+				'Content-Type': 'application/json',
+				[HTTP_HEADERS.EXPLORER_INTERFACE_NAME]: interfaceName,
+			},
 			body: JSON.stringify(gqlQuery)
 		})
 			.then(response => response.json())

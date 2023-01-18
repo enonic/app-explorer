@@ -45,7 +45,7 @@ router.filter((
 
 router.all('/', (r) => htmlResponse(r));
 
-router.post('/api/v1/interface/{interfaceName}', (r) => interfacePost(
+router.post('/api/v1/interface', (r) => interfacePost(
 	r,
 	() => false // false means always authorized
 ));
