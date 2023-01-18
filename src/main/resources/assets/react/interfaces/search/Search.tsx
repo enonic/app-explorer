@@ -12,10 +12,11 @@ import {
 } from 'react-router-dom';
 import {
 	Container,
-	Form,
+	Dropdown,
 	Header,
 	Segment
 } from 'semantic-ui-react';
+import Flex from '../../components/Flex';
 import SearchInput from '../../components/inputs/SearchInput';
 import DocumentsTable from '../../document/DocumentsTable';
 // import {Hits} from './Hits';
@@ -31,12 +32,14 @@ import { Column } from '../../document/constants';
 export function Search(props: SearchProps) {
 	const {
 		basename,
-		interfaceName: interfaceNameProp = 'default'
+		interfaceName: interfaceNameProp = 'default',
+		interfaceOptions = [],
 	} = props;
 	const {
 		// boolOnChange, setBoolOnChange,
 		interfaceCollectionCount, // setInterfaceCollectionCount,
 		interfaceDocumentCount, // setInterfaceDocumentCount,
+		interfaceNameState, setInterfaceNameState,
 		initializing,
 		jsonModalState, setJsonModalState,
 		handlePaginationChange,
@@ -71,54 +74,59 @@ export function Search(props: SearchProps) {
 
 	// NOTE: If you hold a key down, onKeyDown and onKeyPress happens multiple times!
 	return <Container>
-		<Form>
-			<Form.Group widths='equal'>
-				<Form.Field>
-					<SearchInput
-						disabled={!interfaceCollectionCount || !interfaceDocumentCount}
-						fluid
-						loading={false}
-						onKeyUp={(event :{
-							which :number
-						}) => {
-							//console.debug('onKeyUp event.which',event.which);
-							if(event.which == 10 || event.which == 13) {
-								//console.debug('onKeyUp searchString',searchString);
-								setPage(1);
-								// setStart(0);
-								searchFunction({
-									searchString,
-									start: 0
-								});
-							}
+		<Flex
+			justifyContent='space-between'
+			gap
+			marginBottom
+		>
+			<Flex.Item
+				flexGrow
+			>
+				<SearchInput
+					disabled={!interfaceCollectionCount || !interfaceDocumentCount}
+					fluid
+					loading={false}
+					onKeyUp={(event :{
+						which :number
+					}) => {
+						//console.debug('onKeyUp event.which',event.which);
+						if(event.which == 10 || event.which == 13) {
+							//console.debug('onKeyUp searchString',searchString);
+							setPage(1);
+							// setStart(0);
+							searchFunction({
+								searchString,
+								start: 0
+							});
+						}
+					}}
+					onChange={(
+						_event,
+						{value}
+					) => {
+						//console.debug('onChange value',value);
+						setSearchString(value);
+						// if (boolOnChange) {
+						// 	search(value);
+						// }
+					}}
+				/>
+			</Flex.Item>
+			{interfaceOptions.length
+				? <Flex.Item>
+					<Dropdown
+						onChange={(_event,{value}) => {
+							setInterfaceNameState(value as string);
 						}}
-						onChange={(
-							_event,
-							{value}
-						) => {
-							//console.debug('onChange value',value);
-							setSearchString(value);
-							// if (boolOnChange) {
-							// 	search(value);
-							// }
-						}}
+						options={interfaceOptions}
+						search
+						selection
+						value={interfaceNameState}
 					/>
-				</Form.Field>
-
-				{/*interfaceCollectionCount && interfaceDocumentCount
-					? <Form.Checkbox
-						checked={boolOnChange}
-						label='Search on every input change?'
-						onChange={(
-							_event,
-							{checked}
-						) => setBoolOnChange(checked)}
-					/>
-					: null
-				*/}
-
-			</Form.Group>
-		</Form>
+				</Flex.Item>
+				: null
+			}
+		</Flex>
 		{initializing
 			? null
 			: interfaceCollectionCount

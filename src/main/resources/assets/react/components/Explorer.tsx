@@ -9,27 +9,27 @@ import {
 import {
 	Header, Sidebar
 } from 'semantic-ui-react';
-import {ApiKeys} from './api/ApiKeys';
-import {Collections} from './collection/Collections';
-import {Interfaces} from './interfaces/Interfaces';
-import {Journals} from './journal/Journals';
-import {Notifications} from './notifications/Notifications';
-import {Schedule} from './schedule/Schedule';
-import {Documents} from './document/Documents';
-import {DocumentTypes} from './documentTypes/DocumentTypes';
-import {Search} from './interfaces/search/Search';
-import {Status} from './collection/Status';
-import {StopWords} from './stopWords/StopWords';
-import {Thesauri} from './thesaurus/Thesauri';
+import {ApiKeys} from '../api/ApiKeys';
+import {Collections} from '../collection/Collections';
+import {Interfaces} from '../interfaces/Interfaces';
+import {Journals} from '../journal/Journals';
+import {Notifications} from '../notifications/Notifications';
+import {Schedule} from '../schedule/Schedule';
+import {Documents} from '../document/Documents';
+import {DocumentTypes} from '../documentTypes/DocumentTypes';
+import {Search} from '../interfaces/search/Search';
+import {Status} from '../collection/Status';
+import {StopWords} from '../stopWords/StopWords';
+import {Thesauri} from '../thesaurus/Thesauri';
 
-import About from './components/About';
-import BottomOverlayBar from './components/BottomOverlayBar';
-import GraphiQL from './components/GraphiQL';
-import LoadingModal from './components/modals/LoadingModal';
-import SideBarMenu from './components/SideBarMenu';
-import TopBarMenu from './components/TopBarMenu';
-import User from './user/User';
-import {useExplorerState} from './useExplorerState';
+import About from './About';
+import BottomOverlayBar from './BottomOverlayBar';
+import GraphiQL from './GraphiQL';
+import LoadingModal from './modals/LoadingModal';
+import SideBarMenu from './SideBarMenu';
+import TopBarMenu from './TopBarMenu';
+import User from '../user/User';
+import useExplorerState from './useExplorerState';
 
 
 // const handleRender: React.ComponentProps<typeof React.Profiler>["onRender"] = (
@@ -53,7 +53,7 @@ import {useExplorerState} from './useExplorerState';
 // }
 
 
-export function Explorer({
+function Explorer({
 	basename,
 	collectorComponents,
 	licensedTo: initialLicensedTo,
@@ -68,6 +68,7 @@ export function Explorer({
 		bottomBarMessageHeader, setBottomBarMessageHeader,
 		bottomBarVisible, setBottomBarVisible,
 		defaultInterfaceFields,
+		fetchInterfaces, interfaceOptions,
 		licensedTo, setLicensedTo,
 		licenseValid, setLicenseValid,
 		loadingModalState, setLoadingModalState,
@@ -118,6 +119,7 @@ export function Explorer({
 							basename={basename}
 							fields={defaultInterfaceFields}
 							interfaceName='default'
+							interfaceOptions={interfaceOptions}
 							searchString=''
 							servicesBaseUrl={servicesBaseUrl}
 							setBottomBarMessage={setBottomBarMessage}
@@ -181,6 +183,7 @@ export function Explorer({
 					/>}/>
 					<Route path="/interfaces" element={<Interfaces
 						basename={basename}
+						fetchInterfaces={fetchInterfaces}
 						licenseValid={licenseValid}
 						servicesBaseUrl={servicesBaseUrl}
 						setBottomBarMessage={setBottomBarMessage}
@@ -207,3 +210,6 @@ export function Explorer({
 		/>
 	</Router>;
 }
+
+
+export default Explorer;

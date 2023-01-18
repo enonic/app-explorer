@@ -1,15 +1,18 @@
 import type {SemanticICONS} from 'semantic-ui-react/src/generic.d';
+import type {StrictDropdownItemProps} from 'semantic-ui-react';
 import type {InterfaceField} from '/lib/explorer/types/Interface.d';
 import type {User} from '/lib/xp/auth';
-import type {License} from './index.d';
+import type {License} from '../index.d';
 
 
 import {useWhenInitAsync} from '@seamusleahy/init-hooks';
 import * as gql from 'gql-query-builder';
+import { useManualQuery } from 'graphql-hooks';
 import * as React from 'react';
-import LoadingModal from './components/modals/LoadingModal';
-import useBottomOverlayBarState from './components/useBottomOverlayBarState';
-import fetchUser from './fetchers/fetchUser';
+import LoadingModal from './modals/LoadingModal';
+import useBottomOverlayBarState from './useBottomOverlayBarState';
+import fetchUser from '../fetchers/fetchUser';
+import {useUpdateEffect} from '../utils/useUpdateEffect';
 
 
 
@@ -29,10 +32,29 @@ const GQL_BODY_QUERY_INTERFACES_DEFAULT = JSON.stringify(gql.query({
 		}
 	}
 }));
-//console.debug('GQL_BODY_QUERY_INTERFACES_DEFAULT', GQL_BODY_QUERY_INTERFACES_DEFAULT);
+// console.debug('GQL_BODY_QUERY_INTERFACES_DEFAULT', GQL_BODY_QUERY_INTERFACES_DEFAULT);
+
+export interface QueryInterfacesResponseData {
+	queryInterfaces: {
+		hits: {
+			_name: string
+		}[]
+	}
+}
 
 
-export function useExplorerState({
+const GQL_QUERY_INTERFACES = gql.query({
+	operation: 'queryInterfaces',
+	fields: [{
+		hits: [
+			'_name'
+		]
+	}],
+});
+// console.debug('GQL_QUERY_INTERFACES', GQL_QUERY_INTERFACES);
+
+
+function useExplorerState({
 	initialLicensedTo,
 	initialLicenseValid,
 	servicesBaseUrl
@@ -41,6 +63,13 @@ export function useExplorerState({
 	initialLicenseValid :boolean
 	servicesBaseUrl :string
 }) {
+	const [fetchInterfaces,{
+		// loading,
+		// error,
+		data
+	}] = useManualQuery<QueryInterfacesResponseData>(GQL_QUERY_INTERFACES.query);
+	// console.debug('loading', loading, 'error', error, 'data', data);
+
 	const {
 		state: loadingModalState,
 		setState: setLoadingModalState,
@@ -71,6 +100,8 @@ export function useExplorerState({
 	const [menuIconName, setMenuIconName] = React.useState<SemanticICONS>(sideBarVisible ? 'close' : 'bars');
 	const [showWhichLicense, setShowWhichLicense] = React.useState<License>();
 	const [userState, setUserState] = React.useState<User>();
+
+	const [interfaceOptions, setInterfaceOptions] = React.useState<StrictDropdownItemProps[]>([]);
 
 	//const [websocket, setWebsocket] = React.useState(null);
 	//const [queryCollectorsGraph, setQueryCollectorsGraph] = React.useState({});
@@ -110,6 +141,7 @@ export function useExplorerState({
 	// Init
 	//──────────────────────────────────────────────────────────────────────────
 	useWhenInitAsync(() => {
+		fetchInterfaces();
 		setLoadingModalState(prev => {
 			const deref = {...prev};
 			deref.open = true;
@@ -239,10 +271,29 @@ export function useExplorerState({
 	// 	reconnectingWs();
 	// }, []); // useEffect
 
+	//──────────────────────────────────────────────────────────────────────────
+	// Effects (init and update)
+	//──────────────────────────────────────────────────────────────────────────
 	React.useEffect(() => {
 		setMenuIconName(sideBarVisible ? 'close' : 'bars');
 	}, [sideBarVisible]);
 
+	//──────────────────────────────────────────────────────────────────────────
+	// Updates (not init)
+	//──────────────────────────────────────────────────────────────────────────
+	useUpdateEffect(() => {
+		const newInterfaceOptions: StrictDropdownItemProps[] = data.queryInterfaces.hits.map(({_name}) => ({
+			key: _name,
+			text: _name,
+			value: _name,
+		}));
+		// console.debug('newInterfaceOptions', newInterfaceOptions);
+		setInterfaceOptions(newInterfaceOptions)
+	}, [data]);
+
+	//──────────────────────────────────────────────────────────────────────────
+	// Returns
+	//──────────────────────────────────────────────────────────────────────────
 	return {
 		bottomBarIcon, // setBottomBarIcon,
 		bottomBarIconLoading, // setBottomBarIconLoading,
@@ -250,6 +301,7 @@ export function useExplorerState({
 		bottomBarMessageHeader, setBottomBarMessageHeader,
 		bottomBarVisible, setBottomBarVisible,
 		defaultInterfaceFields,
+		fetchInterfaces, interfaceOptions,
 		licensedTo, setLicensedTo,
 		licenseValid, setLicenseValid,
 		loadingModalState, setLoadingModalState,
@@ -259,3 +311,6 @@ export function useExplorerState({
 		userState, // setUserState,
 	};
 }
+
+
+export default useExplorerState;
