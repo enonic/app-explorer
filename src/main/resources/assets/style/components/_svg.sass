@@ -1,0 +1,28 @@
+$bgcolor-button: #e0e1e2
+$bgcolor-button-hover: #cacbcd
+$bgcolor-button-active: #babbbc
+
+// ERROR: Destroys buttons inside GraphiQL
+// svg path
+// 	fill: inherit
+
+a.graphql
+	background: transparent none
+	border-radius: .28571429rem
+	box-shadow: 0 0 0 1px transparent inset,0 0 0 0 rgba(34,36,38,.15) inset
+	display: inline-block
+	height: 36
+	padding: 3
+	transition: opacity .1s ease,background-color .1s ease,color .1s ease,box-shadow .1s ease,background .1s ease,-webkit-box-shadow .1s ease
+	width: 36
+	svg
+		height: 30
+		width: 30
+
+	&:hover
+		background-color: $bgcolor-button
+		box-shadow: 0 0 0 1px transparent inset,0 0 0 0 rgba(34,36,38,.15) inset
+
+	&:active
+		background-color: $bgcolor-button-active
+		box-shadow: 0 0 0 1px transparent inset,none

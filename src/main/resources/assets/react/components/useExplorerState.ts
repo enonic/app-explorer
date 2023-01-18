@@ -284,7 +284,7 @@ function useExplorerState({
 	useUpdateEffect(() => {
 		const newInterfaceOptions: StrictDropdownItemProps[] = data.queryInterfaces.hits.map(({_name}) => ({
 			key: _name,
-			text: _name,
+			text: _name === 'default' ? 'All collections' : _name,
 			value: _name,
 		}));
 		// console.debug('newInterfaceOptions', newInterfaceOptions);

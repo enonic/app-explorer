@@ -7,9 +7,7 @@ import type {SearchProps} from './useSearchState';
 	setIn//,
 	//ucFirst
 } from '@enonic/js-utils';*/
-import {
-	Link
-} from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import {
 	Container,
 	Dropdown,
@@ -113,17 +111,29 @@ export function Search(props: SearchProps) {
 				/>
 			</Flex.Item>
 			{interfaceOptions.length
-				? <Flex.Item>
-					<Dropdown
-						onChange={(_event,{value}) => {
-							setInterfaceNameState(value as string);
-						}}
-						options={interfaceOptions}
-						search
-						selection
-						value={interfaceNameState}
-					/>
-				</Flex.Item>
+				? <>
+					<Flex.Item>
+						<Dropdown
+							onChange={(_event,{value}) => {
+								setInterfaceNameState(value as string);
+							}}
+							options={interfaceOptions}
+							search
+							selection
+							value={interfaceNameState}
+						/>
+					</Flex.Item>
+					<Flex.Item>
+						<Link
+							className='graphql'
+							to={`/graphiql?interfaceName=${interfaceNameState}`}
+						>
+							<svg version="2.0">
+								<use href="#graphql100" />
+							</svg>
+						</Link>
+					</Flex.Item>
+				</>
 				: null
 			}
 		</Flex>
