@@ -120,7 +120,7 @@ export function Search(props: SearchProps) {
 								setInterfaceNameState(value as string);
 							}}
 							options={interfaceOptions}
-							placeholder='Use interface'
+							placeholder='Default interface (all collections)'
 							search
 							selection
 							value={interfaceNameState === 'default' ? undefined : interfaceNameState}
