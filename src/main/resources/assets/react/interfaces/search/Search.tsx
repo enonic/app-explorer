@@ -129,7 +129,7 @@ export function Search(props: SearchProps) {
 					<Flex.Item>
 						<Link
 							className='graphql'
-							to={`/graphiql?interfaceName=${interfaceNameState}`}
+							to={`/api?interfaceName=${interfaceNameState}`}
 						>
 							<svg version="2.0">
 								<use href="#graphql100" />
