@@ -127,12 +127,6 @@ function Explorer({
 							setBottomBarVisible={setBottomBarVisible}
 						/>
 					</>}/>
-					{licenseValid
-						? <Route path="/api" element={<ApiKeys
-							servicesBaseUrl={servicesBaseUrl}
-						/>}/>
-						: null
-					}
 					<Route path="/collections" element={<Collections
 						collectorComponents={collectorComponents}
 						licenseValid={licenseValid}
@@ -169,9 +163,6 @@ function Explorer({
 					<Route path="/documentTypes" element={<DocumentTypes
 						servicesBaseUrl={servicesBaseUrl}
 					/>}/>
-					<Route path="/graphiql" element={<GraphiQLRouted
-						basename={basename}
-					/>}/>
 					<Route path="/stopWords" element={<StopWords
 						servicesBaseUrl={servicesBaseUrl}
 					/>}/>
@@ -192,6 +183,15 @@ function Explorer({
 						setLicensedTo={setLicensedTo}
 						setLicenseValid={setLicenseValid}
 					/>}/>
+					<Route path="/api" element={<GraphiQLRouted
+						basename={basename}
+					/>}/>
+					{licenseValid
+						? <Route path="/api/keys" element={<ApiKeys
+							servicesBaseUrl={servicesBaseUrl}
+						/>}/>
+						: null
+					}
 					<Route path="/about" element={<About
 						showWhichLicense={showWhichLicense}
 						setShowWhichLicense={setShowWhichLicense}
