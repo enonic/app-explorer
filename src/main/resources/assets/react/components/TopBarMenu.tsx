@@ -14,6 +14,7 @@ import {
 } from 'semantic-ui-react';
 import {UploadLicenseModal} from './UploadLicenseModal';
 
+
 export default function TopBarMenu({
 	licensedTo,
 	licenseValid,
@@ -43,7 +44,12 @@ export default function TopBarMenu({
 		<Menu.Item className="fitMenu" as='a' onClick={() => setSideBarVisible(!sideBarVisible)}>
 			<Icon size='large' name={menuIconName}/>
 		</Menu.Item>
-		<Menu.Item header>Explorer</Menu.Item>
+		<Menu.Item
+			as={Link}
+			header
+			to='/'
+			content='Explorer'
+		/>
 		<UploadLicenseModal
 			licenseValid={licenseValid}
 			licensedTo={licensedTo}
