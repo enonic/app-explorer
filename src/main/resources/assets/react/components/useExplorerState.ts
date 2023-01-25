@@ -282,11 +282,12 @@ function useExplorerState({
 	// Updates (not init)
 	//──────────────────────────────────────────────────────────────────────────
 	useUpdateEffect(() => {
-		const newInterfaceOptions: StrictDropdownItemProps[] = data.queryInterfaces.hits.map(({_name}) => ({
-			key: _name,
-			text: _name === 'default' ? 'All collections' : _name,
-			value: _name,
-		}));
+		const newInterfaceOptions: StrictDropdownItemProps[] = data.queryInterfaces.hits
+			.map(({_name: key}) => key === 'default' ? undefined : ({
+				key,
+				text: key,
+				value: key,
+			})).filter((x?: StrictDropdownItemProps) => x);
 		// console.debug('newInterfaceOptions', newInterfaceOptions);
 		setInterfaceOptions(newInterfaceOptions)
 	}, [data]);

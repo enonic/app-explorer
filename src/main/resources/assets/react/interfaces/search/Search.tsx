@@ -114,13 +114,16 @@ export function Search(props: SearchProps) {
 				? <>
 					<Flex.Item>
 						<Dropdown
+							clearable
 							onChange={(_event,{value}) => {
+								if (!value) { value = 'default'; }
 								setInterfaceNameState(value as string);
 							}}
 							options={interfaceOptions}
+							placeholder='Use interface'
 							search
 							selection
-							value={interfaceNameState}
+							value={interfaceNameState === 'default' ? undefined : interfaceNameState}
 						/>
 					</Flex.Item>
 					<Flex.Item>
