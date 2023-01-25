@@ -41,7 +41,7 @@ export default function TopBarMenu({
 		inverted
 		fixed='top'
 	>
-		<Menu.Item className="fitMenu" as='a' onClick={() => setSideBarVisible(!sideBarVisible)}>
+		<Menu.Item className="fitMenu" as={Link} onClick={() => setSideBarVisible(!sideBarVisible)}>
 			<Icon size='large' name={menuIconName}/>
 		</Menu.Item>
 		<Menu.Item
