@@ -166,7 +166,7 @@ export function Search(props: SearchProps) {
 							</Segment>
 							: null
 						}
-						<DocumentsTable
+						{resultState.total ? <DocumentsTable
 							documentsRes={resultState}
 							dragAndDropColumnsProp={false}
 							handlePaginationChange={handlePaginationChange}
@@ -183,7 +183,7 @@ export function Search(props: SearchProps) {
 							]}
 							setJsonModalState={setJsonModalState}
 							start={start}
-						/>
+						/> : null}
 						{/*<Hits
 							firstColumnWidth={firstColumnWidth}
 							hits={result.hits}
