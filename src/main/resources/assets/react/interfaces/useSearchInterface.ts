@@ -130,61 +130,64 @@ function useSearchInterface({
 		fieldsHits.push('_score');
 
 		const gqlQuery = gql.query({
-			operation: 'querySynonyms',
-			variables: {
-				//languages,
-				profiling: {
-					list: false,
-					required: false,
-					value: true // TODO Hardcode
+			operation: 'interface',
+			fields: [{
+				operation: 'querySynonyms',
+				variables: {
+					//languages,
+					profiling: {
+						list: false,
+						required: false,
+						value: true // TODO Hardcode
+					},
+					searchString: {
+						list: false,
+						required: true,
+						value: searchString
+					}
 				},
-				searchString: {
-					list: false,
-					required: true,
-					value: searchString
-				}
-			},
-			fields: [
-				'languages',
-				{
-					profiling: [
-						'currentTimeMillis',
-						'label',
-						'operation'
-					]
-				},
-				{
-					synonyms: [
-						'_highlight',
-						'_score',
-						{
-							synonyms: [
-								'locale',
-								'synonym'
-							]
-						},
-						'thesaurusName'
-					]
-				},
-				{
-					operation: 'search',
-					fields: [
-						'count',
-						{
-							hits: fieldsHits
-						},
-						{
-							profiling: [
-								'currentTimeMillis',
-								'label',
-								'operation'
-							]
-						},
-						'total'
-					],
-					variables
-				}
-			]
+				fields: [
+					'languages',
+					{
+						profiling: [
+							'currentTimeMillis',
+							'label',
+							'operation'
+						]
+					},
+					{
+						synonyms: [
+							'_highlight',
+							'_score',
+							{
+								synonyms: [
+									'locale',
+									'synonym'
+								]
+							},
+							'thesaurusName'
+						]
+					},
+					{
+						operation: 'search',
+						fields: [
+							'count',
+							{
+								hits: fieldsHits
+							},
+							{
+								profiling: [
+									'currentTimeMillis',
+									'label',
+									'operation'
+								]
+							},
+							'total'
+						],
+						variables
+					}
+				]
+			}]
 		}, null, {
 			operationName: 'InterfaceSearch'
 		});
@@ -199,14 +202,14 @@ function useSearchInterface({
 		})
 			.then(response => response.json())
 			.then(aResult => {
-				//console.debug('fetch aResult', aResult);
-				if (aResult && aResult.data && aResult.data.querySynonyms) {
+				console.debug('fetch aResult', aResult);
+				if (aResult && aResult.data && aResult.data.interface && aResult.data.interface.querySynonyms) {
 					const {
 						languages,
 						profiling,
 						search,
 						synonyms
-					} = aResult.data.querySynonyms;
+					} = aResult.data.interface.querySynonyms;
 					const profilingArray = [];
 					const currentTimeMillisStart = profiling[0].currentTimeMillis;
 					//if(profiling) {

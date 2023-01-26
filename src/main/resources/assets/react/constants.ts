@@ -59,6 +59,9 @@ export const NODE_MODULES :{
 	header: 'fomantic-ui-css', // app-explorer
 	href: 'https://github.com/fomantic/Fomantic-UI-CSS/blob/master/package.json'
 }*/,{
+	header: 'GraphiQL', // app-explorer
+	href: 'https://github.com/graphql/graphiql/blob/main/LICENSE'
+},{
 	header: 'GraphQL Query Builder', // app-explorer
 	href: 'https://github.com/atulmy/gql-query-builder/blob/master/LICENSE'
 },{
@@ -87,8 +90,17 @@ export const NODE_MODULES :{
 	header: 'React and React-DOM', // app-explorer
 	href: 'https://github.com/facebook/react/blob/master/LICENSE'
 },{
+	header: 'React DnD', // app-explorer
+	href: 'https://github.com/react-dnd/react-dnd/blob/main/LICENSE'
+},{
 	header: 'React-gantt-antd', // app-explorer
 	href: 'https://github.com/JSainsburyPLC/react-timelines/blob/master/LICENSE'
+},{
+	header: 'React HTML Parser', // app-explorer
+	href: 'https://github.com/peternewnham/react-html-parser/blob/master/LICENSE.md'
+},{
+	header: 'React Router DOM', // app-explorer
+	href: 'https://github.com/remix-run/react-router/blob/main/LICENSE.md'
 },{
 	header: 'react-semantic-ui-datepickers',
 	href: 'https://github.com/arthurdenner/react-semantic-ui-datepickers/blob/develop/LICENSE'

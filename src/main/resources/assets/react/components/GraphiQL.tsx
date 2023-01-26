@@ -29,37 +29,39 @@ function GraphiQL({
 	});
 
 	const [query, setQuery] = React.useState(`query ${graphqlSanitize(searchString) || 'MyQuery'} {
-	querySynonyms(searchString: "${searchString}") {
-		search(
-		count: 1
-		highlight: {fields: [
-			{field: "title"}
-			{field: "text"}
-			{field: "_allText"}
-		]}
-		aggregations: [
-			{name: "collections", terms: {field: "_collection"}},
-			{name: "documentTypes", terms: {field: "_documentType"}}
-		]
-		) {
-		count
-		total
-		aggregationsAsJson
-		hits {
-			_highlight
-			_collection
-			_documentType
-			_json
-			_score
-		}
-		}
-		languages
-		synonyms {
-		thesaurusName
-		synonyms {
-			locale
-			synonym
-		}
+	interface {
+		querySynonyms(searchString: "${searchString}") {
+			search(
+				count: 1
+				highlight: {fields: [
+					{field: "title"}
+					{field: "text"}
+					{field: "_allText"}
+				]}
+				aggregations: [
+					{name: "collections", terms: {field: "_collection"}},
+					{name: "documentTypes", terms: {field: "_documentType"}}
+				]
+			) {
+				count
+				total
+				aggregationsAsJson
+				hits {
+					_highlight
+					_collection
+					_documentType
+					# _json
+					_score
+				}
+			} # search
+			languages
+			synonyms {
+				thesaurusName
+				synonyms {
+					locale
+					synonym
+				}
+			} # synonyms
 		}
 	}
 }`);
