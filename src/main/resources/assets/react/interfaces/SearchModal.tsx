@@ -12,6 +12,7 @@ export function SearchModal({
 	// Required
 	basename,
 	interfaceName,
+	searchString = '', setSearchString,
 	servicesBaseUrl,
 	setBottomBarMessage,
 	setBottomBarMessageHeader,
@@ -26,6 +27,8 @@ export function SearchModal({
 	// Required
 	basename: string
 	interfaceName: string
+	searchString?: string
+	setSearchString: React.Dispatch<React.SetStateAction<string>>
 	servicesBaseUrl: string
 	setBottomBarMessage: React.Dispatch<React.SetStateAction<string>>
 	setBottomBarMessageHeader: React.Dispatch<React.SetStateAction<string>>
@@ -73,6 +76,7 @@ export function SearchModal({
 				firstColumnWidth={3}
 				fields={fields}
 				interfaceName={interfaceName}
+				searchString={searchString} setSearchString={setSearchString}
 				servicesBaseUrl={servicesBaseUrl}
 				setBottomBarMessage={setBottomBarMessage}
 				setBottomBarMessageHeader={setBottomBarMessageHeader}
