@@ -18,6 +18,7 @@ export function App({
 }: ExplorerProps) {
 
 	useWhenInit(() => {
+		// This has to happen before GraphiQL is loaded
 		if (!localStorage.getItem('graphiql:theme')) {
 			localStorage.setItem('graphiql:theme', 'light');
 		}
