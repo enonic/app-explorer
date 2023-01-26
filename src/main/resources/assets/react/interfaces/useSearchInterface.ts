@@ -23,7 +23,7 @@ type SearchResult = {
 
 function useSearchInterface({
 	basename,
-	interfaceName,
+	interfaceNameState,
 	setBottomBarMessage,
 	setBottomBarMessageHeader,
 	setBottomBarVisible,
@@ -31,7 +31,7 @@ function useSearchInterface({
 	fieldsProp
 } :{
 	basename: string
-	interfaceName: string
+	interfaceNameState: string
 	setBottomBarMessage: React.Dispatch<React.SetStateAction<string>>
 	setBottomBarMessageHeader: React.Dispatch<React.SetStateAction<string>>
 	setBottomBarVisible: React.Dispatch<React.SetStateAction<boolean>>
@@ -193,7 +193,7 @@ function useSearchInterface({
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
-				[HTTP_HEADERS.EXPLORER_INTERFACE_NAME]: interfaceName,
+				[HTTP_HEADERS.EXPLORER_INTERFACE_NAME]: interfaceNameState,
 			},
 			body: JSON.stringify(gqlQuery)
 		})
