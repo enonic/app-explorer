@@ -24,10 +24,15 @@ export type SearchProps = {
 	//documentTypesAndFields ?:Record<string,Fields>
 	fields?: InterfaceField[]
 	firstColumnWidth?: 1|2|3|4|5|6|7|8|9|10|11|12|13|14|15
-	interfaceName?: InterfaceName
+
+	interfaceNameState: InterfaceName
+	setInterfaceNameState: React.Dispatch<React.SetStateAction<InterfaceName>>
+
 	interfaceOptions?: StrictDropdownItemProps[]
+
 	searchString?: SearchString
 	setSearchString: React.Dispatch<React.SetStateAction<SearchString>>
+
 	setBottomBarMessage: React.Dispatch<React.SetStateAction<string>>
 	setBottomBarMessageHeader: React.Dispatch<React.SetStateAction<string>>
 	setBottomBarVisible: React.Dispatch<React.SetStateAction<boolean>>
@@ -38,16 +43,17 @@ const DEBUG_DEPENDENCIES = false;
 
 export function useSearchState({
 	basename,
+	interfaceNameState,
 	servicesBaseUrl,
 	// Optional
 	fieldsProp = [],
-	interfaceNameProp = 'default',
 	searchString = '',
 	setBottomBarMessage,
 	setBottomBarMessageHeader,
 	setBottomBarVisible,
 }: {
 	basename: string
+	interfaceNameState: string
 	searchString?: SearchString
 	servicesBaseUrl: string
 	setBottomBarMessage: React.Dispatch<React.SetStateAction<string>>
@@ -55,7 +61,6 @@ export function useSearchState({
 	setBottomBarVisible: React.Dispatch<React.SetStateAction<boolean>>
 	// Optional
 	fieldsProp?: InterfaceField[]
-	interfaceNameProp?: InterfaceName
 }) {
 	//console.debug('Search({fields:', fieldsProp,'})');
 	//console.debug('Search interfaceName', interfaceNameProp);
@@ -65,7 +70,6 @@ export function useSearchState({
 	//──────────────────────────────────────────────────────────────────────────
 	// const [boolOnChange, setBoolOnChange] = React.useState(false);
 	//console.debug('Search boolOnChange', boolOnChange);
-	const [interfaceNameState, setInterfaceNameState] = React.useState(interfaceNameProp);
 	const [initializing, setInitializing] = React.useState(true);
 	const [interfaceCollectionCount, setInterfaceCollectionCount] = React.useState<number>();
 	const [interfaceDocumentCount, setInterfaceDocumentCount] = React.useState<number>();
@@ -94,7 +98,7 @@ export function useSearchState({
 	} = useSearchInterface({
 		basename,
 		fieldsProp,
-		interfaceName: interfaceNameState,
+		interfaceNameState,
 		setBottomBarMessage,
 		setBottomBarMessageHeader,
 		setBottomBarVisible,
@@ -273,7 +277,6 @@ export function useSearchState({
 
 		interfaceCollectionCount, setInterfaceCollectionCount,
 		interfaceDocumentCount, setInterfaceDocumentCount,
-		interfaceNameState, setInterfaceNameState,
 		handlePaginationChange,
 		initializing,
 		jsonModalState, setJsonModalState,
