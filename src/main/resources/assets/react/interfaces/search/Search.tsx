@@ -30,7 +30,7 @@ import { Column } from '../../document/constants';
 export function Search(props: SearchProps) {
 	const {
 		basename,
-		interfaceName: interfaceNameProp = 'default',
+		interfaceNameState, setInterfaceNameState,
 		interfaceOptions = [],
 		searchString = '', setSearchString,
 	} = props;
@@ -38,7 +38,6 @@ export function Search(props: SearchProps) {
 		// boolOnChange, setBoolOnChange,
 		interfaceCollectionCount, // setInterfaceCollectionCount,
 		interfaceDocumentCount, // setInterfaceDocumentCount,
-		interfaceNameState, setInterfaceNameState,
 		initializing,
 		jsonModalState, setJsonModalState,
 		handlePaginationChange,
@@ -52,7 +51,7 @@ export function Search(props: SearchProps) {
 	} = useSearchState({
 		basename,
 		fieldsProp: props.fields,
-		interfaceNameProp,
+		interfaceNameState,
 		searchString,
 		servicesBaseUrl: props.servicesBaseUrl,
 		setBottomBarMessage: props.setBottomBarMessage,
@@ -130,7 +129,7 @@ export function Search(props: SearchProps) {
 					<Flex.Item>
 						<Link
 							className='graphql'
-							to={`/api?interfaceName=${interfaceNameState}`}
+							to='/api'
 						>
 							<svg version="2.0">
 								<use href="#graphql100" />
@@ -190,7 +189,7 @@ export function Search(props: SearchProps) {
 							hits={result.hits}
 							loading={loading}
 						/>*/}
-						{interfaceNameProp === 'default'
+						{interfaceNameState === 'default'
 							? null
 							: searchedStringState ? <Accordion
 								locales={resultState.locales || []}
@@ -199,19 +198,19 @@ export function Search(props: SearchProps) {
 							/> : null
 						}
 					</>
-					: interfaceNameProp === 'default'
+					: interfaceNameState === 'default'
 						? 'No documents available, add some documents to a collection to get started.'
 						: interfaceCollectionCount === 1
-							? `There are no documents in the ${interfaceCollectionCount} collection of the ${interfaceNameProp} interface. Add some documents to it to get started.`
-							: `There are no documents in any of the ${interfaceCollectionCount} collections of the ${interfaceNameProp} interface. Add some documents to any of them to get started.`
-				: interfaceNameProp === 'default'
+							? `There are no documents in the ${interfaceCollectionCount} collection of the ${interfaceNameState} interface. Add some documents to it to get started.`
+							: `There are no documents in any of the ${interfaceCollectionCount} collections of the ${interfaceNameState} interface. Add some documents to any of them to get started.`
+				: interfaceNameState === 'default'
 					? <Segment basic className='c-lgr' size='massive' textAlign='center'>
 						<Header as='h1' content='D&apos;oh!' size='huge' style={{
 							marginBottom: 14
 						}}/>
 						No collections available, <Link to='/collections/create'>create a collection</Link> to get started.
 					</Segment>
-					: `There are no collections in the ${interfaceNameProp} interface. Add collections to the interface to get started.`
+					: `There are no collections in the ${interfaceNameState} interface. Add collections to the interface to get started.`
 		}
 	</Container>;
 } // function Search

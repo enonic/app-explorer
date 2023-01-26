@@ -68,6 +68,7 @@ function Explorer({
 		bottomBarVisible, setBottomBarVisible,
 		defaultInterfaceFields,
 		fetchInterfaces, interfaceOptions,
+		interfaceNameState, setInterfaceNameState,
 		licensedTo, setLicensedTo,
 		licenseValid, setLicenseValid,
 		loadingModalState, setLoadingModalState,
@@ -83,6 +84,8 @@ function Explorer({
 	});
 	return <>
 		<TopBarMenu
+			interfaceNameState={interfaceNameState} setInterfaceNameState={setInterfaceNameState}
+			interfaceOptions={interfaceOptions}
 			licensedTo={licensedTo} setLicensedTo={setLicensedTo}
 			licenseValid={licenseValid} setLicenseValid={setLicenseValid}
 			menuIconName={menuIconName}
@@ -118,7 +121,7 @@ function Explorer({
 						<Search
 							basename={basename}
 							fields={defaultInterfaceFields}
-							interfaceName='default'
+							interfaceNameState={interfaceNameState} setInterfaceNameState={setInterfaceNameState}
 							interfaceOptions={interfaceOptions}
 							searchString={searchString} setSearchString={setSearchString}
 							servicesBaseUrl={servicesBaseUrl}
@@ -181,11 +184,13 @@ function Explorer({
 						setBottomBarMessage={setBottomBarMessage}
 						setBottomBarMessageHeader={setBottomBarMessageHeader}
 						setBottomBarVisible={setBottomBarVisible}
+						setInterfaceNameState={setInterfaceNameState}
 						setLicensedTo={setLicensedTo}
 						setLicenseValid={setLicenseValid}
 					/>}/>
 					<Route path="/api" element={<GraphiQLRouted
 						basename={basename}
+						interfaceNameState={interfaceNameState}
 						searchString={searchString}
 					/>}/>
 					{licenseValid
