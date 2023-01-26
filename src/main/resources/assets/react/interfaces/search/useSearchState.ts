@@ -176,27 +176,30 @@ export function useSearchState({
 				[HTTP_HEADERS.EXPLORER_INTERFACE_NAME]: interfaceNameState,
 			},
 			body: JSON.stringify(gql.query({
-				operation: 'search',
-				variables: {
-					count: {
-						value: 0
+				operation: 'interface',
+				fields: [{
+					operation: 'search',
+					variables: {
+						count: {
+							value: 0
+						},
+						// query: {
+						// 	required: false,
+						// 	type: 'QueryDSL',
+						// 	value: {
+						// 		matchAll: {}
+						// 	}
+						// }
 					},
-					// query: {
-					// 	required: false,
-					// 	type: 'QueryDSL',
-					// 	value: {
-					// 		matchAll: {}
-					// 	}
-					// }
-				},
-				fields: ['total']
+					fields: ['total']
+				}]
 			}))
 		})
 			.then(response => response.json())
 			.then(json => {
 				// console.debug('json', json);
-				// console.debug('setInterfaceDocumentCount:', json.data.search.total);
-				setInterfaceDocumentCount(json.data.search.total);
+				// console.debug('setInterfaceDocumentCount:', json.data.interface.search.total);
+				setInterfaceDocumentCount(json.data.interface.search.total);
 			});
 	}, [
 		basename,
