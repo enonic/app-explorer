@@ -9,6 +9,7 @@ import {useWhenInitAsync} from '@seamusleahy/init-hooks';
 import * as gql from 'gql-query-builder';
 import { useManualQuery } from 'graphql-hooks';
 import * as React from 'react';
+import {useLocation} from 'react-router-dom';
 import LoadingModal from './modals/LoadingModal';
 import useBottomOverlayBarState from './useBottomOverlayBarState';
 import fetchUser from '../fetchers/fetchUser';
@@ -102,6 +103,10 @@ function useExplorerState({
 	const [userState, setUserState] = React.useState<User>();
 
 	const [interfaceOptions, setInterfaceOptions] = React.useState<StrictDropdownItemProps[]>([]);
+
+	const location = useLocation();
+	const [searchString, setSearchString] = React.useState((new URLSearchParams(location.search)).get('q') || '');
+	// console.debug('Explorer searchString', searchString);
 
 	//const [websocket, setWebsocket] = React.useState(null);
 	//const [queryCollectorsGraph, setQueryCollectorsGraph] = React.useState({});
@@ -307,6 +312,7 @@ function useExplorerState({
 		licenseValid, setLicenseValid,
 		loadingModalState, setLoadingModalState,
 		menuIconName,
+		searchString, setSearchString,
 		showWhichLicense, setShowWhichLicense,
 		sideBarVisible, setSideBarVisible,
 		userState, // setUserState,

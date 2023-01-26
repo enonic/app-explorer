@@ -38,6 +38,7 @@ export function Interfaces({
 	basename,
 	fetchInterfaces,
 	licenseValid,
+	searchString = '', setSearchString,
 	servicesBaseUrl,
 	setBottomBarMessage,
 	setBottomBarMessageHeader,
@@ -48,6 +49,8 @@ export function Interfaces({
 	basename: string
 	fetchInterfaces: FetchData<QueryInterfacesResponseData>
 	licenseValid: boolean
+	searchString?: string
+	setSearchString: React.Dispatch<React.SetStateAction<string>>
 	servicesBaseUrl: string
 	setBottomBarMessage: React.Dispatch<React.SetStateAction<string>>
 	setBottomBarMessageHeader: React.Dispatch<React.SetStateAction<string>>
@@ -215,6 +218,7 @@ export function Interfaces({
 										interfaceName={_name}
 										loading={isLoading}
 										fields={fields}
+										searchString={searchString} setSearchString={setSearchString}
 										servicesBaseUrl={servicesBaseUrl}
 										setBottomBarMessage={setBottomBarMessage}
 										setBottomBarMessageHeader={setBottomBarMessageHeader}
