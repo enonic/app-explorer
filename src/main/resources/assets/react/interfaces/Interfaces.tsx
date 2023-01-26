@@ -43,6 +43,7 @@ export function Interfaces({
 	setBottomBarMessage,
 	setBottomBarMessageHeader,
 	setBottomBarVisible,
+	setInterfaceNameState,
 	setLicensedTo,
 	setLicenseValid
 } :{
@@ -55,6 +56,7 @@ export function Interfaces({
 	setBottomBarMessage: React.Dispatch<React.SetStateAction<string>>
 	setBottomBarMessageHeader: React.Dispatch<React.SetStateAction<string>>
 	setBottomBarVisible: React.Dispatch<React.SetStateAction<boolean>>
+	setInterfaceNameState: React.Dispatch<React.SetStateAction<string>>
 	setLicensedTo: SetLicensedToFunction
 	setLicenseValid: SetLicenseValidFunction
 }) {
@@ -223,6 +225,7 @@ export function Interfaces({
 										setBottomBarMessage={setBottomBarMessage}
 										setBottomBarMessageHeader={setBottomBarMessageHeader}
 										setBottomBarVisible={setBottomBarVisible}
+										setInterfaceNameState={setInterfaceNameState}
 									/>
 									<CopyModal
 										afterClose={memoizedUpdateInterfacesCallback}
