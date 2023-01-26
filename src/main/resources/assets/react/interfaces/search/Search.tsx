@@ -32,6 +32,7 @@ export function Search(props: SearchProps) {
 		basename,
 		interfaceName: interfaceNameProp = 'default',
 		interfaceOptions = [],
+		searchString = '', setSearchString,
 	} = props;
 	const {
 		// boolOnChange, setBoolOnChange,
@@ -47,13 +48,12 @@ export function Search(props: SearchProps) {
 		resultState,
 		searchedStringState,
 		searchFunction,
-		searchString, setSearchString,
 		start, // setStart,
 	} = useSearchState({
 		basename,
 		fieldsProp: props.fields,
 		interfaceNameProp,
-		searchStringProp: props.searchString,
+		searchString,
 		servicesBaseUrl: props.servicesBaseUrl,
 		setBottomBarMessage: props.setBottomBarMessage,
 		setBottomBarMessageHeader: props.setBottomBarMessageHeader,
@@ -108,6 +108,7 @@ export function Search(props: SearchProps) {
 						// 	search(value);
 						// }
 					}}
+					value={searchString}
 				/>
 			</Flex.Item>
 			{interfaceOptions.length

@@ -2,7 +2,6 @@ import type {ExplorerProps} from '/index.d';
 
 
 import {
-	BrowserRouter as Router,
 	Route,
 	Routes,
 } from 'react-router-dom';
@@ -73,6 +72,7 @@ function Explorer({
 		licenseValid, setLicenseValid,
 		loadingModalState, setLoadingModalState,
 		menuIconName,
+		searchString, setSearchString,
 		showWhichLicense, setShowWhichLicense,
 		sideBarVisible, setSideBarVisible,
 		userState, // setUserState,
@@ -81,7 +81,7 @@ function Explorer({
 		initialLicenseValid,
 		servicesBaseUrl
 	});
-	return <Router basename={basename}>
+	return <>
 		<TopBarMenu
 			licensedTo={licensedTo} setLicensedTo={setLicensedTo}
 			licenseValid={licenseValid} setLicenseValid={setLicenseValid}
@@ -120,7 +120,7 @@ function Explorer({
 							fields={defaultInterfaceFields}
 							interfaceName='default'
 							interfaceOptions={interfaceOptions}
-							searchString=''
+							searchString={searchString} setSearchString={setSearchString}
 							servicesBaseUrl={servicesBaseUrl}
 							setBottomBarMessage={setBottomBarMessage}
 							setBottomBarMessageHeader={setBottomBarMessageHeader}
@@ -176,6 +176,7 @@ function Explorer({
 						basename={basename}
 						fetchInterfaces={fetchInterfaces}
 						licenseValid={licenseValid}
+						searchString={searchString} setSearchString={setSearchString}
 						servicesBaseUrl={servicesBaseUrl}
 						setBottomBarMessage={setBottomBarMessage}
 						setBottomBarMessageHeader={setBottomBarMessageHeader}
@@ -185,6 +186,7 @@ function Explorer({
 					/>}/>
 					<Route path="/api" element={<GraphiQLRouted
 						basename={basename}
+						searchString={searchString}
 					/>}/>
 					{licenseValid
 						? <Route path="/api/keys" element={<ApiKeys
@@ -208,7 +210,7 @@ function Explorer({
 			state={loadingModalState}
 			setState={setLoadingModalState}
 		/>
-	</Router>;
+	</>;
 }
 
 
