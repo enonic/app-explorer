@@ -72,7 +72,7 @@ router.all(`${ROUTER_PATH_COLLECTIONS_API}/v1`, (r :EnonicXpRequest) => listColl
 router.all(`${ROUTER_PATH_COLLECTIONS_API}/v1/collection/{collection}`, (r :GetCollectionRequest) => getCollection(r));
 router.all(`${ROUTER_PATH_COLLECTIONS_API}/v1/collection/{collection}/documents`, (r :AllDocumentRequest) => documentResponse(r));
 
-//router.all(`${ROUTER_PATH_INTERFACES_API}/v1`, (r :InterfaceRequest) => listInterfaces(r)); // TODO GraphiQL instead
-router.post(`${ROUTER_PATH_INTERFACES_API}/v1/interface`, (r :InterfaceRequest) => interfacePost(r));
+router.post('/api/graphql', (r :InterfaceRequest) => interfacePost(r));
+//router.all('/api/graphql', (r :InterfaceRequest) => listInterfaces(r)); // TODO GraphiQL instead
 
 export const all = (r :Request) => router.dispatch(r);
