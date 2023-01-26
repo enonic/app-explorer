@@ -103,8 +103,8 @@ function useExplorerState({
 	const [userState, setUserState] = React.useState<User>();
 
 	const [interfaceOptions, setInterfaceOptions] = React.useState<StrictDropdownItemProps[]>([]);
-
 	const location = useLocation();
+	const [interfaceNameState, setInterfaceNameState] = React.useState((new URLSearchParams(location.search)).get('interfaceName') || 'default');
 	const [searchString, setSearchString] = React.useState((new URLSearchParams(location.search)).get('q') || '');
 	// console.debug('Explorer searchString', searchString);
 
@@ -308,6 +308,7 @@ function useExplorerState({
 		bottomBarVisible, setBottomBarVisible,
 		defaultInterfaceFields,
 		fetchInterfaces, interfaceOptions,
+		interfaceNameState, setInterfaceNameState,
 		licensedTo, setLicensedTo,
 		licenseValid, setLicenseValid,
 		loadingModalState, setLoadingModalState,

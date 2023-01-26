@@ -17,6 +17,7 @@ export function SearchModal({
 	setBottomBarMessage,
 	setBottomBarMessageHeader,
 	setBottomBarVisible,
+	setInterfaceNameState,
 	// Optional
 	afterClose = () => {/**/},
 	beforeOpen = () => {/**/},
@@ -33,6 +34,7 @@ export function SearchModal({
 	setBottomBarMessage: React.Dispatch<React.SetStateAction<string>>
 	setBottomBarMessageHeader: React.Dispatch<React.SetStateAction<string>>
 	setBottomBarVisible: React.Dispatch<React.SetStateAction<boolean>>
+	setInterfaceNameState: React.Dispatch<React.SetStateAction<string>>
 	// Optional
 	afterClose ?:() => void
 	beforeOpen ?:() => void
@@ -75,12 +77,13 @@ export function SearchModal({
 				basename={basename}
 				firstColumnWidth={3}
 				fields={fields}
-				interfaceName={interfaceName}
+				interfaceNameState={interfaceName}
 				searchString={searchString} setSearchString={setSearchString}
 				servicesBaseUrl={servicesBaseUrl}
 				setBottomBarMessage={setBottomBarMessage}
 				setBottomBarMessageHeader={setBottomBarMessageHeader}
 				setBottomBarVisible={setBottomBarVisible}
+				setInterfaceNameState={setInterfaceNameState}
 			/>
 		</Modal.Content>
 		<Modal.Actions>
