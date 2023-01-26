@@ -1,6 +1,10 @@
 import type {ExplorerProps} from '/index.d';
 
 
+import {useWhenInit} from '@seamusleahy/init-hooks';
+import {
+	BrowserRouter as Router,
+} from 'react-router-dom';
 import GraphQLContextProvider from './components/GraphQLContextProvider';
 import Explorer from './components/Explorer';
 
@@ -12,15 +16,24 @@ export function App({
 	licenseValid,
 	servicesBaseUrl,
 }: ExplorerProps) {
+
+	useWhenInit(() => {
+		if (!localStorage.getItem('graphiql:theme')) {
+			localStorage.setItem('graphiql:theme', 'light');
+		}
+	});
+
 	return <GraphQLContextProvider
 		basename={basename}
 	>
-		<Explorer
-			basename={basename}
-			collectorComponents={collectorComponents}
-			licensedTo={licensedTo}
-			licenseValid={licenseValid}
-			servicesBaseUrl={servicesBaseUrl}
-		/>
+		<Router basename={basename}>
+			<Explorer
+				basename={basename}
+				collectorComponents={collectorComponents}
+				licensedTo={licensedTo}
+				licenseValid={licenseValid}
+				servicesBaseUrl={servicesBaseUrl}
+			/>
+		</Router>
 	</GraphQLContextProvider>;
 }

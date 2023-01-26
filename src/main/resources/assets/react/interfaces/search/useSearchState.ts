@@ -27,6 +27,7 @@ export type SearchProps = {
 	interfaceName?: InterfaceName
 	interfaceOptions?: StrictDropdownItemProps[]
 	searchString?: SearchString
+	setSearchString: React.Dispatch<React.SetStateAction<SearchString>>
 	setBottomBarMessage: React.Dispatch<React.SetStateAction<string>>
 	setBottomBarMessageHeader: React.Dispatch<React.SetStateAction<string>>
 	setBottomBarVisible: React.Dispatch<React.SetStateAction<boolean>>
@@ -41,13 +42,13 @@ export function useSearchState({
 	// Optional
 	fieldsProp = [],
 	interfaceNameProp = 'default',
-	searchStringProp,
+	searchString = '',
 	setBottomBarMessage,
 	setBottomBarMessageHeader,
 	setBottomBarVisible,
 }: {
 	basename: string
-	searchStringProp: SearchString
+	searchString?: SearchString
 	servicesBaseUrl: string
 	setBottomBarMessage: React.Dispatch<React.SetStateAction<string>>
 	setBottomBarMessageHeader: React.Dispatch<React.SetStateAction<string>>
@@ -80,7 +81,6 @@ export function useSearchState({
 		perPage,
 		// setPerPage,
 	] = React.useState(10);
-	const [searchString, setSearchString] = React.useState(searchStringProp || '');
 
 	//const [cache, setCache] = React.useState({} as Cache);
 	//console.debug('Search cache', cache);
@@ -283,7 +283,6 @@ export function useSearchState({
 		resultState,
 		searchFunction,
 		searchedStringState,
-		searchString, setSearchString,
 		start, // setStart,
 	}
 }
