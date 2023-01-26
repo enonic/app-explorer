@@ -99,6 +99,7 @@
     "@enonic-types/lib-task": "^7",
     "@enonic-types/lib-vhost": "^7",
     "@enonic/explorer-utils": "^0",
+    "@graphiql/plugin-explorer": "^0.1.12",
     "@swc/cli": "^0",
     "@swc/core": "^1",
     "@types/jquery": "^3",

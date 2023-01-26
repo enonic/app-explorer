@@ -17,6 +17,7 @@ function SearchInput({
 }: Omit<StrictInputProps, 'icon'> & {
 	borderRadius?: number
 	onKeyUp?: (event: React.KeyboardEvent<HTMLInputElement>) => void
+	value: string
 }) {
 	return <Input
 		icon
