@@ -32,10 +32,6 @@ export type SearchProps = {
 
 	searchString?: SearchString
 	setSearchString: React.Dispatch<React.SetStateAction<SearchString>>
-
-	setBottomBarMessage: React.Dispatch<React.SetStateAction<string>>
-	setBottomBarMessageHeader: React.Dispatch<React.SetStateAction<string>>
-	setBottomBarVisible: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 
@@ -48,17 +44,11 @@ export function useSearchState({
 	// Optional
 	fieldsProp = [],
 	searchString = '',
-	setBottomBarMessage,
-	setBottomBarMessageHeader,
-	setBottomBarVisible,
 }: {
 	basename: string
 	interfaceNameState: string
 	searchString?: SearchString
 	servicesBaseUrl: string
-	setBottomBarMessage: React.Dispatch<React.SetStateAction<string>>
-	setBottomBarMessageHeader: React.Dispatch<React.SetStateAction<string>>
-	setBottomBarVisible: React.Dispatch<React.SetStateAction<boolean>>
 	// Optional
 	fieldsProp?: InterfaceField[]
 }) {
@@ -99,9 +89,6 @@ export function useSearchState({
 		basename,
 		fieldsProp,
 		interfaceNameState,
-		setBottomBarMessage,
-		setBottomBarMessageHeader,
-		setBottomBarVisible,
 		setLoading
 	});
 
@@ -168,7 +155,6 @@ export function useSearchState({
 
 	const getInterfaceDocumentCount = React.useCallback(() => {
 		// console.debug('getInterfaceDocumentCount interfaceNameState:', interfaceNameState);
-		setBottomBarMessage('Getting document count...');
 		return fetch(`${basename}/api/v1/interface`, {
 			method: 'POST',
 			headers: {
@@ -204,7 +190,6 @@ export function useSearchState({
 	}, [
 		basename,
 		interfaceNameState,
-		setBottomBarMessage,
 	]);
 
 	const handlePaginationChange = React.useCallback((
@@ -233,9 +218,6 @@ export function useSearchState({
 	// Init only
 	//──────────────────────────────────────────────────────────────────────────
 	useWhenInitAsync(() => {
-		setBottomBarMessageHeader('Initialize');
-		setBottomBarMessage('Getting collection count...');
-		setBottomBarVisible(true);
 		Promise.all([
 			getInterfaceCollectionCount(),
 			getInterfaceDocumentCount(),

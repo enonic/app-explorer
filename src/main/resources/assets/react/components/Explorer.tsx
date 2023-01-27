@@ -22,7 +22,6 @@ import {StopWords} from '../stopWords/StopWords';
 import {Thesauri} from '../thesaurus/Thesauri';
 
 import About from './About';
-import BottomOverlayBar from './BottomOverlayBar';
 import GraphiQLRouted from './GraphiQLRouted';
 import LoadingModal from './modals/LoadingModal';
 import SideBarMenu from './SideBarMenu';
@@ -61,11 +60,6 @@ function Explorer({
 }: ExplorerProps) {
 	// console.debug('basename', basename);
 	const {
-		bottomBarIcon, // setBottomBarIcon,
-		bottomBarIconLoading, // setBottomBarIconLoading,
-		bottomBarMessage, setBottomBarMessage,
-		bottomBarMessageHeader, setBottomBarMessageHeader,
-		bottomBarVisible, setBottomBarVisible,
 		defaultInterfaceFields,
 		fetchInterfaces, interfaceOptions,
 		interfaceNameState, setInterfaceNameState,
@@ -100,13 +94,6 @@ function Explorer({
 				setSideBarVisible={setSideBarVisible}
 				sideBarVisible={sideBarVisible}
 			/>
-			<BottomOverlayBar
-				icon={bottomBarIcon}
-				iconLoading={bottomBarIconLoading}
-				message={bottomBarMessage}
-				messageHeader={bottomBarMessageHeader}
-				visible={bottomBarVisible}
-			/>
 			<Sidebar.Pusher
 				id='myPusher'
 			>
@@ -125,9 +112,6 @@ function Explorer({
 							interfaceOptions={interfaceOptions}
 							searchString={searchString} setSearchString={setSearchString}
 							servicesBaseUrl={servicesBaseUrl}
-							setBottomBarMessage={setBottomBarMessage}
-							setBottomBarMessageHeader={setBottomBarMessageHeader}
-							setBottomBarVisible={setBottomBarVisible}
 						/>
 					</>}/>
 					<Route path="/collections" element={<Collections
@@ -159,9 +143,6 @@ function Explorer({
 					/>}/>
 					<Route path="/documents" element={<Documents
 						servicesBaseUrl={servicesBaseUrl}
-						setBottomBarMessage={setBottomBarMessage}
-						setBottomBarMessageHeader={setBottomBarMessageHeader}
-						setBottomBarVisible={setBottomBarVisible}
 					/>}/>
 					<Route path="/documentTypes" element={<DocumentTypes
 						servicesBaseUrl={servicesBaseUrl}
@@ -181,9 +162,6 @@ function Explorer({
 						licenseValid={licenseValid}
 						searchString={searchString} setSearchString={setSearchString}
 						servicesBaseUrl={servicesBaseUrl}
-						setBottomBarMessage={setBottomBarMessage}
-						setBottomBarMessageHeader={setBottomBarMessageHeader}
-						setBottomBarVisible={setBottomBarVisible}
 						setInterfaceNameState={setInterfaceNameState}
 						setLicensedTo={setLicensedTo}
 						setLicenseValid={setLicenseValid}
