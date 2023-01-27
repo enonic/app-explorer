@@ -98,7 +98,7 @@ export default function SideBarMenu({
 					onClick={() => {
 						setSideBarVisible(false);
 					}}
-				><Icon name='warning' style={ICON_STYLE}/> Notifications</Menu.Item>
+				><Icon name='mail' style={ICON_STYLE}/> Notifications</Menu.Item>
 				<Menu.Item
 					as={Link}
 					to='/collections/schedule'
