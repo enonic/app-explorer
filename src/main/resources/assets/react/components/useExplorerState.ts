@@ -11,7 +11,6 @@ import { useManualQuery } from 'graphql-hooks';
 import * as React from 'react';
 import {useLocation} from 'react-router-dom';
 import LoadingModal from './modals/LoadingModal';
-import useBottomOverlayBarState from './useBottomOverlayBarState';
 import fetchUser from '../fetchers/fetchUser';
 import {useUpdateEffect} from '../utils/useUpdateEffect';
 
@@ -75,18 +74,7 @@ function useExplorerState({
 		state: loadingModalState,
 		setState: setLoadingModalState,
 	} = LoadingModal.useLoadingModalState();
-	const {
-		icon: bottomBarIcon,
-		// setIcon: setBottomBarIcon,
-		iconLoading: bottomBarIconLoading,
-		// setIconLoading: setBottomBarIconLoading,
-		message: bottomBarMessage,
-		setMessage: setBottomBarMessage,
-		messageHeader: bottomBarMessageHeader,
-		setMessageHeader: setBottomBarMessageHeader,
-		visible: bottomBarVisible,
-		setVisible: setBottomBarVisible,
-	} = useBottomOverlayBarState();
+
 	//──────────────────────────────────────────────────────────────────────────
 	// State
 	//──────────────────────────────────────────────────────────────────────────
@@ -129,7 +117,6 @@ function useExplorerState({
 			.then(json => {
 				//console.debug(json);
 				setDefaultInterfaceFields(json.data.queryInterfaces.hits[0].fields);
-				setBottomBarVisible(false);
 				setLoadingModalState(prev => {
 					const deref = {...prev};
 					deref.open = false;
@@ -138,7 +125,6 @@ function useExplorerState({
 			});
 	}, [
 		servicesBaseUrl,
-		setBottomBarVisible,
 		setLoadingModalState,
 	]);
 
@@ -152,15 +138,11 @@ function useExplorerState({
 			deref.open = true;
 			return deref;
 		});
-		setBottomBarMessageHeader('Initialize');
-		setBottomBarMessage('Fetching user information...');
-		setBottomBarVisible(true);
 		fetchUser({
 			url: `${servicesBaseUrl}/graphQL`
 		}).then(object => {
 			setUserState(object.data.getUser);
 		})
-		setBottomBarMessage('Fetching query information...');
 		memoizedQueryInterfacesDefault();
 	});
 
@@ -301,11 +283,6 @@ function useExplorerState({
 	// Returns
 	//──────────────────────────────────────────────────────────────────────────
 	return {
-		bottomBarIcon, // setBottomBarIcon,
-		bottomBarIconLoading, // setBottomBarIconLoading,
-		bottomBarMessage, setBottomBarMessage,
-		bottomBarMessageHeader, setBottomBarMessageHeader,
-		bottomBarVisible, setBottomBarVisible,
 		defaultInterfaceFields,
 		fetchInterfaces, interfaceOptions,
 		interfaceNameState, setInterfaceNameState,
