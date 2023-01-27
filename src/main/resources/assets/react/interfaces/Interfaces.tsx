@@ -40,9 +40,6 @@ export function Interfaces({
 	licenseValid,
 	searchString = '', setSearchString,
 	servicesBaseUrl,
-	setBottomBarMessage,
-	setBottomBarMessageHeader,
-	setBottomBarVisible,
 	setInterfaceNameState,
 	setLicensedTo,
 	setLicenseValid
@@ -53,9 +50,6 @@ export function Interfaces({
 	searchString?: string
 	setSearchString: React.Dispatch<React.SetStateAction<string>>
 	servicesBaseUrl: string
-	setBottomBarMessage: React.Dispatch<React.SetStateAction<string>>
-	setBottomBarMessageHeader: React.Dispatch<React.SetStateAction<string>>
-	setBottomBarVisible: React.Dispatch<React.SetStateAction<boolean>>
 	setInterfaceNameState: React.Dispatch<React.SetStateAction<string>>
 	setLicensedTo: SetLicensedToFunction
 	setLicenseValid: SetLicenseValidFunction
@@ -222,9 +216,6 @@ export function Interfaces({
 										fields={fields}
 										searchString={searchString} setSearchString={setSearchString}
 										servicesBaseUrl={servicesBaseUrl}
-										setBottomBarMessage={setBottomBarMessage}
-										setBottomBarMessageHeader={setBottomBarMessageHeader}
-										setBottomBarVisible={setBottomBarVisible}
 										setInterfaceNameState={setInterfaceNameState}
 									/>
 									<CopyModal

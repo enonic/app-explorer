@@ -54,9 +54,6 @@ export function Search(props: SearchProps) {
 		interfaceNameState,
 		searchString,
 		servicesBaseUrl: props.servicesBaseUrl,
-		setBottomBarMessage: props.setBottomBarMessage,
-		setBottomBarMessageHeader: props.setBottomBarMessageHeader,
-		setBottomBarVisible: props.setBottomBarVisible,
 	});
 	// console.debug('interfaceCollectionCount', interfaceCollectionCount);
 	// console.debug('interfaceDocumentCount', interfaceDocumentCount);
