@@ -74,7 +74,10 @@ import {hash} from '/lib/explorer/string/hash';
 
 import {Collector} from '/lib/explorer/collector/Collector';
 
+import ContentTypeException from './ContentTypeException';
 import {parseRobotsTxt} from './parseRobotsTxt';
+import NotFoundException from './NotFoundException';
+import RobotsException from './RobotsException';
 
 
 type RobotsTxt = {
@@ -294,7 +297,7 @@ export function run({
 	function throwIfExcluded(normalized :string) {
 		for (let i = 0; i < excludeRegExps.length; i += 1) {
 			if (excludeRegExps[i].test(normalized)) {
-				throw new Error('Matches an exclude regexp!');
+				throw new RobotsException(normalized, 'Matches an exclude regexp!');
 			}
 		}
 	}
@@ -346,7 +349,7 @@ export function run({
 				collector.progress();
 				collector.taskProgressObj.current += 1; // eslint-disable-line no-param-reassign
 				if (robots && !robots.isAllowed('', url)) {
-					throw new Error('Not allowed in robots.txt');
+					throw new RobotsException(url, 'Not allowed in robots.txt');
 				}
 				throwIfExcluded(url);
 				const res = httpClientRequest({
@@ -356,11 +359,17 @@ export function run({
 					},
 					url
 				}) as Response; TRACE && log.debug('res:%s', toStr(res));
+
+				if (res.status === 404) {
+					throw new NotFoundException(url);
+				}
+
 				if (res.status != 200) {
 					throw new Error(`Status: ${res.status}!`);
 				}
+
 				if (!res.contentType.includes('html')) {
-					throw new Error(`ContentType:${res.contentType} does not include html!`);
+					throw new ContentTypeException(url, `ContentType:${res.contentType} does not include html!`);
 				}
 
 				// X-Robots-Tag HTTP header http://www.searchtools.com/robots/x-robots-tag.html
@@ -374,7 +383,7 @@ export function run({
 					}
 					if (xRobotsTag.includes('NOINDEX')) {
 						if(!boolFollow) {
-							throw new Error(`HTTP header X-Robots-Tag:${res.headers['X-Robots-Tag']} includes both NOFOLLOW and NOINDEX`);
+							throw new RobotsException(url, `HTTP header X-Robots-Tag:${res.headers['X-Robots-Tag']} includes both NOFOLLOW and NOINDEX`);
 						}
 						boolIndex = false;
 					}
@@ -407,14 +416,14 @@ export function run({
 						if (robotsMetaUc.includes('NOFOLLOW')) {
 							boolFollow = false;
 							if (robotsMetaUc.includes('NOINDEX')) {
-								throw new Error(`Found both NOFOLLOW and NOINDEX in ${robotsMetaHtml}`);
+								throw new RobotsException(url, `Found both NOFOLLOW and NOINDEX in ${robotsMetaHtml}`);
 							}
 						}
 						if (robotsMetaUc.includes('NOINDEX')) {
 							boolIndex = false;
 						}
 						if(!boolFollow && !boolIndex) {
-							throw new Error(`Found both NOFOLLOW and NOINDEX combined from HTTP header X-Robots-Tag:${res.headers['X-Robots-Tag']} and ${robotsMetaHtml}`);
+							throw new RobotsException(url, `Found both NOFOLLOW and NOINDEX combined from HTTP header X-Robots-Tag:${res.headers['X-Robots-Tag']} and ${robotsMetaHtml}`);
 						}
 					}
 				}
@@ -548,7 +557,7 @@ export function run({
 					// Check if any document with url exists
 					const documentsRes = collector.queryDocuments({
 						aggregations: null,
-						count: 1,
+						count: -1,
 						filters: null,
 						query: {
 							boolean: {
@@ -566,7 +575,18 @@ export function run({
 					// log.debug('webcrawl documentsRes:%s', toStr(documentsRes));
 
 					if (documentsRes.total > 1) {
-						throw new Error(`Multiple documents found with url:${url}! url is supposed to be unique!`);
+						for (let i = 0; i < documentsRes.hits.length; i++) {
+							const {id} = documentsRes.hits[i]
+							const {url: anUrl} = collector.getDocumentNode(id);
+							if (anUrl === url) { // Direct case sensitive match
+								documentToPersist._id = documentsRes.hits[0].id;
+							}
+						}
+						if (!documentToPersist._id) { // This means create rather than update
+							log.debug(`Unable to find a case sensitive match for url among documents with ids:${
+								toStr(documentsRes.hits.map(({id}) => id))
+							}`);
+						}
 					} else if (documentsRes.total === 1) {
 						// Provide which document node to update (rather than creating a new document node)
 						documentToPersist._id = documentsRes.hits[0].id;
@@ -584,11 +604,18 @@ export function run({
 			log.debug(`success url:${toStr(url)}`);
 			collector.addSuccess({message: url});
 		} catch (e) {
-			log.error(`url:${url} message:${e.message}`, e);
-			collector.addError({message: `url:${url} ${e.message}`});
+			if (e.name === 'RobotsException') {
+				collector.addInformation({message: e.message});
+			} else if (e.name === 'NotFoundException') {
+				collector.addWarning({message: e.message});
+			} else if (e.name === 'ContentTypeException') {
+				collector.addInformation({message: e.message});
+			} else {
+				log.error(`url:${url} message:${e.message}`, e);
+				collector.addError({message: `url:${url} ${e.message}`});
+			}
 		} // try ... catch
 	} // while
-
 
 	// ─────────────────────────────────────────────────────────────────────────
 	// 6. Delete old nodes
