@@ -220,19 +220,25 @@ function DocumentsTable({
 												</Button>
 											</Table.Cell>;
 										} else if (selectedColumnName === HIGHLIGHT_FIELD_ALLTEXT) {
-											return searchedString ? <Table.Cell collapsing>
-												{_highlight['_alltext'] && _highlight['_alltext'].length
-													? <ul style={{
-														listStyleType: 'none',
-														margin: 0,
-														padding: 0
-													}}>
-														{_highlight['_alltext'].map((htmlString, j) => <li key={j}>
-															{ReactHtmlParser(htmlString)}
-														</li>)}
-													</ul>
-													: null}
-											</Table.Cell> : null;
+											return searchedString
+												? <Table.Cell collapsing>
+													{
+														_highlight?.['_alltext'].length
+															? <ul style={{
+																listStyleType: 'none',
+																margin: 0,
+																padding: 0
+															}}>
+																{
+																	_highlight['_alltext'].map((htmlString, j) => <li key={j}>
+																		{ReactHtmlParser(htmlString)}
+																	</li>)
+																}
+															</ul>
+															: null
+													}
+												</Table.Cell>
+												: null;
 										} else if (!SELECTED_COLUMNS_DEFAULT.includes(selectedColumnName as Column)) {
 											const htmlString = getHighlightedHtml({
 												_highlight,
