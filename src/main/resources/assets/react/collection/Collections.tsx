@@ -28,6 +28,7 @@ import {
 	Segment,
 	Table,
 } from 'semantic-ui-react';
+import RefreshButton from '../components/buttons/RefreshButton';
 import Flex from '../components/Flex';
 import {Cron} from '../utils/Cron';
 import {
@@ -79,7 +80,6 @@ export function Collections(props :{
 		contentTypeOptions,
 		copyModalCollectionId, setCopyModalCollectionId,
 		// direction,
-		durationSinceLastUpdate,
 		fieldsObj,
 		intInitializedCollectorComponents,
 		isLoading,
@@ -137,12 +137,11 @@ export function Collections(props :{
 					toggle
 				/>
 			</Segment>
-			<Button
-				basic
+			<RefreshButton
 				floated='right'
-				color='blue'
 				loading={isLoading}
-				onClick={memoizedFetchOnUpdate}><Icon className='refresh'/>Last updated: {durationSinceLastUpdate}</Button>
+				onClick={memoizedFetchOnUpdate}
+			/>
 			<div className='cl-b'/>
 			<Header
 				as='h1'

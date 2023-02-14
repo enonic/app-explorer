@@ -5,11 +5,10 @@ import Gantt from 'nice-react-gantt';
 import SemanticDatepicker from 'react-semantic-ui-datepickers';
 import {Slider} from 'react-semantic-ui-range';
 import {
-	Button,
-	Icon,
 	Radio,
 	Table
 } from 'semantic-ui-react';
+import RefreshButton from '../components/buttons/RefreshButton';
 import Flex from '../components/Flex';
 import {useScheduleState} from './useScheduleState';
 
@@ -30,7 +29,6 @@ export const Schedule = ({
 	projects ?:Array<ScheduledJob>
 }) => {
 	const {
-		durationSinceLastUpdate,
 		end,
 		isLoading,
 		key,
@@ -162,11 +160,10 @@ export const Schedule = ({
 						</Table>
 					</Flex.Item>
 					<Flex.Item>
-						<Button
-							basic
-							color='blue'
+						<RefreshButton
 							loading={isLoading}
-							onClick={memoizedFetchJobs}><Icon className='refresh'/>Last updated: {durationSinceLastUpdate}</Button>
+							onClick={memoizedFetchJobs}
+						/>
 					</Flex.Item>
 				</Flex>
 			</Flex.Item>
