@@ -482,54 +482,59 @@ export function run({
 						const href = getAttributeValue(el, 'href'); // javascript:void(0)
 						DEBUG && log.debug('href:%s', href);
 
-						if (href.startsWith('javascript:')) {
-							continue linksForLoop;
-						}
+						try {
+							if (href.startsWith('javascript:')) {
+								continue linksForLoop;
+							}
 
-						// Galimatias
-						const resolved = baseUrlObj.resolve(href);
-						TRACE && log.debug('resolved:%s', toStr(resolved));
-
-						const resolvedUriObj = new URL(resolved);
-						TRACE && log.debug('resolvedUriObj:%s', toStr(resolvedUriObj));
-
-						const currentHost = resolvedUriObj.getHost(); // null has no such function "toString" probably because javascript:void(0) doesn't have any host...
-						TRACE && log.debug('currentHost:%s', toStr(currentHost));
-
-						// jsuri
-						/*
-						const uriObj = new Uri(href);
-						const resolved = resolve(href, url); // log.debug(toStr({resolved}));
-						const resolvedUriObj = new Uri(resolved);
-						const currentHost = resolvedUriObj.host(); // log.debug(toStr({currentHost}));
-						*/
-
-						// uri-js
-						/*
-						const resolved = resolve(url, href); // log.debug(toStr({resolved}));
-						const uriObj = parse(resolved); // log.debug(toStr({uriObj}));
-						const currentHost = uriObj.host; // log.debug(toStr({host}));
-						*/
-
-						if (currentHost === domain) {
 							// Galimatias
-							const normalized = resolvedUriObj.setFragment('').normalize();
-							DEBUG && log.debug('webcrawl: normalized:%s', toStr(normalized));
+							const resolved = baseUrlObj.resolve(href);
+							TRACE && log.debug('resolved:%s', toStr(resolved));
+
+							const resolvedUriObj = new URL(resolved);
+							TRACE && log.debug('resolvedUriObj:%s', toStr(resolvedUriObj));
+
+							const currentHost = resolvedUriObj.getHost(); // null has no such function "toString" probably because javascript:void(0) doesn't have any host...
+							TRACE && log.debug('currentHost:%s', toStr(currentHost));
 
 							// jsuri
-							// resolvedUriObj.setAnchor('');
-							// const normalized = normalizeUrl(resolvedUriObj.toString()); log.debug(toStr({normalized}));
-							// const normalized = normalizeUri(resolvedUriObj.toString()); // log.debug(toStr({normalized}));
+							/*
+							const uriObj = new Uri(href);
+							const resolved = resolve(href, url); // log.debug(toStr({resolved}));
+							const resolvedUriObj = new Uri(resolved);
+							const currentHost = resolvedUriObj.host(); // log.debug(toStr({currentHost}));
+							*/
 
 							// uri-js
-							// delete uriObj.fragment;
-							// const normalized = normalize(serialize(uriObj)); // log.debug(toStr({normalized}));
+							/*
+							const resolved = resolve(url, href); // log.debug(toStr({resolved}));
+							const uriObj = parse(resolved); // log.debug(toStr({uriObj}));
+							const currentHost = uriObj.host; // log.debug(toStr({host}));
+							*/
 
-							if (!links.includes(normalized)) {
-								links.push(normalized);
+							if (currentHost === domain) {
+								// Galimatias
+								const normalized = resolvedUriObj.setFragment('').normalize();
+								DEBUG && log.debug('webcrawl: normalized:%s', toStr(normalized));
+
+								// jsuri
+								// resolvedUriObj.setAnchor('');
+								// const normalized = normalizeUrl(resolvedUriObj.toString()); log.debug(toStr({normalized}));
+								// const normalized = normalizeUri(resolvedUriObj.toString()); // log.debug(toStr({normalized}));
+
+								// uri-js
+								// delete uriObj.fragment;
+								// const normalized = normalize(serialize(uriObj)); // log.debug(toStr({normalized}));
+
+								if (!links.includes(normalized)) {
+									links.push(normalized);
+								}
+								handleNormalizedUri(normalized);
 							}
-							handleNormalizedUri(normalized);
-						}
+						} catch (e) {
+							// Just log and ignore links that we don't support
+							log.error(`${url}: Something went wrong while processing a[href]:${href} ${e.message}`, e);
+						} // try/catch
 					} // for linkEls
 				} // boolFollow
 
