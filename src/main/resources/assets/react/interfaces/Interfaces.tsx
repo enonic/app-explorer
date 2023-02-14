@@ -9,11 +9,11 @@ import type {QueryInterfacesResponseData} from '../components/useExplorerState';
 import {
 	Button,
 	Header,
-	Icon,
 	Radio,
 	Segment,
 	Table
 } from 'semantic-ui-react';
+import RefreshButton from '../components/buttons/RefreshButton';
 import Flex from '../components/Flex';
 import {NewOrEditInterfaceModal} from './NewOrEditInterfaceModal';
 import {CopyModal} from './CopyModal';
@@ -57,7 +57,6 @@ export function Interfaces({
 	const {
 		//collectionIdToFieldKeys,
 		collectionOptions,
-		durationSinceLastUpdate,
 		fieldNameToValueTypesState, // setFieldNameToValueTypesState,
 		//fieldOptions,
 		//globalFieldsObj,
@@ -121,11 +120,10 @@ export function Interfaces({
 					</Segment>
 				</Flex.Item>
 				<Flex.Item>
-					<Button
-						basic
-						color='blue'
+					<RefreshButton
 						loading={isLoading}
-						onClick={memoizedUpdateInterfacesCallback}><Icon className='refresh'/>Last updated: {durationSinceLastUpdate}</Button>
+						onClick={memoizedUpdateInterfacesCallback}
+					/>
 				</Flex.Item>
 			</Flex>
 			<Header

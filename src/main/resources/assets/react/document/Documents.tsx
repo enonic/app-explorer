@@ -15,6 +15,7 @@ import {
 	Segment,
 	Table,
 } from 'semantic-ui-react';
+import RefreshButton from '../components/buttons/RefreshButton';
 import Flex from '../components/Flex';
 import {HoverPopup} from '../components/HoverPopup';
 import SearchInput from '../components/inputs/SearchInput';
@@ -41,8 +42,6 @@ export function Documents({
 		documentsRes, // setDocumentsRes,
 		documentTypeOptions, // setDocumentTypeOptions,
 		documentTypesHoverOpen, setDocumentTypesHoverOpen,
-		doing, // setDoing,
-		durationSinceLastUpdate, // setDurationSinceLastUpdate,
 		fragmentSize, // setFragmentSize,
 		handleDroppedColumn,
 		handlePaginationChange,
@@ -333,10 +332,8 @@ export function Documents({
 					</Form>
 				</Flex.Item>
 				<Flex.Item>
-					<Button
-						basic
+					<RefreshButton
 						disabled={loading}
-						color='blue'
 						onClick={() => {
 							queryDocuments({
 								collectionsFilter: selectedCollections,
@@ -348,12 +345,7 @@ export function Documents({
 								selectedColumns: selectedColumnsState,
 								start,
 							});
-						}}>{doing
-							? doing
-							: <>
-								<Icon className='refresh'/>Last updated: {durationSinceLastUpdate}
-							</>
-						}</Button>
+						}}/>
 				</Flex.Item>
 			</Flex>
 			{

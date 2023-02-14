@@ -11,6 +11,7 @@ import {
 	Segment,
 	Table
 } from 'semantic-ui-react';
+import RefreshButton from '../components/buttons/RefreshButton';
 import {ButtonEdit} from '../components/ButtonEdit';
 import {ButtonNew} from '../components/ButtonNew';
 import {EditManagedDocumentTypeWarningModal} from './EditManagedDocumentTypeWarningModal';
@@ -30,7 +31,6 @@ export function DocumentTypes({
 	const {
 		currentDocumentTypeName, setCurrentDocumentTypeName,
 		documentTypes,
-		durationSinceLastUpdate,
 		editManagedDocumentTypeWarningModalOpen, setEditManagedDocumentTypeWarningModalOpen,
 		isLoading,
 		memoizedUpdateState,
@@ -74,11 +74,10 @@ export function DocumentTypes({
 					</Segment>
 				</Flex.Item>
 				<Flex.Item>
-					<Button
-						basic
-						color='blue'
+					<RefreshButton
 						loading={isLoading}
-						onClick={memoizedUpdateState}><Icon className='refresh'/>Last updated: {durationSinceLastUpdate}</Button>
+						onClick={memoizedUpdateState}
+					/>
 				</Flex.Item>
 			</Flex>
 			<Header as='h1' content='Document types'/>

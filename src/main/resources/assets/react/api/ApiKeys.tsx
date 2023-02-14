@@ -1,12 +1,11 @@
 import * as React from 'react';
 import {
-	Button,
 	Header,
-	Icon,
 	Radio,
 	Segment,
 	Table
 } from 'semantic-ui-react';
+import RefreshButton from '../components/buttons/RefreshButton';
 import Flex from '../components/Flex';
 import {useApiKeysState} from './useApiKeysState';
 import {DeleteApiKeyModal} from './DeleteApiKeyModal';
@@ -23,7 +22,6 @@ export const ApiKeys = (props :{
 
 	const {
 		apiKeys,
-		durationSinceLastUpdate,
 		isLoading,
 		memoizedFetchApiKeys
 	} = useApiKeysState({
@@ -58,11 +56,10 @@ export const ApiKeys = (props :{
 					</Segment>
 				</Flex.Item>
 				<Flex.Item>
-					<Button
-						basic
-						color='blue'
+					<RefreshButton
+						onClick={memoizedFetchApiKeys}
 						loading={isLoading}
-						onClick={memoizedFetchApiKeys}><Icon className='refresh'/>Last updated: {durationSinceLastUpdate}</Button>
+					/>
 				</Flex.Item>
 			</Flex>
 			<Header as='h1' disabled={isLoading}>API Keys</Header>
