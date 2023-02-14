@@ -12,9 +12,7 @@ import type {
 
 
 import {COLON_SIGN} from '@enonic/js-utils';
-import moment from 'moment';
 import * as React from 'react';
-import {useInterval} from '../utils/useInterval';
 import {useUpdateEffect} from '../utils/useUpdateEffect';
 
 
@@ -160,8 +158,6 @@ export function useCollectionsState({
 	collectorComponents :CollectorComponents
 	servicesBaseUrl :string
 }) {
-	const [updatedAt, setUpdatedAt] = React.useState(moment());
-	const [durationSinceLastUpdate, setDurationSinceLastUpdate] = React.useState('');
 	const [isLoading, setIsLoading] = React.useState(false);
 
 	const [jobsObj, setJobsObj] = React.useState({});
@@ -346,7 +342,6 @@ export function useCollectionsState({
 					setJobsObjFromArr(res.data.listScheduledJobs);
 					setDocumentTypes(res.data.queryDocumentTypes.hits);
 					setTasks(res.data.queryTasks);
-					setUpdatedAt(moment());
 					setIsLoading(false);
 				} // if
 			}); // then
@@ -370,7 +365,6 @@ export function useCollectionsState({
 					setJobsObjFromArr(res.data.listScheduledJobs);
 					setDocumentTypes(res.data.queryDocumentTypes.hits);
 					setTasks(res.data.queryTasks);
-					setUpdatedAt(moment());
 					setIsLoading(false);
 				}
 			});
@@ -419,24 +413,6 @@ export function useCollectionsState({
 		memoizedFetchOnMount
 	]); // Only once
 
-	React.useEffect(() => {
-		setDurationSinceLastUpdate(
-			moment
-				.duration(updatedAt.diff(moment()))
-				.humanize()
-		);
-	}, [
-		updatedAt
-	]);
-
-	useInterval(() => {
-		setDurationSinceLastUpdate(
-			moment
-				.duration(updatedAt.diff(moment()))
-				.humanize()
-		);
-	}, 5000);
-
 	const shemaIdToName = {};
 	documentTypes.forEach(({_id, _name}) => {
 		shemaIdToName[_id] = _name;
@@ -471,7 +447,6 @@ export function useCollectionsState({
 		contentTypeOptions,
 		copyModalCollectionId, setCopyModalCollectionId,
 		direction,
-		durationSinceLastUpdate,
 		fieldsObj,
 		intInitializedCollectorComponents,
 		isLoading,

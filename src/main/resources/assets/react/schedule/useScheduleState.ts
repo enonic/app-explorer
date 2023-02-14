@@ -2,10 +2,8 @@ import type {ScheduledJob} from './index.d';
 
 
 import {parseExpression as parseCronExpression} from 'cron-parser';
-import moment from 'moment';
 import hash from 'object-hash';
 import * as React from 'react';
-import {useInterval} from '../utils/useInterval';
 
 
 const JOBS_GQL = `{
@@ -44,8 +42,6 @@ export function useScheduleState({
 	const [now/*, setNow*/] = React.useState(propNow);
 	const [zoom, setZoom] = React.useState(propZoom);
 	const [showDisabled, setShowDisabled] = React.useState(false);
-	const [updatedAt, setUpdatedAt] = React.useState(moment());
-	const [durationSinceLastUpdate, setDurationSinceLastUpdate] = React.useState('');
 	const [isLoading, setIsLoading] = React.useState(false);
 
 	const memoizedFetchJobs = React.useCallback(() => {
@@ -118,7 +114,6 @@ export function useScheduleState({
 						};
 					}); // updatedProjects
 					setProjects(updatedProjects);
-					setUpdatedAt(moment());
 					setIsLoading(false);
 				}
 			});
@@ -126,31 +121,12 @@ export function useScheduleState({
 
 	React.useEffect(memoizedFetchJobs, [memoizedFetchJobs]);
 
-	React.useEffect(() => {
-		setDurationSinceLastUpdate(
-			moment
-				.duration(updatedAt.diff(moment()))
-				.humanize()
-		);
-	}, [
-		updatedAt
-	]);
-
-	useInterval(() => {
-		setDurationSinceLastUpdate(
-			moment
-				.duration(updatedAt.diff(moment()))
-				.humanize()
-		);
-	}, 5000);
-
 	// It seems the Gantt component doesn't update or render when the projects prop is changed.
 	// By changing key we can force a re-mount.
 	React.useEffect(()=> {
 		setKey(hash(projects));
 	}, [projects]);
 	return {
-		durationSinceLastUpdate,
 		end,
 		isLoading,
 		key,

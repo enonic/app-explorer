@@ -5,9 +5,7 @@ import type {
 
 
 import Uri from 'jsuri';
-import moment from 'moment';
 import * as React from 'react';
-import {useInterval} from '../utils/useInterval';
 
 
 type Direction = StrictTableHeaderCellProps['sorted'];
@@ -75,8 +73,6 @@ export function useJournalsState({
 		total :number
 		totalPages :number
 	});
-	const [updatedAt, setUpdatedAt] = React.useState(moment());
-	const [durationSinceLastUpdate, setDurationSinceLastUpdate] = React.useState('');
 
 	const memoizedSearchJournals = React.useCallback(() => {
 		setLoading(true); // Make sure this happens before setResult below?
@@ -90,7 +86,6 @@ export function useJournalsState({
 		fetch(uriStr).then(response => response.json())
 			.then(data => {
 				setResult(data.result);
-				setUpdatedAt(moment());
 				setLoading(false);
 			});
 	},[
@@ -199,24 +194,6 @@ export function useJournalsState({
 		memoizedSearchJournals
 	]);
 
-	React.useEffect(() => {
-		setDurationSinceLastUpdate(
-			moment
-				.duration(updatedAt.diff(moment()))
-				.humanize()
-		);
-	}, [
-		updatedAt
-	]);
-
-	useInterval(() => {
-		setDurationSinceLastUpdate(
-			moment
-				.duration(updatedAt.diff(moment()))
-				.humanize()
-		);
-	}, 5000);
-
 	const {
 		aggregations,
 		//count,
@@ -235,7 +212,6 @@ export function useJournalsState({
 		columns,
 		columnsPopupOpen, setColumnsPopupOpen,
 		direction,
-		durationSinceLastUpdate,
 		end,
 		errorsPopupOpen, setErrorsPopupOpen,
 		handleCheckboxChange,

@@ -10,10 +10,8 @@ import type {
 
 
 import {isSet} from '@enonic/js-utils';
-import moment from 'moment';
 import * as React from 'react';
 import {FIELD_SHORTCUT_COLLECTION} from '../../../services/graphQL/constants';
-import {useInterval} from '../utils/useInterval';
 
 
 type Collection = {
@@ -164,8 +162,6 @@ export function useInterfacesState({
 	const [showDelete, setShowDelete] = React.useState(true);
 
 	const [isLoading, setIsLoading] = React.useState(false);
-	const [updatedAt, setUpdatedAt] = React.useState(moment());
-	const [durationSinceLastUpdate, setDurationSinceLastUpdate] = React.useState('');
 
 	const memoizedUpdateInterfacesCallback = React.useCallback(() => {
 		setIsLoading(true);
@@ -458,24 +454,16 @@ export function useInterfacesState({
 					text: _name,
 					value: _name // TODO _id
 				})));
-				setUpdatedAt(moment());
 				setIsLoading(false);
 			});
-	}, [servicesBaseUrl]);
+	}, [
+		fetchInterfaces,
+		servicesBaseUrl
+	]);
 
 	React.useEffect(() => {
 		memoizedUpdateInterfacesCallback();
 	}, [memoizedUpdateInterfacesCallback]);
-
-	useInterval(() => {
-		if (updatedAt) {
-			setDurationSinceLastUpdate(
-				moment
-					.duration(updatedAt.diff(moment()))
-					.humanize()
-			);
-		}
-	}, 5000);
 
 	const collectionIdToName = {};
 	const collectionOptions = collections.map(({
@@ -495,7 +483,6 @@ export function useInterfacesState({
 	return {
 		//collectionIdToFieldKeys,
 		collectionOptions,
-		durationSinceLastUpdate,
 		fieldNameToValueTypesState, // setFieldNameToValueTypesState,
 		//fieldOptions,
 		//globalFieldsObj,

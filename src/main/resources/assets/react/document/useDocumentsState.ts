@@ -15,7 +15,6 @@ import {useWhenInitAsync} from '@seamusleahy/init-hooks';
 import {useDebounce} from 'use-debounce';
 import * as gql from 'gql-query-builder';
 import {difference} from 'lodash';
-import moment from 'moment';
 import * as React from 'react';
 // import traverse from 'traverse';
 import {
@@ -23,7 +22,6 @@ import {
 	FIELD_SHORTCUT_DOCUMENT_TYPE,
 } from '../../../services/graphQL/constants';
 import useJsonModalState from '../components/modals/useJsonModalState';
-import {useInterval} from '../utils/useInterval';
 import {useUpdateEffect} from '../utils/useUpdateEffect';
 import {
 	FRAGMENT_SIZE_DEFAULT,
@@ -92,14 +90,12 @@ export function useDocumentsState({
 		DropdownItemProps[]
 	>(OPTIONS_COLUMNS_DEFAULT);
 	const [columnsHoverOpen, setColumnsHoverOpen] = React.useState(false);
-	const [doing, setDoing] = React.useState('Initializing...');
 	const [perPage, setPerPage] = React.useState(PER_PAGE_DEFAULT);
 	const [perPageHoverOpen, setPerPageHoverOpen] = React.useState(false);
 	const [documentTypeOptions, setDocumentTypeOptions] = React.useState<
 		DropdownItemProps[]
 	>([]);
 	const [documentTypesHoverOpen, setDocumentTypesHoverOpen] = React.useState(false);
-	const [durationSinceLastUpdate, setDurationSinceLastUpdate] = React.useState('');
 
 	const [
 		fragmentSize,
@@ -125,7 +121,6 @@ export function useDocumentsState({
 			: []
 	);
 	const [start, setStart] = React.useState(0);
-	const [updatedAt, setUpdatedAt] = React.useState(moment());
 
 	//──────────────────────────────────────────────────────────────────────────
 	// Callbacks (should only depend on props, not state)
@@ -154,7 +149,6 @@ export function useDocumentsState({
 		// updateSelectedDocumentTypes: boolean
 	}) => {
 		DEBUG_DEPENDENCIES && console.debug('queryDocuments callback called');
-		setDoing('Querying documents...');
 		setLoading(true);
 		const filters = [];
 		if (collectionsFilter.length) {
@@ -237,7 +231,7 @@ export function useDocumentsState({
 					[
 						{
 							field: '_allText',
-							numberOfFragments: 99999 // _allText is an array, one per added field
+							// numberOfFragments: 99999 // _allText is an array, one per added field
 						// },{
 						// 	field: FIELD_PATH_META_COLLECTION
 						// },{
@@ -254,7 +248,7 @@ export function useDocumentsState({
 				),
 				fragmentSize,
 				// noMatchSize: fragmentSize // FRAGMENT_SIZE_DEFAULT, // The amount of characters you want to return from the beginning of the property if there are no matching fragments to highlight. Defaults to 0 (nothing is returned).
-				numberOfFragments: 1,
+				// numberOfFragments: 1,
 				order: 'score',
 				postTag: POST_TAG,
 				preTag: PRE_TAG
@@ -443,15 +437,6 @@ export function useDocumentsState({
 				setDocumentsRes(json.data.queryDocuments);
 				setSearchedString(query);
 
-				const newUpdatedAt = moment();
-				setDurationSinceLastUpdate(
-					moment
-						.duration(0)
-						.humanize()
-				);
-				setUpdatedAt(newUpdatedAt);
-
-				setDoing('');
 				setLoading(false);
 			});
 	},[ // The callback is not executed when it's deps changes. Only the reference to the callback is updated.
@@ -460,7 +445,6 @@ export function useDocumentsState({
 
 	const getDocumentTypes = React.useCallback(() => {
 		DEBUG_DEPENDENCIES && console.debug('getDocumentTypes callback called');
-		setDoing('Getting documentTypes...');
 		setLoading(true);
 		fetch(`${servicesBaseUrl}/graphQL`, {
 			method: 'POST',
@@ -513,7 +497,6 @@ export function useDocumentsState({
 						}))
 					)
 				);
-				setDoing('Getting profile...');
 				getColumns({servicesBaseUrl}).then(columns => {
 					// console.debug('columns', columns);
 					setSelectedColumnsState(JSON.parse(JSON.stringify(columns))); // NOTE: dereffing: trying to make it work with dragNdrop columns
@@ -578,7 +561,6 @@ export function useDocumentsState({
 
 	const persistSelectedColumns = React.useCallback((newSelectedColumns: string[]) => {
 		DEBUG_DEPENDENCIES && console.debug('persistSelectedColumns callback called');
-		setDoing('Persisting selected columns...');
 		// setSelectedColumnsState(JSON.parse(JSON.stringify(newSelectedColumns)));
 		setLoading(true);
 		persistColumns({
@@ -586,7 +568,6 @@ export function useDocumentsState({
 			getColumns,
 			servicesBaseUrl
 		}).then((/*columns*/) => {
-			setDoing('');
 			setLoading(false);
 		});
 	}, [ // The callback is not executed when it's deps changes. Only the reference to the callback is updated.
@@ -667,18 +648,6 @@ export function useDocumentsState({
 	]);
 
 	//──────────────────────────────────────────────────────────────────────────
-	// Intervals
-	//──────────────────────────────────────────────────────────────────────────
-	useInterval(() => {
-		// DEBUG_DEPENDENCIES && console.debug('useInterval triggered');
-		setDurationSinceLastUpdate(
-			moment
-				.duration(updatedAt.diff(moment()))
-				.humanize()
-		);
-	}, 5000);
-
-	//──────────────────────────────────────────────────────────────────────────
 	// Returns
 	//──────────────────────────────────────────────────────────────────────────
 	return {
@@ -689,8 +658,6 @@ export function useDocumentsState({
 		documentsRes, // setDocumentsRes,
 		documentTypeOptions, // setDocumentTypeOptions,
 		documentTypesHoverOpen, setDocumentTypesHoverOpen,
-		doing, // setDoing,
-		durationSinceLastUpdate, // setDurationSinceLastUpdate,
 		fragmentSize, // setFragmentSize,
 		handleDroppedColumn,
 		handlePaginationChange,

@@ -4,11 +4,9 @@ import type {
 } from './index.d';
 
 
-import moment from 'moment';
 import * as React from 'react';
 import {fetchDocumentTypes} from '../../../services/graphQL/fetchers/fetchDocumentTypes';
 //import {fetchFields} from '../../../services/graphQL/fetchers/fetchFields';
-import {useInterval} from '../utils/useInterval';
 import {buildDocumentTypesObj} from './buildDocumentTypesObj';
 
 
@@ -26,9 +24,6 @@ export function useDocumentTypesState({
 } :{
 	servicesBaseUrl :string
 }) {
-	const [updatedAt, setUpdatedAt] = React.useState(moment());
-	const [durationSinceLastUpdate, setDurationSinceLastUpdate] = React.useState('');
-
 	//const [globalFields, setGlobalFields] = React.useState([]);
 	const [isLoading, setIsLoading] = React.useState(false);
 	const [documentTypes, setDocumentTypes] = React.useState<DocumentTypesObj>({});
@@ -69,7 +64,6 @@ export function useDocumentTypesState({
 		fetchDocumentTypes({
 			handleData: (data) => {
 				setDocumentTypes(buildDocumentTypesObj(data));
-				setUpdatedAt(moment());
 				setIsLoading(false);
 			},
 			url: `${servicesBaseUrl}/graphQL`
@@ -90,30 +84,9 @@ export function useDocumentTypesState({
 	// An empty array [] means on mount and unmount. This tells React that your effect doesn’t depend on any values from props or state.
 	// If you pass an empty array ([]), the props and state inside the effect will always have their initial values
 
-	React.useEffect(() => {
-		setDurationSinceLastUpdate(
-			moment
-				.duration(updatedAt.diff(moment()))
-				.humanize()
-		);
-	}, [
-		updatedAt
-	]);
-
-	useInterval(() => {
-		if (updatedAt) {
-			setDurationSinceLastUpdate(
-				moment
-					.duration(updatedAt.diff(moment()))
-					.humanize()
-			);
-		}
-	}, 1000);
-
 	return {
 		currentDocumentTypeName, setCurrentDocumentTypeName,
 		documentTypes,
-		durationSinceLastUpdate,
 		editManagedDocumentTypeWarningModalOpen, setEditManagedDocumentTypeWarningModalOpen,
 		isLoading,
 		memoizedUpdateState,
