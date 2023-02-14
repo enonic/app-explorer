@@ -6,9 +6,11 @@ import type {
 import type {QueryInterfacesResponseData} from '../components/useExplorerState';
 
 
+import {Link} from 'react-router-dom';
 import {
 	Button,
 	Header,
+	Popup,
 	Radio,
 	Segment,
 	Table
@@ -134,7 +136,7 @@ export function Interfaces({
 			<Table celled compact singleLine striped>
 				<Table.Header>
 					<Table.Row>
-						<Table.HeaderCell>Edit</Table.HeaderCell>
+						<Table.HeaderCell>Edit / Try</Table.HeaderCell>
 						<Table.HeaderCell>Name</Table.HeaderCell>
 						{/*showCollectionCount ? <Table.HeaderCell>Collection count</Table.HeaderCell> : null*/}
 						{showCollections ? <Table.HeaderCell>Collection(s)</Table.HeaderCell> : null}
@@ -162,22 +164,51 @@ export function Interfaces({
 						//console.debug({_name, index});
 						return <Table.Row key={index}>
 							<Table.Cell collapsing>
-								<NewOrEditInterfaceModal
-									_id={_id}
-									_name={_name}
-									afterClose={() => memoizedUpdateInterfacesCallback()}
-									collectionOptions={collectionOptions}
-									fieldNameToValueTypesState={fieldNameToValueTypesState}
-									interfaceNamesObj={interfaceNamesObj/* Currently not allowed to edit _name anyway */}
-									licenseValid={licenseValid}
-									loading={isLoading}
-									servicesBaseUrl={servicesBaseUrl}
-									setLicensedTo={setLicensedTo}
-									setLicenseValid={setLicenseValid}
-									stopWordOptions={stopWordOptions}
-									thesauriOptions={thesauriOptions}
-									total={interfacesTotal}
-								/>
+								<Button.Group>
+									<NewOrEditInterfaceModal
+										_id={_id}
+										_name={_name}
+										afterClose={() => memoizedUpdateInterfacesCallback()}
+										collectionOptions={collectionOptions}
+										fieldNameToValueTypesState={fieldNameToValueTypesState}
+										interfaceNamesObj={interfaceNamesObj/* Currently not allowed to edit _name anyway */}
+										licenseValid={licenseValid}
+										loading={isLoading}
+										servicesBaseUrl={servicesBaseUrl}
+										setLicensedTo={setLicensedTo}
+										setLicenseValid={setLicenseValid}
+										stopWordOptions={stopWordOptions}
+										thesauriOptions={thesauriOptions}
+										total={interfacesTotal}
+									/>
+									<SearchModal
+										basename={basename}
+										interfaceName={_name}
+										loading={isLoading}
+										fields={fields}
+										searchString={searchString} setSearchString={setSearchString}
+										servicesBaseUrl={servicesBaseUrl}
+										setInterfaceNameState={setInterfaceNameState}
+									/>
+									<Popup
+										content={`Try interface ${_name} in GraphiQL`}
+										inverted
+										trigger={<Button
+											as={Link}
+											icon
+											onClick={() => {
+												setInterfaceNameState(_name);
+											}}
+											to='/api'
+										>
+											<i aria-hidden className='icon'>
+												<svg version='2.0'>
+													<use href='#graphql100'/>
+												</svg>
+											</i>
+										</Button>}
+									/>
+								</Button.Group>
 							</Table.Cell>
 							<Table.Cell collapsing disabled={isLoading}>{_name}</Table.Cell>
 							{/*showCollectionCount ? <Table.Cell collapsing disabled={isLoading}>{_name === 'default' ? '∞' : collectionNames.length}</Table.Cell> : null*/}
@@ -207,15 +238,6 @@ export function Interfaces({
 							}}>{stopWords.map((c, i) => <li key={i} style={{marginBottom: 3}}>{c}</li>)}</ul></Table.Cell> : null}
 							<Table.Cell collapsing>
 								<Button.Group>
-									<SearchModal
-										basename={basename}
-										interfaceName={_name}
-										loading={isLoading}
-										fields={fields}
-										searchString={searchString} setSearchString={setSearchString}
-										servicesBaseUrl={servicesBaseUrl}
-										setInterfaceNameState={setInterfaceNameState}
-									/>
 									<CopyModal
 										afterClose={memoizedUpdateInterfacesCallback}
 										loading={isLoading}
