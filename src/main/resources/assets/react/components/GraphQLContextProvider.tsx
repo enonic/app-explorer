@@ -1,4 +1,4 @@
-import { GraphQLClient, ClientContext } from 'graphql-hooks'
+import { GraphQLClient, ClientContext } from 'graphql-hooks';
 
 
 function GraphQLContextProvider({

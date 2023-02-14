@@ -35,7 +35,7 @@ import {
 	MONTH_TO_HUMAN
 } from './SchedulingSegment';
 import {CollectionCopyModal} from './CollectionCopyModal';
-import {DeleteCollectionModal} from './DeleteCollectionModal';
+import {DeleteCollectionModal} from './delete/DeleteCollectionModal';
 import {NewOrEditCollectionModal} from './NewOrEditCollectionModal';
 import {useCollectionsState} from './useCollectionsState';
 
@@ -408,13 +408,14 @@ export function Collections(props :{
 												setCopyModalCollectionId(collectionId);
 											}}><Icon color='blue' name='copy'/></Button>}/>
 										{showDelete ?<DeleteCollectionModal
-											_name={_name}
+											collectionId={collectionId}
+											collectionName={_name}
+											servicesBaseUrl={servicesBaseUrl}
 											disabled={busy}
 											afterClose={() => {
 												//console.debug('DeleteCollectionModal afterClose');
 												memoizedFetchCollections();
 											}}
-											servicesBaseUrl={servicesBaseUrl}
 										/> : null}
 									</Button.Group>
 								</Table.Cell>
