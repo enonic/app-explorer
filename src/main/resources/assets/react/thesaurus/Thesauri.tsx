@@ -15,6 +15,7 @@ import {
 	Segment,
 	Table
 } from 'semantic-ui-react';
+import RefreshButton from '../components/buttons/RefreshButton';
 import Flex from '../components/Flex';
 import {ExportThesaurusModal} from './exportThesaurus/ExportThesaurusModal';
 import {EditSynonymsModal} from './editSynonyms/EditSynonymsModal';
@@ -36,7 +37,6 @@ export function Thesauri({
 	setLicenseValid :SetLicenseValidFunction
 }) {
 	const {
-		durationSinceLastUpdate,
 		editSynonymsModalState,
 		exportDialogState,
 		importDialogState,
@@ -89,11 +89,10 @@ export function Thesauri({
 					</Segment>
 				</Flex.Item>
 				<Flex.Item>
-					<Button
-						basic
-						color='blue'
+					<RefreshButton
 						loading={isLoading}
-						onClick={memoizedFetchOnUpdate}><Icon className='refresh'/>Last updated: {durationSinceLastUpdate}</Button>
+						onClick={memoizedFetchOnUpdate}
+					/>
 				</Flex.Item>
 			</Flex>
 			<Header

@@ -1,9 +1,8 @@
 import {
-	Button,
 	Form,
 	Header,
-	Icon,
 } from 'semantic-ui-react';
+import RefreshButton from '../components/buttons/RefreshButton';
 import Flex from '../components/Flex';
 import {ResetButton} from '../components/ResetButton';
 import {SubmitButton} from '../components/SubmitButton';
@@ -17,7 +16,6 @@ export function Notifications({
 	servicesBaseUrl :string
 }) {
 	const {
-		durationSinceLastUpdate,
 		emails,
 		isLoading,
 		isStateChanged,
@@ -49,11 +47,10 @@ export function Notifications({
 					<Header as='h1'>Notifications</Header>
 				</Flex.Item>
 				<Flex.Item>
-					<Button
-						basic
-						color='blue'
+					<RefreshButton
 						loading={isLoading}
-						onClick={memoizedFetchNotifications}><Icon className='refresh'/>Last updated: {durationSinceLastUpdate}</Button>
+						onClick={memoizedFetchNotifications}
+					/>
 				</Flex.Item>
 			</Flex>
 			<Form>

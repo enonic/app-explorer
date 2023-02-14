@@ -1,9 +1,7 @@
 import type {QueryApiKeysGraph} from './index.d';
 
 
-import moment from 'moment';
 import * as React from 'react';
-import {useInterval} from '../utils/useInterval';
 
 
 const GQL = `{
@@ -26,8 +24,6 @@ export function useApiKeysState({
 	const [queryApiKeysGraph, setQueryApiKeysGraph] = React.useState<QueryApiKeysGraph>({
 		hits: []
 	});
-	const [updatedAt, setUpdatedAt] = React.useState(moment());
-	const [durationSinceLastUpdate, setDurationSinceLastUpdate] = React.useState('');
 	const [isLoading, setIsLoading] = React.useState(false);
 
 	const memoizedFetchApiKeys = React.useCallback(() => {
@@ -42,7 +38,6 @@ export function useApiKeysState({
 				//console.log(res);
 				if (res && res.data) {
 					setQueryApiKeysGraph(res.data.queryApiKeys);
-					setUpdatedAt(moment());
 				}
 				setIsLoading(false);
 			});
@@ -54,28 +49,8 @@ export function useApiKeysState({
 		memoizedFetchApiKeys
 	]); // Only once
 
-	React.useEffect(() => {
-		setDurationSinceLastUpdate(
-			moment
-				.duration(updatedAt.diff(moment()))
-				.humanize()
-		);
-	}, [
-		updatedAt
-	]);
-
-	useInterval(() => {
-		setDurationSinceLastUpdate(
-			moment
-				.duration(updatedAt.diff(moment()))
-				.humanize()
-		);
-	}, 5000);
-
-
 	return {
 		apiKeys: queryApiKeysGraph.hits,
-		durationSinceLastUpdate,
 		isLoading,
 		memoizedFetchApiKeys
 	};

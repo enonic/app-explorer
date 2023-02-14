@@ -1,7 +1,5 @@
 import fastDeepEqual from 'fast-deep-equal/react';
-import moment from 'moment';
 import * as React from 'react';
-import {useInterval} from '../utils/useInterval';
 
 
 export function useNotificationsState({
@@ -13,8 +11,6 @@ export function useNotificationsState({
 	const [initialState, setInitialState] = React.useState<Array<string>>(['']);
 	const [isStateChanged, setIsStateChanged] = React.useState(false);
 	const [isLoading, setIsLoading] = React.useState(false);
-	const [updatedAt, setUpdatedAt] = React.useState(moment());
-	const [durationSinceLastUpdate, setDurationSinceLastUpdate] = React.useState('');
 	//console.debug('initialValues', initialValues);
 
 	const memoizedFetchNotifications = React.useCallback(() => {
@@ -26,7 +22,6 @@ export function useNotificationsState({
 				const newEmails = data.emails || [''];
 				setEmails(newEmails);
 				setInitialState(newEmails);
-				setUpdatedAt(moment());
 				setIsLoading(false);
 			});
 	}, [
@@ -50,33 +45,12 @@ export function useNotificationsState({
 		isStateChanged
 	]);
 
-	React.useEffect(() => {
-		setDurationSinceLastUpdate(
-			moment
-				.duration(updatedAt.diff(moment()))
-				.humanize()
-		);
-	}, [
-		updatedAt
-	]);
-
-	useInterval(() => {
-		if (updatedAt) {
-			setDurationSinceLastUpdate(
-				moment
-					.duration(updatedAt.diff(moment()))
-					.humanize()
-			);
-		}
-	}, 5000);
-
 	function resetState() {
 		setEmails(initialState);
 	}
 
 	//console.debug('initialValues', initialValues);
 	return {
-		durationSinceLastUpdate,
 		emails,
 		isLoading,
 		isStateChanged,

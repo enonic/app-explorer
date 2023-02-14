@@ -7,9 +7,7 @@ import type {
 
 
 import * as gql from 'gql-query-builder';
-import moment from 'moment';
 import * as React from 'react';
-import {useInterval} from '../utils/useInterval';
 
 
 const GQL_LOCALES_GET = {
@@ -83,8 +81,6 @@ export function useThesauriState({
 		_id: undefined,
 		open: false
 	});
-	const [updatedAt, setUpdatedAt] = React.useState(moment());
-	const [durationSinceLastUpdate, setDurationSinceLastUpdate] = React.useState('');
 
 	const [importDialogState, setImportDialogState] = React.useState<{
 		allowedLocales :Locales
@@ -127,7 +123,6 @@ export function useThesauriState({
 						.map(({synonymsCount}) => synonymsCount)
 						.reduce((accumulator, currentValue) => accumulator + currentValue) : 0;
 					setSynonymsSum(sum);
-					setUpdatedAt(moment());
 					setLoading(false);
 				} // if
 			}); // then
@@ -156,7 +151,6 @@ export function useThesauriState({
 						.map(({synonymsCount}) => synonymsCount)
 						.reduce((accumulator, currentValue) => accumulator + currentValue) : 0;
 					setSynonymsSum(sum);
-					setUpdatedAt(moment());
 					setLoading(false);
 				} // if
 			}); // then
@@ -168,26 +162,7 @@ export function useThesauriState({
 		memoizedFetchOnMount
 	]);
 
-	React.useEffect(() => {
-		setDurationSinceLastUpdate(
-			moment
-				.duration(updatedAt.diff(moment()))
-				.humanize()
-		);
-	}, [
-		updatedAt
-	]);
-
-	useInterval(() => {
-		setDurationSinceLastUpdate(
-			moment
-				.duration(updatedAt.diff(moment()))
-				.humanize()
-		);
-	}, 5000);
-
 	return {
-		durationSinceLastUpdate,
 		editSynonymsModalState,
 		exportDialogState,
 		importDialogState,
