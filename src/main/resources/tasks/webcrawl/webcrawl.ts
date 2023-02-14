@@ -469,7 +469,7 @@ export function run({
 
 				const links = [];
 				if (boolFollow) {
-					const linkEls = querySelectorAll(bodyElWithNothingRemoved, "a[href]:not([href^='#']):not([href^='mailto:']):not([href^='tel:'])");
+					const linkEls = querySelectorAll(bodyElWithNothingRemoved, "a[href]:not([href^='#']):not([href^='mailto:']):not([href^='tel:']):not([href^='content:'])");
 					DEBUG && log.debug('linkEls.length:%s', linkEls.length);
 					linksForLoop:
 					for (let i = 0; i < linkEls.length; i += 1) {
