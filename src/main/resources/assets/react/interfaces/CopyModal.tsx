@@ -1,5 +1,12 @@
 import * as React from 'react';
-import {Button, Icon, Input, Message, Modal} from 'semantic-ui-react';
+import {
+	Button,
+	Icon,
+	Input,
+	Message,
+	Modal,
+	Popup,
+} from 'semantic-ui-react';
 
 
 export function CopyModal({
@@ -39,14 +46,22 @@ export function CopyModal({
 		closeOnDimmerClick={false}
 		onClose={doClose}
 		open={open}
-		trigger={<Button
-			onClick={doOpen}
-			compact
-			disabled={loading}
-			loading={loading}
-			size='tiny'
-			type='button'
-		><Icon color='green' name='copy'/>Copy</Button>}
+		trigger={
+			<Popup
+				content={`Copy interface ${name}`}
+				inverted
+				trigger={
+					<Button
+						onClick={doOpen}
+						disabled={loading}
+						icon
+						loading={loading}
+						size='tiny'
+						type='button'
+					><Icon color='green' name='copy'/></Button>
+				}
+			/>
+		}
 	>
 		<Modal.Header>Copy</Modal.Header>
 		<Modal.Content>
