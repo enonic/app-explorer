@@ -1,5 +1,12 @@
 import * as React from 'react';
-import {Button, Icon, Input, Message, Modal} from 'semantic-ui-react';
+import {
+	Button,
+	Icon,
+	Input,
+	Message,
+	Modal,
+	Popup,
+} from 'semantic-ui-react';
 import {fetchInterfaceDelete} from '../../../services/graphQL/fetchers/fetchInterfaceDelete';
 
 
@@ -44,14 +51,22 @@ export function DeleteModal({
 		closeOnDimmerClick={false}
 		onClose={doClose}
 		open={open}
-		trigger={<Button
-			compact
-			disabled={loading || disabled}
-			loading={loading}
-			onClick={doOpen}
-			size='tiny'
-			type='button'
-		><Icon color='red' name='trash alternate outline'/>Delete</Button>}
+		trigger={
+			<Popup
+				content={`Delete interface ${_name}`}
+				inverted
+				trigger={
+					<Button
+						disabled={loading || disabled}
+						icon
+						loading={loading}
+						onClick={doOpen}
+						size='tiny'
+						type='button'
+					><Icon color='red' name='trash alternate outline'/></Button>
+				}
+			/>
+		}
 	>
 		<Modal.Header>Delete interface {_name}</Modal.Header>
 		<Modal.Content>
