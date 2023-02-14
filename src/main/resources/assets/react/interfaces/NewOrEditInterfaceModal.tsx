@@ -91,7 +91,7 @@ export function NewOrEditInterfaceModal(props :NewOrEditInterfaceModalProps) {
 					circular
 					color='green'
 					disabled={loading || disabled}
-					icon
+					icon='plus'
 					loading={loading}
 					onClick={doOpen}
 					size='massive'
@@ -100,9 +100,7 @@ export function NewOrEditInterfaceModal(props :NewOrEditInterfaceModalProps) {
 						margin: 0,
 						position: 'fixed',
 						right: 13.5
-					}}><Icon
-						name='plus'
-					/></Button>}/>}
+					}}/>}/>}
 	>{licenseValid
 		|| (!_id && total <= 1) // Allowed to create interface number 2, but not number 3
 		|| (_id && total <= 2) // Allowed to edit interface number 2, but not number 3

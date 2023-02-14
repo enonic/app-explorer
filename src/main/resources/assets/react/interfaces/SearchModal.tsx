@@ -3,7 +3,11 @@ import type {InterfaceField} from '/lib/explorer/types/Interface.d';
 
 
 import * as React from 'react';
-import {Button, Icon, Modal} from 'semantic-ui-react';
+import {
+	Button,
+	Modal,
+	Popup,
+} from 'semantic-ui-react';
 
 import {Search} from './search/Search';
 
@@ -57,13 +61,21 @@ export function SearchModal({
 		onClose={doClose}
 		open={open}
 		size='fullscreen'
-		trigger={<Button
-			compact
-			disabled={loading}
-			loading={loading}
-			onClick={doOpen}
-			size='tiny'
-		><Icon name='search'/>Search</Button>}
+		trigger={
+			<Popup
+				content={`Try searching interface ${interfaceName}`}
+				inverted
+				trigger={
+					<Button
+						disabled={loading}
+						icon='search'
+						loading={loading}
+						onClick={doOpen}
+						size='tiny'
+					/>
+				}
+			/>
+		}
 	>
 		<Modal.Header>Search interface: {interfaceName}</Modal.Header>
 		<Modal.Content>

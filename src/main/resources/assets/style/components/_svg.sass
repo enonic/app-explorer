@@ -5,6 +5,16 @@ $bgcolor-button-active: #babbbc
 // ERROR: Destroys buttons inside GraphiQL
 // svg path
 // 	fill: inherit
+$size-icon-default: 12px
+$size-icon-svg: 16px
+$margin-icon-svg: ($size-icon-default - $size-icon-svg)/2
+
+i.icon
+	svg
+		margin-left: $margin-icon-svg
+		margin-top: $margin-icon-svg
+		height: $size-icon-svg
+		width: $size-icon-svg
 
 a.graphql
 	background: transparent none
