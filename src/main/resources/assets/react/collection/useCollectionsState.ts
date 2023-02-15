@@ -155,8 +155,8 @@ export function useCollectionsState({
 	collectorComponents,
 	servicesBaseUrl
 }: {
-	collectorComponents :CollectorComponents
-	servicesBaseUrl :string
+	collectorComponents: CollectorComponents
+	servicesBaseUrl: string
 }) {
 	const [isLoading, setIsLoading] = React.useState(false);
 
@@ -168,9 +168,9 @@ export function useCollectionsState({
 		total: 0
 	});
 	const [queryCollectorsGraph, setQueryCollectorsGraph] = React.useState<{
-		count :number
-		hits :Array<Collector>
-		total :number
+		count: number
+		hits: Array<Collector>
+		total: number
 	}>({
 		count: 0,
 		hits: [],
@@ -206,10 +206,10 @@ export function useCollectionsState({
 			key,
 			label: displayName
 		};*/
-	}) : [];
+	}): [];
 
 	const collectorsObj = {};
-	const collectorOptions :DropdownItemsWithKeys<string> = queryCollectorsGraph.hits
+	const collectorOptions: DropdownItemsWithKeys<string> = queryCollectorsGraph.hits
 		? queryCollectorsGraph.hits.map(({
 			appName,
 			taskName,
@@ -282,10 +282,16 @@ export function useCollectionsState({
 		siteOptions: [],
 		sort: '_name ASC'
 	} as {
-		column :string
-		contentTypeOptions :ContentTypeOptions
+		column: string
+		contentTypeOptions: ContentTypeOptions
 		direction: StrictTableHeaderCellProps['sorted']
-		siteOptions :SiteOptions
+		siteOptions: SiteOptions
+	});
+
+	const [deleteCollectionModalState, setDeleteCollectionModalState] = React.useState({
+		collectionId: '',
+		collectionName: '',
+		open: false,
 	});
 
 	const {
@@ -295,12 +301,12 @@ export function useCollectionsState({
 		siteOptions
 	} = state;
 
-	function setJobsObjFromArr(arr :Array<{
-		collectionId :string
-		enabled :boolean
-		schedule :{
-			type :string
-			value :string
+	function setJobsObjFromArr(arr: Array<{
+		collectionId: string
+		enabled: boolean
+		schedule: {
+			type: string
+			value: string
 		}
 	}>) {
 		const obj={};
@@ -446,6 +452,7 @@ export function useCollectionsState({
 		column,
 		contentTypeOptions,
 		copyModalCollectionId, setCopyModalCollectionId,
+		deleteCollectionModalState, setDeleteCollectionModalState,
 		direction,
 		fieldsObj,
 		intInitializedCollectorComponents,

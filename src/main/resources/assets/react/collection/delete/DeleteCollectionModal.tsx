@@ -5,7 +5,6 @@ import {
 	Icon,
 	Message,
 	Modal,
-	Popup,
 } from 'semantic-ui-react';
 import useDeleteCollectionState from './useDeleteCollectionState';
 
@@ -13,74 +12,69 @@ import useDeleteCollectionState from './useDeleteCollectionState';
 export function DeleteCollectionModal({
 	collectionId,
 	collectionName,
+	onClose,
 	servicesBaseUrl,
-	afterClose = () => {/**/},
-	beforeOpen = () => {/**/},
-	disabled = false,
 }: {
 	collectionId: string
 	collectionName: string
+	onClose: () => void
 	servicesBaseUrl: string
-	afterClose?: () => void
-	beforeOpen?: () => void
-	disabled?: boolean
 }) {
 	const {
-		open, setOpen,
+		loading,
 		usedInInterfaces,
 	} = useDeleteCollectionState({
 		collectionId,
 	});
 
-	const doClose = () => {
-		setOpen(false);
-		afterClose();
-	};
-
-	// Made doOpen since onOpen doesn't get called consistently.
-	const doOpen = () => {
-		beforeOpen();
-		setOpen(true);
-	};
-
 	return <Modal
 		closeIcon
 		closeOnDimmerClick={false}
-		onClose={doClose}
-		open={open}
+		onClose={onClose}
+		open
 		size='small'
-		trigger={<Popup
-			content={`Delete collection ${collectionName}`}
-			inverted
-			trigger={<Button
-				disabled={disabled}
-				icon
-				onClick={doOpen}><Icon color='red' name='trash alternate outline'/></Button>}/>}
 	>
 		<Modal.Header>Delete collection {collectionName}</Modal.Header>
 		<Modal.Content>
 			{
-				usedInInterfaces.length
+				loading
 					? <Message
-						icon='warning sign'
-						header={`The collection is used by the following interface${usedInInterfaces.length > 1 ? 's' : ''}:`}
-						list={usedInInterfaces}
-						negative
-					/>
-					: null
+						icon
+						warning
+					>
+						<Icon name='circle notched' loading/>
+						Checking interfaces...
+					</Message>
+					: usedInInterfaces.length
+						? <Message
+							icon='warning sign'
+							header={`The collection is used by the following interface${usedInInterfaces.length > 1 ? 's' : ''}:`}
+							list={usedInInterfaces}
+							negative
+						/>
+						: <Message
+							icon='check'
+							header='The collection is not used in any interfaces'
+							success
+						/>
 			}
-			<Header as='h2'>Do you really want to delete {collectionName}?</Header>
+			{
+				loading
+					? null
+					: <Header as='h2'>Do you{usedInInterfaces.length ? ' really' : ''} want to delete {collectionName}?</Header>
+			}
 		</Modal.Content>
 		<Modal.Actions>
-			<Button onClick={doClose}>Cancel</Button>
+			<Button onClick={onClose}>Cancel</Button>
 			<Button
 				icon
+				disabled={loading}
 				onClick={() => {
 					fetch(`${servicesBaseUrl}/collectionDelete?name=${collectionName}`, {
 						method: 'DELETE'
 					}).then((/*response*/) => {
 						//if (response.status === 200) {}
-						doClose();
+						onClose();
 					});
 				}}
 				primary

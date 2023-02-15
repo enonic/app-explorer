@@ -42,11 +42,10 @@ export default function useDeleteCollectionState({
 	//──────────────────────────────────────────────────────────────────────────
 	// State
 	//──────────────────────────────────────────────────────────────────────────
-	const [open, setOpen] = React.useState(false);
 	const [usedInInterfaces, setUsedInInterfaces] = React.useState<string[]>([]);
 
 	const [fetchInterfacesWithCollection,{
-		// loading,
+		loading,
 		// error,
 		data
 	}] = useManualQuery<QueryInterfacesResponseData>(GQL_QUERY_INTERFACES_WITH_COLLECTION.query, {
@@ -73,7 +72,7 @@ export default function useDeleteCollectionState({
 	// Returns
 	//──────────────────────────────────────────────────────────────────────────
 	return {
-		open, setOpen,
+		loading,
 		usedInInterfaces,
 	};
 }
