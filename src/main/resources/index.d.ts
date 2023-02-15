@@ -3,10 +3,6 @@ import type {
 	CollectorComponentRef,
 	CollectorProps
 } from '/lib/explorer/types/index.d';
-import {
-	App,
-	Log
-} from './types/index.d';
 
 export {
 	App,
@@ -33,10 +29,4 @@ export interface Profile {
 	documents: {
 		columns: string[]
 	}
-}
-
-// Global-modifying module, should be placed in moduleRoot/index.d.ts
-declare global {
-	const app :App;
-	const log :Log;
 }
