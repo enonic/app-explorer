@@ -2,7 +2,7 @@ import type {
 	Interface,
 	InterfaceField,
 	TermQuery
-} from '/lib/explorer/types/Interface.d';
+} from '@enonic-types/lib-explorer/Interface.d';
 import type IQueryBuilderOptions from 'gql-query-builder/build/IQueryBuilderOptions.d';
 import type {DropdownItemProps} from 'semantic-ui-react/index.d';
 import type {
@@ -18,8 +18,11 @@ import {
 	VALUE_TYPE_STRING,
 	isSet
 } from '@enonic/js-utils';
+import {useWhenInitAsync} from '@seamusleahy/init-hooks';
+import {useWhenValuesChange} from '@seamusleahy/values-changes-hooks';
 import fastDeepEqual from 'fast-deep-equal/react';
 import * as gql from 'gql-query-builder';
+import {useManualQuery} from 'graphql-hooks';
 import * as React from 'react';
 import {FIELD_SHORTCUT_COLLECTION} from '../../../services/graphQL/constants';
 // import {DEFAULT_INTERFACE_FIELDS} from '../constants';
@@ -27,7 +30,27 @@ import {mustStartWithALowercaseLetter} from '../utils/mustStartWithALowercaseLet
 import {notDoubleUnderscore} from '../utils/notDoubleUnderscore';
 import {onlyLowercaseAsciiLettersDigitsAndUnderscores} from '../utils/onlyLowercaseAsciiLettersDigitsAndUnderscores';
 import {required} from '../utils/required';
+// import {useUpdateEffect} from '../utils/useUpdateEffect';
 
+
+export interface QueryCollectionsResponseData {
+	queryCollections: {
+		hits: {
+			_id: string
+			// _name: string
+		}[]
+	}
+}
+
+const GQL_QUERY_COLLECTIONS = gql.query({
+	operation: 'queryCollections',
+	fields: [{
+		hits: [
+			'_id',
+			// '_name', // TODO Perhaps use this to build collectionOptions, or use some kind of auto updating cache via graphql-hooks
+		]
+	}]
+});
 
 export const QUERY_VALUE_TYPE_OPTIONS = [
 	VALUE_TYPE_BOOLEAN,
@@ -148,10 +171,22 @@ export function useNewOrEditInterfaceState({
 	_id ?:string
 	interfaceNamesObj ?:InterfaceNamesObj
 }) {
+	//──────────────────────────────────────────────────────────────────────────
+	// State
+	//──────────────────────────────────────────────────────────────────────────
+	const [fetchCollections, {
+		loading: isFetchingCollections,
+		// error,
+		data: fetchCollectionsData
+	}] = useManualQuery<QueryCollectionsResponseData>(GQL_QUERY_COLLECTIONS.query);
+
 	const [name, setName] = React.useState('');
 	const [nameError, setNameError] = React.useState<string>();
 	const [nameVisited, setNameVisited] = React.useState(false);
-	const [collectionIds, setCollectionIds] = React.useState<string[]>([]);
+
+	const [collectionIdsFromStorage, setCollectionIdsFromStorage] = React.useState<string[]>([]);
+	const [nonExistantCollectionIds, setNonExistantCollectionIds] = React.useState<string[]>([]);
+
 	const [fieldButtonVisible, setFieldButtonVisible] = React.useState(_id ? false : true);
 	const [fieldOptions, setFieldOptions] = React.useState<DropdownItemProps[]>([]);
 	const [fields, setFields] = React.useState<InterfaceField[]>([]);
@@ -159,7 +194,10 @@ export function useNewOrEditInterfaceState({
 	// const [boost, setBoost] = React.useState<BoostDSL[]>([]);
 	const [termQueries, setTermQueries] = React.useState<TermQuery[]>([]);
 
-	const [isLoading, setIsLoading] = React.useState(true);
+	const [isFetchingFieldOptions, setIsFetchingFieldOptions] = React.useState(false);
+	const [isFetchingFieldValues, setIsFetchingFieldValues] = React.useState(false);
+	const [isFetchingInterface, setIsFetchingInterface] = React.useState(false);
+
 	const [stopWords, setStopWords] = React.useState<string[]>([]);
 	const [synonymIds, setSynonymIds] = React.useState<string[]>([]);
 	const [termButtonVisible, setTermButtonVisible] = React.useState(_id ? false : true);
@@ -193,7 +231,7 @@ export function useNewOrEditInterfaceState({
 	]);
 
 	const getFieldValues = React.useCallback((field: string) => {
-		setIsLoading(true);
+		setIsFetchingFieldValues(true);
 		fetch(`${servicesBaseUrl}/graphQL`, {
 			method: 'POST',
 			headers: {
@@ -259,7 +297,7 @@ export function useNewOrEditInterfaceState({
 									text: `${key} (${docCount})`,
 									value: key
 								});
-							} else {
+							} else {
 								// Update docCount on existing values
 								deref[field][foundIndex].text = `${key} (${docCount})`;
 							}
@@ -276,14 +314,21 @@ export function useNewOrEditInterfaceState({
 					}
 					return deref;
 				});
-				setIsLoading(false);
+				setIsFetchingFieldValues(false);
 			});
 	}, [
 		servicesBaseUrl
 	]);
 
 	//──────────────────────────────────────────────────────────────────────────
-	// Effects
+	// Init (not updates)
+	//──────────────────────────────────────────────────────────────────────────
+	useWhenInitAsync(() => {
+		fetchCollections();
+	});
+
+	//──────────────────────────────────────────────────────────────────────────
+	// Effects (init and updates)
 	//──────────────────────────────────────────────────────────────────────────
 	React.useEffect(() => {
 		const newNameError = nameVisited
@@ -333,7 +378,7 @@ export function useNewOrEditInterfaceState({
 				_id
 			}));
 		}
-		setIsLoading(true);
+		setIsFetchingInterface(true);
 		fetch(`${servicesBaseUrl}/graphQL`, {
 			method: 'POST',
 			headers: {
@@ -371,7 +416,7 @@ export function useNewOrEditInterfaceState({
 
 					} = data.getInterface;
 					setName(initialName);
-					setCollectionIds(initialCollectionIds);
+					setCollectionIdsFromStorage(initialCollectionIds);
 					setTermQueries(initialTermQueries);
 					for (let i = 0; i < initialTermQueries.length; i++) {
 						const {
@@ -416,7 +461,7 @@ export function useNewOrEditInterfaceState({
 					setSynonymIds(initialSynonymIds);
 					setInitialState({
 						name: initialName,
-						collectionIds: initialCollectionIds,
+						collectionIds: initialCollectionIds, // This is not filtered for non-existant ids, but we don't care, they are removed on submit
 						fields: initialFields,
 						stopWords: initialStopWords,
 						synonymIds: initialSynonymIds,
@@ -439,7 +484,7 @@ export function useNewOrEditInterfaceState({
 				}
 				//console.debug('initialFieldOptions', newFieldOptions);
 				setFieldOptions(newFieldOptions);*/
-				setIsLoading(false);
+				setIsFetchingInterface(false);
 			});
 	}, [ // eslint-disable-line react-hooks/exhaustive-deps
 		_id,
@@ -451,7 +496,7 @@ export function useNewOrEditInterfaceState({
 	React.useEffect(() => {
 		const newIsStateChanged = !fastDeepEqual({
 			name,
-			collectionIds,
+			collectionIds: collectionIdsFromStorage,
 			fields,
 			stopWords,
 			synonymIds
@@ -461,7 +506,7 @@ export function useNewOrEditInterfaceState({
 		}
 	},[
 		name,
-		collectionIds,
+		collectionIdsFromStorage,
 		fields,
 		initialState,
 		isStateChanged,
@@ -471,7 +516,7 @@ export function useNewOrEditInterfaceState({
 
 	// On collectionIds change
 	React.useEffect(() => {
-		setIsLoading(true);
+		setIsFetchingFieldOptions(true);
 		//console.debug('collectionIds', collectionIds);
 		fetch(`${servicesBaseUrl}/graphQL`, {
 			method: 'POST',
@@ -479,7 +524,7 @@ export function useNewOrEditInterfaceState({
 				'Content-Type':	'application/json'
 			},
 			body: JSON.stringify(gql.query(buildQueryDocumentsObject({
-				collectionIds
+				collectionIds: collectionIdsFromStorage
 			})))
 		})
 			.then(response => response.json())
@@ -517,13 +562,27 @@ export function useNewOrEditInterfaceState({
 				}
 				//console.debug('filteredFieldOptions', newFieldOptions);
 				setFieldOptions(newFieldOptions);
-				setIsLoading(false);
+				setIsFetchingFieldOptions(false);
 			});
 	}, [
-		collectionIds,
+		collectionIdsFromStorage,
 		servicesBaseUrl
 	]);
 
+	//──────────────────────────────────────────────────────────────────────────
+	// Updates (not init)
+	//──────────────────────────────────────────────────────────────────────────
+	useWhenValuesChange(() => {
+		if (fetchCollectionsData) {
+			const existingCollectionIds = fetchCollectionsData.queryCollections.hits.map(({_id}) => _id);
+			setNonExistantCollectionIds(collectionIdsFromStorage.filter(collectionId => !existingCollectionIds.includes(collectionId)));
+		}
+	}, [
+		collectionIdsFromStorage,
+		fetchCollectionsData,
+	], false);
+
+	//──────────────────────────────────────────────────────────────────────────
 	function resetState() {
 		const {
 			name: initialName,
@@ -534,7 +593,7 @@ export function useNewOrEditInterfaceState({
 			termQueries: initialTermQueries,
 		} = initialState;
 		setName(initialName);
-		setCollectionIds(initialCollectionIds);
+		setCollectionIdsFromStorage(initialCollectionIds);
 		setTermQueries(initialTermQueries);
 		setFields(initialFields);
 		setStopWords(initialStopWords);
@@ -544,10 +603,10 @@ export function useNewOrEditInterfaceState({
 	return {
 		anyError,
 		// boost, setBoost,
-		collectionIds,
+		collectionIdsFromStorage, setCollectionIdsFromStorage,
 		currentState: {
 			name,
-			collectionIds,
+			collectionIds: collectionIdsFromStorage,
 			fields,
 			stopWords,
 			synonymIds
@@ -559,12 +618,15 @@ export function useNewOrEditInterfaceState({
 		getFieldValues,
 		initialState,
 		isDefaultInterface: name === 'default',
-		isLoading,
+		isLoading: isFetchingFieldOptions
+			|| isFetchingFieldValues
+			|| isFetchingInterface
+			|| isFetchingCollections,
 		isStateChanged,
 		name,
 		nameError,
+		nonExistantCollectionIds,
 		resetState,
-		setCollectionIds,
 		setName,
 		setNameVisited,
 		setStopWords,
