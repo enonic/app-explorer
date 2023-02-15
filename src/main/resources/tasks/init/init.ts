@@ -1,4 +1,4 @@
-log.info('Init task read into memory');
+log.debug('Init task read into memory');
 // @ts-ignore
 const {currentTimeMillis} = Java.type('java.lang.System') as {
 	currentTimeMillis :() => number
@@ -122,7 +122,7 @@ export const EVENT_INIT_COMPLETE = `${APP_EXPLORER}.init.complete`;
 // However we have ensured it only runs once by surrounding it's submitTask with isMaster.
 
 export function run() {
-	log.info('Init task run() called!');
+	log.debug('Init task run() called!');
 	runAsSu(() => {
 		const startTimeRunMs = currentTimeMillis();
 		const progress = new Progress({
@@ -234,7 +234,7 @@ export function run() {
 			const endTimeMs = currentTimeMillis();
 			const durationSinceLoadMs = endTimeMs - startTimeLoadMs
 			const durationSinceRunMs = endTimeMs - startTimeRunMs;
-			log.info('Init since load:%s run:%s', durationSinceLoadMs, durationSinceRunMs);
+			log.debug('Init since load:%s run:%s', durationSinceLoadMs, durationSinceRunMs);
 			// log.info('Init since load:%s run:%s', prettyMs(durationSinceLoadMs), prettyMs(durationSinceRunMs));
 
 			// 		const query = `{
