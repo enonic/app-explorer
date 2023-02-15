@@ -168,6 +168,7 @@ module.exports = {
 			ignoreTemplateLiterals: true
 		}],
 		'no-cond-assign': ['error', 'except-parens'],
+		'no-console': 'off',
 		'no-multi-spaces': ['off'],
 		'no-tabs': ['off'],
 		'no-underscore-dangle': ['error', {
