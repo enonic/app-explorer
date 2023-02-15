@@ -2,7 +2,12 @@
 	"compilerOptions": {
 		"allowJs": true,
 		"allowSyntheticDefaultImports": true,
-		"baseUrl": "./",
+
+		// Lets you set a base directory to resolve non-absolute module names.
+		// If you get tired of imports always looking like "../" or "./", or needing
+		// to change them as you move files, this is a great way to fix that.
+		// "baseUrl": "./",
+
 		"declaration": false,
 		"declarationMap": false,
 		"downlevelIteration": true,
@@ -12,7 +17,6 @@
 		"importsNotUsedAsValues": "remove",
 		"inlineSourceMap": false,
 		"inlineSources": false,
-		"jsx": "react-jsx",
 		"lib": [
 			//"es5",
 			//"es6", // alias for es2015
@@ -27,7 +31,6 @@
 			//"es2020",
 			//"es2021",
 			//"esnext",
-			"dom"//, // Window (also contains print which collides with Nashorn print)
 			//"ScriptHost",
 			//"WebWorker"
 		],
@@ -46,42 +49,49 @@
 		"paths": {
 			// Development (should be commented out when commiting)
 			// "@enonic/js-utils/*": ["../enonic-js-utils/src/*"],
-			// "@enonic/semantic-ui-react-form": ["../semantic-ui-react-form/src"],
-			// "/lib/xp/node": ["../xp/modules/lib/lib-node/src/main/resources/lib/xp/node.ts"],
-			
 			// Production (should be commented in when commiting)
-			"@enonic/app-explorer/*": ["./src/main/resources/*"],
-			"@enonic/js-utils": ["node_modules/@enonic/js-utils/src"],
-			
-			// There is no @enonic-types/lib-explorer yet, so these are workarounds
-			// "@enonic/explorer-utils": ["../explorer-utils"],
-			"@enonic-types/lib-explorer": ["../lib-explorer/src/main/resources/lib/explorer/types/index.d"],
-			"@enonic-types/lib-explorer/*": ["../lib-explorer/src/main/resources/lib/explorer/types/*"],
-			"/lib/explorer/*": ["../lib-explorer/src/main/resources/lib/explorer/*"],
-
-			"/lib/xp/admin": ["node_modules/@enonic-types/lib-admin"],
-			"/lib/xp/auth": ["node_modules/@enonic-types/lib-auth"],
-			"/lib/xp/cluster": ["node_modules/@enonic-types/lib-cluster"],
-			"/lib/xp/event": ["node_modules/@enonic-types/lib-event"],
-			"/lib/xp/io": ["node_modules/@enonic-types/lib-io"],
-			"/lib/xp/node": ["node_modules/@enonic-types/lib-node"],
-			"/lib/xp/portal": ["node_modules/@enonic-types/lib-portal"],
-			"/lib/xp/repo": ["node_modules/@enonic-types/lib-repo"],
-			"/lib/xp/task": ["node_modules/@enonic-types/lib-task"],
-			"/lib/xp/vhost": ["node_modules/@enonic-types/lib-vhost"],
-			"/*": ["./src/main/resources/*"],
+			"@enonic/js-utils": ["./node_modules/@enonic/js-utils/src"],
 		},
 		"preserveWatchOutput": false,
 		"pretty": true,
 		"removeComments": true,
 		"resolveJsonModule": true,
-		"rootDir": "../",
-		"rootDirs": [
-			"src/main/resources",
-			"../lib-explorer",
-			//"node_modules", // Does not help
-			"test"
-		],
+
+		// Default: The longest common path of all non-declaration input files.
+		//
+		// If composite is set, the default is instead the directory containing
+		// the tsconfig.json file.
+		//
+		// When TypeScript compiles files, it keeps the same directory structure
+		// in the output directory as exists in the input directory.
+		//
+		// Importantly, rootDir does not affect which files become part of the
+		// compilation. It has no interaction with the include, exclude, or
+		// files tsconfig.json settings.
+		//
+		// Note that TypeScript will never write an output file to a directory
+		// outside of outDir, and will never skip emitting a file. For this
+		// reason, rootDir also enforces that all files which need to be emitted
+		// are underneath the rootDir path.
+		// "rootDir": "../",
+
+		// Using rootDirs, you can inform the compiler that there are many
+		// “virtual” directories acting as a single root. This allows the
+		// compiler to resolve relative module imports within these “virtual”
+		// directories, as if they were merged in to one directory.
+		//
+		// This does not affect how TypeScript emits JavaScript, it only
+		// emulates the assumption that they will be able to work via those
+		// relative paths at runtime.
+		//
+		// rootDirs can be used to provide a separate “type layer” to files that
+		// are not TypeScript or JavaScript by providing a home for generated
+		// .d.ts files in another folder. This technique is useful for bundled
+		// applications where you use import of files that aren’t necessarily
+		// code.
+		// "rootDirs": [ // TODO make a separate test/tsconfig.json
+		// 	"test"
+		// ],
 
 		// Even though the setting disables type checking for d.ts files,
 		// TypeScript still type checks the code you specifically
@@ -92,16 +102,12 @@
 		"strict": false,
 		"strictNullChecks": false,
 		"target": "es5",
-		"types": [
-			"@enonic-types/global",
-			"jquery",
-			"jsuri",
-			"mocha",
-			"node",
-			"react",
-			"react-html-parser",
-			"traverse"
-		]
+		"typeRoots": [
+			"./node_modules/@types",
+		],
+		// "types": [ // TODO make a separate test/tsconfig.json
+		// 	"mocha"
+		// ],
 	},
 	"exclude": [
 		//"node_modules/@types/node/globals.global.d.ts", // Does not help
@@ -113,9 +119,7 @@
 		"../enonic-js-utils/**/*",
 		"../lib-explorer/**/*"
 	],
-	"include": [
-		"./src/main/resources/**/*.ts",
-		"./src/main/resources/**/*.tsx",
-		"./test/**/*.test.ts"
-	]
+	// "include": [ // TODO make a separate test/tsconfig.json
+	// 	"./test/**/*.test.ts"
+	// ]
 }

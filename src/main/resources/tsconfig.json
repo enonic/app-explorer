@@ -1,0 +1,107 @@
+{
+	"extends": "../../../tsconfig.json",
+
+	// Lets you set a base directory to resolve non-absolute module names.
+	// If you get tired of imports always looking like "../" or "./", or needing
+	// to change them as you move files, this is a great way to fix that.
+	// "baseUrl": "./",
+
+	"exclude": [
+		// "src/main/resources/assets/**/*.tsx",
+		// "src/main/resources/assets/**/*.ts",
+		"./assets/**/*.tsx",
+		"./assets/**/*.ts",
+	],
+	"include": [
+		// "src/main/resources/**/*.ts",
+		"./**/*.ts",
+	],
+	"compilerOptions": {
+		"paths": {
+			// Development (should be commented out when commiting)
+			// "@enonic-types/lib-repo": ["../../../../xp/modules/lib/lib-repo/src/main/resources/lib/xp/repo.ts"],
+			// "@enonic-types/lib-repo": ["../../../../xp/modules/lib/lib-repo/build/typescript/lib/xp/repo.d.ts"],
+			// "/lib/xp/node": ["../../../../xp/modules/lib/lib-node/src/main/resources/lib/xp/node.ts"],
+			// "/lib/xp/node": ["../../../../xp/modules/lib/lib-node/build/typescript/lib/xp/node.d.ts"],
+			// "/lib/xp/repo": ["../../../../xp/modules/lib/lib-repo/src/main/resources/lib/xp/repo.ts"],
+			// "/lib/xp/repo": ["../../../../xp/modules/lib/lib-repo/build/typescript/lib/xp/repo.d.ts"],
+			// Production (should be commented in when commiting)
+			// "@enonic/app-explorer/*": ["./src/main/resources/*"],
+			"@enonic/app-explorer/*": ["./*"],
+			"/lib/xp/admin": ["../../../node_modules/@enonic-types/lib-admin"],
+			"/lib/xp/auth": ["../../../node_modules/@enonic-types/lib-auth"],
+			"/lib/xp/cluster": ["../../../node_modules/@enonic-types/lib-cluster"],
+			"/lib/xp/context": ["../../../node_modules/@enonic-types/lib-context"],
+			"/lib/xp/event": ["../../../node_modules/@enonic-types/lib-event"],
+			"/lib/xp/io": ["../../../node_modules/@enonic-types/lib-io"],
+			"/lib/xp/node": ["../../../node_modules/@enonic-types/lib-node"],
+			"/lib/xp/portal": ["../../../node_modules/@enonic-types/lib-portal"],
+			"/lib/xp/repo": ["../../../node_modules/@enonic-types/lib-repo"],
+			"/lib/xp/task": ["../../../node_modules/@enonic-types/lib-task"],
+			"/lib/xp/value": ["../../../node_modules/@enonic-types/lib-value"],
+			"/lib/xp/vhost": ["../../../node_modules/@enonic-types/lib-vhost"],
+
+			// There is no @enonic-types/lib-explorer yet, so these are workarounds
+			"@enonic-types/lib-explorer": ["../../../../lib-explorer/src/main/resources/lib/explorer/types/index.d"],
+			"@enonic-types/lib-explorer/*": ["../../../../lib-explorer/src/main/resources/lib/explorer/types/*"],
+			// "/lib/explorer/*": ["../../../../lib-explorer/src/main/resources/lib/explorer/*"],
+
+			// Fallback
+			// "/*": ["./src/main/resources/*"],
+			"/*": ["./*"],
+		},
+
+		// Default: The longest common path of all non-declaration input files.
+		//
+		// If composite is set, the default is instead the directory containing
+		// the tsconfig.json file.
+		//
+		// When TypeScript compiles files, it keeps the same directory structure
+		// in the output directory as exists in the input directory.
+		//
+		// Importantly, rootDir does not affect which files become part of the
+		// compilation. It has no interaction with the include, exclude, or
+		// files tsconfig.json settings.
+		//
+		// Note that TypeScript will never write an output file to a directory
+		// outside of outDir, and will never skip emitting a file. For this
+		// reason, rootDir also enforces that all files which need to be emitted
+		// are underneath the rootDir path.
+		"rootDir": "./",
+		// "rootDir": "../../../../", //Maybe needed in development mode?
+
+		// Using rootDirs, you can inform the compiler that there are many
+		// “virtual” directories acting as a single root. This allows the
+		// compiler to resolve relative module imports within these “virtual”
+		// directories, as if they were merged in to one directory.
+		//
+		// This does not affect how TypeScript emits JavaScript, it only
+		// emulates the assumption that they will be able to work via those
+		// relative paths at runtime.
+		//
+		// rootDirs can be used to provide a separate “type layer” to files that
+		// are not TypeScript or JavaScript by providing a home for generated
+		// .d.ts files in another folder. This technique is useful for bundled
+		// applications where you use import of files that aren’t necessarily
+		// code.
+		// "rootDirs": [
+		// 	// "../../../../lib-explorer",
+		// 	// "src/main/resources",
+		// 	"./",
+		// ],
+
+		"typeRoots": [
+			"../../../node_modules/@enonic-types",
+		],
+		"types": [
+			"@enonic-types/global",
+			// "@enonic-types/lib-auth",
+			// "@enonic-types/lib-node",
+			// "@enonic-types/lib-repo",
+			// "@enonic-types/lib-task",
+			// "@enonic-types/lib-value",
+			// "mocha", // We don't want mocha in runtime code
+			// "node", // Is this bringing in console? I think so :(
+		]
+	}
+}
