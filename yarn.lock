@@ -1991,6 +1991,11 @@
   resolved "https://registry.yarnpkg.com/@seamusleahy/init-hooks/-/init-hooks-1.0.2.tgz#346404f99e0b6cdbd270c8fae9b15ebb4d255952"
   integrity sha512-E9/rNGMdKZM2bvgGAEh5nf1SEylwVKnFAfvUxjubBRuvuyr/c04CDZqUo80R8qafsmMPGuZc6u594Cyw8PVyPA==
 
+"@seamusleahy/values-changes-hooks@^1.0.0-alpha":
+  version "1.0.0-alpha"
+  resolved "https://registry.yarnpkg.com/@seamusleahy/values-changes-hooks/-/values-changes-hooks-1.0.0-alpha.tgz#8805fe9b282fc65fbe62848381918c90a02f2d91"
+  integrity sha512-TclC37/XV0056gy1boQuFczOz6crRa4PQ2Y3Ob+PxcQlAJeAsq1JmfS8UG/XJI77cwp5FBTg2KGIKhhplVV2Bw==
+
 "@semantic-ui-react/component-ref@^1":
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/@semantic-ui-react/component-ref/-/component-ref-1.0.0.tgz#b7d64dad27dc62eeb0af1e60e0e6222673a634fa"

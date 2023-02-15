@@ -6,7 +6,8 @@ import {
 	Button,
 	Form,
 	Header,
-	Modal
+	Message,
+	Modal,
 } from 'semantic-ui-react';
 import {ResetButton} from '../components/ResetButton';
 import {SubmitButton} from '../components/SubmitButton';
@@ -27,14 +28,14 @@ export function NewOrEditInterface({
 	collectionOptions = [],
 	doClose = () => {/**/},
 	interfaceNamesObj = {}
-} :NewOrEditInterfaceProps) {
+}: NewOrEditInterfaceProps) {
 	//console.debug('NewOrEditInterface collectionOptions', collectionOptions);
 	//console.debug('NewOrEditInterface stopWordOptions', stopWordOptions);
 	//console.debug('NewOrEditInterface thesauriOptions', thesauriOptions);
 	const {
 		anyError,
 		// boost, setBoost,
-		collectionIds,
+		collectionIdsFromStorage, setCollectionIdsFromStorage,
 		isDefaultInterface,
 		isLoading,
 		isStateChanged,
@@ -45,8 +46,8 @@ export function NewOrEditInterface({
 		getFieldValues,
 		name,
 		nameError,
+		nonExistantCollectionIds,
 		resetState,
-		setCollectionIds,
 		setName,
 		setNameVisited,
 		setStopWords,
@@ -92,12 +93,24 @@ export function NewOrEditInterface({
 					loading={isLoading}
 					multiple={true}
 					options={collectionOptions}
-					onChange={(_e,{value} :{value: Array<string>}) => setCollectionIds(value)}
+					onChange={(_e,{value} :{value: Array<string>}) => setCollectionIdsFromStorage(value)}
 					placeholder={isLoading || isLoading ? 'Fetching selected collections...' : 'Please select one or more collections'}
 					search
 					selection
-					value={collectionIds}
+					value={collectionIdsFromStorage}
 				/>
+				{
+					nonExistantCollectionIds.length
+						? <Message
+							attached='bottom'
+							icon='info'
+							header="These references to collection-ids which doesn't exist, will be removed on save:"
+							list={nonExistantCollectionIds}
+							visible
+							warning
+						/>
+						: null
+				}
 				<BoostBuilder
 					fieldNameToValueTypesState={fieldNameToValueTypesState}
 					fieldButtonVisible={fieldButtonVisible}
@@ -180,7 +193,7 @@ export function NewOrEditInterface({
 						variables: {
 							_id,
 							_name: name,
-							collectionIds,
+							collectionIds: collectionIdsFromStorage.filter(id => !nonExistantCollectionIds.includes(id)),
 							fields,
 							stopWords,
 							synonymIds,
