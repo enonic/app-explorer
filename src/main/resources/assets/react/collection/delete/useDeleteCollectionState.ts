@@ -65,7 +65,9 @@ export default function useDeleteCollectionState({
 	// Updates (not init)
 	//──────────────────────────────────────────────────────────────────────────
 	useUpdateEffect(() => {
-		setUsedInInterfaces(data.queryInterfaces.hits.map(({_name}) => _name));
+		if (data) {
+			setUsedInInterfaces(data.queryInterfaces.hits.map(({_name}) => _name));
+		}
 	}, [data]);
 
 	//──────────────────────────────────────────────────────────────────────────
