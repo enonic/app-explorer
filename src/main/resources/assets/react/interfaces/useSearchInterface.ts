@@ -192,7 +192,7 @@ function useSearchInterface({
 		})
 			.then(response => response.json())
 			.then(aResult => {
-				console.debug('fetch aResult', aResult);
+				// console.debug('fetch aResult', aResult);
 				if (aResult && aResult.data && aResult.data.interface && aResult.data.interface.querySynonyms) {
 					const {
 						languages,

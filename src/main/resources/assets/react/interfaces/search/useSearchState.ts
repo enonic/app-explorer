@@ -52,8 +52,8 @@ export function useSearchState({
 	// Optional
 	fieldsProp?: InterfaceField[]
 }) {
-	//console.debug('Search({fields:', fieldsProp,'})');
-	//console.debug('Search interfaceName', interfaceNameProp);
+	// console.debug('useSearchState fieldsProp', fieldsProp);
+	// console.debug('useSearchState interfaceName', interfaceNameState);
 
 	//──────────────────────────────────────────────────────────────────────────
 	// State
