@@ -9,6 +9,10 @@ import type {
 import {HTTP_HEADERS} from '@enonic/explorer-utils';
 import * as gql from 'gql-query-builder';
 import * as React from 'react';
+import {
+	POST_TAG,
+	PRE_TAG
+} from '../document/constants';
 
 
 type SearchResult = {
@@ -106,8 +110,8 @@ function useSearchInterface({
 				type: 'InputTypeHighlight',
 				value: {
 					numberOfFragments: 1,
-					postTag: '</b>',
-					preTag: '<b>',
+					postTag: POST_TAG,
+					preTag: PRE_TAG,
 					fields: fieldsProp.map(({
 						name
 					}) => ({

@@ -74,7 +74,7 @@ export function Search(props: SearchProps) {
 			marginBottom
 		>
 			<Flex.Item
-				flexGrow
+				flexGrow={4}
 			>
 				<SearchInput
 					disabled={!interfaceCollectionCount || !interfaceDocumentCount}
@@ -109,15 +109,16 @@ export function Search(props: SearchProps) {
 			</Flex.Item>
 			{interfaceOptions.length
 				? <>
-					<Flex.Item>
+					<Flex.Item flexGrow={2}>
 						<Dropdown
 							clearable
+							fluid
 							onChange={(_event,{value}) => {
 								if (!value) { value = 'default'; }
 								setInterfaceNameState(value as string);
 							}}
 							options={interfaceOptions}
-							placeholder='Default interface (all collections)'
+							placeholder='All collections'
 							search
 							selection
 							value={interfaceNameState === 'default' ? undefined : interfaceNameState}
@@ -173,10 +174,10 @@ export function Search(props: SearchProps) {
 							perPage={perPage}
 							searchedString={searchedStringState}
 							selectedColumnsState={[
-								Column.JSON,
+								...props.fields.map(({name}) => name),
 								Column.COLLECTION,
 								Column.DOCUMENT_TYPE,
-								...props.fields.map(({name}) => name)
+								Column.JSON,
 							]}
 							setJsonModalState={setJsonModalState}
 							start={start}

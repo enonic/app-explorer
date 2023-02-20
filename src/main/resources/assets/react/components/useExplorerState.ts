@@ -272,6 +272,7 @@ function useExplorerState({
 		const newInterfaceOptions: StrictDropdownItemProps[] = data.queryInterfaces.hits
 			.map(({_name: key}) => key === 'default' ? undefined : ({
 				key,
+				label: 'interface',
 				text: key,
 				value: key,
 			})).filter((x?: StrictDropdownItemProps) => x);

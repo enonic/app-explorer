@@ -101,7 +101,7 @@ function Item({
 }: {
 	children: any
 	className?: string
-	flexGrow?: boolean|1
+	flexGrow?: boolean|1|2|3|4
 	overflowX?: boolean|'hidden'|'overlay'|'visible' // | React.CSSProperties['overflowX']
 	overflowY?: boolean|'hidden'|'visible' // | React.CSSProperties['overflowY']
 	style?: React.CSSProperties
