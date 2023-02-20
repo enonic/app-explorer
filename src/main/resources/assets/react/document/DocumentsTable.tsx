@@ -147,6 +147,7 @@ function DocumentsTable({
 									? <Table.HeaderCell
 										content={columnNameToDisplayName(columnName)}
 										key={i}
+										singleLine
 									/>
 									: null
 								: dragAndDropColumnsProp
@@ -163,10 +164,12 @@ function DocumentsTable({
 											fromId,
 											toId
 										})}
+										singleLine
 									/>
 									: <Table.HeaderCell
 										content={columnNameToDisplayName(columnName)}
 										key={i}
+										singleLine
 									/>)
 							}
 							{/*columnOptions
@@ -223,7 +226,7 @@ function DocumentsTable({
 											</Table.Cell>;
 										} else if (selectedColumnName === HIGHLIGHT_FIELD_ALLTEXT) {
 											return searchedString
-												? <Table.Cell collapsing>
+												? <Table.Cell>
 													{
 														_highlight?.['_alltext'].length
 															? <ul style={{

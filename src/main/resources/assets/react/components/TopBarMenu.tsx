@@ -90,9 +90,13 @@ export default function TopBarMenu({
 					setInterfaceNameState(value as string);
 				}}
 				options={interfaceOptions}
-				placeholder='Default interface (all collections)'
+				placeholder='All collections'
 				search
 				selection
+				style={{
+					maxWidth: 'calc(100vw - 61px - 44px)',
+					width: 768 - 61 - 44,
+				}}
 				value={interfaceNameState === 'default' ? undefined : interfaceNameState}
 			/>
 			: null
