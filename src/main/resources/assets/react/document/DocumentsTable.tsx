@@ -203,6 +203,8 @@ function DocumentsTable({
 										} else if (selectedColumnName === Column.JSON) {
 											return <Table.Cell collapsing key={key}>
 												<Button
+													basic
+													className='marginLess translucent'
 													onClick={() => {
 														setJsonModalState({
 															open: true,

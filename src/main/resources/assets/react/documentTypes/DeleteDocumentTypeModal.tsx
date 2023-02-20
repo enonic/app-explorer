@@ -1,5 +1,12 @@
 import * as React from 'react';
-import {Button, Icon, Input, Message, Modal} from 'semantic-ui-react';
+import {
+	Button,
+	Icon,
+	Input,
+	Message,
+	Modal,
+	Popup,
+} from 'semantic-ui-react';
 
 import {GQL_MUTATION_DOCUMENT_TYPE_DELETE} from '../../../services/graphQL/mutations/documentTypeDeleteMutation';
 
@@ -39,14 +46,20 @@ export function DeleteDocumentTypeModal({
 		closeOnDimmerClick={false}
 		onClose={doClose}
 		open={open}
-		trigger={<Button
-			compact
-			disabled={disabled}
-			icon
-			onClick={doOpen}
-			size='tiny'
-			type='button'
-		><Icon color='red' name='trash alternate outline'/></Button>}
+		trigger={<Popup
+			content={_name}
+			header='Delete document-type'
+			inverted
+			trigger={
+				<Button
+					basic
+					className='marginless translucent'
+					disabled={disabled}
+					icon
+					onClick={doOpen}
+				><Icon color='red' name='trash alternate outline'/></Button>
+			}
+		/>}
 	>
 		<Modal.Header>Delete document type {_name}</Modal.Header>
 		<Modal.Content>

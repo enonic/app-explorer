@@ -8,7 +8,7 @@ import {
 	Modal,
 	Popup,
 } from 'semantic-ui-react';
-
+import HoverButton from '../components/buttons/HoverButton';
 import {Search} from './search/Search';
 
 
@@ -66,12 +66,11 @@ export function SearchModal({
 				content={`Try searching interface ${interfaceName}`}
 				inverted
 				trigger={
-					<Button
+					<HoverButton
 						disabled={loading}
 						icon='search'
 						loading={loading}
 						onClick={doOpen}
-						size='tiny'
 					/>
 				}
 			/>

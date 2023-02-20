@@ -19,6 +19,7 @@ import type {
 import * as React from 'react';
 import {Button, Icon, Modal, Popup} from 'semantic-ui-react';
 import {Collection} from './Collection';
+import HoverButton from '../components/buttons/HoverButton';
 import {UploadLicense} from '../components/UploadLicense';
 
 
@@ -90,30 +91,38 @@ export function NewOrEditCollectionModal({
 		onClose={doClose}
 		open={state.open}
 		size='fullscreen'
-		trigger={_name ? <Popup
-			content={`Edit collection ${_name}`}
-			inverted
-			trigger={<Button
-				icon
-				disabled={disabled}
-				loading={loading}
-				onClick={doOpen}
-			><Icon color='blue' name='edit'/></Button>}/>
-			: <Button
-				circular
-				color='green'
-				disabled={disabled}
-				icon
-				loading={loading}
-				onClick={doOpen}
-				size='massive'
-				style={{
-					bottom: 13.5,
-					position: 'fixed',
-					right: 13.5
-				}}><Icon
-					name='plus'
-				/></Button>}
+		trigger={
+			_name
+				? <Popup
+					content={`Edit collection ${_name}`}
+					inverted
+					trigger={
+						<HoverButton
+							color='blue'
+							disabled={disabled}
+							icon='edit'
+							loading={loading}
+							onClick={doOpen}
+						/>
+					}
+				/>
+				: <Button
+					circular
+					color='green'
+					disabled={disabled}
+					icon
+					loading={loading}
+					onClick={doOpen}
+					size='massive'
+					style={{
+						bottom: 13.5,
+						position: 'fixed',
+						right: 13.5
+					}}><Icon
+						name='plus'
+					/>
+				</Button>
+		}
 	>{licenseValid || totalNumberOfCollections <= 2 // This means it will be allowed to create collection 3, but not number 4
 			? <>
 				<Modal.Header>{_name ? `Edit collection ${_name}`: 'New collection'}</Modal.Header>

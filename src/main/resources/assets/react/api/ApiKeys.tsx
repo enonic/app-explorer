@@ -66,15 +66,14 @@ export const ApiKeys = (props :{
 			<Table celled compact striped>
 				<Table.Header>
 					<Table.Row>
-						<Table.HeaderCell>Edit</Table.HeaderCell>
 						<Table.HeaderCell>Name</Table.HeaderCell>
 						{showAllFields ?
 							<>
 								<Table.HeaderCell>Collections</Table.HeaderCell>
 								<Table.HeaderCell>Interfaces</Table.HeaderCell>
-								<Table.HeaderCell>Actions</Table.HeaderCell>
 							</>
 							: null}
+						<Table.HeaderCell>{showAllFields ? 'Actions' : 'Edit'}</Table.HeaderCell>
 					</Table.Row>
 				</Table.Header>
 				<Table.Body>
@@ -85,6 +84,27 @@ export const ApiKeys = (props :{
 						interfaces
 					}) => {
 						return <Table.Row disabled={isLoading} key={_name}>
+							<Table.Cell>{_name}</Table.Cell>
+							{
+								showAllFields
+									? <>
+										<Table.Cell><ul style={{
+											listStyleType: 'none',
+											margin: 0,
+											padding: 0
+										}}>
+											{collections.map((collectionName, i) => <li key={i} style={{marginBottom: 3}}>{collectionName}</li>)}
+										</ul></Table.Cell>
+										<Table.Cell><ul style={{
+											listStyleType: 'none',
+											margin: 0,
+											padding: 0
+										}}>
+											{interfaces.map((interfaceName, i) => <li key={i} style={{marginBottom: 3}}>{interfaceName}</li>)}
+										</ul></Table.Cell>
+									</>
+									: null
+							}
 							<Table.Cell collapsing>
 								<NewOrEditApiKeyModal
 									_id={_id}
@@ -100,27 +120,9 @@ export const ApiKeys = (props :{
 									interfaces={interfaces}
 									servicesBaseUrl={servicesBaseUrl}
 								/>
-							</Table.Cell>
-							<Table.Cell collapsing>{_name}</Table.Cell>
-							{showAllFields ?
-								<>
-									<Table.Cell><ul style={{
-										listStyleType: 'none',
-										margin: 0,
-										padding: 0
-									}}>
-										{collections.map((collectionName, i) => <li key={i} style={{marginBottom: 3}}>{collectionName}</li>)}
-									</ul></Table.Cell>
-									<Table.Cell><ul style={{
-										listStyleType: 'none',
-										margin: 0,
-										padding: 0
-									}}>
-										{interfaces.map((interfaceName, i) => <li key={i} style={{marginBottom: 3}}>{interfaceName}</li>)}
-									</ul></Table.Cell>
-
-									<Table.Cell collapsing>
-										<DeleteApiKeyModal
+								{
+									showAllFields
+										? <DeleteApiKeyModal
 											_id={_id}
 											_name={_name}
 											afterClose={() => {
@@ -131,9 +133,9 @@ export const ApiKeys = (props :{
 											loading={isLoading}
 											servicesBaseUrl={servicesBaseUrl}
 										/>
-									</Table.Cell>
-								</>
-								: null}
+										: null
+								}
+							</Table.Cell>
 						</Table.Row>;
 					})}
 				</Table.Body>

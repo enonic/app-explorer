@@ -11,9 +11,9 @@ import type {
 
 import * as React from 'react';
 import {Button, Icon, Modal, Popup} from 'semantic-ui-react';
-
-import {NewOrEditInterface} from './NewOrEditInterface';
+import HoverButton from '../components/buttons/HoverButton';
 import {UploadLicense} from '../components/UploadLicense';
+import {NewOrEditInterface} from './NewOrEditInterface';
 
 
 type NewOrEditInterfaceModalProps = {
@@ -78,29 +78,37 @@ export function NewOrEditInterfaceModal(props :NewOrEditInterfaceModalProps) {
 		onClose={doClose}
 		open={open}
 		size='large'
-		trigger={<Popup
-			content={header}
-			inverted
-			trigger={_id ? <Button
-				disabled={loading || disabled}
-				loading={loading}
-				icon
-				onClick={doOpen}
-			><Icon color='blue' name='edit'/></Button>
-				: <Button
-					circular
-					color='green'
-					disabled={loading || disabled}
-					icon='plus'
-					loading={loading}
-					onClick={doOpen}
-					size='massive'
-					style={{
-						bottom: 13.5,
-						margin: 0,
-						position: 'fixed',
-						right: 13.5
-					}}/>}/>}
+		trigger={
+			<Popup
+				content={header}
+				inverted
+				trigger={
+					_id
+						? <HoverButton
+							color='blue'
+							disabled={loading || disabled}
+							loading={loading}
+							icon='edit'
+							onClick={doOpen}
+						/>
+						: <Button
+							circular
+							color='green'
+							disabled={loading || disabled}
+							icon='plus'
+							loading={loading}
+							onClick={doOpen}
+							size='massive'
+							style={{
+								bottom: 13.5,
+								margin: 0,
+								position: 'fixed',
+								right: 13.5
+							}}
+						/>
+				}
+			/>
+		}
 	>{licenseValid
 		|| (!_id && total <= 1) // Allowed to create interface number 2, but not number 3
 		|| (_id && total <= 2) // Allowed to edit interface number 2, but not number 3

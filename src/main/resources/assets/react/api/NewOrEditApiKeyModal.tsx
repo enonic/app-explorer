@@ -8,6 +8,7 @@ import {
 	Modal,
 	Popup
 } from 'semantic-ui-react';
+import HoverButton from '../components/buttons/HoverButton';
 
 import {NewOrEditApiKey} from './NewOrEditApiKey';
 
@@ -62,30 +63,36 @@ export const NewOrEditApiKeyModal = (props :{
 		onClose={doClose}
 		open={state.open}
 		size='small'
-		trigger={_name ? <Popup
-			content={`Edit API Key ${_name}`}
-			inverted
-			trigger={<Button
-				disabled={disabled}
-				loading={loading}
-				icon
-				onClick={doOpen}
-			><Icon color='blue' name='edit'/></Button>}/>
-			: <Button
-				circular
-				color='green'
-				disabled={disabled}
-				icon
-				loading={loading}
-				onClick={doOpen}
-				size='massive'
-				style={{
-					bottom: 13.5,
-					position: 'fixed',
-					right: 13.5
-				}}><Icon
-					name='plus'
-				/></Button>}
+		trigger={
+			_name
+				? <Popup
+					content={`Edit API Key ${_name}`}
+					inverted
+					trigger={
+						<HoverButton
+							color='blue'
+							disabled={disabled}
+							loading={loading}
+							icon='edit'
+							onClick={doOpen}
+						/>
+					}
+				/>
+				: <Button
+					circular
+					color='green'
+					disabled={disabled}
+					icon
+					loading={loading}
+					onClick={doOpen}
+					size='massive'
+					style={{
+						bottom: 13.5,
+						position: 'fixed',
+						right: 13.5
+					}}><Icon
+						name='plus'
+					/></Button>}
 	>
 		<Modal.Header>{_name ? `Edit API Key ${_name}`: 'New API Key'}</Modal.Header>
 		<NewOrEditApiKey

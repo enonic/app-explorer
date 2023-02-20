@@ -1,5 +1,6 @@
 import * as React from 'react';
 import {Button, Header, Icon, Modal, Popup} from 'semantic-ui-react';
+import HoverButton from '../components/buttons/HoverButton';
 
 
 const GQL_MUTATION_THESAURUS_DELETE = `mutation DeleteThesaurusMutation(
@@ -52,15 +53,21 @@ export function DeleteThesaurus({
 		closeOnDimmerClick={false}
 		onClose={doClose}
 		open={open}
-		trigger={<Popup
-			content={`Delete thesaurus ${name}`}
-			disabled={loading || disabled}
-			loading={loading}
-			inverted
-			trigger={<Button
-				icon
-				onClick={doOpen}
-			><Icon color='red' name='trash alternate outline'/></Button>}/>}
+		trigger={
+			<Popup
+				content={`Delete thesaurus ${name}`}
+				disabled={loading || disabled}
+				loading={loading}
+				inverted
+				trigger={
+					<HoverButton
+						color='red'
+						icon='trash alternate outline'
+						onClick={doOpen}
+					/>
+				}
+			/>
+		}
 	>
 		<Modal.Header>Delete thesaurus {name}</Modal.Header>
 		<Modal.Content>

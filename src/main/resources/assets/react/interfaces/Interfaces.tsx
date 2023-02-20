@@ -136,7 +136,7 @@ export function Interfaces({
 			<Table celled compact singleLine striped>
 				<Table.Header>
 					<Table.Row>
-						<Table.HeaderCell>Edit / Try</Table.HeaderCell>
+						<Table.HeaderCell>Try</Table.HeaderCell>
 						<Table.HeaderCell>Name</Table.HeaderCell>
 						{/*showCollectionCount ? <Table.HeaderCell>Collection count</Table.HeaderCell> : null*/}
 						{showCollections ? <Table.HeaderCell>Collection(s)</Table.HeaderCell> : null}
@@ -164,53 +164,37 @@ export function Interfaces({
 						//console.debug({_name, index});
 						return <Table.Row key={index}>
 							<Table.Cell collapsing>
-								<Button.Group>
-									<NewOrEditInterfaceModal
-										_id={_id}
-										_name={_name}
-										afterClose={() => memoizedUpdateInterfacesCallback()}
-										collectionOptions={collectionOptions}
-										fieldNameToValueTypesState={fieldNameToValueTypesState}
-										interfaceNamesObj={interfaceNamesObj/* Currently not allowed to edit _name anyway */}
-										licenseValid={licenseValid}
-										loading={isLoading}
-										servicesBaseUrl={servicesBaseUrl}
-										setLicensedTo={setLicensedTo}
-										setLicenseValid={setLicenseValid}
-										stopWordOptions={stopWordOptions}
-										thesauriOptions={thesauriOptions}
-										total={interfacesTotal}
-									/>
-									<SearchModal
-										basename={basename}
-										interfaceName={_name}
-										loading={isLoading}
-										fields={fields}
-										searchString={searchString} setSearchString={setSearchString}
-										servicesBaseUrl={servicesBaseUrl}
-										setInterfaceNameState={setInterfaceNameState}
-									/>
-									<Popup
-										content={`Try interface ${_name} in GraphiQL`}
-										inverted
-										trigger={<Button
-											as={Link}
-											icon
-											onClick={() => {
-												setInterfaceNameState(_name);
-											}}
-											to='/api'
-										>
-											<i aria-hidden className='icon'>
-												<svg version='2.0'>
-													<use href='#graphql100'/>
-												</svg>
-											</i>
-										</Button>}
-									/>
-								</Button.Group>
+								<SearchModal
+									basename={basename}
+									interfaceName={_name}
+									loading={isLoading}
+									fields={fields}
+									searchString={searchString} setSearchString={setSearchString}
+									servicesBaseUrl={servicesBaseUrl}
+									setInterfaceNameState={setInterfaceNameState}
+								/>
+								<Popup
+									content={`Try interface ${_name} in GraphiQL`}
+									inverted
+									trigger={<Button
+										as={Link}
+										basic
+										className='marginless translucent'
+										icon
+										onClick={() => {
+											setInterfaceNameState(_name);
+										}}
+										to='/api'
+									>
+										<i aria-hidden className='icon'>
+											<svg version='2.0'>
+												<use href='#graphql100'/>
+											</svg>
+										</i>
+									</Button>}
+								/>
 							</Table.Cell>
-							<Table.Cell collapsing disabled={isLoading}>{_name}</Table.Cell>
+							<Table.Cell disabled={isLoading}>{_name}</Table.Cell>
 							{/*showCollectionCount ? <Table.Cell collapsing disabled={isLoading}>{_name === 'default' ? '∞' : collectionNames.length}</Table.Cell> : null*/}
 							{showCollections ? <Table.Cell collapsing disabled={isLoading}>{_name === 'default' ? '∞' : <ul style={{
 								listStyleType: 'none',
@@ -237,22 +221,36 @@ export function Interfaces({
 								padding: 0
 							}}>{stopWords.map((c, i) => <li key={i} style={{marginBottom: 3}}>{c}</li>)}</ul></Table.Cell> : null}
 							<Table.Cell collapsing>
-								<Button.Group>
-									<CopyModal
-										afterClose={memoizedUpdateInterfacesCallback}
-										loading={isLoading}
-										name={_name}
-										servicesBaseUrl={servicesBaseUrl}
-									/>
-									{showDelete ? <DeleteModal
-										afterClose={memoizedUpdateInterfacesCallback}
-										_id={_id}
-										_name={_name}
-										disabled={_name === 'default'}
-										loading={isLoading}
-										servicesBaseUrl={servicesBaseUrl}
-									/> : null}
-								</Button.Group>
+								<NewOrEditInterfaceModal
+									_id={_id}
+									_name={_name}
+									afterClose={() => memoizedUpdateInterfacesCallback()}
+									collectionOptions={collectionOptions}
+									fieldNameToValueTypesState={fieldNameToValueTypesState}
+									interfaceNamesObj={interfaceNamesObj/* Currently not allowed to edit _name anyway */}
+									licenseValid={licenseValid}
+									loading={isLoading}
+									servicesBaseUrl={servicesBaseUrl}
+									setLicensedTo={setLicensedTo}
+									setLicenseValid={setLicenseValid}
+									stopWordOptions={stopWordOptions}
+									thesauriOptions={thesauriOptions}
+									total={interfacesTotal}
+								/>
+								<CopyModal
+									afterClose={memoizedUpdateInterfacesCallback}
+									loading={isLoading}
+									name={_name}
+									servicesBaseUrl={servicesBaseUrl}
+								/>
+								{showDelete ? <DeleteModal
+									afterClose={memoizedUpdateInterfacesCallback}
+									_id={_id}
+									_name={_name}
+									disabled={_name === 'default'}
+									loading={isLoading}
+									servicesBaseUrl={servicesBaseUrl}
+								/> : null}
 							</Table.Cell>
 						</Table.Row>;
 					})

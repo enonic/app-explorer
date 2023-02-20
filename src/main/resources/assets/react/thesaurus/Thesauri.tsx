@@ -15,6 +15,7 @@ import {
 	Segment,
 	Table
 } from 'semantic-ui-react';
+import HoverButton from '../components/buttons/HoverButton';
 import RefreshButton from '../components/buttons/RefreshButton';
 import Flex from '../components/Flex';
 import {ExportThesaurusModal} from './exportThesaurus/ExportThesaurusModal';
@@ -48,8 +49,8 @@ export function Thesauri({
 		setExportDialogState,
 		setImportDialogState,
 		setNewOrEditState,
-		setShowDelete,
-		showDelete,
+		setShowAll,
+		showAll,
 		synonymsSum,
 		thesauriRes,
 		thesaurusNames
@@ -76,13 +77,13 @@ export function Thesauri({
 				<Flex.Item>
 					<Segment className='button-padding'>
 						<Radio
-							label='Show delete'
-							checked={showDelete}
+							label='Show all fields'
+							checked={showAll}
 							onChange={(
 								_event :unknown,
 								{checked}
 							) => {
-								setShowDelete(checked);
+								setShowAll(checked);
 							}}
 							toggle
 						/>
@@ -129,18 +130,21 @@ export function Thesauri({
 									<Popup
 										content={`Edit thesaurus ${_name}`}
 										inverted
-										trigger={<Button
-											disabled={isLoading}
-											icon
-											loading={isLoading}
-											onClick={() => {
-												setNewOrEditState({
-													_id,
-													_name,
-													open: true
-												});
-											}}
-										><Icon color='blue' name='options'/></Button>}
+										trigger={
+											<HoverButton
+												color='blue'
+												disabled={isLoading}
+												icon='options'
+												loading={isLoading}
+												onClick={() => {
+													setNewOrEditState({
+														_id,
+														_name,
+														open: true
+													});
+												}}
+											/>
+										}
 									/>
 								</Table.Cell>
 								<Table.Cell collapsing>{_name}</Table.Cell>
@@ -155,29 +159,33 @@ export function Thesauri({
 									<Popup
 										content={`Edit ${_name} synonyms`}
 										inverted
-										trigger={<Button
-											disabled={isLoading}
-											icon
-											loading={isLoading}
-											onClick={() => {
-												setEditSynonymsModalState({
-													_id,
-													_name,
-													open: true
-												});
-											}}
-										><Icon color='blue' name='code branch'/></Button>}
+										trigger={
+											<HoverButton
+												color='blue'
+												disabled={isLoading}
+												icon='code branch'
+												loading={isLoading}
+												onClick={() => {
+													setEditSynonymsModalState({
+														_id,
+														_name,
+														open: true
+													});
+												}}
+											/>
+										}
 									/>
 								</Table.Cell>
 								<Table.Cell collapsing>{synonymsCount}</Table.Cell>
 								<Table.Cell collapsing>
-									<Button.Group>
-										<Popup
-											content={`Import to thesaurus ${_name}`}
-											inverted
-											trigger={<Button
+									<Popup
+										content={`Import to thesaurus ${_name}`}
+										inverted
+										trigger={
+											<HoverButton
+												color='blue'
 												disabled={isLoading}
-												icon
+												icon='upload'
 												loading={isLoading}
 												onClick={() => {
 													setImportDialogState({
@@ -190,14 +198,17 @@ export function Thesauri({
 														thesaurusName: _name
 													})
 												}}
-											><Icon color='blue' name='upload'/></Button>}
-										/>
-										<Popup
-											content={`Export from thesaurus ${_name}`}
-											inverted
-											trigger={<Button
+											/>
+										}
+									/>
+									<Popup
+										content={`Export from thesaurus ${_name}`}
+										inverted
+										trigger={
+											<HoverButton
+												color='blue'
 												disabled={isLoading}
-												icon
+												icon='download'
 												loading={isLoading}
 												onClick={() => {
 													setExportDialogState({
@@ -209,17 +220,17 @@ export function Thesauri({
 														thesaurusName: _name
 													})
 												}}
-											><Icon color='blue' name='download'/></Button>}
-										/>
-										{showDelete ? <DeleteThesaurus
-											_id={_id}
-											afterClose={memoizedFetchOnUpdate}
-											disabled={isLoading}
-											loading={isLoading}
-											name={_name}
-											servicesBaseUrl={servicesBaseUrl}
-										/> : null}
-									</Button.Group>
+											/>
+										}
+									/>
+									{showAll ? <DeleteThesaurus
+										_id={_id}
+										afterClose={memoizedFetchOnUpdate}
+										disabled={isLoading}
+										loading={isLoading}
+										name={_name}
+										servicesBaseUrl={servicesBaseUrl}
+									/> : null}
 								</Table.Cell>
 							</Table.Row>;
 						});
@@ -234,18 +245,21 @@ export function Thesauri({
 							<Popup
 								content='Edit all synonyms'
 								inverted
-								trigger={<Button
-									disabled={isLoading}
-									icon
-									loading={isLoading}
-									onClick={() => {
-										setEditSynonymsModalState({
-											_id: undefined,
-											_name: undefined,
-											open: true
-										});
-									}}
-								><Icon color='blue' name='code branch'/></Button>}
+								trigger={
+									<HoverButton
+										color='blue'
+										disabled={isLoading}
+										icon='code branch'
+										loading={isLoading}
+										onClick={() => {
+											setEditSynonymsModalState({
+												_id: undefined,
+												_name: undefined,
+												open: true
+											});
+										}}
+									/>
+								}
 							/>
 						</Table.HeaderCell>
 						<Table.HeaderCell className={isLoading ? 'disabled' : ''}>

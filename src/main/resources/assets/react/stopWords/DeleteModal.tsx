@@ -1,5 +1,6 @@
 import * as React from 'react';
 import {Button, Header, Icon, Modal, Popup} from 'semantic-ui-react';
+import HoverButton from '../components/buttons/HoverButton';
 import {fetchStopWordsDelete} from '../../../services/graphQL/fetchers/fetchStopWordsDelete';
 
 
@@ -44,15 +45,20 @@ export function DeleteModal(props :{
 		closeOnDimmerClick={false}
 		onClose={doClose}
 		open={open}
-		trigger={<Popup
-			content={`Open dialog to confirm deletion of stop words list ${_name}`}
-			inverted
-			trigger={<Button
-				disabled={disabled}
-				icon
-				loading={loading}
-				onClick={doOpen}
-			><Icon color='red' name='trash alternate outline'/></Button>}/>}
+		trigger={
+			<Popup
+				content={`Open dialog to confirm deletion of stop words list ${_name}`}
+				inverted
+				trigger={
+					<HoverButton
+						color='red'
+						disabled={disabled}
+						icon='trash alternate outline'
+						loading={loading}
+						onClick={doOpen}
+					/>}
+			/>
+		}
 	>
 		<Modal.Header>Delete {_name}</Modal.Header>
 		<Modal.Content>

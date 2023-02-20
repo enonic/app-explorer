@@ -3,7 +3,6 @@ import type {DocumentTypesComponentParams} from './index.d';
 
 import {Link} from 'react-router-dom';
 import {
-	Button,
 	Header,
 	Icon,
 	Popup,
@@ -84,19 +83,18 @@ export function DocumentTypes({
 			<Table celled compact singleLine striped>
 				<Table.Header>
 					<Table.Row>
-						<Table.HeaderCell>Edit</Table.HeaderCell>
 						<Table.HeaderCell>Name</Table.HeaderCell>
 						<Table.HeaderCell textAlign='right'>Documents</Table.HeaderCell>
 						{showAllFields ? <Table.HeaderCell>Documents per collection</Table.HeaderCell> : null}
-						<Table.HeaderCell textAlign='right'>Field count</Table.HeaderCell>
-						<Table.HeaderCell>Fields</Table.HeaderCell>
+						<Table.HeaderCell singleLine textAlign='right'>Field count</Table.HeaderCell>
 						{showAllFields ?
 							<>
-								<Table.HeaderCell>Add fields</Table.HeaderCell>
+								<Table.HeaderCell>Fields</Table.HeaderCell>
+								<Table.HeaderCell singleLine>Add fields</Table.HeaderCell>
 								<Table.HeaderCell>Managed by</Table.HeaderCell>
-								<Table.HeaderCell>Delete</Table.HeaderCell>
 							</>
 							: null}
+						<Table.HeaderCell>{showAllFields ? 'Actions' : 'Edit'}</Table.HeaderCell>
 						{/* {showDetails ? <Table.HeaderCell>Details</Table.HeaderCell> : null} */}
 					</Table.Row>
 				</Table.Header>
@@ -113,26 +111,25 @@ export function DocumentTypes({
 						documentsInTotal = 0,
 						managedBy = ''
 					}, index) => {
+						const editButton = <Popup
+							content={_name}
+							header='Edit document-type'
+							inverted
+							trigger={<ButtonEdit basic className='marginless translucent' disabled={isLoading} onClick={() => {
+								setCurrentDocumentTypeName(_name);
+								if (documentTypes[_name] && documentTypes[_name].managedBy) {
+									setEditManagedDocumentTypeWarningModalOpen(true);
+								} else {
+									setNewOrEditModalState({
+										_id,
+										_name,
+										open: true
+									});
+								}
+							}}/>}
+						/>;
 						return <Table.Row key={index}>
-							<Table.Cell collapsing disabled={isLoading}>
-								<Popup
-									content={`Edit document type: ${_name}`}
-									inverted
-									trigger={<ButtonEdit disabled={isLoading} onClick={() => {
-										setCurrentDocumentTypeName(_name);
-										if (documentTypes[_name] && documentTypes[_name].managedBy) {
-											setEditManagedDocumentTypeWarningModalOpen(true);
-										} else {
-											setNewOrEditModalState({
-												_id,
-												_name,
-												open: true
-											});
-										}
-									}}/>}
-								/>
-							</Table.Cell>
-							<Table.Cell collapsing disabled={isLoading}>{_name}</Table.Cell>
+							<Table.Cell disabled={isLoading}>{_name}</Table.Cell>
 
 							<Table.Cell collapsing disabled={isLoading} textAlign='right'>{documentsInTotal > 0
 								? <Link
@@ -150,38 +147,53 @@ export function DocumentTypes({
 								}, i) => <li key={i} style={{marginBottom: 3}}>{name} ({docCount})</li>)}</ul></Table.Cell> : null}
 
 							<Table.Cell collapsing disabled={isLoading} textAlign='right'>{activeProperties.length}</Table.Cell>
-							<Table.Cell collapsing disabled={isLoading}><ul style={{
-								listStyleType: 'none',
-								margin: 0,
-								padding: 0
-							}}>{activePropertyNames.sort().map((p, i) => <li key={i} style={{marginBottom: 3}}>{p}</li>)}</ul></Table.Cell>
-
-							{showAllFields ?
-								<>
-									<Table.Cell collapsing disabled={isLoading}>
-										{addFields ?
-											<Icon color='green' disabled={isLoading} name='checkmark' size='large'/>
-											: <Icon color='grey' disabled={isLoading} name='x' size='large'/>}
+							{
+								showAllFields
+									? <Table.Cell collapsing disabled={isLoading}>
+										<ul style={{
+											listStyleType: 'none',
+											margin: 0,
+											padding: 0
+										}}>
+											{
+												activePropertyNames.sort().map((p, i) => <li key={i} style={{marginBottom: 3}}>{p}</li>)
+											}
+										</ul>
 									</Table.Cell>
-									<Table.Cell collapsing disabled={isLoading}>{managedBy}</Table.Cell>
-									<Table.Cell collapsing disabled={isLoading}>
-										<Button.Group>
-											<DeleteDocumentTypeModal
-												_id={_id}
-												_name={_name}
-												afterClose={() => {
-													//console.debug('DeleteDocumentTypeModal afterClose');
-													memoizedUpdateState();
-												}}
-												collectionNames={collectionsNames}
-												disabled={isLoading}
-												servicesBaseUrl={servicesBaseUrl}
-											/>
-										</Button.Group>
-									</Table.Cell>
-								</>
-								: null}
-
+									: null
+							}
+							{
+								showAllFields
+									? <>
+										<Table.Cell collapsing disabled={isLoading}>
+											{
+												addFields
+													? <Icon color='grey' disabled={isLoading} name='checkmark' size='large'/>
+													: <Icon color='grey' disabled={isLoading} name='x' size='large'/>
+											}
+										</Table.Cell>
+										<Table.Cell collapsing disabled={isLoading}>{managedBy}</Table.Cell>
+									</>
+									: null
+							}
+							<Table.Cell collapsing disabled={isLoading}>
+								{editButton}
+								{
+									showAllFields
+										? <DeleteDocumentTypeModal
+											_id={_id}
+											_name={_name}
+											afterClose={() => {
+												//console.debug('DeleteDocumentTypeModal afterClose');
+												memoizedUpdateState();
+											}}
+											collectionNames={collectionsNames}
+											disabled={isLoading}
+											servicesBaseUrl={servicesBaseUrl}
+										/>
+										: null
+								}
+							</Table.Cell>
 							{/* {showDetails ? <Table.Cell collapsing>
 								<Table>
 									<Table.Header>

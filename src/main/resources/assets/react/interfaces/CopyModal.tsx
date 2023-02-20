@@ -7,6 +7,7 @@ import {
 	Modal,
 	Popup,
 } from 'semantic-ui-react';
+import HoverButton from '../components/buttons/HoverButton';
 
 
 export function CopyModal({
@@ -51,14 +52,13 @@ export function CopyModal({
 				content={`Copy interface ${name}`}
 				inverted
 				trigger={
-					<Button
-						onClick={doOpen}
+					<HoverButton
+						color='blue'
 						disabled={loading}
-						icon
+						icon='copy'
 						loading={loading}
-						size='tiny'
-						type='button'
-					><Icon color='green' name='copy'/></Button>
+						onClick={doOpen}
+					/>
 				}
 			/>
 		}

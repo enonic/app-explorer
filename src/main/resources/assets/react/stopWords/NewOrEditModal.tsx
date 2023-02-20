@@ -19,6 +19,7 @@ import {
 	ResetButton,
 	SubmitButton
 } from '@enonic/semantic-ui-react-form';
+import HoverButton from '../components/buttons/HoverButton';
 import {fetchStopWordsCreate} from '../../../services/graphQL/fetchers/fetchStopWordsCreate';
 import {fetchStopWordsUpdate} from '../../../services/graphQL/fetchers/fetchStopWordsUpdate';
 import {mustStartWithALowercaseLetter} from '../utils/mustStartWithALowercaseLetter';
@@ -89,25 +90,30 @@ export function NewOrEditModal(props :{
 		trigger={<Popup
 			content={header}
 			inverted
-			trigger={editMode ? <Button
-				disabled={disabled}
-				icon
-				loading={loading}
-				onClick={doOpen}
-			><Icon color='blue' name='edit'/></Button> : <Button
-				circular
-				color='green'
-				disabled={disabled}
-				icon
-				loading={loading}
-				onClick={doOpen}
-				size='massive'
-				style={{
-					bottom: 13.5,
-					position: 'fixed',
-					right: 13.5
-				}}
-			><Icon name='plus'/></Button>}/>
+			trigger={
+				editMode
+					? <HoverButton
+						color='blue'
+						disabled={disabled}
+						icon='edit'
+						loading={loading}
+						onClick={doOpen}
+					/>
+					: <Button
+						circular
+						color='green'
+						disabled={disabled}
+						icon
+						loading={loading}
+						onClick={doOpen}
+						size='massive'
+						style={{
+							bottom: 13.5,
+							position: 'fixed',
+							right: 13.5
+						}}
+					><Icon name='plus'/></Button>}
+		/>
 		}
 	>
 		<Modal.Header>{header}</Modal.Header>
