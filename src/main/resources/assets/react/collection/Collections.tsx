@@ -7,8 +7,8 @@ import type {
 
 
 import {
-	TASK_STATE_FAILED,
-	//TASK_STATE_FINISHED,
+	// TASK_STATE_FAILED,
+	// TASK_STATE_FINISHED,
 	TASK_STATE_RUNNING,
 	TASK_STATE_WAITING,
 	lpad,
@@ -40,17 +40,17 @@ import {NewOrEditCollectionModal} from './NewOrEditCollectionModal';
 import {useCollectionsState} from './useCollectionsState';
 
 
-const GQL_MUTATION_COLLECTIONS_REINDEX = `mutation ReindexMutation(
-  $collectionIds: [String]!
-) {
-  reindexCollections(collectionIds: $collectionIds) {
-    collectionId
-    collectionName
-    message
-    documentTypeId
-    taskId
-  }
-}`;
+// const GQL_MUTATION_COLLECTIONS_REINDEX = `mutation ReindexMutation(
+//   $collectionIds: [String]!
+// ) {
+//   reindexCollections(collectionIds: $collectionIds) {
+//     collectionId
+//     collectionName
+//     message
+//     documentTypeId
+//     taskId
+//   }
+// }`;
 
 
 export function Collections(props :{
@@ -358,7 +358,7 @@ export function Collections(props :{
 															}}><Icon color={boolCollectorSelectedAndInitialized ? 'green' : 'grey'} name='cloud download'/></Button>}/>
 												: <Button disabled={true} icon><Icon color='grey' name='cloud download'/></Button>
 											}
-											{anyReindexTaskWithoutCollectionId
+											{/*anyReindexTaskWithoutCollectionId
 												? <Popup
 													content={`Some reindex task is starting...`}
 													inverted
@@ -402,7 +402,7 @@ export function Collections(props :{
 																		: 'green' // objCollectionsBeingReindexed[collectionId] === TASK_STATE_FINISHED
 																: 'green'} name='recycle'/>
 													</Button>}/>
-											}
+											*/}
 											<Popup
 												content={`Copy collection ${collectionName}`}
 												inverted
