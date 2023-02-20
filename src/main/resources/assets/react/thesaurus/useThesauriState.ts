@@ -69,7 +69,7 @@ export function useThesauriState({
 }) {
 	const [isLoading, setLoading] = React.useState(false);
 	const [locales, setLocales] = React.useState<Locales>([]);
-	const [showDelete, setShowDelete] = React.useState(false);
+	const [showAll, setShowAll] = React.useState(true);
 	const [synonymsSum, setSynonymsSum] = React.useState(0);
 	const [thesauriRes, setThesauriRes] = React.useState<QueryThesauriGraph>({
 		count: 0,
@@ -174,8 +174,8 @@ export function useThesauriState({
 		setExportDialogState,
 		setImportDialogState,
 		setNewOrEditState,
-		setShowDelete,
-		showDelete,
+		setShowAll,
+		showAll,
 		synonymsSum,
 		thesauriRes,
 		thesaurusNames: thesauriRes.hits.map(({_name}) => _name)

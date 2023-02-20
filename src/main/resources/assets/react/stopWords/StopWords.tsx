@@ -1,5 +1,4 @@
 import {
-	Button,
 	Header,
 	Radio,
 	Segment,
@@ -21,8 +20,8 @@ export function StopWords({
 		isLoading,
 		memoizedUpdateStopWords,
 		queryStopWords,
-		setShowDelete,
-		showDelete
+		setShowAll,
+		showAll
 	} = useStopWordsState({
 		servicesBaseUrl
 	});
@@ -47,14 +46,14 @@ export function StopWords({
 				<Flex.Item>
 					<Segment className='button-padding'>
 						<Radio
-							label={"Show delete"}
-							checked={showDelete}
+							label={"Show all fields"}
+							checked={showAll}
 							onChange={(
 								//@ts-ignore
 								event :unknown,
 								{checked}
 							) => {
-								setShowDelete(checked);
+								setShowAll(checked);
 							}}
 							toggle
 						/>
@@ -75,11 +74,10 @@ export function StopWords({
 			<Table celled compact striped>
 				<Table.Header>
 					<Table.Row>
-						<Table.HeaderCell>Edit</Table.HeaderCell>
 						<Table.HeaderCell>Name</Table.HeaderCell>
 						<Table.HeaderCell>Count</Table.HeaderCell>
-						<Table.HeaderCell>Words</Table.HeaderCell>
-						{showDelete ? <Table.HeaderCell>Delete</Table.HeaderCell> : null}
+						{showAll ?<Table.HeaderCell>Words</Table.HeaderCell> : null}
+						<Table.HeaderCell textAlign='center'>{showAll ? 'Actions' : 'Edit'}</Table.HeaderCell>
 					</Table.Row>
 				</Table.Header>
 				<Table.Body>
@@ -90,7 +88,23 @@ export function StopWords({
 					}, index :number) => {
 						const key = `list[${index}]`;
 						return <Table.Row disabled={isLoading} key={key}>
-							<Table.Cell collapsing>
+							<Table.Cell>{_name}</Table.Cell>
+							<Table.Cell collapsing textAlign='right'>{words.length}</Table.Cell>
+							{
+								showAll
+									? <Table.Cell>
+										{words.map((word,i) => <span key={i}>{i > 0 && ', '}{word}</span>)}
+										{/*<ul style={{
+											listStyleType: 'none',
+											margin: 0,
+											padding: 0
+										}}>
+											{words.map((word, i) => <li key={i} style={{marginBottom: 3}}>{word}</li>)}
+										</ul>*/}
+									</Table.Cell>
+									: null
+							}
+							<Table.Cell collapsing textAlign='center'>
 								<NewOrEditModal
 									_id={_id}
 									_name={_name}
@@ -101,24 +115,9 @@ export function StopWords({
 									servicesBaseUrl={servicesBaseUrl}
 									words={words}
 								/>
-							</Table.Cell>
-							<Table.Cell collapsing>{_name}</Table.Cell>
-							<Table.Cell collapsing>{words.length}</Table.Cell>
-							<Table.Cell>
-								{words.map((word,i) => <span key={i}>{i > 0 && ', '}{word}</span>)}
-								{/*<ul style={{
-									listStyleType: 'none',
-									margin: 0,
-									padding: 0
-								}}>
-									{words.map((word, i) => <li key={i} style={{marginBottom: 3}}>{word}</li>)}
-								</ul>*/}
-							</Table.Cell>
-							{showDelete
-								? <Table.Cell collapsing>
-									<Button.Group>
-										{/* MAYBE copy/duplicate? */}
-										<DeleteModal
+								{
+									showAll
+										? <DeleteModal
 											_id={_id}
 											_name={_name}
 											afterClose={memoizedUpdateStopWords}
@@ -126,9 +125,9 @@ export function StopWords({
 											loading={isLoading}
 											servicesBaseUrl={servicesBaseUrl}
 										/>
-									</Button.Group>
-								</Table.Cell>
-								: null}
+										: null
+								}
+							</Table.Cell>
 						</Table.Row>;
 					})}
 				</Table.Body>

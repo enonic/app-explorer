@@ -259,15 +259,8 @@ services: {}, // Workaround for i18nUrl BUG
 		</style>
 		<svg style="display: none" version="2.0">
 			<defs>
-				<symbol id="json" viewbox="0 0 24 24">
-					<g transform="translate(0 -1028.362)">
-						<path style="fill:none;fill-rule:evenodd;stroke:#000;stroke-width:2.01073027;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" d="M2.026 1040.272s1.865-.048 2.412.51c1.984 2.03-1.575 5.852.41 7.883.6.615 2.139.595 2.139.595"/>
-						<path d="M2.026 1040.356s1.865.048 2.412-.511c1.984-2.03-1.575-5.852.41-7.883.6-.614 2.139-.594 2.139-.594M21.974 1040.272s-1.865-.048-2.412.51c-1.985 2.03 1.575 5.852-.41 7.883-.6.615-2.139.595-2.139.595" style="fill:none;fill-rule:evenodd;stroke:#000;stroke-width:2.01073027;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"/>
-						<path style="fill:none;fill-rule:evenodd;stroke:#000;stroke-width:2.01073027;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" d="M21.974 1040.356s-1.865.048-2.412-.511c-1.985-2.03 1.575-5.852-.41-7.883-.6-.614-2.139-.594-2.139-.594"/>
-						<circle r="2" cy="1037.362" cx="12" style="opacity:1;fill:#000;fill-opacity:1;stroke:none;stroke-width:0;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"/>
-						<circle style="opacity:1;fill:#000;fill-opacity:1;stroke:none;stroke-width:0;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" cx="12" cy="1043.362" r="2"/>
-						<path d="M12.98 1043.429s.242 2.059-.766 3.244c-.814.956-2.186.907-2.186.907" style="fill:none;fill-rule:evenodd;stroke:#000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"/>
-					</g>
+				<symbol id="json" fill="currentColor" viewBox="0 0 512 512">
+					<path d="M284.09589 382.75518c126.40972-96.06768 39.60866-294.89635-69.51243-277.86038-205.2681 32.04643-153.92524 317.32819-85.53674 370.36292C22.04198 422.38997-22.42647 291.21668 10.82114 179.73984 37.160205 91.426854 119.28723 3.96245 243.70826.61041c196.3664-17.911315 254.87234 364.1644 40.38763 382.14477zm-64.84876-252.55609C106.94737 135.9266 82.72514 249.3567 91.95607 331.31256c13.46832 119.5772 89.24288 197.21638 207.55413 177.68424 181.77637-30.00966 331.90336-318.72546 76.44101-480.0149 94.10969 109.62379 94.98251 331.71315-59.62399 371.12974-142.98119 43.10216-208.07573-187.72477-97.08009-269.91255z"/>
 				</symbol>
 				<symbol id="graphql100" fill="#e10098" style="fill:color(display-p3 .8824 0 .5961)" viewBox="0 0 100 100">
 					<path fill-rule="evenodd" d="M50 6.90308 87.323 28.4515v43.0969L50 93.0968 12.677 71.5484V28.4515L50 6.90308ZM16.8647 30.8693v31.6558l27.4148-47.4837-27.4148 15.8279ZM50 13.5086 18.3975 68.2457h63.205L50 13.5086Zm27.4148 58.9248H22.5852L50 88.2613l27.4148-15.8279Zm5.7205-9.9083L55.7205 15.0414l27.4148 15.8279v31.6558Z" clip-rule="evenodd"/>

@@ -17,10 +17,8 @@ import {
 import {parseExpression as parseCronExpression} from 'cron-parser';
 import {Link} from 'react-router-dom';
 import {
-	Button,
 	Dimmer,
 	Header,
-	Icon,
 	Loader,
 	Popup,
 	Progress,
@@ -28,6 +26,7 @@ import {
 	Segment,
 	Table,
 } from 'semantic-ui-react';
+import HoverButton from '../components/buttons/HoverButton';
 import RefreshButton from '../components/buttons/RefreshButton';
 import Flex from '../components/Flex';
 import {Cron} from '../utils/Cron';
@@ -162,7 +161,7 @@ export function Collections(props :{
 						<Table.Header>
 							<Table.Row>
 								{/* Width is X columns of total 16 */}
-								<Table.HeaderCell>Edit</Table.HeaderCell>
+								<Table.HeaderCell>Collect</Table.HeaderCell>
 								<Table.HeaderCell
 									onClick={null/*handleSortGenerator('displayName')*/}
 									sorted={/*column === '_name' ? direction : */null}
@@ -219,37 +218,60 @@ export function Collections(props :{
 									: [new Cron('0 0 * * 0').toObj()]; // Default once a week
 								const doCollect = jobsObj[collectionId] ? jobsObj[collectionId][0].enabled : false;
 								return <Table.Row key={key}>
-									<Table.Cell collapsing><NewOrEditCollectionModal
-										collections={queryCollectionsGraph.hits}
-										collectorOptions={collectorOptions}
-										collectorComponents={collectorComponents}
-										contentTypeOptions={contentTypeOptions}
-										disabled={disabled}
-										initialValues={{
-											_id: collectionId,
-											_name: collectionName,
-											_path,
-											collector,
-											cron,
-											doCollect,
-											documentTypeId,
-											language
-										}}
-										fields={fieldsObj}
-										loading={isLoading}
-										locales={locales}
-										licenseValid={licenseValid}
-										_name={collectionName}
-										afterClose={() => {
-											//console.debug('NewOrEditCollectionModal afterClose');
-											memoizedFetchOnUpdate();
-										}}
-										servicesBaseUrl={servicesBaseUrl}
-										setLicensedTo={setLicensedTo}
-										setLicenseValid={setLicenseValid}
-										siteOptions={siteOptions}
-										totalNumberOfCollections={queryCollectionsGraph.total}
-									/></Table.Cell>
+									<Table.Cell collapsing>
+										{
+											collector && collector.name
+												? collectionsTaskState[collectionName]
+													? {
+														WAITING: <Popup
+															content={`Collector is in waiting state`}
+															inverted
+															trigger={<HoverButton color='yellow' disabled={!boolCollectorSelectedAndInitialized} icon='pause'/>}/>,
+														RUNNING: <Popup
+															content={`Stop collecting to ${collectionName}`}
+															inverted
+															trigger={<HoverButton color='red' disabled={!boolCollectorSelectedAndInitialized} icon='stop' onClick={() => {
+																fetch(`${servicesBaseUrl}/collectorStop?collectionName=${collectionName}`, {
+																	method: 'POST'
+																}).then(() => {
+																	memoizedFetchTasks();
+																});
+															}}/>}/>,
+														FINISHED: <Popup
+															content={`Finished collecting to ${collectionName}`}
+															inverted
+															trigger={<HoverButton color='green' disabled={!boolCollectorSelectedAndInitialized} icon='checkmark'/>}/>,
+														FAILED: <Popup
+															content={`Something went wrong while collecting to ${collectionName}`}
+															inverted
+															trigger={<HoverButton color='red' disabled={!boolCollectorSelectedAndInitialized} icon='warning'/>}/>
+													}[collectionsTaskState[collectionName]]
+													: anyTaskWithoutCollectionName
+														? <Popup
+															content={`Some collector task is starting...`}
+															inverted
+															trigger={<HoverButton color='yellow' disabled={!boolCollectorSelectedAndInitialized} icon='question' loading/>}/>
+														: <Popup
+															content={`Start collecting to ${collectionName}`}
+															inverted
+															trigger={
+																<HoverButton
+																	color={boolCollectorSelectedAndInitialized ? 'green' : 'grey'}
+																	disabled={!boolCollectorSelectedAndInitialized || busy}
+																	icon='cloud download'
+																	onClick={() => {
+																		fetch(`${servicesBaseUrl}/collectionCollect?id=${collectionId}&name=${collectionName}`, {
+																			method: 'POST'
+																		}).then(() => {
+																			memoizedFetchTasks();
+																		});
+																	}}
+																/>
+															}
+														/>
+												: <HoverButton color='grey' disabled={true} icon='cloud download'/>
+										}
+									</Table.Cell>
 									<Table.Cell collapsing>{collectionName}</Table.Cell>
 									{busy
 										? <Table.Cell collapsing colspan={
@@ -312,128 +334,122 @@ export function Collections(props :{
 											}</Table.Cell> : null}
 										</>
 									}
-
 									<Table.Cell collapsing>
-										<Button.Group>
-											{collector && collector.name
-												? collectionsTaskState[collectionName]
-													? {
-														WAITING: <Popup
-															content={`Collector is in waiting state`}
-															inverted
-															trigger={<Button disabled={!boolCollectorSelectedAndInitialized} icon><Icon color='yellow' name='pause'/></Button>}/>,
-														RUNNING: <Popup
-															content={`Stop collecting to ${collectionName}`}
-															inverted
-															trigger={<Button disabled={!boolCollectorSelectedAndInitialized} icon onClick={() => {
-																fetch(`${servicesBaseUrl}/collectorStop?collectionName=${collectionName}`, {
-																	method: 'POST'
-																}).then(() => {
-																	memoizedFetchTasks();
-																});
-															}}><Icon color='red' name='stop'/></Button>}/>,
-														FINISHED: <Popup
-															content={`Finished collecting to ${collectionName}`}
-															inverted
-															trigger={<Button disabled={!boolCollectorSelectedAndInitialized} icon><Icon color='green' name='checkmark'/></Button>}/>,
-														FAILED: <Popup
-															content={`Something went wrong while collecting to ${collectionName}`}
-															inverted
-															trigger={<Button disabled={!boolCollectorSelectedAndInitialized} icon><Icon color='red' name='warning'/></Button>}/>
-													}[collectionsTaskState[collectionName]]
-													: anyTaskWithoutCollectionName
-														? <Popup
-															content={`Some collector task is starting...`}
-															inverted
-															trigger={<Button disabled={!boolCollectorSelectedAndInitialized} icon loading><Icon color='yellow' name='question'/></Button>}/>
-														: <Popup
-															content={`Start collecting to ${collectionName}`}
-															inverted
-															trigger={<Button disabled={!boolCollectorSelectedAndInitialized || busy} icon onClick={() => {
-																fetch(`${servicesBaseUrl}/collectionCollect?id=${collectionId}&name=${collectionName}`, {
-																	method: 'POST'
-																}).then(() => {
-																	memoizedFetchTasks();
-																});
-															}}><Icon color={boolCollectorSelectedAndInitialized ? 'green' : 'grey'} name='cloud download'/></Button>}/>
-												: <Button disabled={true} icon><Icon color='grey' name='cloud download'/></Button>
-											}
-											{/*anyReindexTaskWithoutCollectionId
-												? <Popup
-													content={`Some reindex task is starting...`}
-													inverted
-													trigger={<Button disabled={true} icon loading><Icon color='yellow' name='question'/></Button>}/>
-												: <Popup
-													content={
-														objCollectionsBeingReindexed[collectionId]
-														&& [TASK_STATE_RUNNING, TASK_STATE_WAITING].includes(objCollectionsBeingReindexed[collectionId].state)
-															? `Collection is being reindexed...`
-															: 'Start reindex'
-													}
-													inverted
-													trigger={<Button
-														disabled={
-															objCollectionsBeingReindexed[collectionId]
-															&& [TASK_STATE_RUNNING, TASK_STATE_WAITING].includes(objCollectionsBeingReindexed[collectionId].state) }
-														icon
-														onClick={() => {
-															fetch(`${servicesBaseUrl}/graphQL`, {
-																method: 'POST',
-																headers: { 'Content-Type': 'application/json' },
-																body: JSON.stringify({
-																	query: GQL_MUTATION_COLLECTIONS_REINDEX,
-																	variables: {
-																		collectionIds: [collectionId]
-																	}
-																})
-															})
-																.then(res => res.json())
-																.then(res => {
-																	console.debug(res);
-																});
-														}}
-													>
-														<Icon color={
-															objCollectionsBeingReindexed[collectionId]
-																? objCollectionsBeingReindexed[collectionId].state === TASK_STATE_FAILED
-																	? 'red'
-																	: [TASK_STATE_RUNNING, TASK_STATE_WAITING].includes(objCollectionsBeingReindexed[collectionId].state)
-																		? 'yellow'
-																		: 'green' // objCollectionsBeingReindexed[collectionId] === TASK_STATE_FINISHED
-																: 'green'} name='recycle'/>
-													</Button>}/>
-											*/}
-											<Popup
-												content={`Copy collection ${collectionName}`}
+										<NewOrEditCollectionModal
+											collections={queryCollectionsGraph.hits}
+											collectorOptions={collectorOptions}
+											collectorComponents={collectorComponents}
+											contentTypeOptions={contentTypeOptions}
+											disabled={disabled}
+											initialValues={{
+												_id: collectionId,
+												_name: collectionName,
+												_path,
+												collector,
+												cron,
+												doCollect,
+												documentTypeId,
+												language
+											}}
+											fields={fieldsObj}
+											loading={isLoading}
+											locales={locales}
+											licenseValid={licenseValid}
+											_name={collectionName}
+											afterClose={() => {
+												//console.debug('NewOrEditCollectionModal afterClose');
+												memoizedFetchOnUpdate();
+											}}
+											servicesBaseUrl={servicesBaseUrl}
+											setLicensedTo={setLicensedTo}
+											setLicenseValid={setLicenseValid}
+											siteOptions={siteOptions}
+											totalNumberOfCollections={queryCollectionsGraph.total}
+										/>
+										{/*anyReindexTaskWithoutCollectionId
+											? <Popup
+												content={`Some reindex task is starting...`}
 												inverted
-												trigger={<Button icon onClick={() => {
-													setCopyModalCollectionId(collectionId);
-												}}><Icon color='blue' name='copy'/></Button>}/>
-											{
-												showDelete
-													? <Popup
-														content={`Delete collection ${collectionName}`}
-														inverted
-														trigger={
-															<Button
-																disabled={busy}
-																icon={{
-																	color: 'red',
-																	name: 'trash alternate outline',
-																}}
-																onClick={() => {
+												trigger={<Button disabled={true} icon loading><Icon color='yellow' name='question'/></Button>}/>
+											: <Popup
+												content={
+													objCollectionsBeingReindexed[collectionId]
+													&& [TASK_STATE_RUNNING, TASK_STATE_WAITING].includes(objCollectionsBeingReindexed[collectionId].state)
+														? `Collection is being reindexed...`
+														: 'Start reindex'
+												}
+												inverted
+												trigger={<Button
+													disabled={
+														objCollectionsBeingReindexed[collectionId]
+														&& [TASK_STATE_RUNNING, TASK_STATE_WAITING].includes(objCollectionsBeingReindexed[collectionId].state) }
+													icon
+													onClick={() => {
+														fetch(`${servicesBaseUrl}/graphQL`, {
+															method: 'POST',
+															headers: { 'Content-Type': 'application/json' },
+															body: JSON.stringify({
+																query: GQL_MUTATION_COLLECTIONS_REINDEX,
+																variables: {
+																	collectionIds: [collectionId]
+																}
+															})
+														})
+															.then(res => res.json())
+															.then(res => {
+																console.debug(res);
+															});
+													}}
+												>
+													<Icon color={
+														objCollectionsBeingReindexed[collectionId]
+															? objCollectionsBeingReindexed[collectionId].state === TASK_STATE_FAILED
+																? 'red'
+																: [TASK_STATE_RUNNING, TASK_STATE_WAITING].includes(objCollectionsBeingReindexed[collectionId].state)
+																	? 'yellow'
+																	: 'green' // objCollectionsBeingReindexed[collectionId] === TASK_STATE_FINISHED
+															: 'green'} name='recycle'/>
+												</Button>}/>
+										*/}
+										<Popup
+											content={`Copy collection ${collectionName}`}
+											inverted
+											trigger={
+												<HoverButton
+													color='blue'
+													icon='copy'
+													onClick={
+														() => {
+															setCopyModalCollectionId(collectionId);
+														}
+													}
+												/>
+											}
+										/>
+										{
+											showDelete
+												? <Popup
+													content={`Delete collection ${collectionName}`}
+													inverted
+													trigger={
+														<HoverButton
+															color='red'
+															disabled={busy}
+															icon='trash alternate outline'
+															onClick={
+																() => {
 																	setDeleteCollectionModalState({
 																		collectionId,
 																		collectionName,
 																		open: true,
 																	})
-																}}
-															/>
-														}
-													/>
-													: null
-											}
-										</Button.Group>
+																}
+															}
+														/>
+													}
+												/>
+												: null
+										}
 									</Table.Cell>
 								</Table.Row>;
 							})}

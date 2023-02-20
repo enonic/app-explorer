@@ -6,8 +6,7 @@ import {
 	Modal,
 	Popup
 } from 'semantic-ui-react';
-
-
+import HoverButton from '../components/buttons/HoverButton';
 import {GQL_MUTATION_API_KEY_DELETE} from '../../../services/graphQL/mutations/apiKeyDeleteMutation';
 
 
@@ -51,15 +50,20 @@ export const DeleteApiKeyModal = (props :{
 		onClose={doClose}
 		open={state.open}
 		size='tiny'
-		trigger={<Popup
-			content={`Delete API Key ${_name}`}
-			inverted
-			trigger={<Button
-				disabled={disabled}
-				icon
-				loading={loading}
-				onClick={doOpen}
-			><Icon color='red' name='trash alternate outline'/></Button>}/>
+		trigger={
+			<Popup
+				content={`Delete API Key ${_name}`}
+				inverted
+				trigger={
+					<HoverButton
+						color='red'
+						disabled={disabled}
+						icon='trash alternate outline'
+						loading={loading}
+						onClick={doOpen}
+					/>
+				}
+			/>
 		}
 	>
 		<Modal.Header>{`Delete API Key ${_name}`}</Modal.Header>

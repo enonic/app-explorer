@@ -8,7 +8,6 @@ import {
 
 export default function RefreshButton({
 	basic, // eslint-disable-line
-	color = 'blue',
 	children, // eslint-disable-line
 	content, // eslint-disable-line
 	icon, // eslint-disable-line
@@ -20,11 +19,12 @@ export default function RefreshButton({
 		inverted
 		trigger={<Button
 			basic
-			color={color}
+			className='translucent'
 			icon
 			{...rest}
 		>
 			<Icon
+				color='blue'
 				loading={loading}
 				name='refresh'
 			/>

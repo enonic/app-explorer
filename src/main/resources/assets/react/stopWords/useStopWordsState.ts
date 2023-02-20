@@ -13,7 +13,7 @@ export function useStopWordsState({
 } :{
 	servicesBaseUrl :string
 }) {
-	const [showDelete, setShowDelete] = React.useState(false);
+	const [showAll, setShowAll] = React.useState(true);
 	const [state, setState] = React.useState({
 		queryStopWords: {
 			count: 0,
@@ -60,7 +60,7 @@ export function useStopWordsState({
 		isLoading,
 		memoizedUpdateStopWords,
 		queryStopWords,
-		setShowDelete,
-		showDelete
+		setShowAll,
+		showAll
 	};
 }

@@ -7,6 +7,7 @@ import {
 	Modal,
 	Popup,
 } from 'semantic-ui-react';
+import HoverButton from '../components/buttons/HoverButton';
 import {fetchInterfaceDelete} from '../../../services/graphQL/fetchers/fetchInterfaceDelete';
 
 
@@ -56,14 +57,13 @@ export function DeleteModal({
 				content={`Delete interface ${_name}`}
 				inverted
 				trigger={
-					<Button
+					<HoverButton
+						color='red'
 						disabled={loading || disabled}
-						icon
+						icon='trash alternate outline'
 						loading={loading}
 						onClick={doOpen}
-						size='tiny'
-						type='button'
-					><Icon color='red' name='trash alternate outline'/></Button>
+					/>
 				}
 			/>
 		}
