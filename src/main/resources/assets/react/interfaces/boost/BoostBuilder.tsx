@@ -7,6 +7,7 @@ import type {
 	TermQuery,
 } from '/lib/explorer/types/Interface.d';
 import type {
+	GetFieldValuesParams,
 	FieldNameToValueTypes,
 	FieldPathToValueOptions,
 } from '../index.d';
@@ -28,6 +29,7 @@ const DURATION_BUTTON_SHOW = 500;
 
 
 export function BoostBuilder({
+	collectionIdsFromStorage,
 	fieldButtonVisible,
 	fieldNameToValueTypesState,
 	fieldOptions,
@@ -36,6 +38,7 @@ export function BoostBuilder({
 	getFieldValues,
 	isDefaultInterface,
 	isLoading,
+	servicesBaseUrl,
 	setFieldButtonVisible,
 	setFieldValueOptions,
 	setTermButtonVisible,
@@ -43,14 +46,16 @@ export function BoostBuilder({
 	termButtonVisible,
 	termQueries,
 }: {
+	collectionIdsFromStorage: string[]
 	fieldButtonVisible: boolean
 	fieldNameToValueTypesState: FieldNameToValueTypes
 	fieldOptions: DropdownItemProps[]
 	fields: InterfaceField[]
 	fieldValueOptions: FieldPathToValueOptions
-	getFieldValues: (field: string) => void
+	getFieldValues: (params: GetFieldValuesParams) => void
 	isDefaultInterface: boolean
 	isLoading: boolean
+	servicesBaseUrl: string
 	setFieldButtonVisible: React.Dispatch<React.SetStateAction<boolean>>
 	setFields: React.Dispatch<React.SetStateAction<InterfaceField[]>>
 	setFieldValueOptions: React.Dispatch<React.SetStateAction<FieldPathToValueOptions>>
@@ -176,6 +181,7 @@ export function BoostBuilder({
 				setFieldButtonVisible={setFieldButtonVisible}
 			/>
 			<Term
+				collectionIdsFromStorage={collectionIdsFromStorage}
 				fieldNameToValueTypesState={fieldNameToValueTypesState}
 				fieldOptions={fieldOptions}
 				fieldValueOptions={fieldValueOptions}
@@ -183,6 +189,7 @@ export function BoostBuilder({
 				isDefaultInterface={isDefaultInterface}
 				isLoading={isLoading}
 				termQueries={termQueries}
+				servicesBaseUrl={servicesBaseUrl}
 				setTermQueries={setTermQueries}
 				setFieldValueOptions={setFieldValueOptions}
 				setTermButtonVisible={setTermButtonVisible}

@@ -27,3 +27,8 @@ export type NewOrEditInterfaceProps = {
 	//globalFieldsObj ?:GlobalFieldObject
 	interfaceNamesObj ?:InterfaceNamesObj
 }
+
+export type GetFieldValuesParams = {
+	collectionIds: string[]
+	field: string
+}
