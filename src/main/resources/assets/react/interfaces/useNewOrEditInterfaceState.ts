@@ -7,6 +7,7 @@ import type IQueryBuilderOptions from 'gql-query-builder/build/IQueryBuilderOpti
 import type {DropdownItemProps} from 'semantic-ui-react/index.d';
 import type {
 	FieldPathToValueOptions,
+	GetFieldValuesParams,
 	InterfaceNamesObj,
 } from './index.d';
 
@@ -230,7 +231,11 @@ export function useNewOrEditInterfaceState({
 		interfaceNamesObj
 	]);
 
-	const getFieldValues = React.useCallback((field: string) => {
+	const getFieldValues = React.useCallback(({
+		collectionIds,
+		field
+	}: GetFieldValuesParams) => {
+		// console.debug('getFieldValues field', field, 'collectionIds', collectionIds);
 		setIsFetchingFieldValues(true);
 		fetch(`${servicesBaseUrl}/graphQL`, {
 			method: 'POST',
@@ -247,11 +252,17 @@ export function useNewOrEditInterfaceState({
 							name: field,
 							terms: {
 								field,
-								minDocCount: 2,
+								//minDocCount: 2, // No, it should be possible to boost single values
 								order: '_count DESC',
-								size: 0 // Seems to mean infinite (undocumented)
+								size: 100, // We only get 100 by default, then 100 per search in the dropdown
 							}
 						}]
+					},
+					collectionIds: {
+						required: false,
+						list: true,
+						type: 'ID',
+						value: collectionIds
 					},
 					count: {
 						value: 0
@@ -443,7 +454,10 @@ export function useNewOrEditInterfaceState({
 								return deref;
 							});
 						}
-						getFieldValues(field);
+						getFieldValues({
+							collectionIds: initialCollectionIds,
+							field
+						});
 					}
 					if (isSet(initialFields)) {
 						if (!Array.isArray(initialFields)) {
@@ -579,6 +593,15 @@ export function useNewOrEditInterfaceState({
 		if (fetchCollectionsData) {
 			const existingCollectionIds = fetchCollectionsData.queryCollections.hits.map(({_id}) => _id);
 			setNonExistantCollectionIds(collectionIdsFromStorage.filter(collectionId => !existingCollectionIds.includes(collectionId)));
+			const fields = Object.keys(fieldValueOptions);
+			for (let index = 0; index < fields.length; index++) {
+				const field = fields[index];
+				// console.debug('Refreshing fieldValues for field', field, 'collectionIdsFromStorage', collectionIdsFromStorage);
+				getFieldValues({
+					collectionIds: collectionIdsFromStorage,
+					field
+				});
+			}
 		}
 	}, [
 		collectionIdsFromStorage,

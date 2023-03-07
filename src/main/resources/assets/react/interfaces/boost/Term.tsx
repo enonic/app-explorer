@@ -4,6 +4,7 @@ import type {
 } from 'semantic-ui-react';
 import type {TermQuery} from '/lib/explorer/types/Interface.d';
 import type {
+	GetFieldValuesParams,
 	FieldNameToValueTypes,
 	FieldPathToValueOptions,
 } from '../index.d';
@@ -14,8 +15,10 @@ import {
 	VALUE_TYPE_DOUBLE,
 	VALUE_TYPE_LONG,
 	VALUE_TYPE_STRING,
+	getIn,
 	isSet,
 } from '@enonic/js-utils';
+import * as gql from 'gql-query-builder';
 import {
 	Button,
 	Dropdown,
@@ -69,6 +72,7 @@ function changedValue({
 
 
 export function Term({
+	collectionIdsFromStorage,
 	disabled = false,
 	fieldNameToValueTypesState,
 	fieldOptions,
@@ -77,18 +81,21 @@ export function Term({
 	isDefaultInterface,
 	isLoading,
 	termQueries,
+	servicesBaseUrl,
 	setFieldValueOptions,
 	setTermButtonVisible,
 	setTermQueries,
 }: {
+	collectionIdsFromStorage: string[]
 	disabled?: boolean
 	fieldNameToValueTypesState: FieldNameToValueTypes
 	fieldOptions: DropdownItemProps[]
 	fieldValueOptions: FieldPathToValueOptions
-	getFieldValues: (field: string) => void
+	getFieldValues: (params: GetFieldValuesParams) => void
 	isLoading: boolean
 	isDefaultInterface: boolean
 	termQueries: TermQuery[]
+	servicesBaseUrl: string
 	setFieldValueOptions: React.Dispatch<React.SetStateAction<FieldPathToValueOptions>>
 	setTermButtonVisible: React.Dispatch<React.SetStateAction<boolean>>
 	setTermQueries: React.Dispatch<React.SetStateAction<TermQuery[]>>
@@ -146,7 +153,10 @@ export function Term({
 									options={fieldOptions}
 									onChange={(_e,{value:newField}: {value: string}) => {
 										if (!fieldValueOptions[newField]) {
-											getFieldValues(newField);
+											getFieldValues({
+												collectionIds: collectionIdsFromStorage,
+												field: newField
+											});
 										}
 										//console.debug('newName', newName);
 										const deref = JSON.parse(JSON.stringify(termQueries));
@@ -316,6 +326,109 @@ export function Term({
 															stringValue: newValue
 														}
 														setTermQueries(deref);
+													}}
+													onSearchChange={(_syntEvent,{searchQuery}) => {
+														fetch(`${servicesBaseUrl}/graphQL`, {
+															method: 'POST',
+															headers: {
+																'Content-Type':	'application/json'
+															},
+															body: JSON.stringify(gql.query({
+																operation: 'queryDocuments',
+																variables: {
+																	collectionIds: {
+																		required: false,
+																		list: true,
+																		type: 'ID',
+																		value: collectionIdsFromStorage
+																	},
+																	count: {
+																		value: 100
+																	},
+																	query: {
+																		required: true,
+																		type: 'QueryDSL',
+																		value: {
+																			boolean: {
+																				should: [{
+																					fulltext: {
+																						boost: 1.1,
+																						fields: [field],
+																						query: searchQuery
+																					}
+																				}, {
+																					ngram: {
+																						fields: [field],
+																						query: searchQuery
+																					  }
+																				}]
+																			}
+																		}
+																	}
+																},
+																fields: [
+																	{
+																		hits: [
+																			'_json'
+																		]
+																	}
+																],
+															}))
+														})
+															.then(response => response.json())
+															.then(obj => {
+																// console.debug('search field', field, 'searchQuery', searchQuery, 'response obj', obj);
+																const {hits} = obj.data.queryDocuments;
+																const foundFieldValues: string[] = [];
+																for (let index = 0; index < hits.length; index++) {
+																	const {_json} = hits[index];
+																	try {
+																		const parsedJsonObj = JSON.parse(_json);
+																		const fieldValue = getIn(parsedJsonObj, field);
+																		if (fieldValue && !foundFieldValues.includes(fieldValue)) {
+																			foundFieldValues.push(fieldValue);
+																		}
+																	} catch(e) {
+																		console.warning('Unable to JSON parse:', _json);
+																	}
+																} // for
+																// console.debug('foundFieldValues', foundFieldValues);
+																setFieldValueOptions(prev => {
+																	const deref = JSON.parse(JSON.stringify(prev)) as typeof prev;
+																	if (deref[field]) {
+																		// We already have some field value options for this field.
+																		for (let i = 0; i < foundFieldValues.length; i++) {
+																			const key = foundFieldValues[i];
+																			let foundIndex = -1;
+																			for (let j = 0; j < deref[field].length; j++) {
+																				const {value: existingKey} = deref[field][j];
+																				// Check all new values against old ones
+																				if (key === existingKey) {
+																					foundIndex = j;
+																				}
+																			}
+																			if (foundIndex === -1) {
+																				// Add missing values
+																				deref[field].push({
+																					text: key,
+																					value: key
+																				});
+																			} else {
+																				// Update docCount on existing values
+																				deref[field][foundIndex].text = key;
+																			}
+																		}
+																	} else {
+																		// We don't have any field value options for this field yet
+																		// So simply add all.
+																		deref[field] = foundFieldValues.map((value) => ({
+																			text: value,
+																			value
+																		}))
+																	}
+																	return deref;
+																});
+															})
 													}}
 													placeholder='Please select or input a value'
 													search

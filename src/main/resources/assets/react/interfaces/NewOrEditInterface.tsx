@@ -112,6 +112,7 @@ export function NewOrEditInterface({
 						: null
 				}
 				<BoostBuilder
+					collectionIdsFromStorage={collectionIdsFromStorage}
 					fieldNameToValueTypesState={fieldNameToValueTypesState}
 					fieldButtonVisible={fieldButtonVisible}
 					fieldOptions={fieldOptions}
@@ -121,6 +122,7 @@ export function NewOrEditInterface({
 					isLoading={isLoading}
 					isDefaultInterface={isDefaultInterface}
 					termQueries={termQueries}
+					servicesBaseUrl={servicesBaseUrl}
 					setFieldButtonVisible={setFieldButtonVisible}
 					setFields={setFields}
 					setFieldValueOptions={setFieldValueOptions}
