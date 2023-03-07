@@ -187,7 +187,7 @@ export function useNewOrEditInterfaceState({
 	const [collectionIdsFromStorage, setCollectionIdsFromStorage] = React.useState<string[]>([]);
 	const [nonExistantCollectionIds, setNonExistantCollectionIds] = React.useState<string[]>([]);
 
-	const [fieldButtonVisible, setFieldButtonVisible] = React.useState(_id ? false : true);
+	const [fieldButtonVisible, setFieldButtonVisible] = React.useState(_id ? false : true); // This is used to make nice transition when adding first/remoing last
 	const [fieldOptions, setFieldOptions] = React.useState<DropdownItemProps[]>([]);
 	const [fields, setFields] = React.useState<InterfaceField[]>([]);
 	const [fieldValueOptions, setFieldValueOptions] = React.useState<FieldPathToValueOptions>({});
@@ -200,7 +200,7 @@ export function useNewOrEditInterfaceState({
 
 	const [stopWords, setStopWords] = React.useState<string[]>([]);
 	const [synonymIds, setSynonymIds] = React.useState<string[]>([]);
-	const [termButtonVisible, setTermButtonVisible] = React.useState(_id ? false : true);
+	const [termButtonVisible, setTermButtonVisible] = React.useState(_id ? false : true); // This is used to make nice transition when adding first/remoing last
 	const [initialState, setInitialState] = React.useState<{
 		name: string
 		collectionIds: string[]
@@ -418,6 +418,9 @@ export function useNewOrEditInterfaceState({
 					setName(initialName);
 					setCollectionIdsFromStorage(initialCollectionIds);
 					setTermQueries(initialTermQueries);
+					if (!initialTermQueries.length) {
+						setTermButtonVisible(true);
+					}
 					for (let i = 0; i < initialTermQueries.length; i++) {
 						const {
 							field,
@@ -595,6 +598,9 @@ export function useNewOrEditInterfaceState({
 		setName(initialName);
 		setCollectionIdsFromStorage(initialCollectionIds);
 		setTermQueries(initialTermQueries);
+		if (!initialTermQueries.length) {
+			setTermButtonVisible(true);
+		}
 		setFields(initialFields);
 		setStopWords(initialStopWords);
 		setSynonymIds(initialSynonymIds);
