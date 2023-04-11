@@ -19,6 +19,7 @@ import {
 } from '/lib/explorer/model/2/constants';
 import {connect} from '/lib/explorer/repo/connect';
 import {query as queryCollectors} from '/lib/explorer/collector/query';
+import {runAsSu} from '/lib/explorer/runAsSu';
 import {get as getRepo} from '/lib/xp/repo';
 import {list as listTasks} from '/lib/xp/task';
 
@@ -34,17 +35,20 @@ export function htmlResponse({
 	// On first startup repos are not yet created.
 	// There is a init task, but it takes a little while to start it.
 
-	let initTask :TaskInfo;
-	if (!getRepo(REPO_ID_EXPLORER)) {
-		initTask = {
-			progress: {
-				current: 0,
-				info: 'Starting task...',
-				total: 15
-			},
-			state: 'STARTING'
-		};
-	}
+	let initTask: TaskInfo;
+	runAsSu(() => { // Fix #784 Access denied to user with only Explorer Administrator role.
+		if (!getRepo(REPO_ID_EXPLORER)) {
+			initTask = {
+				progress: {
+					current: 0,
+					info: 'Starting task...',
+					total: 15
+				},
+				state: 'STARTING'
+			};
+		}
+	});
+
 	const filteredTaskList = listTasks({
 		name: 'com.enonic.app.explorer:init'
 	});
