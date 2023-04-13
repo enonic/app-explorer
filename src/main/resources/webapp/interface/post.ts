@@ -131,10 +131,15 @@ export function overrideable(request: InterfaceRequest, fn = isUnauthorized) {
 	const {
 		body: bodyJson = '{}',
 		headers: {
-			[HTTP_HEADERS.EXPLORER_INTERFACE_NAME]: interfaceName,
-			'Explorer-Log-Query': logQueryHeader, // '1'
-			'Explorer-Log-Synonyms-Query': logSynonymsQueryHeader, // '1'
-			'Explorer-Log-Synonyms-Query-Result': logSynonymsQueryResultHeader // '1'
+			//[HTTP_HEADERS.EXPLORER_INTERFACE_NAME]: interfaceName,
+			//'Explorer-Log-Query': logQueryHeader, // '1'
+			//'Explorer-Log-Synonyms-Query': logSynonymsQueryHeader, // '1'
+			//'Explorer-Log-Synonyms-Query-Result': logSynonymsQueryResultHeader // '1'
+			// FIXED: https://www.rfc-editor.org/rfc/rfc7540#section-8.1.2
+			[HTTP_HEADERS.EXPLORER_INTERFACE_NAME.toLowerCase()]: interfaceName,
+			'explorer-log-query': logQueryHeader, // '1'
+			'explorer-log-synonyms-query': logSynonymsQueryHeader, // '1'
+			'explorer-log-synonyms-query-result': logSynonymsQueryResultHeader // '1'
 		}
 	} = request;
 
