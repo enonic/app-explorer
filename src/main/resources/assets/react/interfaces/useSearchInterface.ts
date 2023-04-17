@@ -190,7 +190,7 @@ function useSearchInterface({
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
-				[HTTP_HEADERS.EXPLORER_INTERFACE_NAME]: interfaceNameState,
+				[HTTP_HEADERS.EXPLORER_INTERFACE_NAME.toLowerCase()]: interfaceNameState,
 			},
 			body: JSON.stringify(gqlQuery)
 		})
