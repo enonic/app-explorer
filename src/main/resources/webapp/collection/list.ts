@@ -24,7 +24,7 @@ export function list(request :EnonicXpRequest) {
 
 	const {
 		headers: {
-			'Authorization': authorization // 'Explorer-Api-Key XXXX'
+			'Authorization': authorization // 'explorer-api-key XXXX'
 		},
 		path
 	} = request;
