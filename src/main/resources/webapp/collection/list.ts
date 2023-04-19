@@ -1,5 +1,7 @@
-import type {EnonicXpRequest} from '/lib/explorer/types/index.d';
-
+import type {
+	EnonicXpRequest,
+	Headers
+} from '@enonic-types/lib-explorer/Request.d';
 
 import {
 	//RESPONSE_TYPE_JSON,
@@ -17,17 +19,17 @@ import {connect} from '/lib/explorer/repo/connect';
 import {hash} from '/lib/explorer/string/hash';
 import {coerceApiKey} from '../../services/graphQL/apiKey/coerceApiKey';
 import {AUTH_PREFIX} from '../constants';
+import lcKeys from '@enonic/js-utils/object/lcKeys';
+
 
 
 export function list(request :EnonicXpRequest) {
 	//log.debug('request:%s', toStr(request));
 
-	const {
-		headers: {
-			'Authorization': authorization // 'Explorer-Api-Key XXXX'
-		},
-		path
-	} = request;
+	const { // HTTP/2 uses lowercase header keys
+		authorization // 'Explorer-Api-Key XXXX'
+	} = lcKeys(request.headers) as Headers;
+
 	if(!authorization) {
 		log.error(`Authorization header missing!`);
 		return {
@@ -78,7 +80,9 @@ export function list(request :EnonicXpRequest) {
 	//log.debug(`apiKeyNode:${toStr(apiKeyNode)}`);
 	const {collections} = apiKeyNode;
 	//log.debug(`collections:${toStr(collections)}`);
-
+	const {
+		path
+	} = request;
 	const parentHref = resolve(path, '..');
 	//log.debug('parentHref:%s', toStr(parentHref));
 

@@ -174,8 +174,8 @@ export const NewOrEditApiKey = (props :{
 					//console.debug('onSubmit variables', variables);
 					fetch(`${servicesBaseUrl}/graphQL`, {
 						method: 'POST',
-						headers: {
-							'Content-Type':	'application/json'
+						headers: { // HTTP/2 uses lowercase header keys
+							'content-type':	'application/json'
 						},
 						body: JSON.stringify({
 							query: _id ? GQL_MUTATION_API_KEY_UPDATE : GQL_MUTATION_API_KEY_CREATE,

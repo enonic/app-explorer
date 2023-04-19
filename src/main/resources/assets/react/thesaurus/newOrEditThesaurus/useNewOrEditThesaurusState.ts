@@ -69,8 +69,8 @@ export function useNewOrEditThesaurusState({
 		setLoading(true);
 		fetch(`${servicesBaseUrl}/graphQL`, {
 			method: 'POST',
-			headers: {
-				'Content-Type':	'application/json'
+			headers: { // HTTP/2 uses lowercase header keys
+				'content-type':	'application/json'
 			},
 			body: JSON.stringify(gql.query({
 				operation: 'getThesaurus',
@@ -252,8 +252,8 @@ export function useNewOrEditThesaurusState({
 		}
 		fetch(`${servicesBaseUrl}/graphQL`, {
 			method: 'POST',
-			headers: {
-				'Content-Type':	'application/json'
+			headers: { // HTTP/2 uses lowercase header keys
+				'content-type':	'application/json'
 			},
 			body: JSON.stringify(gql.mutation({
 				operation: _id ? 'updateThesaurus' : 'createThesaurus',

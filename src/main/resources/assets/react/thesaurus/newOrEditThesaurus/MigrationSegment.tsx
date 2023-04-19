@@ -65,8 +65,8 @@ export function MigrationSegment({
 		setLoading(true);
 		fetch(`${servicesBaseUrl}/graphQL`, {
 			method: 'POST',
-			headers: {
-				'Content-Type':	'application/json'
+			headers: { // HTTP/2 uses lowercase header keys
+				'content-type':	'application/json'
 			},
 			body: JSON.stringify(gql.query({
 				operation: GQL_QUERY_SYNONYMS_NAME,
@@ -125,8 +125,8 @@ export function MigrationSegment({
 		if (migrating) {
 			fetch(`${servicesBaseUrl}/graphQL`, {
 				method: 'POST',
-				headers: {
-					'Content-Type':	'application/json'
+				headers: { // HTTP/2 uses lowercase header keys
+					'content-type':	'application/json'
 				},
 				body: JSON.stringify(gql.query({
 					operation: 'getTask',
@@ -280,8 +280,8 @@ export function MigrationSegment({
 				setLoading(true);
 				fetch(`${servicesBaseUrl}/graphQL`, {
 					method: 'POST',
-					headers: {
-						'Content-Type':	'application/json'
+					headers: { // HTTP/2 uses lowercase header keys
+						'content-type':	'application/json'
 					},
 					body: JSON.stringify(gql.mutation({
 						operation: 'migrateThesaurusSynonyms_v1_to_v2',

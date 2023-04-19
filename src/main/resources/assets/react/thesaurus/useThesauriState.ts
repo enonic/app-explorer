@@ -108,7 +108,9 @@ export function useThesauriState({
 		setLoading(true);
 		fetch(`${servicesBaseUrl}/graphQL`, {
 			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
+			headers: { // HTTP/2 uses lowercase header keys
+				'content-type': 'application/json'
+			},
 			body: GQL_ON_UPDATE
 		})
 			.then(res => res.json() as Promise<{
@@ -134,7 +136,9 @@ export function useThesauriState({
 		setLoading(true);
 		fetch(`${servicesBaseUrl}/graphQL`, {
 			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
+			headers: { // HTTP/2 uses lowercase header keys
+				'content-type': 'application/json'
+			},
 			body: GQL_ON_MOUNT
 		})
 			.then(res => res.json() as Promise<{

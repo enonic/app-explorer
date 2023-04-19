@@ -239,8 +239,8 @@ export function useNewOrEditInterfaceState({
 		setIsFetchingFieldValues(true);
 		fetch(`${servicesBaseUrl}/graphQL`, {
 			method: 'POST',
-			headers: {
-				'Content-Type':	'application/json'
+			headers: { // HTTP/2 uses lowercase header keys
+				'content-type':	'application/json'
 			},
 			body: JSON.stringify(gql.query({
 				operation: 'queryDocuments',
@@ -392,8 +392,8 @@ export function useNewOrEditInterfaceState({
 		setIsFetchingInterface(true);
 		fetch(`${servicesBaseUrl}/graphQL`, {
 			method: 'POST',
-			headers: {
-				'Content-Type':	'application/json'
+			headers: { // HTTP/2 uses lowercase header keys
+				'content-type':	'application/json'
 			},
 			body: JSON.stringify(gql.query(queries))
 		})
@@ -537,8 +537,8 @@ export function useNewOrEditInterfaceState({
 		//console.debug('collectionIds', collectionIds);
 		fetch(`${servicesBaseUrl}/graphQL`, {
 			method: 'POST',
-			headers: {
-				'Content-Type':	'application/json'
+			headers: { // HTTP/2 uses lowercase header keys
+				'content-type':	'application/json'
 			},
 			body: JSON.stringify(gql.query(buildQueryDocumentsObject({
 				collectionIds: collectionIdsFromStorage

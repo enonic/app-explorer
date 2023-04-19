@@ -335,7 +335,9 @@ export function useCollectionsState({
 		setIsLoading(true);
 		fetch(`${servicesBaseUrl}/graphQL`, {
 			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
+			headers: { // HTTP/2 uses lowercase header keys
+				'content-type': 'application/json'
+			},
 			body: JSON.stringify({ query: MOUNT_GQL })
 		})
 			.then(res => res.json())
@@ -359,7 +361,9 @@ export function useCollectionsState({
 		setIsLoading(true);
 		fetch(`${servicesBaseUrl}/graphQL`, {
 			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
+			headers: { // HTTP/2 uses lowercase header keys
+				'content-type': 'application/json'
+			},
 			body: JSON.stringify({ query: UPDATE_GQL })
 		})
 			.then(res => res.json())
@@ -382,7 +386,9 @@ export function useCollectionsState({
 		setIsLoading(true);
 		fetch(`${servicesBaseUrl}/graphQL`, {
 			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
+			headers: { // HTTP/2 uses lowercase header keys
+				'content-type': 'application/json'
+			},
 			body: JSON.stringify({ query: `{${COLLECTIONS_GQL}}` })
 		})
 			.then(res => res.json())
@@ -400,7 +406,9 @@ export function useCollectionsState({
 		setIsLoading(true);
 		fetch(`${servicesBaseUrl}/graphQL`, {
 			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
+			headers: { // HTTP/2 uses lowercase header keys
+				'content-type': 'application/json'
+			},
 			body: JSON.stringify({ query: `{${TASKS_GQL}}` })
 			//GQL_QUERY_TASKS_GET
 		})

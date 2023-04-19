@@ -97,8 +97,8 @@ export function DeleteDocumentTypeModal({
 							onClick={() => {
 								fetch(`${servicesBaseUrl}/graphQL`, {
 									method: 'POST',
-									headers: {
-										'Content-Type':	'application/json'
+									headers: { // HTTP/2 uses lowercase header keys
+										'content-type':	'application/json'
 									},
 									body: JSON.stringify({
 										query: GQL_MUTATION_DOCUMENT_TYPE_DELETE,

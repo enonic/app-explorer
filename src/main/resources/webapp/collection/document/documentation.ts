@@ -152,9 +152,9 @@ export function respondWithHtml({
 
 				fetch(\`?\${urlQuery}\`, {
 					//body: filtersJson, // TypeError: Failed to execute 'fetch' on 'Window': Request with GET/HEAD method cannot have body.
-					headers: {
-						'Accept': 'application/json',
-						'Content-Type': 'application/json'
+					headers: { // HTTP/2 uses lowercase header keys
+						'accept': 'application/json',
+						'content-type': 'application/json'
 					},
 					method: 'GET'
 				});/*.then(data => {
@@ -198,9 +198,9 @@ export function respondWithHtml({
 				}
 
 				fetch(\`?\${urlQuery}\`, {
-					headers: {
-						'Accept': 'application/json',
-						'Content-Type': 'application/json'
+					headers: { // HTTP/2 uses lowercase header keys
+						'accept': 'application/json',
+						'content-type': 'application/json'
 					},
 					body: json,
 					method: 'POST'
@@ -229,9 +229,9 @@ export function respondWithHtml({
 				}
 
 				fetch(\`?\${deleteIds}\`, {
-					headers: {
-						'Accept': 'application/json',
-						'Content-Type': 'application/json'
+					headers: { // HTTP/2 uses lowercase header keys
+						'accept': 'application/json',
+						'content-type': 'application/json'
 					},
 					method: 'DELETE'
 				});/*.then(data => {
@@ -258,16 +258,16 @@ export function respondWithHtml({
 				</thead>
 				<tbody>
 					<tr>
-						<th>Accept</th>
+						<th>accept</th>
 						<td>application/json</td>
 					</tr>
 					<tr>
-						<th>Authorization</th>
+						<th>authorization</th>
 						<td>Explorer-Api-Key XXXX</td>
 						<td>The API key (password) for the collection you want to get documents from.</td>
 					</tr>
 					<tr>
-						<th>Content-Type</th>
+						<th>content-type</th>
 						<td>application/json</td>
 					</tr>
 				</tbody>
@@ -397,16 +397,16 @@ export function respondWithHtml({
 				</thead>
 				<tbody>
 					<tr>
-						<th>Accept</th>
+						<th>accept</th>
 						<td>application/json</td>
 					</tr>
 					<tr>
-						<th>Authorization</th>
+						<th>authorization</th>
 						<td>Explorer-Api-Key XXXX</td>
 						<td>The API key (password) for the collection you want to get documents from.</td>
 					</tr>
 					<tr>
-						<th>Content-Type</th>
+						<th>content-type</th>
 						<td>application/json</td>
 					</tr>
 				</tbody>
@@ -554,16 +554,16 @@ export function respondWithHtml({
 				</thead>
 				<tbody>
 					<tr>
-						<th>Accept</th>
+						<th>accept</th>
 						<td>application/json</td>
 					</tr>
 					<tr>
-						<th>Authorization</th>
+						<th>authorization</th>
 						<td>Explorer-Api-Key XXXX</td>
 						<td>The API key (password) for the collection you want to get documents from.</td>
 					</tr>
 					<tr>
-						<th>Content-Type</th>
+						<th>content-type</th>
 						<td>application/json</td>
 					</tr>
 				</tbody>

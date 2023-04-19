@@ -22,7 +22,9 @@ export async function getColumns({
 }) {
 	return fetch(`${servicesBaseUrl}/graphQL`, {
 		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
+		headers: { // HTTP/2 uses lowercase header keys
+			'content-type': 'application/json'
+		},
 		body: JSON.stringify(gql.query({
 			operation: GQL_QUERY_PROFILE_GET_NAME
 		}))

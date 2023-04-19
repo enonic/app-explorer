@@ -147,8 +147,8 @@ export function NewOrEditModal(props :{
 				//console.debug('NewOrEditModal onSubmit values', values);
 				fetch(`${servicesBaseUrl}/graphQL`, {
 					method: 'POST',
-					headers: {
-						'Content-Type':	'application/json'
+					headers: { // HTTP/2 uses lowercase header keys
+						'content-type':	'application/json'
 					},
 					body: JSON.stringify({
 						query: _id ? GQL_MUTATION_FIELD_UPDATE : GQL_MUTATION_FIELD_CREATE,
