@@ -108,8 +108,8 @@ function useExplorerState({
 	const memoizedQueryInterfacesDefault = React.useCallback(() => {
 		fetch(`${servicesBaseUrl}/graphQL`, {
 			method: 'POST',
-			headers: {
-				'Content-Type':	'application/json'
+			headers: { // HTTP/2 uses lowercase header keys
+				'content-type':	'application/json'
 			},
 			body: GQL_BODY_QUERY_INTERFACES_DEFAULT
 		})

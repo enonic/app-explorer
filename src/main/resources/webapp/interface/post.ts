@@ -1,4 +1,7 @@
-import type {EnonicXpRequest} from '/lib/explorer/types/index.d';
+import type {
+	EnonicXpRequest,
+	Headers
+} from '@enonic-types/lib-explorer/Request.d';
 import {GraphQLContext} from '/lib/explorer/interface/graphql/output/index.d';
 import type {
 	ApiKeyNode,
@@ -12,6 +15,7 @@ import {
 	RESPONSE_TYPE_JSON,
 	// toStr,
 } from '@enonic/js-utils';
+import lcKeys from '@enonic/js-utils/object/lcKeys';
 //@ts-ignore
 import {execute} from '/lib/graphql';
 import {exists as interfaceExists} from '/lib/explorer/interface/exists';
@@ -36,15 +40,14 @@ function isUnauthorized({
 	interfaceName,
 	request
 } :{
-	interfaceName :string
-	request :EnonicXpRequest
+	interfaceName: string
+	request: EnonicXpRequest
 }) {
 	//log.debug('isUnauthorized interfaceName:%s request:%s', interfaceName, toStr(request));
 	const {
-		headers: {
-			'Authorization': authorization//, // 'Explorer-Api-Key XXXX
-		}
-	} = request;
+		 // HTTP/2 uses lowercase header keys
+		'authorization': authorization//, // 'Explorer-Api-Key XXXX
+	} = lcKeys(request.headers) as Headers;
 	//log.debug(`authorization:${toStr(authorization)}`);
 	if(!authorization) {
 		log.error(`Authorization header missing!`);
@@ -130,13 +133,14 @@ export function overrideable(request: InterfaceRequest, fn = isUnauthorized) {
 
 	const {
 		body: bodyJson = '{}',
-		headers: {
-			[HTTP_HEADERS.EXPLORER_INTERFACE_NAME]: interfaceName,
-			'Explorer-Log-Query': logQueryHeader, // '1'
-			'Explorer-Log-Synonyms-Query': logSynonymsQueryHeader, // '1'
-			'Explorer-Log-Synonyms-Query-Result': logSynonymsQueryResultHeader // '1'
-		}
 	} = request;
+
+	const { // HTTP/2 uses lowercased header keys
+		[HTTP_HEADERS.EXPLORER_INTERFACE_NAME]: interfaceName,
+		'explorer-log-query': logQueryHeader, // '1'
+		'explorer-log-synonyms-query': logSynonymsQueryHeader, // '1'
+		'explorer-log-synonyms-query-result': logSynonymsQueryResultHeader // '1'
+	} = lcKeys(request.headers) as Headers;
 
 	if (!interfaceName) {
 		log.error(`interfaceName not provided!`);
@@ -154,7 +158,7 @@ export function overrideable(request: InterfaceRequest, fn = isUnauthorized) {
 	const {query, variables} = body;
 	//log.debug('query:%s', query);
 	//log.debug(`variables:${toStr(variables)}`);
-	const context :GraphQLContext = {
+	const context: GraphQLContext = {
 		interfaceName,
 		logQuery: logQueryHeader === '1',
 		logSynonymsQuery: logSynonymsQueryHeader === '1',
@@ -173,7 +177,7 @@ export function overrideable(request: InterfaceRequest, fn = isUnauthorized) {
 }
 
 
-export function post(request :InterfaceRequest) {
+export function post(request: InterfaceRequest) {
 	//log.debug('post request:%s', toStr(request));
 	return overrideable(request, isUnauthorized);
 }

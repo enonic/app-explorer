@@ -188,8 +188,8 @@ function useSearchInterface({
 		//console.debug('Search() gqlQuery:', gqlQuery);
 		return fetch(uri, {
 			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
+			headers: { // HTTP/2 uses lowercase header keys
+				'content-type': 'application/json',
 				[HTTP_HEADERS.EXPLORER_INTERFACE_NAME]: interfaceNameState,
 			},
 			body: JSON.stringify(gqlQuery)

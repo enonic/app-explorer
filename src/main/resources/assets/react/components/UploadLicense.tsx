@@ -55,8 +55,8 @@ export const UploadLicense = (props :{
 				fetch(`${servicesBaseUrl}/uploadLicense`, {
 					//body: formData,
 					body: license,
-					headers: {
-						//'Content-type': 'multipart/form-data'
+					headers: { // HTTP/2 uses lowercase header keys
+						//'content-type': 'multipart/form-data'
 					},
 					method: 'POST'
 				}).then(response => response.json())

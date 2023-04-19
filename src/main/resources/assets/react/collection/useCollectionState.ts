@@ -171,7 +171,9 @@ export function useCollectionState({
 		if (collectorName) {
 			fetch(`${servicesBaseUrl}/graphQL`, {
 				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
+				headers: { // HTTP/2 uses lowercase header keys
+					'content-type': 'application/json'
+				},
 				body: JSON.stringify(gql.query({
 					operation: 'getManagedDocumentTypes',
 					variables: {
@@ -336,8 +338,8 @@ export function useCollectionState({
 
 		fetch(`${servicesBaseUrl}/graphQL`, {
 			method: 'POST',
-			headers: {
-				'Content-Type':	'application/json'
+			headers: { // HTTP/2 uses lowercase header keys
+				'content-type':	'application/json'
 			},
 			body: JSON.stringify({
 				query: _id ? GQL_MUTATION_UPDATE_COLLECTION : GQL_MUTATION_CREATE_COLLECTION,

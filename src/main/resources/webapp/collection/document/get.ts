@@ -1,4 +1,5 @@
-import type {QueryFilters} from '/lib/explorer/types/index.d';
+import type { Headers } from '@enonic-types/lib-explorer/Request.d';
+import type {QueryFilters} from '@enonic-types/lib-explorer';
 import type {Request} from '../../../types/Request';
 
 
@@ -8,7 +9,7 @@ import {
 	string//,
 	//toStr
 } from '@enonic/js-utils';
-
+import lcKeys from '@enonic/js-utils/object/lcKeys';
 import {
 	COLLECTION_REPO_PREFIX,
 	NT_DOCUMENT,
@@ -149,10 +150,10 @@ export function get(
 ) {
 	//log.info(`request:${toStr(request)}`);
 	const {
+		accept: acceptHeader
+	} = lcKeys(request.headers) as Headers
+	const {
 		//body = "{}", // TypeError: Failed to execute 'fetch' on 'Window': Request with GET/HEAD method cannot have body.
-		headers: {
-			Accept: acceptHeader
-		},
 		params: {
 			collection: collectionParam = '',
 			count: countParam = '10',

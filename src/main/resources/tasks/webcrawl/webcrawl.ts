@@ -270,14 +270,14 @@ export function run({
 	const scheme = entryPointUrlObj.scheme;
 	*/
 
-	const robotsReq :HttpClientRequest = {
+	const robotsReq: HttpClientRequest = {
 		contentType: 'text/plain',
 		followRedirects: false,
-		headers: {
-			'Accept': 'text/plain',
-			'Accept-Charset': 'utf-8, iso-8859-1;q=0.5, *;q=0.1',
-			'Accept-Encoding': 'identity', // Fix for  ID1ID2: actual != expected
-			'User-Agent': userAgent
+		headers: { // HTTP/2 uses lowercase header keys
+			'accept': 'text/plain',
+			'accept-charset': 'utf-8, iso-8859-1;q=0.5, *;q=0.1',
+			'accept-encoding': 'identity', // Fix for  ID1ID2: actual != expected
+			'user-agent': userAgent
 		},
 		method: 'GET',
 		url: `${scheme}://${domain}/robots.txt`
@@ -354,8 +354,8 @@ export function run({
 				throwIfExcluded(url);
 				const res = httpClientRequest({
 					followRedirects: true, // https://www.enonic.com uses 302
-					headers: {
-						'User-Agent': userAgent
+					headers: { // HTTP/2 uses lowercase header keys
+						'user-agent': userAgent
 					},
 					url
 				}) as Response; TRACE && log.debug('res:%s', toStr(res));

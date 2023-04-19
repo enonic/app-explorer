@@ -51,8 +51,8 @@ export function fetchDocumentTypes({
 }) {
 	fetch(url, {
 		method: 'POST',
-		headers: {
-			'Content-Type':	'application/json'
+		headers: { // HTTP/2 uses lowercase header keys
+			'content-type':	'application/json'
 		},
 		body: JSON.stringify(gql.query([{
 			operation: 'queryDocumentTypes',

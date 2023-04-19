@@ -1,3 +1,4 @@
+import type { Headers } from '@enonic-types/lib-explorer/Request.d';
 import type {GetRequest} from './get';
 import type {PostRequest} from './post';
 import type {RemoveRequest} from './remove';
@@ -12,7 +13,7 @@ import {
 	startsWith//,
 	//toStr
 } from '@enonic/js-utils';
-
+import lcKeys from '@enonic/js-utils/object/lcKeys';
 import {get} from './get';
 import {post} from './post';
 import {remove} from './remove';
@@ -32,14 +33,15 @@ const AUTH_PREFIX = 'Explorer-Api-Key ';
 
 
 export function all(
-	request :AllDocumentRequest
+	request: AllDocumentRequest
 ) {
 	//log.info(`request:${toStr(request)}`);
 
+	const { // HTTP/2 uses lowercase header keys
+		'authorization': authorization // 'Explorer-Api-Key XXXX'
+	} = lcKeys(request.headers) as Headers;
+
 	const {
-		headers: {
-			'Authorization': authorization // 'Explorer-Api-Key XXXX'
-		},
 		method
 	} = request;
 	//log.info(`method:${toStr(method)}`);

@@ -80,8 +80,8 @@ export function DeleteThesaurus({
 				onClick={() => {
 					fetch(`${servicesBaseUrl}/graphQL`, {
 						method: 'POST',
-						headers: {
-							'Content-Type':	'application/json'
+						headers: { // HTTP/2 uses lowercase header keys
+							'content-type':	'application/json'
 						},
 						body: JSON.stringify({
 							query: GQL_MUTATION_THESAURUS_DELETE,

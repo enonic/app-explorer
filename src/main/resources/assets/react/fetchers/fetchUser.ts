@@ -75,8 +75,8 @@ async function fetchUser({
 }) {
 	return fetch(url, {
 		method: 'POST',
-		headers: {
-			'Content-Type':	'application/json'
+		headers: { // HTTP/2 uses lowercase header keys
+			'content-type':	'application/json'
 		},
 		body: JSON.stringify(gql.query({
 			operation: GQL_QUERY_USER_GET_NAME,

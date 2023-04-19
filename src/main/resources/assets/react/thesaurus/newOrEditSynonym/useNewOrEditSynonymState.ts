@@ -267,8 +267,8 @@ export function useNewOrEditSynonymState({
 		setLoading(true);
 		fetch(`${servicesBaseUrl}/graphQL`, {
 			method: 'POST',
-			headers: {
-				'Content-Type':	'application/json'
+			headers: { // HTTP/2 uses lowercase header keys
+				'content-type':	'application/json'
 			},
 			body: JSON.stringify(gql.query(queries))
 		})
@@ -397,8 +397,8 @@ export function useNewOrEditSynonymState({
 		}
 		fetch(`${servicesBaseUrl}/graphQL`, {
 			method: 'POST',
-			headers: {
-				'Content-Type':	'application/json'
+			headers: { // HTTP/2 uses lowercase header keys
+				'content-type':	'application/json'
 			},
 			body: JSON.stringify(gql.mutation({
 				operation: _id ? 'updateSynonym' : 'createSynonym',

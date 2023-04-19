@@ -86,8 +86,8 @@ export function get({
 	return {
 		body: `"From","To"${thesaurus.map(s => `\n"${s.from.join(', ')}","${s.to.join(', ')}"`).join('')}\n`,
 		contentType: 'text/csv;charset=utf-8',
-		headers: {
-			'Content-Disposition': `attachment; filename="${name}.csv"`
+		headers: { // HTTP/2 uses lowercase header keys
+			'content-disposition': `attachment; filename="${name}.csv"`
 		}
 	};
 } // get

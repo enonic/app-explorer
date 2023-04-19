@@ -42,8 +42,8 @@ export async function fetchDocumentTypeCreate({
 }) {
 	return fetch(url, {
 		method: 'POST',
-		headers: {
-			'Content-Type':	'application/json'
+		headers: { // HTTP/2 uses lowercase header keys
+			'content-type':	'application/json'
 		},
 		body: JSON.stringify({
 			query: GQL_MUTATION_DOCUMENT_TYPE_CREATE,

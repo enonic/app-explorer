@@ -99,8 +99,8 @@ export function useSearchState({
 		if (interfaceNameState === 'default') {
 			return fetch(`${servicesBaseUrl}/graphQL`, {
 				method: 'POST',
-				headers: {
-					'Content-Type':	'application/json'
+				headers: { // HTTP/2 uses lowercase header keys
+					'content-type':	'application/json'
 				},
 				body: JSON.stringify(gql.query({
 					operation: 'queryCollections',
@@ -115,8 +115,8 @@ export function useSearchState({
 		} else {
 			return fetch(`${servicesBaseUrl}/graphQL`, {
 				method: 'POST',
-				headers: {
-					'Content-Type':	'application/json'
+				headers: { // HTTP/2 uses lowercase header keys
+					'content-type':	'application/json'
 				},
 				body: JSON.stringify(gql.query({
 					operation: 'queryInterfaces',
@@ -157,8 +157,8 @@ export function useSearchState({
 		// console.debug('getInterfaceDocumentCount interfaceNameState:', interfaceNameState);
 		return fetch(`${basename}/api/v1/interface`, {
 			method: 'POST',
-			headers: {
-				'Content-Type':	'application/json',
+			headers: { // HTTP/2 uses lowercase header keys
+				'content-type':	'application/json',
 				[HTTP_HEADERS.EXPLORER_INTERFACE_NAME]: interfaceNameState,
 			},
 			body: JSON.stringify(gql.query({

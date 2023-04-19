@@ -67,7 +67,9 @@ export function CollectionCopyModal({
 				disabled={!!nameError}
 				onClick={() => {
 					fetch(`${servicesBaseUrl}/graphQL`, {
-						headers: { 'Content-Type': 'application/json' },
+						headers: { // HTTP/2 uses lowercase header keys
+							'content-type': 'application/json'
+						},
 						method: 'POST',
 						body: JSON.stringify(gql.mutation({
 							operation: 'copyCollection',
