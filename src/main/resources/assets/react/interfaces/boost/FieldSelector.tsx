@@ -105,7 +105,7 @@ export function FieldSelector(props :{
 											const deref = JSON.parse(JSON.stringify(fieldsArray));
 											deref[index] = {
 												name,
-												boost: newBoost
+												boost: parseFloat(newBoost)
 											}
 											setFields(deref);
 										}}
