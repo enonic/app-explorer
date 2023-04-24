@@ -83,6 +83,10 @@ module.exports = {
 
 	}, //globals
 
+	ignorePatterns: [
+		"build/**/*.*"
+	],
+
 	//parser: 'espree', // default
 	//parser: 'esprima',
 	//parser: 'babel-eslint',
