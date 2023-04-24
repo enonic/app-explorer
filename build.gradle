@@ -61,7 +61,7 @@ dependencies {
 	include 'com.enonic.lib:lib-cache:2.2.0'
 	include 'com.enonic.lib:lib-graphql:2.0.3'
 	//include 'com.enonic.lib:lib-graphql-playground:0.0.1'
-	include 'com.enonic.lib:lib-guillotine:5.5.0'
+	include 'com.enonic.lib:lib-guillotine:6.2.0'
 	include 'com.enonic.lib:lib-http-client:3.2.2'
 	include 'com.enonic.lib:lib-license:3.0.1'
 	include 'com.enonic.lib:lib-router:3.0.1'
