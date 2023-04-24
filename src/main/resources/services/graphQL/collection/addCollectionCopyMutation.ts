@@ -1,14 +1,14 @@
 import type {CollectionNode} from '/lib/explorer/types/Collection';
-import type {Path} from '/lib/explorer/types/index.d';
+import type {Path as PathType} from '/lib/explorer/types/index.d';
 import type {RepoConnection} from '/lib/xp/node';
 import type {Glue} from '../Glue';
 
 
-import {toStr} from '@enonic/js-utils';
 import {
-	PATH_COLLECTIONS,
-	PRINCIPAL_EXPLORER_WRITE
-} from '/lib/explorer/constants';
+	Path,
+	Principal
+} from '@enonic/explorer-utils';
+// import {toStr} from '@enonic/js-utils';
 import {connect} from '/lib/explorer/repo/connect';
 import {exists} from '/lib/explorer/collection/exists';
 import {coerseCollectionType} from '/lib/explorer/collection/coerseCollectionType';
@@ -52,7 +52,7 @@ export function addCollectionCopyMutation({
 			// log.debug('_id:%s', _id);
 			// log.debug('toName:%s', toName);
 
-			const writeConnection = connect({principals: [PRINCIPAL_EXPLORER_WRITE]}) as RepoConnection;
+			const writeConnection = connect({principals: [Principal.EXPLORER_WRITE]}) as RepoConnection;
 
 			// Get current collection
 			const collectionNode = get({
@@ -91,7 +91,7 @@ export function addCollectionCopyMutation({
 			let createdNode: CollectionNode;
 			try {
 				createdNode = create/*<CollectionNode>*/({
-					_parentPath: PATH_COLLECTIONS as Path,
+					_parentPath: Path.COLLECTIONS as PathType,
 					...collectionNode
 				}, {
 					connection: writeConnection

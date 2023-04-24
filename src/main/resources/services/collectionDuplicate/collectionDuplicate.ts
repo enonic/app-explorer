@@ -1,11 +1,11 @@
 import type {Request} from '../../types/Request';
 
 
+import { Principal } from '@enonic/explorer-utils';
 import {
 	RESPONSE_TYPE_JSON//,
 	//toStr
 } from '@enonic/js-utils';
-import {PRINCIPAL_EXPLORER_WRITE} from '/lib/explorer/model/2/constants';
 import {exists} from '/lib/explorer/collection/exists';
 import {get} from '/lib/explorer/collection/get';
 import {connect} from '/lib/explorer/repo/connect';
@@ -23,7 +23,7 @@ export function post({
 		name
 	}
 } :Request<{name :string}>) {
-	const writeConnection = connect({principals: [PRINCIPAL_EXPLORER_WRITE]});
+	const writeConnection = connect({principals: [Principal.EXPLORER_WRITE]});
 	const node = get({
 		connection: writeConnection,
 		name

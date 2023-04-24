@@ -1,19 +1,8 @@
+import { Role } from '@enonic/explorer-utils';
 //import {toStr} from '@enonic/js-utils';
-
-//──────────────────────────────────────────────────────────────────────────────
-// Enonic XP libs (included in jar via gradle dependencies)
-//──────────────────────────────────────────────────────────────────────────────
 //@ts-ignore
 import newRouter from '/lib/router';
 import {hasRole} from '/lib/xp/auth';
-
-//──────────────────────────────────────────────────────────────────────────────
-// Local libs (Absolute path without extension so it doesn't get webpacked)
-//──────────────────────────────────────────────────────────────────────────────
-import {
-	ROLE_SYSTEM_ADMIN,
-	ROLE_EXPLORER_ADMIN
-} from '/lib/explorer/model/2/constants';
 //import {htmlResponse} from '/admin/tools/explorer/htmlResponse';
 import {htmlResponse} from './htmlResponse';
 
@@ -36,7 +25,7 @@ router.filter((
 	req,
 	next
 ) => {
-	if (!(hasRole(ROLE_EXPLORER_ADMIN) || hasRole(ROLE_SYSTEM_ADMIN))) { return { status: 401 }; }
+	if (!(hasRole(Role.EXPLORER_ADMIN) || hasRole(Role.SYSTEM_ADMIN))) { return { status: 401 }; }
 	//log.info(toStr({method: req.method})); // form method only supports get and post
 
 	//return htmlResponse(req);

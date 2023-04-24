@@ -1,7 +1,7 @@
 import type {Glue} from '../Glue';
 
 
-import {PRINCIPAL_EXPLORER_READ} from '/lib/explorer/constants';
+import { Principal } from '@enonic/explorer-utils';
 import {connect} from '/lib/explorer/repo/connect';
 import {getThesaurus} from '/lib/explorer/thesaurus/getThesaurus'
 import {
@@ -31,7 +31,7 @@ export function addGetThesaurus({
 		}) => {
 			return getThesaurus({
 				connection: connect({
-					principals: [PRINCIPAL_EXPLORER_READ]
+					principals: [Principal.EXPLORER_READ]
 				}),
 				_id
 			});

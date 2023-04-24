@@ -10,6 +10,10 @@ mapping.api.target = /webapp/com.enonic.app.explorer/api
 mapping.api.idProvider.system = default
 */
 import {
+	NodeType,
+	Principal
+} from '@enonic/explorer-utils';
+import {
 	startsWith//,
 	//toStr
 } from '@enonic/js-utils';
@@ -17,13 +21,10 @@ import lcKeys from '@enonic/js-utils/object/lcKeys';
 import {get} from './get';
 import {post} from './post';
 import {remove} from './remove';
-import {
-	NT_API_KEY,
-	PRINCIPAL_EXPLORER_READ
-} from '/lib/explorer/constants';
 import {hash} from '/lib/explorer/string/hash';
 import {connect} from '/lib/explorer/repo/connect';
 import {coerceApiKey} from '../../../services/graphQL/apiKey/coerceApiKey';
+// import { Node } from 'cheerio';
 
 
 export type AllDocumentRequest = GetRequest & PostRequest & RemoveRequest;
@@ -63,7 +64,7 @@ export function all(
 	const hashedApiKey = hash(apiKey);
 	//log.debug(`hashedApiKey:${toStr(hashedApiKey)}`);
 
-	const explorerRepoReadConnection = connect({ principals: [PRINCIPAL_EXPLORER_READ] });
+	const explorerRepoReadConnection = connect({ principals: [Principal.EXPLORER_READ] });
 	const matchingApiKeys = explorerRepoReadConnection.query({
 		count: -1,
 		filters: {
@@ -77,12 +78,12 @@ export function all(
 				should: [{
 					hasValue: {
 						field: '_nodetype',
-						values: [NT_API_KEY]
+						values: [NodeType.API_KEY]
 					}
 				},{
 					hasValue: {
 						field: 'type',
-						values: [NT_API_KEY]
+						values: [NodeType.API_KEY]
 					}
 				}]
 			}

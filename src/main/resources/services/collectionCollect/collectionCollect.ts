@@ -1,14 +1,12 @@
+import { Principal } from '@enonic/explorer-utils';
 import {
 	RESPONSE_TYPE_JSON,
 	toStr
 } from '@enonic/js-utils';
-
 //@ts-ignore
 import {assetUrl} from '/lib/xp/portal';
 //@ts-ignore
 import {submitTask} from '/lib/xp/task';
-
-import {PRINCIPAL_EXPLORER_READ} from '/lib/explorer/model/2/constants';
 import {connect} from '/lib/explorer/repo/connect';
 import {get as getCollection} from '/lib/explorer/collection/get';
 import {query as queryCollectors} from '/lib/explorer/collector/query';
@@ -24,11 +22,11 @@ export function post({
 		name: collectionName,
 		resume = false
 	}
-} :{
-	params :{
-		id :string
-		name :string
-		resume ?:'true'|unknown//boolean
+}: {
+	params: {
+		id: string
+		name: string
+		resume?: 'true'|unknown//boolean
 	}
 }) {
 	DEBUG && log.debug('collectionId:%s collectionName:%s resume:%s', collectionId, collectionName, resume);
@@ -52,7 +50,7 @@ export function post({
 	}
 
 	const readConnection = connect({
-		principals: [PRINCIPAL_EXPLORER_READ]
+		principals: [Principal.EXPLORER_READ]
 	});
 
 	const collectionNode = getCollection({

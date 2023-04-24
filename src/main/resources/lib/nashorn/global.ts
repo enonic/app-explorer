@@ -1,14 +1,14 @@
 //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/globalThis
 //type AnyObject = Record<PropertyKey,unknown>
 type MyGlobal = {
-	frames :typeof globalThis
-	globalThis :typeof globalThis
-	self :typeof globalThis
-	window :typeof globalThis
+	frames: typeof globalThis
+	globalThis: typeof globalThis
+	self: typeof globalThis
+	window: typeof globalThis
 	//crypto :typeof globalThis['crypto']
 	//crypto :Window['crypto']
-	crypto :{
-		getRandomValues :Crypto['getRandomValues']
+	crypto: {
+		getRandomValues: Crypto['getRandomValues']
 	}
 }
 /* Google uses this:

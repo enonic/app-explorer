@@ -2,6 +2,10 @@ import type {TaskInfo} from '/lib/xp/task';
 import type {ExplorerProps} from '/index.d';
 
 
+import {
+	Principal,
+	Repo
+} from '@enonic/explorer-utils';
 //import {toStr} from '@enonic/js-utils';
 import serialize from 'serialize-javascript';
 //@ts-ignore
@@ -12,11 +16,6 @@ import {
 	serviceUrl,
 } from '/lib/xp/portal';
 import {getLauncherPath} from '/lib/xp/admin';
-
-import {
-	PRINCIPAL_EXPLORER_READ,
-	REPO_ID_EXPLORER
-} from '/lib/explorer/model/2/constants';
 import {connect} from '/lib/explorer/repo/connect';
 import {query as queryCollectors} from '/lib/explorer/collector/query';
 import {runAsSu} from '/lib/explorer/runAsSu';
@@ -37,7 +36,7 @@ export function htmlResponse({
 
 	let initTask: TaskInfo;
 	runAsSu(() => { // Fix #784 Access denied to user with only Explorer Administrator role.
-		if (!getRepo(REPO_ID_EXPLORER)) {
+		if (!getRepo(Repo.EXPLORER)) {
 			initTask = {
 				progress: {
 					current: 0,
@@ -128,7 +127,7 @@ export function htmlResponse({
 	const collectorsAppToUri = {};
 	const collectorsObj = {};
 	queryCollectors({
-		connection: connect({principals: [PRINCIPAL_EXPLORER_READ]})
+		connection: connect({principals: [Principal.EXPLORER_READ]})
 	}).hits.forEach(({
 		//_name: collectorId,
 		appName,

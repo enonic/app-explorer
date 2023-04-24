@@ -10,15 +10,15 @@ import type {
 
 
 import {
+	Folder,
+	NodeType,
+	ROOT_PERMISSIONS_EXPLORER
+} from '@enonic/explorer-utils';
+import {
 	INDEX_CONFIG_N_GRAM,
 	forceArray,
 	isNotSet
 } from '@enonic/js-utils';
-import {
-	INTERFACES_FOLDER,
-	NT_INTERFACE,
-	ROOT_PERMISSIONS_EXPLORER
-} from '/lib/explorer/constants';
 import {node} from '/lib/explorer/model/2/nodeTypes/node';
 
 //@ts-ignore
@@ -26,30 +26,30 @@ import {reference} from '/lib/xp/value';
 
 
 interface InterfaceModelParamsRequired {
-	_name :string
+	_name: string
 }
 
 interface InterfaceModelParamsRemoved {
-	_id? :string
-	_path? :Path
-	_versionKey? :string
+	_id?: string
+	_path?: Path
+	_versionKey?: string
 }
 
 type InterfaceModelParamsOverWritten = {
 	_indexConfig ?:IndexConfig
 	_inheritsPermissions ?:boolean
 	_parentPath ?:ParentPath
-	_permissions ?:Array<PermissionsParams>
+	_permissions ?:PermissionsParams[]
 	_nodeType ?:string
 }
 
 interface InterfaceModelParamsPassedOn {
-	collectionIds? :OneOrMore<string>
-	//createdTime? :Date|string
-	fields? :OneOrMore<InterfaceField>
-	modifiedTime? :Date|string
-	stopWords? :OneOrMore<string>
-	synonymIds? :OneOrMore<string>
+	collectionIds?: OneOrMore<string>
+	//createdTime?: Date|string
+	fields?: OneOrMore<InterfaceField>
+	modifiedTime?: Date|string
+	stopWords?: OneOrMore<string>
+	synonymIds?: OneOrMore<string>
 }
 
 type InterfaceModelParams = InterfaceModelParamsRequired
@@ -92,7 +92,7 @@ export function interfaceModel({
 	//stopWordIds = [],
 	synonymIds = [],
 	...rest // fields stopWords
-} :InterfaceModelParams) :InterfaceModel {
+}: InterfaceModelParams): InterfaceModel {
 	return node({
 		...rest,
 		_indexConfig: {
@@ -109,8 +109,8 @@ export function interfaceModel({
 		},
 		_inheritsPermissions: false, // false is the default and the fastest, since it doesn't have to read parent to apply permissions.
 		_name,
-		_nodeType: NT_INTERFACE,
-		_parentPath :`/${INTERFACES_FOLDER}`,
+		_nodeType: NodeType.INTERFACE,
+		_parentPath: `/${Folder.INTERFACES}`,
 		_permissions: ROOT_PERMISSIONS_EXPLORER,
 		collectionIds: isNotSet(collectionIds) ? [] : forceArray(collectionIds).map((collectionId) => reference(collectionId)), // empty array allowed,
 		fields: isNotSet(fields) ? [] : forceArray(fields),

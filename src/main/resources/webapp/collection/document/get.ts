@@ -4,17 +4,17 @@ import type {Request} from '../../../types/Request';
 
 
 import {
+	COLLECTION_REPO_PREFIX,
+	NodeType,
+	Principal
+} from '@enonic/explorer-utils';
+import {
 	array,
 	forceArray,
 	string//,
 	//toStr
 } from '@enonic/js-utils';
 import lcKeys from '@enonic/js-utils/object/lcKeys';
-import {
-	COLLECTION_REPO_PREFIX,
-	NT_DOCUMENT,
-	PRINCIPAL_EXPLORER_READ
-} from '/lib/explorer/constants';
 //import {get as getCollection} from '/lib/explorer/collection/get';
 import {connect} from '/lib/explorer/repo/connect';
 
@@ -25,15 +25,15 @@ const {startsWith} = string;
 
 
 export type GetRequest = Request<{
-	id :string
-	collection? :string
-	count? :string
-	filters? :string
-	query? :string
-	sort? :string
-	start? :string
+	id: string
+	collection?: string
+	count?: string
+	filters?: string
+	query?: string
+	sort?: string
+	start?: string
 }, {
-	collection :string
+	collection: string
 }>
 
 
@@ -44,19 +44,19 @@ function respondWithJson({
 	query,
 	sort,
 	start
-} :{
-	collectionName :string
-	count :number
-	filters :QueryFilters
-	query :string
-	sort :string
-	start :number
-}) :{
-	body :{
+}: {
+	collectionName: string
+	count: number
+	filters: QueryFilters
+	query: string
+	sort: string
+	start: number
+}): {
+	body: {
 		message?: string
 	} | any
-	contentType :string
-	status? :number
+	contentType: string
+	status?: number
 } {
 	if (!collectionName) {
 		return {
@@ -74,7 +74,7 @@ function respondWithJson({
 	const branchId = 'master'; // Deliberate hardcode
 	const connectParams = {
 		branch: branchId,
-		principals: [PRINCIPAL_EXPLORER_READ],
+		principals: [Principal.EXPLORER_READ],
 		repoId
 	};
 	//log.debug('connecting using:%s', toStr(connectParams));
@@ -90,11 +90,11 @@ function respondWithJson({
 	};
 	//log.debug('queryParams:%s', toStr(queryParams));
 
-	let queryRes :{
+	let queryRes: {
 		count: number
-		hits: Array<{
-			id :string
-		}>
+		hits: {
+			id: string
+		}[]
 		total: number
 	};
 	try {
@@ -144,9 +144,9 @@ function respondWithJson({
 
 
 export function get(
-	request :GetRequest,
-	collections :Array<string> = []//,
-	//apiKey :string
+	request: GetRequest,
+	collections: string[] = []//,
+	//apiKey: string
 ) {
 	//log.info(`request:${toStr(request)}`);
 	const {
@@ -192,13 +192,13 @@ export function get(
 	filters.boolean.should.push({
 		hasValue: {
 			field: '_nodeType',
-			values: [NT_DOCUMENT]
+			values: [NodeType.DOCUMENT]
 		}
 	});
 	filters.boolean.should.push({
 		hasValue: {
 			field: 'type',
-			values: [NT_DOCUMENT]
+			values: [NodeType.DOCUMENT]
 		}
 	});
 	if (idParam) {

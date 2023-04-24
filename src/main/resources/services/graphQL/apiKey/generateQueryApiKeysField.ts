@@ -1,15 +1,14 @@
 import type {ApiKeyNode} from '../../../types/ApiKey';
 
 import {
+	NodeType,
+	Principal
+} from '@enonic/explorer-utils';
+import {
 	addQueryFilter//,
 	//toStr
 } from '@enonic/js-utils';
 
-import {
-	NT_API_KEY,
-	//PATH_API_KEYS,
-	PRINCIPAL_EXPLORER_READ
-} from '/lib/explorer/constants';
 import {hasValue} from '/lib/explorer/query/hasValue';
 import {connect} from '/lib/explorer/repo/connect';
 import {
@@ -35,11 +34,11 @@ export function generateQueryApiKeysField({
 			sort: GraphQLString,
 			start: GraphQLInt // start is ignored when count -1
 		},
-		resolve: (env :{
+		resolve: (env: {
 			args: {
-				count? :number
-				sort? :string
-				start? :number
+				count?: number
+				sort?: string
+				start?: number
 			}
 		}) => {
 			//log.info(`env:${toStr(env)}`);
@@ -58,7 +57,7 @@ export function generateQueryApiKeysField({
 				count,
 				filters: addQueryFilter({
 					clause: 'must',
-					filter: hasValue('_nodeType', [NT_API_KEY]),
+					filter: hasValue('_nodeType', [NodeType.API_KEY]),
 					filters: {}
 				}),
 				query: '',
@@ -67,7 +66,7 @@ export function generateQueryApiKeysField({
 			};
 			//log.debug('queryParams:%s', toStr(queryParams));
 
-			const readConnection = connect({ principals: [PRINCIPAL_EXPLORER_READ] });
+			const readConnection = connect({ principals: [Principal.EXPLORER_READ] });
 
 			const queryRes = readConnection.query(queryParams);
 			//log.debug('queryRes:%s', toStr(queryRes));

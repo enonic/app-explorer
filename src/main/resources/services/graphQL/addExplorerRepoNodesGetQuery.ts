@@ -2,19 +2,15 @@ import type {BooleanFilter} from '@enonic/js-utils/src/types/index.d';
 
 
 import {
+	NodeType,
+	Principal
+} from '@enonic/explorer-utils';
+import {
 	addQueryFilter,
 	isNotSet//,
 	//toStr
 } from '@enonic/js-utils';
 import {NT_DOCUMENT_TYPE} from '/lib/explorer/documentType/constants';
-import {
-	NT_COLLECTION,
-	NT_FIELD,
-	NT_INTERFACE,
-	NT_STOP_WORDS,
-	NT_THESAURUS,
-	PRINCIPAL_EXPLORER_READ
-} from '/lib/explorer/model/2/constants';
 import {hasValue} from '/lib/explorer/query/hasValue';
 import {connect} from '/lib/explorer/repo/connect';
 import {
@@ -59,16 +55,16 @@ export const addExplorerRepoNodesGetQuery = ({glue}) => {
 			} = env;
 			if (isNotSet(count)) {count = -1;}
 			if (isNotSet(nodeTypes)) {nodeTypes = [
-				NT_COLLECTION,
+				NodeType.COLLECTION,
 				NT_DOCUMENT_TYPE,
-				NT_FIELD,
-				NT_INTERFACE,
-				NT_STOP_WORDS,
-				NT_THESAURUS
+				NodeType.FIELD,
+				NodeType.INTERFACE,
+				NodeType.STOP_WORDS,
+				NodeType.THESAURUS
 			];}
 			if (isNotSet(query)) {query = '';}
 			if (isNotSet(start)) {start = 0;}
-			const readConnection = connect({principals: [PRINCIPAL_EXPLORER_READ]});
+			const readConnection = connect({principals: [Principal.EXPLORER_READ]});
 			const queryParams :{
 				count :number
 				filters ?:BooleanFilter

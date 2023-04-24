@@ -2,13 +2,13 @@ import type {InputTypeSynonymLanguage} from '/lib/explorer/types/Synonym.d';
 
 
 import {
+	NodeType,
+	Principal
+} from '@enonic/explorer-utils';
+import {
 	isString,
 	toStr
 } from '@enonic/js-utils';
-import {
-	NT_SYNONYM,
-	PRINCIPAL_EXPLORER_WRITE
-} from '/lib/explorer/constants';
 import {query} from '/lib/explorer/node/query';
 import {parseCsv} from '/lib/explorer/parseCsv';
 import {connect} from '/lib/explorer/repo/connect';
@@ -23,11 +23,11 @@ export function run({
 	fromLocale,
 	thesaurusId,
 	toLocale
-} :{
-	csv :string
-	fromLocale :string
-	thesaurusId :string
-	toLocale :string
+}: {
+	csv: string
+	fromLocale: string
+	thesaurusId: string
+	toLocale: string
 }) {
 	/*log.debug('csv:%s', csv);
 	log.debug('fromLocale:%s', fromLocale);
@@ -65,10 +65,10 @@ export function run({
 	progress.finishItem().addItems(1).setMessage(`Getting thesaurus with id:${thesaurusId}`).report()//.debug();
 
 	const explorerRepoWriteConnection = connect({
-		principals:[PRINCIPAL_EXPLORER_WRITE]
+		principals:[Principal.EXPLORER_WRITE]
 	});
 
-	let thesaurusNode :ReturnType<typeof getThesaurus>;
+	let thesaurusNode: ReturnType<typeof getThesaurus>;
 	try {
 		thesaurusNode = getThesaurus({
 			connection: explorerRepoWriteConnection,
@@ -87,7 +87,7 @@ export function run({
 
 	const synonymsQueryRes = query({
 		connection: explorerRepoWriteConnection,
-		nodeTypes: [NT_SYNONYM],
+		nodeTypes: [NodeType.SYNONYM],
 		parentPaths: [thesaurusNode._path]
 	});
 	//log.debug('synonymsQueryRes:%s', toStr(synonymsQueryRes));
@@ -97,10 +97,10 @@ export function run({
 
 	progress.finishItem().addItems(1).setMessage(`Parsing csv`).report()//.debug();
 
-	const parsedCsv :Array<{
-		from ?:string
-		to ?:string
-	}> = parseCsv({
+	const parsedCsv: {
+		from?: string
+		to?: string
+	}[] = parseCsv({
 		csvString: csv,
 		columns: ['from', 'to'],
 		start: 1 // Aka skip line 0
@@ -112,7 +112,7 @@ export function run({
 	let successes = 0;
 
 	const synonymIdsCreated = [];
-	const synonymIdsPossibleDuplicates :Record<string, Array<string>>= {};
+	const synonymIdsPossibleDuplicates: Record<string, string[]>= {};
 	const synonymIdsPossibleDuplicatesArr = [];
 	//const synonymIdsUpdated = [];
 	const synonymIdsUntouched = [];
@@ -161,7 +161,7 @@ export function run({
 			//log.debug('cleanedFromArr:%s', toStr(cleanedFromArr));
 			//log.debug('cleanedToArr:%s', toStr(cleanedToArr));
 
-			const fromLanguageObject :InputTypeSynonymLanguage = {
+			const fromLanguageObject: InputTypeSynonymLanguage = {
 				both: [],
 				locale: fromLocale,
 				from: [],

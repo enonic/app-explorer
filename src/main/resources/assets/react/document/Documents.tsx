@@ -23,11 +23,6 @@ import {useDocumentsState} from './useDocumentsState';
 import DocumentsTable from './DocumentsTable';
 // import {FRAGMENT_SIZE_DEFAULT} from './constants';
 
-// import {FIELD_PATH_META} from '/lib/explorer/constants'; // TODO setup build system so this import works
-
-
-// const FIELD_PATH_META = 'document_metadata';
-
 
 export function Documents({
 	servicesBaseUrl

@@ -1,5 +1,5 @@
+import { Principal } from '@enonic/explorer-utils';
 import {RESPONSE_TYPE_JSON} from '@enonic/js-utils';
-import {PRINCIPAL_EXPLORER_WRITE} from '/lib/explorer/constants';
 import {connect} from '/lib/explorer/repo/connect';
 import {copy} from '/lib/explorer/interface/copy';
 
@@ -13,7 +13,7 @@ export function get({
 	try {
 		copy({
 			connection: connect({
-				principals: [PRINCIPAL_EXPLORER_WRITE]
+				principals: [Principal.EXPLORER_WRITE]
 			}),
 			from,
 			to

@@ -1,5 +1,7 @@
 import type {ApiKeyNodeUpdated} from '../../../types/ApiKey';
 
+
+import { Principal } from '@enonic/explorer-utils';
 //import {toStr} from '@enonic/js-utils';
 import {
 	GraphQLString,
@@ -9,7 +11,6 @@ import {
 //@ts-ignore
 import {getUser} from '/lib/xp/auth';
 
-import {PRINCIPAL_EXPLORER_WRITE} from '/lib/explorer/constants';
 import {connect} from '/lib/explorer/repo/connect';
 import {hash} from '/lib/explorer/string/hash';
 
@@ -56,7 +57,7 @@ export function addMutationApiKeyUpdate({glue}) {
 			//log.debug('key:%s', key);
 
 			const writeConnection = connect({
-				principals: [PRINCIPAL_EXPLORER_WRITE]
+				principals: [Principal.EXPLORER_WRITE]
 			});
 
 			const updatedApiKeyNode :ApiKeyNodeUpdated = writeConnection.modify({

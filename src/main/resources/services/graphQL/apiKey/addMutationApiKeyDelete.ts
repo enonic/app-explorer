@@ -3,7 +3,7 @@ import {
 	toStr
 } from '@enonic/js-utils';
 
-import {PRINCIPAL_EXPLORER_WRITE} from '/lib/explorer/constants';
+import { Principal } from '@enonic/explorer-utils';
 import {connect} from '/lib/explorer/repo/connect';
 
 import {
@@ -32,7 +32,7 @@ export function addMutationApiKeyDelete({glue}) {
 			log.debug('_id:%s', _id);
 
 			const writeConnection = connect({
-				principals: [PRINCIPAL_EXPLORER_WRITE]
+				principals: [Principal.EXPLORER_WRITE]
 			});
 
 			const deleteApiKeyRes = writeConnection.delete(_id);

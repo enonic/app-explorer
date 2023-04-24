@@ -3,16 +3,16 @@ import {
 	CollectionNode,
 	CollectionNodeCreateParams,
 	CollectionWithCron
-} from '/lib/explorer/types/index.d';
+} from '@enonic-types/lib-explorer';
 import type {GraphQLField} from '../types.d';
 
-//import {toStr} from '@enonic/js-utils';
 
 import {
-	NT_COLLECTION,
-	PRINCIPAL_EXPLORER_WRITE,
+	NodeType,
+	Principal,
 	ROOT_PERMISSIONS_EXPLORER
-} from '/lib/explorer/constants';
+} from '@enonic/explorer-utils';
+//import {toStr} from '@enonic/js-utils';
 import {coerseCollectionType} from '/lib/explorer/collection/coerseCollectionType';
 import {createDocumentType} from '/lib/explorer/documentType/createDocumentType';
 import {exists} from '/lib/explorer/node/exists';
@@ -39,14 +39,14 @@ import {
 
 export function generateCreateCollectionField({
 	glue
-}) :GraphQLField<
+}): GraphQLField<
 	{
-		_name :string
-		collector :string
-		cron :string
-		doCollect :string
-		documentTypeId :string
-		language :string
+		_name: string
+		collector: string
+		cron: string
+		doCollect: string
+		documentTypeId: string
+		language: string
 	},
 	Partial<CollectionWithCron>,
 	Collection
@@ -76,18 +76,18 @@ export function generateCreateCollectionField({
 			//log.debug(`doCollect:${toStr(doCollect)}`);
 			//log.debug(`documentTypeId:${toStr(documentTypeId)}`);
 
-			const nodeToBeCreated :CollectionNodeCreateParams = {
+			const nodeToBeCreated: CollectionNodeCreateParams = {
 				_indexConfig: {default: 'byType'},
 				_inheritsPermissions: false, // false is the default and the fastest, since it doesn't have to read parent to apply permissions.
 				_name,
-				_nodeType: NT_COLLECTION,
+				_nodeType: NodeType.COLLECTION,
 				_parentPath: '/collections',
 				_permissions: ROOT_PERMISSIONS_EXPLORER,
 				creator: getUser().key,
 				createdTime: new Date(),
 				language
 			} /*as Partial<Omit<CollectionNode, 'collector'> & {
-				collector :Partial<CollectionNode['collector']>
+				collector: Partial<CollectionNode['collector']>
 			}>;*/
 			//log.debug(`nodeToBeCreated:${toStr(nodeToBeCreated)}`);
 
@@ -110,7 +110,7 @@ export function generateCreateCollectionField({
 			//log.debug(`nodeToBeCreated:${toStr(nodeToBeCreated)}`);
 
 			const writeConnection = connect({
-				principals: [PRINCIPAL_EXPLORER_WRITE]
+				principals: [Principal.EXPLORER_WRITE]
 			});
 
 			if (documentTypeId === '_new') {
