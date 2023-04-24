@@ -1,4 +1,4 @@
-{
+{ // This file is used by your code editor, and tsup during build
 	"compilerOptions": {
 		"allowJs": true,
 		"allowSyntheticDefaultImports": true,
@@ -50,7 +50,10 @@
 			// Development (should be commented out when commiting)
 			// "@enonic/js-utils/*": ["../enonic-js-utils/src/*"],
 			// Production (should be commented in when commiting)
-			"@enonic/js-utils": ["./node_modules/@enonic/js-utils/src"],
+			"@enonic/js-utils": ["./node_modules/@enonic/js-utils"],
+			"@enonic/js-utils/*": ["./node_modules/@enonic/js-utils/*"],
+			"@enonic/nashorn-polyfills": ["./src/main/resources/lib/nashorn/index.ts"],
+			"/lib/licensing": ["./src/main/resources/lib/licensing.ts"],
 		},
 		"preserveWatchOutput": false,
 		"pretty": true,
@@ -101,7 +104,11 @@
 		"sourceMap": false,
 		"strict": false,
 		"strictNullChecks": false,
-		"target": "es5",
+
+		// tsup: ERROR Transforming const to the configured target environment ("es5") is not supported yet
+		// Set to es5 in tsup.config.js instead
+		"target": "ES2015",
+
 		"typeRoots": [
 			"./node_modules/@types",
 		],
