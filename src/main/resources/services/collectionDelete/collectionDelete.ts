@@ -1,9 +1,8 @@
+import { Principal } from '@enonic/explorer-utils';
 import {
 	RESPONSE_TYPE_JSON,
 	toStr
 } from '@enonic/js-utils';
-
-import {PRINCIPAL_EXPLORER_WRITE} from '/lib/explorer/model/2/constants';
 import {connect} from '/lib/explorer/repo/connect';
 import {remove} from '/lib/explorer/node/remove';
 import {listExplorerJobsThatStartWithName} from '/lib/explorer/scheduler/listExplorerJobsThatStartWithName';
@@ -21,13 +20,13 @@ exports.delete = ({
 	params: {
 		name
 	}
-} :{
-	params :{
-		name :string
+}: {
+	params: {
+		name: string
 	}
 }) => {
 	//log.debug(`name:${toStr({name})}`);
-	const writeConnection = connect({principals: [PRINCIPAL_EXPLORER_WRITE]});
+	const writeConnection = connect({principals: [Principal.EXPLORER_WRITE]});
 
 	const nodePath = `${PATH_COLLECTIONS}/${name}`;
 	//log.debug(`nodePath:${toStr({nodePath})}`);
@@ -65,9 +64,9 @@ exports.delete = ({
 		_name: name
 	});
 	//log.debug(`removeRes:${toStr({removeRes})}`);
-	const body :{
-		error ?:string
-		message ?:string
+	const body: {
+		error?: string
+		message?: string
 	} = {};
 	let status = 200;
 	if (removeRes) {

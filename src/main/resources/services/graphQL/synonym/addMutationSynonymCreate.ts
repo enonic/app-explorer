@@ -2,8 +2,8 @@ import type {InputTypeSynonymLanguages} from '/lib/explorer/types/Synonym.d';
 import type {Glue} from '../Glue';
 
 
+import { Principal } from '@enonic/explorer-utils';
 //import {toStr} from '@enonic/js-utils';
-import {PRINCIPAL_EXPLORER_WRITE} from '/lib/explorer/constants';
 import {connect} from '/lib/explorer/repo/connect';
 import {createSynonym} from '/lib/explorer/synonym/createSynonym';
 import {
@@ -59,7 +59,7 @@ export function addMutationSynonymCreate({
 				languages
 			},{
 				explorerRepoWriteConnection: connect({
-					principals: [PRINCIPAL_EXPLORER_WRITE]
+					principals: [Principal.EXPLORER_WRITE]
 				}),
 				checkInterfaceIds: true,
 				checkThesaurus: true,

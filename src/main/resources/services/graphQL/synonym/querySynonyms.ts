@@ -10,8 +10,8 @@ import type {
 } from '/lib/explorer/types/index.d';
 
 
+import { Principal } from '@enonic/explorer-utils';
 //import {toStr} from '@enonic/js-utils';
-import {PRINCIPAL_EXPLORER_READ} from '/lib/explorer/constants';
 import {connect} from '/lib/explorer/repo/connect';
 import {query as qS} from '/lib/explorer/synonym/query';
 
@@ -38,7 +38,7 @@ export function querySynonyms({
 		sort,
 		start
 	}));*/
-	const connection = connect({ principals: [PRINCIPAL_EXPLORER_READ] });
+	const connection = connect({ principals: [Principal.EXPLORER_READ] });
 	const synonymsRes = qS<'thesaurus'>({
 		connection,
 		count,

@@ -174,9 +174,9 @@ export function useDocumentsState({
 		if (query) {
 			const fields = jsonColumns.length ? jsonColumns.map(f => `${f}^2`): [];
 			fields.push(
-				// `${FIELD_PATH_META_COLLECTION}^2`,
-				// `${FIELD_PATH_META_DOCUMENT_TYPE}^2`,
-				// `${FIELD_PATH_META_LANGUAGE}^2`,
+				// `${FieldPath.META_COLLECTION}^2`,
+				// `${FieldPath.META_DOCUMENT_TYPE}^2`,
+				// `${FieldPath.META_LANGUAGE}^2`,
 				'_allText', // WARNING: Frequently fields are not duplicated into _allText
 			)
 			// queryValue = bool(or(
@@ -233,11 +233,11 @@ export function useDocumentsState({
 							field: '_allText',
 							// numberOfFragments: 99999 // _allText is an array, one per added field
 						// },{
-						// 	field: FIELD_PATH_META_COLLECTION
+						// 	field: FieldPath.META_COLLECTION
 						// },{
-						// 	field: FIELD_PATH_META_DOCUMENT_TYPE
+						// 	field: FieldPath.META_DOCUMENT_TYPE
 						// },{
-						// 	field: FIELD_PATH_META_LANGUAGE
+						// 	field: FieldPath.META_LANGUAGE
 						}
 					],
 					jsonColumns.map(

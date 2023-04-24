@@ -5,12 +5,12 @@ import type {
 } from '/lib/xp/node';
 // import type {WriteConnection} from '/lib/explorer/types/index.d';
 
+import { NodeType } from '@enonic/explorer-utils';
 import {
 	sanitize,
 	startsWith,
 	// toStr
 } from '@enonic/js-utils';
-import {NT_COLLECTION} from '/lib/explorer/constants';
 import {rename} from '/lib/explorer/collection/rename';
 import {setModel} from '/lib/explorer/model/setModel';
 import {Progress} from '../Progress';
@@ -31,7 +31,7 @@ export function model16({
 				must: {
 					term: {
 						field: '_nodeType',
-						value: NT_COLLECTION
+						value: NodeType.COLLECTION
 					}
 				}
 			}

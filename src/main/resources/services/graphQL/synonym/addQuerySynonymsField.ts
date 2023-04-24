@@ -1,18 +1,18 @@
-import type {AggregationsResponseEntry} from '@enonic/js-utils/src/types/node/query/Aggregation.d';
+import type {AggregationsResponseEntry} from '@enonic/js-utils/types/node/query/Aggregation.d';
 import type {
 	QueryFilters,
 	QueriedSynonym
-} from '/lib/explorer/types/index.d';
+} from '@enonic-types/lib-explorer';
 import type {Glue} from '../Glue';
 
 
+import { Principal } from '@enonic/explorer-utils';
 import {
 	addQueryFilter,
 	arrayIncludes,
 	storage,
 	// toStr,
 } from '@enonic/js-utils';
-import {PRINCIPAL_EXPLORER_READ} from '/lib/explorer/constants';
 import {hasValue} from '/lib/explorer/query/hasValue';
 import {connect} from '/lib/explorer/repo/connect';
 import {javaLocaleToSupportedLanguage} from '/lib/explorer/stemming/javaLocaleToSupportedLanguage';
@@ -43,21 +43,21 @@ const stemmed = storage.query.dsl.stemmed;
 
 export function addQuerySynonymsField({
 	glue
-} :{
-	glue :Glue
+}: {
+	glue: Glue
 }) {
 	glue.addQuery<{
-		count ?:number
-		filters ?:QueryFilters
-		from ?:string
-		languages ?:Array<string>
-		query ?:string
-		page ?:number
-		perPage ?:number
-		sort ?:string
-		start ?:number
-		thesaurusNames ?:Array<string>
-		to ?:string
+		count?: number
+		filters?: QueryFilters
+		from?: string
+		languages?: string[]
+		query?: string
+		page?: number
+		perPage?: number
+		sort?: string
+		start?: number
+		thesaurusNames?: string[]
+		to?: string
 	}>({
 		name: GQL_QUERY_SYNONYMS_NAME,
 		args: {
@@ -91,9 +91,9 @@ export function addQuerySynonymsField({
 		}) => {
 			//log.debug('thesaurusNames:%s', toStr(thesaurusNames));
 			const highlightLocales = [];
-			const localeToStemmingLanguage :Record<string,string> = {};
+			const localeToStemmingLanguage: Record<string,string> = {};
 			const explorerRepoReadConnection = connect({
-				principals: [PRINCIPAL_EXPLORER_READ]
+				principals: [Principal.EXPLORER_READ]
 			});
 			if(thesaurusNames.length) {
 				thesaurusNames.forEach(thesaurusName => {
@@ -238,17 +238,17 @@ export function addQuerySynonymsField({
 			//log.debug('querySynonymsParams:%s', toStr(querySynonymsParams));
 
 			const result = querySynonyms(querySynonymsParams) as {
-				aggregations ?:{
-					thesaurus :AggregationsResponseEntry
+				aggregations?: {
+					thesaurus: AggregationsResponseEntry
 				}
-				count :number
-				end :number
-				hits: Array<QueriedSynonym>
-				localeToStemmingLanguage :Record<string,string>
-				page :number
-				start :number
-				total :number
-				totalPages :number
+				count: number
+				end: number
+				hits: QueriedSynonym[]
+				localeToStemmingLanguage: Record<string,string>
+				page: number
+				start: number
+				total: number
+				totalPages: number
 			};
 			result.localeToStemmingLanguage = localeToStemmingLanguage;
 			result.page = page;

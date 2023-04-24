@@ -4,6 +4,13 @@ import type {
 	ApiKeyNodeCreateParams
 } from '../../../types/ApiKey';
 
+
+import {
+	NodeType,
+	Path,
+	Principal,
+	ROOT_PERMISSIONS_EXPLORER
+} from '@enonic/explorer-utils';
 /*import {
 	//forceArray,
 	toStr
@@ -17,12 +24,6 @@ import {
 //@ts-ignore
 import {getUser} from '/lib/xp/auth';
 
-import {
-	NT_API_KEY,
-	PATH_API_KEYS,
-	PRINCIPAL_EXPLORER_WRITE,
-	ROOT_PERMISSIONS_EXPLORER
-} from '/lib/explorer/constants';
 import {connect} from '/lib/explorer/repo/connect';
 import {hash} from '/lib/explorer/string/hash';
 
@@ -68,8 +69,8 @@ export function addMutationApiKeyCreate({glue}) {
 				_indexConfig: {default: 'byType'},
 				_inheritsPermissions: false, // false is the default and the fastest, since it doesn't have to read parent to apply permissions.
 				_name,
-				_nodeType: NT_API_KEY,
-				_parentPath: PATH_API_KEYS as ParentPath,
+				_nodeType: NodeType.API_KEY,
+				_parentPath: Path.API_KEYS as ParentPath,
 				_permissions: ROOT_PERMISSIONS_EXPLORER,
 				collections, // No need to forceArray let Enonic XP do it's thing
 				createdTime: new Date(),
@@ -81,7 +82,7 @@ export function addMutationApiKeyCreate({glue}) {
 			//log.debug('apiKeyNodeToCreate:%s', toStr(apiKeyNodeToCreate));
 
 			const writeConnection = connect({
-				principals: [PRINCIPAL_EXPLORER_WRITE]
+				principals: [Principal.EXPLORER_WRITE]
 			});
 
 			const createdApiKeyNode :ApiKeyNode = writeConnection.create(apiKeyNodeToCreate);

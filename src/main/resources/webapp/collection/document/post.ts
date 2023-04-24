@@ -1,24 +1,20 @@
 //import type {RepoConnection} from '/lib/explorer/types/index.d';
 import type {Request} from '../../../types/Request';
 
-import {
-	array,
-	forceArray,
-	toStr
-} from '@enonic/js-utils';
 
 import {
 	APP_EXPLORER,
 	BRANCH_ID_EXPLORER,
 	COLLECTION_REPO_PREFIX,
-	PATH_COLLECTIONS,
-	PRINCIPAL_EXPLORER_READ,
-	PRINCIPAL_EXPLORER_WRITE,
-	REPO_ID_EXPLORER/*,
-	ROLE_EXPLORER_ADMIN,
-	ROLE_EXPLORER_WRITE,
-	ROLE_SYSTEM_ADMIN*/
-} from '/lib/explorer/constants';
+	Path,
+	Principal,
+	Repo
+} from '@enonic/explorer-utils';
+import {
+	array,
+	forceArray,
+	toStr
+} from '@enonic/js-utils';
 import {USER as EXPLORER_APP_USER} from '/lib/explorer/model/2/users/explorer';
 //import {get as getCollection} from '/lib/explorer/collection/get';
 //import {createOrModify} from '/lib/explorer/node/createOrModify';
@@ -39,11 +35,11 @@ const {includes: arrayIncludes} = array;
 
 
 export type PostRequest = Request<{
-	collection? :string
-	partial? :string
-	requireValid? :string
+	collection?: string
+	partial?: string
+	requireValid?: string
 }, {
-	collection? :string
+	collection?: string
 }>
 
 
@@ -53,8 +49,8 @@ const COLLECTOR_VERSION = app.version;
 
 function createDocument<
 	Node extends {
-		_id :string
-		error? :string
+		_id: string
+		error?: string
 	}
 >({
 	boolRequireValid = true,
@@ -63,14 +59,14 @@ function createDocument<
 	idField,
 	responseArray,
 	toPersist
-} :{
-	collectionId :string
-	collectionName :string
-	responseArray :Array<Node>
-	toPersist :Node
+}: {
+	collectionId: string
+	collectionName: string
+	responseArray: Node[]
+	toPersist: Node
 	// Optional
-	boolRequireValid? :boolean
-	idField? :string
+	boolRequireValid?: boolean
+	idField?: string
 }) {
 	const createdNode = create({
 		collectionId,
@@ -97,8 +93,8 @@ function createDocument<
 
 function modifyDocument<
 	Node extends {
-		_id :string
-		error? :string
+		_id: string
+		error?: string
 	}
 >({
 	collectionId,
@@ -111,16 +107,16 @@ function modifyDocument<
 	boolPartial = false,
 	boolRequireValid = true,
 	idField
-} :{
-	collectionId :string
-	collectionName :string
-	id :string
-	responseArray :Array<Node>
-	toPersist :Node
+}: {
+	collectionId: string
+	collectionName: string
+	id: string
+	responseArray: Node[]
+	toPersist: Node
 	// Optional
-	boolPartial? :boolean
-	boolRequireValid? :boolean
-	idField? :string
+	boolPartial?: boolean
+	boolRequireValid?: boolean
+	idField?: string
 }) {
 	const updatedNode = update({
 		collectionId,
@@ -152,14 +148,14 @@ function modifyDocument<
 
 
 export function post(
-	request :PostRequest,
-	collections :Array<string> = []
-) :{
-	body :{
-		message :string
+	request: PostRequest,
+	collections: string[] = []
+): {
+	body: {
+		message: string
 	}
-	contentType :string
-	status :number
+	contentType: string
+	status: number
 } {
 	//const user = getUser();
 	//log.info(`user:${toStr(user)}`);
@@ -247,10 +243,10 @@ export function post(
 
 	const explorerReadConnection = connect({
 		branch: BRANCH_ID_EXPLORER,
-		principals: [PRINCIPAL_EXPLORER_READ],
-		repoId: REPO_ID_EXPLORER
+		principals: [Principal.EXPLORER_READ],
+		repoId: Repo.EXPLORER
 	});
-	const collectionPath = `${PATH_COLLECTIONS}/${collectionName}`;
+	const collectionPath = `${Path.COLLECTIONS}/${collectionName}`;
 	const collectionNode = explorerReadConnection.get(collectionPath);
 	if (!collectionNode) {
 		log.error(`Unable to get CollectionNode from collectionPath:${collectionPath}!`);
@@ -299,16 +295,16 @@ export function post(
 		// This allows any user to write in app-explorer, journal and collections.
 		// So even though you are logged into Enonic XP admin with a user that does not have PRINCIPAL_EXPLORER_WRITE:
 		// You may still create/update the documentTypes and  documents.
-		principals: [PRINCIPAL_EXPLORER_WRITE],
+		principals: [Principal.EXPLORER_WRITE],
 		//principals: [],
 
 		//repository: 'system-repo',
-		repository: REPO_ID_EXPLORER,
+		repository: Repo.EXPLORER,
 		user
 	}, () => {
 		const writeToCollectionBranchConnection = connect({
 			branch: branchId,
-			principals: [PRINCIPAL_EXPLORER_WRITE], // Additional principals to execute the callback with
+			principals: [Principal.EXPLORER_WRITE], // Additional principals to execute the callback with
 			repoId//,
 			//user // Default is the default user
 		});

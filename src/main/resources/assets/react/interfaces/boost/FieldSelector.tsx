@@ -1,5 +1,5 @@
 import type {DropdownItemProps} from 'semantic-ui-react/index.d';
-import type {InterfaceField} from '/lib/explorer/types/index.d';
+import type {InterfaceField} from '@enonic-types/lib-explorer';
 
 
 import {
@@ -101,7 +101,7 @@ export function FieldSelector(props :{
 										disabled={disabled}
 										fluid
 										onChange={(_e,{value:newBoost}) => {
-											//console.debug('newBoost', newBoost);
+											// console.debug('newBoost', newBoost);
 											const deref = JSON.parse(JSON.stringify(fieldsArray));
 											deref[index] = {
 												name,

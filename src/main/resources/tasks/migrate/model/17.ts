@@ -6,34 +6,34 @@ import type {
 
 
 import {
+	COLLECTION_REPO_PREFIX,
+	FieldPath,
+	NodeType,
+	Principal
+} from '@enonic/explorer-utils';
+import {
 	setIn,
 	startsWith,
 	// toStr
 } from '@enonic/js-utils';
-import {
-	COLLECTION_REPO_PREFIX,
-	FIELD_PATH_META,
-	NT_DOCUMENT,
-	PRINCIPAL_EXPLORER_READ,
-	PRINCIPAL_EXPLORER_WRITE
-} from '/lib/explorer/constants';
 import {setModel} from '/lib/explorer/model/setModel';
 import {connect} from '/lib/explorer/repo/connect';
 import {multiConnect} from '/lib/explorer/repo/multiConnect';
 import {list} from '/lib/xp/repo';
 import {Progress} from '../Progress';
+import { Node } from 'cheerio';
 
 
 export function model17({
 	progress,
 	writeConnection
 } :{
-	progress :Progress
-	writeConnection :RepoConnection
+	progress: Progress
+	writeConnection: RepoConnection
 }) {
 	progress.addItems(1).setInfo('Finding all collection repos...').report().logInfo();
 	const repoList = list();
-	const collectionRepoIds:string[] = [];
+	const collectionRepoIds: string[] = [];
 	for (let i = 0; i < repoList.length; i++) {
 		const {
 			id: repoId
@@ -45,11 +45,11 @@ export function model17({
 	progress.finishItem()
 
 	if (collectionRepoIds.length) {
-		progress.addItems(1).setInfo(`Finding all documents without ${FIELD_PATH_META}.collection...`).report().logInfo();
+		progress.addItems(1).setInfo(`Finding all documents without ${FieldPath.META_COLLECTION}...`).report().logInfo();
 		const multiRepoReadConnection = multiConnect({
 			sources: collectionRepoIds.map((repoId) => ({
 				branch: 'master',
-				principals: [PRINCIPAL_EXPLORER_READ],
+				principals: [Principal.EXPLORER_READ],
 				repoId
 			}))
 		}) as unknown as MultiRepoConnection;
@@ -60,7 +60,7 @@ export function model17({
 				boolean: {
 					mustNot: {
 						exists: {
-							field: `${FIELD_PATH_META}.collection`
+							field: FieldPath.META_COLLECTION
 						}
 					}
 				},
@@ -70,7 +70,7 @@ export function model17({
 					must: {
 						term: {
 							field: '_nodeType',
-							value: NT_DOCUMENT
+							value: NodeType.DOCUMENT
 						}
 					}
 				}
@@ -99,7 +99,7 @@ export function model17({
 
 			const collectionRepoWriteConnection = connect({
 				repoId,
-				principals: [PRINCIPAL_EXPLORER_WRITE]
+				principals: [Principal.EXPLORER_WRITE]
 			});
 
 			const documentNode = collectionRepoWriteConnection.get(documentNodeId) as Node;
@@ -115,7 +115,7 @@ export function model17({
 					collectionRepoWriteConnection.modify({
 						key: documentNodeId,
 						editor: (node) => {
-							setIn(node, `${FIELD_PATH_META}.collection`, collectionName)
+							setIn(node, FieldPath.META_COLLECTION, collectionName)
 							return node;
 						}
 					});

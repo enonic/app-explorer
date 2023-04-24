@@ -14,6 +14,11 @@ import type {
 
 
 import {
+	COLLECTION_REPO_PREFIX,
+	FieldPath,
+	Principal
+} from '@enonic/explorer-utils';
+import {
 	VALUE_TYPE_SET,
 	addQueryFilter,
 	camelize,
@@ -21,12 +26,6 @@ import {
 	toStr
 } from '@enonic/js-utils';
 import {getCollectionIds} from '/lib/explorer/collection/getCollectionIds';
-import {
-	COLLECTION_REPO_PREFIX,
-	FIELD_PATH_GLOBAL,
-	FIELD_PATH_META,
-	PRINCIPAL_EXPLORER_READ
-} from '/lib/explorer/constants';
 import {queryDocumentTypes} from '/lib/explorer/documentType/queryDocumentTypes';
 import {addFilterInput} from '/lib/explorer/interface/graphql/filters/guillotine/input/addFilterInput';
 import {addInputTypeHighlight} from '/lib/explorer/interface/graphql/highlight/input/addInputTypeHighlight';
@@ -107,8 +106,8 @@ type QueryRes = {
 
 // Name must be non-null, non-empty and match [_A-Za-z][_0-9A-Za-z]*
 const FIELD_NAME_TO_PATH = {
-	[FIELD_SHORTCUT_COLLECTION]: `${FIELD_PATH_META}.collection`,
-	[FIELD_SHORTCUT_DOCUMENT_TYPE]: `${FIELD_PATH_META}.documentType`,
+	[FIELD_SHORTCUT_COLLECTION]: FieldPath.META_COLLECTION,
+	[FIELD_SHORTCUT_DOCUMENT_TYPE]: FieldPath.META_DOCUMENT_TYPE,
 };
 
 const FIELD_VALUE_COUNT_AGGREGATION_PREFIX = '_count_Field_';
@@ -393,7 +392,7 @@ export function addQueryDocuments({
 			//log.debug('query:%s', toStr(query));
 
 			const explorerRepoReadConnection = connect({
-				principals: [PRINCIPAL_EXPLORER_READ]
+				principals: [Principal.EXPLORER_READ]
 			});
 
 			// Get actual collections that exists
@@ -426,7 +425,7 @@ export function addQueryDocuments({
 						sources.push({
 							repoId: `${COLLECTION_REPO_PREFIX}${collectionIdToName[collectionId]}`,
 							branch: 'master', // NOTE Hardcoded
-							principals: [PRINCIPAL_EXPLORER_READ]
+							principals: [Principal.EXPLORER_READ]
 						});
 					} else {
 						log.error(`Unable to find collectionName for collectionId:${collectionId} in collectionIdToName:${toStr(collectionIdToName)}!`);
@@ -440,7 +439,7 @@ export function addQueryDocuments({
 						sources.push({
 							repoId: `${COLLECTION_REPO_PREFIX}${collectionName}`,
 							branch: 'master', // NOTE Hardcoded
-							principals: [PRINCIPAL_EXPLORER_READ]
+							principals: [Principal.EXPLORER_READ]
 						});
 					} else {
 						log.error(`Unable to find collectionId for collectionName:${collectionName} in collectionNameToId:${toStr(collectionNameToId)}!`);
@@ -453,7 +452,7 @@ export function addQueryDocuments({
 						sources.push({
 							repoId: `${COLLECTION_REPO_PREFIX}${collectionIdToName[collectionId]}`,
 							branch: 'master', // NOTE Hardcoded
-							principals: [PRINCIPAL_EXPLORER_READ]
+							principals: [Principal.EXPLORER_READ]
 						});
 					} else {
 						// Probably not possible, but whatever
@@ -464,7 +463,7 @@ export function addQueryDocuments({
 			//log.debug('sources:%s', toStr(sources));
 
 			const documentTypes = queryDocumentTypes({
-				readConnection: connect({ principals: [PRINCIPAL_EXPLORER_READ] })
+				readConnection: connect({ principals: [Principal.EXPLORER_READ] })
 			}).hits;
 			//log.debug('documentTypes:%s', toStr(documentTypes));
 
@@ -520,7 +519,7 @@ export function addQueryDocuments({
 			//log.debug('fieldNameToPath:%s', toStr(fieldNameToPath));
 
 			const multiConnectParams = {
-				principals: [PRINCIPAL_EXPLORER_READ],
+				principals: [Principal.EXPLORER_READ],
 				sources
 			};
 			//log.debug('multiConnectParams:%s', toStr(multiConnectParams));
@@ -631,7 +630,7 @@ export function addQueryDocuments({
 				}) => {
 					const singleRepoReadConnection = connect({
 						branch,
-						principals: [PRINCIPAL_EXPLORER_READ],
+						principals: [Principal.EXPLORER_READ],
 						repoId
 					});
 					const documentNode = singleRepoReadConnection.get(id);
@@ -652,8 +651,8 @@ export function addQueryDocuments({
 						const key = keys[i];
 						if (
 							!key.startsWith('_')
-							&& !key.startsWith(FIELD_PATH_GLOBAL)
-							&& !key.startsWith(FIELD_PATH_META)
+							&& !key.startsWith(FieldPath.GLOBAL)
+							&& !key.startsWith(FieldPath.META)
 						) {
 							obj[key] = rest[key]
 						}
@@ -661,8 +660,8 @@ export function addQueryDocuments({
 					//log.debug('obj:%s', toStr(obj));
 
 					return {
-						// _collection: documentNode[FIELD_PATH_META].collection,
-						// _documentType: documentNode[FIELD_PATH_META].documentType,
+						// _collection: documentNode[FieldPath.META].collection,
+						// _documentType: documentNode[FieldPath.META].documentType,
 						_highlight: highlight,
 						_id,
 						_json: JSON.stringify(obj),
@@ -670,7 +669,7 @@ export function addQueryDocuments({
 						_nodeType,
 						_path,
 						_versionKey,
-						[FIELD_PATH_META]: documentNode[FIELD_PATH_META],
+						[FieldPath.META]: documentNode[FieldPath.META],
 					};
 				}) // hits.map
 			}; // return
@@ -707,7 +706,7 @@ export function addQueryDocuments({
 					fields: {
 						// _collection: { type: GraphQLString },
 						// _documentType: { type: GraphQLString },
-						[FIELD_PATH_META]: { type: GraphQLJson },
+						[FieldPath.META]: { type: GraphQLJson },
 						_highlight: { type: GraphQLJson },
 						_id: { type: glue.getScalarType('_id') },
 						_json: { type: GraphQLJson },

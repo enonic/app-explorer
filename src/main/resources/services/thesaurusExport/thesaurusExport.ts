@@ -1,9 +1,7 @@
 import type {Request} from '../../types/Request';
 
 
-import {
-	PRINCIPAL_EXPLORER_READ
-} from '/lib/explorer/constants';
+import { Principal } from '@enonic/explorer-utils';
 import {connect} from '/lib/explorer/repo/connect';
 import {query as querySynonyms} from '/lib/explorer/synonym/query';
 
@@ -18,7 +16,7 @@ function getThesaurus({
 	toLanguage :string
 }) {
 	const connection = connect({
-		principals: [PRINCIPAL_EXPLORER_READ]
+		principals: [Principal.EXPLORER_READ]
 	});
 	const queryRes = querySynonyms({
 		connection,

@@ -3,17 +3,19 @@ import type {
 	MetaData
 } from '/lib/explorer/types/Document.d';
 
+
+import {
+	COLLECTION_REPO_PREFIX,
+	NodeType
+} from '@enonic/explorer-utils';
 /*import {
 	//addQueryFilter,
 	//forceArray,
 	toStr
 } from '@enonic/js-utils';*/
 import {
-	COLLECTION_REPO_PREFIX,
 	FIELD_DOCUMENT_METADATA_LANGUAGE_INDEX_CONFIG,
 	FIELD_DOCUMENT_METADATA_STEMMING_LANGUAGE_INDEX_CONFIG,
-	NT_DOCUMENT//,
-	//PRINCIPAL_EXPLORER_WRITE
 } from '/lib/explorer/model/2/constants';
 import {USER as EXPLORER_APP_USER} from '/lib/explorer/model/2/users/explorer';
 import {connect} from '/lib/explorer/repo/connect';
@@ -117,7 +119,7 @@ export function run({
 					must: [{
 						hasValue: {
 							field: '_nodeType',
-							values: [NT_DOCUMENT]
+							values: [NodeType.DOCUMENT]
 						}
 					}]
 				}

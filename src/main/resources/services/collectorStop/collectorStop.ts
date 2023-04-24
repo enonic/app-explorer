@@ -1,12 +1,11 @@
 import {
+	COLLECTION_REPO_PREFIX,
+	Principal
+} from '@enonic/explorer-utils';
+import {
 	RESPONSE_TYPE_JSON//,
 	//toStr
 } from '@enonic/js-utils';
-
-import {
-	COLLECTION_REPO_PREFIX,
-	PRINCIPAL_EXPLORER_WRITE
-} from '/lib/explorer/model/2/constants';
 import {connect} from '/lib/explorer/repo/connect';
 import {get as getTask} from '/lib/explorer/task/get';
 import {modify as modifyTask} from '/lib/explorer/task/modify';
@@ -21,7 +20,7 @@ export function post({
 	const connection = connect({
 		repoId,
 		branch: 'master',
-		principals: [PRINCIPAL_EXPLORER_WRITE]
+		principals: [Principal.EXPLORER_WRITE]
 	});
 
 	const task = getTask({connection});	//log.info(toStr({task}));

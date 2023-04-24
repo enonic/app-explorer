@@ -2,16 +2,14 @@ import type {Request} from '../../../types/Request';
 
 
 import {
+	COLLECTION_REPO_PREFIX,
+	Principal
+} from '@enonic/explorer-utils';
+import {
 	array,
 	forceArray//,
 	//toStr
 } from '@enonic/js-utils';
-
-import {
-	COLLECTION_REPO_PREFIX,
-	PRINCIPAL_EXPLORER_READ,
-	PRINCIPAL_EXPLORER_WRITE
-} from '/lib/explorer/constants';
 //import {get as getCollection} from '/lib/explorer/collection/get';
 import {connect} from '/lib/explorer/repo/connect';
 
@@ -19,22 +17,22 @@ const {includes: arrayIncludes} = array;
 
 
 export type RemoveRequest = Request<{
-	collection? :string
-	id :string
+	collection?: string
+	id: string
 }, {
-	collection? :string
+	collection?: string
 }>
 
 
 export function remove(
-	request :RemoveRequest,
-	collections :Array<string> = []
-) :{
-	body :{
-		message :string
+	request: RemoveRequest,
+	collections: string[] = []
+): {
+	body: {
+		message: string
 	} | unknown
-	contentType :string
-	status? :number
+	contentType: string
+	status?: number
 } {
 	const {
 		params: {
@@ -92,12 +90,12 @@ export function remove(
 	const branchId = 'master'; // Deliberate hardcode
 	const readFromCollectionBranchConnection = connect({
 		branch: branchId,
-		principals: [PRINCIPAL_EXPLORER_READ],
+		principals: [Principal.EXPLORER_READ],
 		repoId
 	});
 	const writeToCollectionBranchConnection = connect({
 		branch: branchId,
-		principals: [PRINCIPAL_EXPLORER_WRITE],
+		principals: [Principal.EXPLORER_WRITE],
 		repoId
 	});
 
@@ -109,9 +107,9 @@ export function remove(
 		const getRes = readFromCollectionBranchConnection.get(id);
 		//log.info(`getRes:${toStr(getRes)}`);
 
-		let item :{
-			_id? :string
-			error? :string
+		let item: {
+			_id?: string
+			error?: string
 		} = {};
 		if (!getRes) { // getRes === null
 			item.error = `Unable to find document with _id = ${id}!`;
