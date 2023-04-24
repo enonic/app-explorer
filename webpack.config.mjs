@@ -3,10 +3,7 @@
 import CaseSensitivePathsPlugin from 'case-sensitive-paths-webpack-plugin';
 import { CleanWebpackPlugin } from 'clean-webpack-plugin';
 import CopyWebpackPlugin from 'copy-webpack-plugin';
-import {
-	ESBuildMinifyPlugin,
-	ESBuildPlugin
-} from 'esbuild-loader';
+import { EsbuildPlugin } from 'esbuild-loader';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import path from 'path';
 import postcssPresetEnv from 'postcss-preset-env';
@@ -22,7 +19,6 @@ import {
 	BOOL_MINIMIZE,
 	MODE
 } from './.webpack.constants.mjs';
-
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
@@ -65,8 +61,8 @@ const SS_ALIAS = {
 			? path.resolve(__dirname, '../enonic-js-utils/dist/cjs/index.js')
 			: path.resolve(__dirname, './node_modules/@enonic/js-utils/dist/cjs/index.js')
 		: BOOL_LOCAL_JS_UTILS
-			? path.resolve(__dirname, '../enonic-js-utils/src/index.ts')
-			: path.resolve(__dirname, './node_modules/@enonic/js-utils/src/index.ts'), // This is used in production build
+			? path.resolve(__dirname, '../enonic-js-utils')
+			: path.resolve(__dirname, './node_modules/@enonic/js-utils'), // This is used in production build
 	// '@enonic/explorer-utils': // BOOL_LOCAL_LIB_EXPLORER
 	// ? path.resolve(__dirname, '../explorer-utils/index.mts')
 	// :
@@ -120,7 +116,7 @@ if (BOOL_LOCAL_LIB_EXPLORER) {
 
 const SS_PLUGINS = [
 	new CaseSensitivePathsPlugin(),
-	//new ESBuildPlugin(),
+	//new EsbuildPlugin(),
 	new webpack.ProvidePlugin({
 		/* ERROR: For some reason this breaks the webcrawl task!
 		console: { // Attempt at avoiding ReferenceError: "console" is not defined
@@ -331,23 +327,23 @@ const SS_JS_CONFIG = {
 
 		// library: {
 
-			// https://webpack.js.org/configuration/output/#type-commonjs
-			// NOTE: that NOT setting a output.library.name will cause all
-			// properties returned by the entry point to be assigned to the
-			// given object; there are no checks against existing property names
+		// 	// https://webpack.js.org/configuration/output/#type-commonjs
+		// 	// NOTE: that NOT setting a output.library.name will cause all
+		// 	// properties returned by the entry point to be assigned to the
+		// 	// given object; there are no checks against existing property names
 
-			// name: 'MyLibrary', // exports.MyLibrary = __webpack_exports__;
-			// When name is ommited: for(var i in __webpack_exports__) __webpack_export_target__[i] = __webpack_exports__[i];
+		// 	name: 'MyLibrary', // exports.MyLibrary = __webpack_exports__;
+		// 	// When name is ommited: for(var i in __webpack_exports__) __webpack_export_target__[i] = __webpack_exports__[i];
 
-			// type: 'commonjs', // exports['MyLibrary'] = _entry_return_;
+		// 	type: 'commonjs', // exports['MyLibrary'] = _entry_return_;
 
-			// Individual exports will be set as properties on module.exports.
-			// The "static" in the name refers to the output being statically
-			// analysable, and thus named exports are importable into ESM via Node.js:
-			// type: 'commonjs-static',
+		// 	// Individual exports will be set as properties on module.exports.
+		// 	// The "static" in the name refers to the output being statically
+		// 	// analysable, and thus named exports are importable into ESM via Node.js:
+		// 	type: 'commonjs-static',
 
-			// type: 'umd', // ReferenceError: "global" is not defined
-			// umdNamedDefine: false,
+		// 	type: 'umd', // ReferenceError: "global" is not defined
+		// 	umdNamedDefine: false,
 		// },
 
 		// https://webpack.js.org/configuration/output/#outputlibrarytarget
@@ -387,7 +383,7 @@ const SS_JS_CONFIG = {
 };
 //print({SS_JS_CONFIG}, { maxItems: Infinity });
 //process.exit();
-WEBPACK_CONFIG.push(SS_JS_CONFIG);
+//WEBPACK_CONFIG.push(SS_JS_CONFIG); // Trying TSUP instead
 
 //──────────────────────────────────────────────────────────────────────────────
 // Assets (sass)
@@ -667,7 +663,7 @@ const CLIENT_ES_CONFIG = {
 	optimization: {
 		minimize: BOOL_MINIMIZE,
 		minimizer: MODE === 'production' ? [
-			new ESBuildMinifyPlugin({
+			new EsbuildPlugin({
 				target: ESBUILD_TARGET
 			})
 		] : []
@@ -697,13 +693,13 @@ const CLIENT_ES_CONFIG = {
 			Buffer: ['buffer', 'Buffer']
 		}),
 		//new EsmWebpackPlugin(), // Webpack 5: Error: Cannot find module 'webpack/lib/MultiModule'
-		new ESBuildPlugin()
+		new EsbuildPlugin()
 	],
 	resolve: {
 		alias: {
 			'@enonic/js-utils': BOOL_LOCAL_JS_UTILS
-				? path.resolve(__dirname, '../enonic-js-utils/src/index.ts')
-				: path.resolve(__dirname, './node_modules/@enonic/js-utils/src/index.ts'),
+				? path.resolve(__dirname, '../enonic-js-utils')
+				: path.resolve(__dirname, './node_modules/@enonic/js-utils'),
 			'@enonic/semantic-ui-react-form': BOOL_LOCAL_SEMANTIC_UI_REACT_FORM
 				? path.resolve(__dirname, '../semantic-ui-react-form/src')
 				: path.resolve(__dirname, './node_modules/@enonic/semantic-ui-react-form/src')//,

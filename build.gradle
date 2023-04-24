@@ -116,10 +116,18 @@ task webpack(type:NodeTask) {
 	outputs.dir './build/resources/main' // processResources will delete the directory if this is not present
 }
 
-task swc(type:YarnTask) {
-	dependsOn webpack
-	mustRunAfter webpack
-	args = ['swc']
+// task swc(type:YarnTask) {
+// 	dependsOn webpack
+// 	mustRunAfter webpack
+// 	args = ['swc']
+// 	outputs.dir './build/resources/main' // processResources will delete the directory if this is not present
+// }
+
+task tsup(
+	dependsOn: yarn_install,
+	type: YarnTask
+) {
+	args = ['build:tsup']
 	outputs.dir './build/resources/main' // processResources will delete the directory if this is not present
 }
 
@@ -133,8 +141,8 @@ task watch(type:NodeTask) {
 
 
 processResources {
-	dependsOn swc
-	mustRunAfter swc
+	dependsOn tsup
+	dependsOn webpack
 
 	exclude '**/.gitkeep'
 
@@ -149,5 +157,3 @@ processResources {
 	exclude '**/*.styl'
 	exclude '**/*.ts'
 }
-
-jar.dependsOn webpack
