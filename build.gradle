@@ -146,6 +146,13 @@ processResources {
 
 	exclude '**/.gitkeep'
 
+	// We want these:
+	// * collectors.json
+	// * documentTypes.json
+	// But not these:
+	exclude 'tsconfig.json'
+	exclude 'assets/tsconfig.json'
+
 	// Let webpack handle these (rather than gradle)
 	exclude '**/*.css'
 	exclude '**/*.es'

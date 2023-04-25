@@ -8,11 +8,16 @@ import type {
 	EmptyObject
 } from '../../types';
 
+// These imports works when treeshake: false, but gives error when treeshake: true
+// ReferenceError: "Reflect" is not defined
+// Must be imported only once per WebPack Bundle (Required by setIn)
+// import 'core-js/stable/reflect';
+// import 'reflect-metadata';
 
-import 'reflect-metadata'; // Must be imported only once per WebPack Bundle (Required by setIn)
 import {HTTP_HEADERS} from '@enonic/explorer-utils/src'; // Adding "src" fixes the empty AbstractParser error
 import {
 	RESPONSE_TYPE_JSON,
+	arrayIncludes,
 	// toStr,
 } from '@enonic/js-utils';
 import lcKeys from '@enonic/js-utils/object/lcKeys';
@@ -39,7 +44,7 @@ const AUTHORIZATION_PREFIX = 'Explorer-Api-Key ';
 function isUnauthorized({
 	interfaceName,
 	request
-} :{
+}: {
 	interfaceName: string
 	request: EnonicXpRequest
 }) {
@@ -104,7 +109,7 @@ function isUnauthorized({
 	let {interfaces = []} = apiKeyNode;
 	if (!Array.isArray(interfaces)) { interfaces = [interfaces]; }
 	//log.debug(`interfaces:${toStr(interfaces)}`);
-	if (!interfaces.includes(interfaceName)) {
+	if (!arrayIncludes(interfaces, interfaceName)) {
 		log.error(`API key hashedApiKey:${hashedApiKey} doesn't have read access to interface:${interfaceName}!`);
 		return {
 			body: {

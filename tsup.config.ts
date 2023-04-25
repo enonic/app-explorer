@@ -31,6 +31,10 @@ export default defineConfig((options: MyOptions) => {
 	if (options.d === 'build/resources/main') {
 		return {
 			entry: SERVER_FILES,
+			esbuildOptions(options, context) {
+				options.chunkNames = '_chunks/[name]-[hash]'
+			// 	options.tsconfig = 'tsconfig.tsup.json'
+			},
 			external: [ // All these are available runtime in the jar file:
 				'/lib/cache',
 				/^\/lib\/explorer/,
@@ -70,6 +74,23 @@ export default defineConfig((options: MyOptions) => {
 				'/lib/xp/websocket',
 			],
 			format: 'cjs',
+			inject: [
+				'node_modules/buffer/index.js',
+				'src/main/resources/lib/nashorn/global.ts',
+				//'node_modules/core-js/stable/global-this.js',
+				'node_modules/core-js/stable/array/flat.js',
+
+				// This works, but might not be needed, because I'm using arrayIncludes from @enonic/js-utils
+				'node_modules/core-js/stable/array/includes.js',
+
+				'node_modules/core-js/stable/math/trunc.js', // Needed by pretty-ms
+				'node_modules/core-js/stable/number/is-finite.js', // Needed by pretty-ms
+				'node_modules/core-js/stable/number/is-integer.js',
+				'node_modules/core-js/stable/parse-float.js',
+				// This is needed when treeshake: true
+				// So I'm assuming that the injects are not treeshaken
+				'node_modules/core-js/stable/reflect/index.js'
+			],
 			'main-fields': 'main,module',
 			minify: false, // Minifying server files makes debugging harder
 			noExternal: [
@@ -80,20 +101,24 @@ export default defineConfig((options: MyOptions) => {
 				// '@enonic/explorer-utils', //
 				// '@enonic/fnv-plus', //
 				/^@enonic\/js-utils/, // many places
+				'array.prototype.find', // tasks/webcrawl/webcrawl
 				'cheerio', //
 				'gql-query-builder', //
 				'core-js', //
+				'core-js-pure', //
 				// 'd3-dsv', //
 				'deep-object-diff', //
 				// 'diff', //
 				'fast-deep-equal', //
 				'human-object-diff', //
+				'object.getownpropertydescriptors', // tasks/webcrawl/webcrawl
 				'polyfill-crypto.getrandomvalues', //
 				'reflect-metadata', //
 				'robots-txt-guard', //
 				'serialize-javascript', //
 				// 'traverse', //
 				'uri-js', //
+				'util',
 			],
 			platform: 'neutral',
 
@@ -103,11 +128,24 @@ export default defineConfig((options: MyOptions) => {
 			// If you want code splitting for cjs output format as well, try
 			// using --splitting flag which is an experimental feature to get
 			// rid of the limitation in esbuild.
-			// splitting: true,
+			splitting: true, // Might cause weird error messages at runtime
 
 			shims: false, // https://tsup.egoist.dev/#inject-cjs-and-esm-shims
 			sourcemap: false,
-			target: 'es5'
+			target: 'es5',
+
+			// https://tsup.egoist.dev/#tree-shaking
+			// Tree shaking
+			// esbuild has tree shaking enabled by default, but sometimes it's
+			// not working very well, see #1794 #1435, so tsup offers an
+			// additional option to let you use Rollup for tree shaking instead
+			// This option has the same type as the treeshake option in Rollup:
+			// https://rollupjs.org/configuration-options/#treeshake
+			//
+			// Fails after 1m 10s when splitting: false
+			// treeshake: true // ReferenceError: "Reflect" is not defined
+
+			// tsconfig: 'tsconfig.tsup.json'
 		};
 	}
 	throw new Error(`Unconfigured directory:${options.d}!`)
