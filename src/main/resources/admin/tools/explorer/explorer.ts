@@ -1,5 +1,5 @@
 import { Role } from '@enonic/explorer-utils';
-//import {toStr} from '@enonic/js-utils';
+// import {toStr} from '@enonic/js-utils';
 //@ts-ignore
 import newRouter from '/lib/router';
 import {hasRole} from '/lib/xp/auth';
@@ -25,24 +25,41 @@ router.filter((
 	req,
 	next
 ) => {
+	// log.info('filter request:%s', toStr(req));
 	if (!(hasRole(Role.EXPLORER_ADMIN) || hasRole(Role.SYSTEM_ADMIN))) { return { status: 401 }; }
-	//log.info(toStr({method: req.method})); // form method only supports get and post
+	// log.info('filter method:%s', req.method); // form method only supports get and post
 
 	//return htmlResponse(req);
 	return next(req);
 });
 
-router.all('/', (r) => htmlResponse(r));
+router.all('', (r) => { // Without ending slash is actually the default link.
+	// log.info('missing slash request:%s', toStr(r));
+	return htmlResponse(r);
+});
 
-router.post('/api/v1/interface', (r) => interfacePost(
-	r,
-	() => false // false means always authorized
-));
+router.all('/', (r) => {
+	// log.info('/ request:%s', toStr(r));
+	return htmlResponse(r);
+});
 
-router.all('{path:.+}', (r) => htmlResponse(r)); // Doens't cover '/' ?
+
+router.post('/api/v1/interface', (r) => {
+	// log.info('/api/v1/interface request:%s', toStr(r));
+	return interfacePost(
+		r,
+		() => false // false means always authorized
+	);
+});
+
+router.all('{path:.+}', (r) => { // Doens't cover '/' ?
+	// log.info('path request:%s', toStr(r));
+	return htmlResponse(r);
+});
 
 // NOTE https://github.com/enonic/xp/issues/6793
 
 export function all(req) {
+	// log.info('all request:%s', toStr(req));
 	return router.dispatch(req);
 }

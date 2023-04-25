@@ -6,7 +6,7 @@ import {
 	Principal,
 	Repo
 } from '@enonic/explorer-utils';
-//import {toStr} from '@enonic/js-utils';
+// import {toStr} from '@enonic/js-utils';
 import serialize from 'serialize-javascript';
 //@ts-ignore
 import {isLicenseValid, getIssuedTo} from '/lib/licensing';
@@ -31,6 +31,8 @@ const EXPLORER_URL = getToolUrl(app.name, 'explorer');
 export function htmlResponse({
 	status = 200
 } = {}) {
+	// log.info('htmlResponse status:%s', status);
+
 	// On first startup repos are not yet created.
 	// There is a init task, but it takes a little while to start it.
 
@@ -112,7 +114,6 @@ export function htmlResponse({
 			};
 		}
 	}
-	//log.info(toStr({path}));
 
 	const propsObj: Partial<ExplorerProps> = {
 		basename: EXPLORER_URL,
