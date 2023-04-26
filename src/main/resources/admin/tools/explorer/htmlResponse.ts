@@ -8,7 +8,7 @@ import {
 } from '@enonic/explorer-utils';
 // import {toStr} from '@enonic/js-utils';
 import serialize from 'serialize-javascript';
-//@ts-ignore
+// @ts-ignore
 import {isLicenseValid, getIssuedTo} from '/lib/licensing';
 import {getToolUrl} from '/lib/xp/admin';
 import {
@@ -26,7 +26,12 @@ const ID_REACT_EXPLORER_CONTAINER = 'reactExplorerContainer';
 
 const EXPLORER_URL = getToolUrl(app.name, 'explorer');
 
-//const {currentTimeMillis} = Java.type('java.lang.System');
+
+// @ts-ignore
+// const {currentTimeMillis} = Java.type('java.lang.System') as {
+// 	currentTimeMillis: () => number
+// }
+
 
 export function htmlResponse({
 	status = 200
