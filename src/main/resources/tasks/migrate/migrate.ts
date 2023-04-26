@@ -101,7 +101,8 @@ export function run() {
 						folder({
 							_name
 						}), {
-							connection: writeConnection
+							connection: writeConnection,
+							sanitize: false // Fix #787 Cannot create node with name test, parent '/api-keys'
 						}
 					);
 				});
