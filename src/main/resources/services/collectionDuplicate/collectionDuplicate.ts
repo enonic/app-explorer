@@ -22,7 +22,7 @@ export function post({
 	params: {
 		name
 	}
-} :Request<{name :string}>) {
+}: Request<{name: string}>) {
 	const writeConnection = connect({principals: [Principal.EXPLORER_WRITE]});
 	const node = get({
 		connection: writeConnection,
@@ -39,7 +39,7 @@ export function post({
 	}
 
 	const body = {} as ResponseBody;
-	let status :number;
+	let status: number;
 	try {
 		let number = 1;
 		while(exists({ // WARNING This could theoretically go on for a while...
