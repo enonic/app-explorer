@@ -32,6 +32,9 @@ export default defineConfig((options: MyOptions) => {
 		return {
 			entry: SERVER_FILES,
 			esbuildOptions(options, context) {
+				options.alias = {
+					'util': './src/main/resources/my_node_modules/util/util.js'
+				};
 				options.chunkNames = '_chunks/[name]-[hash]'
 			// 	options.tsconfig = 'tsconfig.tsup.json'
 			},
@@ -111,6 +114,7 @@ export default defineConfig((options: MyOptions) => {
 				// 'diff', //
 				'fast-deep-equal', //
 				'human-object-diff', //
+				'is-generator-function', // my_node_modules/util
 				'object.getownpropertydescriptors', // tasks/webcrawl/webcrawl
 				'polyfill-crypto.getrandomvalues', //
 				'reflect-metadata', //
@@ -118,7 +122,9 @@ export default defineConfig((options: MyOptions) => {
 				'serialize-javascript', //
 				// 'traverse', //
 				'uri-js', //
-				'util',
+
+				// Without it TypeError: null is not a function
+				'util', // node_modules/object-inspect/util.inspect.js
 			],
 			platform: 'neutral',
 
