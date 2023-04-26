@@ -17,34 +17,34 @@ type Directive =
 	| typeof DIRECTIVE_USER_AGENT
 
 type Extension = {
-	extension :Directive
-	value :string
+	extension: Directive
+	value: string
 }
 
 type Group = {
-	agents :Array<any>,
-	rules :Array<any>
+	agents: any[],
+	rules: any[]
 }
 
 type Token =
 	| typeof GROUP_MEMBER
-	| typeof NON_GROUP
+	| typeof NON_GROUP
 	| typeof START_GROUP
 
 type Result = {
-	groups: Array<Group>,
-	extensions: Array<Extension>
+	groups: Group[],
+	extensions: Extension[]
 }
 
 
-export function parseRobotsTxt(txt :string) {
-	const result :Result = {
+export function parseRobotsTxt(txt: string) {
+	const result: Result = {
 		groups: [],
 		extensions: []
 	};
 	const lines = txt.split('\n');
-	let currentGroup :Group = null;
-	let prevToken :Token = null;
+	let currentGroup: Group = null;
+	let prevToken: Token = null;
 	for (let i = 0; i < lines.length; i += 1) {
 		const commentFree = lines[i].replace(/#.*$/, '');
 		const index = commentFree.indexOf(':');
