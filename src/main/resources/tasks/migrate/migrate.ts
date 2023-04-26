@@ -6,8 +6,8 @@ const {currentTimeMillis} = Java.type('java.lang.System') as {
 const startTimeLoadMs = currentTimeMillis();
 
 
-import type {IndexConfigObject} from '/lib/explorer/types.d';
-import type {CollectionWithCron} from '/lib/explorer/types/Collection.d';
+import type {IndexConfigObject} from '@enonic-types/lib-explorer';
+import type {CollectionWithCron} from '@enonic-types/lib-explorer/Collection.d';
 //import type {InterfaceNode} from '/lib/explorer/interface/types.d';
 import type {RepoConnection} from '/lib/xp/node';
 import type {
@@ -18,6 +18,12 @@ import type {
 
 
 import {
+	FOLDERS,
+	NodeType,
+	Path,
+	Principal
+} from '@enonic/explorer-utils';
+import {
 	VALUE_TYPE_STRING,
 	addQueryFilter,
 	forceArray,
@@ -25,14 +31,6 @@ import {
 } from '@enonic/js-utils';
 // import prettyMs from 'pretty-ms'; // Adds to bundle size and thus makes things take more time
 import {ignoreErrors} from '/lib/explorer/ignoreErrors';
-import {
-	FOLDERS,
-	NT_COLLECTION,
-	//NT_DOCUMENT,
-	NT_INTERFACE,
-	PATH_FIELDS,
-	PRINCIPAL_EXPLORER_WRITE,
-} from '/lib/explorer/index';
 import {
 	READWRITE_FIELDS,
 	SYSTEM_FIELDS,
@@ -85,7 +83,7 @@ export function run() {
 			total: 1
 		}).report();
 		const writeConnection = connect({
-			principals:[PRINCIPAL_EXPLORER_WRITE]
+			principals:[Principal.EXPLORER_WRITE]
 		}) as RepoConnection;
 
 		//──────────────────────────────────────────────────────────────────────
@@ -399,11 +397,11 @@ export function run() {
 						should: [{
 							hasValue: {
 								field: '_nodeType',
-								values: [NT_INTERFACE]
+								values: [NodeType.INTERFACE]
 							}},	{
 							hasValue: {
 								field: 'type',
-								values: [NT_INTERFACE]
+								values: [NodeType.INTERFACE]
 							}
 						}]
 					}
@@ -499,7 +497,7 @@ export function run() {
 			version: 6
 		})) {
 			progress.addItems(1).setInfo(`Removing "system" fields from explorer repo...`).report().logInfo();
-			const fieldsPathsToDelete = [...SYSTEM_FIELDS, FIELD_TYPE].map(({_name}) => `${PATH_FIELDS}/${_name}`);
+			const fieldsPathsToDelete = [...SYSTEM_FIELDS, FIELD_TYPE].map(({_name}) => `${Path.FIELDS}/${_name}`);
 			//log.debug(`fieldsPathsToDelete:${toStr(fieldsPathsToDelete)}`);
 
 			//const deleteRes =
@@ -537,7 +535,7 @@ export function run() {
 						}
 					},
 					filters: addQueryFilter({
-						filter: hasValue('_nodeType', [NT_COLLECTION]),
+						filter: hasValue('_nodeType', [NodeType.COLLECTION]),
 					})
 				}),
 				query: ''
