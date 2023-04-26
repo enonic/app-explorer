@@ -65,7 +65,7 @@ dependencies {
 	include 'com.enonic.lib:lib-http-client:3.2.2'
 	include 'com.enonic.lib:lib-license:3.0.1'
 	include 'com.enonic.lib:lib-router:3.0.1'
-	include 'com.enonic.lib:lib-explorer:4.0.0-SNAPSHOT' // Version must be here or dependabot fails
+	include 'com.enonic.lib:lib-explorer:4.0.0-RC6' // Version must be here or dependabot fails
 	include 'com.enonic.lib:lib-util:3.1.1'
 	include 'com.enonic.lib:lib-galimatias:1.0.0-B1'
 
