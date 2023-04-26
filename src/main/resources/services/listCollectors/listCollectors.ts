@@ -4,7 +4,9 @@ import {
 } from '@enonic/js-utils';
 
 import {listCollectors} from '/lib/explorer/collector/listCollectors';
-import {currentTimeMillis} from '/lib/explorer/time/currentTimeMillis';
+
+// This fails when tsup code splitting: true
+// import {currentTimeMillis} from '/lib/explorer/time/currentTimeMillis';
 
 
 /*const TEST_DATA = [{
@@ -46,6 +48,13 @@ import {currentTimeMillis} from '/lib/explorer/time/currentTimeMillis';
 		total: 2
 	}
 }];*/
+
+
+// @ts-ignore
+const {currentTimeMillis} = Java.type('java.lang.System') as {
+	currentTimeMillis: () => number
+}
+
 
 export const get = () => ({
 	contentType: RESPONSE_TYPE_JSON,

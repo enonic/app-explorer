@@ -13,8 +13,9 @@
 import type {EmptyObject} from '/lib/explorer/types/index.d';
 import type {Request} from '../../types/index.d';
 
-
+// This fails when tsup code splitting: true
 // import {currentTimeMillis} from '/lib/explorer/time/currentTimeMillis';
+
 import {
 	RESPONSE_TYPE_JSON,
 	sortKeys,
@@ -100,7 +101,10 @@ import {addExplorerRepoNodesGetQuery} from './addExplorerRepoNodesGetQuery';
 import {createObjectTypesUsingUnionTypes} from './createObjectTypesUsingUnionTypes';
 
 
-//const {currentTimeMillis} = Java.type('java.lang.System');
+// @ts-ignore
+// const {currentTimeMillis} = Java.type('java.lang.System') as {
+// 	currentTimeMillis: () => number
+// }
 // const serviveStartTimeMs = currentTimeMillis();
 
 

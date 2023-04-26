@@ -1,5 +1,5 @@
 log.info('Migrate task read into memory');
-//@ts-ignore
+// @ts-ignore
 const {currentTimeMillis} = Java.type('java.lang.System') as {
 	currentTimeMillis :() => number
 };
