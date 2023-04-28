@@ -1,4 +1,3 @@
-//import type {InterfaceField} from '/lib/explorer/types/index.d';
 import type {DropdownItemProps} from 'semantic-ui-react/index.d';
 
 

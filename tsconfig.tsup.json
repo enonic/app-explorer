@@ -1,0 +1,11 @@
+{ // This file is used by tsup transpiling source code
+	"compilerOptions": {
+		"paths": {
+			"@enonic/js-utils": ["./node_modules/@enonic/js-utils"],
+			"@enonic/js-utils/*": ["./node_modules/@enonic/js-utils/*"],
+			"@enonic/nashorn-polyfills": ["./src/main/resources/lib/nashorn/index.ts"],
+			"/lib/licensing": ["./src/main/resources/lib/licensing.ts"],
+		},
+		"target": "ES5"
+	}
+}

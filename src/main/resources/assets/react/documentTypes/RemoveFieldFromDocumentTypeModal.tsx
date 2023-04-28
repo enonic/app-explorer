@@ -26,16 +26,16 @@ export function RemoveFieldFromDocumentTypeModal({
 	},
 	// Optional
 	collectionNames = [], // optional
-	interfaceNames = [],  // optional
-} :{
+	interfaceNames = [], // optional
+}: {
 	// Required
-	onClose :() => void
-	modalState :AddOrEditLocalFieldModalState
-	servicesBaseUrl :string
-	updateOrDeleteProperties :UpdateOrDeletePropertiesFunction
+	onClose: () => void
+	modalState: AddOrEditLocalFieldModalState
+	servicesBaseUrl: string
+	updateOrDeleteProperties: UpdateOrDeletePropertiesFunction
 	// Optional
-	collectionNames ?:Array<string>
-	interfaceNames ?:Array<string>
+	collectionNames?: string[]
+	interfaceNames?: string[]
 }) {
 	const [isLoading, setIsLoading] = React.useState(true);
 	const [fieldHasValueInDocumentsTotal, setFieldHasValueInDocumentsTotal] = React.useState(undefined);

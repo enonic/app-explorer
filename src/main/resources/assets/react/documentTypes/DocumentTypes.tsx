@@ -25,7 +25,7 @@ import {
 
 export function DocumentTypes({
 	servicesBaseUrl
-} :DocumentTypesComponentParams) {
+}: DocumentTypesComponentParams) {
 
 	const {
 		currentDocumentTypeName, setCurrentDocumentTypeName,
@@ -106,7 +106,7 @@ export function DocumentTypes({
 						activeProperties,
 						activePropertyNames,
 						addFields = true,
-						collectionsNames = [],
+						collectionNames = [],
 						collections = [],
 						documentsInTotal = 0,
 						managedBy = ''
@@ -187,7 +187,7 @@ export function DocumentTypes({
 												//console.debug('DeleteDocumentTypeModal afterClose');
 												memoizedUpdateState();
 											}}
-											collectionNames={collectionsNames}
+											collectionNames={collectionNames}
 											disabled={isLoading}
 											servicesBaseUrl={servicesBaseUrl}
 										/>

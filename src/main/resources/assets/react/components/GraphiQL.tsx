@@ -69,6 +69,7 @@ function GraphiQL({
 	const explorerPlugin = useExplorerPlugin({
 		query,
 		onEdit: setQuery,
+		showAttribution: false
 	});
 
 	return <GraphiQLOrig

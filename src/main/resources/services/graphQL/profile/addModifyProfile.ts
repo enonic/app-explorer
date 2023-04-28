@@ -1,4 +1,4 @@
-import type {AnyObject} from '/lib/explorer/types/index.d';
+import type {AnyObject} from '@enonic-types/lib-explorer';
 import type {Glue} from '../Glue';
 
 

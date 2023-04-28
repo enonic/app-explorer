@@ -1,4 +1,4 @@
-import type {DocumentType} from '/lib/explorer/types/index.d';
+import type {DocumentType} from '@enonic-types/lib-explorer/index.d';
 import type {JSONResponse} from '../../../services/graphQL/fetchers/index.d';
 import type {FetchDocumentTypeCreateData} from '../../../services/graphQL/fetchers/fetchDocumentTypeCreate';
 import type {FetchDocumentTypeUpdateData} from '../../../services/graphQL/fetchers/fetchDocumentTypeUpdate';
@@ -21,9 +21,9 @@ import {nameValidator} from '../utils/nameValidator';
  * Validates the name input
  */
 function validateName(
-	value :string, // value from an input button
-	documentTypes :DocumentTypesObj
-) :string|false {
+	value: string, // value from an input button
+	documentTypes: DocumentTypesObj
+): string|false {
 	const result = nameValidator(value);
 	// NameValidator sets undefined when no error. Object on error
 	if (result) {
@@ -44,13 +44,13 @@ export function useNewOrEditDocumentTypeState({
 	documentTypes,
 	servicesBaseUrl,
 	setModalState
-} :{
-	_id ?:string
-	_name ?:string
-	doClose :() => void
-	documentTypes :DocumentTypesObj
-	servicesBaseUrl :string
-	setModalState :React.Dispatch<React.SetStateAction<DocumentTypeModal>>
+}: {
+	_id?: string
+	_name?: string
+	doClose: () => void
+	documentTypes: DocumentTypesObj
+	servicesBaseUrl: string
+	setModalState: React.Dispatch<React.SetStateAction<DocumentTypeModal>>
 }) {
 	const [state, setState] = React.useState<NewOrEditDocumentTypeState>({
 		_name: '',
@@ -63,7 +63,7 @@ export function useNewOrEditDocumentTypeState({
 	const [activeInput, setActiveInput] = React.useState(false);
 	const [isLoading, setIsLoading] = React.useState(_id ? true : false);
 
-	const memoizedFetchDocumentTypeGet = React.useCallback((id :string) => fetchDocumentTypeGet({
+	const memoizedFetchDocumentTypeGet = React.useCallback((id: string) => fetchDocumentTypeGet({
 		url: `${servicesBaseUrl}/graphQL`,
 		variables: {
 			_id: id
@@ -112,7 +112,7 @@ export function useNewOrEditDocumentTypeState({
 		memoizedFetchDocumentTypeGet
 	]); // After first paint only
 
-	let disabled :boolean;
+	let disabled: boolean;
 	if (!_id) {
 		if (!activeInput || error) {
 			disabled = true;
@@ -127,8 +127,8 @@ export function useNewOrEditDocumentTypeState({
 	 * Creates or updates a document model with a fetch call
 	 */
 	async function createOrUpdateDocument(
-		data :NewOrEditDocumentTypeState, // data state that the document will be updated to
-		success :(data :FetchDocumentTypeCreateData|FetchDocumentTypeUpdateData) => void // success method that will be called when completed
+		data: NewOrEditDocumentTypeState, // data state that the document will be updated to
+		success: (data: FetchDocumentTypeCreateData|FetchDocumentTypeUpdateData) => void // success method that will be called when completed
 	) {
 		if (_id) {
 			return fetchDocumentTypeUpdate({
@@ -191,7 +191,7 @@ export function useNewOrEditDocumentTypeState({
 			if (_id) {
 				doClose();
 			} else {
-				const resultDocumentType :DocumentType = (data['createDocumentType'] || data['updateDocumentType']) as DocumentType;
+				const resultDocumentType: DocumentType = (data['createDocumentType'] || data['updateDocumentType']) as DocumentType;
 				const updateId = resultDocumentType._id;
 				const updateName = resultDocumentType._name;
 

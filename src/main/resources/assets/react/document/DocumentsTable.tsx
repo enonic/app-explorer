@@ -212,7 +212,7 @@ function DocumentsTable({
 														setJsonModalState({
 															open: true,
 															header: _id,
-															parsedJson: parsedJson || rest['_json'],
+															parsedJson: parsedJson,// || rest['_json'], // Can't fallback to string, when the type should be object
 														})
 													}}
 													style={{

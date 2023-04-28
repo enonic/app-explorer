@@ -1,4 +1,4 @@
-import type {Task} from '/lib/explorer/types/'
+import type {Task} from '@enonic-types/lib-explorer'
 import type {Locales} from '../../index.d';
 import type {JSONResponse}  from '../../../../services/graphQL/fetchers/index.d';
 

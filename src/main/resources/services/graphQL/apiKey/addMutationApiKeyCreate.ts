@@ -1,4 +1,4 @@
-import type {ParentPath} from '/lib/explorer/types/index.d';
+import type {ParentPath} from '@enonic-types/lib-explorer';
 import type {
 	ApiKeyNode,
 	ApiKeyNodeCreateParams

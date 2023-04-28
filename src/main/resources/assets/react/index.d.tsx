@@ -2,7 +2,7 @@ import type {
 	AnyObject,
 	CollectorComponentRef,
 	CollectorProps
-} from '/lib/explorer/types/index.d';
+} from '@enonic-types/lib-explorer';
 
 
 export type CollectorComponent<CollectorConfig extends AnyObject = AnyObject> = (props :CollectorProps & {

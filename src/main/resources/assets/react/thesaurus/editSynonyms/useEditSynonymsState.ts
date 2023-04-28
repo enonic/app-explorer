@@ -1,8 +1,9 @@
+import type {BucketsAggregationResult} from '/lib/xp/node';
 import type {
 	// PaginationProps,
 	StrictTableHeaderCellProps
 } from 'semantic-ui-react';
-import type {QueriedSynonym} from '/lib/explorer/types/index.d';
+import type {QueriedSynonym} from '@enonic-types/lib-explorer/index.d';
 
 //import {isSet} from '@enonic/js-utils';
 import {useWhenInitAsync} from '@seamusleahy/init-hooks';
@@ -13,12 +14,7 @@ import {useUpdateEffect} from '../../utils/useUpdateEffect';
 
 type EditSynonymsState = {
 	aggregations: {
-		thesaurus: {
-			buckets: Array<{
-				docCount: number
-				key: string
-			}>
-		}
+		thesaurus: BucketsAggregationResult
 	},
 	count: number
 	end: number

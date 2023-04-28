@@ -1,7 +1,7 @@
 import type {
 	SynonymGUI,
 	SynonymGUI_LanguagesSynonymObject
-} from '/lib/explorer/types/Synonym.d';
+} from '@enonic-types/lib-explorer/Synonym.d';
 import type {Locales} from '../../index.d';
 
 

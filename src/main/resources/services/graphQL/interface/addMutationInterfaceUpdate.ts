@@ -1,4 +1,4 @@
-import type {TermQuery} from '/lib/explorer/types/Interface.d';
+import type {TermQuery} from '@enonic-types/lib-explorer/Interface.d';
 
 
 import {coerseInterfaceType} from '/lib/explorer/interface/coerseInterfaceType';

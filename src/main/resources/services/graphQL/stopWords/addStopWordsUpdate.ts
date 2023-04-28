@@ -1,4 +1,4 @@
-import type {StopwordNode} from '/lib/explorer/types/StopWord.d';
+import type {StopwordNode} from '@enonic-types/lib-explorer/StopWord.d';
 
 import {PRINCIPAL_EXPLORER_WRITE} from '/lib/explorer/model/2/constants';
 import {modify} from '/lib/explorer/node/modify';

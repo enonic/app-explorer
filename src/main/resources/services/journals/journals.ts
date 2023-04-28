@@ -1,4 +1,7 @@
-import type {AggregationsResponseEntry} from '@enonic/js-utils/types/node/query/Aggregation.d';
+import type {
+	AggregationsResult,
+	Filter
+} from '/lib/xp/node';
 //import type {Journal} from '/lib/explorer/journal/types.d';
 
 
@@ -24,7 +27,7 @@ export interface JournalHit {
 
 export interface QueryJournalsRes {
 	aggregations?: {
-		collection: AggregationsResponseEntry
+		collection: AggregationsResult
 	}
 	count: number
 	end: number
@@ -60,14 +63,14 @@ export function get({
 	const intPage = parseInt(page, 10);
 	const start = (intPage - 1 ) * intPerPage;
 
-	let filters = {};
+	let filters = {} as Filter;
 
 	const collectionsArr = collections.split(',');
 	if(collections) {
 		filters = addQueryFilter({
 			filters,
 			filter: hasValue('name', collectionsArr)
-		});
+		}) as Filter;
 	}
 
 	/*if (endTimeRanges) {
@@ -166,14 +169,14 @@ export function get({
 		aggregations: {
 			collection: {
 				terms: {
-        			field: 'name',
-        			order: '_count desc',
-        			size: 0, // Seems to mean infinite (undocumented)
-      			}
+					field: 'name',
+					order: '_count desc',
+					size: 0, // Seems to mean infinite (undocumented)
+				}
 			}
 		},
 		count: 0,
-		filters: {},
+		filters: {} as Filter,
 		query
 	});
 	//log.debug('collectionsAggregationQueryResult:%s', toStr(collectionsAggregationQueryResult));

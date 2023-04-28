@@ -1,4 +1,6 @@
 {
+	// This file is used by your code editor,
+	// TODO: and package.json verify:types:server
 	"extends": "../../../tsconfig.json",
 
 	// Lets you set a base directory to resolve non-absolute module names.
@@ -28,23 +30,14 @@
 			// Production (should be commented in when commiting)
 			// "@enonic/app-explorer/*": ["./src/main/resources/*"],
 			"@enonic/app-explorer/*": ["./*"],
-			"/lib/xp/admin": ["../../../node_modules/@enonic-types/lib-admin"],
-			"/lib/xp/auth": ["../../../node_modules/@enonic-types/lib-auth"],
-			"/lib/xp/cluster": ["../../../node_modules/@enonic-types/lib-cluster"],
-			"/lib/xp/context": ["../../../node_modules/@enonic-types/lib-context"],
-			"/lib/xp/event": ["../../../node_modules/@enonic-types/lib-event"],
-			"/lib/xp/io": ["../../../node_modules/@enonic-types/lib-io"],
-			"/lib/xp/node": ["../../../node_modules/@enonic-types/lib-node"],
-			"/lib/xp/portal": ["../../../node_modules/@enonic-types/lib-portal"],
-			"/lib/xp/repo": ["../../../node_modules/@enonic-types/lib-repo"],
-			"/lib/xp/task": ["../../../node_modules/@enonic-types/lib-task"],
-			"/lib/xp/value": ["../../../node_modules/@enonic-types/lib-value"],
-			"/lib/xp/vhost": ["../../../node_modules/@enonic-types/lib-vhost"],
+			"/lib/xp/*": ["../../../node_modules/@enonic-types/lib-*"],
 
 			// There is no @enonic-types/lib-explorer yet, so these are workarounds
 			"@enonic-types/lib-explorer": ["../../../../lib-explorer/src/main/resources/lib/explorer/types/index.d"],
 			"@enonic-types/lib-explorer/*": ["../../../../lib-explorer/src/main/resources/lib/explorer/types/*"],
-			// "/lib/explorer/*": ["../../../../lib-explorer/src/main/resources/lib/explorer/*"],
+
+			// lib-explorer is an external, but we still want the code editor to resolve types
+			"/lib/explorer/*": ["../../../../lib-explorer/src/main/resources/lib/explorer/*"],
 
 			// Fallback
 			// "/*": ["./src/main/resources/*"],

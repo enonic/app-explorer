@@ -2,7 +2,7 @@ import type {
 	StrictDropdownItemProps,
 	PaginationProps,
 } from 'semantic-ui-react';
-import type {InterfaceField} from '/lib/explorer/types/Interface.d';
+import type {InterfaceField} from '@enonic-types/lib-explorer/Interface.d';
 
 
 
@@ -234,7 +234,7 @@ export function useSearchState({
 	// Update only (not init)
 	//──────────────────────────────────────────────────────────────────────────
 	useUpdateEffect(() => {
-		console.debug('update page:', page, 'perPage:', perPage, 'start:', start);
+		// console.debug('update page:', page, 'perPage:', perPage, 'start:', start);
 		const newStart = (page as number - 1 ) * perPage;
 		if (newStart !== start) {
 			setStart(newStart)

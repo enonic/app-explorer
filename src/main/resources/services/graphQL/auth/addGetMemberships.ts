@@ -1,4 +1,4 @@
-import type { EmptyObject } from '/lib/explorer/types/index.d';
+import type { EmptyObject } from '@enonic-types/lib-explorer';
 import type {
 	// Group,
 	GroupKey,

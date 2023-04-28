@@ -1,4 +1,4 @@
-//import type {RepoConnection} from '/lib/explorer/types/index.d';
+//import type {RepoConnection} from '@enonic-types/lib-explorer';
 import type {Request} from '../../../types/Request';
 
 

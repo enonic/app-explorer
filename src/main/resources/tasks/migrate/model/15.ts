@@ -1,4 +1,4 @@
-import type {WriteConnection} from '/lib/explorer/types/index.d';
+import type {WriteConnection} from '@enonic-types/lib-explorer';
 
 import {setModel} from '/lib/explorer/model/setModel';
 import {get as getInterface} from '/lib/explorer/interface/get';

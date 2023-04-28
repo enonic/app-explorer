@@ -1,7 +1,7 @@
 import type {
 	ParentPath,
 	RequiredNodeProperties
-} from '/lib/explorer/types/index.d';
+} from '@enonic-types/lib-explorer';
 
 
 export type ApiKey = {

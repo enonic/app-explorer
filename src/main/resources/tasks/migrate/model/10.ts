@@ -1,7 +1,7 @@
 import type {
 	RepoConnection,
 	ScheduledJob
-} from '/lib/explorer/types/index.d';
+} from '@enonic-types/lib-explorer';
 
 
 import {

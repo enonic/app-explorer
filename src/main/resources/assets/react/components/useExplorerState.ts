@@ -1,6 +1,6 @@
 import type {SemanticICONS} from 'semantic-ui-react/src/generic.d';
 import type {StrictDropdownItemProps} from 'semantic-ui-react';
-import type {InterfaceField} from '/lib/explorer/types/Interface.d';
+import type {InterfaceField} from '@enonic-types/lib-explorer/Interface.d';
 import type {User} from '/lib/xp/auth';
 import type {License} from '../index.d';
 

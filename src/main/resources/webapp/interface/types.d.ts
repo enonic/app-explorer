@@ -2,7 +2,7 @@ import type {AggregationForGraphQLSchemaQueryArgsInputType} from '@enonic/js-uti
 import type {
 	Highlight,
 	QueryFilters
-} from '/lib/explorer/types/index.d';
+} from '@enonic-types/lib-explorer';
 
 
 export {

@@ -1,5 +1,6 @@
-import type {InterfaceField} from '/lib/explorer/types/Interface.d';
-import type {Hit} from './search/Hits';
+import type {InterfaceField} from '@enonic-types/lib-explorer/Interface.d';
+// import type {Hit} from './search/Hits';
+import type {QueryDocumentsHit} from '../document'
 import type {
 	Profiling,
 	Synonyms
@@ -17,9 +18,9 @@ import {
 
 type SearchResult = {
 	count: number
-	hits: Hit[]
-	profiling: Profiling[]
+	hits: QueryDocumentsHit[] // Hit[]
 	locales: string[]
+	profiling: Profiling[]
 	synonyms: Synonyms
 	total: number
 }

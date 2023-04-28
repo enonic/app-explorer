@@ -1,3 +1,5 @@
+import type { BucketsAggregationResult } from '/lib/xp/node';
+
 import ms from 'ms';
 import {
 	Button,
@@ -63,7 +65,7 @@ export function Journals({
 							multiple={true}
 							name='collections'
 							onChange={handleInputChange}
-							options={aggregations.collection.buckets.map(({key, docCount}) => ({key, text: `${key} (${docCount})`, value: key}))}
+							options={(aggregations.collection as BucketsAggregationResult).buckets.map(({key, docCount}) => ({key, text: `${key} (${docCount})`, value: key}))}
 							search
 							selection
 							style={{marginTop:6}}

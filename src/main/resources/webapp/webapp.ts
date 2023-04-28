@@ -5,7 +5,7 @@ mapping.api.target = /webapp/com.enonic.app.explorer/api
 mapping.api.idProvider.system = default
 */
 
-import type {EnonicXpRequest} from '/lib/explorer/types/index.d';
+import type {EnonicXpRequest} from '@enonic-types/lib-explorer';
 import type {GetCollectionRequest} from './collection/get';
 import type {AllDocumentRequest} from './collection/document';
 import type {InterfaceRequest} from './interface/post';

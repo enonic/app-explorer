@@ -1,4 +1,4 @@
-import type {InterfaceNode} from '/lib/explorer/types/Interface.d';
+import type {InterfaceNode} from '@enonic-types/lib-explorer/Interface.d';
 
 //import {toStr} from '@enonic/js-utils';
 

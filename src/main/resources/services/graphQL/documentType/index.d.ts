@@ -1,7 +1,7 @@
 import type {
 	AnyObject,
 	DocumentType
-} from '/lib/explorer/types/index.d';
+} from '@enonic-types/lib-explorer';
 
 
 export type DocumentTypeEnv<
