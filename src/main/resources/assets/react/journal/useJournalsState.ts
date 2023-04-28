@@ -2,6 +2,7 @@ import type {
 	PaginationProps,
 	StrictTableHeaderCellProps
 } from 'semantic-ui-react';
+import type {QueryJournalsRes} from '../../../services/journals/journals';
 
 
 import Uri from 'jsuri';
@@ -13,8 +14,8 @@ type Direction = StrictTableHeaderCellProps['sorted'];
 
 export function useJournalsState({
 	servicesBaseUrl
-} :{
-	servicesBaseUrl :string
+}: {
+	servicesBaseUrl: string
 }) {
 	const [collectionsPopupOpen, setCollectionsPopupOpen] = React.useState(false);
 	const [columnsPopupOpen, setColumnsPopupOpen] = React.useState(false);
@@ -39,7 +40,7 @@ export function useJournalsState({
 		sort: 'endTime DESC'
 	});
 	const column = params.sort.split(' ')[0];
-	const direction :Direction = params.sort.split(' ')[1] === 'DESC' ? 'descending' : 'ascending';
+	const direction: Direction = params.sort.split(' ')[1] === 'DESC' ? 'descending' : 'ascending';
 	const [result, setResult] = React.useState({
 		aggregations: {
 			collection: {
@@ -59,20 +60,7 @@ export function useJournalsState({
 		total: 0,
 		totalPages: 0,
 		hits: []
-	} as {
-		aggregations :{
-			collection: {
-				buckets :Array<unknown>
-			}
-		}
-		count :number
-		end :number
-		hits :Array<unknown>
-		page :number
-		start :number
-		total :number
-		totalPages :number
-	});
+	} as QueryJournalsRes);
 
 	const memoizedSearchJournals = React.useCallback(() => {
 		setLoading(true); // Make sure this happens before setResult below?
@@ -94,7 +82,7 @@ export function useJournalsState({
 	]);
 
 	function handleCheckboxChange(
-		_event :React.ChangeEvent<HTMLInputElement>,
+		_event: React.ChangeEvent<HTMLInputElement>,
 		{checked, name}
 	) {
 		//console.debug({function: 'handleCheckboxChange', name, checked});
@@ -136,7 +124,7 @@ export function useJournalsState({
 	} // function handleCheckboxChange
 
 	function handleInputChange(
-		_event :React.ChangeEvent<HTMLInputElement>,
+		_event: React.ChangeEvent<HTMLInputElement>,
 		{name, value}
 	) {
 		//console.debug({function: 'handleInputChange', name, value});
@@ -150,8 +138,8 @@ export function useJournalsState({
 
 	function handlePaginationChange(
 		//@ts-ignore
-		event :React.MouseEvent<HTMLAnchorElement>,
-		data :PaginationProps
+		event: React.MouseEvent<HTMLAnchorElement>,
+		data: PaginationProps
 	) {
 		const {activePage} = data;
 		//console.debug({function: 'handlePaginationChange', activePage});
@@ -162,7 +150,7 @@ export function useJournalsState({
 		});
 	} // handlePaginationChange
 
-	function handleSort({target} :React.SyntheticEvent<
+	function handleSort({target}: React.SyntheticEvent<
 		HTMLTableCellElement, React.MouseEvent<HTMLTableCellElement>
 	>) {
 		//console.debug({function: 'handleSort'});

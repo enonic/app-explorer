@@ -75,9 +75,6 @@ export const NODE_MODULES :{
 	header: 'Moment.js', // app-explorer
 	href: 'https://github.com/moment/moment/blob/develop/LICENSE'
 },{
-	header: 'pretty-ms', // app-explorer
-	href: 'https://github.com/sindresorhus/pretty-ms/blob/master/license'
-},{
 	header: 'React and React-DOM', // app-explorer
 	href: 'https://github.com/facebook/react/blob/master/LICENSE'
 },{
