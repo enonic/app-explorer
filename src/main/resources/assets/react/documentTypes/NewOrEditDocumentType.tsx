@@ -1,4 +1,4 @@
-import type {DocumentTypeField} from '/lib/explorer/types/index.d';
+import type {DocumentTypeField} from '@enonic-types/lib-explorer';
 import type {
 	NewOrEditDocumentTypeComponentParams,
 	NewOrEditDocumentTypeState
@@ -31,7 +31,7 @@ export function NewOrEditDocumentType({
 	_id,
 	_name,
 	doClose = () => {/**/}
-} :NewOrEditDocumentTypeComponentParams) {
+}: NewOrEditDocumentTypeComponentParams) {
 	const {
 		activeInput,
 		disabled,
@@ -51,6 +51,7 @@ export function NewOrEditDocumentType({
 		servicesBaseUrl,
 		setModalState
 	});
+	// console.debug('documentTypes', documentTypes);
 	return !isLoading
 		?
 		<>
@@ -69,7 +70,7 @@ export function NewOrEditDocumentType({
 								render: () => <Tab.Pane>
 									<FieldsList
 										collectionNames={documentTypes[_name] ? documentTypes[_name].collectionNames || [] : []}
-										interfaceNames={documentTypes[_name] ? documentTypes[_name].interfaceNames || [] : []}
+										interfaceNames={documentTypes[_name] ? documentTypes[_name].interfaceNames || [] : [] /* TODO I suspect this doesn't exist anymore */}
 										servicesBaseUrl={servicesBaseUrl}
 										properties={state.properties}
 										updateOrDeleteProperties={

@@ -2,7 +2,7 @@ import type {
 	DropdownItemProps,
 	TRANSITION_STATUSES as TransitionStatuses,
 } from 'semantic-ui-react';
-import type {InterfaceField} from '/lib/explorer/types/Interface.d';
+import type {InterfaceField} from '@enonic-types/lib-explorer/Interface.d';
 
 
 import {isSet} from '@enonic/js-utils';

@@ -2,7 +2,7 @@ import type {
 	DropdownItemProps,
 	TRANSITION_STATUSES as TransitionStatuses,
 } from 'semantic-ui-react';
-import type {TermQuery} from '/lib/explorer/types/Interface.d';
+import type {TermQuery} from '@enonic-types/lib-explorer/Interface.d';
 import type {
 	GetFieldValuesParams,
 	FieldNameToValueTypes,
@@ -389,7 +389,7 @@ export function Term({
 																			foundFieldValues.push(fieldValue);
 																		}
 																	} catch(e) {
-																		console.warning('Unable to JSON parse:', _json);
+																		console.warn('Unable to JSON parse:', _json);
 																	}
 																} // for
 																// console.debug('foundFieldValues', foundFieldValues);

@@ -1,4 +1,4 @@
-import type {SynonymGUI} from '/lib/explorer/types/Synonym.d';
+import type {SynonymGUI} from '@enonic-types/lib-explorer/Synonym.d';
 import type {Locales} from '../../index.d';
 
 

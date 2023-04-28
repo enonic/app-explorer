@@ -1,6 +1,6 @@
 import type {SearchProps} from './useSearchState';
 //import type {AnyObject} from '@enonic/js-utils/src/types';
-//import type {Fields} from '/lib/explorer/types/Field.d';
+//import type {Fields} from '@enonic-types/lib-explorer/Field.d';
 
 /*import {
 	getIn,

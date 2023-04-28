@@ -436,6 +436,7 @@ export function useDocumentsState({
 				// // console.log('newColumnOptions', newColumnOptions);
 				// setColumnOptions(newColumnOptions);
 
+				// console.debug('json.data.queryDocuments', json.data.queryDocuments);
 				setDocumentsRes(json.data.queryDocuments);
 				setSearchedString(query);
 

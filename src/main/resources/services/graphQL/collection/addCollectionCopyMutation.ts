@@ -1,5 +1,5 @@
-import type {CollectionNode} from '/lib/explorer/types/Collection';
-import type {Path as PathType} from '/lib/explorer/types/index.d';
+import type {CollectionNode} from '@enonic-types/lib-explorer/Collection';
+import type {Path as PathType} from '@enonic-types/lib-explorer';
 import type {RepoConnection} from '/lib/xp/node';
 import type {Glue} from '../Glue';
 

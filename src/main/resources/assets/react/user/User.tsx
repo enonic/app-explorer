@@ -26,7 +26,7 @@ function User({
 }: {
 	servicesBaseUrl: string
 	userState: UserType & {
-		getMemberships: ExtendedPrincipal[]
+		getMemberships?: ExtendedPrincipal[]
 	}
 }) {
 	const {

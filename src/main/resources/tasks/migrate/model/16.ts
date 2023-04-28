@@ -3,7 +3,7 @@ import type {
 	QueryNodeParams,
 	RepoConnection
 } from '/lib/xp/node';
-// import type {WriteConnection} from '/lib/explorer/types/index.d';
+// import type {WriteConnection} from '@enonic-types/lib-explorer';
 
 import { NodeType } from '@enonic/explorer-utils';
 import {

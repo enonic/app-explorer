@@ -1,4 +1,6 @@
-{ // This file is used by your code editor, and tsup during build
+{
+	// This file is used by your code editor,
+	// and bundle-require to transpile the tsup.config.ts file
 	"compilerOptions": {
 		"allowJs": true,
 		"allowSyntheticDefaultImports": true,
@@ -54,6 +56,8 @@
 			"@enonic/js-utils/*": ["./node_modules/@enonic/js-utils/*"],
 			"@enonic/nashorn-polyfills": ["./src/main/resources/lib/nashorn/index.ts"],
 			"/lib/licensing": ["./src/main/resources/lib/licensing.ts"],
+			// "/lib/xp/*": ["./node_modules/@enonic-types/lib-*"],
+			// "/*": ["./src/main/resources/*"],
 		},
 		"preserveWatchOutput": false,
 		"pretty": true,
@@ -105,16 +109,10 @@
 		"strict": false,
 		"strictNullChecks": false,
 
-		// "target": "es5",
-		// tsup: ERROR Transforming const to the configured target environment
-		// ("es5") is not supported yet
-		// Set to es5 in tsup.config.js instead
-		//
-		// https://tsup.egoist.dev/#es5-support
-		// You can use --target es5 to compile the code down to es5, in this
-		// target your code will be transpiled by esbuild to es2020 first, and
-		// then transpiled to es5 by SWC.
-		"target": "ES2020",
+		// There are actually two "targets"
+		// 1. The environment tsup runs in (set in this file)
+		// 2. The environment tsup transpiles to (set in tsconfig.tsup.json via tsup.config.ts)
+		"target": "ES2020", // What bundle-require inside tsup uses to load tsup.config.ts
 
 		"typeRoots": [
 			"./node_modules/@types",

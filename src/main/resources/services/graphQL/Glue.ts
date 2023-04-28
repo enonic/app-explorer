@@ -3,7 +3,7 @@ import type {
 	AnyObject,
 	EmptyObject,
 	OneOrMore,
-} from '/lib/explorer/types/index.d';
+} from '@enonic-types/lib-explorer';
 
 
 import {

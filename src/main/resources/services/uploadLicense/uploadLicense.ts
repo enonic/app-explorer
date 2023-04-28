@@ -1,7 +1,7 @@
 import type {
 	EnonicXpRequest,
 	Response
-} from '/lib/explorer/types/index.d';
+} from '@enonic-types/lib-explorer';
 
 
 //import {toStr} from '@enonic/js-utils';

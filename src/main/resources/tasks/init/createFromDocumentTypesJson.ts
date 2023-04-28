@@ -1,4 +1,4 @@
-import type {DocumentTypeFields} from '/lib/explorer/types/index.d';
+import type {DocumentTypeFields} from '@enonic-types/lib-explorer';
 
 
 import {fold} from '@enonic/js-utils';

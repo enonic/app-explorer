@@ -1,4 +1,4 @@
-import type {InputTypeSynonymLanguages} from '/lib/explorer/types/Synonym.d';
+import type {InputTypeSynonymLanguages} from '@enonic-types/lib-explorer/Synonym.d';
 import type {Glue} from '../Glue';
 
 

@@ -1,4 +1,4 @@
-import type {InterfaceField} from '/lib/explorer/types/Interface';
+import type {InterfaceField} from '@enonic-types/lib-explorer/Interface';
 import type {FetchData} from 'graphql-hooks';
 import type {DropdownItemProps} from 'semantic-ui-react/index.d';
 import type {QueryInterfacesResponseData} from '../components/useExplorerState';
@@ -15,21 +15,21 @@ import {FIELD_SHORTCUT_COLLECTION} from '../../../services/graphQL/constants';
 
 
 type Collection = {
-	_id :string
-	_name :string
-	documentTypeId :string
-	docCount ?:number
+	_id: string
+	_name: string
+	documentTypeId: string
+	docCount?: number
 }
 
 type Interface = {
-	_id :string
-	_name :string
-	// boostableFieldKeys: :Array<string>
-	collectionNames :Array<string>
+	_id: string
+	_name: string
+	// boostableFieldKeys:: string[]
+	collectionNames: string[]
 	// documentTypesAndFields,
-	fields :Array<InterfaceField>
-	stopWords :Array<string>
-	thesaurusNames :Array<string>
+	fields: InterfaceField[]
+	stopWords: string[]
+	thesaurusNames: string[]
 }
 
 
@@ -137,22 +137,22 @@ const GQL_ALL = `{
 export function useInterfacesState({
 	fetchInterfaces,
 	servicesBaseUrl,
-} :{
+}: {
 	servicesBaseUrl: string
-	fetchInterfaces: FetchData<QueryInterfacesResponseData>
+	fetchInterfaces: FetchData<QueryInterfacesResponseData, object, object>
 }) {
-	const [collections, setCollections] = React.useState<Array<Collection>>([]);
+	const [collections, setCollections] = React.useState<Collection[]>([]);
 	//const [collectionIdToFieldKeys, setCollectionIdToFieldKeys] = React.useState({});
 	/*const [globalFieldsObj, setGlobalFieldsObj] = React.useState<GlobalFieldObject>({
 		'_allText': true // TODO: Hardcode
 	});*/
 	const [fieldNameToValueTypesState, setFieldNameToValueTypesState] = React.useState<FieldNameToValueTypes>({});
-	const [interfaces, setInterfaces] = React.useState<Array<Interface>>([]);
+	const [interfaces, setInterfaces] = React.useState<Interface[]>([]);
 	const [interfaceNamesObj, setInterfaceNamesObj] = React.useState({} as InterfaceNamesObj);
 	const [interfacesTotal, setInterfacesTotal] = React.useState(0);
-	//const [fieldOptions, setFieldOptions] = React.useState<Array<DropdownItemProps>>([]);
-	const [stopWordOptions, setStopWordOptions] = React.useState<Array<DropdownItemProps>>([]);
-	const [thesauriOptions, setThesauriOptions] = React.useState<Array<DropdownItemProps>>([]);
+	//const [fieldOptions, setFieldOptions] = React.useState<DropdownItemProps[]>([]);
+	const [stopWordOptions, setStopWordOptions] = React.useState<DropdownItemProps[]>([]);
+	const [thesauriOptions, setThesauriOptions] = React.useState<DropdownItemProps[]>([]);
 
 	// const [showCollectionCount/*, setShowCollectionCount*/] = React.useState(true);
 	const [showCollections, setShowCollections] = React.useState(true);
@@ -178,68 +178,68 @@ export function useInterfacesState({
 			.then(response => response.json())
 			.then(json => {
 				const data = json.data as {
-					queryCollections :{
-						hits :Array<{
-							_id :string
-							_name :string
-							documentTypeId :string
-						}>
+					queryCollections: {
+						hits: {
+							_id: string
+							_name: string
+							documentTypeId: string
+						}[]
 					}
-					queryDocuments :{
-						aggregations :Array<{
-							name :'collections'//string
-							buckets :Array<{
-								key :string
-								docCount :number
-							}>
-						}>
-						/*fieldValueCounts :Array<{
-							count :number
-							fieldPath :string
-						}>*/
+					queryDocuments: {
+						aggregations: {
+							name: 'collections'//string
+							buckets: {
+								key: string
+								docCount: number
+							}[]
+						}[]
+						/*fieldValueCounts: {
+							count: number
+							fieldPath: string
+						}[]*/
 					}
-					queryDocumentTypes :{
-						hits :Array<{
-							_id :string
-							_name :string
-							properties :Array<{
-								active :boolean
-								enabled :boolean
-								fulltext :boolean
-								includeInAllText :boolean
-								max :number
-								min :number
-								name :string
-								nGram :boolean
-								path :boolean
-								valueType :string // TODO?
-							}>
-						}>
+					queryDocumentTypes: {
+						hits: {
+							_id: string
+							_name: string
+							properties: {
+								active: boolean
+								enabled: boolean
+								fulltext: boolean
+								includeInAllText: boolean
+								max: number
+								min: number
+								name: string
+								nGram: boolean
+								path: boolean
+								valueType: string // TODO?
+							}[]
+						}[]
 					}
-					queryInterfaces :{
-						hits :Array<{
-							_id :string
-							_name :string
-							collectionIds :Array<string>
-							fields :Array<{
-								boost :number
-								name :string
-							}>
-							stopWords :Array<string>
-							synonymIds :Array<string>
-						}>
-						total :number
+					queryInterfaces: {
+						hits: {
+							_id: string
+							_name: string
+							collectionIds: string[]
+							fields: {
+								boost: number
+								name: string
+							}[]
+							stopWords: string[]
+							synonymIds: string[]
+						}[]
+						total: number
 					}
-					queryStopWords :{
-						hits :Array<{
-							_name :string
-						}>
+					queryStopWords: {
+						hits: {
+							_name: string
+						}[]
 					}
-					queryThesauri :{
-						hits :Array<{
-							_id :string
-							_name :string
-						}>
+					queryThesauri: {
+						hits: {
+							_id: string
+							_name: string
+						}[]
 					}
 				};
 				//console.debug('data', data);
@@ -280,7 +280,7 @@ export function useInterfacesState({
 				} // if aggregations
 				//console.debug('collectionNameToDocCount', collectionNameToDocCount);
 
-				/*const newFieldOptions :Array<DropdownItemProps> = [];
+				/*const newFieldOptions: DropdownItemProps[] = [];
 				if (data.queryDocuments.fieldValueCounts && data.queryDocuments.fieldValueCounts.length) {
 					for (let i = 0; i < data.queryDocuments.fieldValueCounts.length; i++) {
 					    const {
@@ -297,21 +297,21 @@ export function useInterfacesState({
 				//console.debug('newFieldOptions', newFieldOptions);
 				setFieldOptions(newFieldOptions);*/
 
-				const documentTypeIdToFieldKeys :Record<string,Array<string>> = {};
-				const documentTypeIdToFields :Record<string,Array<{
-					active :boolean
-					enabled :boolean
-					fulltext :boolean
-					includeInAllText :boolean
-					max :number
-					min :number
-					name :string
-					nGram :boolean
-					path :boolean
-					valueType :string // TODO?
-				}>> = {};
+				const documentTypeIdToFieldKeys: Record<string,string[]> = {};
+				const documentTypeIdToFields: Record<string,{
+					active: boolean
+					enabled: boolean
+					fulltext: boolean
+					includeInAllText: boolean
+					max: number
+					min: number
+					name: string
+					nGram: boolean
+					path: boolean
+					valueType: string // TODO?
+				}[]> = {};
 				const fieldNameToValueTypes: FieldNameToValueTypes = {};
-				//const documentTypeIdToName :Record<string,string> = {};
+				//const documentTypeIdToName: Record<string,string> = {};
 				data.queryDocumentTypes.hits.forEach(({
 					_id,
 					//_name,

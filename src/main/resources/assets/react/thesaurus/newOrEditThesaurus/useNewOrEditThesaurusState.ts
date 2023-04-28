@@ -1,4 +1,4 @@
-import type {Thesaurus} from '/lib/explorer/types/index.d';
+import type {Thesaurus} from '@enonic-types/lib-explorer/index.d';
 import type {JSONResponse}  from '../../../../services/graphQL/fetchers/index.d';
 
 

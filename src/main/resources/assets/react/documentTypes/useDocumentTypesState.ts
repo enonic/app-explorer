@@ -22,7 +22,7 @@ export function getDefaultModalState(open = false) :DocumentTypeModal {
 export function useDocumentTypesState({
 	servicesBaseUrl
 } :{
-	servicesBaseUrl :string
+	servicesBaseUrl: string
 }) {
 	//const [globalFields, setGlobalFields] = React.useState([]);
 	const [isLoading, setIsLoading] = React.useState(false);

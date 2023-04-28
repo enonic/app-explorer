@@ -10,7 +10,7 @@
      ^               ^                                        Loose│
      └───────────────┴─────────────────────────────────────────────┘
 */
-import type {EmptyObject} from '/lib/explorer/types/index.d';
+import type {EmptyObject} from '@enonic-types/lib-explorer';
 import type {Request} from '../../types/index.d';
 
 // This fails when tsup code splitting: true

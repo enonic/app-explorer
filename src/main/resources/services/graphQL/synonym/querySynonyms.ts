@@ -7,7 +7,7 @@ import type {
 	Highlight,
 	QueryFilters,
 	QueriedSynonym
-} from '/lib/explorer/types/index.d';
+} from '@enonic-types/lib-explorer';
 
 
 import { Principal } from '@enonic/explorer-utils';

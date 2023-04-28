@@ -1,4 +1,3 @@
-// import { nodeModulesPolyfillPlugin } from 'esbuild-plugins-node-modules-polyfill';
 import { polyfillNode } from "esbuild-plugin-polyfill-node";
 import { globSync } from 'glob';
 // import { print } from 'q-i';
@@ -90,7 +89,6 @@ export default defineConfig((options: MyOptions) => {
 						zlib: false,
 					}
 				}) // ReferenceError: "navigator" is not defined
-				// nodeModulesPolyfillPlugin()
 			],
 			esbuildOptions(options, context) {
 				// options.alias = {
@@ -99,7 +97,8 @@ export default defineConfig((options: MyOptions) => {
 				options.banner = {
 					js: `const globalThis = (1, eval)('this');`
 				};
-				options.chunkNames = '_chunks/[name]-[hash]'
+				options.chunkNames = '_chunks/[name]-[hash]';
+				// options.target = 'es2020'; // tsup does this for us :)
 			// 	options.tsconfig = 'tsconfig.tsup.json'
 			},
 			external: [ // All these are available runtime in the jar file:
@@ -201,7 +200,7 @@ export default defineConfig((options: MyOptions) => {
 
 			shims: false, // https://tsup.egoist.dev/#inject-cjs-and-esm-shims
 			sourcemap: false,
-			target: 'es5',
+			// target: 'es5', // Set in tsconfig.tsup.json
 
 			// https://tsup.egoist.dev/#tree-shaking
 			// Tree shaking
@@ -217,8 +216,8 @@ export default defineConfig((options: MyOptions) => {
 			// In conclusion: The default tree-shaking that esbuild provides is
 			// enough, we don't need extra tree-shaking rollup.
 
-			// tsconfig: 'tsconfig.tsup.json'
+			tsconfig: 'tsconfig.tsup.json'
 		};
 	}
 	throw new Error(`Unconfigured directory:${options.d}!`)
-})
+});

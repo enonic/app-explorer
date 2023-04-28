@@ -1,4 +1,4 @@
-import type {Interface} from '/lib/explorer/types/index.d';
+import type {Interface} from '@enonic-types/lib-explorer';
 
 
 //import {toStr} from '@enonic/js-utils';

@@ -1,4 +1,4 @@
-import type {DocumentType} from '/lib/explorer/types/index.d';
+import type {DocumentType} from '@enonic-types/lib-explorer';
 import type {JSONResponse} from './index.d';
 
 

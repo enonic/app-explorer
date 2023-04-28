@@ -47,7 +47,7 @@ export function Interfaces({
 	setLicenseValid
 } :{
 	basename: string
-	fetchInterfaces: FetchData<QueryInterfacesResponseData>
+	fetchInterfaces: FetchData<QueryInterfacesResponseData, object, object>
 	licenseValid: boolean
 	searchString?: string
 	setSearchString: React.Dispatch<React.SetStateAction<string>>

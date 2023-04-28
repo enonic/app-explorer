@@ -1,4 +1,4 @@
-import type { OneOrMore } from '/lib/explorer/types/index.d';
+import type { OneOrMore } from '@enonic-types/lib-explorer';
 import type {
 	// Group,
 	Principal,

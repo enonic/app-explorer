@@ -91,6 +91,7 @@
     "@enonic-types/lib-admin": "^7",
     "@enonic-types/lib-auth": "^7",
     "@enonic-types/lib-cluster": "^7",
+    "@enonic-types/lib-context": "^7",
     "@enonic-types/lib-event": "^7",
     "@enonic-types/lib-io": "^7",
     "@enonic-types/lib-node": "^7",
@@ -197,6 +198,9 @@
     "swc": "npm-run-all --parallel swc:graphql swc:init swc:migrate swc:webcrawl",
     "test": "npx mocha build/tsc/app-explorer/test/**/*.test.js",
     "tsc": "npx tsc --pretty",
+    "verify:types": "yarn verify:types:assets && yarn verify:types:server",
+    "verify:types:assets": "npx tsc --noEmit -p src/main/resources/assets/tsconfig.json",
+    "verify:types:server": "npx tsc --noEmit -p src/main/resources/tsconfig.json",
     "watch": "node_modules/webpack-cli/bin/cli.js -w --stdin",
     "webpack": "node_modules/webpack-cli/bin/cli.js"
   },

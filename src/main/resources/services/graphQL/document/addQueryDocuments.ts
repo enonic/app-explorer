@@ -7,10 +7,10 @@ import type {
 } from '@enonic/js-utils/src/types/node/query/Filters.d';
 import type {
 	AnyObject
-} from '/lib/explorer/types/index.d';
+} from '@enonic-types/lib-explorer';
 import type {
 	Highlight
-} from '/lib/explorer/types/GraphQL.d';
+} from '@enonic-types/lib-explorer/GraphQL.d';
 
 
 import {

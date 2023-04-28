@@ -1,4 +1,4 @@
-import type {DocumentTypeFields} from '/lib/explorer/types/index.d';
+import type {DocumentTypeFields} from '@enonic-types/lib-explorer/index.d';
 import type {
 	AddOrEditLocalFieldModalState,
 	UpdateOrDeletePropertiesFunction
@@ -25,12 +25,12 @@ import {AddOrEditLocalFieldModal} from './AddOrEditLocalFieldModal';
 import {RemoveFieldFromDocumentTypeModal} from './RemoveFieldFromDocumentTypeModal';
 
 
-const ADD_OR_EDIT_MODAL_STATE_DEFAULT :AddOrEditLocalFieldModalState = {
+const ADD_OR_EDIT_MODAL_STATE_DEFAULT: AddOrEditLocalFieldModalState = {
 	open: false,
 	state: {
 		active: true,
 		enabled: true,
-		includeInAllText : true,
+		includeInAllText: true,
 		index: null,
 		fulltext: true,
 		max: 0,
@@ -49,12 +49,12 @@ export const FieldsList = ({
 	servicesBaseUrl,
 	properties,
 	updateOrDeleteProperties
-} :{
-	collectionNames :Array<string>
-	interfaceNames :Array<string>
-	servicesBaseUrl :string
-	properties :DocumentTypeFields
-	updateOrDeleteProperties :UpdateOrDeletePropertiesFunction
+}: {
+	collectionNames: string[]
+	interfaceNames: string[]
+	servicesBaseUrl: string
+	properties: DocumentTypeFields
+	updateOrDeleteProperties: UpdateOrDeletePropertiesFunction
 }) => {
 
 	const [addOrEditModalState, setAddOrEditModalState] = React.useState<AddOrEditLocalFieldModalState>(ADD_OR_EDIT_MODAL_STATE_DEFAULT);
@@ -114,7 +114,7 @@ export const FieldsList = ({
 						min,
 						nGram,
 						path
-					}, i :number) => <Table.Row className={active ? null : 'strikeout'} key={i}>
+					}, i: number) => <Table.Row className={active ? null : 'strikeout'} key={i}>
 						<Table.Cell collapsing style={cellStyle} textAlign='center'>
 							<Button.Group>
 								<Popup

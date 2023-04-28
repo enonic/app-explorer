@@ -73,9 +73,10 @@ export function buildDocumentTypesObj(data :FetchQueryDocumentTypesData) {
 			_name,
 			activeProperties,
 			activePropertyNames,
+			collectionNames: documentTypeCounts[_name] ? documentTypeCounts[_name].collections.map(({name}) => name) : [],
 			collections: documentTypeCounts[_name] ? documentTypeCounts[_name].collections : [],
-			collectionsNames: documentTypeCounts[_name] ? documentTypeCounts[_name].collections.map(({name}) => name) : [],
 			documentsInTotal: documentTypeCounts[_name] ? documentTypeCounts[_name].docCount : 0,
+			// TODO: Should interfaceNames be added here? Or be removed from types and NewOrEditDocumentType and FieldsList
 			...rest
 		};
 	} // for

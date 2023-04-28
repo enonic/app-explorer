@@ -1,5 +1,5 @@
-import type {AggregationsResponseEntry} from '@enonic/js-utils/src/types/node/query/Aggregation.d';
-import type {QueriedSynonym} from '/lib/explorer/types/index.d';
+import type {BucketsAggregationResult} from '/lib/xp/node';
+import type {QueriedSynonym} from '@enonic-types/lib-explorer';
 
 
 import * as gql from 'gql-query-builder';
@@ -7,18 +7,18 @@ import type {JSONResponse}  from './index.d';
 
 
 export type FetchSynonymsQueryData = {
-	querySynonyms :{
-		aggregations :{
-			thesaurus :AggregationsResponseEntry
+	querySynonyms: {
+		aggregations: {
+			thesaurus: BucketsAggregationResult
 		}
-		count :number
-		end :number
-		hits: Array<QueriedSynonym>
-		localeToStemmingLanguage :Record<string,string>
-		page :number
-		start :number
-		total :number
-		totalPages :number
+		count: number
+		end: number
+		hits: QueriedSynonym[]
+		localeToStemmingLanguage: Record<string,string>
+		page: number
+		start: number
+		total: number
+		totalPages: number
 	}
 }
 
@@ -37,7 +37,7 @@ export async function fetchSynonymsQuery({
 		thesauri,
 		to
 	},
-	handleData = (data :FetchSynonymsQueryData) => {
+	handleData = (data: FetchSynonymsQueryData) => {
 		// This will only be called if neither handleResponse nor handleData is passed in...
 		console.debug(
 			'fetchSynonymsQuery(',{
@@ -64,21 +64,21 @@ export async function fetchSynonymsQuery({
 			return Promise.reject(error);
 		}
 	}
-} :{
-	url :string
-	variables :{
-		//count ?:number
-		from ?:string
-		languages ?:Array<string>
-		page ?:number,
-		perPage ?:number,
-		query ?:string,
-		sort ?:string,
-		thesauri ?:Array<string>,
-		to ?:string
+}: {
+	url: string
+	variables: {
+		//count?: number
+		from?: string
+		languages?: string[]
+		page?: number,
+		perPage?: number,
+		query?: string,
+		sort?: string,
+		thesauri?: string[],
+		to?: string
 	},
-	handleData? :(data :FetchSynonymsQueryData) => void,
-	handleResponse? :(response :Response) => void
+	handleData?: (data: FetchSynonymsQueryData) => void,
+	handleResponse?: (response: Response) => void
 }) {
 	const obj = gql.query({
 		operation: 'querySynonyms',
