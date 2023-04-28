@@ -11,7 +11,7 @@ import {
 import _ from 'lodash';
 import classNames from 'classnames';
 import moment from 'moment';
-import prettyMs from 'pretty-ms';
+import ms from 'ms';
 import * as React from 'react';
 import {Dropdown, Form, Header, Table} from 'semantic-ui-react';
 import Flex from '../components/Flex';
@@ -31,32 +31,32 @@ type TaskState =
 	| typeof TASK_STATE_WAITING
 
 type Collector = {
-	averageMs :number
-	collection :string
-	current :number
-	currentTime :number
-	durationMs :number
-	etaMs :number
-	message :string
-	percent :number
-	remainingCount :number
-	remainingMs :number
-	startTime :number
-	state :TaskState
-	total :number
+	averageMs: number
+	collection: string
+	current: number
+	currentTime: number
+	durationMs: number
+	etaMs: number
+	message: string
+	percent: number
+	remainingCount: number
+	remainingMs: number
+	startTime: number
+	state: TaskState
+	total: number
 }
 
 type StatusComponentState = {
-	collectors :Array<Collector>
-	column :string
-	direction :Direction
-	isLoading :boolean
+	collectors: Collector[]
+	column: string
+	direction: Direction
+	isLoading: boolean
 }
 
 const FORMAT = 'YYYY-MM-DD hh:mm:ss';
 
 
-function taskStateToProgressClassName(state :TaskState) {
+function taskStateToProgressClassName(state: TaskState) {
 	switch (state) {
 	case TASK_STATE_RUNNING: return 'active';
 	case TASK_STATE_FINISHED: return 'success';
@@ -67,8 +67,8 @@ function taskStateToProgressClassName(state :TaskState) {
 }
 
 
-export function Status (props :{
-	servicesBaseUrl :string
+export function Status (props: {
+	servicesBaseUrl: string
 }) {
 	const {
 		//setTasks, // Application wide state has side-effects :(
@@ -120,10 +120,10 @@ export function Status (props :{
 		collectors,
 		column,
 		direction
-	} :{
-		collectors :Array<Collector>
-		column :string
-		direction :Direction
+	}: {
+		collectors: Collector[]
+		column: string
+		direction: Direction
 	}) {
 		const sorted = _.sortBy(collectors, column);
 		if(direction === DIRECTION_DESCENDING) {
@@ -226,7 +226,7 @@ export function Status (props :{
 		updateTasks();
 	}, delay);
 
-	const sortGen = (c :string) => () => {
+	const sortGen = (c: string) => () => {
 		setState(prev => {
 			const deref = JSON.parse(JSON.stringify(prev)) as StatusComponentState;
 			if(c === prev.column) {
@@ -348,19 +348,19 @@ export function Status (props :{
 								<Table.Cell>{percent}</Table.Cell>
 
 								<Table.Cell>{moment(new Date(startTime)).format(FORMAT)}</Table.Cell>
-								<Table.Cell>{prettyMs(durationMs, {
+								<Table.Cell>{ms(durationMs)/*prettyMs(durationMs, {
 									//formatSubMilliseconds: true,
 									separateMilliseconds: true
-								})}</Table.Cell>
+								})*/}</Table.Cell>
 
-								<Table.Cell>{prettyMs(averageMs, {
+								<Table.Cell>{ms(averageMs)/*prettyMs(averageMs, {
 									//formatSubMilliseconds: true,
 									separateMilliseconds: true
-								})}</Table.Cell>
-								<Table.Cell>{state === TASK_STATE_RUNNING ? prettyMs(remainingMs, {
+								})*/}</Table.Cell>
+								<Table.Cell>{state === TASK_STATE_RUNNING ? ms(remainingMs)/*prettyMs(remainingMs, {
 									//formatSubMilliseconds: true,
 									separateMilliseconds: true
-								}) : null}</Table.Cell>
+								})*/ : null}</Table.Cell>
 								<Table.Cell>{state === TASK_STATE_RUNNING ? moment(new Date(etaMs)).format(FORMAT) : null}</Table.Cell>
 								{/* End time */}
 								<Table.Cell>{state === TASK_STATE_RUNNING ? '' : moment(new Date(currentTime)).format(FORMAT)}</Table.Cell>

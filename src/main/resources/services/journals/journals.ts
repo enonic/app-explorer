@@ -1,4 +1,4 @@
-import type {AggregationsResponseEntry} from '@enonic/js-utils/src/types/node/query/Aggregation.d';
+import type {AggregationsResponseEntry} from '@enonic/js-utils/types/node/query/Aggregation.d';
 //import type {Journal} from '/lib/explorer/journal/types.d';
 
 
@@ -12,6 +12,30 @@ import {query as queryJournals} from '/lib/explorer/journal/query';
 import {hasValue} from '/lib/explorer/query/hasValue';
 
 
+export interface JournalHit {
+	name?: string
+	collection: string
+	duration: number
+	endTime: number
+	errorCount: number
+	startTime: number
+	successCount: number
+}
+
+export interface QueryJournalsRes {
+	aggregations?: {
+		collection: AggregationsResponseEntry
+	}
+	count: number
+	end: number
+	hits: JournalHit[]
+	page: number
+	start: number
+	total: number
+	totalPages: number
+}
+
+
 export function get({
 	params: {
 		collections = '',
@@ -21,13 +45,13 @@ export function get({
 		perPage = '25',
 		sort = 'endTime DESC'
 	} = {}
-} : {
-	params ?:{
-		collections ?:string
-		showWithoutErrors ?:'true'|'false'
-		page ?:string // number
-		perPage ?:string // number
-		sort ?:string
+}:  {
+	params?: {
+		collections?: string
+		showWithoutErrors?: 'true'|'false'
+		page?: string // number
+		perPage?: string // number
+		sort?: string
 	}
 } = {}) {
 	const expressions = [];
@@ -105,26 +129,7 @@ export function get({
 		query,
 		sort,
 		start
-	}) as unknown as {
-		aggregations ?:{
-			collection :AggregationsResponseEntry
-		}
-		count :number
-		end :number
-		hits :Array<{
-			name ?:string
-			collection :string
-			duration :number
-			endTime :number
-			errorCount :number
-			startTime :number
-			successCount :number
-		}>
-		page :number
-		start :number
-		total :number
-		totalPages :number
-	};
+	}) as unknown as QueryJournalsRes;
 	//log.debug('queryJournalsRes:%s', toStr(result));
 
 	result.page = intPage;

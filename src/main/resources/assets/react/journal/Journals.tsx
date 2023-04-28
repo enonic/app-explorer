@@ -1,4 +1,4 @@
-import prettyMs from 'pretty-ms';
+import ms from 'ms';
 import {
 	Button,
 	Checkbox,
@@ -19,8 +19,8 @@ import {useJournalsState} from './useJournalsState';
 
 export function Journals({
 	servicesBaseUrl
-} :{
-	servicesBaseUrl :string
+}: {
+	servicesBaseUrl: string
 }) {
 	const {
 		aggregations,
@@ -267,11 +267,18 @@ export function Journals({
 							</Table.Row>
 						</Table.Header>
 						<Table.Body>
-							{hits.map(({collection, startTime, endTime, duration, errorCount, successCount}, i) => <Table.Row disabled={loading} key={i}>
+							{hits.map(({
+								collection,
+								startTime,
+								endTime,
+								duration,
+								errorCount,
+								successCount
+							}, i) => <Table.Row disabled={loading} key={i}>
 								{columns.name ? <Table.Cell collapsing>{collection}</Table.Cell> : null}
 								{columns.startTime ? <Table.Cell collapsing>{startTime}</Table.Cell> : null}
 								{columns.endTime ? <Table.Cell collapsing>{endTime}</Table.Cell> : null}
-								{columns.duration ? <Table.Cell collapsing>{prettyMs(duration)}</Table.Cell> : null}
+								{columns.duration ? <Table.Cell collapsing>{ms(duration)}</Table.Cell> : null}
 								{columns.errorCount ? <Table.Cell collapsing>{errorCount}</Table.Cell> : null}
 								{columns.successCount ? <Table.Cell collapsing>{successCount}</Table.Cell> : null}
 							</Table.Row>)}

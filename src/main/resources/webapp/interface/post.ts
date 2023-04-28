@@ -11,7 +11,7 @@ import type {
 // These imports works when treeshake: false, but gives error when treeshake: true
 // ReferenceError: "Reflect" is not defined
 // Must be imported only once per WebPack Bundle (Required by setIn)
-// import 'core-js/stable/reflect';
+import 'core-js/stable/reflect';
 // import 'reflect-metadata';
 
 import {HTTP_HEADERS} from '@enonic/explorer-utils/src'; // Adding "src" fixes the empty AbstractParser error
