@@ -19,16 +19,16 @@ import {GenerateKeyButton} from './GenerateKeyButton';
 import {nameValidator} from '../utils/nameValidator';
 
 
-export const NewOrEditApiKey = (props :{
+export const NewOrEditApiKey = (props: {
 	// Required
 	apiKeys: QueryApiKeysHits
-	doClose :() => void
-	servicesBaseUrl :string
+	doClose: () => void
+	servicesBaseUrl: string
 	// Optional
-	_id ?:string
-	_name ?:string
-	collections ?:Array<string>
-	interfaces ?:Array<string>
+	_id?: string
+	_name?: string
+	collections?: string[]
+	interfaces?: string[]
 }) => {
 	//console.debug('props', props);
 	const {
@@ -78,8 +78,8 @@ export const NewOrEditApiKey = (props :{
 						fluid
 						onChange={(
 							_event,
-							data :{
-								value :string
+							data: {
+								value: string
 							}
 						) => {
 							const newName = fold(data.value.toLowerCase());
@@ -98,7 +98,7 @@ export const NewOrEditApiKey = (props :{
 				}
 				<Form.Input
 					fluid
-					onChange={(_e,{value:newKey} :{value: string}) => setKey(newKey)}
+					onChange={(_e,{value:newKey}: {value: string}) => setKey(newKey)}
 					placeholder={_name ? 'If you type anything here, it will overwrite the previous key on save' : 'Key is one way hashed on save'}
 					value={key}
 				>
@@ -118,7 +118,7 @@ export const NewOrEditApiKey = (props :{
 					<Dropdown
 						multiple={true}
 						options={collectionOptions}
-						onChange={(_e,{value} :{value: Array<string>}) => setCollectionNames(value)}
+						onChange={(_e,{value}: {value: Array<string>}) => setCollectionNames(value)}
 						placeholder='Please select one or more collections...'
 						selection
 						value={collectionNames}
@@ -134,7 +134,7 @@ export const NewOrEditApiKey = (props :{
 					<Dropdown
 						multiple={true}
 						options={interfaceOptions}
-						onChange={(_e,{value} :{value: Array<string>}) => setInterfaceNames(value)}
+						onChange={(_e,{value}: {value: Array<string>}) => setInterfaceNames(value)}
 						placeholder='Please select one or more interfaces...'
 						selection
 						value={interfaceNames}
@@ -154,12 +154,12 @@ export const NewOrEditApiKey = (props :{
 				isStateChanged={isStateChanged}
 				onClick={() => {
 					//console.debug('onSubmit values', values);
-					const variables :{
-						_id? :string // update
-						_name? :string // create
-						collections :Array<string>
-						interfaces :Array<string>
-						key? :string
+					const variables: {
+						_id?: string // update
+						_name?: string // create
+						collections: string[]
+						interfaces: string[]
+						key?: string
 					} = {
 						_name: name,
 						collections: collectionNames,

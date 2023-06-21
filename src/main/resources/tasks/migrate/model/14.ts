@@ -1,4 +1,5 @@
 import type {RepoConnection} from '@enonic-types/lib-explorer';
+import type { Progress } from '../../init/Progress';
 
 
 import {
@@ -21,16 +22,15 @@ import {
 	list,
 	multiConnect
 } from '/lib/explorer/repo';
-import {Progress} from '../Progress';
 
 // _inheritsPermissions: false and _permissions: EXPLORER
 
 export function model14({
 	progress,
 	writeConnection
-} :{
-	progress :Progress
-	writeConnection :RepoConnection
+}: {
+	progress: Progress
+	writeConnection: RepoConnection
 }) {
 	progress.addItems(1).setInfo('Finding nodes with _inheritsPermissions:true').report().logInfo();
 
