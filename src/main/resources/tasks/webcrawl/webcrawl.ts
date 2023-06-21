@@ -7,6 +7,7 @@ import type {
 	HttpClientRequest,
 	Response
 } from '@enonic-types/lib-explorer';
+import type { WebCrawlConfig } from './webcrawl.d';
 
 
 import 'core-js/stable/array/from';
@@ -211,13 +212,7 @@ export function run({
 	// log.debug('webcrawl: language:%s', language);
 	// log.debug('webcrawl: name:%s', name);
 
-	const collector = new Collector<{
-		baseUri: string
-		excludes?: string[]
-		keepHtml?: boolean
-		resume?: boolean
-		userAgent?: string
-	}>({
+	const collector = new Collector<WebCrawlConfig>({
 		collectionId,
 		collectorId,
 		configJson,
@@ -228,18 +223,19 @@ export function run({
 	collector.start();
 
 	let {
-		baseUri
+		baseUri,
 	} = collector.config;
 	const {
-		resume = false,
 		excludes = [],
 		keepHtml = false,
+		maxPages = 1000,
+		resume = false,
 		userAgent = DEFAULT_UA
 	} = collector.config;
 	DEBUG && log.debug('keepHtml:%s', keepHtml);
 	DEBUG && log.debug('userAgent:%s', userAgent);
 
-	const excludeRegExps = excludes.map(str => new RegExp(str));
+	const excludeRegExps = forceArray(excludes).map(str => new RegExp(str));
 
 	// Galimatias
 	if (!baseUri.includes('://')) { baseUri = `https://${baseUri}`;}
@@ -310,11 +306,14 @@ export function run({
 		}
 	} // handleNormalizedUri
 
+	let pageCounter = 0;
 	whileQueueLoop:
 	while(queueArr.length) {
-		if (collector.shouldStop()) {
+		if (pageCounter >= maxPages || collector.shouldStop()) {
 			break whileQueueLoop;
 		}
+		pageCounter += 1;
+
 		const url = queueArr.shift(); // Normalized before added to queue
 		DEBUG && log.debug('url:%s', url);
 

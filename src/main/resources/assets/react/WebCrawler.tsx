@@ -2,7 +2,7 @@ import type {
 	CollectorComponentRef,
 	CollectorProps
 } from '@enonic-types/lib-explorer';
-import type {CollectorConfig} from './useWebCrawlerState';
+import type { CollectorConfig } from '/tasks/webcrawl/webcrawl.d';
 
 import * as React from 'react';
 import {
@@ -28,7 +28,7 @@ export const Collector = React.forwardRef(({
 	//explorer,
 	setCollectorConfig,
 	setCollectorConfigErrorCount
-} :CollectorProps<CollectorConfig>, ref :CollectorComponentRef<CollectorConfig>) => {
+}: CollectorProps<CollectorConfig>, ref: CollectorComponentRef<CollectorConfig>) => {
 	const {
 		baseUri,
 		baseUriError,
@@ -36,6 +36,7 @@ export const Collector = React.forwardRef(({
 		baseUriOnChange,
 		excludesArray,
 		keepHtml,
+		maxPages, setMaxPages,
 		setExcludesArray,
 		setKeepHtml,
 		setUserAgent,
@@ -122,6 +123,15 @@ export const Collector = React.forwardRef(({
 				</Button>
 			</Form.Field>
 		}
+		<Form.Input
+			label='Max pages'
+			max={100000}
+			min={1}
+			onChange={(_event,{value}) => setMaxPages(parseInt(value))}
+			placeholder='1000'
+			type='number'
+			value={maxPages}
+		/>
 		<Form.Checkbox
 			checked={keepHtml}
 			label='Keep a copy of the HTML source? (not recommended)'
