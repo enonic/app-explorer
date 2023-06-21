@@ -90,7 +90,6 @@ function Explorer({
 		<Sidebar.Pushable
 			id='explorerPushable'>
 			<SideBarMenu
-				licenseValid={licenseValid}
 				setSideBarVisible={setSideBarVisible}
 				sideBarVisible={sideBarVisible}
 			/>
@@ -171,12 +170,9 @@ function Explorer({
 						interfaceNameState={interfaceNameState}
 						searchString={searchString}
 					/>}/>
-					{licenseValid
-						? <Route path="/api/keys" element={<ApiKeys
-							servicesBaseUrl={servicesBaseUrl}
-						/>}/>
-						: null
-					}
+					<Route path="/api/keys" element={<ApiKeys
+						servicesBaseUrl={servicesBaseUrl}
+					/>}/>
 					<Route path="/about" element={<About
 						showWhichLicense={showWhichLicense}
 						setShowWhichLicense={setShowWhichLicense}
