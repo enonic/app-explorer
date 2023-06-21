@@ -125,16 +125,20 @@ export function Search(props: SearchProps) {
 							value={interfaceNameState === 'default' ? undefined : interfaceNameState}
 						/>
 					</Flex.Item>
-					<Flex.Item>
-						<Link
-							className='graphql'
-							to='/api'
-						>
-							<svg version="2.0">
-								<use href="#graphql100" />
-							</svg>
-						</Link>
-					</Flex.Item>
+					{
+						interfaceNameState === 'default'
+							? null
+							: <Flex.Item>
+								<Link
+									className='graphql'
+									to='/api'
+								>
+									<svg version="2.0">
+										<use href="#graphql100" />
+									</svg>
+								</Link>
+							</Flex.Item>
+					}
 				</>
 				: null
 			}
