@@ -85,9 +85,10 @@
 
 		"typeRoots": [
 			"../../../node_modules/@enonic-types",
+			// "../../../node_modules/@types", // Not using any types from there yet.
 		],
 		"types": [
-			"@enonic-types/global",
+			"global", // For some reason "@enonic-types/global" doesn't work
 			// "@enonic-types/lib-auth",
 			// "@enonic-types/lib-node",
 			// "@enonic-types/lib-repo",
