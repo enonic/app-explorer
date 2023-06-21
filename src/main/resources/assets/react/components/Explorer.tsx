@@ -102,7 +102,7 @@ function Explorer({
 						<Header
 							as='h1'
 							className='mt-1rem'
-							content='Explorer'
+							content='Search all documents'
 							textAlign='center'
 						/>
 						<Search

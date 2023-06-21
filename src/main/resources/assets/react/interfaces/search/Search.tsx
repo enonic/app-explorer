@@ -55,6 +55,7 @@ export function Search(props: SearchProps) {
 		searchString,
 		servicesBaseUrl: props.servicesBaseUrl,
 	});
+	// console.debug({initializing, interfaceCollectionCount, interfaceDocumentCount});
 	// console.debug('interfaceCollectionCount', interfaceCollectionCount);
 	// console.debug('interfaceDocumentCount', interfaceDocumentCount);
 	const {
@@ -138,78 +139,81 @@ export function Search(props: SearchProps) {
 				: null
 			}
 		</Flex>
-		{initializing
-			? null
-			: interfaceCollectionCount
-				? interfaceDocumentCount
-					? <>
-						{searchedStringState
-							? <Segment basic>
-								Searched {interfaceDocumentCount} documents
-								across {interfaceCollectionCount} collections
-								for <b>{searchedStringState}</b>
-								<span> and found {resultState.total} matching documents.</span>
-							</Segment>
-							: loading
-								? <Segment basic>Searching {interfaceDocumentCount} documents across {interfaceCollectionCount} collections...</Segment>
-								: <Segment basic>Ready to search {interfaceDocumentCount} documents across {interfaceCollectionCount} collections.</Segment>
-						}
+		{(() => {
+			if (initializing) return null;
 
-						{searchedStringState && !resultState.total
-							? <Segment basic className='c-lgr' size='massive' textAlign='center'>
-								<Header as='h1' content='D&apos;oh!' size='huge' style={{
-									marginBottom: 14
-								}}/>
-								No hits - better luck next time...
-							</Segment>
-							: null
-						}
-						{resultState.total ? <DocumentsTable
-							documentsRes={resultState}
-							dragAndDropColumnsProp={false}
-							handlePaginationChange={handlePaginationChange}
-							jsonModalState={jsonModalState}
-							loading={loading}
-							page={page}
-							perPage={perPage}
-							searchedString={searchedStringState}
-							selectedColumnsState={[
-								...props.fields.map(({name}) => name),
-								Column.COLLECTION,
-								Column.DOCUMENT_TYPE,
-								Column.JSON,
-							]}
-							setJsonModalState={setJsonModalState}
-							start={start}
-						/> : null}
-						{/*<Hits
-							firstColumnWidth={firstColumnWidth}
-							hits={result.hits}
-							loading={loading}
-						/>*/}
-						{interfaceNameState === 'default'
-							? null
-							: searchedStringState ? <Accordion
-								locales={resultState.locales || []}
-								profiling={resultState.profiling || []}
-								synonyms={resultState.synonyms || []}
-							/> : null
-						}
-					</>
-					: interfaceNameState === 'default'
-						? 'No documents available, add some documents to a collection to get started.'
-						: interfaceCollectionCount === 1
-							? `There are no documents in the ${interfaceCollectionCount} collection of the ${interfaceNameState} interface. Add some documents to it to get started.`
-							: `There are no documents in any of the ${interfaceCollectionCount} collections of the ${interfaceNameState} interface. Add some documents to any of them to get started.`
-				: interfaceNameState === 'default'
+			if (!interfaceCollectionCount) {
+				if (interfaceNameState === 'default') {
+					return <Segment basic textAlign='center'>
+						No documents available yet - <Link to='/collections/create'>create a collection</Link> to get started
+					</Segment>;
+				}
+				return `There are no collections in the ${interfaceNameState} interface. Add collections to the interface to get started.`;
+			}
+
+			if (!interfaceDocumentCount) {
+				return interfaceNameState === 'default'
+					? 'No documents available, add some documents to a collection to get started.'
+					: interfaceCollectionCount === 1
+						? `There are no documents in the ${interfaceCollectionCount} collection of the ${interfaceNameState} interface. Add some documents to it to get started.`
+						: `There are no documents in any of the ${interfaceCollectionCount} collections of the ${interfaceNameState} interface. Add some documents to any of them to get started.`
+			}
+
+			return <>
+				{searchedStringState
+					? <Segment basic>
+						Searched {interfaceDocumentCount} documents
+						across {interfaceCollectionCount} collections
+						for <b>{searchedStringState}</b>
+						<span> and found {resultState.total} matching documents.</span>
+					</Segment>
+					: loading
+						? <Segment basic>Searching {interfaceDocumentCount} documents across {interfaceCollectionCount} collections...</Segment>
+						: <Segment basic>Ready to search {interfaceDocumentCount} documents across {interfaceCollectionCount} collections.</Segment>
+				}
+
+				{searchedStringState && !resultState.total
 					? <Segment basic className='c-lgr' size='massive' textAlign='center'>
 						<Header as='h1' content='D&apos;oh!' size='huge' style={{
 							marginBottom: 14
 						}}/>
-						No collections available, <Link to='/collections/create'>create a collection</Link> to get started.
+						No hits - better luck next time...
 					</Segment>
-					: `There are no collections in the ${interfaceNameState} interface. Add collections to the interface to get started.`
-		}
+					: null
+				}
+				{resultState.total ? <DocumentsTable
+					documentsRes={resultState}
+					dragAndDropColumnsProp={false}
+					handlePaginationChange={handlePaginationChange}
+					jsonModalState={jsonModalState}
+					loading={loading}
+					page={page}
+					perPage={perPage}
+					searchedString={searchedStringState}
+					selectedColumnsState={[
+						...props.fields.map(({name}) => name),
+						Column.COLLECTION,
+						Column.DOCUMENT_TYPE,
+						Column.JSON,
+					]}
+					setJsonModalState={setJsonModalState}
+					start={start}
+				/> : null}
+				{/*<Hits
+					firstColumnWidth={firstColumnWidth}
+					hits={result.hits}
+					loading={loading}
+				/>*/}
+				{interfaceNameState === 'default'
+					? null
+					: searchedStringState ? <Accordion
+						locales={resultState.locales || []}
+						profiling={resultState.profiling || []}
+						synonyms={resultState.synonyms || []}
+					/> : null
+				}
+			</>
+		})()}
 	</Container>;
 } // function Search
 
