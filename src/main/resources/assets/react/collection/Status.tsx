@@ -5,17 +5,17 @@ import {
 	TASK_STATE_FAILED,
 	TASK_STATE_FINISHED,
 	TASK_STATE_RUNNING,
-	TASK_STATE_WAITING//,
+	TASK_STATE_WAITING,
 	//toStr
 } from '@enonic/js-utils';
 import _ from 'lodash';
 import classNames from 'classnames';
 import moment from 'moment';
-import ms from 'ms';
 import * as React from 'react';
 import {Dropdown, Form, Header, Table} from 'semantic-ui-react';
 import Flex from '../components/Flex';
 import {useInterval} from '../utils/useInterval';
+import safeMs from '../utils/safeMs';
 
 
 const DIRECTION_ASCENDING = 'ascending';
@@ -348,16 +348,16 @@ export function Status (props: {
 								<Table.Cell>{percent}</Table.Cell>
 
 								<Table.Cell>{moment(new Date(startTime)).format(FORMAT)}</Table.Cell>
-								<Table.Cell>{ms(durationMs)/*prettyMs(durationMs, {
+								<Table.Cell>{safeMs(durationMs)/*prettyMs(durationMs, {
 									//formatSubMilliseconds: true,
 									separateMilliseconds: true
 								})*/}</Table.Cell>
 
-								<Table.Cell>{ms(averageMs)/*prettyMs(averageMs, {
+								<Table.Cell>{safeMs(averageMs)/*prettyMs(averageMs, {
 									//formatSubMilliseconds: true,
 									separateMilliseconds: true
 								})*/}</Table.Cell>
-								<Table.Cell>{state === TASK_STATE_RUNNING ? ms(remainingMs)/*prettyMs(remainingMs, {
+								<Table.Cell>{state === TASK_STATE_RUNNING ? safeMs(remainingMs)/*prettyMs(remainingMs, {
 									//formatSubMilliseconds: true,
 									separateMilliseconds: true
 								})*/ : null}</Table.Cell>
