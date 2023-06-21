@@ -13,19 +13,19 @@ import HoverButton from '../components/buttons/HoverButton';
 import {NewOrEditApiKey} from './NewOrEditApiKey';
 
 
-export const NewOrEditApiKeyModal = (props :{
+export const NewOrEditApiKeyModal = (props: {
 	// Required
 	apiKeys: QueryApiKeysHits
-	servicesBaseUrl :string
+	servicesBaseUrl: string
 	// Optional
-	_id ?:string
-	_name ?:string
-	afterClose ?:() => void
-	beforeOpen ?:() => void
-	collections ?:Array<string>
-	disabled ?:boolean
-	loading ?:boolean
-	interfaces ?:Array<string>
+	_id?: string
+	_name?: string
+	afterClose?: () => void
+	beforeOpen?: () => void
+	collections?: string[]
+	disabled?: boolean
+	loading?: boolean
+	interfaces?: string[]
 }) => {
 	//console.debug('props', props);
 	const {
