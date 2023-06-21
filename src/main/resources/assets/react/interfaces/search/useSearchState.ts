@@ -183,9 +183,16 @@ export function useSearchState({
 		})
 			.then(response => response.json())
 			.then(json => {
-				// console.debug('json', json);
-				// console.debug('setInterfaceDocumentCount:', json.data.interface.search.total);
-				setInterfaceDocumentCount(json.data.interface.search.total);
+				const {
+					errors
+				} = json;
+				if (errors) {
+					// console.debug('errors', errors);
+					setInterfaceDocumentCount(0);
+				} else {
+					// console.debug('setInterfaceDocumentCount:', json.data.interface.search.total);
+					setInterfaceDocumentCount(json.data.interface.search.total);
+				}
 			});
 	}, [
 		basename,
