@@ -115,6 +115,12 @@
 		"target": "ES2020", // What bundle-require inside tsup uses to load tsup.config.ts
 
 		"typeRoots": [
+
+			// Nope, enonic-types should not be available in the node build env,
+			// only the build target enonic runtime env
+			// Thus it's set in src/main/resource/tsconfig.json instead.
+			// "./node_modules/@enonic-types",
+
 			"./node_modules/@types",
 		],
 		// "types": [ // TODO make a separate test/tsconfig.json
