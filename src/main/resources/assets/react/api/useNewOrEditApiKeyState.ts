@@ -119,11 +119,13 @@ export function useNewOrEditApiKeyState({
 			value: key
 		})),
 		interfaceNames,
-		interfaceOptions: queryInterfacesGraph.hits.map(({_name: key}) => ({
-			key,
-			text: key,
-			value: key
-		})),
+		interfaceOptions: queryInterfacesGraph.hits
+			.filter(({_name}) => _name !== 'default')
+			.map(({_name: key}) => ({
+				key,
+				text: key,
+				value: key
+			})),
 		isStateChanged,
 		key,
 		name,
