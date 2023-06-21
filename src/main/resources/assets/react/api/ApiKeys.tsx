@@ -12,8 +12,8 @@ import {DeleteApiKeyModal} from './DeleteApiKeyModal';
 import {NewOrEditApiKeyModal} from './NewOrEditApiKeyModal';
 
 
-export const ApiKeys = (props :{
-	servicesBaseUrl :string
+export const ApiKeys = (props: {
+	servicesBaseUrl: string
 }) => {
 	//console.debug('props', props);
 	const {
@@ -45,8 +45,7 @@ export const ApiKeys = (props :{
 							label={"Show all fields"}
 							checked={showAllFields}
 							onChange={(
-								//@ts-ignore
-								event :unknown,
+								_event: unknown,
 								{checked}
 							) => {
 								setShowAllFields(checked);
