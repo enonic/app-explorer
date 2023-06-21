@@ -28,11 +28,9 @@ function getDescendants(element: Element) {
 
 
 export default function SideBarMenu({
-	licenseValid,
 	setSideBarVisible,
 	sideBarVisible,
 }: {
-	licenseValid: boolean
 	setSideBarVisible: React.Dispatch<React.SetStateAction<boolean>>
 	sideBarVisible: boolean
 }) {
@@ -152,9 +150,7 @@ export default function SideBarMenu({
 				active={location.pathname === '/api'}
 				as={Link}
 				onClick={() => {
-					if (!licenseValid) {
-						setSideBarVisible(false);
-					}
+					setSideBarVisible(false);
 				}}
 				to='/api'
 			><Icon name='plug' style={ICON_STYLE}/> API</Menu.Item>
@@ -162,14 +158,14 @@ export default function SideBarMenu({
 				'/api',
 				'/api/keys',
 			].includes(location.pathname) && <Menu.Menu>
-				{licenseValid && <Menu.Item
+				<Menu.Item
 					as={Link}
 					to='/api/keys'
 					active={location.pathname === '/api/keys'}
 					onClick={() => {
 						setSideBarVisible(false);
 					}}
-				><Icon name='key' style={ICON_STYLE}/> Keys</Menu.Item>}
+				><Icon name='key' style={ICON_STYLE}/> Keys</Menu.Item>
 			</Menu.Menu>}
 			<Menu.Item
 				as={Link}
