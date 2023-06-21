@@ -14,19 +14,19 @@ import {
 
 
 export class Progress<Info extends string|AnyObject = string> {
-	current :number
-	info :Info
-	total :number
+	current: number
+	info: Info
+	total: number
 
 	constructor({
 		current = 0,
 		info = 'Initializing',
 		//sleepMsAfterItem = 0,
 		total = 1
-	} :{
-		current ?:number
-		info ?:string|AnyObject
-		total ?:number
+	}: {
+		current?: number
+		info?: string|AnyObject
+		total?: number
 	} = {}) {
 		this.current = current;
 
@@ -58,7 +58,7 @@ export class Progress<Info extends string|AnyObject = string> {
 		return this.info;
 	}
 
-	setInfo(info :Info) {
+	setInfo(info: Info) {
 		this.info = info;
 		return this; // chainable
 	}
@@ -72,12 +72,12 @@ export class Progress<Info extends string|AnyObject = string> {
 		return this; // chainable
 	}
 
-	addItems(count :number) {
+	addItems(count: number) {
 		this.total += count;
 		return this; // chainable
 	}
 
-	finishItem(info? :Info) {
+	finishItem(info?: Info) {
 		this.current += 1;
 		if (info) {
 			this.info = info;

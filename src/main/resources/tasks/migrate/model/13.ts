@@ -1,25 +1,24 @@
 import type {RepoConnection} from '@enonic-types/lib-explorer';
 import type {ApiKeyNode} from '../../../types/ApiKey.d';
+import type { Progress } from '../../init/Progress';
 
 
 import {addQueryFilter} from '@enonic/js-utils';
 import {NT_API_KEY} from '/lib/explorer/index';
 import {setModel} from '/lib/explorer/model/setModel';
 import {hasValue} from '/lib/explorer/query/hasValue';
-//@ts-ignore
 import {getUser} from '/lib/xp/auth';
-import {Progress} from '../Progress';
 
 
 type ApiKeyNodeWithType = ApiKeyNode & {
-	type :string
+	type: string
 }
 
 
 export function model13({
 	progress,
 	writeConnection
-} :{
+}: {
 	progress :Progress
 	writeConnection :RepoConnection
 }) {

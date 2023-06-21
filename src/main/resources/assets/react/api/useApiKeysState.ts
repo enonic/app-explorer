@@ -18,8 +18,8 @@ const GQL = `{
 
 export function useApiKeysState({
 	servicesBaseUrl
-} :{
-	servicesBaseUrl :string
+}: {
+	servicesBaseUrl: string
 }) {
 	const [queryApiKeysGraph, setQueryApiKeysGraph] = React.useState<QueryApiKeysGraph>({
 		hits: []

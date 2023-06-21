@@ -3,6 +3,7 @@ import type {
 	QueryNodeParams,
 	RepoConnection
 } from '/lib/xp/node';
+import type { Progress } from '../../init/Progress';
 
 
 import {
@@ -20,14 +21,13 @@ import {setModel} from '/lib/explorer/model/setModel';
 import {connect} from '/lib/explorer/repo/connect';
 import {multiConnect} from '/lib/explorer/repo/multiConnect';
 import {list} from '/lib/xp/repo';
-import {Progress} from '../Progress';
 import { Node } from 'cheerio';
 
 
 export function model17({
 	progress,
 	writeConnection
-} :{
+}: {
 	progress: Progress
 	writeConnection: RepoConnection
 }) {
