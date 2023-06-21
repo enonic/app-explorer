@@ -3,6 +3,7 @@ import type {
 	CollectorComponentAfterResetFunction,
 	CollectorComponentValidateFunction
 } from '@enonic-types/lib-explorer';
+import type { CollectorConfig } from '/tasks/webcrawl/webcrawl.d';
 
 
 import {
@@ -13,36 +14,28 @@ import * as React from 'react';
 import {useUpdateEffect} from './utils/useUpdateEffect';
 
 
-export type CollectorConfig = {
-	baseUri?: string
-	excludes?: string|string[]
-	keepHtml?: boolean
-	userAgent?: string
-}
-
-
 export function useWebCrawlerState({
 	collectorConfig,
 	ref,
 	setCollectorConfig,
 	setCollectorConfigErrorCount
-} :{
-	collectorConfig :CollectorConfig
-	ref :CollectorComponentRef<CollectorConfig>
-	setCollectorConfig :(param :CollectorConfig|((prevCollectorConfig :CollectorConfig) => CollectorConfig)) => void
-	setCollectorConfigErrorCount :(collectorConfigErrorCount :number) => void
+}: {
+	collectorConfig: CollectorConfig
+	ref: CollectorComponentRef<CollectorConfig>
+	setCollectorConfig: (param: CollectorConfig|((prevCollectorConfig: CollectorConfig) => CollectorConfig)) => void
+	setCollectorConfigErrorCount: (collectorConfigErrorCount: number) => void
 }) {
 	//──────────────────────────────────────────────────────────────────────────
 	// Avoiding derived state, by simply "symlinking"
 	//──────────────────────────────────────────────────────────────────────────
 	const baseUri = collectorConfig
-		? (collectorConfig.baseUri || '')
+		? (collectorConfig.baseUri || '')
 		: '';
 
 	const excludesArray = collectorConfig && collectorConfig.excludes ? forceArray(collectorConfig.excludes) : undefined; // Avoid derived state, so don't wrap with useState!
 	//console.debug('excludesArray', excludesArray);
 
-	const setExcludesArray = (newExcludesArray :Array<string>) => setCollectorConfig(prevCollectorConfig => {
+	const setExcludesArray = (newExcludesArray: Array<string>) => setCollectorConfig(prevCollectorConfig => {
 		//console.debug('setExcludesArray newExcludesArray', newExcludesArray);
 		return {
 			...prevCollectorConfig,
@@ -60,11 +53,26 @@ export function useWebCrawlerState({
 		};
 	});
 
+	const maxPages = collectorConfig
+		? (collectorConfig.maxPages || 1000)
+		: 1000;
+
+	const setMaxPages = (newMaxPages: number) => {
+		if (newMaxPages < 1) newMaxPages = 1;
+		if (newMaxPages > 100000) newMaxPages = 100000;
+		setCollectorConfig(prevCollectorConfig => {
+			return {
+				...prevCollectorConfig,
+				maxPages: newMaxPages
+			};
+		});
+	};
+
 	const userAgent = collectorConfig
 		? (collectorConfig.userAgent || '')
 		: '';
 
-	const setUserAgent = (newUserAgent :string) => setCollectorConfig(prevCollectorConfig => {
+	const setUserAgent = (newUserAgent: string) => setCollectorConfig(prevCollectorConfig => {
 		return {
 			...prevCollectorConfig,
 			userAgent: newUserAgent
@@ -80,7 +88,7 @@ export function useWebCrawlerState({
 	//──────────────────────────────────────────────────────────────────────────
 	// Callbacks, should only depend on props, not state
 	//──────────────────────────────────────────────────────────────────────────
-	const validateBaseUri = React.useCallback((baseUri :string) => {
+	const validateBaseUri = React.useCallback((baseUri: string) => {
 		//console.debug('in validateBaseUri');
 		const newError = !baseUri ? 'Uri is required!' : undefined;
 		setBaseUriError(newError); // useEffect[baseUriError] triggers setCollectorConfigErrorCount
@@ -88,8 +96,8 @@ export function useWebCrawlerState({
 	},[]); // Since there are no deps, it could have been a normal function rather than a React.useCallback
 
 	const baseUriOnChange = React.useCallback((
-		_event :React.ChangeEvent<HTMLInputElement>,
-		{value} : {value :string}
+		_event: React.ChangeEvent<HTMLInputElement>,
+		{value}:  {value: string}
 	) => {
 		//console.debug('baseUriOnChange');
 		setCollectorConfig(prevCollectorConfig => ({
@@ -113,12 +121,12 @@ export function useWebCrawlerState({
 		validateBaseUri
 	]);
 
-	const afterReset :CollectorComponentAfterResetFunction = () => {
+	const afterReset: CollectorComponentAfterResetFunction = () => {
 		setBaseUriVisited(false); // no listeners on baseUriVisited :)
 		setBaseUriError(undefined); // useEffect[baseUriError] SHOULD trigger setCollectorConfigErrorCount, but DOESN'T ???
 	};
 
-	const validate = React.useCallback<CollectorComponentValidateFunction<CollectorConfig>>(({baseUri} :CollectorConfig) => {
+	const validate = React.useCallback<CollectorComponentValidateFunction<CollectorConfig>>(({baseUri}: CollectorConfig) => {
 		//console.debug('in validateCollectorConfig');
 		const newCollectorConfigErrorCount = validateBaseUri(baseUri) ? 0 : 1;
 		return !newCollectorConfigErrorCount;
@@ -158,6 +166,7 @@ export function useWebCrawlerState({
 		baseUriError,
 		excludesArray,
 		keepHtml,
+		maxPages, setMaxPages,
 		setExcludesArray,
 		setKeepHtml,
 		setUserAgent,
