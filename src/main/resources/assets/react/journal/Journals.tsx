@@ -1,6 +1,6 @@
 import type { BucketsAggregationResult } from '/lib/xp/node';
 
-import ms from 'ms';
+
 import {
 	Button,
 	Checkbox,
@@ -17,6 +17,7 @@ import {
 import RefreshButton from '../components/buttons/RefreshButton';
 import Flex from '../components/Flex';
 import {useJournalsState} from './useJournalsState';
+import safeMs from '../utils/safeMs';
 
 
 export function Journals({
@@ -280,7 +281,7 @@ export function Journals({
 								{columns.name ? <Table.Cell collapsing>{collection}</Table.Cell> : null}
 								{columns.startTime ? <Table.Cell collapsing>{startTime}</Table.Cell> : null}
 								{columns.endTime ? <Table.Cell collapsing>{endTime}</Table.Cell> : null}
-								{columns.duration ? <Table.Cell collapsing>{ms(duration)}</Table.Cell> : null}
+								{columns.duration ? <Table.Cell collapsing>{safeMs(duration)}</Table.Cell> : null}
 								{columns.errorCount ? <Table.Cell collapsing>{errorCount}</Table.Cell> : null}
 								{columns.successCount ? <Table.Cell collapsing>{successCount}</Table.Cell> : null}
 							</Table.Row>)}
