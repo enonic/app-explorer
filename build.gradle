@@ -108,13 +108,19 @@ sourceSets {
 
 task webpack(type:NodeTask) {
 	dependsOn yarn_install
-	mustRunAfter yarn_install
-	script = file('node_modules/webpack-cli/bin/cli.js')
+	environment = [
+		'FORCE_COLOR': 'true',
+		'LOG_LEVEL_FROM_GRADLE': gradle.startParameter.logLevel.toString(),
+		'NODE_ENV': project.hasProperty('dev') || project.hasProperty('development') ? 'development' : 'production'
+	]
 	args = [
 		'--color'
 	]
+	inputs.dir 'src/main/resources'
 	outputs.dir './build/resources/main' // processResources will delete the directory if this is not present
+	script = file('node_modules/webpack-cli/bin/cli.js')
 }
+jar.dependsOn webpack
 
 // task swc(type:YarnTask) {
 // 	dependsOn webpack
@@ -128,8 +134,16 @@ task tsup(
 	type: YarnTask
 ) {
 	args = ['build:tsup']
+	environment = [
+		'FORCE_COLOR': 'true',
+		'LOG_LEVEL_FROM_GRADLE': gradle.startParameter.logLevel.toString(),
+		'NODE_ENV': project.hasProperty('dev') || project.hasProperty('development') ? 'development' : 'production'
+	]
+	inputs.dir 'src/main/resources'
 	outputs.dir './build/resources/main' // processResources will delete the directory if this is not present
 }
+jar.dependsOn tsup
+
 
 task watch(type:NodeTask) {
 	script = file('node_modules/webpack-cli/bin/cli.js')
@@ -141,9 +155,6 @@ task watch(type:NodeTask) {
 
 
 processResources {
-	dependsOn tsup
-	dependsOn webpack
-
 	exclude '**/.gitkeep'
 
 	// We want these:
