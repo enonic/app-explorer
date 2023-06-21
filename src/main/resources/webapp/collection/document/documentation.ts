@@ -3,14 +3,14 @@ export function respondWithHtml({
 	query,
 	sort,
 	start
-} :{
-	count :number|string
-	query :string
-	sort :string
-	start :number|string
-}) :{
-		body :string
-		contentType :string
+}: {
+	count: number|string
+	query: string
+	sort: string
+	start: number|string
+}): {
+		body: string
+		contentType: string
 } {
 	return {
 		body: `<html>
@@ -94,6 +94,11 @@ export function respondWithHtml({
 
 				const params = {};
 
+				var collection = document.getElementById('getCollection').value
+				if (collection) {
+					params.collection = collection;
+				}
+
 				var getCount = document.getElementById('getCount').value;
 				if (getCount) {
 					params.count = getCount;
@@ -170,6 +175,11 @@ export function respondWithHtml({
 
 				const params = {};
 
+				var collection = document.getElementById('postCollection').value
+				if (collection) {
+					params.collection = collection;
+				}
+
 				var requireValidFalse = document.getElementById('requireValidFalse').checked;
 				//console.log('requireValidFalse', requireValidFalse);
 				if (requireValidFalse) {
@@ -215,20 +225,26 @@ export function respondWithHtml({
 				//console.log('event', event);
 				event.preventDefault();
 
+				let urlQuery = '';
+
+				var collection = document.getElementById('deleteCollection').value
+				if (collection) {
+					urlQuery = \`collection=\${collection}&\`;
+				}
+
 				var nodeList = document.querySelectorAll('[name=deleteId]'); // Dynamic
 				//console.debug('nodeList', nodeList);
 				//var array = Array.prototype.slice.call(nodeList); // Static
 				var array = Array.from(nodeList); // Static
 				//console.debug('array', array);
-				let deleteIds;
 				if (array.length) {
-					deleteIds = array
+					urlQuery += array
 						.filter((el) => el.value)
 						.map((el) => \`id=\${el.value}\`).join('&');
-					//console.debug('deleteIds', deleteIds);
 				}
 
-				fetch(\`?\${deleteIds}\`, {
+
+				fetch(\`?\${urlQuery}\`, {
 					headers: { // HTTP/2 uses lowercase header keys
 						'accept': 'application/json',
 						'content-type': 'application/json'
@@ -285,6 +301,13 @@ export function respondWithHtml({
 				</thead>
 				<tbody>
 					<tr>
+						<th>collection</th>
+						<td>&lt;required&gt;</td>
+						<td></td>
+						<td>The collection to get documents from.</td>
+					</tr>
+
+					<tr>
 						<th>id</th>
 						<td>&lt;optional&gt;</td>
 						<td></td>
@@ -339,17 +362,20 @@ export function respondWithHtml({
 			<h2>GET Form (XHR)</h2>
 			<form autocomplete="off" method="GET" novalidate onsubmit="return myGet(event)">
 				<dl>
+					<dt>Collection</dt>
+					<dd><input id="getCollection" name="collection" placeholder="" size="80" spellcheck="false" type="text" value=""/></dd>
+
 					<dt><label for="getId">Id</label></dt>
-					<dd><input name="getId" placeholder="" size="80" type="text" value=""/></dd>
-					<dd><input name="getId" placeholder="" size="80" type="text" value=""/></dd>
-					<dd><input name="getId" placeholder="" size="80" type="text" value=""/></dd>
-					<dd><input name="getId" placeholder="" size="80" type="text" value=""/></dd>
-					<dd><input name="getId" placeholder="" size="80" type="text" value=""/></dd>
-					<dd><input name="getId" placeholder="" size="80" type="text" value=""/></dd>
-					<dd><input name="getId" placeholder="" size="80" type="text" value=""/></dd>
-					<dd><input name="getId" placeholder="" size="80" type="text" value=""/></dd>
-					<dd><input name="getId" placeholder="" size="80" type="text" value=""/></dd>
-					<dd><input name="getId" placeholder="" size="80" type="text" value=""/></dd>
+					<dd><input name="getId" placeholder="" size="80" spellcheck="false" type="text" value=""/></dd>
+					<dd><input name="getId" placeholder="" size="80" spellcheck="false" type="text" value=""/></dd>
+					<dd><input name="getId" placeholder="" size="80" spellcheck="false" type="text" value=""/></dd>
+					<dd><input name="getId" placeholder="" size="80" spellcheck="false" type="text" value=""/></dd>
+					<dd><input name="getId" placeholder="" size="80" spellcheck="false" type="text" value=""/></dd>
+					<dd><input name="getId" placeholder="" size="80" spellcheck="false" type="text" value=""/></dd>
+					<dd><input name="getId" placeholder="" size="80" spellcheck="false" type="text" value=""/></dd>
+					<dd><input name="getId" placeholder="" size="80" spellcheck="false" type="text" value=""/></dd>
+					<dd><input name="getId" placeholder="" size="80" spellcheck="false" type="text" value=""/></dd>
+					<dd><input name="getId" placeholder="" size="80" spellcheck="false" type="text" value=""/></dd>
 
 					<dt><label for="getStart">Start</label></dt>
 					<dd><input id="getStart" name="getStart" type="number" value="${start}"/></dd>
@@ -375,10 +401,10 @@ export function respondWithHtml({
 }</textarea></dd>
 
 					<dt><label for="getQuery">Query</label></dt>
-					<dd><input id="getQuery" name="getQuery" placeholder="if provided keys ignored" size="80" type="text" value="${query}"/></dd>
+					<dd><input id="getQuery" name="getQuery" placeholder="if provided keys ignored" size="80" spellcheck="false" type="text" value="${query}"/></dd>
 
 					<dt><label for="getSort">Sort</label></dt>
-					<dd><input id="getSort" name="getSort" placeholder="optionial" size="80" type="text" value="${sort}"/></dd>
+					<dd><input id="getSort" name="getSort" placeholder="optionial" size="80" spellcheck="false" type="text" value="${sort}"/></dd>
 				</dl>
 				<input type="submit" value="GET">
 			</form>
@@ -423,6 +449,12 @@ export function respondWithHtml({
 					</tr>
 				</thead>
 				<tbody>
+					<tr>
+						<th>collection</th>
+						<td>&lt;required&gt;</td>
+						<td></td>
+						<td>The collection to create or modify documents in.</td>
+					</tr>
 					<tr>
 						<th>requireValid</th>
 						<td>&lt;optional&gt;</td>
@@ -488,6 +520,9 @@ export function respondWithHtml({
 			<h2>POST Form Create or modify (XHR)</h2>
 			<form autocomplete="off" method="POST" novalidate onsubmit="return myPost(event)">
 				<dl>
+					<dt>Collection</dt>
+					<dd><input id="postCollection" name="collection" placeholder="" size="80" spellcheck="false" type="text" value=""/></dd>
+
 					<dt>Require valid</dt>
 					<dd>
 						<input checked="checked" id="requireValidTrue" name="requireValid" type="radio" value="true"/>
@@ -580,6 +615,11 @@ export function respondWithHtml({
 				</thead>
 				<tbody>
 					<tr>
+						<th>collection</th>
+						<td>&lt;required&gt;</td>
+						<td>The collection to delete documents from.</td>
+					</tr>
+					<tr>
 						<th>id</th>
 						<td>&lt;required&gt;</td>
 						<td>Id of document to delete. May supply multiple.</td>
@@ -597,17 +637,20 @@ export function respondWithHtml({
 			<h2>DELETE Form (XHR)</h2>
 			<form autocomplete="off" method="DELETE" novalidate onsubmit="return myDelete(event)">
 				<dl>
+					<dt>Collection</dt>
+					<dd><input id="deleteCollection" name="collection" placeholder="" size="80" spellcheck="false" type="text" value=""/></dd>
+
 					<dt><label for="deleteId">Id</label></dt>
-					<dd><input name="deleteId" placeholder="" size="80" type="text" value=""/></dd>
-					<dd><input name="deleteId" placeholder="" size="80" type="text" value=""/></dd>
-					<dd><input name="deleteId" placeholder="" size="80" type="text" value=""/></dd>
-					<dd><input name="deleteId" placeholder="" size="80" type="text" value=""/></dd>
-					<dd><input name="deleteId" placeholder="" size="80" type="text" value=""/></dd>
-					<dd><input name="deleteId" placeholder="" size="80" type="text" value=""/></dd>
-					<dd><input name="deleteId" placeholder="" size="80" type="text" value=""/></dd>
-					<dd><input name="deleteId" placeholder="" size="80" type="text" value=""/></dd>
-					<dd><input name="deleteId" placeholder="" size="80" type="text" value=""/></dd>
-					<dd><input name="deleteId" placeholder="" size="80" type="text" value=""/></dd>
+					<dd><input name="deleteId" placeholder="" size="80" spellcheck="false" type="text" value=""/></dd>
+					<dd><input name="deleteId" placeholder="" size="80" spellcheck="false" type="text" value=""/></dd>
+					<dd><input name="deleteId" placeholder="" size="80" spellcheck="false" type="text" value=""/></dd>
+					<dd><input name="deleteId" placeholder="" size="80" spellcheck="false" type="text" value=""/></dd>
+					<dd><input name="deleteId" placeholder="" size="80" spellcheck="false" type="text" value=""/></dd>
+					<dd><input name="deleteId" placeholder="" size="80" spellcheck="false" type="text" value=""/></dd>
+					<dd><input name="deleteId" placeholder="" size="80" spellcheck="false" type="text" value=""/></dd>
+					<dd><input name="deleteId" placeholder="" size="80" spellcheck="false" type="text" value=""/></dd>
+					<dd><input name="deleteId" placeholder="" size="80" spellcheck="false" type="text" value=""/></dd>
+					<dd><input name="deleteId" placeholder="" size="80" spellcheck="false" type="text" value=""/></dd>
 				</dl>
 				<input type="submit" value="DELETE">
 			</form>
