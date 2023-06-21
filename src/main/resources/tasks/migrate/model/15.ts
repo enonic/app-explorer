@@ -1,4 +1,6 @@
 import type {WriteConnection} from '@enonic-types/lib-explorer';
+import type { Progress } from '../../init/Progress';
+
 
 import {setModel} from '/lib/explorer/model/setModel';
 import {get as getInterface} from '/lib/explorer/interface/get';
@@ -7,15 +9,14 @@ import {
 	DEFAULT_INTERFACE,
 	DEFAULT_INTERFACE_NAME
 } from '../interfaceDefault';
-import {Progress} from '../Progress';
 
 
 export function model15({
 	progress,
 	writeConnection
-} :{
-	progress :Progress
-	writeConnection :WriteConnection
+}: {
+	progress: Progress
+	writeConnection: WriteConnection
 }) {
 	progress.addItems(1).setInfo('Updating default interface with fields _alltext ...').report().logInfo();
 	const existingInterfaceNode = getInterface({

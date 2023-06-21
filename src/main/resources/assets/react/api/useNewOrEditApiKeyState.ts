@@ -33,16 +33,16 @@ export function useNewOrEditApiKeyState({
 	collections = [],
 	interfaces = []
 }: {
-	apiKeys :QueryApiKeysHits
-	_name ?:string
-	collections ?:Array<string>
-	interfaces ?:Array<string>
-	servicesBaseUrl :string
+	apiKeys: QueryApiKeysHits
+	_name?: string
+	collections?: string[]
+	interfaces?: string[]
+	servicesBaseUrl: string
 }) {
 	const [name, setName] = React.useState(_name);
 	const [key, setKey] = React.useState(_name ? '' : makeKey());
-	const [collectionNames, setCollectionNames] = React.useState<Array<string>>(collections);
-	const [interfaceNames, setInterfaceNames] = React.useState<Array<string>>(interfaces);
+	const [collectionNames, setCollectionNames] = React.useState<string[]>(collections);
+	const [interfaceNames, setInterfaceNames] = React.useState<string[]>(interfaces);
 	const [initialState/*, setInitialState*/] = React.useState({
 		name,
 		key,

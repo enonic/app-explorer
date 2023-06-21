@@ -4,6 +4,8 @@ import type {
 	RepoConnection
 } from '/lib/xp/node';
 // import type {WriteConnection} from '@enonic-types/lib-explorer';
+import type { Progress } from '../../init/Progress';
+
 
 import { NodeType } from '@enonic/explorer-utils';
 import {
@@ -13,7 +15,6 @@ import {
 } from '@enonic/js-utils';
 import {rename} from '/lib/explorer/collection/rename';
 import {setModel} from '/lib/explorer/model/setModel';
-import {Progress} from '../Progress';
 
 
 export function model16({
