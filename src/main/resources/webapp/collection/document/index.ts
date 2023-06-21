@@ -18,19 +18,20 @@ import {
 	//toStr
 } from '@enonic/js-utils';
 import lcKeys from '@enonic/js-utils/object/lcKeys';
-import {get} from './get';
+import { get } from './get';
 import {post} from './post';
 import {remove} from './remove';
 import {hash} from '/lib/explorer/string/hash';
 import {connect} from '/lib/explorer/repo/connect';
 import {coerceApiKey} from '../../../services/graphQL/apiKey/coerceApiKey';
+import {
+	AUTH_PREFIX,
+	HTTP_RESPONSE_STATUS_CODES
+} from '../../constants';
 // import { Node } from 'cheerio';
 
 
 export type AllDocumentRequest = GetRequest & PostRequest & RemoveRequest;
-
-
-const AUTH_PREFIX = 'Explorer-Api-Key ';
 
 
 export function all(
@@ -49,17 +50,17 @@ export function all(
 
 	if(!authorization) {
 		log.error(`Authorization header missing!`);
-		return {status: 401}; // Unauthorized
+		return { status: HTTP_RESPONSE_STATUS_CODES.UNAUTHORIZED };
 	}
 	if(!startsWith(authorization, AUTH_PREFIX)) {
 		log.error(`Invalid Authorization header:${authorization}!`);
-		return { status: 401 }; // Unauthorized
+		return { status: HTTP_RESPONSE_STATUS_CODES.UNAUTHORIZED };
 	}
 	const apiKey = authorization.substring(AUTH_PREFIX.length);
 	//log.debug(`apiKey:${toStr(apiKey)}`);
 	if (!apiKey) {
 		log.error(`ApiKey not found in Authorization header:${authorization}!`);
-		return { status: 401 }; // Unauthorized
+		return { status: HTTP_RESPONSE_STATUS_CODES.UNAUTHORIZED };
 	}
 	const hashedApiKey = hash(apiKey);
 	//log.debug(`hashedApiKey:${toStr(hashedApiKey)}`);
@@ -93,7 +94,7 @@ export function all(
 	//log.debug(`matchingApiKeys:${toStr(matchingApiKeys)}`);
 	if(matchingApiKeys.total !== 1) {
 		log.error(`Unique apiKey:${apiKey} not found!`);
-		return { status: 401 }; // Unauthorized
+		return { status: HTTP_RESPONSE_STATUS_CODES.UNAUTHORIZED };
 	}
 	const apiKeyNode = coerceApiKey(explorerRepoReadConnection.get(matchingApiKeys.hits[0].id));
 	//log.debug(`apiKeyNode:${toStr(apiKeyNode)}`);
@@ -113,6 +114,6 @@ export function all(
 	} // method === 'DELETE'
 
 	return {
-		status: 405 // Method not allowed
+		status: HTTP_RESPONSE_STATUS_CODES.METHOD_NOT_ALLOWED
 	};
 }

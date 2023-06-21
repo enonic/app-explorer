@@ -17,8 +17,9 @@ import {
 import lcKeys from '@enonic/js-utils/object/lcKeys';
 //import {get as getCollection} from '/lib/explorer/collection/get';
 import {connect} from '/lib/explorer/repo/connect';
+import { respondWithHtml } from './documentation';
+import { HTTP_RESPONSE_STATUS_CODES } from '../../constants';
 
-import {respondWithHtml} from './documentation';
 
 const {includes: arrayIncludes} = array;
 const {startsWith} = string;
@@ -64,7 +65,7 @@ function respondWithJson({
 				message: 'Missing required parameter collection!'
 			},
 			contentType: 'text/json;charset=utf-8',
-			status: 400 // Bad Request
+			status: HTTP_RESPONSE_STATUS_CODES.BAD_REQUEST
 		};
 	}
 
@@ -113,7 +114,7 @@ function respondWithJson({
 				error
 			},
 			contentType: 'text/json;charset=utf-8',
-			status: 500
+			status: HTTP_RESPONSE_STATUS_CODES.INTERNAL_SERVER_ERROR
 		}
 	}
 
@@ -155,7 +156,7 @@ export function get(
 	const {
 		//body = "{}", // TypeError: Failed to execute 'fetch' on 'Window': Request with GET/HEAD method cannot have body.
 		params: {
-			collection: collectionParam = '',
+			collection: collectionName = '',
 			count: countParam = '10',
 			filters: filtersParam = '{}',
 			id: idParam,
@@ -163,19 +164,16 @@ export function get(
 			sort = 'score DESC',
 			start: startParam = '0'
 		} = {},
-		pathParams: {
-			collection: collectionName = collectionParam
-		} = {}
 	} = request;
 
-	if (!arrayIncludes(forceArray(collections), collectionName)) {
+	if (collectionName && !arrayIncludes(forceArray(collections), collectionName)) {
 		log.error(`No access to collection:${collectionName}!`);
 		return {
 			body: {
 				message: 'Bad Request'
 			},
 			contentType: 'text/json;charset=utf-8',
-			status: 400 // Bad Request
+			status: HTTP_RESPONSE_STATUS_CODES.BAD_REQUEST
 		};
 	}
 
