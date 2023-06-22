@@ -51,7 +51,7 @@ export function fetchInterfaceCreate({
 	handleData?: (data: unknown) => void
 	handleResponse?: (response: Response) => void
 }) {
-	console.debug('fetchInterfaceCreate({url:', url, ', variables:', variables, '})');
+	// console.debug('fetchInterfaceCreate({url:', url, ', variables:', variables, '})');
 	fetch(url, {
 		method: 'POST',
 		headers: { // HTTP/2 uses lowercase header keys
