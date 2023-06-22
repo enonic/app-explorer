@@ -40,6 +40,7 @@ export function Interfaces({
 	basename,
 	fetchInterfaces,
 	licenseValid,
+	newInterfaceModalOpen = false,
 	searchString = '', setSearchString,
 	servicesBaseUrl,
 	setInterfaceNameState,
@@ -49,6 +50,7 @@ export function Interfaces({
 	basename: string
 	fetchInterfaces: FetchData<QueryInterfacesResponseData, object, object>
 	licenseValid: boolean
+	newInterfaceModalOpen?: boolean
 	searchString?: string
 	setSearchString: React.Dispatch<React.SetStateAction<string>>
 	servicesBaseUrl: string
@@ -261,6 +263,7 @@ export function Interfaces({
 			<NewOrEditInterfaceModal
 				afterClose={memoizedUpdateInterfacesCallback}
 				collectionOptions={collectionOptions}
+				defaultOpen={newInterfaceModalOpen}
 				fieldNameToValueTypesState={fieldNameToValueTypesState}
 				interfaceNamesObj={interfaceNamesObj}
 				licenseValid={licenseValid}

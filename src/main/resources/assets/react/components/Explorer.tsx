@@ -165,9 +165,21 @@ function Explorer({
 						setLicensedTo={setLicensedTo}
 						setLicenseValid={setLicenseValid}
 					/>}/>
+					<Route path="/interfaces/create" element={<Interfaces
+						basename={basename}
+						fetchInterfaces={fetchInterfaces}
+						licenseValid={licenseValid}
+						newInterfaceModalOpen={true}
+						searchString={searchString} setSearchString={setSearchString}
+						servicesBaseUrl={servicesBaseUrl}
+						setInterfaceNameState={setInterfaceNameState}
+						setLicensedTo={setLicensedTo}
+						setLicenseValid={setLicenseValid}
+					/>}/>
 					<Route path="/api" element={<GraphiQLRouted
 						basename={basename}
 						interfaceNameState={interfaceNameState}
+						interfaceOptions={interfaceOptions}
 						searchString={searchString}
 					/>}/>
 					<Route path="/api/keys" element={<ApiKeys
