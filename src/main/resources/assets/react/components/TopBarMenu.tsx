@@ -76,7 +76,7 @@ export default function TopBarMenu({
 				{userState?.displayName}
 			</Menu.Item>
 		</Menu.Menu>
-		{location.pathname === '/api'
+		{location.pathname === '/api' && interfaceOptions.length
 			? <Dropdown
 				className={[
 					'p-f',
@@ -84,20 +84,19 @@ export default function TopBarMenu({
 					'l-50p',
 					'tf-tx--50p'
 				].join(' ')}
-				clearable
 				onChange={(_event,{value}) => {
 					if (!value) { value = 'default'; }
 					setInterfaceNameState(value as string);
 				}}
 				options={interfaceOptions}
-				placeholder='All collections'
+				placeholder='Please select an interface'
 				search
 				selection
 				style={{
 					maxWidth: 'calc(100vw - 61px - 44px)',
 					width: 768 - 61 - 44,
 				}}
-				value={interfaceNameState === 'default' ? undefined : interfaceNameState}
+				value={interfaceNameState === 'default'? undefined : interfaceNameState}
 			/>
 			: null
 		}

@@ -1,4 +1,4 @@
-import type {DropdownItemProps} from 'semantic-ui-react/index.d';
+import type { DropdownItemProps } from 'semantic-ui-react/index.d';
 import type {
 	SetLicensedToFunction,
 	SetLicenseValidFunction
@@ -10,54 +10,60 @@ import type {
 
 
 import * as React from 'react';
-import {Button, Icon, Modal, Popup} from 'semantic-ui-react';
+import { Button, Modal, Popup } from 'semantic-ui-react';
 import HoverButton from '../components/buttons/HoverButton';
-import {UploadLicense} from '../components/UploadLicense';
-import {NewOrEditInterface} from './NewOrEditInterface';
+import { UploadLicense } from '../components/UploadLicense';
+import { NewOrEditInterface } from './NewOrEditInterface';
 
 
 type NewOrEditInterfaceModalProps = {
-	_id? :string
-	_name? :string
-	afterClose :() => void
-	beforeOpen? :() => void
-	collectionOptions :Array<DropdownItemProps>
-	disabled? :boolean
+	// Required
+	collectionOptions: DropdownItemProps[]
 	fieldNameToValueTypesState: FieldNameToValueTypes
-	interfaceNamesObj :InterfaceNamesObj
-	licenseValid :boolean
-	loading ?:boolean
-	servicesBaseUrl :string
-	setLicensedTo :SetLicensedToFunction
-	setLicenseValid :SetLicenseValidFunction
-	stopWordOptions :Array<DropdownItemProps>
-	thesauriOptions :Array<DropdownItemProps>
-	total :number
+	interfaceNamesObj: InterfaceNamesObj
+	licenseValid: boolean
+	servicesBaseUrl: string
+	setLicensedTo: SetLicensedToFunction
+	setLicenseValid: SetLicenseValidFunction
+	stopWordOptions: DropdownItemProps[]
+	thesauriOptions: DropdownItemProps[]
+	total: number
+	// Optional
+	_id?: string
+	_name?: string
+	afterClose?: () => void
+	beforeOpen?: () => void
+	defaultOpen?: boolean,
+	disabled?: boolean
+	loading?: boolean
 }
 
 
-export function NewOrEditInterfaceModal(props :NewOrEditInterfaceModalProps) {
+export function NewOrEditInterfaceModal(props: NewOrEditInterfaceModalProps) {
 	const {
-		_id, // nullable
-		_name,
-		afterClose = () => {/**/},
-		beforeOpen = () => {/**/},
-		collectionOptions = [],
-		disabled = false,
+		// Required
+		collectionOptions,
 		fieldNameToValueTypesState,
-		interfaceNamesObj = {},
+		interfaceNamesObj,
 		licenseValid,
-		loading = false,
 		servicesBaseUrl,
 		setLicensedTo,
 		setLicenseValid,
 		stopWordOptions,
 		thesauriOptions,
-		total
+		total,
+		// Optional
+		_id, // nullable
+		_name,
+		afterClose = () => {/**/},
+		beforeOpen = () => {/**/},
+		defaultOpen = false,
+		disabled = false,
+		loading = false,
 	} = props;
 	//console.debug('initialValues', initialValues);
 
-	const [open, setOpen] = React.useState(false);
+	const [open, setOpen] = React.useState(defaultOpen);
 
 	const header = _id ? `Edit interface ${_name}`: 'New interface';
 
@@ -86,7 +92,7 @@ export function NewOrEditInterfaceModal(props :NewOrEditInterfaceModalProps) {
 					_id
 						? <HoverButton
 							color='blue'
-							disabled={loading || disabled}
+							disabled={loading || disabled}
 							loading={loading}
 							icon='edit'
 							onClick={doOpen}
@@ -94,7 +100,7 @@ export function NewOrEditInterfaceModal(props :NewOrEditInterfaceModalProps) {
 						: <Button
 							circular
 							color='green'
-							disabled={loading || disabled}
+							disabled={loading || disabled}
 							icon='plus'
 							loading={loading}
 							onClick={doOpen}
