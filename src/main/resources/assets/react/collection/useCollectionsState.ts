@@ -1,14 +1,7 @@
 import type {StrictTableHeaderCellProps} from 'semantic-ui-react';
-import type {
-	Collector,
-	ContentTypeOptions,
-	SiteOptions
-} from '@enonic-types/lib-explorer/Collector.d';
+import type {Collector, ContentTypeOptions, SiteOptions} from '@enonic-types/lib-explorer/Collector.d';
 import type {CollectorComponents} from '../index.d';
-import type {
-	DropdownItemsWithKeys,
-	QueryCollectionsGraph
-} from './index.d';
+import type {DropdownItemsWithKeys, QueryCollectionsGraph} from './index.d';
 
 
 import {COLON_SIGN} from '@enonic/js-utils';
@@ -333,6 +326,8 @@ export function useCollectionsState({
 
 	const memoizedFetchOnMount = React.useCallback(() => {
 		setIsLoading(true);
+		console.error(JSON.stringify({ query: {JOBS_GQL} }))
+		console.error(`${servicesBaseUrl}/graphQL`)
 		fetch(`${servicesBaseUrl}/graphQL`, {
 			method: 'POST',
 			headers: { // HTTP/2 uses lowercase header keys
@@ -359,6 +354,8 @@ export function useCollectionsState({
 
 	const memoizedFetchOnUpdate = React.useCallback(() => {
 		setIsLoading(true);
+		console.error(JSON.stringify({ query: {JOBS_GQL} }))
+		console.error(`${servicesBaseUrl}/graphQL`)
 		fetch(`${servicesBaseUrl}/graphQL`, {
 			method: 'POST',
 			headers: { // HTTP/2 uses lowercase header keys

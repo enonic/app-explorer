@@ -1,44 +1,28 @@
-import type {
-	EnonicXpRequest,
-	Headers
-} from '@enonic-types/lib-explorer/Request.d';
+import type {EnonicXpRequest, Headers} from '@enonic-types/lib-explorer/Request.d';
 import {GraphQLContext} from '/lib/explorer/interface/graphql/output/index.d';
-import type {
-	ApiKeyNode,
-	EmptyObject
-} from '../../types';
+import type {ApiKeyNode, EmptyObject} from '../../types';
 
 // These imports works when treeshake: false, but gives error when treeshake: true
 // ReferenceError: "Reflect" is not defined
 // Must be imported only once per WebPack Bundle (Required by setIn)
 import 'core-js/stable/reflect';
 // import 'reflect-metadata';
-
 import {HTTP_HEADERS} from '@enonic/explorer-utils/src'; // Adding "src" fixes the empty AbstractParser error
-import {
-	RESPONSE_TYPE_JSON,
-	arrayIncludes,
-	// toStr,
-} from '@enonic/js-utils';
+import {arrayIncludes, RESPONSE_TYPE_JSON,} from '@enonic/js-utils';
 import lcKeys from '@enonic/js-utils/object/lcKeys';
 //@ts-ignore
 import {execute} from '/lib/graphql';
 import {exists as interfaceExists} from '/lib/explorer/interface/exists';
-import {
-	NT_API_KEY,
-	PRINCIPAL_EXPLORER_READ
-} from '/lib/explorer/model/2/constants';
+import {NT_API_KEY, PRINCIPAL_EXPLORER_READ} from '/lib/explorer/model/2/constants';
 import {hash} from '/lib/explorer/string/hash';
 import {connect} from '/lib/explorer/repo/connect';
 
 //import {generateSchemaForInterface} from './schemaWithLimitedDocumentTypes/generateSchemaForInterface';
 import {getCachedSchema} from '/lib/explorer/interface/graphql/getCachedSchema';
+import {AUTH_PREFIX} from '../constants'
 
 
 export type InterfaceRequest = EnonicXpRequest<EmptyObject>
-
-
-const AUTHORIZATION_PREFIX = 'Explorer-Api-Key ';
 
 
 function isUnauthorized({
@@ -51,18 +35,18 @@ function isUnauthorized({
 	//log.debug('isUnauthorized interfaceName:%s request:%s', interfaceName, toStr(request));
 	const {
 		 // HTTP/2 uses lowercase header keys
-		'authorization': authorization//, // 'Explorer-Api-Key XXXX
+		'authorization': authorization//, // 'explorer-api-key XXXX
 	} = lcKeys(request.headers) as Headers;
 	//log.debug(`authorization:${toStr(authorization)}`);
 	if(!authorization) {
 		log.error(`Authorization header missing!`);
 		return { status: 401 }; // Unauthorized
 	}
-	if(!authorization.startsWith(AUTHORIZATION_PREFIX)) {
+	if(!authorization.startsWith(AUTH_PREFIX)) {
 		log.error(`Invalid Authorization header:${authorization}!`);
 		return { status: 401 }; // Unauthorized
 	}
-	const apiKey = authorization.substring(AUTHORIZATION_PREFIX.length);
+	const apiKey = authorization.substring(AUTH_PREFIX.length);
 	//log.debug(`apiKey:${toStr(apiKey)}`);
 	if (!apiKey) {
 		log.error(`ApiKey not found in Authorization header:${authorization}!`);

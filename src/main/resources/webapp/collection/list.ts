@@ -1,20 +1,8 @@
-import type {
-	EnonicXpRequest,
-	Headers
-} from '@enonic-types/lib-explorer/Request.d';
+import type {EnonicXpRequest, Headers} from '@enonic-types/lib-explorer/Request.d';
 
-import {
-	//RESPONSE_TYPE_JSON,
-	RESPONSE_TYPE_HTML,
-	forceArray,
-	startsWith//,
-	//toStr
-} from '@enonic/js-utils';
+import {forceArray, RESPONSE_TYPE_HTML, startsWith} from '@enonic/js-utils';
 import {resolve} from 'uri-js';
-import {
-	NT_API_KEY,
-	PRINCIPAL_EXPLORER_READ
-} from '/lib/explorer/model/2/constants';
+import {NT_API_KEY, PRINCIPAL_EXPLORER_READ} from '/lib/explorer/model/2/constants';
 import {connect} from '/lib/explorer/repo/connect';
 import {hash} from '/lib/explorer/string/hash';
 import {coerceApiKey} from '../../services/graphQL/apiKey/coerceApiKey';
@@ -22,12 +10,11 @@ import {AUTH_PREFIX} from '../constants';
 import lcKeys from '@enonic/js-utils/object/lcKeys';
 
 
-
 export function list(request :EnonicXpRequest) {
 	//log.debug('request:%s', toStr(request));
 
 	const { // HTTP/2 uses lowercase header keys
-		authorization // 'Explorer-Api-Key XXXX'
+		authorization // 'explorer-api-key XXXX'
 	} = lcKeys(request.headers) as Headers;
 
 	if(!authorization) {

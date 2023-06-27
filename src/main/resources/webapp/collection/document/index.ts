@@ -1,7 +1,10 @@
-import type { Headers } from '@enonic-types/lib-explorer/Request.d';
+import type {Headers} from '@enonic-types/lib-explorer/Request.d';
 import type {GetRequest} from './get';
+import {get} from './get';
 import type {PostRequest} from './post';
+import {post} from './post';
 import type {RemoveRequest} from './remove';
+import {remove} from './remove';
 
 /*
 mapping.api.host = localhost
@@ -9,28 +12,17 @@ mapping.api.source = /api
 mapping.api.target = /webapp/com.enonic.app.explorer/api
 mapping.api.idProvider.system = default
 */
-import {
-	NodeType,
-	Principal
-} from '@enonic/explorer-utils';
-import {
-	startsWith//,
-	//toStr
-} from '@enonic/js-utils';
+import {NodeType, Principal} from '@enonic/explorer-utils';
+import {startsWith} from '@enonic/js-utils';
 import lcKeys from '@enonic/js-utils/object/lcKeys';
-import {get} from './get';
-import {post} from './post';
-import {remove} from './remove';
 import {hash} from '/lib/explorer/string/hash';
 import {connect} from '/lib/explorer/repo/connect';
 import {coerceApiKey} from '../../../services/graphQL/apiKey/coerceApiKey';
+import {AUTH_PREFIX} from '../../constants'
 // import { Node } from 'cheerio';
 
 
 export type AllDocumentRequest = GetRequest & PostRequest & RemoveRequest;
-
-
-const AUTH_PREFIX = 'Explorer-Api-Key ';
 
 
 export function all(
@@ -39,7 +31,7 @@ export function all(
 	//log.info(`request:${toStr(request)}`);
 
 	const { // HTTP/2 uses lowercase header keys
-		'authorization': authorization // 'Explorer-Api-Key XXXX'
+		'authorization': authorization // 'explorer-api-key XXXX'
 	} = lcKeys(request.headers) as Headers;
 
 	const {

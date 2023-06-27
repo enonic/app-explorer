@@ -263,7 +263,7 @@ export function respondWithHtml({
 					</tr>
 					<tr>
 						<th>authorization</th>
-						<td>Explorer-Api-Key XXXX</td>
+						<td>explorer-api-key XXXX</td>
 						<td>The API key (password) for the collection you want to get documents from.</td>
 					</tr>
 					<tr>
@@ -402,7 +402,7 @@ export function respondWithHtml({
 					</tr>
 					<tr>
 						<th>authorization</th>
-						<td>Explorer-Api-Key XXXX</td>
+						<td>explorer-api-key XXXX</td>
 						<td>The API key (password) for the collection you want to get documents from.</td>
 					</tr>
 					<tr>
@@ -559,7 +559,7 @@ export function respondWithHtml({
 					</tr>
 					<tr>
 						<th>authorization</th>
-						<td>Explorer-Api-Key XXXX</td>
+						<td>explorer-api-key XXXX</td>
 						<td>The API key (password) for the collection you want to get documents from.</td>
 					</tr>
 					<tr>
