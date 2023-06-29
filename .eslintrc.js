@@ -204,6 +204,8 @@ module.exports = {
 			enforceInMethodNames: false
 		}],
 		'no-unexpected-multiline': 'off',
+		'no-unused-vars': ["warn", { "argsIgnorePattern": "^_" }],
+		'@typescript-eslint/no-unused-vars': ["warn", { "argsIgnorePattern": "^_" }],
 		'object-curly-spacing': ['off'],
 		'react/jsx-no-undef': [
 			'error',

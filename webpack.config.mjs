@@ -58,10 +58,10 @@ const SS_ALIAS = {
 	'@enonic/nashorn-polyfills': path.resolve(__dirname, 'src/main/resources/lib/nashorn/index.ts'),
 	'@enonic/js-utils': BOOL_LOCAL_LIB_EXPLORER
 		? BOOL_LOCAL_JS_UTILS
-			? path.resolve(__dirname, '../enonic-js-utils/dist/cjs/index.js')
+			? path.resolve(__dirname, 'symlinks/enonic-js-utils/dist/cjs/index.js')
 			: path.resolve(__dirname, './node_modules/@enonic/js-utils/dist/cjs/index.js')
 		: BOOL_LOCAL_JS_UTILS
-			? path.resolve(__dirname, '../enonic-js-utils')
+			? path.resolve(__dirname, 'symlinks/enonic-js-utils')
 			: path.resolve(__dirname, './node_modules/@enonic/js-utils'), // This is used in production build
 	// '@enonic/explorer-utils': // BOOL_LOCAL_LIB_EXPLORER
 	// ? path.resolve(__dirname, '../explorer-utils/index.mts')
@@ -108,8 +108,8 @@ const SS_EXTERNALS = [
 ];
 
 if (BOOL_LOCAL_LIB_EXPLORER) {
-	SS_ALIAS['/lib/explorer'] = path.resolve(__dirname, '../lib-explorer/src/main/resources/lib/explorer/');
-	//SS_ALIAS['/lib/explorer'] = path.resolve(__dirname, '../lib-explorer/build/resources/main/lib/explorer/');
+	SS_ALIAS['/lib/explorer'] = path.resolve(__dirname, 'symlinks/lib-explorer/src/main/resources/lib/explorer/');
+	//SS_ALIAS['/lib/explorer'] = path.resolve(__dirname, 'symlinks/lib-explorer/build/resources/main/lib/explorer/');
 } else {
 	SS_EXTERNALS.push(/^\/lib\/explorer\//);
 }
@@ -157,7 +157,7 @@ if (MODE === 'production') {
 	SS_EXTERNALS.push('/lib/util');
 	SS_EXTERNALS.push(/^\/lib\/util\//);
 } else {
-	SS_ALIAS['/lib/util'] = path.resolve(__dirname, '../lib-util/src/main/resources/lib/util');
+	SS_ALIAS['/lib/util'] = path.resolve(__dirname, 'symlinks/lib-util/src/main/resources/lib/util');
 	/*SS_PLUGINS.push(new BrowserSyncPlugin({
 		host: 'localhost',
 		port: 3000,

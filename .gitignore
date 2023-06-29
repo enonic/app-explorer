@@ -1,8 +1,11 @@
+/bin/
 /.build/
 /.enonic
 /.gradle/
 /.idea
 /build/
+/coverage/
 /node_modules/
+/symlinks/
 /yarn-error.log
 .DS_Store

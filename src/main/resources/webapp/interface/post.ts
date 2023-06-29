@@ -2,6 +2,7 @@ import type {
 	EnonicXpRequest,
 	Headers
 } from '@enonic-types/lib-explorer/Request.d';
+import type { Response } from '@enonic-types/lib-explorer/Response.d';
 import {GraphQLContext} from '/lib/explorer/interface/graphql/output/index.d';
 import type {
 	ApiKeyNode,
@@ -14,13 +15,18 @@ import type {
 import 'core-js/stable/reflect';
 // import 'reflect-metadata';
 
-import {HTTP_HEADERS} from '@enonic/explorer-utils/src'; // Adding "src" fixes the empty AbstractParser error
+// Adding "src" fixes the empty AbstractParser error
+// But it breaks jest :(
+// import {HTTP_HEADERS} from '@enonic/explorer-utils/src';
+import {HTTP_HEADERS} from '@enonic/explorer-utils';
+
 import {
 	RESPONSE_TYPE_JSON,
-	arrayIncludes,
-	// toStr,
+	toStr,
 } from '@enonic/js-utils';
+import { includes as arrayIncludes } from '@enonic/js-utils/array/includes';
 import lcKeys from '@enonic/js-utils/object/lcKeys';
+
 //@ts-ignore
 import {execute} from '/lib/graphql';
 import {exists as interfaceExists} from '/lib/explorer/interface/exists';
@@ -33,6 +39,7 @@ import {connect} from '/lib/explorer/repo/connect';
 
 //import {generateSchemaForInterface} from './schemaWithLimitedDocumentTypes/generateSchemaForInterface';
 import {getCachedSchema} from '/lib/explorer/interface/graphql/getCachedSchema';
+import { HTTP_RESPONSE_STATUS_CODES } from '../constants';
 
 
 export type InterfaceRequest = EnonicXpRequest<EmptyObject>
@@ -47,7 +54,7 @@ function isUnauthorized({
 }: {
 	interfaceName: string
 	request: EnonicXpRequest
-}) {
+}): Response | false {
 	//log.debug('isUnauthorized interfaceName:%s request:%s', interfaceName, toStr(request));
 	const {
 		 // HTTP/2 uses lowercase header keys
@@ -56,17 +63,17 @@ function isUnauthorized({
 	//log.debug(`authorization:${toStr(authorization)}`);
 	if(!authorization) {
 		log.error(`Authorization header missing!`);
-		return { status: 401 }; // Unauthorized
+		return { status: HTTP_RESPONSE_STATUS_CODES.UNAUTHORIZED };
 	}
 	if(!authorization.startsWith(AUTHORIZATION_PREFIX)) {
 		log.error(`Invalid Authorization header:${authorization}!`);
-		return { status: 401 }; // Unauthorized
+		return { status: HTTP_RESPONSE_STATUS_CODES.BAD_REQUEST };
 	}
 	const apiKey = authorization.substring(AUTHORIZATION_PREFIX.length);
 	//log.debug(`apiKey:${toStr(apiKey)}`);
 	if (!apiKey) {
 		log.error(`ApiKey not found in Authorization header:${authorization}!`);
-		return { status: 401 }; // Unauthorized
+		return { status: HTTP_RESPONSE_STATUS_CODES.BAD_REQUEST };
 	}
 	const hashedApiKey = hash(apiKey);
 	//log.debug(`hashedApiKey:${toStr(hashedApiKey)}`);
@@ -95,30 +102,28 @@ function isUnauthorized({
 	if(matchingApiKeys.total !== 1) {
 		log.error(`API key hashedApiKey:${hashedApiKey} not found!`);
 		return {
-			body: {
-				//message: 'Bad Request'
-				message: 'Unauthorized'
-			},
+			body: JSON.stringify({
+				message: 'Forbidden'
+			}),
 			contentType: 'text/json;charset=utf-8',
-			//status: 400 // Bad Request
-			status: 401 // Unauthorized
+			status: HTTP_RESPONSE_STATUS_CODES.FORBIDDEN
 		};
 	}
+	log.debug('matchingApiKeys.hits[0].id:%s', matchingApiKeys.hits[0].id);
+
 	const apiKeyNode = explorerRepoReadConnection.get<ApiKeyNode>(matchingApiKeys.hits[0].id);
-	//log.debug(`apiKeyNode:${toStr(apiKeyNode)}`);
+	// log.debug('apiKeyNode:%s', toStr(apiKeyNode));
 	let {interfaces = []} = apiKeyNode;
 	if (!Array.isArray(interfaces)) { interfaces = [interfaces]; }
 	//log.debug(`interfaces:${toStr(interfaces)}`);
 	if (!arrayIncludes(interfaces, interfaceName)) {
 		log.error(`API key hashedApiKey:${hashedApiKey} doesn't have read access to interface:${interfaceName}!`);
 		return {
-			body: {
-				//message: 'Bad Request'
-				message: 'Unauthorized'
-			},
+			body: JSON.stringify({
+				message: 'Forbidden'
+			}),
 			contentType: 'text/json;charset=utf-8',
-			//status: 400 // Bad Request
-			status: 401 // Unauthorized
+			status: HTTP_RESPONSE_STATUS_CODES.FORBIDDEN
 		};
 	}
 	//log.debug(`interfaceName:${toStr(interfaceName)}`);
@@ -127,13 +132,13 @@ function isUnauthorized({
 		name: interfaceName
 	})) {
 		log.error(`interface:${interfaceName} doesn't exist!`);
-		return {status: 404}; // Not Found
+		return {status: HTTP_RESPONSE_STATUS_CODES.NOT_FOUND};
 	}
 	return false; // Authorized
 } // isUnauthorized
 
 
-export function overrideable(request: InterfaceRequest, fn = isUnauthorized) {
+export function overrideable(request: InterfaceRequest, fn = isUnauthorized): Response {
 	// log.debug('overrideable request:%s', toStr(request));
 
 	const {
@@ -149,7 +154,7 @@ export function overrideable(request: InterfaceRequest, fn = isUnauthorized) {
 
 	if (!interfaceName) {
 		log.error(`interfaceName not provided!`);
-		return {status: 404}; // Not Found
+		return { status: HTTP_RESPONSE_STATUS_CODES.NOT_FOUND };
 	}
 
 	const unauthorized = fn({
@@ -175,14 +180,17 @@ export function overrideable(request: InterfaceRequest, fn = isUnauthorized) {
 	const schema = getCachedSchema();
 
 	return {
-		contentType: RESPONSE_TYPE_JSON,
 		//body: JSON.stringify(execute(generateSchemaForInterface(interfaceName), query, variables, context))
-		body: JSON.stringify(execute(schema, query, variables, context))
+		body: JSON.stringify(execute(schema, query, variables, context)),
+		contentType: RESPONSE_TYPE_JSON,
+		status: 200
 	};
 }
 
 
-export function post(request: InterfaceRequest) {
-	//log.debug('post request:%s', toStr(request));
-	return overrideable(request, isUnauthorized);
+export function post(request: InterfaceRequest): Response {
+	// log.debug('post request:%s', toStr(request));
+	const response = overrideable(request, isUnauthorized);
+	// log.debug('post response:%s', toStr(response));
+	return response;
 }
