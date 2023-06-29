@@ -46,7 +46,9 @@ export function parseRobotsTxt(txt: string) {
 	let currentGroup: Group = null;
 	let prevToken: Token = null;
 	for (let i = 0; i < lines.length; i += 1) {
+		// log.debug('lines[%s]:%s', i, lines[i]);
 		const commentFree = lines[i].replace(/#.*$/, '');
+		// log.debug('commentFree:%s', commentFree);
 		const index = commentFree.indexOf(':');
 		if(index === -1) {continue;}
 		const directive = commentFree.substr(0, index).trim().toLowerCase() as Directive;

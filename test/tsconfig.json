@@ -1,0 +1,44 @@
+{
+	"compilerOptions": {
+		"allowJs": true,
+		"baseUrl": ".",
+		"checkJs": false,
+		"declaration": false,
+		"declarationMap": false,
+		"esModuleInterop": true,
+		"forceConsistentCasingInFileNames": true,
+		"inlineSourceMap": false,
+		"inlineSources": false,
+		"noEmit": true,
+		"noImplicitAny": false,
+		"noUnusedLocals": false, // Annoying while writing tests
+		"noUnusedParameters": false,
+		"paths": {
+			// There is no @enonic-types/lib-explorer yet, so these are workarounds
+			"@enonic-types/lib-explorer": ["../symlinks/lib-explorer/src/main/resources/lib/explorer/types/index.d"],
+			"@enonic-types/lib-explorer/*": ["../symlinks/lib-explorer/src/main/resources/lib/explorer/types/*"],
+
+			// lib-explorer is an external, but we still want the code editor to resolve types
+			"/lib/explorer/*": ["../symlinks/lib-explorer/src/main/resources/lib/explorer/*"],
+
+			"/lib/xp/*": ["../node_modules/@enonic-types/lib-*"],
+		},
+		"rootDir": "..",
+		"rootDirs": [
+			"../src/main/resources",
+			// "../node_modules"
+		],
+		"skipLibCheck": true,
+		"sourceMap": true, // Needed to get correct Uncovered Line numbers
+		"strict": false,
+		"strictFunctionTypes": false,
+		"strictNullChecks": false,
+		"target": "ES5",
+		"types": [
+			"@enonic-types/global"
+		],
+	},
+	"include": [
+		"./**/*.ts"
+	]
+}
