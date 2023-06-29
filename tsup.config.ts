@@ -1,6 +1,7 @@
 import { polyfillNode } from "esbuild-plugin-polyfill-node";
 import { globSync } from 'glob';
-// import { print } from 'q-i';
+// import { globbySync } from 'globby';
+import { print } from 'q-i';
 import { defineConfig, type Options } from 'tsup';
 
 
@@ -13,18 +14,25 @@ const RESOURCES_PATH = 'src/main/resources';
 const ASSETS_PATH = `${RESOURCES_PATH}/assets`;
 // const CLIENT_GLOB_EXTENSIONS = '{tsx,ts,jsx,js}';
 
+const DECLARATION_FILES = globSync(`${RESOURCES_PATH}/**/*.d.ts`);
+// const DECLARATION_FILES = globbySync(`${RESOURCES_PATH}/**/*.d.ts`);
+// print({DECLARATION_FILES}, { maxItems: Infinity }); process.exit(0);
+
+const ASSET_FILES = globSync(`${ASSETS_PATH}/**/*.*`);
+// const ASSET_FILES = globbySync(`${ASSETS_PATH}/**/*.*`);
+// print({ASSET_FILES}, { maxItems: Infinity }); process.exit(0);
 
 const SERVER_FILES = globSync(
 	`${RESOURCES_PATH}/**/*.ts`,
 	{
 		absolute: false,
 		ignore: [].concat(
-			globSync(`${RESOURCES_PATH}/**/*.d.ts`),
-			globSync(`${ASSETS_PATH}/**/*.*`),
+			DECLARATION_FILES,
+			ASSET_FILES,
 		),
 	}
 );
-// print(SERVER_FILES, { maxItems: Infinity });
+print({SERVER_FILES}, { maxItems: Infinity }); // process.exit(0);
 
 
 export default defineConfig((options: MyOptions) => {
