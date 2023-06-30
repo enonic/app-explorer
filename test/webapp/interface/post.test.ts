@@ -278,16 +278,6 @@ describe('webapp', () => {
 			// 	jest.resetModules();
 			// });
 
-			test('returns 404 when explorer-interface-name is not in the request headers', () => {
-				import('../../../src/main/resources/webapp/interface/post').then((moduleName) => {
-					expect(moduleName.post({
-						headers: {},
-					})).toStrictEqual({
-						status: 404
-					});
-				});
-			});
-
 			test('returns 401 Unauthorized when Authorization header missing', () => {
 				import('../../../src/main/resources/webapp/interface/post').then((moduleName) => {
 					expect(moduleName.post({
@@ -338,7 +328,7 @@ describe('webapp', () => {
 			});
 
 			let apiKeyNodeId: string;
-			test("returns 403 Forbidden when api-key doesn't have access to interface", () => {
+			test("returns 200 Ok, even though the api-key doesn't have access to interface", () => {
 				const createdApiKeyNode = nodeConnection.create({
 					_name: API_KEY_NAME,
 					_nodeType: NodeType.API_KEY,
@@ -359,11 +349,11 @@ describe('webapp', () => {
 						},
 					});
 					// log.debug('response:%s', response);
-					expect(response.status).toBe(403);
+					expect(response.status).toBe(200);
 				});
 			});
 
-			test("returns 404 Not found when interface doesn't exist", () => {
+			test("returns 200 Ok, even though the interface doesn't exist", () => {
 				// const modifiedApiKeyNode =
 				nodeConnection.modify({
 					key: apiKeyNodeId,
@@ -382,11 +372,11 @@ describe('webapp', () => {
 						},
 					});
 					// log.debug('response:%s', response);
-					expect(response.status).toBe(404);
+					expect(response.status).toBe(200);
 				});
 			});
 
-			test("returns 200 kK when api-key has access to interface", () => {
+			test("returns 200 Ok when api-key has access to interface", () => {
 				// const modifiedApiKeyNode =
 				nodeConnection.modify({
 					key: apiKeyNodeId,
@@ -408,6 +398,19 @@ describe('webapp', () => {
 					});
 					// log.debug('response:%s', response);
 					expect(response.status).toBe(200);
+				});
+			});
+
+			test('returns 200 Ok even though explorer-interface-name is not in the request headers', () => {
+				import('../../../src/main/resources/webapp/interface/post').then((moduleName) => {
+					expect(moduleName.post({
+						body: JSON.stringify({
+							"query": "\n    query IntrospectionQuery {\n      __schema {\n        queryType { name }\n        mutationType { name }\n        subscriptionType { name }\n        types {\n          ...FullType\n        }\n        directives {\n          name\n          description\n          locations\n          args {\n            ...InputValue\n          }\n        }\n      }\n    }\n\n    fragment FullType on __Type {\n      kind\n      name\n      description\n      fields(includeDeprecated: true) {\n        name\n        description\n        args {\n          ...InputValue\n        }\n        type {\n          ...TypeRef\n        }\n        isDeprecated\n        deprecationReason\n      }\n      inputFields {\n        ...InputValue\n      }\n      interfaces {\n        ...TypeRef\n      }\n      enumValues(includeDeprecated: true) {\n        name\n        description\n        isDeprecated\n        deprecationReason\n      }\n      possibleTypes {\n        ...TypeRef\n      }\n    }\n\n    fragment InputValue on __InputValue {\n      name\n      description\n      type { ...TypeRef }\n      defaultValue\n    }\n\n    fragment TypeRef on __Type {\n      kind\n      name\n      ofType {\n        kind\n        name\n        ofType {\n          kind\n          name\n          ofType {\n            kind\n            name\n            ofType {\n              kind\n              name\n              ofType {\n                kind\n                name\n                ofType {\n                  kind\n                  name\n                  ofType {\n                    kind\n                    name\n                  }\n                }\n              }\n            }\n          }\n        }\n      }\n    }\n  "
+						}),
+						headers: {
+							'authorization': `Explorer-Api-Key ${API_KEY}`,
+						},
+					}).status).toBe(200);
 				});
 			});
 
