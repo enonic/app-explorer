@@ -3,11 +3,13 @@ plugins {
 	id 'maven-publish' // Provides publishing and publishToMavenLocal
 	id 'com.enonic.defaults' version '2.1.2' // Publishing
 	id 'com.enonic.xp.app' version '3.4.0'
-
-	//id 'com.moowork.node' version '1.3.1'
 	id 'com.github.node-gradle.node' version '5.0.0'
 }
 
+// XP 7.12 and below requires Java 11
+// compileJava {
+// 	options.release = 17
+// }
 
 repositories {
 	mavenLocal()
