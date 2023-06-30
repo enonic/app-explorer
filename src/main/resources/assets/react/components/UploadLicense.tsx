@@ -10,16 +10,11 @@ import {
 } from 'semantic-ui-react';
 
 
-type FileWithLastModifiedDate = File & {
-	lastModifiedDate :Date
-}
-
-
-export const UploadLicense = (props :{
-	servicesBaseUrl :string
-	setLicensedTo :SetLicensedToFunction
-	setLicenseValid :SetLicenseValidFunction
-	whenValid ?:() => void
+export const UploadLicense = (props: {
+	servicesBaseUrl: string
+	setLicensedTo: SetLicensedToFunction
+	setLicenseValid: SetLicenseValidFunction
+	whenValid?: () => void
 }) => {
 	const {
 		servicesBaseUrl,
@@ -29,7 +24,7 @@ export const UploadLicense = (props :{
 	} = props;
 
 	const [uploadedLicenseValid, setUploadedLicenseValid] = React.useState(true);
-	const [file, setFile] = React.useState<FileWithLastModifiedDate>();
+	const [file, setFile] = React.useState<File>();
 	const [license, setLicense] = React.useState<string>();
 
 	React.useEffect(() => {
@@ -84,9 +79,9 @@ export const UploadLicense = (props :{
 							<Message.Content>Uploaded license invalid, please try again.</Message.Content>
 						</Message>}
 					<Input
-						onChange={(event :React.ChangeEvent<HTMLInputElement>) => {
+						onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
 							//console.debug(event);
-							setFile(event.target.files[0] as FileWithLastModifiedDate);
+							setFile(event.target.files[0]);
 						}}
 						type='file'
 					/>
@@ -100,7 +95,7 @@ export const UploadLicense = (props :{
 							</Table.Row>
 							<Table.Row>
 								<Table.HeaderCell collapsing>Filetype</Table.HeaderCell>
-								<Table.Cell>{file.type}</Table.Cell>
+								<Table.Cell>{file.type || 'unknown'}</Table.Cell>
 							</Table.Row>
 							<Table.Row>
 								<Table.HeaderCell collapsing>Size in bytes</Table.HeaderCell>
@@ -109,7 +104,7 @@ export const UploadLicense = (props :{
 							<Table.Row>
 								<Table.HeaderCell collapsing>Last modified date</Table.HeaderCell>
 								<Table.Cell>{
-									file.lastModifiedDate.toLocaleDateString()
+									new Date(file.lastModified).toLocaleDateString()
 								}</Table.Cell>
 							</Table.Row>
 							<Table.Row>
