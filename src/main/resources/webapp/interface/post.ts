@@ -21,7 +21,7 @@ import 'core-js/stable/reflect';
 import {HTTP_HEADERS} from '@enonic/explorer-utils';
 
 import { RESPONSE_TYPE_JSON } from '@enonic/js-utils';
-import { toStr } from '@enonic/js-utils/value/toStr';
+// import { toStr } from '@enonic/js-utils/value/toStr';
 import lcKeys from '@enonic/js-utils/object/lcKeys';
 
 //@ts-ignore
@@ -49,12 +49,12 @@ function authorize({
 }: {
 	request: EnonicXpRequest
 }): Response {
-	//log.debug('isUnauthorized interfaceName:%s request:%s', interfaceName, toStr(request));
+	// log.debug('isUnauthorized interfaceName:%s request:%s', interfaceName, toStr(request));
 	const {
 		 // HTTP/2 uses lowercase header keys
 		'authorization': authorization//, // 'Explorer-Api-Key XXXX
 	} = lcKeys(request.headers) as Headers;
-	//log.debug(`authorization:${toStr(authorization)}`);
+	// log.debug(`authorization:${toStr(authorization)}`);
 	if(!authorization) {
 		log.error(`Authorization header missing!`);
 		return { status: HTTP_RESPONSE_STATUS_CODES.UNAUTHORIZED };
@@ -64,13 +64,13 @@ function authorize({
 		return { status: HTTP_RESPONSE_STATUS_CODES.BAD_REQUEST };
 	}
 	const apiKey = authorization.substring(AUTHORIZATION_PREFIX.length);
-	//log.debug(`apiKey:${toStr(apiKey)}`);
+	// log.debug(`apiKey:${toStr(apiKey)}`);
 	if (!apiKey) {
 		log.error(`ApiKey not found in Authorization header:${authorization}!`);
 		return { status: HTTP_RESPONSE_STATUS_CODES.BAD_REQUEST };
 	}
 	const hashedApiKey = hash(apiKey);
-	//log.debug(`hashedApiKey:${toStr(hashedApiKey)}`);
+	// log.debug(`hashedApiKey:${toStr(hashedApiKey)}`);
 
 	const explorerRepoReadConnection = connect({ principals: [PRINCIPAL_EXPLORER_READ] });
 	const matchingApiKeys = explorerRepoReadConnection.query({
@@ -92,7 +92,7 @@ function authorize({
 		},
 		query: ''
 	});
-	//log.debug(`matchingApiKeys:${toStr(matchingApiKeys)}`);
+	// log.debug(`matchingApiKeys:${toStr(matchingApiKeys)}`);
 	if(matchingApiKeys.total !== 1) {
 		log.error(`API key hashedApiKey:${hashedApiKey} not found!`);
 		return {
@@ -103,13 +103,13 @@ function authorize({
 			status: HTTP_RESPONSE_STATUS_CODES.FORBIDDEN
 		};
 	}
-	log.debug('matchingApiKeys.hits[0].id:%s', matchingApiKeys.hits[0].id);
+	// log.debug('matchingApiKeys.hits[0].id:%s', matchingApiKeys.hits[0].id);
 
 	const apiKeyNode = explorerRepoReadConnection.get<ApiKeyNode>(matchingApiKeys.hits[0].id);
 	// log.debug('apiKeyNode:%s', toStr(apiKeyNode));
 	let {interfaces = []} = apiKeyNode;
 	if (!Array.isArray(interfaces)) { interfaces = [interfaces]; }
-	//log.debug(`interfaces:${toStr(interfaces)}`);
+	// log.debug(`interfaces:${toStr(interfaces)}`);
 
 	return { // Authorized
 		body: JSON.stringify({
@@ -149,8 +149,8 @@ export function overrideable(request: InterfaceRequest, fn = authorize): Respons
 
 	const requestBody = JSON.parse(bodyJson);
 	const {query, variables} = requestBody;
-	//log.debug('query:%s', query);
-	//log.debug(`variables:${toStr(variables)}`);
+	// log.debug('query:%s', query);
+	// log.debug(`variables:${toStr(variables)}`);
 	const context: GraphQLContext = {
 		allowedInterfaces,
 		interfaceName,
