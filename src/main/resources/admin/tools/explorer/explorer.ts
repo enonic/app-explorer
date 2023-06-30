@@ -1,8 +1,12 @@
+import type { InterfaceRequest } from '../../../webapp/interface/post';
+
+
 import { Role } from '@enonic/explorer-utils';
 // import {toStr} from '@enonic/js-utils';
 //@ts-ignore
 import newRouter from '/lib/router';
 import {hasRole} from '/lib/xp/auth';
+import {HTTP_HEADERS} from '@enonic/explorer-utils';
 //import {htmlResponse} from '/admin/tools/explorer/htmlResponse';
 import {htmlResponse} from './htmlResponse';
 
@@ -44,11 +48,17 @@ router.all('/', (r) => {
 });
 
 
-router.post('/api/v1/interface', (r) => {
+router.post('/api/v1/interface', (r: InterfaceRequest) => {
 	// log.info('/api/v1/interface request:%s', toStr(r));
 	return interfacePost(
 		r,
-		() => false // false means always authorized
+		() => ({
+			body: JSON.stringify({
+				allowedInterfaces: [r.headers[HTTP_HEADERS.EXPLORER_INTERFACE_NAME]]
+			}),
+			contentType: 'text/json;charset=utf-8',
+			status: 200,
+		})
 	);
 });
 
