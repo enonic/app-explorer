@@ -20,16 +20,12 @@ import 'core-js/stable/reflect';
 // import {HTTP_HEADERS} from '@enonic/explorer-utils/src';
 import {HTTP_HEADERS} from '@enonic/explorer-utils';
 
-import {
-	RESPONSE_TYPE_JSON,
-	toStr,
-} from '@enonic/js-utils';
-import { includes as arrayIncludes } from '@enonic/js-utils/array/includes';
+import { RESPONSE_TYPE_JSON } from '@enonic/js-utils';
+import { toStr } from '@enonic/js-utils/value/toStr';
 import lcKeys from '@enonic/js-utils/object/lcKeys';
 
 //@ts-ignore
 import {execute} from '/lib/graphql';
-import {exists as interfaceExists} from '/lib/explorer/interface/exists';
 import {
 	NT_API_KEY,
 	PRINCIPAL_EXPLORER_READ
@@ -48,13 +44,11 @@ export type InterfaceRequest = EnonicXpRequest<EmptyObject>
 const AUTHORIZATION_PREFIX = 'Explorer-Api-Key ';
 
 
-function isUnauthorized({
-	interfaceName,
+function authorize({
 	request
 }: {
-	interfaceName: string
 	request: EnonicXpRequest
-}): Response | false {
+}): Response {
 	//log.debug('isUnauthorized interfaceName:%s request:%s', interfaceName, toStr(request));
 	const {
 		 // HTTP/2 uses lowercase header keys
@@ -116,29 +110,18 @@ function isUnauthorized({
 	let {interfaces = []} = apiKeyNode;
 	if (!Array.isArray(interfaces)) { interfaces = [interfaces]; }
 	//log.debug(`interfaces:${toStr(interfaces)}`);
-	if (!arrayIncludes(interfaces, interfaceName)) {
-		log.error(`API key hashedApiKey:${hashedApiKey} doesn't have read access to interface:${interfaceName}!`);
-		return {
-			body: JSON.stringify({
-				message: 'Forbidden'
-			}),
-			contentType: 'text/json;charset=utf-8',
-			status: HTTP_RESPONSE_STATUS_CODES.FORBIDDEN
-		};
+
+	return { // Authorized
+		body: JSON.stringify({
+			allowedInterfaces: interfaces,
+		}),
+		contentType: 'text/json;charset=utf-8',
+		status: HTTP_RESPONSE_STATUS_CODES.OK
 	}
-	//log.debug(`interfaceName:${toStr(interfaceName)}`);
-	if (!interfaceExists({
-		connection: explorerRepoReadConnection,
-		name: interfaceName
-	})) {
-		log.error(`interface:${interfaceName} doesn't exist!`);
-		return {status: HTTP_RESPONSE_STATUS_CODES.NOT_FOUND};
-	}
-	return false; // Authorized
-} // isUnauthorized
+} // authorize
 
 
-export function overrideable(request: InterfaceRequest, fn = isUnauthorized): Response {
+export function overrideable(request: InterfaceRequest, fn = authorize): Response {
 	// log.debug('overrideable request:%s', toStr(request));
 
 	const {
@@ -152,45 +135,45 @@ export function overrideable(request: InterfaceRequest, fn = isUnauthorized): Re
 		'explorer-log-synonyms-query-result': logSynonymsQueryResultHeader // '1'
 	} = lcKeys(request.headers) as Headers;
 
-	if (!interfaceName) {
-		log.error(`interfaceName not provided!`);
-		return { status: HTTP_RESPONSE_STATUS_CODES.NOT_FOUND };
-	}
-
-	const unauthorized = fn({
-		interfaceName,
+	const maybeResponse = fn({
+		// interfaceName,
 		request
 	});
 
-	if (unauthorized) { return unauthorized; }
+	if (maybeResponse && maybeResponse.status !== 200 ) {
+		return maybeResponse;
+	}
 
-	const body = JSON.parse(bodyJson);
-	const {query, variables} = body;
+	const { allowedInterfaces = [] } = JSON.parse(maybeResponse.body);
+	// log.debug('allowedInterfaces:%s', toStr(allowedInterfaces));
+
+	const requestBody = JSON.parse(bodyJson);
+	const {query, variables} = requestBody;
 	//log.debug('query:%s', query);
 	//log.debug(`variables:${toStr(variables)}`);
 	const context: GraphQLContext = {
+		allowedInterfaces,
 		interfaceName,
 		logQuery: logQueryHeader === '1',
 		logSynonymsQuery: logSynonymsQueryHeader === '1',
 		logSynonymsQueryResult: logSynonymsQueryResultHeader === '1'//,
 		//query
 	};
-	//log.debug(`context:${toStr(context)}`);
+	// log.debug('context:%s', toStr(context));
 
 	const schema = getCachedSchema();
 
 	return {
-		//body: JSON.stringify(execute(generateSchemaForInterface(interfaceName), query, variables, context))
 		body: JSON.stringify(execute(schema, query, variables, context)),
 		contentType: RESPONSE_TYPE_JSON,
 		status: 200
 	};
-}
+} // overrideable
 
 
 export function post(request: InterfaceRequest): Response {
 	// log.debug('post request:%s', toStr(request));
-	const response = overrideable(request, isUnauthorized);
+	const response = overrideable(request, authorize);
 	// log.debug('post response:%s', toStr(response));
 	return response;
 }
