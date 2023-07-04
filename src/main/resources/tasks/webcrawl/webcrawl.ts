@@ -192,16 +192,23 @@ const outerHTML = (node: Cheerio<AnyNode>) => node.clone().wrap('<div>').parent(
 const REPLACEMENT = '&#129'; // HOP illegal in html :)
 const REPLACE_ALL_REPLACEMENT_REGEXP = new RegExp(`${REPLACEMENT}+`, 'g');
 function getText(node: Cheerio<AnyNode>) {
+	TRACE && log.debug('getText(%s)', node);
 	// Note that while textContent gets the content of all elements, including <script> and <style> elements, innerText, doesn't.
 	// innerText is also aware of style and will not return the text of hidden elements, whereas textContent will.
 	// log.info('textContent:%s', node.prop('textContent'));
 	// log.info('innerText:%s', node.prop('innerText')); // These doesn't seem to be differences in whitespace between textContent and innerText
-	// log.info('innerHTML:%s', node.prop('innerHTML'));
+	TRACE && log.info('getText innerHTML:%s', node.prop('innerHTML'));
 	// return node.prop('innerText').replace(/(\r\n|\n|\r)/gm, ' '); // No whitespace bewteen elements :(
- 	return node
+	const innerHTML = node.prop('innerHTML');
+	if (!innerHTML) {
+		DEBUG && log.warning('getText innerHTML is empty!');
+		return '';
+	}
+	return innerHTML
+ 	// return node
  		// .text() // No whitespace bewteen elements :(
 		// .html() // is this the same as innerHTML or outerHTML ?
-		.prop('innerHTML')
+		// .prop('innerHTML')
  		//.replaceAll(/<\/?[a-zA-Z0-9=" ]*>/g, ' ') // This doesn't handle <!-- --> and more
 		// How to handle tags inside comments... <!-- <div></div> -->
 		.replace(/<\/?[^>]+>/g, REPLACEMENT)
