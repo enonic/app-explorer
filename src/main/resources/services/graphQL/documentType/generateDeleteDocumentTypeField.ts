@@ -25,6 +25,7 @@ export function generateDeleteDocumentTypeField({
 			if (array.length !== 1 ) {
 				throw new Error(`Something went wrong while trying to delete documentType with id:${_id}!`);
 			}
+			writeConnection.refresh();
 			return {
 				_id: array[0]
 			};

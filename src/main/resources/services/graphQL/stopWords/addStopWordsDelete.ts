@@ -27,11 +27,10 @@ export function addStopWordsDelete({glue}) {
 			const deleteStopwordsRes = writeConnection.delete(_id);
 			//log.debug('deleteStopwordsRes:%s', toStr(deleteStopwordsRes));
 
-			if (deleteStopwordsRes.length === 1 ) {
-				writeConnection.refresh(); // So the data becomes immidiately searchable
-			} else {
+			if (deleteStopwordsRes.length !== 1 ) {
 				throw new Error(`Something went wrong when trying to delete apiKey with id:${_id}`);
 			}
+			writeConnection.refresh(); // So the data becomes immidiately searchable
 			return {
 				_id: deleteStopwordsRes[0]
 			};
