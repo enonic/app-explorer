@@ -1,3 +1,4 @@
+import type { Node } from '/lib/xp/node';
 import type {
 	AnyNode,
 	Cheerio,
@@ -91,6 +92,16 @@ type Url = {
 	normalize: () => string
 }
 
+
+interface WebCrawlDocument {
+	// displayName: string
+	links?: string[]
+	text: string
+	title: string
+	url: string
+	_id?: string
+	html?: string
+}
 
 /*function normalizeUri(uri) {
   return encodeURI(decodeURI(uri))
@@ -288,10 +299,10 @@ export function run({
 	const seenUrisObj = {[normalizedentryPointUrl]: true};
 	const queueArr = [normalizedentryPointUrl];
 
-	function throwIfExcluded(normalized: string) {
+	function throwIfExcluded(urlWithoutSchemeAndDomain: string) {
 		for (let i = 0; i < excludeRegExps.length; i += 1) {
-			if (excludeRegExps[i].test(normalized)) {
-				throw new RobotsException(normalized, 'Matches an exclude regexp!');
+			if (excludeRegExps[i].test(urlWithoutSchemeAndDomain)) {
+				throw new RobotsException(urlWithoutSchemeAndDomain, 'Matches an exclude regexp!');
 			}
 		}
 	}
@@ -332,13 +343,11 @@ export function run({
 					_parentPath: '/',
 					_name: nodeName
 				})) {
-					const node = get<{
-						links: string[]|string
-					}>({
+					const node = get<WebCrawlDocument>({
 						connection: collector.collection.connection,
 						_name: nodeName
 					});
-					const {links} = node;
+					const {links} = node as Node<WebCrawlDocument>;
 					forceArray(links).forEach(normalized => handleNormalizedUri(normalized));
 				} // exists
 			} else { // !resume
