@@ -21,7 +21,7 @@ export function generateDeleteSynonymField({
 			//log.debug(`_id:${toStr(_id)}`);
 			const writeConnection = connect({ principals: [PRINCIPAL_EXPLORER_WRITE] });
 			const array = writeConnection.delete(_id);
-			if (array.length !== 1 ) {
+			if (array.length !== 1) {
 				throw new Error(`Something went wrong while trying to delete synonym with id:${_id}!`);
 			}
 			writeConnection.refresh();

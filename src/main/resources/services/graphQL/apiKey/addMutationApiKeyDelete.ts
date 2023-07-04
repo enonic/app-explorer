@@ -38,11 +38,10 @@ export function addMutationApiKeyDelete({glue}) {
 			const deleteApiKeyRes = writeConnection.delete(_id);
 			log.debug('deleteApiKeyRes:%s', toStr(deleteApiKeyRes));
 
-			if (deleteApiKeyRes.length === 1 ) {
-				writeConnection.refresh(); // So the data becomes immidiately searchable
-			} else {
+			if (deleteApiKeyRes.length !== 1 ) {
 				throw new Error(`Something went wrong when trying to delete apiKey with id:${_id}`);
 			}
+			writeConnection.refresh(); // So the data becomes immidiately searchable
 			return {
 				_id: deleteApiKeyRes[0]
 			};
