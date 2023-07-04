@@ -31,6 +31,7 @@ export function addMutationInterfaceDelete({glue}) {
 			if (array.length !== 1 ) {
 				throw new Error(`Something went wrong while trying to delete interface with id:${_id}!`);
 			}
+			writeConnection.refresh(); // Fix #821 Deleting an interface causes white page
 			return {
 				_id: array[0]
 			};

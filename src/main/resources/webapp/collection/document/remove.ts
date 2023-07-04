@@ -119,6 +119,7 @@ export function remove(
 			const deleteRes = writeToCollectionBranchConnection.delete(id);
 			if (deleteRes.length === 1) {
 				item._id = getRes._id;
+				writeToCollectionBranchConnection.refresh();
 			} else {
 				item.error = `Unable to delete documents with _id = ${id}!`;
 			}
