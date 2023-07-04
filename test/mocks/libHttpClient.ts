@@ -9,9 +9,9 @@ interface HttpClientRequest {
 }
 
 interface HttpClientResponse {
-	body: string
-	contentType: string
-	headers: Record<string, string>
+	body?: string
+	contentType?: string
+	headers?: Record<string, string>
 	status: number
 }
 
@@ -36,9 +36,19 @@ Disallow: */docs/`,
 					status: 200
 				}
 			} else if (url.startsWith('https://www.enonic.com/')) {
-				// @ts-ignore
 				return {
 					status: 404,
+				};
+			} else if (url === 'https://www.example.com/robots.txt') {
+				return {
+					status: 404,
+				};
+			} else if (url === 'https://www.example.com/') {
+				return {
+					body: `<html/>`,
+					contentType: 'text/html; charset=utf-8',
+					headers: {},
+					status: 200,
 				};
 			} else {
 				throw new Error(`Unmocked request url:${url} request:${toStr(request)}`);
