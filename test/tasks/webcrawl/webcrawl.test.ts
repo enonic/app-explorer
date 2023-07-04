@@ -42,6 +42,9 @@ const COLLECTOR_CONFIG = {
 	excludes: ["^/blog.*$"],
 	maxPages: 100,
 }
+const COLLECTOR_CONFIG2 = {
+	baseUri: "https://www.example.com"
+}
 const CONFIG_JSON = JSON.stringify(COLLECTOR_CONFIG);
 const LANGUAGE = 'en';
 const NAME = 'name';
@@ -95,8 +98,12 @@ javaBridge.repo.create({
 	id: Repo.JOURNALS
 });
 const REPO_COLLECTION_TEST = `${COLLECTION_REPO_PREFIX}test_collection`;
+const REPO_COLLECTION_TEST2 = `${COLLECTION_REPO_PREFIX}test_collection2`;
 javaBridge.repo.create({
 	id: REPO_COLLECTION_TEST
+});
+javaBridge.repo.create({
+	id: REPO_COLLECTION_TEST2
 });
 //──────────────────────────────────────────────────────────────────────────────
 // Mocks
@@ -165,6 +172,17 @@ const createdCollection = nodeConnection.create({
 		name: 'com.enonic.app.explorer:webcrawl',
 		configJson: CONFIG_JSON,
 		config: COLLECTOR_CONFIG
+	}
+});
+const createdCollection2 = nodeConnection.create({
+	_name: 'test_collection2',
+	_nodeType: NodeType.COLLECTION,
+	_parentPath: Path.COLLECTIONS,
+	language: 'en',
+	collector: {
+		name: 'com.enonic.app.explorer:webcrawl',
+		configJson: JSON.stringify(COLLECTOR_CONFIG2),
+		config: COLLECTOR_CONFIG2
 	}
 });
 const createdDocumentType = nodeConnection.create({
@@ -273,8 +291,9 @@ describe('webcrawl', () => {
 			});
 			const journalNode = journalConnection.get<JournalNode>('00000000-0000-4000-8000-000000000002');
 			// log.error('journalNode:%s', journalNode);
+			expect(journalNode.errorCount).toBe(0);
 			expect(journalNode.successCount).toBe(1);
-			expect(journalNode.warnings.length).toBe(48);
+			expect(journalNode.warningCount).toBe(48);
 
 			const collectionConnection = connect({
 				branch: 'master',
@@ -289,6 +308,59 @@ describe('webcrawl', () => {
 			expect(documentNode.links.length).toBe(51);
 			expect(documentNode.title).toBe('Take control of your content: Composable content platform without limitations');
 			expect(documentNode.url).toBe('https://www.enonic.com/');
+		});
+	});
+
+	it('handles invalid html', () => {
+		import('../../../src/main/resources/tasks/webcrawl/webcrawl').then((moduleName) => {
+			moduleName.run({
+				collectionId: createdCollection2._id,
+				collectorId: createdDocumentType._id, // COLLECTOR_ID,
+				configJson: JSON.stringify(COLLECTOR_CONFIG2),
+				language: LANGUAGE,
+				name: NAME,
+			})
+			// javaBridge.repo.list().forEach((repo) => {
+			// 	// log.debug('repo:%s', repo);
+			// 	const { id: repoId } = repo;
+			// 	log.error('repoId:%s', repoId);
+			// 	const nodeConnection = connect({
+			// 		branch: 'master',
+			// 		repoId
+			// 	});
+			// 	const queryRes = nodeConnection.query({});
+			// 	// log.debug('queryRes:%s', queryRes);
+			// 	queryRes.hits.forEach((hit) => {
+			// 		const {id} = hit;
+			// 		const node = nodeConnection.get(id);
+			// 		log.error('node:%s', node);
+			// 	});
+			// });
+			const journalConnection = connect({
+				branch: 'master',
+				repoId: Repo.JOURNALS
+			});
+			const journalNode = journalConnection.get<JournalNode>('00000000-0000-4000-8000-000000000004');
+			// log.error('journalNode:%s', journalNode);
+			expect(journalNode.errorCount).toBe(0);
+			expect(journalNode.successCount).toBe(1);
+			expect(journalNode.warningCount).toBe(0);
+
+			const collectionConnection = connect({
+				branch: 'master',
+				repoId: REPO_COLLECTION_TEST2
+			});
+			const documentNode = collectionConnection.get<Node<{
+				links: string[]
+				text: string
+				title: string
+				url: string
+			}>>('00000000-0000-4000-8000-000000000002');
+			// log.error('documentNode:%s', documentNode);
+			expect(documentNode.links).toBe(undefined);
+			expect(documentNode.text).toBe('');
+			expect(documentNode.title).toBe('');
+			expect(documentNode.url).toBe('https://www.example.com/');
 		});
 	});
 });
