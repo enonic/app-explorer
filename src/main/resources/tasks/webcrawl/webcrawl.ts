@@ -357,7 +357,11 @@ export function run({
 				if (robots && !robots.isAllowed('', url)) {
 					throw new RobotsException(url, 'Not allowed in robots.txt');
 				}
-				throwIfExcluded(url);
+				const urlWithoutSchemeAndDomain = url
+					.replace(/^.*?:\/\//, '') // scheme http://
+					.replace(/^.*?\//, '/') // domain www.enonic.com
+				TRACE && log.debug('urlWithoutSchemeAndDomain:%s', urlWithoutSchemeAndDomain);
+				throwIfExcluded(urlWithoutSchemeAndDomain);
 				const res = httpClientRequest({
 					followRedirects: true, // https://www.enonic.com uses 302
 					headers: { // HTTP/2 uses lowercase header keys
