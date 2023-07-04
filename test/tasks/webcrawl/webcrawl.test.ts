@@ -39,8 +39,8 @@ import mockLibXpValue from '../../mocks/libXpValue';
 // const COLLECTOR_ID = 'collectorId';
 const COLLECTOR_CONFIG = {
 	baseUri: "https://www.enonic.com",
-	maxPages: 10,
-	// excludes: "^/blog.*$"
+	excludes: ["^/blog.*$"],
+	maxPages: 100,
 }
 const CONFIG_JSON = JSON.stringify(COLLECTOR_CONFIG);
 const LANGUAGE = 'en';
@@ -274,7 +274,7 @@ describe('webcrawl', () => {
 			const journalNode = journalConnection.get<JournalNode>('00000000-0000-4000-8000-000000000002');
 			// log.error('journalNode:%s', journalNode);
 			expect(journalNode.successCount).toBe(1);
-			expect(journalNode.warnings.length).toBe(9);
+			expect(journalNode.warnings.length).toBe(48);
 
 			const collectionConnection = connect({
 				branch: 'master',
