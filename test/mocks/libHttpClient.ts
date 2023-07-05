@@ -23,12 +23,16 @@ export default function mockLibHttpClient() {
 				return {
 					body: `Sitemap: https://enonic.com/sitemap.xml,
 User-agent: *
-Disallow: */docs/`,
+Disallow: /platform
+Noindex: /resources/case-studies`,
 					contentType: 'text/plain; charset=utf-8',
 					headers: {},
 					status: 200
 				};
-			} else if (url === 'https://www.enonic.com/') {
+			} else if (
+				url === 'https://www.enonic.com/'
+				|| url === 'https://www.enonic.com/resources/case-studies/nav-headless-next-js'
+			) {
 				return {
 					body: readFileSync(join(__dirname, 'enonic.com.html')).toString(),
 					contentType: 'text/html; charset=utf-8',

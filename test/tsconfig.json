@@ -33,7 +33,7 @@
 		"strict": false,
 		"strictFunctionTypes": false,
 		"strictNullChecks": false,
-		"target": "ES5",
+		"target": "ES2022", // Recommended for Node 18 (tests fail with ES5)
 		"types": [
 			"@enonic-types/global"
 		],

@@ -143,6 +143,7 @@
     "graphql-ws": "^5",
     "is-generator-function": "^1",
     "jest": "^29.5.0",
+    "jest-environment-jsdom": "^29.6.0",
     "less": "^4",
     "mini-css-extract-plugin": "^2",
     "npm-build-tools": "^2",
