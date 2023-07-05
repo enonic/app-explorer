@@ -103,7 +103,7 @@
     "@enonic-types/lib-value": "^7",
     "@enonic-types/lib-vhost": "^7",
     "@enonic/explorer-utils": "^0.2.0",
-    "@enonic/mock-xp": "^0.8.0",
+    "@enonic/mock-xp": "^0.8.1",
     "@graphiql/plugin-explorer": "^0.1.12",
     "@jest/globals": "^29",
     "@seamusleahy/values-changes-hooks": "^1.0.0-alpha",
