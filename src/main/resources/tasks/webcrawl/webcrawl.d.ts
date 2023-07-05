@@ -8,6 +8,12 @@ export interface CollectorConfig {
 	userAgent?: string
 }
 
+export type RobotsTxt = {
+	isAllowed: (userAgent: string, path: string) => boolean
+	isDisallowAll: (userAgent: string) => boolean
+	isIndexable: (userAgent: string, path: string) => boolean
+}
+
 // NOTE: Using type instead of interface, because interface doesn't satify NestedRecord
 export type WebCrawlConfig = {
 	baseUri?: string
