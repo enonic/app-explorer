@@ -79,8 +79,8 @@ global.log = Log.createLogger({
 	// loglevel: 'debug'
 	// loglevel: 'info'
 	// loglevel: 'warn'
-	loglevel: 'error'
-	// loglevel: 'silent'
+	// loglevel: 'error'
+	loglevel: 'silent'
 });
 
 const javaBridge = new JavaBridge({
@@ -290,10 +290,11 @@ describe('webcrawl', () => {
 				repoId: Repo.JOURNALS
 			});
 			const journalNode = journalConnection.get<JournalNode>('00000000-0000-4000-8000-000000000002');
-			// log.error('journalNode:%s', journalNode);
+			log.info('journalNode:%s', journalNode);
 			expect(journalNode.errorCount).toBe(0);
 			expect(journalNode.successCount).toBe(1);
-			expect(journalNode.warningCount).toBe(48);
+			expect(journalNode.warningCount).toBe(36);
+			expect(journalNode.informations.length).toBe(14);
 
 			const collectionConnection = connect({
 				branch: 'master',

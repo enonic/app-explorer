@@ -4,10 +4,7 @@ import type {
 	Cheerio,
 	SelectorType
 } from 'cheerio';
-import type {
-	HttpClientRequest,
-	Response
-} from '@enonic-types/lib-explorer';
+import type { Response } from '@enonic-types/lib-explorer';
 import type { WebCrawlConfig } from './webcrawl.d';
 
 
@@ -22,22 +19,11 @@ import 'core-js/stable/array/includes';
 // TypeError: Object.getOwnPropertyDescriptors is not a function
 require('object.getownpropertydescriptors').shim(); // eslint-disable-line @typescript-eslint/no-var-requires
 
-// import 'babel-es6-polyfill'; // TypeError: Cannot read property "document" from undefined
-
-// Polyfill Reflect to avoid "Reflect" not defined.
-// But introduces: TypeError: null has no such function "ownKeys"
-// var Reflect = require('harmony-reflect');
-
-// 'use strict'; // This doesn't help debugging: TypeError: Cannot read property "Symbol" from undefined
-
-// import 'symbol-es6'; // This does not fix: TypeError: Cannot read property "Symbol" from undefined
-
 import {
 	// VALUE_TYPE_STRING,
 	forceArray,
 	toStr
 } from '@enonic/js-utils';
-import guard from 'robots-txt-guard';
 
 // Cheerio import causes:
 // TypeError: Cannot read property "TYPED_ARRAY_SUPPORT" from undefined
@@ -51,46 +37,25 @@ import { ElementType } from "domelementtype";
 // import safeStringify from 'fast-safe-stringify';
 // import {parseDOM} from 'htmlparser2';
 
-// WARNING Causes TypeError: Cannot read property "Symbol" from undefined in production mode!
-/*import { // Runtime Errors with MAP and symbol?
+// WARNING: Causes TypeError: Cannot read property "Symbol" from undefined in production mode!
+// NOTE: Now that the server files are build using tsup, the error seems gone on my laptop.
+import { // Runtime Errors with MAP and symbol?
 	normalize, parse, resolve, serialize
-} from 'uri-js/src/uri.ts';
-// 'uri-js/dist/esnext/uri.js';
-// 'uri-js';*/
+} from 'uri-js';
 
-// import normalizeUrl from 'normalize-url'; // Uses reflect :(
-// import normalizeUri from 'normalize-uri';
-// import normalizeUrl from 'conservative-normalize-url';
-// import {resolve} from 'relative-to-absolute-iri';
-// import Uri from 'jsuri';
-// @ts-ignore
-import {URL} from '/lib/galimatias';
 // @ts-ignore
 import {request as httpClientRequest} from '/lib/http-client';
 
 import {exists} from '/lib/explorer/node/exists';
 import {get} from '/lib/explorer/node/get';
 import {hash} from '/lib/explorer/string/hash';
-
 import {Collector} from '/lib/explorer/collector/Collector';
-
 import ContentTypeException from './ContentTypeException';
-import {parseRobotsTxt} from './parseRobotsTxt';
+import getRobotsTxt from './getRobotsTxt';
 import NotFoundException from './NotFoundException';
 import RobotsException from './RobotsException';
-
-
-type RobotsTxt = {
-	isAllowed: (userAgent: string, path: string) => boolean
-	isDisallowAll: (userAgent: string) => boolean
-	isIndexable: (userAgent: string, path: string) => boolean
-}
-
-type Url = {
-	getHost: () => string
-	getScheme: () => string
-	normalize: () => string
-}
+import throwIfNotAllowed from './throwIfNotAllowed';
+import throwIfNotIndexable from './throwIfNotIndexable';
 
 
 interface WebCrawlDocument {
@@ -103,12 +68,7 @@ interface WebCrawlDocument {
 	html?: string
 }
 
-/*function normalizeUri(uri) {
-  return encodeURI(decodeURI(uri))
-}*/
-
-
-const DEBUG = false;
+const DEBUG = true;
 const TRACE = false;
 
 const DEFAULT_UA = 'Mozilla/5.0 (compatible; Enonic XP Explorer Collector Web crawler/1.0.0)';
@@ -255,53 +215,19 @@ export function run({
 
 	const excludeRegExps = forceArray(excludes).map(str => new RegExp(str));
 
-	// Galimatias
 	if (!baseUri.includes('://')) { baseUri = `https://${baseUri}`;}
-	const entryPointUrlObj: Url = new URL(baseUri);
+	const entryPointUrlObj = parse(baseUri);
 
-	const normalizedentryPointUrl = entryPointUrlObj.normalize();
+	const normalizedentryPointUrl = normalize(baseUri);
 	DEBUG && log.debug('normalizedentryPointUrl:%s', normalizedentryPointUrl);
 
-	const domain = entryPointUrlObj.getHost();
+	const domain = entryPointUrlObj.host;
 	DEBUG && log.debug('domain:%s', domain);
 
-	const scheme = entryPointUrlObj.getScheme();
+	const scheme = entryPointUrlObj.scheme;
 	DEBUG && log.debug('scheme:%s', scheme);
 
-	// jsuri
-	/*
-	const entryPointUrlObj = new Uri(baseUri); // log.debug(toStr({entryPointUrlObj}));
-	const domain = entryPointUrlObj.host(); // log.debug(`domain:${domain}`);
-	const scheme = entryPointUrlObj.protocol(); // log.debug(`scheme:${scheme}`);
-	*/
-
-	// uri-js
-	/*
-	const entryPointUrlObj = parse(baseUri)
-	const domain = entryPointUrlObj.host; // log.debug(toStr({domain}));
-	const scheme = entryPointUrlObj.scheme;
-	*/
-
-	const robotsReq: HttpClientRequest = {
-		contentType: 'text/plain',
-		followRedirects: false,
-		headers: { // HTTP/2 uses lowercase header keys
-			'accept': 'text/plain',
-			'accept-charset': 'utf-8, iso-8859-1;q=0.5, *;q=0.1',
-			'accept-encoding': 'identity', // Fix for  ID1ID2: actual != expected
-			'user-agent': userAgent
-		},
-		method: 'GET',
-		url: `${scheme}://${domain}/robots.txt`
-	};
-	DEBUG && log.debug('robotsReq:%s', toStr(robotsReq));
-
-	const robotsRes = httpClientRequest(robotsReq) as Response; // log.debug(toStr({robotsRes}));
-	let robots: RobotsTxt;
-	if(robotsRes.status === 200 && robotsRes.contentType === 'text/plain') {
-		robots = guard(parseRobotsTxt(robotsRes.body));
-	}
-	DEBUG && log.debug('robots:%s', toStr(robots));
+	const robots = getRobotsTxt(userAgent, scheme, domain); // object with functions
 
 	const seenUrisObj = {[normalizedentryPointUrl]: true};
 	const queueArr = [normalizedentryPointUrl];
@@ -335,7 +261,7 @@ export function run({
 		const url = queueArr.shift(); // Normalized before added to queue
 		DEBUG && log.debug('url:%s', url);
 
-		const baseUrlObj = new URL(url);
+		const baseUrlObj = parse(url);
 		// log.debug(toStr({baseUrlObj}));
 
 		try {
@@ -361,9 +287,11 @@ export function run({
 				collector.taskProgressObj.info.message = `Processing ${url}`;
 				collector.progress();
 				collector.taskProgressObj.current += 1; // eslint-disable-line no-param-reassign
-				if (robots && !robots.isAllowed('', url)) {
-					throw new RobotsException(url, 'Not allowed in robots.txt');
-				}
+				throwIfNotAllowed({
+					robots,
+					path: baseUrlObj.path,
+					userAgent: '', // TODO: Use the real user agent?
+				});
 				const urlWithoutSchemeAndDomain = url
 					.replace(/^.*?:\/\//, '') // scheme http://
 					.replace(/^.*?\//, '/') // domain www.enonic.com
@@ -504,44 +432,19 @@ export function run({
 								continue linksForLoop;
 							}
 
-							// Galimatias
-							const resolved = baseUrlObj.resolve(href);
-							TRACE && log.debug('resolved:%s', toStr(resolved));
+							const resolved = resolve(url, href);
+							DEBUG && log.debug('resolved:%s', resolved);
 
-							const resolvedUriObj = new URL(resolved);
-							TRACE && log.debug('resolvedUriObj:%s', toStr(resolvedUriObj));
+							const uriObj = parse(resolved);
+							DEBUG && log.debug('uriObj:%s', uriObj);
 
-							const currentHost = resolvedUriObj.getHost(); // null has no such function "toString" probably because javascript:void(0) doesn't have any host...
-							TRACE && log.debug('currentHost:%s', toStr(currentHost));
-
-							// jsuri
-							/*
-							const uriObj = new Uri(href);
-							const resolved = resolve(href, url); // log.debug(toStr({resolved}));
-							const resolvedUriObj = new Uri(resolved);
-							const currentHost = resolvedUriObj.host(); // log.debug(toStr({currentHost}));
-							*/
-
-							// uri-js
-							/*
-							const resolved = resolve(url, href); // log.debug(toStr({resolved}));
-							const uriObj = parse(resolved); // log.debug(toStr({uriObj}));
-							const currentHost = uriObj.host; // log.debug(toStr({host}));
-							*/
+							const currentHost = uriObj.host;
+							DEBUG && log.debug('currentHost:%s', currentHost);
 
 							if (currentHost === domain) {
-								// Galimatias
-								const normalized = resolvedUriObj.setFragment('').normalize();
-								DEBUG && log.debug('webcrawl: normalized:%s', toStr(normalized));
-
-								// jsuri
-								// resolvedUriObj.setAnchor('');
-								// const normalized = normalizeUrl(resolvedUriObj.toString()); log.debug(toStr({normalized}));
-								// const normalized = normalizeUri(resolvedUriObj.toString()); // log.debug(toStr({normalized}));
-
-								// uri-js
-								// delete uriObj.fragment;
-								// const normalized = normalize(serialize(uriObj)); // log.debug(toStr({normalized}));
+								delete uriObj.fragment;
+								const normalized = normalize(serialize(uriObj));
+								DEBUG && log.debug('normalized:%s', normalized);
 
 								if (!links.includes(normalized)) {
 									links.push(normalized);
@@ -555,7 +458,12 @@ export function run({
 					} // for linkEls
 				} // boolFollow
 
-				if (boolIndex && (!robots || robots.isIndexable('', url))) {
+				if (boolIndex) {
+					throwIfNotIndexable({
+						path: baseUrlObj.path,
+						robots,
+						userAgent: '', // TODO: Use the real user agent?
+					});
 					const documentToPersist: {
 						// displayName: string
 						links?: string[]
