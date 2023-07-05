@@ -5,6 +5,7 @@ import {
 } from '@jest/globals';
 import Log from '@enonic/mock-xp/dist/Log';
 import guard from 'robots-txt-guard';
+import { DEFAULT_UA } from '../../../src/main/resources/tasks/webcrawl/constants';
 import throwIfNotIndexable from '../../../src/main/resources/tasks/webcrawl/throwIfNotIndexable';
 
 //──────────────────────────────────────────────────────────────────────────────
@@ -36,9 +37,36 @@ describe('throwIfNotIndexable', () => {
 				"path": "/docs/",
 				"rule": "noindex",
 			}],
+		},{
+			"agents": [
+				"EnonicXpExplorerCollectorWebcrawlerBot",
+			],
+			"rules": [{
+				"path": "/docs/",
+				"rule": "noindex",
+			},{
+				"path": "/example/",
+				"rule": "noindex",
+			}],
 		}]
 	});
-	it("does NOT throw when indexable", () => {
+	it("does NOT throw when indexable (all browsers)", () => {
+		[
+			'/',
+			'/docs',
+			'/docs?',
+			'/docs#',
+			'/docsaddenum',
+			'/example/'
+		].forEach(path => {
+			expect(() => throwIfNotIndexable({
+				path,
+				robots,
+				userAgent: '',
+			})).not.toThrow();
+		});
+	});
+	it("does NOT throw when indexable (EnonicXpExplorerCollectorWebcrawlerBot)", () => {
 		[
 			'/',
 			'/docs',
@@ -49,11 +77,11 @@ describe('throwIfNotIndexable', () => {
 			expect(() => throwIfNotIndexable({
 				path,
 				robots,
-				userAgent: '',
+				userAgent: DEFAULT_UA,
 			})).not.toThrow();
 		});
 	});
-	it("throws when NOT indexable", () => {
+	it("throws when NOT indexable (all browsers)", () => {
 		[
 			'/docs/',
 			'/docs/?',
@@ -65,6 +93,22 @@ describe('throwIfNotIndexable', () => {
 				path,
 				robots,
 				userAgent: '',
+			})).toThrow('Not indexable in robots.txt');
+		})
+	});
+	it("throws when NOT indexable (EnonicXpExplorerCollectorWebcrawlerBot)", () => {
+		[
+			'/docs/',
+			'/docs/?',
+			'/docs/#',
+			'/docs/index.html',
+			'/docs/index.html?foo=bar',
+			'/example/'
+		].forEach(path => {
+			expect(() => throwIfNotIndexable({
+				path,
+				robots,
+				userAgent: DEFAULT_UA,
 			})).toThrow('Not indexable in robots.txt');
 		})
 	});

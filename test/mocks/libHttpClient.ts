@@ -24,13 +24,18 @@ export default function mockLibHttpClient() {
 					body: `Sitemap: https://enonic.com/sitemap.xml,
 User-agent: *
 Disallow: /platform
-Noindex: /resources/case-studies`,
+Noindex: /resources/case-studies
+
+User-agent: EnonicXpExplorerCollectorWebcrawlerBot
+Disallow: /company
+Noindex: /platform`,
 					contentType: 'text/plain; charset=utf-8',
 					headers: {},
 					status: 200
 				};
 			} else if (
 				url === 'https://www.enonic.com/'
+				|| url === 'https://www.enonic.com/platform/overview'
 				|| url === 'https://www.enonic.com/resources/case-studies/nav-headless-next-js'
 			) {
 				return {

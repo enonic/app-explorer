@@ -50,6 +50,7 @@ import {exists} from '/lib/explorer/node/exists';
 import {get} from '/lib/explorer/node/get';
 import {hash} from '/lib/explorer/string/hash';
 import {Collector} from '/lib/explorer/collector/Collector';
+import { DEFAULT_UA } from './constants';
 import ContentTypeException from './ContentTypeException';
 import getRobotsTxt from './getRobotsTxt';
 import NotFoundException from './NotFoundException';
@@ -70,9 +71,6 @@ interface WebCrawlDocument {
 
 const DEBUG = true;
 const TRACE = false;
-
-const DEFAULT_UA = 'Mozilla/5.0 (compatible; Enonic XP Explorer Collector Web crawler/1.0.0)';
-
 
 const querySelector = (
 	node: Cheerio<AnyNode>,
@@ -290,7 +288,7 @@ export function run({
 				throwIfNotAllowed({
 					robots,
 					path: baseUrlObj.path,
-					userAgent: '', // TODO: Use the real user agent?
+					userAgent
 				});
 				const urlWithoutSchemeAndDomain = url
 					.replace(/^.*?:\/\//, '') // scheme http://
@@ -462,7 +460,7 @@ export function run({
 					throwIfNotIndexable({
 						path: baseUrlObj.path,
 						robots,
-						userAgent: '', // TODO: Use the real user agent?
+						userAgent
 					});
 					const documentToPersist: {
 						// displayName: string
@@ -485,7 +483,7 @@ export function run({
 					TRACE && log.debug('documentToPersist:%s', toStr(documentToPersist));
 
 					// Check if any document with url exists
-					const documentsRes = collector.queryDocuments({
+					const queryDocumentsParams = {
 						aggregations: null,
 						count: -1,
 						filters: null,
@@ -501,8 +499,10 @@ export function run({
 						},
 						sort: null,
 						start: null
-					});
+					};
+					const documentsRes = collector.queryDocuments(queryDocumentsParams);
 					// log.debug('webcrawl documentsRes:%s', toStr(documentsRes));
+					// log.error('webcrawl queryDocumentsParams:%s documentsRes:%s', queryDocumentsParams, documentsRes);
 
 					if (documentsRes.total > 1) {
 						for (let i = 0; i < documentsRes.hits.length; i++) {
@@ -522,6 +522,7 @@ export function run({
 						documentToPersist._id = documentsRes.hits[0].id;
 					}
 
+					// log.error('documentToPersist:%s', documentToPersist);
 					const persistedDocument = collector.persistDocument(
 						documentToPersist, {
 							// Must be identical to a _name in src/main/resources/documentTypes.json
