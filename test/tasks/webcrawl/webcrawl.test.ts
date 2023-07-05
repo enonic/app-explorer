@@ -290,16 +290,23 @@ describe('webcrawl', () => {
 				repoId: Repo.JOURNALS
 			});
 			const journalNode = journalConnection.get<JournalNode>('00000000-0000-4000-8000-000000000002');
-			log.info('journalNode:%s', journalNode);
+			// log.error('journalNode:%s', journalNode);
 			expect(journalNode.errorCount).toBe(0);
-			expect(journalNode.successCount).toBe(1);
-			expect(journalNode.warningCount).toBe(36);
-			expect(journalNode.informations.length).toBe(14);
+			expect(journalNode.successCount).toBe(2);
+			expect(journalNode.warningCount).toBe(38);
+			expect(journalNode.informations.length).toBe(11);
 
 			const collectionConnection = connect({
 				branch: 'master',
 				repoId: REPO_COLLECTION_TEST
 			});
+
+			// const queryRes = collectionConnection.query({
+			// 	count: -1,
+			// 	query: ''
+			// });
+			// log.error('queryRes:%s', queryRes);
+
 			const documentNode = collectionConnection.get<Node<{
 				links: string[]
 				title: string
@@ -351,6 +358,13 @@ describe('webcrawl', () => {
 				branch: 'master',
 				repoId: REPO_COLLECTION_TEST2
 			});
+
+			// const queryRes = collectionConnection.query({
+			// 	count: -1,
+			// 	query: ''
+			// });
+			// log.error('queryRes:%s', queryRes);
+
 			const documentNode = collectionConnection.get<Node<{
 				links: string[]
 				text: string

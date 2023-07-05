@@ -18,9 +18,7 @@ import {InsertButton} from './components/InsertButton';
 import {MoveDownButton} from './components/MoveDownButton';
 import {MoveUpButton} from './components/MoveUpButton';
 import {useWebCrawlerState} from './useWebCrawlerState';
-
-
-const DEFAULT_UA = 'Mozilla/5.0 (compatible; Enonic XP Explorer Collector Web crawler/1.0.0)';
+import {DEFAULT_UA} from '../../tasks/webcrawl/constants';
 
 
 export const Collector = React.forwardRef(({

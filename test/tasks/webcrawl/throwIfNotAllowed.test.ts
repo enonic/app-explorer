@@ -5,6 +5,7 @@ import {
 } from '@jest/globals';
 import Log from '@enonic/mock-xp/dist/Log';
 import guard from 'robots-txt-guard';
+import { DEFAULT_UA } from '../../../src/main/resources/tasks/webcrawl/constants';
 import throwIfNotAllowed from '../../../src/main/resources/tasks/webcrawl/throwIfNotAllowed';
 
 //──────────────────────────────────────────────────────────────────────────────
@@ -36,9 +37,36 @@ describe('throwIfNotAllowed', () => {
 				"path": "/docs/",
 				"rule": "disallow",
 			}],
+		},{
+			"agents": [
+				"EnonicXpExplorerCollectorWebcrawlerBot",
+			],
+			"rules": [{
+				"path": "/docs/",
+				"rule": "disallow",
+			},{
+				"path": "/example/",
+				"rule": "disallow",
+			}],
 		}]
 	});
-	it("does NOT throw when allowed", () => {
+	it("does NOT throw when allowed (all browsers)", () => {
+		[
+			'/',
+			'/docs',
+			'/docs?',
+			'/docs#',
+			'/docsaddenum',
+			'/example/'
+		].forEach(path => {
+			expect(() => throwIfNotAllowed({
+				path,
+				robots,
+				userAgent: '',
+			})).not.toThrow();
+		});
+	});
+	it("does NOT throw when allowed (EnonicXpExplorerCollectorWebcrawlerBot)", () => {
 		[
 			'/',
 			'/docs',
@@ -49,11 +77,11 @@ describe('throwIfNotAllowed', () => {
 			expect(() => throwIfNotAllowed({
 				path,
 				robots,
-				userAgent: '',
+				userAgent: DEFAULT_UA,
 			})).not.toThrow();
 		});
 	});
-	it("throws when NOT allowed", () => {
+	it("throws when NOT allowed (all browsers)", () => {
 		[
 			'/docs/',
 			'/docs/?',
@@ -65,6 +93,22 @@ describe('throwIfNotAllowed', () => {
 				path,
 				robots,
 				userAgent: '',
+			})).toThrow('Not allowed in robots.txt');
+		})
+	});
+	it("throws when NOT allowed (EnonicXpExplorerCollectorWebcrawlerBot)", () => {
+		[
+			'/docs/',
+			'/docs/?',
+			'/docs/#',
+			'/docs/index.html',
+			'/docs/index.html?foo=bar',
+			'/example/'
+		].forEach(path => {
+			expect(() => throwIfNotAllowed({
+				path,
+				robots,
+				userAgent: DEFAULT_UA,
 			})).toThrow('Not allowed in robots.txt');
 		})
 	});

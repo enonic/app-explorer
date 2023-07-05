@@ -30,7 +30,10 @@ describe('parseRobotsTxt', () => {
 		expect(parseRobotsTxt(`Sitemap: https://enonic.com/sitemap.xml
 User-agent: *
 Disallow: /docs/
-Noindex: /blog/`)).toStrictEqual({
+Noindex: /blog/
+
+User-agent: EnonicXpExplorerCollectorWebcrawlerBot
+Disallow: /example/`)).toStrictEqual({
 			extensions: [{
 				extension: "sitemap",
 				value: "https://enonic.com/sitemap.xml",
@@ -45,6 +48,14 @@ Noindex: /blog/`)).toStrictEqual({
 				},{
 					"path": "/blog/",
 					"rule": "noindex",
+				}],
+			},{
+				"agents": [
+					"EnonicXpExplorerCollectorWebcrawlerBot",
+				],
+				"rules": [{
+					"path": "/example/",
+					"rule": "disallow",
 				}],
 			}]
 		});
