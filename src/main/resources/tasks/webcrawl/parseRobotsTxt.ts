@@ -38,6 +38,7 @@ type Result = {
 
 
 export function parseRobotsTxt(txt: string) {
+	// log.debug('parseRobotsTxt(%s)', txt);
 	const result: Result = {
 		groups: [],
 		extensions: []
@@ -92,46 +93,6 @@ export function parseRobotsTxt(txt: string) {
 			prevToken = NON_GROUP;
 		} // switch directive
 	} // for lines
+	// log.debug('parseRobotsTxt result:%s', result);
 	return result;
 } // function parse
-
-/*
-require('array.prototype.find').shim();
-import guard from 'robots-txt-guard';
-const obj = parse(`
-Sitemap: http://www.example.com/sitemap.xml
-
-User-agent: *
-Disallow: /allDisallow
-Noindex: /allNoindex
-
-User-agent: google
-Disallow: /googleDisallow
-Noindex: /googleNoindex
-`);
-log.info(toStr({obj}));
-
-const bot = guard(obj);
-
-log.info(toStr({
-	isAllowedAllOnAllDisallow: bot.isAllowed('', '/allDisallow'),
-	//isAllowedGoogleOnAllDisallow: bot.isAllowed('google', '/allDisallow'),
-	//isIndexableAllOnAllDisallow: bot.isIndexable('', '/allDisallow'),
-	//isIndexableGoogleOnAllDisallow: bot.isIndexable('google', '/allDisallow'),
-
-	//isAllowedAllOnAllNoindex: bot.isAllowed('', '/allNoindex'),
-	//isAllowedGoogleOnAllNoindex: bot.isAllowed('google', '/allNoindex'),
-	isIndexableAllNoindex: bot.isIndexable('', '/allNoindex'),
-	//isIndexableGoogleOnAllNoindex: bot.isIndexable('google', '/allNoindex'),
-
-	//isAllowedAllOnGoogleDisallow: bot.isAllowed('', '/googleDisallow'),
-	isAllowedGoogleOnGoogleDisallow: bot.isAllowed('google', '/googleDisallow'),
-	//isIndexableAllOnGoogleDisallow: bot.isIndexable('', '/googleDisallow'),
-	//isIndexableGoogleOnGoogleDisallow: bot.isIndexable('google', '/googleDisallow'),
-
-	//isAllowedAllOnGoogleNoindex: bot.isAllowed('', '/googleNoindex'),
-	//isAllowedGoogleOnGoogleNoindex: bot.isAllowed('google', '/googleNoindex'),
-	//isIndexableAllOnGoogleNoindex: bot.isIndexable('', '/googleNoindex'),
-	isIndexableGoogleOnGoogleNoindex: bot.isIndexable('google', '/googleNoindex'),
-}));
-*/
