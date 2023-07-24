@@ -1,10 +1,22 @@
 import type {
-	QueryDSL
-} from '@enonic/js-utils/src/types';
-import type {
+	Aggregations,
+	// AggregationsResult,
+	BucketsAggregationResult,
 	BooleanFilter,
+	QueryDsl,
+	SingleValueMetricAggregationResult,
+	StatsAggregationResult
+} from '@enonic-types/core';
+import type {
+	// NodeQueryResultHit // NOTE: highlight is optional
+	NodeMultiRepoQueryResult
+} from '@enonic-types/lib-node';
+
+// import type { QueryDSL } from '@enonic/js-utils/types';
+import type {
+	// BooleanFilter,
 	Guillotine
-} from '@enonic/js-utils/src/types/node/query/Filters.d';
+} from '@enonic/js-utils/types/node/query/Filters.d';
 import type {
 	AnyObject
 } from '@enonic-types/lib-explorer';
@@ -68,40 +80,28 @@ import {addMatchAll} from '../inputTypes/queryDSL/addMatchAll';
 
 
 type AggregationArg = {
-	name :string
-	count ?:{
-		fields :Array<string>
+	name: string
+	count?: {
+		fields: Array<string>
 	}
-	subAggregations ?:Array<AggregationArg>
-	terms ?:{
-		field :string
-		order ?:string
-		size ?:number
-		minDocCount ?:number
+	subAggregations?: Array<AggregationArg>
+	terms?: {
+		field: string
+		order?: string
+		size?: number
+		minDocCount?: number
 	}
 }
 
-type AggregationBucket = {
-	key :string
-	docCount :number
-} & AggregationRes
+// type AggregationOutput = Record<string, AggregationsResult> // Includes SingleValueMetricAggregationResult
+type AggregationOutput = Record<string,
+	BucketsAggregationResult<Aggregations>
+	& StatsAggregationResult
+	& SingleValueMetricAggregationResult
+>
+type MyNodeMultiRepoQueryResult = NodeMultiRepoQueryResult<AggregationOutput>;
 
 
-type AggregationRes = Record<string,{
-	buckets :Array<AggregationBucket>
-}>
-
-type QueryRes = {
-	aggregations :AggregationRes
-	count :number
-	total :number
-	hits :Array<{
-		branch :string
-		id :string
-		repoId :string
-		score :number
-	}>
-}
 
 
 // Name must be non-null, non-empty and match [_A-Za-z][_0-9A-Za-z]*
@@ -114,8 +114,8 @@ const FIELD_VALUE_COUNT_AGGREGATION_PREFIX = '_count_Field_';
 
 function aggregationsArgToQuery({
 	aggregationsArg = []
-} :{
-	aggregationsArg ?:Array<AggregationArg>
+}: {
+	aggregationsArg?: Array<AggregationArg>
 }) {
 	const obj = {};
 	for (let i = 0; i < aggregationsArg.length; i++) {
@@ -161,9 +161,9 @@ function aggregationsArgToQuery({
 function processAggregationsRes({
 	aggregations = {},
 	fieldNameToPath = {}
-} :{
-	aggregations ?:AggregationRes
-	fieldNameToPath ?:Record<string,string>
+}: {
+	aggregations?: AggregationOutput
+	fieldNameToPath?: Record<string,string>
 }) {
 	const list = [];
 	const fieldValueCounts = [];
@@ -171,7 +171,11 @@ function processAggregationsRes({
 	for (let i = 0; i < names.length; i++) {
 		const name = names[i];
 		// log.debug('processAggregationsRes: aggregations[%s]:%s', name, toStr(aggregations[name]));
+
+		// Value Count aggregation has "value" instead of "buckets
+		// https://developer.enonic.com/docs/xp/stable/storage/aggregations#value_count
 		const {buckets, value} = aggregations[name];
+
 		if (buckets) {
 			//const {} = buckets;
 			list.push({
@@ -184,7 +188,7 @@ function processAggregationsRes({
 					const {
 						aggregations: sA
 					} = processAggregationsRes({
-						aggregations: subAggregations,
+						aggregations: subAggregations as AggregationOutput,
 						fieldNameToPath
 					});
 					const bucket = {
@@ -352,23 +356,23 @@ export function addQueryDocuments({
 			collectionIds: list(GraphQLID),
 			collections: list(GraphQLString),
 			count: GraphQLInt,
-			countFieldValues :GraphQLBoolean,
+			countFieldValues: GraphQLBoolean,
 			filters: list(filterInput),
 			highlight: addInputTypeHighlight({glue}),
 			query: queryInput,
 			start: GraphQLInt
 		},
-		resolve(env :{
+		resolve(env: {
 			args: {
-				aggregations ?:Array<AggregationArg>
-				count ?:number
-				countFieldValues ?:boolean
-				collectionIds ?:Array<string>
-				collections ?:Array<string>
+				aggregations?: Array<AggregationArg>
+				count?: number
+				countFieldValues?: boolean
+				collectionIds?: Array<string>
+				collections?: Array<string>
 				filters?: Guillotine.BooleanFilter
 				highlight?: Highlight
-				query ?:QueryDSL|string
-				start ?:number
+				query?: QueryDsl|string
+				start?: number
 			}
 		}) {
 			//log.debug('env:%s', toStr(env));
@@ -402,8 +406,8 @@ export function addQueryDocuments({
 			//log.debug('collectionIds:%s', toStr(collectionIds));
 
 			// 2 way lookup tables :)
-			const collectionIdToName :Record<string,string> = {};
-			const collectionNameToId :Record<string,string> = {};
+			const collectionIdToName: Record<string,string> = {};
+			const collectionNameToId: Record<string,string> = {};
 			for (let i = 0; i < collectionIds.length; i++) {
 				const collectionId = collectionIds[i];
 				const collectionNode = explorerRepoReadConnection.get(collectionId);
@@ -524,7 +528,7 @@ export function addQueryDocuments({
 			};
 			//log.debug('multiConnectParams:%s', toStr(multiConnectParams));
 
-			let queryResult: QueryRes;
+			let queryResult: MyNodeMultiRepoQueryResult;
 			try {
 				// ERROR: This fails on a fresh sandbox, because there are no collection repos yet
 				const multiRepoReadConnection = multiConnect(multiConnectParams); // NOTE: This now protects against empty sources array.
@@ -541,7 +545,7 @@ export function addQueryDocuments({
 					})
 				});
 
-				let filtersArray :Array<AnyObject>;
+				let filtersArray: Array<AnyObject>;
 				if (filtersArg) {
 					// This works magically because fieldType is an Enum?
 					filtersArray = createFilters(filtersArg);
@@ -562,8 +566,8 @@ export function addQueryDocuments({
 				};
 				// log.debug('multiRepoQueryParams:%s', toStr(multiRepoQueryParams));
 
-				queryResult = multiRepoReadConnection.query(multiRepoQueryParams) as unknown as QueryRes;
-				// log.debug('queryResult:%s', toStr(queryResult));
+				queryResult = multiRepoReadConnection.query(multiRepoQueryParams);
+				// log.debug('addQueryDocuments queryResult:%s', toStr(queryResult));
 				// log.debug('queryResult.aggregations:%s', toStr(queryResult.aggregations));
 			} catch (e) {
 				if (e.message === 'multiConnect: empty sources is not allowed!') {
@@ -624,6 +628,8 @@ export function addQueryDocuments({
 				hits: queryResult.hits.map(({
 					branch,
 					id,
+					// WARNING: optional aka can be missing!
+					// No point in defaulting to empty object, cause GraphQL will not return it.
 					highlight,
 					repoId//,
 					//score

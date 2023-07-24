@@ -1,4 +1,4 @@
-{
+{ // https://www.typescriptlang.org/tsconfig
 	// This file is used by your code editor,
 	// TODO: and package.json verify:types:assets
 	"extends": "../../../../tsconfig.json",
@@ -19,6 +19,8 @@
 		"lib": [
 			"dom"
 		],
+		// "noImplicitAny": true, // TODO: enable and fix 162 errors
+		// "noUnusedLocals": true, // TODO: enable and fix 1 error
 		"paths": {
 			// Development (should be commented out when commiting)
 			// "@enonic/semantic-ui-react-form": ["../../../../../semantic-ui-react-form/src"],
@@ -72,7 +74,9 @@
 		"rootDirs": [
 			"./",
 		],
-
+		"skipLibCheck": true,
+		// "strict": true, // TODO: enable and fix 55 errors
+		// "strictNullChecks": true, // TODO: enable and fix 400 errors
 		"types": [
 			"jquery",
 			"jsuri",

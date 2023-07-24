@@ -1,3 +1,4 @@
+import type { HighlightResult } from '@enonic-types/core';
 import type {
 	PaginationProps,
 } from 'semantic-ui-react';
@@ -6,10 +7,8 @@ import type {QueryDocumentsResult} from './';
 
 
 import {
-	ELLIPSIS,
-	getIn,
 	HIGHLIGHT_FIELD_ALLTEXT,
-	isString,
+	getIn,
 } from '@enonic/js-utils';
 import {FieldPath} from '@enonic/explorer-utils';
 import {DndProvider} from 'react-dnd';
@@ -25,67 +24,17 @@ import JsonModal from '../components/modals/JsonModal';
 import {
 	FRAGMENT_SIZE_DEFAULT,
 	PER_PAGE_DEFAULT,
-	POST_TAG,
-	PRE_TAG,
 	SELECTED_COLUMNS_DEFAULT,
 	Column,
 } from './constants';
 import DragAndDropableHeaderCell from './DragAndDropableHeaderCell';
+import getHighlightedHtml from './getHighlightedHtml';
 import React from 'react';
 
 const ROW_HEIGHT = 34;
 const JSON_ICON_HEIGHT = 20;
 const JSON_BUTTON_PADDING = (ROW_HEIGHT - JSON_ICON_HEIGHT)/2;
 
-function getHighlightedHtml({
-	_highlight,
-	fallback = '',
-	fieldPath,
-	fragmentSize,
-}: {
-	_highlight: Record<string,string[]>
-	fallback: string
-	fieldPath: string
-	fragmentSize: number
-}) {
-	const lcFieldPath = fieldPath.toLowerCase();
-	let highlightedHtml = _highlight[lcFieldPath]
-		? _highlight[lcFieldPath][0]
-		: _highlight[`${lcFieldPath}._stemmed_en`] // TODO Hardcode
-			? _highlight[`${lcFieldPath}._stemmed_en`][0]
-			: _highlight[`${lcFieldPath}._stemmed_no`]
-				? _highlight[`${lcFieldPath}._stemmed_no`][0]
-				: isString(fallback)
-					? fallback.length > fragmentSize
-						? `${fallback.substring(0, fragmentSize)}${ELLIPSIS}`
-						: fallback
-					: fallback;
-	const strippedHighlight = highlightedHtml.replace(new RegExp(PRE_TAG,'g'), '').replace(new RegExp(POST_TAG,'g'), '');
-	if (
-		strippedHighlight !== fallback
-	) {
-		const startOfFieldWithSameLengthAsStrippedHighlight = fallback.substring(0, strippedHighlight.length);
-		const endOfFieldWithSameLengthAsStrippedHighlight = fallback.substring(fallback.length - strippedHighlight.length);
-		// console.debug({
-		// 	fallback,
-		// 	'fallback.length': fallback.length,
-		// 	fragmentSize,
-		// 	highlightedHtml,
-		// 	strippedHighlight,
-		// 	'strippedHighlight.length': strippedHighlight.length,
-		// 	startOfFieldWithSameLengthAsStrippedHighlight,
-		// 	endOfFieldWithSameLengthAsStrippedHighlight,
-		// });
-		if (strippedHighlight === startOfFieldWithSameLengthAsStrippedHighlight) {
-			highlightedHtml = `${highlightedHtml}${ELLIPSIS}`;
-		} else if (strippedHighlight === endOfFieldWithSameLengthAsStrippedHighlight) {
-			highlightedHtml = `${ELLIPSIS}${highlightedHtml}`;
-		} else {
-			highlightedHtml = `${ELLIPSIS}${highlightedHtml}${ELLIPSIS}`;
-		}
-	}
-	return highlightedHtml;
-}
 
 function columnNameToDisplayName(columnName: string) {
 	return columnName === Column.COLLECTION
@@ -179,7 +128,7 @@ function DocumentsTable({
 					</Table.Header>
 					<Table.Body>
 						{documentsRes.hits.map(({
-							_highlight = {},
+							_highlight, // NOTE: _highlight can be undefined, but getHighlightedHtml handles that :)
 							_id,
 							// _json,
 							parsedJson,

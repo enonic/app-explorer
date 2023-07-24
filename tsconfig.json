@@ -1,4 +1,4 @@
-{
+{ // https://www.typescriptlang.org/tsconfig
 	// This file is used by your code editor,
 	// and bundle-require to transpile the tsup.config.ts file
 	"compilerOptions": {
