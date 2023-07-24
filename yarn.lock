@@ -1585,6 +1585,11 @@
   resolved "https://registry.yarnpkg.com/@enonic/js-utils/-/js-utils-1.4.1.tgz#590dd3b0d805e61fb37493ce9c9a16abbab3a431"
   integrity sha512-4jvvOHE74DH5mZGUu3QeVv2X+eY81rQf6EBAT2SGb5fizZzS2S460kBEUSaV2fLGBtK6pgVWTcn8tTxHSY+wAg==
 
+"@enonic/js-utils@^1.5.1":
+  version "1.5.1"
+  resolved "https://registry.yarnpkg.com/@enonic/js-utils/-/js-utils-1.5.1.tgz#efae03c17634fac9e271a5bac65e27148980ef6c"
+  integrity sha512-ugaAxT+fHm0QIz0LX/JTSviHDF3OH2OzSSrF40eWyDVqe325+ErBlxtJpZGFEMFgnpHpfdzqtGc8Wwav7O/iYg==
+
 "@enonic/mock-xp@^0.8.1":
   version "0.8.1"
   resolved "https://registry.yarnpkg.com/@enonic/mock-xp/-/mock-xp-0.8.1.tgz#f29676fef5c9393624a2f75e3ce6f6124599e7f6"

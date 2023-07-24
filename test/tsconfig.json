@@ -9,6 +9,7 @@
 		"forceConsistentCasingInFileNames": true,
 		"inlineSourceMap": false,
 		"inlineSources": false,
+		"moduleResolution": "node",
 		"noEmit": true,
 		"noImplicitAny": false,
 		"noUnusedLocals": false, // Annoying while writing tests
