@@ -1,5 +1,5 @@
 //import type {RepoConnection} from '@enonic-types/lib-explorer';
-import type {Request} from '../../../types/Request';
+import type { Request } from '../../types/Request';
 
 
 import {
@@ -18,18 +18,15 @@ import {
 import {USER as EXPLORER_APP_USER} from '/lib/explorer/model/2/users/explorer';
 //import {get as getCollection} from '/lib/explorer/collection/get';
 //import {createOrModify} from '/lib/explorer/node/createOrModify';
-import {connect} from '/lib/explorer/repo/connect';
-import {maybeCreate as maybeCreateRepoAndBranch} from '/lib/explorer/repo/maybeCreate';
-import {runAsSu} from '/lib/explorer/runAsSu';
-import {create/*, ValidationError*/} from '/lib/explorer/document/create';
-import {update} from '/lib/explorer/document/update';
-import {
-	getUser/*,
-	hasRole*/
-	//@ts-ignore
-} from '/lib/xp/auth';
-//@ts-ignore
-import {run} from '/lib/xp/context';
+import { connect } from '/lib/explorer/repo/connect';
+import { maybeCreate as maybeCreateRepoAndBranch } from '/lib/explorer/repo/maybeCreate';
+import { runAsSu } from '/lib/explorer/runAsSu';
+import { create/*, ValidationError*/} from '/lib/explorer/document/create';
+import { update } from '/lib/explorer/document/update';
+import { HTTP_RESPONSE_STATUS_CODES } from '../constants';
+import authorize from './authorize';
+import runWithExplorerWrite from './runWithExplorerWrite';
+
 
 const {includes: arrayIncludes} = array;
 
@@ -91,7 +88,7 @@ function createDocument<
 	}
 }
 
-function modifyDocument<
+export function modifyDocument<
 	Node extends {
 		_id: string
 		error?: string
@@ -147,16 +144,16 @@ function modifyDocument<
 }
 
 
-export function post(
-	request: PostRequest,
-	collections: string[] = []
+export default function createOrUpdateMany(
+	request: PostRequest
 ): {
-	body: {
+	body?: {
 		message: string
-	}
-	contentType: string
+	} | any[]
+	contentType?: string
 	status: number
 } {
+	log.debug('request:%s', toStr(request));
 	//const user = getUser();
 	//log.info(`user:${toStr(user)}`);
 
@@ -198,8 +195,14 @@ export function post(
 				message: 'Missing required parameter collection!'
 			},
 			contentType: 'text/json;charset=utf-8',
-			status: 400 // Bad Request
+			status: HTTP_RESPONSE_STATUS_CODES.BAD_REQUEST
 		};
+	}
+
+	const maybeErrorResponse = authorize(request, collectionName);
+
+    if (maybeErrorResponse.status !== 200 ) {
+		return maybeErrorResponse;
 	}
 
 	// Cases:
@@ -217,30 +220,6 @@ export function post(
 	//    We could have been nice and said, wrong or typo in collection name
 	//    but for same reasons as 2, letting 2 handle this is the best.
 
-
-
-	if (!collections) {
-		log.error(`Access too no collections!`);
-		return {
-			body: {
-				message: 'Bad Request'
-			},
-			contentType: 'text/json;charset=utf-8',
-			status: 400 // Bad Request
-		};
-	}
-
-	if (!arrayIncludes(forceArray(collections), collectionName)) {
-		log.error(`No access to collection:${collectionName}!`);
-		return {
-			body: {
-				message: 'Bad Request'
-			},
-			contentType: 'text/json;charset=utf-8',
-			status: 400 // Bad Request
-		};
-	}
-
 	const explorerReadConnection = connect({
 		branch: BRANCH_ID_EXPLORER,
 		principals: [Principal.EXPLORER_READ],
@@ -255,7 +234,7 @@ export function post(
 				message: 'Bad Request'
 			},
 			contentType: 'text/json;charset=utf-8',
-			status: 400 // Bad Request
+			status: HTTP_RESPONSE_STATUS_CODES.BAD_REQUEST
 		};
 	}
 	const collectionId = collectionNode._id;
@@ -274,34 +253,7 @@ export function post(
 	const dataArray = forceArray(data);
 	//log.info(`dataArray:${toStr(dataArray)}`);
 
-	let user = getUser();
-	if (!user) {
-		// CreateNode tries to set owner, and fails when no user
-		user = {
-			displayName: EXPLORER_APP_USER.displayName,
-			disabled: false,
-			idProvider: EXPLORER_APP_USER.idProvider, // 'system',
-			key: `user:${EXPLORER_APP_USER.idProvider}:${EXPLORER_APP_USER.name}`, // `user:system:${USER_EXPLORER_APP_NAME}`,
-			login: EXPLORER_APP_USER.name, //USER_EXPLORER_APP_NAME,
-			type: 'user'
-		};
-		log.info('user:%s', toStr(user));
-	}
-
-	return run({ // Override current users permissions
-		attributes: {},
-		branch: 'master',
-
-		// This allows any user to write in app-explorer, journal and collections.
-		// So even though you are logged into Enonic XP admin with a user that does not have PRINCIPAL_EXPLORER_WRITE:
-		// You may still create/update the documentTypes and  documents.
-		principals: [Principal.EXPLORER_WRITE],
-		//principals: [],
-
-		//repository: 'system-repo',
-		repository: Repo.EXPLORER,
-		user
-	}, () => {
+	return runWithExplorerWrite(() => {
 		const writeToCollectionBranchConnection = connect({
 			branch: branchId,
 			principals: [Principal.EXPLORER_WRITE], // Additional principals to execute the callback with
@@ -416,7 +368,8 @@ export function post(
 		} // for
 		return {
 			body: responseArray,
-			contentType: 'text/json;charset=utf-8'
+			contentType: 'text/json;charset=utf-8',
+			status: HTTP_RESPONSE_STATUS_CODES.OK
 		};
-	}); // libContext.run
+	});
 } // export function post

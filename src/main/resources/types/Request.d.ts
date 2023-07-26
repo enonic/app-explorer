@@ -6,6 +6,7 @@ export type Request<
 	PathParams extends AnyObject = AnyObject
 > = {
 	body?: string
+	contentType?: string
 	headers?: { // HTTPS/2 uses lowercase header keys
 		accept?: string
 		authorization?: string

@@ -1,17 +1,23 @@
-export function respondWithHtml({
-	count,
-	query,
-	sort,
-	start
-}: {
-	count: number|string
+import type { Request } from '../../types/Request';
+
+
+export default function documentation(request: Request<{
+	count: string
 	query: string
 	sort: string
-	start: number|string
-}): {
+	start: string
+}>): {
 		body: string
 		contentType: string
 } {
+	const {
+		count: countString = '10',
+		query = '',
+		sort = 'score DESC',
+		start: startString = '0'
+	} = request.params;
+	// const countNumber = parseInt(countString, 10);
+	// const startNumber = parseInt(startString, 10);
 	return {
 		body: `<html>
 	<head>
@@ -176,9 +182,9 @@ export function respondWithHtml({
 				const params = {};
 
 				var collection = document.getElementById('postCollection').value
-				if (collection) {
-					params.collection = collection;
-				}
+				// if (collection) {
+				// 	params.collection = collection;
+				// }
 
 				var requireValidFalse = document.getElementById('requireValidFalse').checked;
 				//console.log('requireValidFalse', requireValidFalse);
@@ -207,7 +213,7 @@ export function respondWithHtml({
 					//console.log('json', json);
 				}
 
-				fetch(\`?\${urlQuery}\`, {
+				fetch(\`documents/\${collection}?\${urlQuery}\`, {
 					headers: { // HTTP/2 uses lowercase header keys
 						'accept': 'application/json',
 						'content-type': 'application/json'
@@ -378,10 +384,10 @@ export function respondWithHtml({
 					<dd><input name="getId" placeholder="" size="80" spellcheck="false" type="text" value=""/></dd>
 
 					<dt><label for="getStart">Start</label></dt>
-					<dd><input id="getStart" name="getStart" type="number" value="${start}"/></dd>
+					<dd><input id="getStart" name="getStart" type="number" value="${startString}"/></dd>
 
 					<dt><label for="getCount">Count</label></dt>
-					<dd><input id="getCount" name="getCount" type="number" value="${count}"/></dd>
+					<dd><input id="getCount" name="getCount" type="number" value="${countString}"/></dd>
 
 					<dt><label for="getFilters">Filters</label></dt>
 					<dd><textarea cols="173" id="getFilters" name="getFilters" rows="16">{
@@ -659,4 +665,4 @@ export function respondWithHtml({
 </html>`,
 		contentType: 'text/html;charset=utf-8'
 	};
-} // respondWithHtml
+} // documentation

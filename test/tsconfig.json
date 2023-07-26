@@ -9,6 +9,7 @@
 		"forceConsistentCasingInFileNames": true,
 		"inlineSourceMap": false,
 		"inlineSources": false,
+		"module": "ES2022",
 		"moduleResolution": "node",
 		"noEmit": true,
 		"noImplicitAny": false,
