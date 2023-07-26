@@ -1,4 +1,4 @@
-import type {Request} from '../../../types/Request';
+import type { Request } from '../../types/Request';
 
 
 import {
@@ -24,7 +24,7 @@ export type RemoveRequest = Request<{
 }>
 
 
-export function remove(
+export default function deleteMany(
 	request: RemoveRequest,
 	collections: string[] = []
 ): {
