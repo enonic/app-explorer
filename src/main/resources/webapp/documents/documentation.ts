@@ -455,7 +455,7 @@ export default function documentation(request: Request<{
 		</details>
 
 		<details class="method-post">
-			<summary><span>POST</span> <b>${PATH_PREFIX}/{collection}</b> Create or modify documents</summary>
+			<summary><span>POST</span> <b>${PATH_PREFIX}/{collection}</b> Create or modify document(s)</summary>
 			<h2>Headers</h2>
 			<table>
 				<thead>
@@ -645,7 +645,7 @@ export default function documentation(request: Request<{
 		</details>
 
 		<details class="method-delete">
-			<summary><span>DELETE</span> <b>${PATH_PREFIX}/{collection}</b> Delete documents</summary>
+			<summary><span>DELETE</span> <b>${PATH_PREFIX}/{collection}</b> Delete document(s)</summary>
 			<h2>Headers</h2>
 			<table>
 				<thead>
