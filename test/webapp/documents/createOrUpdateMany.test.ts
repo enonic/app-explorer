@@ -131,7 +131,7 @@ const createdCollection2 = explorerNodeConnection.create({
 	_parentPath: Path.COLLECTIONS,
 	documentTypeId: createdDocumentTypeNode._id,
 	// collector: {}, // optional
-	//language: 'no', // optional?
+	// language: 'no', // optional?
 });
 explorerNodeConnection.create({
 	_name: 'api-keys',
