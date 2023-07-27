@@ -1,15 +1,38 @@
 import type { Request } from '../../types/Request';
 
 
+import { Role } from '@enonic/explorer-utils';
+import { hasRole } from '/lib/xp/auth';
+import { DOCUMENT_REST_API_VERSION } from '../constants';
+import authorize from './authorize';
+
+
+const PATH_PREFIX = `/api/v${DOCUMENT_REST_API_VERSION}/documents`;
+
+
 export default function documentation(request: Request<{
 	count: string
 	query: string
 	sort: string
 	start: string
 }>): {
-		body: string
-		contentType: string
+		body?: string | {
+			message: string
+		}
+		contentType?: string
+		status?: number
 } {
+	if (!hasRole(Role.EXPLORER_READ)) {
+		const maybeErrorResponse = authorize(
+			request,
+			undefined // Not checking access to collection
+		);
+
+		if (maybeErrorResponse.status !== 200 ) {
+			return maybeErrorResponse;
+		}
+	}
+
 	const {
 		count: countString = '10',
 		query = '',
@@ -21,7 +44,7 @@ export default function documentation(request: Request<{
 	return {
 		body: `<html>
 	<head>
-		<title>Documents Endpoint - Version 1 - API documentation</title>
+		<title>Documents Endpoint - Version ${DOCUMENT_REST_API_VERSION} - API documentation</title>
 		<style>
 			table {
 				border: 1px solid black;
@@ -44,32 +67,41 @@ export default function documentation(request: Request<{
 			}
 			.method-get span,
 			.method-post span,
+			.method-put span,
 			.method-delete span {
 				border-radius: 3px;
 				color: white;
 				display: inline-block;
 				font-size: 14px;
-	    		font-weight: 700;
+				font-weight: 700;
 				min-width: 80px;
 				padding: 6px 15px;
 				text-align: center;
 			}
 			.method-get {
-				background-color: lightblue;
-				border-color: blue;
-			}
-			.method-get span {
-				background-color: blue;
-			}
-			.method-post {
-				background-color: lightgreen;
+				background-color: hsla(120,100%,50%,.1);
 				border-color: green;
 			}
-			.method-post span {
+			.method-get span {
 				background-color: green;
 			}
+			.method-post {
+				background-color: hsla(240,100%,50%,.1);
+				border-color: blue;
+
+			}
+			.method-post span {
+				background-color: blue;
+			}
+			.method-put {
+				background-color: hsla(39,100%,50%,.1);
+				border-color: darkorange;
+			}
+			.method-put span {
+				background-color: darkorange;
+			}
 			.method-delete {
-				background-color: #ffcccb;
+				background-color: hsla(0,100%,50%,.1);
 				border-color: red;
 			}
 			.method-delete span {
@@ -265,16 +297,18 @@ export default function documentation(request: Request<{
 		</script>
 	</head>
 	<body>
-		<h1>API documentation</h1>
+		<h1>Documents API documentation</h1>
 
+		<h2>Bulk</h2>
 		<details class="method-get">
-			<summary><span>GET</span> <b>/api/v1/documents</b> Get documents</summary>
+			<summary><span>GET</span> <b>${PATH_PREFIX}/{collection}</b> Get document(s)</summary>
 			<h2>Headers</h2>
 			<table>
 				<thead>
 					<tr>
 						<th>Name</th>
 						<th>Value</th>
+						<th>Attributes</th>
 						<th>Description</th>
 					</tr>
 				</thead>
@@ -282,15 +316,19 @@ export default function documentation(request: Request<{
 					<tr>
 						<th>accept</th>
 						<td>application/json</td>
+						<td>&lt;optional&gt;</td>
 					</tr>
 					<tr>
 						<th>authorization</th>
 						<td>Explorer-Api-Key XXXX</td>
+						<td>&lt;required&gt;</td>
 						<td>The API key (password) for the collection you want to get documents from.</td>
 					</tr>
 					<tr>
 						<th>content-type</th>
 						<td>application/json</td>
+						<td>&lt;optional&gt;</td>
+						<td>Get requests can't have a body (content) in the Fetch API standard</td>
 					</tr>
 				</tbody>
 			</table>
@@ -417,13 +455,14 @@ export default function documentation(request: Request<{
 		</details>
 
 		<details class="method-post">
-			<summary><span>POST</span> <b>/api/v1/documents</b> Create or modify documents</summary>
+			<summary><span>POST</span> <b>${PATH_PREFIX}/{collection}</b> Create or modify documents</summary>
 			<h2>Headers</h2>
 			<table>
 				<thead>
 					<tr>
 						<th>Name</th>
 						<th>Value</th>
+						<th>Attributes</th>
 						<th>Description</th>
 					</tr>
 				</thead>
@@ -431,15 +470,18 @@ export default function documentation(request: Request<{
 					<tr>
 						<th>accept</th>
 						<td>application/json</td>
+						<td>&lt;optional&gt;</td>
 					</tr>
 					<tr>
 						<th>authorization</th>
 						<td>Explorer-Api-Key XXXX</td>
+						<td>&lt;required&gt;</td>
 						<td>The API key (password) for the collection you want to get documents from.</td>
 					</tr>
 					<tr>
 						<th>content-type</th>
 						<td>application/json</td>
+						<td>&lt;required&gt;</td>
 					</tr>
 				</tbody>
 			</table>
@@ -460,6 +502,22 @@ export default function documentation(request: Request<{
 						<td>&lt;required&gt;</td>
 						<td></td>
 						<td>The collection to create or modify documents in.</td>
+					</tr>
+					<tr>
+						<th>documentType</th>
+						<td>&lt;semi-optional&gt;</td>
+						<td></td>
+						<td>
+							The documentType is selected in the following order:
+							<ol>
+								<li>_documentTypeId property on each document in the body json.</li>
+								<li>_documentType property on each document in the body json.</li>
+								<li>documentTypeId url query parameter.</li>
+								<li>documentType url query.</li>
+								<li>documentTypeId property stored on the collection node.</li>
+							</ol>
+							If it's not provided by any of these ways, the document will NOT be created or updated.
+						</td>
 					</tr>
 					<tr>
 						<th>requireValid</th>
@@ -582,14 +640,19 @@ export default function documentation(request: Request<{
 			</form>
 		</details>
 
+		<details class="method-post">
+			<summary><span>POST</span> <b>${PATH_PREFIX}/{collection}/query</b> Query documents</summary>
+		</details>
+
 		<details class="method-delete">
-			<summary><span>DELETE</span> <b>/api/v1/documents</b> Delete documents</summary>
+			<summary><span>DELETE</span> <b>${PATH_PREFIX}/{collection}</b> Delete documents</summary>
 			<h2>Headers</h2>
 			<table>
 				<thead>
 					<tr>
 						<th>Name</th>
 						<th>Value</th>
+						<th>Attributes</th>
 						<th>Description</th>
 					</tr>
 				</thead>
@@ -597,15 +660,18 @@ export default function documentation(request: Request<{
 					<tr>
 						<th>accept</th>
 						<td>application/json</td>
+						<td>&lt;optional&gt;</td>
 					</tr>
 					<tr>
 						<th>authorization</th>
 						<td>Explorer-Api-Key XXXX</td>
+						<td>&lt;required&gt;</td>
 						<td>The API key (password) for the collection you want to get documents from.</td>
 					</tr>
 					<tr>
 						<th>content-type</th>
 						<td>application/json</td>
+						<td>&lt;optional&gt;</td>
 					</tr>
 				</tbody>
 			</table>
@@ -661,6 +727,25 @@ export default function documentation(request: Request<{
 				<input type="submit" value="DELETE">
 			</form>
 		</details>
+
+		<h2>Single</h2>
+
+		<details class="method-get">
+			<summary><span>GET</span> <b>${PATH_PREFIX}/{collection}/{documentId}</b> Get a document</summary>
+		</details>
+
+		<details class="method-put">
+			<summary><span>PUT</span> <b>${PATH_PREFIX}/{collection}/{documentId}</b> Replace a document</summary>
+		</details>
+
+		<details class="method-post">
+			<summary><span>POST</span> <b>${PATH_PREFIX}/{collection}/{documentId}</b> Patch a document</summary>
+		</details>
+
+		<details class="method-delete">
+			<summary><span>DELETE</span> <b>${PATH_PREFIX}/{collection}/{documentId}</b> Delete a document</summary>
+		</details>
+
 	</body>
 </html>`,
 		contentType: 'text/html;charset=utf-8'

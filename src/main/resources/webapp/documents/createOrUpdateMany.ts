@@ -33,6 +33,8 @@ const {includes: arrayIncludes} = array;
 
 export type PostRequest = Request<{
 	collection?: string
+	documentType?: string
+	documentTypeId?: string
 	partial?: string
 	requireValid?: string
 }, {
@@ -53,12 +55,16 @@ function createDocument<
 	boolRequireValid = true,
 	collectionId,
 	collectionName,
+	documentTypeId,
+	documentTypeName,
 	idField,
 	responseArray,
 	toPersist
 }: {
 	collectionId: string
 	collectionName: string
+	documentTypeId?: string
+	documentTypeName?: string
 	responseArray: Node[]
 	toPersist: Node
 	// Optional
@@ -71,6 +77,8 @@ function createDocument<
 		collectorId: COLLECTOR_ID,
 		collectorVersion: COLLECTOR_VERSION,
 		data: toPersist,
+		documentTypeId,
+		documentTypeName,
 		requireValid: boolRequireValid
 	});
 	if(createdNode) {
@@ -96,6 +104,8 @@ export function modifyDocument<
 >({
 	collectionId,
 	collectionName,
+	documentTypeId,
+	documentTypeName,
 	id,
 	responseArray,
 	toPersist,
@@ -107,6 +117,8 @@ export function modifyDocument<
 }: {
 	collectionId: string
 	collectionName: string
+	documentTypeId?: string
+	documentTypeName?: string
 	id: string
 	responseArray: Node[]
 	toPersist: Node
@@ -124,6 +136,8 @@ export function modifyDocument<
 			_id: id,
 			...toPersist
 		},
+		documentTypeId,
+		documentTypeName,
 		partial: boolPartial,
 		requireValid: boolRequireValid
 	});
@@ -153,24 +167,14 @@ export default function createOrUpdateMany(
 	contentType?: string
 	status: number
 } {
-	log.debug('request:%s', toStr(request));
-	//const user = getUser();
-	//log.info(`user:${toStr(user)}`);
-
-	/*if (!(
-		hasRole(ROLE_SYSTEM_ADMIN)
-		|| hasRole(ROLE_EXPLORER_ADMIN)
-		|| hasRole(ROLE_EXPLORER_WRITE)
-	)) {
-		return {
-			status: 403
-		};
-	}*/
+	// log.debug('request:%s', toStr(request));
 
 	const {
 		body,
 		params: {
 			collection: collectionParam = '',
+			documentType: documentTypeParam,
+			documentTypeId: documentTypeIdParam,
 			partial: partialParam = 'false',
 			requireValid: requireValidParam = 'true'
 		} = {},
@@ -201,7 +205,7 @@ export default function createOrUpdateMany(
 
 	const maybeErrorResponse = authorize(request, collectionName);
 
-    if (maybeErrorResponse.status !== 200 ) {
+	if (maybeErrorResponse.status !== 200 ) {
 		return maybeErrorResponse;
 	}
 
@@ -264,6 +268,19 @@ export default function createOrUpdateMany(
 		for (let j = 0; j < dataArray.length; j++) {
 			try {
 				const toPersist = dataArray[j];
+				let documentTypeId: string|undefined;
+				let documentTypeName: string|undefined;
+				if (toPersist._documentTypeId) {
+					documentTypeId = toPersist._documentTypeId;
+					delete toPersist._documentTypeId;
+				} else if (toPersist._documentType) {
+					documentTypeName = toPersist._documentType;
+					delete toPersist._documentType;
+				} else if (documentTypeIdParam) {
+					documentTypeId = documentTypeIdParam;
+				} else if (documentTypeParam) {
+					documentTypeName = documentTypeParam;
+				}
 
 				// CREATE when idfield, _id, _name, _path not matched
 				// Otherwise MODIFY
@@ -275,6 +292,8 @@ export default function createOrUpdateMany(
 							boolRequireValid,
 							collectionId,
 							collectionName,
+							documentTypeId,
+							documentTypeName,
 							id: toPersist._id,
 							responseArray,
 							toPersist
@@ -284,6 +303,8 @@ export default function createOrUpdateMany(
 							boolRequireValid,
 							collectionId,
 							collectionName,
+							documentTypeId,
+							documentTypeName,
 							responseArray,
 							toPersist
 						});
@@ -295,6 +316,8 @@ export default function createOrUpdateMany(
 							boolRequireValid,
 							collectionId,
 							collectionName,
+							documentTypeId,
+							documentTypeName,
 							id: `/${toPersist._name}`,
 							responseArray,
 							toPersist
@@ -304,6 +327,8 @@ export default function createOrUpdateMany(
 							boolRequireValid,
 							collectionId,
 							collectionName,
+							documentTypeId,
+							documentTypeName,
 							responseArray,
 							toPersist
 						});
@@ -315,6 +340,8 @@ export default function createOrUpdateMany(
 							boolRequireValid,
 							collectionId,
 							collectionName,
+							documentTypeId,
+							documentTypeName,
 							id: toPersist._path,
 							responseArray,
 							toPersist
@@ -324,6 +351,8 @@ export default function createOrUpdateMany(
 							boolRequireValid,
 							collectionId,
 							collectionName,
+							documentTypeId,
+							documentTypeName,
 							responseArray,
 							toPersist
 						});
@@ -333,15 +362,17 @@ export default function createOrUpdateMany(
 						boolRequireValid,
 						collectionId,
 						collectionName,
+						documentTypeId,
+						documentTypeName,
 						responseArray,
 						toPersist
 					});
 				}
 			} catch (e) {
-				//log.error(`e:${toStr(e)}`, e);
-				//log.error(`e.message:${toStr(e.message)}`, e.message);
-				//log.error(`e.name:${toStr(e.name)}`, e.name);
-				//log.error(`e.class:${toStr(e.class)}`, e.class); // Undefined
+				// log.error(`e:${toStr(e)}`, e);
+				// log.error(`e.message:${toStr(e.message)}`, e.message);
+				// log.error(`e.name:${toStr(e.name)}`, e.name);
+				// log.error(`e.class:${toStr(e.class)}`, e.class); // Undefined
 				if (e.class && e.class.name === 'java.time.format.DateTimeParseException') {
 					log.error(e);
 					responseArray.push({
@@ -359,7 +390,7 @@ export default function createOrUpdateMany(
 						error: e.message
 					});
 				} else {
-					log.error('Unknown error', e);
+					log.error(`Unknown error: message:${toStr(e.message)}`, e);
 					responseArray.push({
 						error: 'Unknown error. The stacktrace has been logged.'
 					});

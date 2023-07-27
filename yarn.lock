@@ -1567,10 +1567,10 @@
   resolved "https://registry.yarnpkg.com/@enonic-types/lib-vhost/-/lib-vhost-7.13.1.tgz#85a5846d088a4a6e709cb653f9ee4b8a57141017"
   integrity sha512-eWEgnp6MGc9dvU9rZMaeqJPHoAq7eYnxB6JGzJaWSs1JlnZE4viXqNoY+ZRBaFemdYPNeeoDwZ9zh/v60xhnHg==
 
-"@enonic/explorer-utils@^0.2.0":
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/@enonic/explorer-utils/-/explorer-utils-0.2.0.tgz#3ee4ba77e4950128aaccbf4d3bd6c24e80586302"
-  integrity sha512-kPlb7MDAhIXcN4LM91rIP41kcagGlGswSLrQXOMFcP3/RgzdJWlbTxad0rr6nyJswa1vjGVrpb4y893/gaSehw==
+"@enonic/explorer-utils@^0.3.0":
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/@enonic/explorer-utils/-/explorer-utils-0.3.0.tgz#51864e6c10243e159a73f95d3a2a53c1803b82e1"
+  integrity sha512-i6gOVzATlpBWUTVXAXY7eePo9YinmzzwTuYTu+DKcqbH0/02JuWogkbbMU+erLjXhFGOAc4vrvnvvNud0CwgjQ==
   dependencies:
     "@enonic/js-utils" "^1.1.0"
 
@@ -1584,10 +1584,10 @@
   resolved "https://registry.yarnpkg.com/@enonic/js-utils/-/js-utils-1.5.1.tgz#efae03c17634fac9e271a5bac65e27148980ef6c"
   integrity sha512-ugaAxT+fHm0QIz0LX/JTSviHDF3OH2OzSSrF40eWyDVqe325+ErBlxtJpZGFEMFgnpHpfdzqtGc8Wwav7O/iYg==
 
-"@enonic/mock-xp@^0.8.1":
-  version "0.8.1"
-  resolved "https://registry.yarnpkg.com/@enonic/mock-xp/-/mock-xp-0.8.1.tgz#f29676fef5c9393624a2f75e3ce6f6124599e7f6"
-  integrity sha512-7/oUFUQclX6B7qFpCp+qXVKHYu3+gs+BugCrnloSvtU3D4fTET4c7OocT2LWwbnWYZCtu9GxggaEajwlRfefsQ==
+"@enonic/mock-xp@^0.9.0":
+  version "0.9.0"
+  resolved "https://registry.yarnpkg.com/@enonic/mock-xp/-/mock-xp-0.9.0.tgz#eae3a3e40a087bf4991096cdf8d6b55132c3cbef"
+  integrity sha512-JJGPQt6wwhEdo477T+nsQQr6hcl0cZEQsOTMi6RtMCTjM3M8kkYxK9ZnCIUvqOsPrHy5uU2+0MtEOHtlX4cjvw==
   dependencies:
     "@enonic/js-utils" "^1.4.1"
     colors "^1.4.0"

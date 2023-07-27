@@ -13,7 +13,8 @@ import type { Request } from '../../types/Request';
 import {
 	COLLECTION_REPO_PREFIX,
 	NodeType,
-	Principal
+	Principal,
+	Role
 } from '@enonic/explorer-utils';
 import {
 	array,
@@ -25,6 +26,7 @@ import lcKeys from '@enonic/js-utils/object/lcKeys';
 import { toStr } from '@enonic/js-utils/value/toStr';
 //import {get as getCollection} from '/lib/explorer/collection/get';
 import { connect } from '/lib/explorer/repo/connect';
+import { hasRole } from '/lib/xp/auth';
 import { HTTP_RESPONSE_STATUS_CODES } from '../constants';
 import authorize from './authorize';
 
@@ -107,9 +109,11 @@ export default function query(
 		};
 	}
 
-	const maybeErrorResponse = authorize(request, collectionName);
-    if (maybeErrorResponse.status !== 200 ) {
-		return maybeErrorResponse;
+	if (!hasRole(Role.EXPLORER_READ)) {
+		const maybeErrorResponse = authorize(request, collectionName);
+		if (maybeErrorResponse.status !== 200 ) {
+			return maybeErrorResponse;
+		}
 	}
 
 	const {

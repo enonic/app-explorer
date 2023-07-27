@@ -14,7 +14,8 @@ export default {
 
 	globals: {
 		app: {
-			name: 'com.enonic.app.explorer'
+			name: 'com.enonic.app.explorer',
+			version: '2.0.0'
 		},
 		Java: {
 			type: (path: string) => {
@@ -35,6 +36,7 @@ export default {
 
 	// It seems mocks doesn't apply to mapped modules?
 	moduleNameMapper: {
+		// '@enonic/mock-xp/(.*)': '<rootDir>/symlinks/enonic-mock-xp/$1',
 		'/lib/explorer/(.*)': '<rootDir>/symlinks/lib-explorer/src/main/resources/lib/explorer/$1'
 	},
 
