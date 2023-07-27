@@ -4,36 +4,38 @@ import type { Request } from '../../types/Request';
 
 import {
 	COLLECTION_REPO_PREFIX,
-	Principal
+	Principal,
+	Role
 } from '@enonic/explorer-utils';
 import { startsWith } from '@enonic/js-utils/string/startsWith';
 // import { toStr } from '@enonic/js-utils/value/toStr';
 import { connect } from '/lib/explorer/repo/connect';
+import { hasRole } from '/lib/xp/auth';
 import { HTTP_RESPONSE_STATUS_CODES } from '../constants';
 import authorize from './authorize';
 
 
 export default function getOne(request: Request<{
-    collection?: string
-    id?: string
+	collection?: string
+	id?: string
 },{
-    collectionName?: string
-    documentId?: string
+	collectionName?: string
+	documentId?: string
 }>) {
-    // log.debug('getOne request:%s', toStr(request));
+	// log.debug('getOne request:%s', toStr(request));
 
-    const {
-        params: {
-            collection: collectionParam,
-            id: idParam = ''
-        } = {},
-        pathParams: {
-            collectionName = collectionParam,
-            documentId = idParam
-        } = {}
-    } = request;
+	const {
+		params: {
+			collection: collectionParam,
+			id: idParam = ''
+		} = {},
+		pathParams: {
+			collectionName = collectionParam,
+			documentId = idParam
+		} = {}
+	} = request;
 
-    if (!collectionName) {
+	if (!collectionName) {
 		return {
 			body: {
 				message: 'Missing required parameter collection!'
@@ -43,7 +45,7 @@ export default function getOne(request: Request<{
 		};
 	}
 
-    if (!documentId) {
+	if (!documentId) {
 		return {
 			body: {
 				message: 'Missing required parameter id!'
@@ -53,15 +55,17 @@ export default function getOne(request: Request<{
 		};
 	}
 
-    const maybeErrorResponse = authorize(request, collectionName);
+	if (!hasRole(Role.EXPLORER_READ)) {
+		const maybeErrorResponse = authorize(request, collectionName);
 
-    if (maybeErrorResponse.status !== 200 ) {
-		return maybeErrorResponse;
+		if (maybeErrorResponse.status !== 200 ) {
+			return maybeErrorResponse;
+		}
 	}
 
-    const repoId = `${COLLECTION_REPO_PREFIX}${collectionName}`;
+	const repoId = `${COLLECTION_REPO_PREFIX}${collectionName}`;
 	//log.info(`repoId:${toStr(repoId)}`);
-    const connectParams = {
+	const connectParams = {
 		branch: 'master', // Deliberate hardcode,
 		principals: [Principal.EXPLORER_READ],
 		repoId
@@ -70,32 +74,32 @@ export default function getOne(request: Request<{
 	const readFromCollectionBranchConnection = connect(connectParams);
 	//log.debug('connected using:%s', toStr(connectParams));
 
-    const documentNode = readFromCollectionBranchConnection.get(documentId);
-    // log.debug('documentNode:%s', toStr(documentNode));
+	const documentNode = readFromCollectionBranchConnection.get(documentId);
+	// log.debug('documentNode:%s', toStr(documentNode));
 
-    if (!documentNode) {
-        return {
-            status: HTTP_RESPONSE_STATUS_CODES.NOT_FOUND
-        }
-    }
+	if (!documentNode) {
+		return {
+			status: HTTP_RESPONSE_STATUS_CODES.NOT_FOUND
+		}
+	}
 
-    const strippedDocumentNode = {};
-    // Not allowed to see any underscore fields (except _id, _name, _path)
-    Object.keys(documentNode).forEach((k) => {
-        if (
-            !startsWith(k, '_')
-            || k === '_id'
-            || k === '_name'
-            || k === '_path'
-        ) {
-            strippedDocumentNode[k] = documentNode[k];
-        }
-    });
+	const strippedDocumentNode = {};
+	// Not allowed to see any underscore fields (except _id, _name, _path)
+	Object.keys(documentNode).forEach((k) => {
+		if (
+			!startsWith(k, '_')
+			|| k === '_id'
+			|| k === '_name'
+			|| k === '_path'
+		) {
+			strippedDocumentNode[k] = documentNode[k];
+		}
+	});
 	// log.debug('strippedDocumentNode:%s', toStr(strippedDocumentNode));
 
 	return {
 		body: strippedDocumentNode,
 		contentType: 'text/json;charset=utf-8',
-        status: HTTP_RESPONSE_STATUS_CODES.OK
+		status: HTTP_RESPONSE_STATUS_CODES.OK
 	};
 }

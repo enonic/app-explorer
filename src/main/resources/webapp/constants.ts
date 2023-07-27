@@ -1,7 +1,10 @@
 export const AUTH_PREFIX = 'Explorer-Api-Key ';
 
+export const DOCUMENT_REST_API_VERSION = '2';
+
 export enum HTTP_RESPONSE_STATUS_CODES {
 	OK = 200,
+	CREATED = 201,
 	BAD_REQUEST = 400,
 	UNAUTHORIZED = 401,
 	FORBIDDEN = 403,
