@@ -738,9 +738,9 @@ export default function documentation(request: Request<{
 			<summary><span>POST</span> <b>${PATH_PREFIX}/{collection}/{documentId}</b> Patch a document</summary>
 		</details>
 
-		<details class="method-put">
+		<!--details class="method-put">
 			<summary><span>PUT</span> <b>${PATH_PREFIX}/{collection}/{documentId}</b> Replace a document</summary>
-		</details>
+		</details-->
 
 		<details class="method-delete">
 			<summary><span>DELETE</span> <b>${PATH_PREFIX}/{collection}/{documentId}</b> Delete a document</summary>

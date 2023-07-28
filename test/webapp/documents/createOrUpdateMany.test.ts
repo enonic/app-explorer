@@ -39,11 +39,11 @@ import {
 } from '@enonic/explorer-utils';
 
 const log = Log.createLogger({
-	loglevel: 'debug'
+	// loglevel: 'debug'
 	// loglevel: 'info'
 	// loglevel: 'warn'
 	// loglevel: 'error'
-	// loglevel: 'silent'
+	loglevel: 'silent'
 });
 
 //──────────────────────────────────────────────────────────────────────────────
@@ -71,6 +71,22 @@ const USER = {
 //──────────────────────────────────────────────────────────────────────────────
 // Globals
 //──────────────────────────────────────────────────────────────────────────────
+global.Java = {
+	//from: jest.fn().mockImplementation((obj: any) => obj),
+	type: jest.fn().mockImplementation((path: string) => {
+		if (path === 'java.util.Locale') {
+			return {
+				forLanguageTag: jest.fn().mockImplementation((locale: string) => locale)
+			}
+		} else if (path === 'java.lang.System') {
+			return {
+				currentTimeMillis: jest.fn().mockReturnValue(1) // Needs a truthy value :)
+			};
+		} else {
+			throw new Error(`Unmocked Java.type path: '${path}'`);
+		}
+	})
+}
 // @ts-ignore TS2339: Property 'log' does not exist on type 'typeof globalThis'.
 global.log = log
 

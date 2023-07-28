@@ -12,26 +12,28 @@ import {
 } from '@enonic/js-utils';
 //import {get as getCollection} from '/lib/explorer/collection/get';
 import {connect} from '/lib/explorer/repo/connect';
+import { HTTP_RESPONSE_STATUS_CODES } from '../constants';
+import authorize from './authorize';
+
 
 const {includes: arrayIncludes} = array;
 
 
 export type RemoveRequest = Request<{
 	collection?: string
-	id: string
+	id: string | string[]
 }, {
-	collection?: string
+	collectionName?: string
 }>
 
 
 export default function deleteMany(
-	request: RemoveRequest,
-	collections: string[] = []
+	request: RemoveRequest
 ): {
-	body: {
+	body?: {
 		message: string
 	} | unknown
-	contentType: string
+	contentType?: string
 	status?: number
 } {
 	const {
@@ -40,7 +42,7 @@ export default function deleteMany(
 			id: idParam
 		} = {},
 		pathParams: {
-			collection: collectionName = collectionParam
+			collectionName = collectionParam
 		} = {}
 	} = request;
 	if (!collectionName) {
@@ -62,26 +64,10 @@ export default function deleteMany(
 		};
 	}
 
-	if (!collections) {
-		log.error(`Access too no collections!`);
-		return {
-			body: {
-				message: 'Bad Request'
-			},
-			contentType: 'text/json;charset=utf-8',
-			status: 400 // Bad Request
-		};
-	}
+	const maybeErrorResponse = authorize(request, collectionName);
 
-	if (!arrayIncludes(forceArray(collections), collectionName)) {
-		log.error(`No access to collection:${collectionName}!`);
-		return {
-			body: {
-				message: 'Bad Request'
-			},
-			contentType: 'text/json;charset=utf-8',
-			status: 400 // Bad Request
-		};
+	if (maybeErrorResponse.status !== 200 ) {
+		return maybeErrorResponse;
 	}
 
 	const repoId = `${COLLECTION_REPO_PREFIX}${collectionName}`;
@@ -129,6 +115,7 @@ export default function deleteMany(
 
 	return {
 		body: responseArray,
-		contentType: 'text/json;charset=utf-8'
+		contentType: 'text/json;charset=utf-8',
+		status: HTTP_RESPONSE_STATUS_CODES.OK
 	};
 } // function remove
