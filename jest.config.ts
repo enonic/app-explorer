@@ -17,21 +17,22 @@ export default {
 			name: 'com.enonic.app.explorer',
 			version: '2.0.0'
 		},
-		Java: {
-			type: (path: string) => {
-				if (path === 'java.util.Locale') {
-					return {
-						forLanguageTag: (locale: string) => locale
-					}
-				} else if (path === 'java.lang.System') {
-					return {
-						currentTimeMillis: () => 0
-					};
-				} else {
-					throw new Error(`Unmocked Java.type path: '${path}'`);
-				}
-			}
-		}
+		// Didn't work when running more than one test
+		// Java: {
+		// 	type: (path: string) => {
+		// 		if (path === 'java.util.Locale') {
+		// 			return {
+		// 				forLanguageTag: (locale: string) => locale
+		// 			}
+		// 		} else if (path === 'java.lang.System') {
+		// 			return {
+		// 				currentTimeMillis: () => 0
+		// 			};
+		// 		} else {
+		// 			throw new Error(`Unmocked Java.type path: '${path}'`);
+		// 		}
+		// 	}
+		// }
 	},
 
 	// It seems mocks doesn't apply to mapped modules?

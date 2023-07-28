@@ -1,4 +1,5 @@
 // import type { EnonicXpRequest } from '@enonic-types/lib-explorer';
+import type { DocumentNode } from '/lib/explorer/types/Document';
 import type { Request } from '../../types/Request';
 
 
@@ -13,6 +14,7 @@ import { connect } from '/lib/explorer/repo/connect';
 import { hasRole } from '/lib/xp/auth';
 import { HTTP_RESPONSE_STATUS_CODES } from '../constants';
 import authorize from './authorize';
+import stripDocumentNode from './stripDocumentNode';
 
 
 export default function getOne(request: Request<{
@@ -74,7 +76,7 @@ export default function getOne(request: Request<{
 	const readFromCollectionBranchConnection = connect(connectParams);
 	//log.debug('connected using:%s', toStr(connectParams));
 
-	const documentNode = readFromCollectionBranchConnection.get(documentId);
+	const documentNode = readFromCollectionBranchConnection.get<DocumentNode>(documentId);
 	// log.debug('documentNode:%s', toStr(documentNode));
 
 	if (!documentNode) {
@@ -83,18 +85,7 @@ export default function getOne(request: Request<{
 		}
 	}
 
-	const strippedDocumentNode = {};
-	// Not allowed to see any underscore fields (except _id, _name, _path)
-	Object.keys(documentNode).forEach((k) => {
-		if (
-			!startsWith(k, '_')
-			|| k === '_id'
-			|| k === '_name'
-			|| k === '_path'
-		) {
-			strippedDocumentNode[k] = documentNode[k];
-		}
-	});
+	const strippedDocumentNode = stripDocumentNode(documentNode);
 	// log.debug('strippedDocumentNode:%s', toStr(strippedDocumentNode));
 
 	return {

@@ -26,7 +26,7 @@ import {
 	getMany,
 	getOne,
 	patch,
-	put,
+	// put,
 	query
 } from './documents';
 import {
@@ -65,8 +65,8 @@ router.delete(`/api/v${DOCUMENT_REST_API_VERSION}/documents/{collectionName}/{do
 router.get(`/api/v${DOCUMENT_REST_API_VERSION}/documents/{collectionName}/{documentId}`, (r: EnonicXpRequest) => getOne(r));
 router.get(`/api/v${DOCUMENT_REST_API_VERSION}/documents/{collectionName}/{documentId}/`, (r: EnonicXpRequest) => getOne(r));
 
-router.put(`/api/v${DOCUMENT_REST_API_VERSION}/documents/{collectionName}/{documentId}`, (r: EnonicXpRequest) => put(r));
-router.put(`/api/v${DOCUMENT_REST_API_VERSION}/documents/{collectionName}/{documentId}/`, (r: EnonicXpRequest) => put(r));
+// router.put(`/api/v${DOCUMENT_REST_API_VERSION}/documents/{collectionName}/{documentId}`, (r: EnonicXpRequest) => put(r));
+// router.put(`/api/v${DOCUMENT_REST_API_VERSION}/documents/{collectionName}/{documentId}/`, (r: EnonicXpRequest) => put(r));
 
 // Method PATCH isn't part of the HTTP/1.1 standard.
 // It is supported by some frameworks, but currently NOT Enonic XP, NOR lib-router:

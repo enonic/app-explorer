@@ -31,6 +31,7 @@ import { JavaBridge } from '@enonic/mock-xp/src/JavaBridge';
 import Log from '@enonic/mock-xp/src/Log';
 import {
 	COLLECTION_REPO_PREFIX,
+	FieldPath,
 	Folder,
 	NodeType,
 	Path,
@@ -182,23 +183,25 @@ jest.mock('/lib/xp/value', () => ({
 //──────────────────────────────────────────────────────────────────────────────
 describe('webapp', () => {
 	describe('documents', () => {
-		describe('getOne', () => {
+		describe('deleteMany', () => {
 			const collectionConnection = javaBridge.connect({
 				branch: 'master',
 				repoId: COLLECTION_REPO_ID
 			});
 
 			import('../../../src/main/resources/webapp/documents/createOrUpdateMany').then((moduleName) => {
-				const createOrUpdateManyResponse = moduleName.default({
-					body: JSON.stringify({
-						_documentTypeId: createdDocumentTypeNode._id,
-						key: 'value'
-					}),
+				moduleName.default({
+					body: JSON.stringify([{
+						key: 'value1'
+					},{
+						key: 'value2'
+					}]),
 					contentType: 'application/json',
 					headers: {
 						authorization: `Explorer-Api-Key ${API_KEY}`
 					},
 					params: {
+						documentTypeId: createdDocumentTypeNode._id,
 						requireValid: 'false'
 					},
 					pathParams: {
@@ -207,21 +210,64 @@ describe('webapp', () => {
 				});
 			});
 
-			it('returns 404 Not found when there are no documents with documentId', () => {
-				import('../../../src/main/resources/webapp/documents/getOne').then((moduleName) => {
+			it('returns 200 Ok when there are no documents with documentId', () => {
+				// const queryRes = collectionConnection.query({
+				// 	query: {
+				// 		boolean: {
+				// 			must: {
+				// 				term: {
+				// 					field: '_nodeType',
+				// 					value: NodeType.DOCUMENT
+				// 				}
+				// 			}
+				// 		}
+				// 	}
+				// });
+				// log.debug('queryRes: %s', queryRes);
+				// queryRes.hits.forEach(({id}) => {
+				// 	const documentNode = collectionConnection.get(id);
+				// 	log.debug('documentNode: %s', documentNode);
+				// });
+				import('../../../src/main/resources/webapp/documents/deleteMany').then((moduleName) => {
 					expect(moduleName.default({
+						params: {
+							id: '71cffa3d-2c3f-464a-a2b0-19bd447b4b95'
+						},
 						pathParams: {
 							collectionName: COLLECTION_NAME,
-							documentId: '123'
 						}
 					})).toStrictEqual({
-						status: HTTP_RESPONSE_STATUS_CODES.NOT_FOUND
-					});
+						body: [{
+							error: 'Unable to find document with _id = 71cffa3d-2c3f-464a-a2b0-19bd447b4b95!'
+						}],
+						contentType: 'text/json;charset=utf-8',
+						status: HTTP_RESPONSE_STATUS_CODES.OK
+					}); // expect
+
+					expect(moduleName.default({
+						params: {
+							id: [
+								'71cffa3d-2c3f-464a-a2b0-19bd447b4b95',
+								'71cffa3d-2c3f-464a-a2b0-19bd447b4b96'
+							]
+						},
+						pathParams: {
+							collectionName: COLLECTION_NAME,
+						}
+					})).toStrictEqual({
+						body: [{
+							error: 'Unable to find document with _id = 71cffa3d-2c3f-464a-a2b0-19bd447b4b95!'
+						},{
+							error: 'Unable to find document with _id = 71cffa3d-2c3f-464a-a2b0-19bd447b4b96!'
+						}],
+						contentType: 'text/json;charset=utf-8',
+						status: HTTP_RESPONSE_STATUS_CODES.OK
+					}); // expect
 				});
 			}); // it
 
-			it('returns 200 Ok and the document when found', () => {
-				import('../../../src/main/resources/webapp/documents/getOne').then((moduleName) => {
+			it('returns 200 Ok and overwrites the document when found', () => {
+				import('../../../src/main/resources/webapp/documents/deleteMany').then((moduleName) => {
 					const queryRes = collectionConnection.query({
 						query: {
 							boolean: {
@@ -236,23 +282,21 @@ describe('webapp', () => {
 					});
 					// log.debug('queryRes: %s', queryRes);
 
-					const cleanedNode = collectionConnection.get(queryRes.hits[0].id);
-					delete cleanedNode['_indexConfig'];
-					delete cleanedNode['_inheritsPermissions'];
-					delete cleanedNode['_nodeType'];
-					delete cleanedNode['_permissions'];
-					delete cleanedNode['_state'];
-					delete cleanedNode['_ts'];
-					delete cleanedNode['_versionKey'];
-					// delete cleanedNode['document_metadata']; // TODO: Should this be deleted?
-
-					expect(moduleName.default({
+					const deleteResponse = moduleName.default({
+						params: {
+							id: queryRes.hits.map(({id}) => id)
+						},
 						pathParams: {
 							collectionName: COLLECTION_NAME,
-							documentId: queryRes.hits[0].id
 						}
-					})).toStrictEqual({
-						body: cleanedNode,
+					});
+
+					expect(deleteResponse).toStrictEqual({
+						body: [{
+							_id: queryRes.hits[0].id,
+						},{
+							_id: queryRes.hits[1].id,
+						}],
 						contentType: 'text/json;charset=utf-8',
 						status: HTTP_RESPONSE_STATUS_CODES.OK
 					});

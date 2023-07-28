@@ -31,6 +31,7 @@ import { JavaBridge } from '@enonic/mock-xp/src/JavaBridge';
 import Log from '@enonic/mock-xp/src/Log';
 import {
 	COLLECTION_REPO_PREFIX,
+	FieldPath,
 	Folder,
 	NodeType,
 	Path,
@@ -182,7 +183,7 @@ jest.mock('/lib/xp/value', () => ({
 //──────────────────────────────────────────────────────────────────────────────
 describe('webapp', () => {
 	describe('documents', () => {
-		describe('getOne', () => {
+		describe('patch', () => {
 			const collectionConnection = javaBridge.connect({
 				branch: 'master',
 				repoId: COLLECTION_REPO_ID
@@ -208,20 +209,45 @@ describe('webapp', () => {
 			});
 
 			it('returns 404 Not found when there are no documents with documentId', () => {
-				import('../../../src/main/resources/webapp/documents/getOne').then((moduleName) => {
+				// const queryRes = collectionConnection.query({
+				// 	query: {
+				// 		boolean: {
+				// 			must: {
+				// 				term: {
+				// 					field: '_nodeType',
+				// 					value: NodeType.DOCUMENT
+				// 				}
+				// 			}
+				// 		}
+				// 	}
+				// });
+				// log.debug('queryRes: %s', queryRes);
+				// queryRes.hits.forEach(({id}) => {
+				// 	const documentNode = collectionConnection.get(id);
+				// 	log.debug('documentNode: %s', documentNode);
+				// });
+				import('../../../src/main/resources/webapp/documents/patch').then((moduleName) => {
 					expect(moduleName.default({
+						body: JSON.stringify({
+							// _documentTypeId: createdDocumentTypeNode._id,
+							newKey: 'value'
+						}),
 						pathParams: {
 							collectionName: COLLECTION_NAME,
-							documentId: '123'
+							documentId: '71cffa3d-2c3f-464a-a2b0-19bd447b4b95'
 						}
 					})).toStrictEqual({
+						body: {
+							message: 'Document with id "71cffa3d-2c3f-464a-a2b0-19bd447b4b95" does not exist in collection "my_collection"!'
+						},
+						contentType: 'text/json;charset=utf-8',
 						status: HTTP_RESPONSE_STATUS_CODES.NOT_FOUND
 					});
 				});
 			}); // it
 
-			it('returns 200 Ok and the document when found', () => {
-				import('../../../src/main/resources/webapp/documents/getOne').then((moduleName) => {
+			it('returns 200 Ok and overwrites the document when found', () => {
+				import('../../../src/main/resources/webapp/documents/patch').then((moduleName) => {
 					const queryRes = collectionConnection.query({
 						query: {
 							boolean: {
@@ -245,13 +271,21 @@ describe('webapp', () => {
 					delete cleanedNode['_ts'];
 					delete cleanedNode['_versionKey'];
 					// delete cleanedNode['document_metadata']; // TODO: Should this be deleted?
+					cleanedNode['newkey'] = 'value'; // Yes, property keys are contrained.
 
-					expect(moduleName.default({
+					const patchResponse = moduleName.default({
+						body: JSON.stringify({
+							// _documentTypeId: createdDocumentTypeNode._id,
+							newKey: 'value'
+						}),
 						pathParams: {
 							collectionName: COLLECTION_NAME,
 							documentId: queryRes.hits[0].id
 						}
-					})).toStrictEqual({
+					});
+					cleanedNode[FieldPath.META]['modifiedTime'] = patchResponse.body[FieldPath.META]['modifiedTime'];
+
+					expect(patchResponse).toStrictEqual({
 						body: cleanedNode,
 						contentType: 'text/json;charset=utf-8',
 						status: HTTP_RESPONSE_STATUS_CODES.OK

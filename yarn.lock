@@ -1584,10 +1584,10 @@
   resolved "https://registry.yarnpkg.com/@enonic/js-utils/-/js-utils-1.5.1.tgz#efae03c17634fac9e271a5bac65e27148980ef6c"
   integrity sha512-ugaAxT+fHm0QIz0LX/JTSviHDF3OH2OzSSrF40eWyDVqe325+ErBlxtJpZGFEMFgnpHpfdzqtGc8Wwav7O/iYg==
 
-"@enonic/mock-xp@^0.9.0":
-  version "0.9.0"
-  resolved "https://registry.yarnpkg.com/@enonic/mock-xp/-/mock-xp-0.9.0.tgz#eae3a3e40a087bf4991096cdf8d6b55132c3cbef"
-  integrity sha512-JJGPQt6wwhEdo477T+nsQQr6hcl0cZEQsOTMi6RtMCTjM3M8kkYxK9ZnCIUvqOsPrHy5uU2+0MtEOHtlX4cjvw==
+"@enonic/mock-xp@^0.9.1":
+  version "0.9.1"
+  resolved "https://registry.yarnpkg.com/@enonic/mock-xp/-/mock-xp-0.9.1.tgz#e31bb6c2c9885c70bb85de6b1cf659b8ee8c5221"
+  integrity sha512-0b8q48lFjTMvTV5rigJ2dr0ZhTtaFWKbfolspbm91y3HrWExJ9a87eTsCPmR3Yc0mfqHv+9CC9u8jl1K23boVg==
   dependencies:
     "@enonic/js-utils" "^1.4.1"
     colors "^1.4.0"

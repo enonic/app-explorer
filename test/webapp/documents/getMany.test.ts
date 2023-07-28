@@ -19,6 +19,7 @@ import type {
 	Repository,
 	get as getRepo
 } from '@enonic-types/lib-repo';
+import type { DocumentNode } from '/lib/explorer/types/Document';
 
 
 import {
@@ -182,23 +183,25 @@ jest.mock('/lib/xp/value', () => ({
 //──────────────────────────────────────────────────────────────────────────────
 describe('webapp', () => {
 	describe('documents', () => {
-		describe('getOne', () => {
+		describe('getMany', () => {
 			const collectionConnection = javaBridge.connect({
 				branch: 'master',
 				repoId: COLLECTION_REPO_ID
 			});
 
 			import('../../../src/main/resources/webapp/documents/createOrUpdateMany').then((moduleName) => {
-				const createOrUpdateManyResponse = moduleName.default({
-					body: JSON.stringify({
-						_documentTypeId: createdDocumentTypeNode._id,
-						key: 'value'
-					}),
+				moduleName.default({
+					body: JSON.stringify([{
+						key: 'value1'
+					},{
+						key: 'value2'
+					}]),
 					contentType: 'application/json',
 					headers: {
 						authorization: `Explorer-Api-Key ${API_KEY}`
 					},
 					params: {
+						documentTypeId: createdDocumentTypeNode._id,
 						requireValid: 'false'
 					},
 					pathParams: {
@@ -208,20 +211,43 @@ describe('webapp', () => {
 			});
 
 			it('returns 404 Not found when there are no documents with documentId', () => {
-				import('../../../src/main/resources/webapp/documents/getOne').then((moduleName) => {
+				import('../../../src/main/resources/webapp/documents/getMany').then((moduleName) => {
 					expect(moduleName.default({
+						params: {
+							id: 'nonexistent_document_id'
+						},
 						pathParams: {
 							collectionName: COLLECTION_NAME,
-							documentId: '123'
 						}
 					})).toStrictEqual({
+						body: {
+							message: "Didn't find any documents for ids:nonexistent_document_id"
+						},
+						contentType: 'text/json;charset=utf-8',
 						status: HTTP_RESPONSE_STATUS_CODES.NOT_FOUND
-					});
+					}); // expect
+					expect(moduleName.default({
+						params: {
+							id: [
+								'nonexistent_document_id1',
+								'nonexistent_document_id2'
+							]
+						},
+						pathParams: {
+							collectionName: COLLECTION_NAME,
+						}
+					})).toStrictEqual({
+						body: {
+							message: "Didn't find any documents for ids:nonexistent_document_id1,nonexistent_document_id2"
+						},
+						contentType: 'text/json;charset=utf-8',
+						status: HTTP_RESPONSE_STATUS_CODES.NOT_FOUND
+					}); // expect
 				});
 			}); // it
 
-			it('returns 200 Ok and the document when found', () => {
-				import('../../../src/main/resources/webapp/documents/getOne').then((moduleName) => {
+			it('returns 200 Ok and the document(s) when found', () => {
+				import('../../../src/main/resources/webapp/documents/getMany').then((moduleName) => {
 					const queryRes = collectionConnection.query({
 						query: {
 							boolean: {
@@ -236,25 +262,25 @@ describe('webapp', () => {
 					});
 					// log.debug('queryRes: %s', queryRes);
 
-					const cleanedNode = collectionConnection.get(queryRes.hits[0].id);
-					delete cleanedNode['_indexConfig'];
-					delete cleanedNode['_inheritsPermissions'];
-					delete cleanedNode['_nodeType'];
-					delete cleanedNode['_permissions'];
-					delete cleanedNode['_state'];
-					delete cleanedNode['_ts'];
-					delete cleanedNode['_versionKey'];
-					// delete cleanedNode['document_metadata']; // TODO: Should this be deleted?
-
+					import('../../../src/main/resources/webapp/documents/stripDocumentNode').then((stripDocumentNodeModule) => {
 					expect(moduleName.default({
+						params: {
+							id: [
+								queryRes.hits[0].id,
+								queryRes.hits[1].id,
+							]
+						},
 						pathParams: {
 							collectionName: COLLECTION_NAME,
-							documentId: queryRes.hits[0].id
 						}
-					})).toStrictEqual({
-						body: cleanedNode,
-						contentType: 'text/json;charset=utf-8',
-						status: HTTP_RESPONSE_STATUS_CODES.OK
+						})).toStrictEqual({
+							body: queryRes.hits.map(({id}) => {
+								const documentNode = collectionConnection.get(id) as unknown as DocumentNode;
+								return stripDocumentNodeModule.default(documentNode);
+							}),
+							contentType: 'text/json;charset=utf-8',
+							status: HTTP_RESPONSE_STATUS_CODES.OK
+						});
 					});
 				});
 			}); // it

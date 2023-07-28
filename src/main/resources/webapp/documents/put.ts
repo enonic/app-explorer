@@ -16,6 +16,7 @@ import { connect } from '/lib/explorer/repo/connect';
 import { HTTP_RESPONSE_STATUS_CODES } from '../constants';
 import authorize from './authorize';
 import runWithExplorerWrite from './runWithExplorerWrite';
+import stripDocumentNode from './stripDocumentNode';
 
 
 const COLLECTOR_ID = `${APP_EXPLORER}:documentRestApi`;
@@ -76,12 +77,15 @@ export default function put(request: Request<{
 	}
 
 	const repoId = `${COLLECTION_REPO_PREFIX}${collectionName}`;
+	// log.debug('repoId:%s', repoId);
+
 	const writeToCollectionBranchConnection = connect({
 		branch: 'master',
 		principals: [Principal.EXPLORER_WRITE], // Additional principals to execute the callback with
 		repoId//,
 		//user // Default is the default user
 	});
+
 	if (!writeToCollectionBranchConnection.exists(documentId)) {
 		return {
 			body: {
@@ -164,9 +168,7 @@ export default function put(request: Request<{
 		};
 	}
 	return {
-		body: {
-			_id: updatedNode._id
-		},
+		body: stripDocumentNode(updatedNode),
 		contentType: 'text/json;charset=utf-8',
 		status: HTTP_RESPONSE_STATUS_CODES.OK
 	};
