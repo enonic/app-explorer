@@ -38,6 +38,7 @@ export default {
 	// It seems mocks doesn't apply to mapped modules?
 	moduleNameMapper: {
 		// '@enonic/mock-xp/(.*)': '<rootDir>/symlinks/enonic-mock-xp/$1',
+		// '@enonic/js-utils/(.*)': '<rootDir>/symlinks/enonic-js-utils/$1',
 		'/lib/explorer/(.*)': '<rootDir>/symlinks/lib-explorer/src/main/resources/lib/explorer/$1'
 	},
 
