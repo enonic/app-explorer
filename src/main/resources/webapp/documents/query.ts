@@ -74,14 +74,14 @@ export default function query(
 		// collection?: string
 		// collections?: string[]
 		count?: number
-    	// explain?: boolean;
+		// explain?: boolean;
 		filters?: Filter | Filter[]
-    	// highlight?: Highlight;
+		// highlight?: Highlight;
 		// id?: string|string[]
 		query?: QueryDsl | string
 		sort?: string | SortDsl | SortDsl[]
 		start?: number
-    	// suggestions?: Record<string, TermSuggestion>;
+		// suggestions?: Record<string, TermSuggestion>;
 	} = {};
 	if (bodyJson) {
 		try {
@@ -139,20 +139,14 @@ export default function query(
 		if (!filters['boolean']) {
 			filters['boolean'] = {};
 		}
-		if (!(filters as BooleanFilter).boolean.should) {
-			(filters as BooleanFilter).boolean.should = [];
+		if (!(filters as BooleanFilter).boolean.must) {
+			(filters as BooleanFilter).boolean.must = [];
 		} else if (!Array.isArray((filters as BooleanFilter).boolean.should)) {
-			(filters as BooleanFilter).boolean.should = [(filters as BooleanFilter).boolean.should] as Filter[];
+			(filters as BooleanFilter).boolean.must = [(filters as BooleanFilter).boolean.should] as Filter[];
 		}
-		((filters as BooleanFilter).boolean.should as Filter[]).push({
+		((filters as BooleanFilter).boolean.must as Filter[]).push({
 			hasValue: {
 				field: '_nodeType',
-				values: [NodeType.DOCUMENT]
-			}
-		});
-		((filters as BooleanFilter).boolean.should as Filter[]).push({
-			hasValue: {
-				field: 'type',
 				values: [NodeType.DOCUMENT]
 			}
 		});
@@ -167,7 +161,7 @@ export default function query(
 		// 	}
 		// 	forceArray(idParam).forEach((id) => {
 		// 		filters.ids.values.push(id);
-	
+
 		// 	});
 		// }
 		// log.debug('filters:%s', toStr(filters));
@@ -200,7 +194,8 @@ export default function query(
 		sort,
 		start
 	};
-	log.debug('queryParams:%s', toStr(queryParams));
+	// log.debug('queryParams:%s', queryParams); // Without toStr for running jest
+	// log.debug('queryParams:%s', toStr(queryParams));
 
 	let queryRes: {
 		count: number
@@ -211,7 +206,8 @@ export default function query(
 	};
 	try {
 		queryRes = readFromCollectionBranchConnection.query(queryParams);
-		//log.debug('queryRes:%s', toStr(queryRes));
+		// log.debug('queryRes:%s', queryRes); // Without toStr for running jest
+		// log.debug('queryRes:%s', toStr(queryRes));
 	} catch (e) {
 		let error = `Unknown error when quering in collectionName:${collectionName}!`;
 		if (
@@ -233,7 +229,8 @@ export default function query(
 	//log.info(`keys:${toStr(keys)}`);
 
 	const getRes = readFromCollectionBranchConnection.get(...keys);
-	//log.info(`getRes:${toStr(getRes)}`);
+	// log.debug('getRes:%s', getRes); // Without toStr for running jest
+	// log.info(`getRes:${toStr(getRes)}`);
 
 	const strippedRes = forceArray(getRes).map((node) => {
 		// Not allowed to see any underscore fields (except _id, _name, _path)
