@@ -1,7 +1,7 @@
 {
   "author": "Christian Andreas Westgaard <cwe@enonic.com>",
   "dependencies": {
-    "@enonic/js-utils": "^1.5.1",
+    "@enonic/js-utils": "^1.5.2",
     "@enonic/semantic-ui-react-form": "^2",
     "@seamusleahy/init-hooks": "^1",
     "@semantic-ui-react/component-ref": "^1",
