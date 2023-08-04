@@ -8,14 +8,15 @@ import * as React from 'react';
 
 const JOBS_GQL = `{
 	listScheduledJobs {
-    	collectionId
-    	enabled
-    	descriptor
-    	schedule {
-      	timeZone
-      	type
-      	value
-    	}
+		collectionId
+		collectionName
+		enabled
+		descriptor
+		schedule {
+		timeZone
+		type
+		value
+		}
 	}
 }`;
 
@@ -27,13 +28,13 @@ export function useScheduleState({
 	propStart,
 	propZoom,
 	servicesBaseUrl
-} :{
-	servicesBaseUrl :string
-	propEnd ?:Date
-	propNow ?:Date
-	propStart ?:Date
-	propProjects ?:Array<ScheduledJob>
-	propZoom ?:number
+}: {
+	servicesBaseUrl: string
+	propEnd?: Date
+	propNow?: Date
+	propStart?: Date
+	propProjects?: ScheduledJob[]
+	propZoom?: number
 }) {
 	const [key, setKey] = React.useState(hash(propProjects));
 	const [projects, setProjects] = React.useState(propProjects);
@@ -61,7 +62,8 @@ export function useScheduleState({
 						? res.data.listScheduledJobs
 						: res.data.listScheduledJobs.filter(({enabled}) => enabled)
 					).map(({
-						collectionId,
+						// collectionId,
+						collectionName,
 						//descriptor,
 						//enabled,
 						schedule: {
@@ -69,8 +71,8 @@ export function useScheduleState({
 							//type, // TODO: filter on CRON?
 							value: cronExpression
 						}
-					} :ScheduledJob) => {
-						const projectId = collectionId;
+					}: ScheduledJob) => {
+						const projectId = collectionName;
 						const tasks = [];
 						let taskCount = 1;
 						try {

@@ -1,7 +1,8 @@
 export type ScheduledJob = {
-	collectionId :string
-	enabled :boolean
-	schedule :{
-		value :string
+	collectionId: string
+	collectionName: string
+	enabled: boolean
+	schedule: {
+		value: string
 	}
 }
