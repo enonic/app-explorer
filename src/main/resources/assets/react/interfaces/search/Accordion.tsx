@@ -114,6 +114,7 @@ export function Accordion({
 	}];
 	return <SURAccordion
 		defaultActiveIndex={[]}
+		exclusive={false}
 		fluid
 		panels={panels}
 		styled
