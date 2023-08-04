@@ -117,6 +117,7 @@ export const GQL_MUTATION_API_KEY_CREATE_NAME = 'createApiKey';
 export const GQL_MUTATION_API_KEY_DELETE_NAME = 'deleteApiKey';
 export const GQL_MUTATION_API_KEY_UPDATE_NAME = 'updateApiKey';
 export const GQL_MUTATION_COLLECTION_COPY_NAME = 'copyCollection';
+export const GQL_MUTATION_COLLECTION_DELETE_NAME = 'deleteCollection';
 export const GQL_MUTATION_INTERFACE_CREATE_NAME = 'createInterface';
 export const GQL_MUTATION_INTERFACE_DELETE_NAME = 'deleteInterface';
 export const GQL_MUTATION_INTERFACE_UPDATE_NAME = 'updateInterface';
