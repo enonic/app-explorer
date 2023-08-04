@@ -95,7 +95,7 @@ function DocumentsTable({
 								? searchedString
 									? <Table.HeaderCell
 										content={columnNameToDisplayName(columnName)}
-										key={i}
+										key={`column-${columnName}`}
 										singleLine
 									/>
 									: null
@@ -117,7 +117,7 @@ function DocumentsTable({
 									/>
 									: <Table.HeaderCell
 										content={columnNameToDisplayName(columnName)}
-										key={i}
+										key={`column-${columnName}`}
 										singleLine
 									/>)
 							}
@@ -134,10 +134,10 @@ function DocumentsTable({
 							parsedJson,
 							...rest
 						}, i) => {
-							return <Table.Row key={i}>
+							return <Table.Row key={`row-${i}`}>
 								{
 									selectedColumnsState.map((selectedColumnName, j) => {
-										const key = `${i}.${j}`;
+										const key = `cell-${i}.${j}`;
 										if (selectedColumnName === Column.COLLECTION) {
 											return <Table.Cell collapsing key={key}>
 												{rest[FieldPath.META] && rest[FieldPath.META].collection || rest['_collection']}
@@ -175,7 +175,7 @@ function DocumentsTable({
 											</Table.Cell>;
 										} else if (selectedColumnName === HIGHLIGHT_FIELD_ALLTEXT) {
 											return searchedString
-												? <Table.Cell>
+												? <Table.Cell key={key}>
 													{
 														_highlight?.['_alltext'].length
 															? <ul style={{
