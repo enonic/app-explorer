@@ -59,6 +59,8 @@ import {addMutationApiKeyDelete} from './apiKey/addMutationApiKeyDelete';
 import {addMutationApiKeyUpdate} from './apiKey/addMutationApiKeyUpdate';
 import {generateQueryApiKeysField} from './apiKey/generateQueryApiKeysField';
 
+
+import addMutationCollectionDelete from './collection/addMutationCollectionDelete'
 import {generateCollectionFields} from './collection/generateCollectionFields';
 import {addGetManagedDocumentTypes} from './collector/addGetManagedDocumentTypes';
 import {generateQueryCollectorsField} from './collector/generateQueryCollectorsField';
@@ -211,6 +213,7 @@ const {
 	reindexCollectionsField,
 	updateCollectionField
 } = generateCollectionFields({glue});
+addMutationCollectionDelete({glue});
 
 addGetMembers({glue});
 addGetMemberships({glue});
