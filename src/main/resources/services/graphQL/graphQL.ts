@@ -19,7 +19,7 @@ import type {Request} from '../../types/index.d';
 import {
 	RESPONSE_TYPE_JSON,
 	sortKeys,
-	//toStr
+	// toStr
 } from '@enonic/js-utils';
 // import prettyMs from 'pretty-ms';
 //@ts-ignore
@@ -28,6 +28,15 @@ import {
 	execute
 	//@ts-ignore
 } from '/lib/graphql';
+// @ts-expect-error TS2307: Cannot find module '/lib/router' or its corresponding type declarations.
+import Router from '/lib/router';
+import {
+	GETTER_ROOT,
+	FILEPATH_MANIFEST,
+	FILEPATH_MANIFEST_NODE_MODULES
+} from './constants';
+import immutableGetter from './immutableGetter';
+import getImmuteableUrl from './getImmuteableUrl';
 
 
 import {Glue} from './Glue';
@@ -106,6 +115,9 @@ import {createObjectTypesUsingUnionTypes} from './createObjectTypesUsingUnionTyp
 // 	currentTimeMillis: () => number
 // }
 // const serviveStartTimeMs = currentTimeMillis();
+
+
+const router = Router();
 
 
 const SECONDS_TO_CACHE = 3600; // One hour
@@ -327,6 +339,7 @@ const query = glue.schemaGenerator.createObjectType({
 
 //const objectTypes = glue.getObjectTypes();
 //const unionTypes = glue.getUnionTypes();
+const ID_REACT_CONTAINER = 'react-container';
 
 
 export function getCachedSchema() {
@@ -345,7 +358,7 @@ export function getCachedSchema() {
 export const SCHEMA = getCachedSchema();
 
 
-export function post(request :Request) {
+export function graphQLResponse(request: Request) {
 	// const requestStartTimeMs = currentTimeMillis();
 	//log.info(`request:${toStr(request)}`);
 
@@ -385,3 +398,60 @@ export function post(request :Request) {
 		//)
 	};
 } // post
+
+
+function graphiQLAppResponse(request: Request) {
+	const {url} = request;
+	const propsObj = {
+		url
+	};
+	const graphiQLAppUrl = getImmuteableUrl({
+		manifestPath: FILEPATH_MANIFEST,
+		path: 'react/GraphiQLApp.mjs'
+	});
+	return {
+		body: `<html>
+	<head>
+		<meta name="robots" content="noindex,nofollow">
+		<script type="text/javascript" src="${getImmuteableUrl({
+			manifestPath: FILEPATH_MANIFEST_NODE_MODULES,
+			path: 'react/umd/react.development.js'
+		})}"></script>
+		<script type="text/javascript" src="${getImmuteableUrl({
+			manifestPath: FILEPATH_MANIFEST_NODE_MODULES,
+			path: 'react-dom/umd/react-dom.development.js'
+		})}"></script>
+		<link rel="stylesheet" type="text/css" href="${getImmuteableUrl({
+			manifestPath: FILEPATH_MANIFEST_NODE_MODULES,
+			path: 'graphiql/graphiql.min.css'
+		})}">
+		<title>GraphiQL</title>
+	</head>
+	<body style="margin:0">
+		<div id="${ID_REACT_CONTAINER}"/>
+		<!--script type="module" src="./${graphiQLAppUrl}"></script-->
+		<script type='module' defer>
+			import { GraphiQLApp } from './${graphiQLAppUrl}';
+			const propsObj = eval(${JSON.stringify(propsObj)});
+			//console.debug('propsObj', propsObj);
+			const root = ReactDOM.createRoot(document.getElementById('${ID_REACT_CONTAINER}'));
+			root.render(React.createElement(GraphiQLApp, propsObj));
+		</script>
+	</body>
+</html>`,
+		contentType: 'text/html; charset=utf-8',
+	};
+}
+
+router.get('/', (r: Request) => graphiQLAppResponse(r));
+router.get('', (r: Request) => graphiQLAppResponse(r));
+
+router.post('/', (r: Request) => graphQLResponse(r));
+router.post('', (r: Request) => graphQLResponse(r));
+
+router.all(`/${GETTER_ROOT}/{path:.+}`, (r: Request) => {
+	// log.info('request:%s', toStr(r));
+	return immutableGetter(r);
+});
+
+export const all = (r: Request) => router.dispatch(r);

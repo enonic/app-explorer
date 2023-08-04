@@ -1,3 +1,10 @@
+export const SERVICE_NAME = 'graphQL';
+export const GETTER_ROOT = 'static';
+export const FILEPATH_MANIFEST = `/${GETTER_ROOT}/manifest.json`;
+export const FILEPATH_MANIFEST_NODE_MODULES = `/${GETTER_ROOT}/node_modules-manifest.json`;
+
+//──────────────────────────────────────────────────────────────────────────────
+
 // [_A-Za-z][_0-9A-Za-z]*
 
 export const FIELD_SHORTCUT_COLLECTION = '_collectionName';
