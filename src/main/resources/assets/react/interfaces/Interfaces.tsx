@@ -170,7 +170,6 @@ export function Interfaces({
 									basename={basename}
 									interfaceName={_name}
 									loading={isLoading}
-									fields={fields}
 									searchString={searchString} setSearchString={setSearchString}
 									servicesBaseUrl={servicesBaseUrl}
 									setInterfaceNameState={setInterfaceNameState}
