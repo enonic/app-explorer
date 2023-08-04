@@ -111,6 +111,7 @@ export default defineConfig((options: MyOptions) => {
 			},
 			external: [ // All these are available runtime in the jar file:
 				'/lib/cache',
+				'/lib/enonic/static',
 				/^\/lib\/explorer/,
 				'/lib/galimatias',
 				'/lib/graphql',
@@ -226,6 +227,9 @@ export default defineConfig((options: MyOptions) => {
 
 			tsconfig: 'tsconfig.tsup.json'
 		};
+	}
+	if (options.d === 'build/resources/main/static') {
+		return import('./tsup/static').then(m => m.default());
 	}
 	throw new Error(`Unconfigured directory:${options.d}!`)
 });
