@@ -14,6 +14,21 @@ export interface QueryInterfacesResponseData {
 	}
 }
 
+const GQL_MUTATION_COLLECTION_DELETE = gql.mutation({
+	operation: 'deleteCollection',
+	fields: [
+		'_id',
+	],
+	variables: {
+		_id: {
+			list: false,
+			required: true,
+			type: 'ID',
+			// value:
+		}
+	}
+});
+
 
 const GQL_QUERY_INTERFACES_WITH_COLLECTION = gql.query({
 	operation: 'queryInterfaces',
@@ -28,7 +43,7 @@ const GQL_QUERY_INTERFACES_WITH_COLLECTION = gql.query({
 			list: false,
 			required: false,
 			type: 'String',
-			//value:
+			// value:
 		}
 	},
 });
@@ -36,13 +51,38 @@ const GQL_QUERY_INTERFACES_WITH_COLLECTION = gql.query({
 
 export default function useDeleteCollectionState({
 	collectionId,
+	onClose
 }: {
 	collectionId: string
+	onClose: () => void
 }) {
 	//──────────────────────────────────────────────────────────────────────────
 	// State
 	//──────────────────────────────────────────────────────────────────────────
 	const [usedInInterfaces, setUsedInInterfaces] = React.useState<string[]>([]);
+
+	const [fetchDeleteCollection, {
+		// data: dataDeleteCollection,
+		// error: errorDeleteCollection,
+		loading: loadingDeleteCollection,
+	}] = useManualQuery(GQL_MUTATION_COLLECTION_DELETE.query);
+
+	const fetchDeleteCollectionAndClose = async () => {
+		const {
+			data: localDataDeleteCollection,
+		} = await fetchDeleteCollection({
+			variables: {
+				_id: collectionId
+			}
+		});
+		// console.debug('dataDeleteCollection', dataDeleteCollection); // undefined
+		// console.debug('errorDeleteCollection', errorDeleteCollection); // undefined
+		// console.debug('loadingDeleteCollection', loadingDeleteCollection); // false
+		// console.debug('localDataDeleteCollection', localDataDeleteCollection);
+		if (localDataDeleteCollection) {
+			onClose();
+		}
+	}
 
 	const [fetchInterfacesWithCollection,{
 		loading,
@@ -74,7 +114,9 @@ export default function useDeleteCollectionState({
 	// Returns
 	//──────────────────────────────────────────────────────────────────────────
 	return {
+		fetchDeleteCollectionAndClose,
 		loading,
+		loadingDeleteCollection,
 		usedInInterfaces,
 	};
 }
