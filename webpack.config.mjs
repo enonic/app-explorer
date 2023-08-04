@@ -174,7 +174,6 @@ const SS_JS_CONFIG = {
 		'lib/licensing': './lib/licensing.ts',
 		'main': './main.ts',
 		'services/collectionCollect/collectionCollect': './services/collectionCollect/collectionCollect.ts',
-		'services/collectionDelete/collectionDelete': './services/collectionDelete/collectionDelete.ts',
 		'services/collectionDuplicate/collectionDuplicate': './services/collectionDuplicate/collectionDuplicate.ts',
 		'services/collectorStop/collectorStop': './services/collectorStop/collectorStop.ts',
 		'services/interfaceCopy/interfaceCopy': './services/interfaceCopy/interfaceCopy.ts',

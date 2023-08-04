@@ -1555,6 +1555,13 @@
   resolved "https://registry.yarnpkg.com/@enonic-types/lib-repo/-/lib-repo-7.13.1.tgz#72636f2e5c6b0995612fc437276beb3c9e9f81d8"
   integrity sha512-ZCPUu6GQ2GO/1Gfosb/5Q2rn9mBVKvCh+Ig0Epr9Cz1UuycuomawkDQw80Ue/FgE5Kb6k/M2c0G4X31nWBy/cQ==
 
+"@enonic-types/lib-scheduler@^7":
+  version "7.13.1"
+  resolved "https://registry.yarnpkg.com/@enonic-types/lib-scheduler/-/lib-scheduler-7.13.1.tgz#1126abd31dcc8e569ff6c55d7932495a08d2f972"
+  integrity sha512-H26/gOlhLc4Fei6UwmlzTkDvMWhcDt8M++KIw6vIOZHULc4Cfb+gK007q8yqjOD1DsvZhVmInWt0KNpYEmmjrw==
+  dependencies:
+    "@enonic-types/core" "7.13.1"
+
 "@enonic-types/lib-task@^7":
   version "7.13.1"
   resolved "https://registry.yarnpkg.com/@enonic-types/lib-task/-/lib-task-7.13.1.tgz#cf7bd74855e9f591b2885635269bcfa8cd43e424"
