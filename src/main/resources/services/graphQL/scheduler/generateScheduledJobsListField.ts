@@ -20,13 +20,15 @@ export function generateScheduledJobsListField({
 				.filter(({descriptor}) => descriptor.startsWith(APP_EXPLORER))
 				.map(({
 					config: {
-						collectionId
+						collectionId,
+						name: collectionName
 					},
 					descriptor,
 					enabled,
 					schedule
 				}) => ({
 					collectionId,
+					collectionName,
 					descriptor,
 					enabled,
 					schedule
@@ -43,6 +45,7 @@ export function generateScheduledJobsListField({
 {
 	listScheduledJobs {
 		collectionId
+		collectionName
 		descriptor
 		enabled
 		schedule {
