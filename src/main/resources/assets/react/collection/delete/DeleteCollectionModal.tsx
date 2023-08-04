@@ -13,18 +13,19 @@ export function DeleteCollectionModal({
 	collectionId,
 	collectionName,
 	onClose,
-	servicesBaseUrl,
 }: {
 	collectionId: string
 	collectionName: string
 	onClose: () => void
-	servicesBaseUrl: string
 }) {
 	const {
+		fetchDeleteCollectionAndClose,
 		loading,
+		loadingDeleteCollection,
 		usedInInterfaces,
 	} = useDeleteCollectionState({
 		collectionId,
+		onClose
 	});
 
 	return <Modal
@@ -68,15 +69,8 @@ export function DeleteCollectionModal({
 			<Button onClick={onClose}>Cancel</Button>
 			<Button
 				icon
-				disabled={loading}
-				onClick={() => {
-					fetch(`${servicesBaseUrl}/collectionDelete?name=${collectionName}`, {
-						method: 'DELETE'
-					}).then((/*response*/) => {
-						//if (response.status === 200) {}
-						onClose();
-					});
-				}}
+				disabled={loading || loadingDeleteCollection}
+				onClick={fetchDeleteCollectionAndClose}
 				primary
 			><Icon name='trash alternate outline'/>Confirm Delete</Button>
 		</Modal.Actions>

@@ -7,6 +7,9 @@ import {
 	Principal
 } from '@enonic/explorer-utils';
 import { connect } from '/lib/explorer/repo/connect';
+import { listExplorerJobsThatStartWithName } from '/lib/explorer/scheduler/listExplorerJobsThatStartWithName';
+import { delete as deleteJob } from '/lib/xp/scheduler';
+import { executeFunction } from '/lib/xp/task';
 import {
 	GQL_MUTATION_COLLECTION_DELETE_NAME,
 	GQL_TYPE_NODE_DELETED_NAME
@@ -30,7 +33,7 @@ export default function addMutationCollectionDelete({glue}) {
 					_id,
 				}
 			} = env;
-			log.debug('_id:%s', _id);
+			// log.debug('_id:%s', _id);
 
 			const writeConnection = connect({
 				principals: [Principal.EXPLORER_WRITE]
@@ -46,8 +49,20 @@ export default function addMutationCollectionDelete({glue}) {
 				throw new Error(`id:${_id} not a collection!`);
 			}
 
+			executeFunction({
+				description: `Delete any scheduled job relating to collection with path:${collectionNode._path}`,
+				func: () => {
+					const explorerJobsThatStartWithName = listExplorerJobsThatStartWithName({name: collectionNode._id});
+					log.debug(`collection path:${collectionNode._path} explorerJobsThatStartWithName:${toStr(explorerJobsThatStartWithName)}`);
+					explorerJobsThatStartWithName.forEach(({name}) => {
+						log.info(`Deleting job name:${name}, while deleting collection with path:${collectionNode._path}`);
+						deleteJob({name});
+					});
+				}
+			});
+
 			const deleteCollectionRes = writeConnection.delete(_id);
-			log.debug('deleteCollectionRes:%s', toStr(deleteCollectionRes));
+			// log.debug('deleteCollectionRes:%s', toStr(deleteCollectionRes));
 
 			if (deleteCollectionRes.length !== 1 ) {
 				throw new Error(`Something went wrong when trying to delete collection with id:${_id}`);
