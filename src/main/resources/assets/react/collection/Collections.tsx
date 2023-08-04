@@ -292,7 +292,7 @@ export function Collections(props :{
 											{showDocumentCount ? <Table.Cell collapsing>{
 												documentCount === -1
 													? ''
-													: documentCount > 1
+													: documentCount >= 1
 														? <Link
 															to={`/documents?collection=${collectionName}`}
 														>{documentCount}</Link>
