@@ -15,6 +15,7 @@ export function generateSchedulerTypes({
 		name: GQL_TYPE_JOB_NAME,
 		fields: {
 			collectionId: { type: glue.getScalarType('_id') },
+			collectionName: { type: glue.getScalarType('_name') },
 			descriptor: { type: nonNull(GraphQLString) },
 			enabled: { type: nonNull(GraphQLBoolean) },
 			schedule: { type: nonNull(glue.addObjectType({
