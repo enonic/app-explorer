@@ -123,7 +123,13 @@ export function NewOrEditCollectionModal({
 					/>
 				</Button>
 		}
-	>{licenseValid || totalNumberOfCollections <= 2 // This means it will be allowed to create collection 3, but not number 4
+	>{
+		(
+			licenseValid
+			|| _name
+				? totalNumberOfCollections <= 3 // This means it will be allowed to edit collection 3, but not number 4
+				: totalNumberOfCollections <= 2 // This means it will be allowed to create collection 3, but not number 4
+		)
 			? <>
 				<Modal.Header>{_name ? `Edit collection ${_name}`: 'New collection'}</Modal.Header>
 				<Collection
