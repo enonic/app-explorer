@@ -23,7 +23,6 @@ export function SearchModal({
 	afterClose = () => {/**/},
 	beforeOpen = () => {/**/},
 	//documentTypesAndFields = {},
-	fields = [],
 	loading = false
 } :{
 	// Required
@@ -81,7 +80,9 @@ export function SearchModal({
 			<Search
 				basename={basename}
 				firstColumnWidth={3}
-				fields={fields}
+				fields={[{
+					name: '_alltext'
+				}]}
 				interfaceNameState={interfaceName}
 				searchString={searchString} setSearchString={setSearchString}
 				servicesBaseUrl={servicesBaseUrl}
