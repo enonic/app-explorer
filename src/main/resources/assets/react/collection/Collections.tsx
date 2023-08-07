@@ -87,8 +87,8 @@ export function Collections(props :{
 		locales,
 		memoizedFetchCollections,
 		memoizedFetchOnUpdate,
-		memoizedFetchTasks,
 		objCollectionsBeingReindexed,
+		pollTasksWhileActive,
 		queryCollectionsGraph,
 		shemaIdToName,
 		setShowCollector,
@@ -234,7 +234,7 @@ export function Collections(props :{
 																fetch(`${servicesBaseUrl}/collectorStop?collectionName=${collectionName}`, {
 																	method: 'POST'
 																}).then(() => {
-																	memoizedFetchTasks();
+																	pollTasksWhileActive();
 																});
 															}}/>}/>,
 														FINISHED: <Popup
@@ -249,6 +249,7 @@ export function Collections(props :{
 													: anyTaskWithoutCollectionName
 														? <Popup
 															content={`Some collector task is starting...`}
+															pollTasksWhileActive
 															inverted
 															trigger={<HoverButton color='yellow' disabled={!boolCollectorSelectedAndInitialized} icon='question' loading/>}/>
 														: <Popup
@@ -263,7 +264,7 @@ export function Collections(props :{
 																		fetch(`${servicesBaseUrl}/collectionCollect?id=${collectionId}&name=${collectionName}`, {
 																			method: 'POST'
 																		}).then(() => {
-																			memoizedFetchTasks();
+																			pollTasksWhileActive();
 																		});
 																	}}
 																/>
@@ -523,7 +524,6 @@ export function Collections(props :{
 						})
 						memoizedFetchCollections();
 					}}
-					servicesBaseUrl={servicesBaseUrl}
 				/>
 				: null
 		}
