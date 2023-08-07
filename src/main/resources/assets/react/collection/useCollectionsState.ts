@@ -1,3 +1,4 @@
+import type {TaskInfo} from '@enonic-types/lib-task';
 import type {StrictTableHeaderCellProps} from 'semantic-ui-react';
 import type {
 	Collector,
@@ -12,8 +13,16 @@ import type {
 
 
 import {COLON_SIGN} from '@enonic/js-utils';
+import * as gql from 'gql-query-builder';
+import { useManualQuery } from 'graphql-hooks';
 import * as React from 'react';
+import {useInterval} from '../utils/useInterval';
 import {useUpdateEffect} from '../utils/useUpdateEffect';
+
+
+interface FetchTasksData {
+	queryTasks: TaskInfo[]
+}
 
 
 const COLLECTIONS_GQL = `queryCollections(
@@ -86,10 +95,10 @@ const GQL_DOCUMENT_TYPES_QUERY = `queryDocumentTypes {
 }`;
 
 /*const GQL_QUERY_TASKS_GET = `query GetTasks(
-  $appName: String
-  $descriptor: String,
-  $onlyRegisteredCollectorTasks: Boolean,
-  $state: EnumTaskStates
+	$appName: String
+	$descriptor: String,
+	$onlyRegisteredCollectorTasks: Boolean,
+	$state: EnumTaskStates
 ) {
 	queryTasks(
 		appName: $appName
@@ -111,6 +120,26 @@ const GQL_DOCUMENT_TYPES_QUERY = `queryDocumentTypes {
 		user
 	}
 }`;*/
+
+const GQL_QUERY_QUERY_TASKS = gql.query({
+	operation: 'queryTasks',
+	fields: [
+		'application',
+		'description',
+		'id',
+		'name'	,
+		{
+			progress: [
+				'current',
+				'info',
+				'total'
+			]
+		},
+		'startTime',
+		'state',
+		'user'
+	]
+});
 
 const TASKS_GQL = `queryTasks {
 	application
@@ -150,6 +179,7 @@ const UPDATE_GQL = `{
 	${GQL_DOCUMENT_TYPES_QUERY}
 	${TASKS_GQL}
 }`;
+
 
 export function useCollectionsState({
 	collectorComponents,
@@ -191,7 +221,7 @@ export function useCollectionsState({
 	const [showInterfaces, setShowInterfaces] = React.useState(false);
 	const [showDocumentType, setShowDocumentType] = React.useState(true);
 	const [showSchedule, setShowSchedule] = React.useState(true);
-	const [tasks, setTasks] = React.useState([]);
+	const [tasks, setTasks] = React.useState<TaskInfo[]>([]);
 	const [copyModalCollectionId, setCopyModalCollectionId] = React.useState<string>();
 
 	const fieldsObj = {};
@@ -236,7 +266,7 @@ export function useCollectionsState({
 			info,
 			total
 		},
-		state // WAITING | RUNNING | FINISHED | FAILED
+		state
 	}) => {
 		if (collectorsObj[taskDescriptor]) { // This is a collector task
 			try {
@@ -247,7 +277,11 @@ export function useCollectionsState({
 					anyTaskWithoutCollectionName = true;
 				}
 			} catch (e) {
-				anyTaskWithoutCollectionName = true;
+				// This happens while a collector task is beeing started.
+				// This can also happen when a collector task is finished with errors.
+				if (['WAITING', 'RUNNING'].includes(state)) {
+					anyTaskWithoutCollectionName = true;
+				}
 			}
 		} else if (taskDescriptor === `com.enonic.app.explorer${COLON_SIGN}reindexCollection`) {
 			try {
@@ -402,26 +436,34 @@ export function useCollectionsState({
 		servicesBaseUrl
 	]);
 
-	const memoizedFetchTasks = React.useCallback(() => {
+	const [ fetchTasks ] = useManualQuery<FetchTasksData>(GQL_QUERY_QUERY_TASKS.query);
+	const [pollTasks, setPollTasks] = React.useState(false);
+	const pollTasksWhileActive = () => {
 		setIsLoading(true);
-		fetch(`${servicesBaseUrl}/graphQL`, {
-			method: 'POST',
-			headers: { // HTTP/2 uses lowercase header keys
-				'content-type': 'application/json'
-			},
-			body: JSON.stringify({ query: `{${TASKS_GQL}}` })
-			//GQL_QUERY_TASKS_GET
-		})
-			.then(res => res.json())
-			.then(res => {
-				if (res && res.data && res.data.queryTasks) {
-					setTasks(res.data.queryTasks);
-				}
-				setIsLoading(false);
-			});
-	}, [
-		servicesBaseUrl
-	]);
+		fetchTasks().then(res => {
+			if (res && res.data && res.data.queryTasks) {
+				setTasks(res.data.queryTasks);
+				setPollTasks(res.data.queryTasks.some(({
+					name: taskDescriptor,
+					state: taskState
+				}) => {
+					if (
+						['WAITING', 'RUNNING'].includes(taskState)
+						// NOTE: Assuming the rest are collector tasks
+						&& taskDescriptor !== `com.enonic.app.explorer${COLON_SIGN}reindexCollection`
+					) {
+						return true;
+					}
+				}));
+			}
+			setIsLoading(false);
+		});
+	};
+	useInterval(() => {
+		if (pollTasks) {
+			pollTasksWhileActive();
+		}
+	}, 1000);
 
 	React.useEffect(() => memoizedFetchOnMount(), [
 		memoizedFetchOnMount
@@ -469,8 +511,8 @@ export function useCollectionsState({
 		locales,
 		memoizedFetchCollections,
 		memoizedFetchOnUpdate,
-		memoizedFetchTasks,
 		objCollectionsBeingReindexed,
+		pollTasksWhileActive,
 		queryCollectionsGraph,
 		shemaIdToName,
 		setShowCollector,
