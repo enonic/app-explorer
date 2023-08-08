@@ -5,8 +5,9 @@ mapping.api.target = /webapp/com.enonic.app.explorer/api
 mapping.api.idProvider.system = default
 */
 
-import type {EnonicXpRequest} from '@enonic-types/lib-explorer';
-import type {InterfaceRequest} from './interface/post';
+import type { EnonicXpRequest } from '@enonic-types/lib-explorer';
+import type { Request } from '../types/index.d';
+import type { InterfaceRequest } from './interface/post';
 
 
 import '@enonic/nashorn-polyfills';
@@ -14,6 +15,7 @@ import { Role } from '@enonic/explorer-utils';
 //@ts-ignore
 import Router from '/lib/router';
 import { hasRole } from '/lib/xp/auth';
+import { GETTER_ROOT } from '../constants';
 import {
 	DOCUMENT_REST_API_VERSION,
 	HTTP_RESPONSE_STATUS_CODES
@@ -29,41 +31,40 @@ import {
 	// put,
 	query
 } from './documents';
-import {
-	post as interfacePost
-} from './interface';
+import { immutableGetter } from './immutableGetter';
+import { post as interfacePost } from './interface';
 
 
 const router = Router();
 
-router.post('/api/graphql', (r: InterfaceRequest) => interfacePost(r));
-router.post('/api/graphql/', (r: InterfaceRequest) => interfacePost(r));
+// router.post('/api/graphql', (r: InterfaceRequest) => interfacePost(r));
+router.post('/api/graphql/?', (r: InterfaceRequest) => interfacePost(r));
 //router.all('/api/graphql', (r :InterfaceRequest) => listInterfaces(r)); // TODO GraphiQL instead
 
 //──────────────────────────────────────────────────────────────────────────────
 // Batch/Bulk/Many
 //──────────────────────────────────────────────────────────────────────────────
 
-router.delete(`/api/v${DOCUMENT_REST_API_VERSION}/documents/{collectionName}`, (r: EnonicXpRequest) => deleteMany(r));
-router.delete(`/api/v${DOCUMENT_REST_API_VERSION}/documents/{collectionName}/`, (r: EnonicXpRequest) => deleteMany(r));
+// router.delete(`/api/v${DOCUMENT_REST_API_VERSION}/documents/{collectionName}`, (r: EnonicXpRequest) => deleteMany(r));
+router.delete(`/api/v${DOCUMENT_REST_API_VERSION}/documents/{collectionName}/?`, (r: EnonicXpRequest) => deleteMany(r));
 
-router.get(`/api/v${DOCUMENT_REST_API_VERSION}/documents/{collectionName}`, (r: EnonicXpRequest) => getMany(r));
-router.get(`/api/v${DOCUMENT_REST_API_VERSION}/documents/{collectionName}/`, (r: EnonicXpRequest) => getMany(r));
+// router.get(`/api/v${DOCUMENT_REST_API_VERSION}/documents/{collectionName}`, (r: EnonicXpRequest) => getMany(r));
+router.get(`/api/v${DOCUMENT_REST_API_VERSION}/documents/{collectionName}/?`, (r: EnonicXpRequest) => getMany(r));
 
-router.post(`/api/v${DOCUMENT_REST_API_VERSION}/documents/{collectionName}`, (r: EnonicXpRequest) => createOrUpdateMany(r));
-router.post(`/api/v${DOCUMENT_REST_API_VERSION}/documents/{collectionName}/`, (r: EnonicXpRequest) => createOrUpdateMany(r));
+// router.post(`/api/v${DOCUMENT_REST_API_VERSION}/documents/{collectionName}`, (r: EnonicXpRequest) => createOrUpdateMany(r));
+router.post(`/api/v${DOCUMENT_REST_API_VERSION}/documents/{collectionName}/?`, (r: EnonicXpRequest) => createOrUpdateMany(r));
 
-router.post(`/api/v${DOCUMENT_REST_API_VERSION}/documents/{collectionName}/query`, (r: EnonicXpRequest) => query(r));
-router.post(`/api/v${DOCUMENT_REST_API_VERSION}/documents/{collectionName}/query/`, (r: EnonicXpRequest) => query(r));
+// router.post(`/api/v${DOCUMENT_REST_API_VERSION}/documents/{collectionName}/query`, (r: EnonicXpRequest) => query(r));
+router.post(`/api/v${DOCUMENT_REST_API_VERSION}/documents/{collectionName}/query/?`, (r: EnonicXpRequest) => query(r));
 
 //──────────────────────────────────────────────────────────────────────────────
 // One/Single
 //──────────────────────────────────────────────────────────────────────────────
-router.delete(`/api/v${DOCUMENT_REST_API_VERSION}/documents/{collectionName}/{documentId}`, (r: EnonicXpRequest) => deleteOne(r));
-router.delete(`/api/v${DOCUMENT_REST_API_VERSION}/documents/{collectionName}/{documentId}/`, (r: EnonicXpRequest) => deleteOne(r));
+// router.delete(`/api/v${DOCUMENT_REST_API_VERSION}/documents/{collectionName}/{documentId}`, (r: EnonicXpRequest) => deleteOne(r));
+router.delete(`/api/v${DOCUMENT_REST_API_VERSION}/documents/{collectionName}/{documentId}/?`, (r: EnonicXpRequest) => deleteOne(r));
 
-router.get(`/api/v${DOCUMENT_REST_API_VERSION}/documents/{collectionName}/{documentId}`, (r: EnonicXpRequest) => getOne(r));
-router.get(`/api/v${DOCUMENT_REST_API_VERSION}/documents/{collectionName}/{documentId}/`, (r: EnonicXpRequest) => getOne(r));
+// router.get(`/api/v${DOCUMENT_REST_API_VERSION}/documents/{collectionName}/{documentId}`, (r: EnonicXpRequest) => getOne(r));
+router.get(`/api/v${DOCUMENT_REST_API_VERSION}/documents/{collectionName}/{documentId}/?`, (r: EnonicXpRequest) => getOne(r));
 
 // router.put(`/api/v${DOCUMENT_REST_API_VERSION}/documents/{collectionName}/{documentId}`, (r: EnonicXpRequest) => put(r));
 // router.put(`/api/v${DOCUMENT_REST_API_VERSION}/documents/{collectionName}/{documentId}/`, (r: EnonicXpRequest) => put(r));
@@ -72,16 +73,16 @@ router.get(`/api/v${DOCUMENT_REST_API_VERSION}/documents/{collectionName}/{docum
 // It is supported by some frameworks, but currently NOT Enonic XP, NOR lib-router:
 // https://github.com/enonic/xp/issues/9131
 // https://github.com/enonic/lib-router/issues/108
-router.post(`/api/v${DOCUMENT_REST_API_VERSION}/documents/{collectionName}/{documentId}`, (r: EnonicXpRequest) => patch(r));
-router.post(`/api/v${DOCUMENT_REST_API_VERSION}/documents/{collectionName}/{documentId}/`, (r: EnonicXpRequest) => patch(r));
+// router.post(`/api/v${DOCUMENT_REST_API_VERSION}/documents/{collectionName}/{documentId}`, (r: EnonicXpRequest) => patch(r));
+router.post(`/api/v${DOCUMENT_REST_API_VERSION}/documents/{collectionName}/{documentId}/?`, (r: EnonicXpRequest) => patch(r));
 
 //──────────────────────────────────────────────────────────────────────────────
 // Documentation
 //──────────────────────────────────────────────────────────────────────────────
-router.get(`/api/v${DOCUMENT_REST_API_VERSION}/documents`, (r: EnonicXpRequest) => documentation(r));
-router.get(`/api/v${DOCUMENT_REST_API_VERSION}/documents/`, (r: EnonicXpRequest) => documentation(r));
+// router.get(`/api/v${DOCUMENT_REST_API_VERSION}/documents`, (r: EnonicXpRequest) => documentation(r));
+router.get(`/api/v${DOCUMENT_REST_API_VERSION}/documents/?`, (r: EnonicXpRequest) => documentation(r));
 
-function respondToRootRequest(request: EnonicXpRequest) {
+function respondToRootRequest(/*request: EnonicXpRequest*/) {
 	if (!(
 		hasRole(Role.SYSTEM_ADMIN)
 		|| hasRole(Role.EXPLORER_ADMIN)
@@ -109,7 +110,12 @@ function respondToRootRequest(request: EnonicXpRequest) {
 	};
 }
 
-router.get('', respondToRootRequest);
-router.get('/', respondToRootRequest);
+// router.get('', respondToRootRequest);
+router.get('/?', respondToRootRequest);
+
+router.all(`/${GETTER_ROOT}/{path:.+}`, (r: Request) => {
+	// log.info('request:%s', toStr(r));
+	return immutableGetter(r);
+});
 
 export const all = (r: EnonicXpRequest) => router.dispatch(r);

@@ -55,8 +55,10 @@
 			"@enonic/js-utils": ["./node_modules/@enonic/js-utils"],
 			"@enonic/js-utils/*": ["./node_modules/@enonic/js-utils/*"],
 			"@enonic/nashorn-polyfills": ["./src/main/resources/lib/nashorn/index.ts"],
+			// "/constants": ["./src/main/resources/constants"], // Doesn't work
 			"/lib/licensing": ["./src/main/resources/lib/licensing.ts"],
 			// "/lib/xp/*": ["./node_modules/@enonic-types/lib-*"],
+			// "/webapp/*": ["./src/main/resources/webapp/*"], // Doesn't work
 			// "/*": ["./src/main/resources/*"],
 		},
 		"preserveWatchOutput": false,
