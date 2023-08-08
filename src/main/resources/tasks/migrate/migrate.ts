@@ -58,6 +58,7 @@ import {model15} from './model/15';
 import {model16} from './model/16';
 import {model17} from './model/17';
 import model18 from './model/18';
+import model19 from './model/19';
 import {applicationListener} from '../init/applicationListener';
 import {Progress} from '../init/Progress';
 import {EVENT_INIT_COMPLETE} from '../init/init';
@@ -585,95 +586,104 @@ export function run() {
 		//──────────────────────────────────────────────────────────────────────
 		if (isModelLessThan({
 			connection: writeConnection,
-			version: 18
+			version: 19
 		})) {
 			if (isModelLessThan({
 				connection: writeConnection,
-				version: 17
+				version: 18
 			})) {
 				if (isModelLessThan({
 					connection: writeConnection,
-					version: 16
+					version: 17
 				})) {
 					if (isModelLessThan({
 						connection: writeConnection,
-						version: 15
+						version: 16
 					})) {
 						if (isModelLessThan({
 							connection: writeConnection,
-							version: 14
+							version: 15
 						})) {
 							if (isModelLessThan({
 								connection: writeConnection,
-								version: 13
+								version: 14
 							})) {
 								if (isModelLessThan({
 									connection: writeConnection,
-									version: 12
+									version: 13
 								})) {
 									if (isModelLessThan({
 										connection: writeConnection,
-										version: 11
+										version: 12
 									})) {
 										if (isModelLessThan({
 											connection: writeConnection,
-											version: 10
+											version: 11
 										})) {
 											if (isModelLessThan({
 												connection: writeConnection,
-												version: 9
+												version: 10
 											})) {
-												// Model 8: Add stemmed query expressions to Default interface (not needed anymore, see 9)
-												model9({ // Remove filters and query from interfaces and Add thesaurusReference to synonym nodes
+												if (isModelLessThan({
+													connection: writeConnection,
+													version: 9
+												})) {
+													// Model 8: Add stemmed query expressions to Default interface (not needed anymore, see 9)
+													model9({ // Remove filters and query from interfaces and Add thesaurusReference to synonym nodes
+														progress,
+														writeConnection
+													});
+												} // <9
+												model10({ // Change job name format
 													progress,
 													writeConnection
 												});
-											} // <9
-											model10({ // Change job name format
+											} // <10
+											model11({ // interface.collections -> interface.collectionIds
 												progress,
 												writeConnection
 											});
-										} // <10
-										model11({ // interface.collections -> interface.collectionIds
+										} // <11
+										model12({ // interface.synonyms -> interface.synonymIds
 											progress,
 											writeConnection
 										});
-									} // <11
-									model12({ // interface.synonyms -> interface.synonymIds
+									} // <12
+									model13({ // Make sure ApiKeys has correct structure
 										progress,
 										writeConnection
 									});
-								} // <12
-								model13({ // Make sure ApiKeys has correct structure
+								} // <13
+								model14({
 									progress,
 									writeConnection
 								});
-							} // <13
-							model14({
+							} // <14
+							model15({
 								progress,
 								writeConnection
 							});
-						} // <14
-						model15({
+						} // <15
+						model16({
 							progress,
 							writeConnection
 						});
-					} // <15
-					model16({
+					} // <16
+					model17({
 						progress,
 						writeConnection
 					});
-				} // <16
-				model17({
+				} // <17
+				model18({
 					progress,
 					writeConnection
 				});
-			} // <17
-			model18({
+			} // <18
+			model19({
 				progress,
 				writeConnection
 			});
-		} // <18
+		} // <19
 		progress.setInfo('Initialization complete :)').report().debug();
 		applicationListener();
 		const event = {

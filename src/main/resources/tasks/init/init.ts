@@ -167,7 +167,7 @@ export function run() {
 		// ... TODO MODELS WAS HERE ...
 		if (isModelLessThan({
 			connection: writeConnection,
-			version: 18
+			version: 19
 		})) {
 			submitTask({
 				descriptor: 'migrate'
