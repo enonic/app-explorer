@@ -2,11 +2,18 @@ import type { Request } from '../../types/Request';
 
 
 import { Role } from '@enonic/explorer-utils';
+// import { toStr } from '@enonic/js-utils/value/toStr';
 import { hasRole } from '/lib/xp/auth';
+import {
+	FILEPATH_MANIFEST,
+	FILEPATH_MANIFEST_NODE_MODULES,
+} from '../../constants';
 import { DOCUMENT_REST_API_VERSION } from '../constants';
+import getImmuteableUrl from '../getImmuteableUrl';
 import authorize from './authorize';
 
 
+const ID_REACT_CONTAINER = 'react-container';
 const PATH_PREFIX = `/api/v${DOCUMENT_REST_API_VERSION}/documents`;
 
 
@@ -22,6 +29,7 @@ export default function documentation(request: Request<{
 		contentType?: string
 		status?: number
 } {
+	// log.debug('documentation request:%s', toStr(request));
 	if (!hasRole(Role.EXPLORER_READ)) {
 		const maybeErrorResponse = authorize(
 			request,
@@ -31,6 +39,115 @@ export default function documentation(request: Request<{
 		if (maybeErrorResponse.status !== 200 ) {
 			return maybeErrorResponse;
 		}
+	}
+
+	if (true) {
+		const {url} = request;
+		const propsObj = {
+			url
+		};
+		const documentsApiDocUrl = getImmuteableUrl({
+			manifestPath: FILEPATH_MANIFEST,
+			path: 'react/DocumentsApiDoc.mjs'
+		});
+		return {
+			body: `<html>
+		<head>
+			<meta name="robots" content="noindex,nofollow">
+			<script type="text/javascript" src="${getImmuteableUrl({
+				manifestPath: FILEPATH_MANIFEST_NODE_MODULES,
+				path: 'react/umd/react.development.js'
+			})}"></script>
+			<script type="text/javascript" src="${getImmuteableUrl({
+				manifestPath: FILEPATH_MANIFEST_NODE_MODULES,
+				path: 'react-dom/umd/react-dom.development.js'
+			})}"></script>
+			<title>Documents Endpoint - Version ${DOCUMENT_REST_API_VERSION} - API documentation</title>
+			<style>
+				table {
+					border: 1px solid black;
+					border-collapse: collapse;
+				}
+				tr, th, td {
+					border: 1px solid black;
+				}
+				th, td {
+					padding: 1em;
+				}
+				.pre {
+					white-space: pre;
+				}
+				details {
+					border: 1px solid black;
+					border-radius: 4px;
+					margin: 6px;
+					padding: 6px;
+				}
+				.method-get span,
+				.method-post span,
+				.method-put span,
+				.method-delete span {
+					border-radius: 3px;
+					color: white;
+					display: inline-block;
+					font-size: 14px;
+					font-weight: 700;
+					min-width: 80px;
+					padding: 6px 15px;
+					text-align: center;
+				}
+				.method-get {
+					background-color: hsla(120,100%,50%,.1);
+					border-color: green;
+				}
+				.method-get span {
+					background-color: green;
+				}
+				.method-post {
+					background-color: hsla(240,100%,50%,.1);
+					border-color: blue;
+
+				}
+				.method-post span {
+					background-color: blue;
+				}
+				.method-put {
+					background-color: hsla(39,100%,50%,.1);
+					border-color: darkorange;
+				}
+				.method-put span {
+					background-color: darkorange;
+				}
+				.method-delete {
+					background-color: hsla(0,100%,50%,.1);
+					border-color: red;
+				}
+				.method-delete span {
+					background-color: red;
+				}
+				samp {
+					background-color: black;
+					color: white;
+					display: block;
+					margin: 6px;
+					padding: 6px;
+					white-space: pre;
+				}
+			</style>
+		</head>
+		<body style="margin:0">
+			<div id="${ID_REACT_CONTAINER}"/>
+			<script type='module' defer>
+				import DocumentsApiDoc from '${documentsApiDocUrl}';
+				const propsObj = eval(${JSON.stringify(propsObj)});
+				//console.debug('propsObj', propsObj);
+				const root = ReactDOM.createRoot(document.getElementById('${ID_REACT_CONTAINER}'));
+				root.render(React.createElement(DocumentsApiDoc, propsObj));
+			</script>
+		</body>
+	</html>`,
+			contentType: 'text/html; charset=utf-8',
+		};
 	}
 
 	const {

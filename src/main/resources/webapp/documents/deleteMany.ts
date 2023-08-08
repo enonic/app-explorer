@@ -38,11 +38,10 @@ export default function deleteMany(
 } {
 	const {
 		params: {
-			collection: collectionParam = '',
 			id: idParam
 		} = {},
 		pathParams: {
-			collectionName = collectionParam
+			collectionName = ''
 		} = {}
 	} = request;
 	if (!collectionName) {

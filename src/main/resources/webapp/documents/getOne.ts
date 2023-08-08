@@ -28,11 +28,10 @@ export default function getOne(request: Request<{
 
 	const {
 		params: {
-			collection: collectionParam,
 			id: idParam = ''
 		} = {},
 		pathParams: {
-			collectionName = collectionParam,
+			collectionName = '',
 			documentId = idParam
 		} = {}
 	} = request;

@@ -64,7 +64,7 @@ export default function query(
 		// 	start: startParam = '0'
 		// } = {},
 		pathParams: {
-			collectionName
+			collectionName = ''
 		} = {}
 	} = request;
 	// log.debug('bodyJson:%s', bodyJson);

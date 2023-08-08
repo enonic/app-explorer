@@ -30,6 +30,7 @@
 			// Production (should be commented in when commiting)
 			// "@enonic/app-explorer/*": ["./src/main/resources/*"],
 			"@enonic/app-explorer/*": ["./*"],
+			// "/constants": ["./constants"], // Doesn't work
 			"/lib/xp/*": ["../../../node_modules/@enonic-types/lib-*"],
 
 			// There is no @enonic-types/lib-explorer yet, so these are workarounds
@@ -41,7 +42,8 @@
 
 			// Fallback
 			// "/*": ["./src/main/resources/*"],
-			"/*": ["./*"],
+			// "/webapp/*": ["./webapp/*"], Doesn't work
+			"/*": ["./*"], // Doesn't work?
 		},
 
 		// Default: The longest common path of all non-declaration input files.

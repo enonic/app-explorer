@@ -32,13 +32,12 @@ const {includes: arrayIncludes} = array;
 
 
 export type PostRequest = Request<{
-	collection?: string
 	documentType?: string
 	documentTypeId?: string
 	partial?: string
 	requireValid?: string
 }, {
-	collection?: string
+	collectionName?: string
 }>
 
 
@@ -168,18 +167,19 @@ export default function createOrUpdateMany(
 	status: number
 } {
 	// log.debug('request:%s', toStr(request));
+	log.debug('request.params:%s', toStr(request.params));
+	log.debug('request.pathParams:%s', toStr(request.pathParams));
 
 	const {
 		body,
 		params: {
-			collection: collectionParam = '',
 			documentType: documentTypeParam,
 			documentTypeId: documentTypeIdParam,
 			partial: partialParam = 'false',
 			requireValid: requireValidParam = 'true'
 		} = {},
 		pathParams: {
-			collection: collectionName = collectionParam
+			collectionName = ''
 		} = {}
 	} = request;
 	//log.info(`body:${toStr(body)}`);
@@ -188,11 +188,11 @@ export default function createOrUpdateMany(
 	//const d = new Date();
 	//const branchDefault = `${d.getFullYear()}_${d.getMonth()+1}_${d.getDate()}T${d.getHours()}_${d.getMinutes()}_${d.getSeconds()}`;
 
-	//log.info(`collectionName:${toStr(collectionName)}`);
 
 	const boolRequireValid = requireValidParam !== 'false'; // Thus fallsback to true if something invalid provided
 	const boolPartial = partialParam === 'true'; // Thus fallsback to false if something invalid provided
 
+	log.debug('collectionName:%s', collectionName);
 	if (!collectionName) {
 		return {
 			body: {

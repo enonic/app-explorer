@@ -27,11 +27,10 @@ export default function getMany(request: Request<{
 
 	const {
 		params: {
-			collection: collectionParam,
 			id: idParam = ''
 		} = {},
 		pathParams: {
-			collectionName = collectionParam,
+			collectionName = '',
 		} = {}
 	} = request;
 
