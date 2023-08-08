@@ -1,7 +1,11 @@
+export {
+	FILEPATH_MANIFEST,
+	FILEPATH_MANIFEST_NODE_MODULES,
+	GETTER_ROOT
+} from '../../constants';
+
 export const SERVICE_NAME = 'graphQL';
-export const GETTER_ROOT = 'static';
-export const FILEPATH_MANIFEST = `/${GETTER_ROOT}/manifest.json`;
-export const FILEPATH_MANIFEST_NODE_MODULES = `/${GETTER_ROOT}/node_modules-manifest.json`;
+
 
 //──────────────────────────────────────────────────────────────────────────────
 

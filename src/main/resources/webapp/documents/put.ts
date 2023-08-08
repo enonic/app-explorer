@@ -36,14 +36,13 @@ export default function put(request: Request<{
 	const {
 		body: bodyJson,
 		params: {
-			collection: collectionParam,
 			documentType: documentTypeParam,
 			documentTypeId: documentTypeIdParam,
 			id: idParam = '',
 			requireValid: requireValidParam = 'true'
 		} = {},
 		pathParams: {
-			collectionName = collectionParam,
+			collectionName = '',
 			documentId = idParam
 		} = {}
 	} = request;
