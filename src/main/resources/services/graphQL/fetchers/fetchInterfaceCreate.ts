@@ -18,7 +18,7 @@ type JSONResponse = {
 
 export function fetchInterfaceCreate({
 	url,
-	variables,
+	// variables,
 	variables: {
 		_name,
 		collectionIds = [],

@@ -1,6 +1,7 @@
 // import type { NestedRecord } from "/lib/explorer/types";
 
-export interface CollectorConfig {
+// Use type instead of interface, because interface doesn't satify AnyObject
+export type CollectorConfig = {
 	baseUri?: string
 	excludes?: string|string[]
 	keepHtml?: boolean
