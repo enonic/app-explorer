@@ -39,7 +39,12 @@ export default {
 	moduleNameMapper: {
 		// '@enonic/mock-xp/(.*)': '<rootDir>/symlinks/enonic-mock-xp/$1',
 		// '@enonic/js-utils/(.*)': '<rootDir>/symlinks/enonic-js-utils/$1',
-		'/lib/explorer/(.*)': '<rootDir>/symlinks/lib-explorer/src/main/resources/lib/explorer/$1'
+
+		// There is no @enonic-types/lib-explorer yet, so these are workarounds
+		'@enonic-types/lib-explorer': '<rootDir>/symlinks/lib-explorer/src/main/resources/lib/explorer/types/index.d',
+		'@enonic-types/lib-explorer/(.*)': '<rootDir>/symlinks/lib-explorer/src/main/resources/lib/explorer/types/$1',
+
+		'/lib/explorer/(.*)': '<rootDir>/symlinks/lib-explorer/src/main/resources/lib/explorer/$1',
 	},
 
 	preset: 'ts-jest/presets/js-with-babel-legacy',
