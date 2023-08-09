@@ -109,6 +109,36 @@ sourceSets {
 	}
 }
 
+task yarnCheck(
+	dependsOn: yarn_install,
+	type: YarnTask
+) {
+	args = ['verify:types']
+	environment = [
+		'FORCE_COLOR': 'true',
+	]
+}
+check.dependsOn yarnCheck
+
+task yarnTest(
+	dependsOn: yarn_install,
+	type: YarnTask
+) {
+	args = ['test']
+	environment = [
+		'FORCE_COLOR': 'true',
+	]
+	inputs.dir 'src/main/resources'
+	inputs.dir 'test'
+	outputs.dir 'coverage'
+}
+test.dependsOn yarnTest
+
+task cleanCoverage(type:Delete) {
+	delete 'coverage'
+}
+clean.dependsOn cleanCoverage
+
 task webpack(type:NodeTask) {
 	dependsOn yarn_install
 	environment = [

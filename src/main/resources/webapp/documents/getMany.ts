@@ -17,12 +17,15 @@ import authorize from './authorize';
 import stripDocumentNode from './stripDocumentNode';
 
 
-export default function getMany(request: Request<{
+export type GetManyRequest = Request<{
 	collection?: string
 	id: string|string[]
 },{
 	collectionName?: string
-}>) {
+}>
+
+
+export default function getMany(request: GetManyRequest) {
 	log.debug('getMany request:%s', toStr(request));
 
 	const {

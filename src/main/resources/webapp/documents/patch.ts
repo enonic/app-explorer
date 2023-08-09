@@ -5,14 +5,17 @@ import type { Request } from '../../types/Request';
 import put from './put';
 
 
-export default function patch(request: Request<{
-    collection?: string
-    id?: string
-    requireValid?: 'true' | 'false'
+export type PatchRequest = Request<{
+	collection?: string
+	id?: string
+	requireValid?: 'true' | 'false'
 },{
-    collectionName?: string
-    documentId?: string
-}>) {
+	collectionName?: string
+	documentId?: string
+}>;
+
+
+export default function patch(request: PatchRequest) {
     // log.debug('patch request:%s', toStr(request));
     const {
         method

@@ -11,6 +11,7 @@ import type {
 	RepoConnection,
 	connect
 } from '@enonic-types/lib-node';
+import type { Request } from '../../../src/main/resources/types/Request';
 
 
 import {
@@ -195,7 +196,7 @@ describe('webapp', () => {
 						hasRole: jest.fn<typeof hasRole>((role) => role === Role.SYSTEM_ADMIN)
 					}), { virtual: true });
 					import('../../../src/main/resources/webapp/documents/authorize').then((moduleName) => {
-						expect(moduleName.default({}, COLLECTION_NAME)).toStrictEqual({
+						expect(moduleName.default({} as Request, COLLECTION_NAME)).toStrictEqual({
 							status: 200
 						});
 					});
@@ -208,7 +209,7 @@ describe('webapp', () => {
 						hasRole: jest.fn<typeof hasRole>((role) => role === Role.EXPLORER_ADMIN)
 					}), { virtual: true });
 					import('../../../src/main/resources/webapp/documents/authorize').then((moduleName) => {
-						expect(moduleName.default({}, COLLECTION_NAME)).toStrictEqual({
+						expect(moduleName.default({} as Request, COLLECTION_NAME)).toStrictEqual({
 							status: 200
 						});
 					});
@@ -221,7 +222,7 @@ describe('webapp', () => {
 						hasRole: jest.fn<typeof hasRole>((role) => role === Role.EXPLORER_WRITE)
 					}), { virtual: true });
 					import('../../../src/main/resources/webapp/documents/authorize').then((moduleName) => {
-						expect(moduleName.default({}, COLLECTION_NAME)).toStrictEqual({
+						expect(moduleName.default({} as Request, COLLECTION_NAME)).toStrictEqual({
 							status: 200
 						});
 					});
@@ -234,7 +235,7 @@ describe('webapp', () => {
 						hasRole: jest.fn<typeof hasRole>((role) => role === Role.EXPLORER_READ)
 					}), { virtual: true });
 					import('../../../src/main/resources/webapp/documents/authorize').then((moduleName) => {
-						expect(moduleName.default({}, COLLECTION_NAME)).toStrictEqual({
+						expect(moduleName.default({} as Request, COLLECTION_NAME)).toStrictEqual({
 							status: HTTP_RESPONSE_STATUS_CODES.UNAUTHORIZED
 						});
 					});
@@ -252,7 +253,7 @@ describe('webapp', () => {
 					import('../../../src/main/resources/webapp/documents/authorize').then((moduleName) => {
 						expect(moduleName.default({
 							headers: {}
-						}, COLLECTION_NAME)).toStrictEqual({
+						} as Request, COLLECTION_NAME)).toStrictEqual({
 							status: HTTP_RESPONSE_STATUS_CODES.UNAUTHORIZED
 						});
 					});
@@ -269,7 +270,7 @@ describe('webapp', () => {
 							headers: {
 								authorization: 'invalid'
 							}
-						}, COLLECTION_NAME)).toStrictEqual({
+						} as Request, COLLECTION_NAME)).toStrictEqual({
 							status: HTTP_RESPONSE_STATUS_CODES.BAD_REQUEST
 						});
 					});
@@ -286,7 +287,7 @@ describe('webapp', () => {
 							headers: {
 								authorization: AUTH_PREFIX
 							}
-						}, COLLECTION_NAME)).toStrictEqual({
+						} as Request, COLLECTION_NAME)).toStrictEqual({
 							status: HTTP_RESPONSE_STATUS_CODES.BAD_REQUEST
 						});
 					});
@@ -303,7 +304,7 @@ describe('webapp', () => {
 							headers: {
 								authorization: `${AUTH_PREFIX} nonExistentApiKey`
 							}
-						}, COLLECTION_NAME)).toStrictEqual({
+						} as Request, COLLECTION_NAME)).toStrictEqual({
 							status: HTTP_RESPONSE_STATUS_CODES.FORBIDDEN
 						});
 					});
@@ -320,7 +321,7 @@ describe('webapp', () => {
 							headers: {
 								authorization: `${AUTH_PREFIX} ${API_KEY}`
 							}
-						}, COLLECTION_NAME)).toStrictEqual({
+						} as Request, COLLECTION_NAME)).toStrictEqual({
 							status: HTTP_RESPONSE_STATUS_CODES.FORBIDDEN
 						});
 					});
@@ -337,7 +338,7 @@ describe('webapp', () => {
 							headers: {
 								authorization: `${AUTH_PREFIX} ${API_KEY3}`
 							}
-						},'another_collection')).toStrictEqual({
+						} as Request, 'another_collection')).toStrictEqual({
 							body: {
 								message: "The API key doesn't have access to any collections!"
 							},
@@ -358,7 +359,7 @@ describe('webapp', () => {
 							headers: {
 								authorization: `${AUTH_PREFIX} ${API_KEY4}`
 							}
-						},'another_collection')).toStrictEqual({
+						} as Request, 'another_collection')).toStrictEqual({
 							body: {
 								message: "Bad Request"
 							},
@@ -379,7 +380,7 @@ describe('webapp', () => {
 							headers: {
 								authorization: `${AUTH_PREFIX} ${API_KEY4}`
 							}
-						},COLLECTION_NAME)).toStrictEqual({
+						} as Request, COLLECTION_NAME)).toStrictEqual({
 							status: HTTP_RESPONSE_STATUS_CODES.OK
 						});
 					});
@@ -396,7 +397,7 @@ describe('webapp', () => {
 							headers: {
 								authorization: `${AUTH_PREFIX} ${API_KEY4}`
 							}
-						},undefined)).toStrictEqual({
+						} as Request, undefined)).toStrictEqual({
 							status: HTTP_RESPONSE_STATUS_CODES.OK
 						});
 					});

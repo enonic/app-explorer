@@ -12,13 +12,15 @@ import authorize from './authorize';
 import runWithExplorerWrite from './runWithExplorerWrite';
 
 
-export default function deleteOne(request: Request<{
+export type DeleteOneRequest = Request<{
 	collection?: string
 	id?: string
 },{
 	collectionName?: string
 	documentId?: string
-}>) {
+}>;
+
+export default function deleteOne(request: DeleteOneRequest) {
 	// log.debug('deleteOne request:%s', toStr(request));
 
 	const {

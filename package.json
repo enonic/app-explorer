@@ -1,7 +1,7 @@
 {
   "author": "Christian Andreas Westgaard <cwe@enonic.com>",
   "dependencies": {
-    "@enonic/js-utils": "^1.5.2",
+    "@enonic/js-utils": "^1.5.3",
     "@enonic/semantic-ui-react-form": "^2",
     "@seamusleahy/init-hooks": "^1",
     "@semantic-ui-react/component-ref": "^1",
@@ -185,7 +185,7 @@
     "build": "concurrently -c auto -g --timings npm:build:*",
     "build:static": "npx tsup -d build/resources/main/static",
     "build:tsup": "npx tsup -d build/resources/main",
-    "clean": "del-cli build",
+    "clean": "del-cli build coverage",
     "concat:graphql": "n-concat src/main/resources/lib/esbuild/getOwnPropertyDescriptors.js build/esbuild/services/graphQL/graphQL.js | n-pipe build/concat/services/graphQL/graphQL.js",
     "concat:init": "n-concat src/main/resources/lib/esbuild/getOwnPropertyDescriptors.js build/esbuild/tasks/init/init.js | n-pipe build/concat/tasks/init/init.js",
     "concat:migrate": "n-concat src/main/resources/lib/esbuild/getOwnPropertyDescriptors.js build/esbuild/tasks/migrate/migrate.js | n-pipe build/concat/tasks/migrate/migrate.js",

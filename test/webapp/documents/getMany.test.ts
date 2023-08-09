@@ -20,6 +20,8 @@ import type {
 	get as getRepo
 } from '@enonic-types/lib-repo';
 import type { DocumentNode } from '/lib/explorer/types/Document';
+import type { PostRequest } from '../../../src/main/resources/webapp/documents/createOrUpdateMany';
+import type { GetManyRequest } from '../../../src/main/resources/webapp/documents/getMany';
 
 
 import {
@@ -40,7 +42,7 @@ import {
 import {
 	HTTP_RESPONSE_STATUS_CODES
 } from '../../../src/main/resources/webapp/constants';
-import { query } from '@enonic-types/lib-content';
+// import { query } from '@enonic-types/lib-content';
 
 
 const log = Log.createLogger({
@@ -205,9 +207,9 @@ describe('webapp', () => {
 						requireValid: 'false'
 					},
 					pathParams: {
-						collection: COLLECTION_NAME
+						collectionName: COLLECTION_NAME
 					}
-				});
+				} as PostRequest);
 			});
 
 			it('returns 404 Not found when there are no documents with documentId', () => {
@@ -219,7 +221,7 @@ describe('webapp', () => {
 						pathParams: {
 							collectionName: COLLECTION_NAME,
 						}
-					})).toStrictEqual({
+					} as GetManyRequest)).toStrictEqual({
 						body: {
 							message: "Didn't find any documents for ids:nonexistent_document_id"
 						},
@@ -236,7 +238,7 @@ describe('webapp', () => {
 						pathParams: {
 							collectionName: COLLECTION_NAME,
 						}
-					})).toStrictEqual({
+					} as GetManyRequest)).toStrictEqual({
 						body: {
 							message: "Didn't find any documents for ids:nonexistent_document_id1,nonexistent_document_id2"
 						},
@@ -263,17 +265,17 @@ describe('webapp', () => {
 					// log.debug('queryRes: %s', queryRes);
 
 					import('../../../src/main/resources/webapp/documents/stripDocumentNode').then((stripDocumentNodeModule) => {
-					expect(moduleName.default({
-						params: {
-							id: [
-								queryRes.hits[0].id,
-								queryRes.hits[1].id,
-							]
-						},
-						pathParams: {
-							collectionName: COLLECTION_NAME,
-						}
-						})).toStrictEqual({
+						expect(moduleName.default({
+							params: {
+								id: [
+									queryRes.hits[0].id,
+									queryRes.hits[1].id,
+								]
+							},
+							pathParams: {
+								collectionName: COLLECTION_NAME,
+							}
+						} as GetManyRequest)).toStrictEqual({
 							body: queryRes.hits.map(({id}) => {
 								const documentNode = collectionConnection.get(id) as unknown as DocumentNode;
 								return stripDocumentNodeModule.default(documentNode);

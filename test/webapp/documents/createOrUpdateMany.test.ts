@@ -20,6 +20,7 @@ import type {
 	get as getRepo
 } from '@enonic-types/lib-repo';
 import type { DocumentNode } from '/lib/explorer/types/Document';
+import type { PostRequest } from '../../../src/main/resources/webapp/documents/createOrUpdateMany';
 
 
 import {
@@ -37,6 +38,7 @@ import {
 	Path,
 	Repo,
 } from '@enonic/explorer-utils';
+
 
 const log = Log.createLogger({
 	// loglevel: 'debug'
@@ -231,9 +233,9 @@ describe('webapp', () => {
 							requireValid: 'false'
 						},
 						pathParams: {
-							collection: COLLECTION_NAME
+							collectionName: COLLECTION_NAME
 						}
-					});
+					} as PostRequest);
 					const queryRes = collectionConnection.query({
 						query: {
 							boolean: {
@@ -305,9 +307,9 @@ describe('webapp', () => {
 							requireValid: 'false'
 						},
 						pathParams: {
-							collection: COLLECTION_NAME
+							collectionName: COLLECTION_NAME
 						}
-					});
+					} as PostRequest);
 					const queryRes = collectionConnection.query({
 						query: {
 							boolean: {
@@ -358,9 +360,9 @@ describe('webapp', () => {
 							requireValid: 'false'
 						},
 						pathParams: {
-							collection: COLLECTION_NAME
+							collectionName: COLLECTION_NAME
 						}
-					});
+					} as PostRequest);
 					const queryRes = collectionConnection.query({
 						query: {
 							boolean: {
@@ -406,9 +408,9 @@ describe('webapp', () => {
 							requireValid: 'false'
 						},
 						pathParams: {
-							collection: COLLECTION_NAME
+							collectionName: COLLECTION_NAME
 						}
-					});
+					} as PostRequest);
 					// log.debug('createOrUpdateManyResponse', createOrUpdateManyResponse);
 					const queryRes = collectionConnection.query({
 						query: {
@@ -449,9 +451,9 @@ describe('webapp', () => {
 							requireValid: 'false'
 						},
 						pathParams: {
-							collection: COLLECTION_NAME2
+							collectionName: COLLECTION_NAME2
 						}
-					});
+					} as PostRequest);
 					const queryRes = collection2Connection.query({
 						query: {
 							boolean: {

@@ -19,6 +19,8 @@ import type {
 	Repository,
 	get as getRepo
 } from '@enonic-types/lib-repo';
+import type { GetOneRequest } from '../../../src/main/resources/webapp/documents/getOne';
+import type { PostRequest } from '../../../src/main/resources/webapp/documents/createOrUpdateMany';
 
 
 import {
@@ -39,7 +41,7 @@ import {
 import {
 	HTTP_RESPONSE_STATUS_CODES
 } from '../../../src/main/resources/webapp/constants';
-import { query } from '@enonic-types/lib-content';
+// import { query } from '@enonic-types/lib-content';
 
 
 const log = Log.createLogger({
@@ -202,9 +204,9 @@ describe('webapp', () => {
 						requireValid: 'false'
 					},
 					pathParams: {
-						collection: COLLECTION_NAME
+						collectionName: COLLECTION_NAME
 					}
-				});
+				} as PostRequest);
 			});
 
 			it('returns 404 Not found when there are no documents with documentId', () => {
@@ -214,7 +216,7 @@ describe('webapp', () => {
 							collectionName: COLLECTION_NAME,
 							documentId: '123'
 						}
-					})).toStrictEqual({
+					} as GetOneRequest)).toStrictEqual({
 						status: HTTP_RESPONSE_STATUS_CODES.NOT_FOUND
 					});
 				});
@@ -251,7 +253,7 @@ describe('webapp', () => {
 							collectionName: COLLECTION_NAME,
 							documentId: queryRes.hits[0].id
 						}
-					})).toStrictEqual({
+					} as GetOneRequest)).toStrictEqual({
 						body: cleanedNode,
 						contentType: 'text/json;charset=utf-8',
 						status: HTTP_RESPONSE_STATUS_CODES.OK

@@ -22,8 +22,7 @@ import stripDocumentNode from './stripDocumentNode';
 const COLLECTOR_ID = `${APP_EXPLORER}:documentRestApi`;
 const COLLECTOR_VERSION = app.version;
 
-
-export default function put(request: Request<{
+export type PutRequest = Request<{
 	collection?: string
 	documentType?: string
 	documentTypeId?: string
@@ -32,7 +31,9 @@ export default function put(request: Request<{
 },{
 	collectionName?: string
 	documentId?: string
-}>, partial = false) {
+}>
+
+export default function put(request: PutRequest, partial = false) {
 	const {
 		body: bodyJson,
 		params: {

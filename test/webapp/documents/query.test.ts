@@ -20,6 +20,8 @@ import type {
 	get as getRepo
 } from '@enonic-types/lib-repo';
 import type { DocumentNode } from '/lib/explorer/types/Document';
+import type { PostRequest } from '../../../src/main/resources/webapp/documents/createOrUpdateMany';
+import type { QueryRequest } from '../../../src/main/resources/webapp/documents/query';
 
 
 import {
@@ -38,6 +40,7 @@ import {
 	Repo,
 } from '@enonic/explorer-utils';
 import { HTTP_RESPONSE_STATUS_CODES } from '../../../src/main/resources/webapp/constants';
+
 
 const log = Log.createLogger({
 	// loglevel: 'debug'
@@ -211,9 +214,9 @@ describe('webapp', () => {
 							requireValid: 'false'
 						},
 						pathParams: {
-							collection: COLLECTION_NAME
+							collectionName: COLLECTION_NAME
 						}
-					});
+					} as PostRequest);
 					const collectionConnection = javaBridge.connect({
 						branch: 'master',
 						repoId: COLLECTION_REPO_ID
@@ -246,7 +249,7 @@ describe('webapp', () => {
 							pathParams: {
 								collectionName: COLLECTION_NAME
 							}
-						});
+						} as QueryRequest);
 						// log.debug('queryResponse', queryResponse);
 						import('../../../src/main/resources/webapp/documents/stripDocumentNode').then((stripDocumentNodeModule) => {
 							expect(queryResponse).toStrictEqual({

@@ -19,6 +19,8 @@ import type {
 	Repository,
 	get as getRepo
 } from '@enonic-types/lib-repo';
+import type { PostRequest } from '../../../src/main/resources/webapp/documents/createOrUpdateMany';
+import type { PatchRequest } from '../../../src/main/resources/webapp/documents/patch';
 
 
 import {
@@ -203,9 +205,9 @@ describe('webapp', () => {
 						requireValid: 'false'
 					},
 					pathParams: {
-						collection: COLLECTION_NAME
+						collectionName: COLLECTION_NAME
 					}
-				});
+				} as PostRequest);
 			});
 
 			it('returns 404 Not found when there are no documents with documentId', () => {
@@ -236,7 +238,7 @@ describe('webapp', () => {
 							collectionName: COLLECTION_NAME,
 							documentId: '71cffa3d-2c3f-464a-a2b0-19bd447b4b95'
 						}
-					})).toStrictEqual({
+					} as PatchRequest)).toStrictEqual({
 						body: {
 							message: 'Document with id "71cffa3d-2c3f-464a-a2b0-19bd447b4b95" does not exist in collection "my_collection"!'
 						},
@@ -282,7 +284,7 @@ describe('webapp', () => {
 							collectionName: COLLECTION_NAME,
 							documentId: queryRes.hits[0].id
 						}
-					});
+					} as PatchRequest);
 					cleanedNode[FieldPath.META]['modifiedTime'] = patchResponse.body[FieldPath.META]['modifiedTime'];
 
 					expect(patchResponse).toStrictEqual({

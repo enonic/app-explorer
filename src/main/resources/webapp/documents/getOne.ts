@@ -17,13 +17,15 @@ import authorize from './authorize';
 import stripDocumentNode from './stripDocumentNode';
 
 
-export default function getOne(request: Request<{
+export type GetOneRequest = Request<{
 	collection?: string
 	id?: string
 },{
 	collectionName?: string
 	documentId?: string
-}>) {
+}>
+
+export default function getOne(request: GetOneRequest) {
 	// log.debug('getOne request:%s', toStr(request));
 
 	const {

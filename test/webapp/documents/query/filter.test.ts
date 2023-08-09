@@ -19,7 +19,9 @@ import type {
 	Repository,
 	get as getRepo
 } from '@enonic-types/lib-repo';
-import type { DocumentNode } from '/lib/explorer/types/Document';
+// import type { DocumentNode } from '/lib/explorer/types/Document';
+import type { PostRequest } from '../../../../src/main/resources/webapp/documents/createOrUpdateMany';
+import type { QueryRequest } from '../../../../src/main/resources/webapp/documents/query';
 
 
 import {
@@ -211,9 +213,9 @@ describe('webapp', () => {
 							requireValid: 'false'
 						},
 						pathParams: {
-							collection: COLLECTION_NAME
+							collectionName: COLLECTION_NAME
 						}
-					});
+					} as PostRequest);
 					const collectionConnection = javaBridge.connect({
 						branch: 'master',
 						repoId: COLLECTION_REPO_ID
@@ -282,7 +284,7 @@ describe('webapp', () => {
 							pathParams: {
 								collectionName: COLLECTION_NAME
 							}
-						});
+						} as QueryRequest);
 						// log.debug('queryResponse', queryResponse);
 						expect(queryResponse).toStrictEqual({
 							body: [],
