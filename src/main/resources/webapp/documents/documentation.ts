@@ -62,6 +62,10 @@ export default function documentation(request: Request<{
 				manifestPath: FILEPATH_MANIFEST_NODE_MODULES,
 				path: 'react-dom/umd/react-dom.development.js'
 			})}"></script>
+			<link rel="stylesheet" type="text/css" href="${getImmuteableUrl({
+				manifestPath: FILEPATH_MANIFEST_NODE_MODULES,
+				path: 'semantic-ui-css/semantic.min.css'
+			})}">
 			<title>Documents Endpoint - Version ${DOCUMENT_REST_API_VERSION} - API documentation</title>
 			<style>
 				table {

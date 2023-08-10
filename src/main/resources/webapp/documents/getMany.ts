@@ -26,7 +26,7 @@ export type GetManyRequest = Request<{
 
 
 export default function getMany(request: GetManyRequest) {
-	log.debug('getMany request:%s', toStr(request));
+	// log.debug('getMany request:%s', toStr(request));
 
 	const {
 		params: {

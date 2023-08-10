@@ -37,6 +37,9 @@ export default function buildStaticConfig(): Options {
 					'graphiql/graphiql.min.css',
 					'react/{cjs,umd}/*.js',
 					'react-dom/{cjs,umd}/*.js',
+					'semantic-ui-css/*.css',
+					'semantic-ui-css/themes/**/*',
+					'semantic-ui-react/dist/**/*',
 				]
 			}),
 			GlobalsPlugin({
@@ -72,6 +75,7 @@ export default function buildStaticConfig(): Options {
 		noExternal: [
 			'react', // WARNING: For GlobalsPlugin to work react MUST be listed here (if react under dependencies or peerDependencies)
 			'react-dom',
+			'semantic-ui-react',
 		],
 		platform: 'browser',
 		silent: ['QUIET', 'WARN'].includes(process.env['LOG_LEVEL_FROM_GRADLE']||''),
