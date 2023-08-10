@@ -15,7 +15,7 @@ const PATH_PREFIX = '';//`/api/v${DOCUMENT_REST_API_VERSION}/documents`;
 
 export default function DocumentsApiDoc() {
 
-	const [apiKey, setApiKey] = useState<string>('XXXX');
+	const [apiKey, setApiKey] = useState<string>(window['__EXPLORER_API_KEY__']);
 	const [collection, setCollection] = useState<string>();
 	const [documentId, setDocumentId] = useState<string>();
 
@@ -55,7 +55,7 @@ export default function DocumentsApiDoc() {
 					authorization: {
 						value: `Explorer-Api-Key ${apiKey}`,
 						attributes: '<required>',
-						description: 'The API key (password) for the collection you want to get documents from.'
+						description: 'The API key (password) for the collection you want to get document(s) from.'
 					},
 					// 'content-type': {
 					// 	value: 'application/json',
@@ -227,6 +227,18 @@ export default function DocumentsApiDoc() {
 					}],
 					type: 'object | object[]'
 				}}
+				headers={{
+					authorization: {
+						value: `Explorer-Api-Key ${apiKey}`,
+						attributes: '<required>',
+						description: 'The API key (password) for the collection you want to create or update document(s) in.'
+					},
+					'content-type': {
+						value: 'application/json;charset=utf-8',
+						attributes: '<required>',
+						description: "The content type of the body. It must be application/json;charset=utf-8."
+					},
+				}}
 				method="POST"
 				parameters={{
 					documentType: {
@@ -260,6 +272,32 @@ export default function DocumentsApiDoc() {
 					}
 				}}
 				pattern={`${prefix}`}
+				responses={[{
+					status: 200,
+					body: [{
+						action: 'create',
+						_id: '1',
+						// message: "Document created, got id '1'",
+						status: 200
+					},{
+						_id: '2',
+						action: 'update',
+						// message: "Document with id '2' updated.",
+						status: 200
+					},{
+						action: 'create',
+						error: 'Something went wrong while trying to create a document!',
+						status: 500
+					},{
+						action: 'update',
+						error: "Document with _id '2' not found in collection 'collectionName'!",
+						status: 404
+					},{
+						action: 'update',
+						error: "Something went wrong while trying to update document with _id '5'!",
+						status: 500
+					}]
+				}]}
 			/>
 			<Action
 				apiKey={apiKey}
@@ -291,6 +329,18 @@ export default function DocumentsApiDoc() {
 					},
 					start: 0,
 				} as QueryNodeParams, null, 4)}'`}
+				headers={{
+					authorization: {
+						value: `Explorer-Api-Key ${apiKey}`,
+						attributes: '<required>',
+						description: 'The API key (password) for the collection you want to query for document(s) in.'
+					},
+					'content-type': {
+						value: 'application/json;charset=utf-8',
+						attributes: '<required>',
+						description: "The content type of the body. It must be application/json;charset=utf-8."
+					},
+				}}
 				method="POST"
 				pattern={`${prefix}/query`}
 			/>
@@ -298,6 +348,14 @@ export default function DocumentsApiDoc() {
 				apiKey={apiKey}
 				comment='Delete document(s)'
 				curl={`-H "authorization:Explorer-Api-Key ${apiKey}"`}
+				headers={{
+					authorization: {
+						value: `Explorer-Api-Key ${apiKey}`,
+						attributes: '<required>',
+						description: 'The API key (password) for the collection you want to delete document(s) from.'
+					},
+				}}
+				method="DELETE"
 				parameters={{
 					id: {
 						default: ['1', '2'],
@@ -307,7 +365,6 @@ export default function DocumentsApiDoc() {
 						type: 'string'
 					},
 				}}
-				method="DELETE"
 				pattern={`${prefix}`}
 			/>
 			<h2>Single</h2>
@@ -322,8 +379,26 @@ export default function DocumentsApiDoc() {
 				apiKey={apiKey}
 				curl={`-H "authorization:Explorer-Api-Key ${apiKey}"`}
 				comment='Get a document'
+				headers={{
+					authorization: {
+						value: `Explorer-Api-Key ${apiKey}`,
+						attributes: '<required>',
+						description: 'The API key (password) for the collection you want to get a document from.'
+					},
+				}}
 				method="GET"
 				pattern={documentPath}
+				responses={[{
+					status: 200,
+					body: {
+						_id: '1'
+					}
+				}, {
+					status: 404,
+					body: {
+						message: 'Document with id "1" doesn\'t exist in collection "collectionName"!'
+					}
+				}]}
 			/>
 			<Action
 				apiKey={apiKey}
@@ -354,6 +429,18 @@ export default function DocumentsApiDoc() {
 						}
 					}],
 					type: 'object'
+				}}
+				headers={{
+					authorization: {
+						value: `Explorer-Api-Key ${apiKey}`,
+						attributes: '<required>',
+						description: 'The API key (password) for the collection you want to create or update a document in.'
+					},
+					'content-type': {
+						value: 'application/json;charset=utf-8',
+						attributes: '<required>',
+						description: "The content type of the body. It must be application/json;charset=utf-8."
+					},
 				}}
 				method="POST"
 				parameters={{
@@ -393,8 +480,26 @@ export default function DocumentsApiDoc() {
 				apiKey={apiKey}
 				curl={`-H "authorization:Explorer-Api-Key ${apiKey}"`}
 				comment='Delete a document'
+				headers={{
+					authorization: {
+						value: `Explorer-Api-Key ${apiKey}`,
+						attributes: '<required>',
+						description: 'The API key (password) for the collection you want to delete a document from.'
+					},
+				}}
 				method="DELETE"
 				pattern={documentPath}
+				responses={[{
+					status: 200,
+					body: {
+						message: 'Deleted document with id:1',
+					}
+				}, {
+					status: 404,
+					body: {
+						message: 'Document with id "1" does not exist in collection "collectionName"!'
+					}
+				}]}
 			/>
 		</Segment>
 	</main>;

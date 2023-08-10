@@ -49,9 +49,15 @@ export default function Action({
 		type?: string
 	}>
 	responses?: {
-		body?: Record<string, unknown>[] | {
-			message: string
-		}
+		body?:
+			| Record<string, unknown>
+			| Record<string, unknown>[]
+			| {
+				message: string
+			}
+			| {
+				message: string
+			}[]
 		// contentType: 'application/json;charset=UTF-8'
 		status: number
 	}[]
