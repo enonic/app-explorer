@@ -3,12 +3,16 @@ import type { Request } from '../../types/Request';
 
 import { Role } from '@enonic/explorer-utils';
 // import { toStr } from '@enonic/js-utils/value/toStr';
+import lcKeys from '@enonic/js-utils/object/lcKeys';
 import { hasRole } from '/lib/xp/auth';
 import {
 	FILEPATH_MANIFEST,
 	FILEPATH_MANIFEST_NODE_MODULES,
 } from '../../constants';
-import { DOCUMENT_REST_API_VERSION } from '../constants';
+import {
+	AUTH_PREFIX,
+	DOCUMENT_REST_API_VERSION
+} from '../constants';
 import getImmuteableUrl from '../getImmuteableUrl';
 import authorize from './authorize';
 
@@ -42,7 +46,15 @@ export default function documentation(request: Request<{
 	}
 
 	if (true) {
-		const {url} = request;
+		const {
+			headers,
+			url
+		} = request;
+		const lcHeaders = lcKeys(headers) as typeof headers;
+		const {
+			authorization = 'Explorer-Api-Key XXXX'
+		} = lcHeaders;
+		const apiKey = authorization.substring(AUTH_PREFIX.length);
 		const propsObj = {
 			url
 		};
@@ -66,6 +78,9 @@ export default function documentation(request: Request<{
 				manifestPath: FILEPATH_MANIFEST_NODE_MODULES,
 				path: 'semantic-ui-css/semantic.min.css'
 			})}">
+			<script>
+				window.__EXPLORER_API_KEY__ = '${apiKey}';
+			</script>
 			<title>Documents Endpoint - Version ${DOCUMENT_REST_API_VERSION} - API documentation</title>
 			<style>
 				table {
