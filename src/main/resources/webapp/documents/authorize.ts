@@ -24,7 +24,7 @@ import {
 
 export default function authorize(request: Request, collectionName: string): {
 	body?: {
-		message: string
+		error: string
 	}
 	contentType?: string
 	status: number
@@ -135,7 +135,7 @@ export default function authorize(request: Request, collectionName: string): {
 		log.error(`The API key with name:${apiKeyName} doesn't have access to any collections!`);
 		return {
 			body: {
-				message: "The API key doesn't have access to any collections!"
+				error: "The API key doesn't have access to any collections!"
 			},
 			contentType: 'text/json;charset=utf-8',
 			status: HTTP_RESPONSE_STATUS_CODES.BAD_REQUEST
@@ -146,7 +146,7 @@ export default function authorize(request: Request, collectionName: string): {
 		log.error(`No access to collection:${collectionName}!`);
 		return {
 			body: {
-				message: 'Bad Request'
+				error: 'Bad Request'
 			},
 			contentType: 'text/json;charset=utf-8',
 			status: HTTP_RESPONSE_STATUS_CODES.BAD_REQUEST

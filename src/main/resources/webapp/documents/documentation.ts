@@ -28,7 +28,7 @@ export default function documentation(request: Request<{
 	start: string
 }>): {
 		body?: string | {
-			message: string
+			error: string
 		}
 		contentType?: string
 		status?: number
@@ -102,10 +102,10 @@ export default function documentation(request: Request<{
 					margin: 6px;
 					padding: 6px;
 				}
-				.method-get span,
-				.method-post span,
-				.method-put span,
-				.method-delete span {
+				.method-get summary > span:first-child,
+				.method-post summary > span:first-child,
+				.method-put summary > span:first-child,
+				.method-delete summary > span:first-child {
 					border-radius: 3px;
 					color: white;
 					display: inline-block;
@@ -119,7 +119,7 @@ export default function documentation(request: Request<{
 					background-color: hsla(120,100%,50%,.1);
 					border-color: green;
 				}
-				.method-get span {
+				.method-get summary > span:first-child {
 					background-color: green;
 				}
 				.method-post {
@@ -127,21 +127,21 @@ export default function documentation(request: Request<{
 					border-color: blue;
 
 				}
-				.method-post span {
+				.method-post summary > span:first-child {
 					background-color: blue;
 				}
 				.method-put {
 					background-color: hsla(39,100%,50%,.1);
 					border-color: darkorange;
 				}
-				.method-put span {
+				.method-put summary > span:first-child {
 					background-color: darkorange;
 				}
 				.method-delete {
 					background-color: hsla(0,100%,50%,.1);
 					border-color: red;
 				}
-				.method-delete span {
+				.method-delete summary > span:first-child {
 					background-color: red;
 				}
 				samp {

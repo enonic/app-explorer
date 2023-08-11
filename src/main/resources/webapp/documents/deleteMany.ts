@@ -31,7 +31,7 @@ export default function deleteMany(
 	request: RemoveRequest
 ): {
 	body?: {
-		message: string
+		error: string
 	} | unknown
 	contentType?: string
 	status?: number
@@ -47,7 +47,7 @@ export default function deleteMany(
 	if (!collectionName) {
 		return {
 			body: {
-				message: 'Missing required parameter collection!'
+				error: 'Missing required parameter collection!'
 			},
 			contentType: 'text/json;charset=utf-8',
 			status: 400 // Bad Request
@@ -56,7 +56,7 @@ export default function deleteMany(
 	if (!idParam) {
 		return {
 			body: {
-				message: 'Missing required url query parameter id!'
+				error: 'Missing required url query parameter id!'
 			},
 			contentType: 'text/json;charset=utf-8',
 			status: 400 // Bad Request

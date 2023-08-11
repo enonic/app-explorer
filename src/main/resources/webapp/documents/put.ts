@@ -53,7 +53,7 @@ export default function put(request: PutRequest, partial = false) {
 	if (!collectionName) {
 		return {
 			body: {
-				message: 'Missing required parameter collection!'
+				error: 'Missing required parameter collection!'
 			},
 			contentType: 'text/json;charset=utf-8',
 			status: HTTP_RESPONSE_STATUS_CODES.BAD_REQUEST
@@ -63,7 +63,7 @@ export default function put(request: PutRequest, partial = false) {
 	if (!documentId) {
 		return {
 			body: {
-				message: 'Missing required parameter id!'
+				error: 'Missing required parameter id!'
 			},
 			contentType: 'text/json;charset=utf-8',
 			status: HTTP_RESPONSE_STATUS_CODES.BAD_REQUEST
@@ -89,7 +89,8 @@ export default function put(request: PutRequest, partial = false) {
 	if (!writeToCollectionBranchConnection.exists(documentId)) {
 		return {
 			body: {
-				message: `Document with id "${documentId}" does not exist in collection "${collectionName}"!`
+				id: documentId,
+				error: `Document with id "${documentId}" does not exist in collection "${collectionName}"!`
 			},
 			contentType: 'text/json;charset=utf-8',
 			status: HTTP_RESPONSE_STATUS_CODES.NOT_FOUND
@@ -103,7 +104,8 @@ export default function put(request: PutRequest, partial = false) {
 		log.error('Unable to JSON.parse:%s', bodyJson);
 		return {
 			body: {
-				message: 'Failed to JSON.parse',
+				id: documentId,
+				error: 'Failed to JSON.parse',
 			},
 			contentType: 'text/json;charset=utf-8',
 			status: HTTP_RESPONSE_STATUS_CODES.INTERNAL_SERVER_ERROR
@@ -121,7 +123,8 @@ export default function put(request: PutRequest, partial = false) {
 		log.error(`Unable to get CollectionNode from collectionPath:${collectionPath}!`);
 		return {
 			body: {
-				message: `Unable to get CollectionNode from collectionName:${collectionName}!`
+				id: documentId,
+				error: `Unable to get CollectionNode from collectionName:${collectionName}!`
 			},
 			contentType: 'text/json;charset=utf-8',
 			status: HTTP_RESPONSE_STATUS_CODES.INTERNAL_SERVER_ERROR
@@ -161,7 +164,8 @@ export default function put(request: PutRequest, partial = false) {
 		log.error(`Something went wrong while trying to update document with id:${documentId}!`, e); // Log the stack trace
 		return {
 			body: {
-				message: `Something went wrong while trying to update document with id:${documentId}!`
+				id: documentId,
+				error: `Something went wrong while trying to update document with id:${documentId}!`
 			},
 			contentType: 'text/json;charset=utf-8',
 			status: HTTP_RESPONSE_STATUS_CODES.INTERNAL_SERVER_ERROR

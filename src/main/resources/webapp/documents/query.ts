@@ -90,7 +90,7 @@ export default function query(
 			log.error('Unable to JSON.parse:%s', bodyJson);
 			return {
 				body: {
-					message: 'Failed to JSON.parse',
+					error: 'Failed to JSON.parse',
 				},
 				contentType: 'text/json;charset=utf-8',
 				status: HTTP_RESPONSE_STATUS_CODES.INTERNAL_SERVER_ERROR
@@ -102,7 +102,7 @@ export default function query(
 	if (!collectionName) {
 		return {
 			body: {
-				message: 'Missing required parameter collection!'
+				error: 'Missing required parameter collection!'
 			},
 			contentType: 'text/json;charset=utf-8',
 			status: HTTP_RESPONSE_STATUS_CODES.BAD_REQUEST
@@ -130,7 +130,7 @@ export default function query(
 		log.error('The root filter must be of type boolean! queryNodeParams:%s', toStr(queryNodeParams));
 		return {
 			body: {
-				message: 'The root filter must be of type boolean!'
+				error: 'The root filter must be of type boolean!'
 			},
 			contentType: 'text/json;charset=utf-8',
 			status: HTTP_RESPONSE_STATUS_CODES.BAD_REQUEST

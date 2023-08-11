@@ -40,7 +40,7 @@ export default function getMany(request: GetManyRequest) {
 	if (!collectionName) {
 		return {
 			body: {
-				message: 'Missing required parameter collection!'
+				error: 'Missing required parameter collection!'
 			},
 			contentType: 'text/json;charset=utf-8',
 			status: HTTP_RESPONSE_STATUS_CODES.BAD_REQUEST
@@ -50,7 +50,7 @@ export default function getMany(request: GetManyRequest) {
 	if (!idParam) {
 		return {
 			body: {
-				message: 'Missing required parameter id!'
+				error: 'Missing required parameter id!'
 			},
 			contentType: 'text/json;charset=utf-8',
 			status: HTTP_RESPONSE_STATUS_CODES.BAD_REQUEST
@@ -71,7 +71,30 @@ export default function getMany(request: GetManyRequest) {
 		repoId
 	};
 	//log.debug('connecting using:%s', toStr(connectParams));
-	const readFromCollectionBranchConnection = connect(connectParams);
+	let readFromCollectionBranchConnection: ReturnType<typeof connect>;
+	try {
+		readFromCollectionBranchConnection = connect(connectParams);
+	} catch (e) {
+		if (
+			e.class && e.class.name === 'java.lang.IllegalArgumentException'
+			&& startsWith(e.message, 'RepositoryId format incorrect')
+		) {
+			return {
+				body: {
+					error: `Collection format incorrect:${collectionName}!`
+				},
+				status: HTTP_RESPONSE_STATUS_CODES.INTERNAL_SERVER_ERROR
+			};
+		}
+		log.error('stacktrace', e);
+		// log.error(`e.message:${toStr(e.message)}`, e.message);
+		return {
+			body: {
+				error: `Failed to read from collection:${collectionName}!`
+			},
+			status: HTTP_RESPONSE_STATUS_CODES.INTERNAL_SERVER_ERROR
+		};
+	}
 	//log.debug('connected using:%s', toStr(connectParams));
 
 	const ids = forceArray(idParam);
@@ -93,7 +116,7 @@ export default function getMany(request: GetManyRequest) {
 	if (!strippedDocumentNodes.length) {
 		return {
 			body: {
-				message: `Didn't find any documents for ids:${ids.join(',')}`
+				error: `Didn't find any documents for ids:${ids.join(',')}`
 			},
 			contentType: 'text/json;charset=utf-8',
 			status: HTTP_RESPONSE_STATUS_CODES.NOT_FOUND
