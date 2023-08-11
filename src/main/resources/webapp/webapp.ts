@@ -140,17 +140,27 @@ router.all(`/${GETTER_ROOT}/{path:.+}`, (r: Request) => {
 		const immuteableResponse = immutableGetter(r);
 		// log.debug('immuteableResponse:%s', toStr(immuteableResponse));
 		if (immuteableResponse.status !== HTTP_RESPONSE_STATUS_CODES.OK) {
-			log.warning('immuteableResponse:%s', toStr(immuteableResponse)); // This can happen if the file doesn't exist.
+			log.warning('immuteableResponse:%s url:%s', toStr(immuteableResponse), r.url); // This can happen if the file doesn't exist.
 		}
 		return immuteableResponse;
 	} else {
-		r.path = `${r.path.split(`/${GETTER_ROOT}/`, 2)[0]}/${postFix}`;
-		r.rawPath = `${r.rawPath.split(`/${GETTER_ROOT}/`, 2)[0]}/${postFix}`;
-		r.url = `${r.url.split(`/${GETTER_ROOT}/`, 2)[0]}/${postFix}`;
-		const etagResponse = etagGetter(r);
+		const modifiedRequest = JSON.parse(JSON.stringify(r)) as typeof r; // dereference
+		modifiedRequest.path = `${r.path.split(`/${GETTER_ROOT}/`, 2)[0]}/${postFix}`;
+		modifiedRequest.rawPath = `${r.rawPath.split(`/${GETTER_ROOT}/`, 2)[0]}/${postFix}`;
+		modifiedRequest.url = `${r.url.split(`/${GETTER_ROOT}/`, 2)[0]}/${postFix}`;
+		const etagResponse = etagGetter(modifiedRequest);
 		// log.debug('etagResponse:%s', toStr(etagResponse));
-		if (etagResponse.status !== HTTP_RESPONSE_STATUS_CODES.OK) {
-			log.warning('etagResponse:%s', toStr(etagResponse)); // This probably can't happen.
+		if (
+			etagResponse.status !== HTTP_RESPONSE_STATUS_CODES.OK
+			&& etagResponse.status !== HTTP_RESPONSE_STATUS_CODES.NOT_MODIFIED
+		) {
+			// This probably can't happen.
+			log.warning(
+				'etagResponse:%s origUrl:%s modifiedUrl:%s',
+				toStr(etagResponse),
+				r.url,
+				modifiedRequest.url
+			);
 		}
 		return etagResponse;
 	}

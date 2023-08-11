@@ -161,14 +161,14 @@ export default function createOrUpdateMany(
 	request: PostRequest
 ): {
 	body?: {
-		message: string
+		error: string
 	} | any[]
 	contentType?: string
 	status: number
 } {
 	// log.debug('request:%s', toStr(request));
-	log.debug('request.params:%s', toStr(request.params));
-	log.debug('request.pathParams:%s', toStr(request.pathParams));
+	// log.debug('request.params:%s', toStr(request.params));
+	// log.debug('request.pathParams:%s', toStr(request.pathParams));
 
 	const {
 		body,
@@ -182,7 +182,7 @@ export default function createOrUpdateMany(
 			collectionName = ''
 		} = {}
 	} = request;
-	//log.info(`body:${toStr(body)}`);
+	// log.debug('body:%s', body);
 	//log.info(`params:${toStr(params)}`);
 
 	//const d = new Date();
@@ -192,11 +192,11 @@ export default function createOrUpdateMany(
 	const boolRequireValid = requireValidParam !== 'false'; // Thus fallsback to true if something invalid provided
 	const boolPartial = partialParam === 'true'; // Thus fallsback to false if something invalid provided
 
-	log.debug('collectionName:%s', collectionName);
+	// log.debug('collectionName:%s', collectionName);
 	if (!collectionName) {
 		return {
 			body: {
-				message: 'Missing required parameter collection!'
+				error: 'Missing required parameter collection!'
 			},
 			contentType: 'text/json;charset=utf-8',
 			status: HTTP_RESPONSE_STATUS_CODES.BAD_REQUEST
@@ -235,7 +235,7 @@ export default function createOrUpdateMany(
 		log.error(`Unable to get CollectionNode from collectionPath:${collectionPath}!`);
 		return {
 			body: {
-				message: 'Bad Request'
+				error: 'Bad Request'
 			},
 			contentType: 'text/json;charset=utf-8',
 			status: HTTP_RESPONSE_STATUS_CODES.BAD_REQUEST
@@ -252,10 +252,10 @@ export default function createOrUpdateMany(
 	}));
 
 	const data = JSON.parse(body);
-	//log.info(`data:${toStr(data)}`);
+	// log.debug('data:%s', toStr(data));
 
 	const dataArray = forceArray(data);
-	//log.info(`dataArray:${toStr(dataArray)}`);
+	// log.debug('dataArray:%s', toStr(dataArray));
 
 	return runWithExplorerWrite(() => {
 		const writeToCollectionBranchConnection = connect({
@@ -268,6 +268,7 @@ export default function createOrUpdateMany(
 		for (let j = 0; j < dataArray.length; j++) {
 			try {
 				const toPersist = dataArray[j];
+				// log.debug('toPersist:%s', toStr(toPersist));
 				let documentTypeId: string|undefined;
 				let documentTypeName: string|undefined;
 				if (toPersist._documentTypeId) {
@@ -287,6 +288,7 @@ export default function createOrUpdateMany(
 
 				if (toPersist._id) {
 					if (writeToCollectionBranchConnection.exists(toPersist._id)) {
+						// log.debug(`toPersist._id:${toPersist._id} exists!`);
 						modifyDocument({
 							boolPartial,
 							boolRequireValid,
@@ -299,6 +301,7 @@ export default function createOrUpdateMany(
 							toPersist
 						});
 					} else {
+						// log.debug(`toPersist._id:${toPersist._id} does not exist!`);
 						createDocument({
 							boolRequireValid,
 							collectionId,
@@ -311,6 +314,7 @@ export default function createOrUpdateMany(
 					}
 				} else if (toPersist._name) {
 					if (writeToCollectionBranchConnection.exists(`/${toPersist._name}`)) {
+						// log.debug(`toPersist._name:${toPersist._name} exists!`);
 						modifyDocument({
 							boolPartial,
 							boolRequireValid,
@@ -323,6 +327,7 @@ export default function createOrUpdateMany(
 							toPersist
 						});
 					} else {
+						// log.debug(`toPersist._name:${toPersist._name} does not exist!`);
 						createDocument({
 							boolRequireValid,
 							collectionId,
@@ -335,6 +340,7 @@ export default function createOrUpdateMany(
 					}
 				} else if (toPersist._path) {
 					if (writeToCollectionBranchConnection.exists(toPersist._path)) {
+						// log.debug(`toPersist._path:${toPersist._path} exists!`);
 						modifyDocument({
 							boolPartial,
 							boolRequireValid,
@@ -347,6 +353,7 @@ export default function createOrUpdateMany(
 							toPersist
 						});
 					} else {
+						// log.debug(`toPersist._path:${toPersist._path} does not exist!`);
 						createDocument({
 							boolRequireValid,
 							collectionId,
@@ -358,6 +365,7 @@ export default function createOrUpdateMany(
 						});
 					}
 				} else {
+					// log.debug(`No _id, _name or _path!`);
 					createDocument({
 						boolRequireValid,
 						collectionId,

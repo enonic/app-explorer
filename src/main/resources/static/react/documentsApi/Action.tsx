@@ -5,8 +5,11 @@ import {
 import {
 	Button,
 	Form,
+	Grid,
 	Segment,
 } from 'semantic-ui-react';
+import TypedReactJson from '../components/TypedReactJson';
+
 
 export default function Action({
 	apiKey,
@@ -62,6 +65,7 @@ export default function Action({
 		status: number
 	}[]
 }) {
+	const [requestState, setRequestState] = useState<Record<string, unknown>>();
 	const [dataJsonString, setDataJsonString] = useState(data ? JSON.stringify(data.default, null, 4) : '');
 	let restringifiedData;
 	try {
@@ -297,10 +301,19 @@ export default function Action({
 						authorization: `Explorer-Api-Key ${apiKey}`,
 					}
 				}
+				const requestObjForState = {
+					method,
+					headers: {
+						authorization: `Explorer-Api-Key ${apiKey}`,
+					},
+					url
+				}
 				if (dataJsonString.length) {
 					fetchOptions['body'] = restringifiedData;
+					requestObjForState['body'] = JSON.parse(restringifiedData);
 				}
 				// console.debug('fetchOptions', fetchOptions);
+				setRequestState(requestObjForState);
 				fetch(url, fetchOptions)
 					.then(async res => {
 						// console.debug('res', res);
@@ -311,14 +324,56 @@ export default function Action({
 					});
 			}}
 		/>
-		{
-			responseState
-			? <>
-				<h5>Fetch Response</h5>
-				<Segment><pre>{JSON.stringify(responseState, null, 4)}</pre></Segment>
-			</>
-			: null
-		}
+		<div>
+			<Grid columns='equal'>
+				<Grid.Row>
+					<Grid.Column>
+						{
+							requestState
+							? <div>
+								<h5>Fetch Request</h5>
+								<Segment>
+									<TypedReactJson
+										enableClipboard={false}
+										displayArrayKey={false}
+										displayDataTypes={false}
+										displayObjectSize={false}
+										indentWidth={2}
+										name={null}
+										quotesOnKeys={false}
+										sortKeys={true}
+										src={requestState}
+									/>
+								</Segment>
+							</div>
+							: null
+						}
+					</Grid.Column>
+					<Grid.Column>
+						{
+							responseState
+							? <div>
+								<h5>Fetch Response</h5>
+								<Segment>
+									<TypedReactJson
+										enableClipboard={false}
+										displayArrayKey={false}
+										displayDataTypes={false}
+										displayObjectSize={false}
+										indentWidth={2}
+										name={null}
+										quotesOnKeys={false}
+										sortKeys={true}
+										src={responseState}
+									/>
+								</Segment>
+							</div>
+							: null
+						}
+					</Grid.Column>
+				</Grid.Row>
+			</Grid>
+		</div>
 
 		{
 			responses.length === 0

@@ -97,7 +97,7 @@ function authorize({
 		log.error(`API key hashedApiKey:${hashedApiKey} not found!`);
 		return {
 			body: JSON.stringify({
-				message: 'Forbidden'
+				error: 'Forbidden'
 			}),
 			contentType: 'text/json;charset=utf-8',
 			status: HTTP_RESPONSE_STATUS_CODES.FORBIDDEN

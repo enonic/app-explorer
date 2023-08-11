@@ -41,7 +41,7 @@ export default function getOne(request: GetOneRequest) {
 	if (!collectionName) {
 		return {
 			body: {
-				message: 'Missing required parameter collection!'
+				error: 'Missing required parameter collection!'
 			},
 			contentType: 'text/json;charset=utf-8',
 			status: HTTP_RESPONSE_STATUS_CODES.BAD_REQUEST
@@ -51,7 +51,7 @@ export default function getOne(request: GetOneRequest) {
 	if (!documentId) {
 		return {
 			body: {
-				message: 'Missing required parameter id!'
+				error: 'Missing required parameter id!'
 			},
 			contentType: 'text/json;charset=utf-8',
 			status: HTTP_RESPONSE_STATUS_CODES.BAD_REQUEST

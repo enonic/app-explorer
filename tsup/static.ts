@@ -75,6 +75,7 @@ export default function buildStaticConfig(): Options {
 		noExternal: [
 			'react', // WARNING: For GlobalsPlugin to work react MUST be listed here (if react under dependencies or peerDependencies)
 			'react-dom',
+			'react-json-view',
 			'semantic-ui-react',
 		],
 		platform: 'browser',
