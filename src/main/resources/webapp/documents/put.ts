@@ -16,7 +16,7 @@ import { connect } from '/lib/explorer/repo/connect';
 import { HTTP_RESPONSE_STATUS_CODES } from '../constants';
 import authorize from './authorize';
 import runWithExplorerWrite from './runWithExplorerWrite';
-import stripDocumentNode from './stripDocumentNode';
+import documentNodeToBodyItem from './documentNodeToBodyItem';
 
 
 const COLLECTOR_ID = `${APP_EXPLORER}:documentRestApi`;
@@ -28,6 +28,8 @@ export type PutRequest = Request<{
 	documentTypeId?: string
 	id?: string
 	requireValid?: 'true' | 'false'
+	returnDocument?: 'true' | 'false'
+	returnMetadata?: 'true' | 'false'
 },{
 	collectionName?: string
 	documentId?: string
@@ -40,7 +42,9 @@ export default function put(request: PutRequest, partial = false) {
 			documentType: documentTypeParam,
 			documentTypeId: documentTypeIdParam,
 			id: idParam = '',
-			requireValid: requireValidParam = 'true'
+			requireValid: requireValidParam = 'true',
+			returnDocument: returnDocumentParam = 'false',
+			returnMetadata: returnMetadataParam = 'false'
 		} = {},
 		pathParams: {
 			collectionName = '',
@@ -49,6 +53,8 @@ export default function put(request: PutRequest, partial = false) {
 	} = request;
 
 	const boolRequireValid = requireValidParam !== 'false'; // Thus fallsback to true if something invalid provided
+	const boolReturnDocument = returnDocumentParam !== 'false'; // Fallsback to false if something invalid is provided
+	const boolReturnMetadata = returnMetadataParam !== 'false'; // Fallsback to false if something invalid is provided
 
 	if (!collectionName) {
 		return {
@@ -172,7 +178,11 @@ export default function put(request: PutRequest, partial = false) {
 		};
 	}
 	return {
-		body: stripDocumentNode(updatedNode),
+		body: documentNodeToBodyItem({
+			documentNode: updatedNode,
+			includeDocument: boolReturnDocument,
+			includeMetadata: boolReturnMetadata
+		}),
 		contentType: 'text/json;charset=utf-8',
 		status: HTTP_RESPONSE_STATUS_CODES.OK
 	};

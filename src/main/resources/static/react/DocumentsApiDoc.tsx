@@ -27,6 +27,7 @@ export default function DocumentsApiDoc() {
 		<h1>Documents API documentation</h1>
 
 		<h2>Common</h2>
+
 		<Form>
 			<Form.Input
 				defaultValue={apiKey}
@@ -42,6 +43,7 @@ export default function DocumentsApiDoc() {
 		</Form>
 
 		<h2>Bulk</h2>
+
 		<Action
 			apiKey={apiKey}
 			comment='Get document(s)'
@@ -97,6 +99,13 @@ export default function DocumentsApiDoc() {
 				// 	default: '{}',
 				// 	description: 'Query expression. Keep in mind that filters are usually more quicker. See <a href="https://developer.enonic.com/docs/xp/stable/storage/noql">documentation</a>.'
 				// }
+				returnMetadata: {
+					default: false,
+					description: 'When true, the metadata of the document will be returned in the response.',
+					list: false,
+					required: false,
+					type: 'boolean'
+				}
 			}}
 			responses={[{
 				body: [{
@@ -137,6 +146,7 @@ export default function DocumentsApiDoc() {
 				status: 200,
 			}]}
 		/>
+
 		<Action
 			apiKey={apiKey}
 			comment='Create or modify document(s)'
@@ -263,16 +273,30 @@ _id?: string
 					required: false,
 					type: 'string'
 				},
-				partial: {
-					default: false,
-					description: 'When true, values are only added or updated. Unprovided values are not removed.',
+				// partial: { // TODO Not supported by the backend yet.
+				// 	default: false,
+				// 	description: 'When true, values are only added or updated. Unprovided values are not removed.',
+				// 	list: false,
+				// 	required: false,
+				// 	type: 'boolean'
+				// },
+				requireValid: {
+					default: true,
+					description: 'The data has to be valid, according to the field types, to be created or updated. If requireValid=true and the data is not strictly valid, an error will be returned.',
 					list: false,
 					required: false,
 					type: 'boolean'
 				},
-				requireValid: {
-					default: true,
-					description: 'The data has to be valid, according to the field types, to be created or updated. If requireValid=true and the data is not strictly valid, an error will be returned.',
+				returnDocument: {
+					default: false,
+					description: 'When true, the created or updated document(s) will be returned in the response, not just the id.',
+					list: false,
+					required: false,
+					type: 'boolean'
+				},
+				returnMetadata: {
+					default: false,
+					description: 'When true, the metadata of the created or updated document(s) will be returned in the response.',
 					list: false,
 					required: false,
 					type: 'boolean'
@@ -306,6 +330,7 @@ _id?: string
 				}]
 			}]}
 		/>
+
 		<Action
 			apiKey={apiKey}
 			comment='Query document(s)'
@@ -349,6 +374,22 @@ _id?: string
 				},
 			}}
 			method="POST"
+			parameters={{
+				returnDocument: {
+					default: false,
+					description: 'When true, the document(s) will be returned in the response, not just the id(s).',
+					list: false,
+					required: false,
+					type: 'boolean'
+				},
+				returnMetadata: {
+					default: false,
+					description: 'When true, the metadata of the document(s) will be returned in the response.',
+					list: false,
+					required: false,
+					type: 'boolean'
+				}
+			}}
 			pattern={`${prefix}/query`}
 		/>
 		<Action
@@ -374,7 +415,9 @@ _id?: string
 			}}
 			pattern={`${prefix}`}
 		/>
+
 		<h2>Single</h2>
+
 		<Form>
 			<Form.Input
 				label='Document ID'
@@ -382,6 +425,7 @@ _id?: string
 				onChange={(_, { value }) => setDocumentId(value)}
 			/>
 		</Form>
+
 		<Action
 			apiKey={apiKey}
 			curl={`-H "authorization:Explorer-Api-Key ${apiKey}"`}
@@ -395,6 +439,15 @@ _id?: string
 			}}
 			method="GET"
 			pattern={documentPath}
+			parameters={{
+				returnMetadata: {
+					default: false,
+					description: 'When true, the metadata of the document will be returned in the response.',
+					list: false,
+					required: false,
+					type: 'boolean'
+				}
+			}}
 			responses={[{
 				status: 200,
 				body: {
@@ -407,6 +460,7 @@ _id?: string
 				}
 			}]}
 		/>
+
 		<Action
 			apiKey={apiKey}
 			curl={`-H "authorization:Explorer-Api-Key ${apiKey}" -H "content-type:application/json"`}
@@ -466,16 +520,30 @@ _id?: string
 					required: false,
 					type: 'string'
 				},
-				partial: {
-					default: false,
-					description: 'When true, values are only added or updated. Unprovided values are not removed.',
+				// partial: {
+				// 	default: false,
+				// 	description: 'When true, values are only added or updated. Unprovided values are not removed.',
+				// 	list: false,
+				// 	required: false,
+				// 	type: 'boolean'
+				// },
+				requireValid: {
+					default: true,
+					description: 'The data has to be valid, according to the field types, to be created or updated. If requireValid=true and the data is not strictly valid, an error will be returned.',
 					list: false,
 					required: false,
 					type: 'boolean'
 				},
-				requireValid: {
-					default: true,
-					description: 'The data has to be valid, according to the field types, to be created or updated. If requireValid=true and the data is not strictly valid, an error will be returned.',
+				returnDocument: {
+					default: false,
+					description: 'When true, the patched document will be returned in the response, not just the id.',
+					list: false,
+					required: false,
+					type: 'boolean'
+				},
+				returnMetadata: {
+					default: false,
+					description: 'When true, the metadata of the patched document will be returned in the response.',
 					list: false,
 					required: false,
 					type: 'boolean'
@@ -483,6 +551,7 @@ _id?: string
 			}}
 			pattern={documentPath}
 		/>
+
 		<Action
 			apiKey={apiKey}
 			curl={`-H "authorization:Explorer-Api-Key ${apiKey}"`}

@@ -1,5 +1,6 @@
 //import type {RepoConnection} from '@enonic-types/lib-explorer';
 import type { Request } from '../../types/Request';
+import type { BodyItem } from './documentNodeToBodyItem';
 
 
 import {
@@ -11,7 +12,7 @@ import {
 	Repo
 } from '@enonic/explorer-utils';
 import {
-	array,
+	// array,
 	forceArray,
 	toStr
 } from '@enonic/js-utils';
@@ -25,38 +26,38 @@ import { create/*, ValidationError*/} from '/lib/explorer/document/create';
 import { update } from '/lib/explorer/document/update';
 import { HTTP_RESPONSE_STATUS_CODES } from '../constants';
 import authorize from './authorize';
+import documentNodeToBodyItem from './documentNodeToBodyItem';
 import runWithExplorerWrite from './runWithExplorerWrite';
 
 
-const {includes: arrayIncludes} = array;
+// const {includes: arrayIncludes} = array;
 
 
 export type PostRequest = Request<{
 	documentType?: string
 	documentTypeId?: string
-	partial?: string
-	requireValid?: string
+	partial?: 'true' | 'false'
+	requireValid?: 'true' | 'false'
+	returnDocument?: 'true' | 'false'
+	returnMetadata?: 'true' | 'false'
 }, {
 	collectionName?: string
 }>
+
 
 
 const COLLECTOR_ID = `${APP_EXPLORER}:documentRestApi`;
 const COLLECTOR_VERSION = app.version;
 
 
-function createDocument<
-	Node extends {
-		_id: string
-		error?: string
-	}
->({
+function createDocument({
 	boolRequireValid = true,
+	boolReturnDocument = false,
+	boolReturnMetadata = false,
 	collectionId,
 	collectionName,
 	documentTypeId,
 	documentTypeName,
-	idField,
 	responseArray,
 	toPersist
 }: {
@@ -64,11 +65,12 @@ function createDocument<
 	collectionName: string
 	documentTypeId?: string
 	documentTypeName?: string
-	responseArray: Node[]
-	toPersist: Node
+	responseArray: BodyItem[]
+	toPersist: Record<string, unknown>
 	// Optional
 	boolRequireValid?: boolean
-	idField?: string
+	boolReturnDocument?: boolean
+	boolReturnMetadata?: boolean
 }) {
 	const createdNode = create({
 		collectionId,
@@ -81,26 +83,24 @@ function createDocument<
 		requireValid: boolRequireValid
 	});
 	if(createdNode) {
-		const responseNode = {} as Node;
-		if (idField) {
-			responseNode[idField] = createdNode[idField];
-		} else {
-			responseNode._id = createdNode._id;
-		}
-		responseArray.push(responseNode);
+		responseArray.push({
+			...documentNodeToBodyItem({
+				documentNode: createdNode,
+				includeDocument: boolReturnDocument,
+				includeMetadata: boolReturnMetadata
+			}),
+			status: HTTP_RESPONSE_STATUS_CODES.OK
+		});
 	} else {
 		responseArray.push({
-			error: 'Something went wrong when trying to create the document!'
-		} as Node);
+			error: 'Something went wrong when trying to create the document!',
+			status: HTTP_RESPONSE_STATUS_CODES.INTERNAL_SERVER_ERROR
+		});
 	}
 }
 
-export function modifyDocument<
-	Node extends {
-		_id: string
-		error?: string
-	}
->({
+export function modifyDocument
+({
 	collectionId,
 	collectionName,
 	documentTypeId,
@@ -112,19 +112,21 @@ export function modifyDocument<
 	// Optional
 	boolPartial = false,
 	boolRequireValid = true,
-	idField
+	boolReturnDocument = false,
+	boolReturnMetadata = false,
 }: {
 	collectionId: string
 	collectionName: string
 	documentTypeId?: string
 	documentTypeName?: string
 	id: string
-	responseArray: Node[]
-	toPersist: Node
+	responseArray: BodyItem[]
+	toPersist: Record<string, unknown>
 	// Optional
 	boolPartial?: boolean
 	boolRequireValid?: boolean
-	idField?: string
+	boolReturnDocument?: boolean
+	boolReturnMetadata?: boolean
 }) {
 	const updatedNode = update({
 		collectionId,
@@ -142,17 +144,19 @@ export function modifyDocument<
 	});
 	//log.info(`updatedNode:${toStr(updatedNode)}`);
 	if(updatedNode) {
-		const responseNode = {} as Node;
-		if (idField) {
-			responseNode[idField] = updatedNode[idField];
-		} else {
-			responseNode._id = updatedNode._id;
-		}
-		responseArray.push(responseNode);
+		responseArray.push({
+			...documentNodeToBodyItem({
+				documentNode: updatedNode,
+				includeDocument: boolReturnDocument,
+				includeMetadata: boolReturnMetadata
+			}),
+			status: HTTP_RESPONSE_STATUS_CODES.OK
+		});
 	} else {
 		responseArray.push({
-			error: 'Something went wrong when trying to modify the document!'
-		} as Node);
+			error: 'Something went wrong when trying to modify the document!',
+			status: HTTP_RESPONSE_STATUS_CODES.INTERNAL_SERVER_ERROR
+		});
 	}
 }
 
@@ -176,7 +180,9 @@ export default function createOrUpdateMany(
 			documentType: documentTypeParam,
 			documentTypeId: documentTypeIdParam,
 			partial: partialParam = 'false',
-			requireValid: requireValidParam = 'true'
+			requireValid: requireValidParam = 'true',
+			returnDocument: returnDocumentParam = 'false',
+			returnMetadata: returnMetadataParam = 'false'
 		} = {},
 		pathParams: {
 			collectionName = ''
@@ -189,8 +195,11 @@ export default function createOrUpdateMany(
 	//const branchDefault = `${d.getFullYear()}_${d.getMonth()+1}_${d.getDate()}T${d.getHours()}_${d.getMinutes()}_${d.getSeconds()}`;
 
 
-	const boolRequireValid = requireValidParam !== 'false'; // Thus fallsback to true if something invalid provided
-	const boolPartial = partialParam === 'true'; // Thus fallsback to false if something invalid provided
+	const boolPartial = partialParam !== 'false'; // Fallsback to false if something invalid is provided
+	const boolRequireValid = requireValidParam !== 'false'; // Fallsback to true if something invalid is provided
+	const boolReturnDocument = returnDocumentParam !== 'false'; // Fallsback to false if something invalid is provided
+	const boolReturnMetadata = returnMetadataParam !== 'false'; // Fallsback to false if something invalid is provided
+
 
 	// log.debug('collectionName:%s', collectionName);
 	if (!collectionName) {
@@ -283,7 +292,7 @@ export default function createOrUpdateMany(
 					documentTypeName = documentTypeParam;
 				}
 
-				// CREATE when idfield, _id, _name, _path not matched
+				// CREATE when _id, _name, _path not matched
 				// Otherwise MODIFY
 
 				if (toPersist._id) {
@@ -292,6 +301,8 @@ export default function createOrUpdateMany(
 						modifyDocument({
 							boolPartial,
 							boolRequireValid,
+							boolReturnDocument,
+							boolReturnMetadata,
 							collectionId,
 							collectionName,
 							documentTypeId,
@@ -304,6 +315,8 @@ export default function createOrUpdateMany(
 						// log.debug(`toPersist._id:${toPersist._id} does not exist!`);
 						createDocument({
 							boolRequireValid,
+							boolReturnDocument,
+							boolReturnMetadata,
 							collectionId,
 							collectionName,
 							documentTypeId,
@@ -318,6 +331,8 @@ export default function createOrUpdateMany(
 						modifyDocument({
 							boolPartial,
 							boolRequireValid,
+							boolReturnDocument,
+							boolReturnMetadata,
 							collectionId,
 							collectionName,
 							documentTypeId,
@@ -330,6 +345,8 @@ export default function createOrUpdateMany(
 						// log.debug(`toPersist._name:${toPersist._name} does not exist!`);
 						createDocument({
 							boolRequireValid,
+							boolReturnDocument,
+							boolReturnMetadata,
 							collectionId,
 							collectionName,
 							documentTypeId,
@@ -344,6 +361,8 @@ export default function createOrUpdateMany(
 						modifyDocument({
 							boolPartial,
 							boolRequireValid,
+							boolReturnDocument,
+							boolReturnMetadata,
 							collectionId,
 							collectionName,
 							documentTypeId,
@@ -356,6 +375,8 @@ export default function createOrUpdateMany(
 						// log.debug(`toPersist._path:${toPersist._path} does not exist!`);
 						createDocument({
 							boolRequireValid,
+							boolReturnDocument,
+							boolReturnMetadata,
 							collectionId,
 							collectionName,
 							documentTypeId,
@@ -368,6 +389,8 @@ export default function createOrUpdateMany(
 					// log.debug(`No _id, _name or _path!`);
 					createDocument({
 						boolRequireValid,
+						boolReturnDocument,
+						boolReturnMetadata,
 						collectionId,
 						collectionName,
 						documentTypeId,
