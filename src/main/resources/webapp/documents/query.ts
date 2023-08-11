@@ -7,6 +7,7 @@ import type {
 } from '@enonic-types/lib-node';
 import type { Headers } from '@enonic-types/lib-explorer/Request.d';
 import type { QueryFilters } from '@enonic-types/lib-explorer';
+import type { DocumentNode } from '/lib/explorer/types/Document';
 import type { Request } from '../../types/Request';
 
 
@@ -21,28 +22,25 @@ import {
 	forceArray,
 	string
 } from '@enonic/js-utils';
+// import { includes as arrayIncludes } from '@enonic/js-utils/array/include'; // TODO Not export in @enonic/js-utils yet?
 import { isBooleanFilter } from '@enonic/js-utils/storage/query/filter/isBooleanFilter';
-import lcKeys from '@enonic/js-utils/object/lcKeys';
+// import lcKeys from '@enonic/js-utils/object/lcKeys';
 import { toStr } from '@enonic/js-utils/value/toStr';
 //import {get as getCollection} from '/lib/explorer/collection/get';
 import { connect } from '/lib/explorer/repo/connect';
 import { hasRole } from '/lib/xp/auth';
 import { HTTP_RESPONSE_STATUS_CODES } from '../constants';
 import authorize from './authorize';
+import documentNodeToBodyItem from './documentNodeToBodyItem';
 
 
-const {includes: arrayIncludes} = array;
+// const {includes: arrayIncludes} = array;
 const {startsWith} = string;
 
 
 export type QueryRequest = Request<{
-	// id?: string
-	// collection?: string
-	// count?: string
-	// filters?: string
-	// query?: string
-	// sort?: string
-	// start?: string
+	returnDocument?: 'true'|'false'
+	returnMetadata?: 'true'|'false'
 }, {
 	collectionName?: string
 }>
@@ -54,7 +52,7 @@ export default function query(
 	// log.debug('query request:%s', toStr(request));
 	const {
 		body: bodyJson,
-		// params: {
+		params: {
 		// 	collection: collectionParam = '',
 		// 	count: countParam = '10',
 		// 	filters: filtersParam = '{}',
@@ -62,7 +60,9 @@ export default function query(
 		// 	query = '',
 		// 	sort = 'score DESC',
 		// 	start: startParam = '0'
-		// } = {},
+			returnDocument: returnDocumentParam = 'false',
+			returnMetadata: returnMetadataParam = 'false'
+		} = {},
 		pathParams: {
 			collectionName = ''
 		} = {}
@@ -174,6 +174,9 @@ export default function query(
 	);
 	// log.debug('count:%s', count);
 
+	const boolReturnDocument = returnDocumentParam !== 'false'; // Fallsback to false if something invalid is provided
+	const boolReturnMetadata = returnMetadataParam !== 'false'; // Fallsback to false if something invalid is provided
+
 	const repoId = `${COLLECTION_REPO_PREFIX}${collectionName}`;
 	//log.info(`repoId:${toStr(repoId)}`);
 
@@ -228,25 +231,21 @@ export default function query(
 	const keys = queryRes.hits.map(({id}) => id);
 	//log.info(`keys:${toStr(keys)}`);
 
-	const getRes = readFromCollectionBranchConnection.get(...keys);
+	const getRes = readFromCollectionBranchConnection.get<DocumentNode>(...keys);
 	// log.debug('getRes:%s', getRes); // Without toStr for running jest
 	// log.info(`getRes:${toStr(getRes)}`);
 
-	const strippedRes = forceArray(getRes).map((node) => {
-		// Not allowed to see any underscore fields (except _id, _name, _path)
-		Object.keys(node).forEach((k) => {
-			if (k === '_id' || k === '_name' || k === '_path') {
-				// no-op
-			} else if (startsWith(k, '_')) {
-				delete node[k];
-			}
+	const body = forceArray(getRes).map((documentNode) => {
+		return documentNodeToBodyItem({
+			documentNode,
+			includeDocument: boolReturnDocument,
+			includeMetadata: boolReturnMetadata,
 		});
-		return node;
 	});
-	//log.info(`strippedRes:${toStr(strippedRes)}`);
+	// log.debug('body:%s', toStr(body));
 
 	return {
-		body: strippedRes,
+		body,
 		contentType: 'text/json;charset=utf-8',
 		status: HTTP_RESPONSE_STATUS_CODES.OK
 	};

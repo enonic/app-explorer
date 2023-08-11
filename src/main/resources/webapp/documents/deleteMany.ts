@@ -6,7 +6,7 @@ import {
 	Principal
 } from '@enonic/explorer-utils';
 import {
-	array,
+	// array,
 	forceArray//,
 	//toStr
 } from '@enonic/js-utils';
@@ -16,7 +16,7 @@ import { HTTP_RESPONSE_STATUS_CODES } from '../constants';
 import authorize from './authorize';
 
 
-const {includes: arrayIncludes} = array;
+// const {includes: arrayIncludes} = array;
 
 
 export type RemoveRequest = Request<{
@@ -86,34 +86,40 @@ export default function deleteMany(
 
 	let idsArray = forceArray(idParam);
 
-	const responseArray = [];
+	const body = [];
 	idsArray.forEach((id) => {
 		//log.info(`ids:${toStr(ids)}`);
 		const getRes = readFromCollectionBranchConnection.get(id);
 		//log.info(`getRes:${toStr(getRes)}`);
 
 		let item: {
-			_id?: string
+			id?: string
 			error?: string
-		} = {};
+			status?: number
+		} = {
+			id
+		};
 		if (!getRes) { // getRes === null
-			item.error = `Unable to find document with _id = ${id}!`;
+			item.error = `Unable to find document with id = ${id}!`;
+			item.status = HTTP_RESPONSE_STATUS_CODES.NOT_FOUND;
 		} else if (Array.isArray(getRes)) { // getRes === [{},{}]
-			item.error = `Found multiple documents with _id = ${id}!`;
+			item.error = `Found multiple document with id = ${id}!`;
+			item.status = HTTP_RESPONSE_STATUS_CODES.CONFLICT;
 		} else { // getRes === {}
 			const deleteRes = writeToCollectionBranchConnection.delete(id);
 			if (deleteRes.length === 1) {
-				item._id = getRes._id;
 				writeToCollectionBranchConnection.refresh();
+				item.status = HTTP_RESPONSE_STATUS_CODES.OK;
 			} else {
-				item.error = `Unable to delete documents with _id = ${id}!`;
+				item.error = `Unable to delete document with id = ${id}!`;
+				item.status = HTTP_RESPONSE_STATUS_CODES.INTERNAL_SERVER_ERROR;
 			}
 		}
-		responseArray.push(item);
+		body.push(item);
 	}); // forEach key
 
 	return {
-		body: responseArray,
+		body,
 		contentType: 'text/json;charset=utf-8',
 		status: HTTP_RESPONSE_STATUS_CODES.OK
 	};

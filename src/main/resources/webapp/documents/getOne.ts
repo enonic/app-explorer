@@ -14,12 +14,13 @@ import { connect } from '/lib/explorer/repo/connect';
 import { hasRole } from '/lib/xp/auth';
 import { HTTP_RESPONSE_STATUS_CODES } from '../constants';
 import authorize from './authorize';
-import stripDocumentNode from './stripDocumentNode';
+import documentNodeToBodyItem from './documentNodeToBodyItem';
 
 
 export type GetOneRequest = Request<{
 	collection?: string
 	id?: string
+	returnMetadata?: 'true'|'false'
 },{
 	collectionName?: string
 	documentId?: string
@@ -30,7 +31,8 @@ export default function getOne(request: GetOneRequest) {
 
 	const {
 		params: {
-			id: idParam = ''
+			id: idParam = '',
+			returnMetadata: returnMetadataParam = 'false'
 		} = {},
 		pathParams: {
 			collectionName = '',
@@ -66,6 +68,8 @@ export default function getOne(request: GetOneRequest) {
 		}
 	}
 
+	const boolReturnMetadata = returnMetadataParam !== 'false'; // Fallsback to false if something invalid is provided
+
 	const repoId = `${COLLECTION_REPO_PREFIX}${collectionName}`;
 	//log.info(`repoId:${toStr(repoId)}`);
 	const connectParams = {
@@ -86,11 +90,14 @@ export default function getOne(request: GetOneRequest) {
 		}
 	}
 
-	const strippedDocumentNode = stripDocumentNode(documentNode);
-	// log.debug('strippedDocumentNode:%s', toStr(strippedDocumentNode));
+	const body = documentNodeToBodyItem({
+		documentNode,
+		includeMetadata: boolReturnMetadata
+	});
+	// log.debug('body:%s', toStr(body));
 
 	return {
-		body: strippedDocumentNode,
+		body,
 		contentType: 'text/json;charset=utf-8',
 		status: HTTP_RESPONSE_STATUS_CODES.OK
 	};

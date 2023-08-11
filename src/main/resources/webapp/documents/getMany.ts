@@ -14,12 +14,13 @@ import { toStr } from '@enonic/js-utils/value/toStr';
 import { connect } from '/lib/explorer/repo/connect';
 import { HTTP_RESPONSE_STATUS_CODES } from '../constants';
 import authorize from './authorize';
-import stripDocumentNode from './stripDocumentNode';
+import documentNodeToBodyItem from './documentNodeToBodyItem';
 
 
 export type GetManyRequest = Request<{
 	collection?: string
 	id: string|string[]
+	returnMetadata?: 'true'|'false'
 },{
 	collectionName?: string
 }>
@@ -30,7 +31,8 @@ export default function getMany(request: GetManyRequest) {
 
 	const {
 		params: {
-			id: idParam = ''
+			id: idParam = '',
+			returnMetadata: returnMetadataParam = 'false'
 		} = {},
 		pathParams: {
 			collectionName = '',
@@ -62,6 +64,8 @@ export default function getMany(request: GetManyRequest) {
 	if (maybeErrorResponse.status !== 200 ) {
 		return maybeErrorResponse;
 	}
+
+	const boolReturnMetadata = returnMetadataParam !== 'false'; // Fallsback to false if something invalid is provided
 
 	const repoId = `${COLLECTION_REPO_PREFIX}${collectionName}`;
 	//log.info(`repoId:${toStr(repoId)}`);
@@ -98,33 +102,30 @@ export default function getMany(request: GetManyRequest) {
 	//log.debug('connected using:%s', toStr(connectParams));
 
 	const ids = forceArray(idParam);
-	const strippedDocumentNodes = [];
+	const body = [];
 	for (let i = 0; i < ids.length; i++) {
 		const id = ids[i];
 		const documentNode = readFromCollectionBranchConnection.get<DocumentNode>(id);
 		// log.debug('documentNode:%s', toStr(documentNode));
 
 		if (!documentNode) {
-			log.error('Document with id:%s not found in collection:%s!', id, collectionName);
+			body.push({
+				id,
+				status: HTTP_RESPONSE_STATUS_CODES.NOT_FOUND
+			});
 		} else {
-			const strippedDocumentNode = stripDocumentNode(documentNode);
-			// log.debug('strippedDocumentNode:%s', toStr(strippedDocumentNode));
-			strippedDocumentNodes.push(strippedDocumentNode);
+			const bodyItem = documentNodeToBodyItem({
+				documentNode,
+				includeMetadata: boolReturnMetadata,
+			});
+			bodyItem.status = HTTP_RESPONSE_STATUS_CODES.OK;
+			// log.debug('bodyItem:%s', toStr(bodyItem));
+			body.push(bodyItem);
 		}
 	} // for ids
 
-	if (!strippedDocumentNodes.length) {
-		return {
-			body: {
-				error: `Didn't find any documents for ids:${ids.join(',')}`
-			},
-			contentType: 'text/json;charset=utf-8',
-			status: HTTP_RESPONSE_STATUS_CODES.NOT_FOUND
-		}
-	}
-
 	return {
-		body: strippedDocumentNodes,
+		body,
 		contentType: 'text/json;charset=utf-8',
 		status: HTTP_RESPONSE_STATUS_CODES.OK
 	};

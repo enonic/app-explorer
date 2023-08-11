@@ -9,6 +9,8 @@ export type PatchRequest = Request<{
 	collection?: string
 	id?: string
 	requireValid?: 'true' | 'false'
+	returnDocument?: 'true' | 'false'
+	returnMetadata?: 'true' | 'false'
 },{
 	collectionName?: string
 	documentId?: string
