@@ -11,6 +11,7 @@ import { startsWith } from '@enonic/js-utils/string/startsWith';
 // import { HTTP_RESPONSE_STATUS_CODES } from '../constants';
 
 export interface BodyItem {
+	action?: 'create' | 'update'
 	id?: string // Not on failed create
 	error?: string
 	document?: Record<string, unknown>

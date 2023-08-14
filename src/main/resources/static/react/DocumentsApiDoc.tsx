@@ -45,6 +45,7 @@ export default function DocumentsApiDoc() {
 		<h2>Bulk</h2>
 
 		<Action
+			key='get-documents'
 			apiKey={apiKey}
 			comment='Get document(s)'
 			curl={`-H "authorization:Explorer-Api-Key ${apiKey}"`}
@@ -148,100 +149,124 @@ export default function DocumentsApiDoc() {
 		/>
 
 		<Action
+			key='create-or-modify-documents'
 			apiKey={apiKey}
 			comment='Create or modify document(s)'
 			curl={`-H "authorization:Explorer-Api-Key ${apiKey}" -H "content-type:application/json"`}
 			data={{
-				default: [{
-					available: true,
-					count: -999999999999999,
-					date: '2021-01-01',
-					datetime: '2021-01-01T00:00:00',
-					instant: '2021-01-01T00:00:00Z',
-					location: '59.9090442,10.7423389',
-					price: -999999999999999.9,
-					time: '00:00:00',
-					language: 'english',
-					text: 'This domain is for use in illustrative examples in documents. You may use this domain in literature without prior coordination or asking for permission.',
-					title: 'Example Domain',
-					url: 'https://www.example.com'
-				},{
-					available: false,
-					count: 999999999999999,
-					date: '2021-12-31',
-					datetime: '2021-12-31T23:59:59',
-					instant: '2021-12-31T23:59:59Z',
-					location: [
-						59.9090442,
-						10.7423389
-					],
-					price: 999999999999999.9,
-					time: '23:59:59',
-					language: 'english',
-					text: 'Whatever',
-					title: 'Whatever',
-					url: 'https://www.whatever.com'
-				}],
+				default: `[{
+	// "id": "1", // Add id, in order to update a document (rather than creating a new document).
+	"document": {
+		"available": true,
+		"count": -999999999999999,
+		"date": "2021-01-01",
+		"datetime": "2021-01-01T00:00:00",
+		"instant": "2021-01-01T00:00:00Z",
+		"location": "59.9090442,10.7423389",
+		"price": -999999999999999.9,
+		"time": "00:00:00",
+		"language": "english",
+		"text": "This domain is for use in illustrative examples in documents. You may use this domain in literature without prior coordination or asking for permission.",
+		"title": "Example Domain",
+		"url": "https://www.example.com"
+	}
+},{
+	"document": {
+		"available": false,
+		"count": 999999999999999,
+		"date": "2021-12-31",
+		"datetime": "2021-12-31T23:59:59",
+		"instant": "2021-12-31T23:59:59Z",
+		"location": [
+			59.9090442,
+			10.7423389
+		],
+		"price": 999999999999999.9,
+		"time": "23:59:59",
+		"language": "english",
+		"text": "Whatever",
+		"title": "Whatever",
+		"url": "https://www.whatever.com"
+	}
+}]`,
 				examples: [{
 					comment: 'Create a document',
 					type: 'object',
 					example: {
-						text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
-						title: 'Hello World',
-						uri: 'https://www.example.com'
+						document: {
+							text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+							title: 'Hello World',
+							uri: 'https://www.example.com'
+						}
 					}
 				},{
 					comment: 'Modify a document',
 					type: 'object',
 					example: {
-						_id: '1',
-						text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
-						title: 'Hello World',
-						uri: 'https://www.example.com'
+						id: '1',
+						document: {
+							text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+							title: 'Hello World',
+							uri: 'https://www.example.com'
+						}
 					}
 				}, {
 					comment: 'Create multiple documents',
 					type: 'object[]',
 					example: [{
-						text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
-						title: 'The standard Lorem Ipsum passage, used since the 1500s',
-						uri: 'https://www.example.com'
+						document: {
+							text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+							title: 'The standard Lorem Ipsum passage, used since the 1500s',
+							uri: 'https://www.example.com'
+						}
 					}, {
-						text: 'Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?',
-						title: 'Section 1.10.32 of "de Finibus Bonorum et Malorum", written by Cicero in 45 BC',
-						uri: 'https://www.example.com'
+						document: {
+							text: 'Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?',
+							title: 'Section 1.10.32 of "de Finibus Bonorum et Malorum", written by Cicero in 45 BC',
+							uri: 'https://www.example.com'
+						}
 					}]
 				},{
 					comment: 'Update multiple documents',
 					type: 'object[]',
 					example: [{
-						_id: '1',
-						text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
-						title: 'The standard Lorem Ipsum passage, used since the 1500s',
-						uri: 'https://www.example.com'
+						id: '1',
+						document: {
+							text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+							title: 'The standard Lorem Ipsum passage, used since the 1500s',
+							uri: 'https://www.example.com'
+						}
 					}, {
-						_id: '2',
-						text: 'Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?',
-						title: 'Section 1.10.32 of "de Finibus Bonorum et Malorum", written by Cicero in 45 BC',
-						uri: 'https://www.example.com'
+						id: '2',
+						document: {
+							text: 'Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?',
+							title: 'Section 1.10.32 of "de Finibus Bonorum et Malorum", written by Cicero in 45 BC',
+							uri: 'https://www.example.com'
+						}
 					}]
 				},{
 					comment: 'Create or update multiple documents',
 					type: `{
-_id?: string
-[key: string]?: unknown
+id?: string
+document: Record<string, unknown>
+documentType?: string
 }[]`,
 					example: [{
-						text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
-						title: 'The standard Lorem Ipsum passage, used since the 1500s',
-						uri: 'https://www.example.com'
+						document: {
+							text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+							title: 'The standard Lorem Ipsum passage, used since the 1500s',
+							uri: 'https://www.example.com'
+						}
 					}, {
-						_id: '1',
-						text: 'Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?',
-						title: 'Section 1.10.32 of "de Finibus Bonorum et Malorum", written by Cicero in 45 BC',
-						uri: 'https://www.example.com'
+						id: '1',
+						document: {
+							text: 'Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?',
+							title: 'Section 1.10.32 of "de Finibus Bonorum et Malorum", written by Cicero in 45 BC',
+							uri: 'https://www.example.com'
+						}
 					}]
 				}],
+				list: true,
 				type: 'object | object[]'
 			}}
 			headers={{
@@ -261,9 +286,9 @@ _id?: string
 				documentType: {
 					description: <>The documentType is selected in the following order:
 					<ol>
-						<li>_documentTypeId property on each document in the body json.</li>
-						<li>_documentType property on each document in the body json.</li>
-						<li>documentTypeId url query parameter.</li>
+						{/* <li>documentTypeId property on each document in the body json.</li> */}
+						<li>documentType property on each item in the body json.</li>
+						{/* <li>documentTypeId url query parameter.</li> */}
 						<li>documentType url query.</li>
 						<li>documentTypeId property stored on the collection node.</li>
 					</ol>
@@ -307,13 +332,21 @@ _id?: string
 				status: 200,
 				body: [{
 					action: 'create',
-					_id: '1',
+					id: '1',
+					// document: {
+					// 	key: 'value'
+					// },
 					// message: "Document created, got id '1'",
+					// metadata: {}
 					status: 200
 				},{
-					_id: '2',
+					id: '2',
 					action: 'update',
+					// document: {
+					// 	key: 'value'
+					// },
 					// message: "Document with id '2' updated.",
+					// metadata: {}
 					status: 200
 				},{
 					action: 'create',
@@ -321,17 +354,18 @@ _id?: string
 					status: 500
 				},{
 					action: 'update',
-					error: "Document with _id '2' not found in collection 'collectionName'!",
+					error: "Document with id '2' not found in collection 'collectionName'!",
 					status: 404
 				},{
 					action: 'update',
-					error: "Something went wrong while trying to update document with _id '5'!",
+					error: "Something went wrong while trying to update document with id '5'!",
 					status: 500
 				}]
 			}]}
 		/>
 
 		<Action
+			key='query-documents'
 			apiKey={apiKey}
 			comment='Query document(s)'
 			curl={`-H "authorization:Explorer-Api-Key ${apiKey}" -H "content-type:application/json" -d'${JSON.stringify({
@@ -393,6 +427,7 @@ _id?: string
 			pattern={`${prefix}/query`}
 		/>
 		<Action
+			key='delete-documents'
 			apiKey={apiKey}
 			comment='Delete document(s)'
 			curl={`-H "authorization:Explorer-Api-Key ${apiKey}"`}
@@ -427,6 +462,7 @@ _id?: string
 		</Form>
 
 		<Action
+			key='get-document'
 			apiKey={apiKey}
 			curl={`-H "authorization:Explorer-Api-Key ${apiKey}"`}
 			comment='Get a document'
@@ -451,7 +487,7 @@ _id?: string
 			responses={[{
 				status: 200,
 				body: {
-					_id: '1'
+					id: '1'
 				}
 			}, {
 				status: 404,
@@ -462,24 +498,28 @@ _id?: string
 		/>
 
 		<Action
+			key='patch-document'
 			apiKey={apiKey}
 			curl={`-H "authorization:Explorer-Api-Key ${apiKey}" -H "content-type:application/json"`}
 			comment='Patch a document'
 			data={{
-				default: {
-					available: false,
-					count: 0,
-					date: '2023-01-01',
-					datetime: '2023-01-01T00:00:00',
-					instant: '2023-01-01T00:00:00Z',
-					location: '59.9090442,10.7423389',
-					price: 0,
-					// time: '00:00:00',
-					language: 'norsk',
-					text: 'Hei!',
-					title: 'Tittel',
-					url: 'https://www.example.no'
-				},
+				default: `{
+	"document": {
+		"available": false,
+		"count": 0,
+		"date": "2023-01-01",
+		"datetime": "2023-01-01T00:00:00",
+		"instant": "2023-01-01T00:00:00Z",
+		"location": "59.9090442,10.7423389",
+		"price": 0,
+		// "time": "00:00:00",
+		"language": "norsk",
+		"text": "Hei!",
+		"title": "Tittel",
+		"url": "https://www.example.no"
+	},
+	// "documentType": "documentTypeName",
+}`,
 				examples: [{
 					comment: 'Patch a document',
 					type: 'object',
@@ -489,6 +529,7 @@ _id?: string
 						uri: 'https://www.example.com'
 					}
 				}],
+				list: false,
 				type: 'object'
 			}}
 			headers={{
@@ -508,9 +549,9 @@ _id?: string
 				documentType: {
 					description: <>The documentType is selected in the following order:
 					<ol>
-						<li>_documentTypeId property on each document in the body json.</li>
-						<li>_documentType property on each document in the body json.</li>
-						<li>documentTypeId url query parameter.</li>
+						{/* <li>documentTypeId property on each document in the body json.</li> */}
+						<li>documentType property on each item in the body json.</li>
+						{/* <li>documentTypeId url query parameter.</li> */}
 						<li>documentType url query.</li>
 						<li>documentTypeId property stored on the collection node.</li>
 					</ol>
@@ -553,6 +594,7 @@ _id?: string
 		/>
 
 		<Action
+			key='delete-document'
 			apiKey={apiKey}
 			curl={`-H "authorization:Explorer-Api-Key ${apiKey}"`}
 			comment='Delete a document'

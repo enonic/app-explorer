@@ -73,10 +73,13 @@ export default function buildStaticConfig(): Options {
 		],
 		minify: process.env['NODE_ENV'] === 'development' ? false : true,
 		noExternal: [
+			// '@enonic/js-utils', // Not in use yet.
+			'@monaco-editor/react',
 			'react', // WARNING: For GlobalsPlugin to work react MUST be listed here (if react under dependencies or peerDependencies)
 			'react-dom',
 			'react-json-view',
 			'semantic-ui-react',
+			'tiny-jsonc'
 		],
 		platform: 'browser',
 		silent: ['QUIET', 'WARN'].includes(process.env['LOG_LEVEL_FROM_GRADLE']||''),
