@@ -84,6 +84,7 @@ function createDocument({
 	});
 	if(createdNode) {
 		responseArray.push({
+			action: 'create',
 			...documentNodeToBodyItem({
 				documentNode: createdNode,
 				includeDocument: boolReturnDocument,
@@ -93,6 +94,7 @@ function createDocument({
 		});
 	} else {
 		responseArray.push({
+			action: 'create',
 			error: 'Something went wrong when trying to create the document!',
 			status: HTTP_RESPONSE_STATUS_CODES.INTERNAL_SERVER_ERROR
 		});
@@ -145,6 +147,7 @@ export function modifyDocument
 	//log.info(`updatedNode:${toStr(updatedNode)}`);
 	if(updatedNode) {
 		responseArray.push({
+			action: 'update',
 			...documentNodeToBodyItem({
 				documentNode: updatedNode,
 				includeDocument: boolReturnDocument,
@@ -154,7 +157,8 @@ export function modifyDocument
 		});
 	} else {
 		responseArray.push({
-			error: 'Something went wrong when trying to modify the document!',
+			action: 'update',
+			error: 'Something went wrong when trying to update the document!',
 			status: HTTP_RESPONSE_STATUS_CODES.INTERNAL_SERVER_ERROR
 		});
 	}

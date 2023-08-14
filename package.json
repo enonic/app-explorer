@@ -3,6 +3,7 @@
   "dependencies": {
     "@enonic/js-utils": "^1.5.3",
     "@enonic/semantic-ui-react-form": "^2",
+    "@monaco-editor/react": "^4.5.1",
     "@seamusleahy/init-hooks": "^1",
     "@semantic-ui-react/component-ref": "^1",
     "cheerio": "1.0.0-rc.12",
@@ -43,6 +44,7 @@
     "semantic-ui-css": "^2",
     "semantic-ui-react": "^2",
     "serialize-javascript": "^5",
+    "tiny-jsonc": "^1.0.1",
     "traverse": "^0",
     "uri-js": "^4",
     "use-debounce": "^9"

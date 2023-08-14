@@ -1,3 +1,4 @@
+import MonacoEditor from "@monaco-editor/react";
 import {
 	Fragment,
 	useState
@@ -8,8 +9,66 @@ import {
 	Grid,
 	Segment,
 } from 'semantic-ui-react';
+import JSONC from 'tiny-jsonc';
 import TypedReactJson from '../components/TypedReactJson';
 
+
+const MONACO_FONT_SIZE = 14;
+const MONACO_LINE_HEIGHT = 21; // 14px font-size + 7px line-height
+
+const FILE_MATCH_ID_PATCH_DOCUMENT = 'patchDocument.json';
+const FILE_MATCH_ID_CREATE_OR_UPDATE_DOCUMENTS = 'createOrUpdateDocuments.json';
+
+const JSON_SCHEMA_PATCH_DOCUMENT = {
+	// "fileMatch": ["*"],
+	"fileMatch": [FILE_MATCH_ID_PATCH_DOCUMENT],
+	"uri": "http://www.enonic.com/schemas/patchDocument.json",
+	"schema": {
+		"type": "object",
+		"properties": {
+			"document": {
+				"type": "object",
+				// By default any additional properties are allowed.
+				// "properties": {} // shape of the documentType(s)
+			},
+			"documentType": {
+				"type": "string"
+			},
+		},
+		"additionalProperties": false,
+		"required": ["document"]
+	}
+};
+
+const JSON_SCHEMA_CREATE_OR_UPDATE_DOCUMENTS = {
+	// "fileMatch": ["*"],
+	"fileMatch": [FILE_MATCH_ID_CREATE_OR_UPDATE_DOCUMENTS],
+	"uri": "http://www.enonic.com/schemas/createOrUpdateDocuments.json",
+	"schema": {
+		"type": "array",
+		// "uniqueItems": false, // While it doesn't make sence, it's allow to make multiple identical documents in the same request.
+		// List validation is useful for arrays of arbitrary length where each item matches the same schema.
+		// For this kind of array, set the items keyword to a single schema that will be used to validate all of the items in the array.
+		"items": {
+			"type": "object",
+			"properties": {
+				"document": {
+					"type": "object",
+					// By default any additional properties are allowed.
+					// "properties": {} // shape of the documentType(s)
+				},
+				"documentType": {
+					"type": "string"
+				},
+				"id": {
+					"type": "string"
+				},
+			},
+			"additionalProperties": false,
+			"required": ["document"]
+		}
+	}
+};
 
 export default function Action({
 	apiKey,
@@ -24,13 +83,13 @@ export default function Action({
 }: {
 	apiKey: string,
 	data?: {
-		default: Record<string, unknown> | Record<string, unknown>[]
+		default: string // Record<string, unknown> | Record<string, unknown>[]
 		examples: {
 			comment: string
 			example: Record<string, unknown> | Record<string, unknown>[]
 			type: string
 		}[]
-		// list: boolean,
+		list: boolean,
 		type: string
 	}
 	comment: string
@@ -66,10 +125,10 @@ export default function Action({
 	}[]
 }) {
 	const [requestState, setRequestState] = useState<Record<string, unknown>>();
-	const [dataJsonString, setDataJsonString] = useState(data ? JSON.stringify(data.default, null, 4) : '');
+	const [dataJsonString, setDataJsonString] = useState(data && data.default ? data.default : '');
 	let restringifiedData;
 	try {
-		restringifiedData = JSON.stringify(JSON.parse(dataJsonString), null, 4);
+		restringifiedData = JSON.stringify(JSONC.parse(dataJsonString), null, 4);
 	} catch (e) {
 		restringifiedData = '{}';
 	}
@@ -259,10 +318,52 @@ export default function Action({
 						: null
 					}
 					<Form>
-						<Form.TextArea
+						{/* <Form.TextArea
 							defaultValue={dataJsonString}
 							onChange={(e, { value }) => setDataJsonString(value as string)}
 							rows={dataJsonString.split('\n').length}
+						/> */}
+						<MonacoEditor
+							height={`${dataJsonString.split('\n').length * MONACO_LINE_HEIGHT}px`}
+							language="json"
+							onChange={(value) => {
+								setDataJsonString(value);
+							}}
+							onMount={(editor, monaco) => {
+								// monaco.languages.typescript.typescriptDefaults.setCompilerOptions({isolatedModules: true})
+								monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
+									allowComments: true,
+									enableSchemaRequest: false, // uri's are fake
+									// schemaRequest: 'ignore',
+									schemaValidation: 'error', // The severity of problems from schema validation. If set to 'ignore', schema validation will be skipped. If not set, 'warning' is used.
+									trailingCommas: 'ignore',
+									validate: true,
+									// schemas: data.list ? [JSON_SCHEMA_CREATE_OR_UPDATE_DOCUMENTS] : [JSON_SCHEMA_PATCH_DOCUMENT]
+									schemas: [
+										JSON_SCHEMA_CREATE_OR_UPDATE_DOCUMENTS,
+										JSON_SCHEMA_PATCH_DOCUMENT
+									]
+								});
+								// console.debug('MonacoEditor onMount data.list', data.list);
+								const model = monaco.editor.createModel(
+									dataJsonString, // value: string
+									'json', // language?: string
+									data.list // uri?: Uri
+										? `internal://server/${FILE_MATCH_ID_CREATE_OR_UPDATE_DOCUMENTS}`
+										: `internal://server/${FILE_MATCH_ID_PATCH_DOCUMENT}`
+								);
+								editor.setModel(model);
+							}}
+							options={{
+								fontSize: MONACO_FONT_SIZE,
+								minimap: {
+									enabled: false
+								},
+								scrollBeyondLastLine: false,
+								scrollbars: {
+									vertical: 'hidden',
+								}
+							}}
 						/>
 					</Form>
 				</>
