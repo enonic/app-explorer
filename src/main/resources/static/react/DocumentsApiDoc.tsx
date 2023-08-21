@@ -149,13 +149,13 @@ export default function DocumentsApiDoc() {
 		/>
 
 		<Action
-			key='create-or-modify-documents'
+			key='crud-documents'
 			apiKey={apiKey}
-			comment='Create or modify document(s)'
+			comment='Create, read, update or delete document(s)'
 			curl={`-H "authorization:Explorer-Api-Key ${apiKey}" -H "content-type:application/json"`}
 			data={{
 				default: `[{
-	// "id": "1", // Add id, in order to update a document (rather than creating a new document).
+	// "action": "create", // Create is assumed if action and id is missing.
 	"document": {
 		"available": true,
 		"count": -999999999999999,
@@ -171,6 +171,11 @@ export default function DocumentsApiDoc() {
 		"url": "https://www.example.com"
 	}
 },{
+	"action": "read",
+	"id": "1"
+},{
+	// "action": "update", // Update is assumed if action is missing, but id is present.
+	"id": "1",
 	"document": {
 		"available": false,
 		"count": 999999999999999,
@@ -188,20 +193,46 @@ export default function DocumentsApiDoc() {
 		"title": "Whatever",
 		"url": "https://www.whatever.com"
 	}
+},{
+	"action": "delete",
+	"id": "1"
 }]`,
 				examples: [{
 					comment: 'Create a document',
-					type: 'object',
+					type: `{
+	action?: 'create'
+	id: never
+	document: Record<string, unknown>
+	documentType?: string
+}`,
 					example: {
+						// action: 'create',
 						document: {
 							text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
 							title: 'Hello World',
 							uri: 'https://www.example.com'
 						}
 					}
-				},{
-					comment: 'Modify a document',
-					type: 'object',
+				}, {
+					comment: 'Read a document',
+					type: `{
+	action: 'read'
+	id: string
+	document: never
+	documentType: never
+}`,
+					example: {
+						action: 'read',
+						id: '1',
+					}
+				}, {
+					comment: 'Update a document',
+					type: `{
+	action?: 'update'
+	id: string
+	document: Record<string, unknown>
+	documentType?: string
+}`,
 					example: {
 						id: '1',
 						document: {
@@ -211,8 +242,25 @@ export default function DocumentsApiDoc() {
 						}
 					}
 				}, {
+					comment: 'Delete a document',
+					type: `{
+	action: 'delete'
+	id: string
+	document: never
+	documentType: never
+}`,
+					example: {
+						action: 'delete',
+						id: '1',
+					}
+				}, {
 					comment: 'Create multiple documents',
-					type: 'object[]',
+					type: `{
+	action?: 'create'
+	id: never
+	document: Record<string, unknown>
+	documentType?: string
+}[]`,
 					example: [{
 						document: {
 							text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
@@ -226,9 +274,29 @@ export default function DocumentsApiDoc() {
 							uri: 'https://www.example.com'
 						}
 					}]
-				},{
+				}, {
+					comment: 'Read multiple documents',
+					type: `{
+	action: 'read'
+	id: string
+	document: never
+	documentType: never
+}[]`,
+					example: [{
+						action: 'read',
+						id: '1'
+					}, {
+						action: 'read',
+						id: '2'
+					}]
+				}, {
 					comment: 'Update multiple documents',
-					type: 'object[]',
+					type: `{
+	action?: 'update'
+	id: string
+	document: Record<string, unknown>
+	documentType?: string
+}[]`,
 					example: [{
 						id: '1',
 						document: {
@@ -244,12 +312,28 @@ export default function DocumentsApiDoc() {
 							uri: 'https://www.example.com'
 						}
 					}]
-				},{
-					comment: 'Create or update multiple documents',
+				}, {
+					comment: 'Delete multiple documents',
 					type: `{
-id?: string
-document: Record<string, unknown>
-documentType?: string
+	action: 'delete'
+	id: string
+	document: never
+	documentType: never
+}[]`,
+					example: [{
+						action: 'delete',
+						id: '1'
+					}, {
+						action: 'delete',
+						id: '2'
+					}]
+				}, {
+					comment: 'Create, read, update or delete multiple documents',
+					type: `{
+	action?: 'create' | 'read' | 'update' | 'delete'
+	id?: string
+	document?: Record<string, unknown>
+	documentType?: string
 }[]`,
 					example: [{
 						document: {
@@ -258,16 +342,26 @@ documentType?: string
 							uri: 'https://www.example.com'
 						}
 					}, {
+						action: 'read',
+						id: '1',
+					}, {
 						id: '1',
 						document: {
 							text: 'Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?',
 							title: 'Section 1.10.32 of "de Finibus Bonorum et Malorum", written by Cicero in 45 BC',
 							uri: 'https://www.example.com'
 						}
+					}, {
+						action: 'delete',
+						id: '1',
 					}]
 				}],
 				list: true,
-				type: 'object | object[]'
+				type: `{
+	action: 'create' | 'read' | 'update' | 'delete'
+	id: string
+	document?: Record<string, unknown>
+}[]`
 			}}
 			headers={{
 				authorization: {
@@ -522,15 +616,21 @@ documentType?: string
 }`,
 				examples: [{
 					comment: 'Patch a document',
-					type: 'object',
+					type: `{
+	document: Record<string, unknown>
+}`,
 					example: {
-						text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
-						title: 'Hello World',
-						uri: 'https://www.example.com'
+						document: {
+							text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+							title: 'Hello World',
+							uri: 'https://www.example.com'
+						}
 					}
 				}],
 				list: false,
-				type: 'object'
+				type: `{
+	document: Record<string, unknown>
+}`
 			}}
 			headers={{
 				authorization: {
