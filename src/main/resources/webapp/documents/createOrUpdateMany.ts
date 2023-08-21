@@ -1,4 +1,5 @@
 //import type {RepoConnection} from '@enonic-types/lib-explorer';
+import type { DocumentNode } from '/lib/explorer/types/Document';
 import type { Request } from '../../types/Request';
 import type { BodyItem } from './documentNodeToBodyItem';
 
@@ -28,6 +29,7 @@ import { HTTP_RESPONSE_STATUS_CODES } from '../constants';
 import authorize from './authorize';
 import documentNodeToBodyItem from './documentNodeToBodyItem';
 import runWithExplorerWrite from './runWithExplorerWrite';
+import { RepoConnection } from '@enonic-types/lib-node';
 
 
 // const {includes: arrayIncludes} = array;
@@ -56,17 +58,17 @@ function createDocument({
 	boolReturnMetadata = false,
 	collectionId,
 	collectionName,
+	document,
+	documentType,
 	documentTypeId,
-	documentTypeName,
 	responseArray,
-	toPersist
 }: {
 	collectionId: string
 	collectionName: string
+	document: Record<string, unknown>
+	documentType?: string
 	documentTypeId?: string
-	documentTypeName?: string
 	responseArray: BodyItem[]
-	toPersist: Record<string, unknown>
 	// Optional
 	boolRequireValid?: boolean
 	boolReturnDocument?: boolean
@@ -77,9 +79,9 @@ function createDocument({
 		collectionName,
 		collectorId: COLLECTOR_ID,
 		collectorVersion: COLLECTOR_VERSION,
-		data: toPersist,
+		data: document,
 		documentTypeId,
-		documentTypeName,
+		documentTypeName: documentType,
 		requireValid: boolRequireValid
 	});
 	if(createdNode) {
@@ -101,15 +103,52 @@ function createDocument({
 	}
 }
 
+
+function deleteDocument({
+	id,
+	writeToCollectionBranchConnection
+}: {
+	id: string
+	writeToCollectionBranchConnection: RepoConnection
+}) {
+	// NOTE: Not wrapped with runWithExplorerWrite
+	if (!writeToCollectionBranchConnection.exists(id)) {
+		return {
+			action: 'delete',
+			error: `Document with id "${id}" doesn't exist!`,
+			id,
+			status: HTTP_RESPONSE_STATUS_CODES.NOT_FOUND
+		}
+	}
+	let deleteRes = [];
+	try {
+		deleteRes = writeToCollectionBranchConnection.delete(id);
+		return {
+			action: 'delete',
+			id,
+			status: HTTP_RESPONSE_STATUS_CODES.OK
+		};
+	} catch (e) {
+		log.error(`Something went wrong while trying to delete document with id:${id}!`, e); // Log the stack trace
+		return {
+			action: 'delete',
+			error: `Something went wrong while trying to delete document with id:${id}!`,
+			id,
+			status: HTTP_RESPONSE_STATUS_CODES.INTERNAL_SERVER_ERROR
+		};
+	}
+}
+
+
 export function modifyDocument
 ({
 	collectionId,
 	collectionName,
+	document,
 	documentTypeId,
-	documentTypeName,
+	documentType,
 	id,
 	responseArray,
-	toPersist,
 	//user
 	// Optional
 	boolPartial = false,
@@ -119,17 +158,18 @@ export function modifyDocument
 }: {
 	collectionId: string
 	collectionName: string
+	document: Record<string, unknown>
+	documentType?: string
 	documentTypeId?: string
-	documentTypeName?: string
 	id: string
 	responseArray: BodyItem[]
-	toPersist: Record<string, unknown>
 	// Optional
 	boolPartial?: boolean
 	boolRequireValid?: boolean
 	boolReturnDocument?: boolean
 	boolReturnMetadata?: boolean
 }) {
+	// WARNING: Not wrapped with runWithExplorerWrite
 	const updatedNode = update({
 		collectionId,
 		collectionName,
@@ -137,10 +177,10 @@ export function modifyDocument
 		collectorVersion: COLLECTOR_VERSION,
 		data: {
 			_id: id,
-			...toPersist
+			...document
 		},
 		documentTypeId,
-		documentTypeName,
+		documentTypeName: documentType,
 		partial: boolPartial,
 		requireValid: boolRequireValid
 	});
@@ -162,6 +202,34 @@ export function modifyDocument
 			status: HTTP_RESPONSE_STATUS_CODES.INTERNAL_SERVER_ERROR
 		});
 	}
+}
+
+
+function readDocument({
+	boolReturnMetadata,
+	id,
+	readFromCollectionBranchConnection
+}: {
+	boolReturnMetadata: boolean
+	id: string
+	readFromCollectionBranchConnection: RepoConnection
+}) {
+	const documentNode = readFromCollectionBranchConnection.get<DocumentNode>(id);
+	if (!documentNode) {
+		return {
+			action: 'read',
+			id,
+			error: `Document with id "${id} doesn't exist!"`,
+			status: HTTP_RESPONSE_STATUS_CODES.NOT_FOUND
+		}
+	}
+	const item = documentNodeToBodyItem({
+		documentNode,
+		includeMetadata: boolReturnMetadata
+	});
+	item.action = 'read';
+	item.status = HTTP_RESPONSE_STATUS_CODES.OK;
+	return item;
 }
 
 
@@ -267,7 +335,7 @@ export default function createOrUpdateMany(
 	const data = JSON.parse(body);
 	// log.debug('data:%s', toStr(data));
 
-	const dataArray = forceArray(data);
+	const dataArray = forceArray<BodyItem>(data);
 	// log.debug('dataArray:%s', toStr(dataArray));
 
 	return runWithExplorerWrite(() => {
@@ -280,27 +348,49 @@ export default function createOrUpdateMany(
 		const responseArray = [];
 		for (let j = 0; j < dataArray.length; j++) {
 			try {
-				const toPersist = dataArray[j];
-				// log.debug('toPersist:%s', toStr(toPersist));
-				let documentTypeId: string|undefined;
-				let documentTypeName: string|undefined;
-				if (toPersist._documentTypeId) {
-					documentTypeId = toPersist._documentTypeId;
-					delete toPersist._documentTypeId;
-				} else if (toPersist._documentType) {
-					documentTypeName = toPersist._documentType;
-					delete toPersist._documentType;
-				} else if (documentTypeIdParam) {
-					documentTypeId = documentTypeIdParam;
-				} else if (documentTypeParam) {
-					documentTypeName = documentTypeParam;
+				const {
+					action,
+					document,
+					id,
+					name,
+					path
+				} = dataArray[j];
+				let {
+					documentType,
+					documentTypeId,
+				} = dataArray[j];
+				log.debug('id:%s name:%s path:%s documentType:%s documentTypeId:%s document:%s', id, name, path, documentType, documentTypeId, toStr(document));
+				if (!documentTypeId && !documentType) {
+					if (documentTypeIdParam) {
+						documentTypeId = documentTypeIdParam;
+					} else if (documentTypeParam) {
+						documentType = documentTypeParam;
+					}
 				}
+				log.debug('documentType:%s documentTypeId:%s', documentType, documentTypeId);
 
 				// CREATE when _id, _name, _path not matched
 				// Otherwise MODIFY
 
-				if (toPersist._id) {
-					if (writeToCollectionBranchConnection.exists(toPersist._id)) {
+				if (id) {
+					if (action === 'create') {
+						responseArray.push({
+							action: 'create',
+							error: `id shouldn't be provided when the action is create!`,
+							status: HTTP_RESPONSE_STATUS_CODES.BAD_REQUEST
+						});
+					} else if (action === 'read') {
+						responseArray.push(readDocument({
+							boolReturnMetadata,
+							id,
+							readFromCollectionBranchConnection: writeToCollectionBranchConnection
+						}));
+					} else if (action === 'delete') {
+						responseArray.push(deleteDocument({
+							id,
+							writeToCollectionBranchConnection
+						}));
+					} else if (writeToCollectionBranchConnection.exists(id)) {
 						// log.debug(`toPersist._id:${toPersist._id} exists!`);
 						modifyDocument({
 							boolPartial,
@@ -309,28 +399,38 @@ export default function createOrUpdateMany(
 							boolReturnMetadata,
 							collectionId,
 							collectionName,
+							document,
+							documentType,
 							documentTypeId,
-							documentTypeName,
-							id: toPersist._id,
+							id,
 							responseArray,
-							toPersist
 						});
 					} else {
-						// log.debug(`toPersist._id:${toPersist._id} does not exist!`);
-						createDocument({
-							boolRequireValid,
-							boolReturnDocument,
-							boolReturnMetadata,
-							collectionId,
-							collectionName,
-							documentTypeId,
-							documentTypeName,
-							responseArray,
-							toPersist
+						responseArray.push({
+							action: 'update',
+							error: `Document with id "${id}" doesn't exist!`,
+							status: HTTP_RESPONSE_STATUS_CODES.NOT_FOUND
 						});
 					}
-				} else if (toPersist._name) {
-					if (writeToCollectionBranchConnection.exists(`/${toPersist._name}`)) {
+				} else if (name) {
+					if (action === 'create') {
+						responseArray.push({
+							action: 'create',
+							error: `name shouldn't be provided when the action is create!`,
+							status: HTTP_RESPONSE_STATUS_CODES.BAD_REQUEST
+						});
+					} else if (action === 'read') {
+						responseArray.push(readDocument({
+							boolReturnMetadata,
+							id: `/${name}`,
+							readFromCollectionBranchConnection: writeToCollectionBranchConnection
+						}));
+					} else if (action === 'delete') {
+						responseArray.push(deleteDocument({
+							id: `/${name}`,
+							writeToCollectionBranchConnection
+						}));
+					} else if (writeToCollectionBranchConnection.exists(`/${name}`)) {
 						// log.debug(`toPersist._name:${toPersist._name} exists!`);
 						modifyDocument({
 							boolPartial,
@@ -339,28 +439,38 @@ export default function createOrUpdateMany(
 							boolReturnMetadata,
 							collectionId,
 							collectionName,
+							document,
+							documentType,
 							documentTypeId,
-							documentTypeName,
-							id: `/${toPersist._name}`,
+							id: `/${name}`,
 							responseArray,
-							toPersist
 						});
 					} else {
-						// log.debug(`toPersist._name:${toPersist._name} does not exist!`);
-						createDocument({
-							boolRequireValid,
-							boolReturnDocument,
-							boolReturnMetadata,
-							collectionId,
-							collectionName,
-							documentTypeId,
-							documentTypeName,
-							responseArray,
-							toPersist
+						responseArray.push({
+							action: 'update',
+							error: `Document with name "${name}" doesn't exist!`,
+							status: HTTP_RESPONSE_STATUS_CODES.NOT_FOUND
 						});
 					}
-				} else if (toPersist._path) {
-					if (writeToCollectionBranchConnection.exists(toPersist._path)) {
+				} else if (path) {
+					if (action === 'create') {
+						responseArray.push({
+							action: 'create',
+							error: `path shouldn't be provided when the action is create!`,
+							status: HTTP_RESPONSE_STATUS_CODES.BAD_REQUEST
+						});
+					} else if (action === 'read') {
+						responseArray.push(readDocument({
+							boolReturnMetadata,
+							id: path,
+							readFromCollectionBranchConnection: writeToCollectionBranchConnection
+						}));
+					} else if (action === 'delete') {
+						responseArray.push(deleteDocument({
+							id: path,
+							writeToCollectionBranchConnection
+						}));
+					} else if (writeToCollectionBranchConnection.exists(path)) {
 						// log.debug(`toPersist._path:${toPersist._path} exists!`);
 						modifyDocument({
 							boolPartial,
@@ -369,39 +479,52 @@ export default function createOrUpdateMany(
 							boolReturnMetadata,
 							collectionId,
 							collectionName,
+							document,
+							documentType,
 							documentTypeId,
-							documentTypeName,
-							id: toPersist._path,
+							id: path,
 							responseArray,
-							toPersist
 						});
 					} else {
-						// log.debug(`toPersist._path:${toPersist._path} does not exist!`);
+						responseArray.push({
+							action: 'update',
+							error: `Document with path "${path}" doesn't exist!`,
+							status: HTTP_RESPONSE_STATUS_CODES.NOT_FOUND
+						});
+					}
+				} else {
+					// log.debug(`No _id, _name or _path! action:"%s"`, action);
+					if (action === 'update') {
+						responseArray.push({
+							action: 'update',
+							error: `id, name or path required when action is update!`,
+							status: HTTP_RESPONSE_STATUS_CODES.BAD_REQUEST
+						});
+					} else if (action === 'read') {
+						responseArray.push({
+							action: 'read',
+							error: `id, name or path required when action is read!`,
+							status: HTTP_RESPONSE_STATUS_CODES.BAD_REQUEST
+						});
+					} else if (action === 'delete') {
+						responseArray.push({
+							action: 'delete',
+							error: `id, name or path required when action is delete!`,
+							status: HTTP_RESPONSE_STATUS_CODES.BAD_REQUEST
+						});
+					} else {
 						createDocument({
 							boolRequireValid,
 							boolReturnDocument,
 							boolReturnMetadata,
 							collectionId,
 							collectionName,
+							document,
+							documentType,
 							documentTypeId,
-							documentTypeName,
 							responseArray,
-							toPersist
 						});
 					}
-				} else {
-					// log.debug(`No _id, _name or _path!`);
-					createDocument({
-						boolRequireValid,
-						boolReturnDocument,
-						boolReturnMetadata,
-						collectionId,
-						collectionName,
-						documentTypeId,
-						documentTypeName,
-						responseArray,
-						toPersist
-					});
 				}
 			} catch (e) {
 				// log.error(`e:${toStr(e)}`, e);
