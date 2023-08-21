@@ -45,7 +45,7 @@ export default function DocumentsApiDoc() {
 		<h2>Bulk</h2>
 
 		<Action
-			key='get-documents'
+			name='get-documents'
 			apiKey={apiKey}
 			comment='Get document(s)'
 			curl={`-H "authorization:Explorer-Api-Key ${apiKey}"`}
@@ -100,36 +100,27 @@ export default function DocumentsApiDoc() {
 				// 	default: '{}',
 				// 	description: 'Query expression. Keep in mind that filters are usually more quicker. See <a href="https://developer.enonic.com/docs/xp/stable/storage/noql">documentation</a>.'
 				// }
-				returnMetadata: {
-					default: false,
-					description: 'When true, the metadata of the document will be returned in the response.',
-					list: false,
-					required: false,
-					type: 'boolean'
-				}
 			}}
 			responses={[{
 				body: [{
 					id: '1',
+					collection: "enonic",
+					collector:{
+						id: "com.enonic.app.explorer:webcrawl",
+						version: "2.0.0.SNAPSHOT"
+					},
+					createdTime: "2023-07-24T11:27:10.679Z",
 					document: {
 						text: 'This domain is for use in illustrative examples in documents. You may use this domain in literature without prior coordination or asking for permission.',
 						title: 'Example Domain',
 						url: 'https://www.example.com'
 					},
-					metadata: {
-						collection: "enonic",
-						collector:{
-							id: "com.enonic.app.explorer:webcrawl",
-							version: "2.0.0.SNAPSHOT"
-						},
-						createdTime: "2023-07-24T11:27:10.679Z",
-						documentType: "webpage",
-						language: "en",
-						modifiedTime: "2023-08-07T08:54:42.294Z",
-						stemmingLanguage: "en",
-						valid: true
-					},
-					status: 200
+					documentType: "webpage",
+					language: "en",
+					modifiedTime: "2023-08-07T08:54:42.294Z",
+					status: 200,
+					stemmingLanguage: "en",
+					valid: true,
 				}],
 				// contentType: 'text/json;charset=utf-8',
 				status: 200,
@@ -149,9 +140,9 @@ export default function DocumentsApiDoc() {
 		/>
 
 		<Action
-			key='crud-documents'
+			name='crud-documents'
 			apiKey={apiKey}
-			comment='Create, read, update or delete document(s)'
+			comment='Create, get, modify or delete document(s)'
 			curl={`-H "authorization:Explorer-Api-Key ${apiKey}" -H "content-type:application/json"`}
 			data={{
 				default: `[{
@@ -171,10 +162,10 @@ export default function DocumentsApiDoc() {
 		"url": "https://www.example.com"
 	}
 },{
-	"action": "read",
+	"action": "get",
 	"id": "1"
 },{
-	// "action": "update", // Update is assumed if action is missing, but id is present.
+	// "action": "modify", // Modify is assumed if action is missing, but id is present.
 	"id": "1",
 	"document": {
 		"available": false,
@@ -200,7 +191,7 @@ export default function DocumentsApiDoc() {
 				examples: [{
 					comment: 'Create a document',
 					type: `{
-	action?: 'create'
+	action: 'create'
 	id: never
 	document: Record<string, unknown>
 	documentType?: string
@@ -214,21 +205,21 @@ export default function DocumentsApiDoc() {
 						}
 					}
 				}, {
-					comment: 'Read a document',
+					comment: 'Get a document',
 					type: `{
-	action: 'read'
+	action: 'get'
 	id: string
 	document: never
 	documentType: never
 }`,
 					example: {
-						action: 'read',
+						action: 'get',
 						id: '1',
 					}
 				}, {
-					comment: 'Update a document',
+					comment: 'Modify a document',
 					type: `{
-	action?: 'update'
+	action: 'modify'
 	id: string
 	document: Record<string, unknown>
 	documentType?: string
@@ -256,7 +247,7 @@ export default function DocumentsApiDoc() {
 				}, {
 					comment: 'Create multiple documents',
 					type: `{
-	action?: 'create'
+	action: 'create'
 	id: never
 	document: Record<string, unknown>
 	documentType?: string
@@ -275,24 +266,24 @@ export default function DocumentsApiDoc() {
 						}
 					}]
 				}, {
-					comment: 'Read multiple documents',
+					comment: 'Get multiple documents',
 					type: `{
-	action: 'read'
+	action: 'get'
 	id: string
 	document: never
 	documentType: never
 }[]`,
 					example: [{
-						action: 'read',
+						action: 'get',
 						id: '1'
 					}, {
-						action: 'read',
+						action: 'get',
 						id: '2'
 					}]
 				}, {
-					comment: 'Update multiple documents',
+					comment: 'Modify multiple documents',
 					type: `{
-	action?: 'update'
+	action: 'modify'
 	id: string
 	document: Record<string, unknown>
 	documentType?: string
@@ -328,9 +319,9 @@ export default function DocumentsApiDoc() {
 						id: '2'
 					}]
 				}, {
-					comment: 'Create, read, update or delete multiple documents',
+					comment: 'Create, get, modify or delete multiple documents',
 					type: `{
-	action?: 'create' | 'read' | 'update' | 'delete'
+	action: 'create' | 'get' | 'modify' | 'delete'
 	id?: string
 	document?: Record<string, unknown>
 	documentType?: string
@@ -342,7 +333,7 @@ export default function DocumentsApiDoc() {
 							uri: 'https://www.example.com'
 						}
 					}, {
-						action: 'read',
+						action: 'get',
 						id: '1',
 					}, {
 						id: '1',
@@ -358,7 +349,7 @@ export default function DocumentsApiDoc() {
 				}],
 				list: true,
 				type: `{
-	action: 'create' | 'read' | 'update' | 'delete'
+	action: 'create' | 'get' | 'modify' | 'delete'
 	id: string
 	document?: Record<string, unknown>
 }[]`
@@ -367,7 +358,7 @@ export default function DocumentsApiDoc() {
 				authorization: {
 					value: `Explorer-Api-Key ${apiKey}`,
 					attributes: '<required>',
-					description: 'The API key (password) for the collection you want to create or update document(s) in.'
+					description: 'The API key (password) for the collection you want to create or modify document(s) in.'
 				},
 				'content-type': {
 					value: 'application/json;charset=utf-8',
@@ -386,7 +377,7 @@ export default function DocumentsApiDoc() {
 						<li>documentType url query.</li>
 						<li>documentTypeId property stored on the collection node.</li>
 					</ol>
-					If it's not provided by any of these ways, the document will NOT be created or updated.
+					If it's not provided by any of these ways, the document will NOT be created or modifed.
 					</>,
 					list: false,
 					required: false,
@@ -394,32 +385,25 @@ export default function DocumentsApiDoc() {
 				},
 				// partial: { // TODO Not supported by the backend yet.
 				// 	default: false,
-				// 	description: 'When true, values are only added or updated. Unprovided values are not removed.',
+				// 	description: 'When true, values are only added or modified. Unprovided values are not removed.',
 				// 	list: false,
 				// 	required: false,
 				// 	type: 'boolean'
 				// },
 				requireValid: {
 					default: true,
-					description: 'The data has to be valid, according to the field types, to be created or updated. If requireValid=true and the data is not strictly valid, an error will be returned.',
+					description: 'The data has to be valid, according to the field types, to be created or modified. If requireValid=true and the data is not strictly valid, an error will be returned.',
 					list: false,
 					required: false,
 					type: 'boolean'
 				},
 				returnDocument: {
 					default: false,
-					description: 'When true, the created or updated document(s) will be returned in the response, not just the id.',
+					description: 'When true, the created or modified document(s) will be returned in the response, not just the id.',
 					list: false,
 					required: false,
 					type: 'boolean'
 				},
-				returnMetadata: {
-					default: false,
-					description: 'When true, the metadata of the created or updated document(s) will be returned in the response.',
-					list: false,
-					required: false,
-					type: 'boolean'
-				}
 			}}
 			pattern={`${prefix}`}
 			responses={[{
@@ -431,64 +415,123 @@ export default function DocumentsApiDoc() {
 					// 	key: 'value'
 					// },
 					// message: "Document created, got id '1'",
-					// metadata: {}
 					status: 200
 				},{
 					id: '2',
-					action: 'update',
+					action: 'modify',
 					// document: {
 					// 	key: 'value'
 					// },
-					// message: "Document with id '2' updated.",
-					// metadata: {}
+					// message: "Document with id '2' modified.",
 					status: 200
 				},{
 					action: 'create',
 					error: 'Something went wrong while trying to create a document!',
 					status: 500
 				},{
-					action: 'update',
+					action: 'modify',
 					error: "Document with id '2' not found in collection 'collectionName'!",
 					status: 404
 				},{
-					action: 'update',
-					error: "Something went wrong while trying to update document with id '5'!",
+					action: 'modify',
+					error: "Something went wrong while trying to modify document with id '5'!",
 					status: 500
 				}]
 			}]}
 		/>
 
 		<Action
-			key='query-documents'
+			name='query-documents'
 			apiKey={apiKey}
 			comment='Query document(s)'
-			curl={`-H "authorization:Explorer-Api-Key ${apiKey}" -H "content-type:application/json" -d'${JSON.stringify({
-				count: 10,
-				filters: {
-					boolean: {
-						must: {
-							exists: {
-								field: 'url'
-							}
-						}
+			curl={`-H "authorization:Explorer-Api-Key ${apiKey}" -H "content-type:application/json"`}
+			data={{
+				default: `{
+	"count": 10,
+	"filters": {
+		"boolean": {
+			"must": [{
+				"exists": {
+					"field": "url"
+				}
+			}]
+		}
+	},
+	"query": {
+		"boolean": {
+			"must": [{
+				"term": {
+					"field": "url",
+					"value": "https://enonic.com"
+				}
+			}]
+		}
+	},
+	"sort": {
+		"field": "_score",
+		"direction": "DESC"
+	},
+	"start": 0
+}`,
+				examples: [{
+					comment: 'Query for all document(s)',
+					type: 'object',
+					example: {
+						count: 10,
+						query: {
+							matchAll: {}
+						},
+						sort: {
+							field: '_score',
+							direction: 'DESC'
+						},
+						start: 0,
 					}
-				},
-				query: {
-					boolean: {
-						must: {
-							term: {
-								field: 'url',
-								value: 'https://enonic.com'
+				},{
+					comment: 'Query for document(s) with url',
+					type: 'object',
+					example: {
+						count: 10,
+						filters: {
+							boolean: {
+								must: {
+									exists: {
+										field: 'url'
+									}
+								}
 							}
-						}
+						},
+						sort: {
+							field: '_score',
+							direction: 'DESC'
+						},
+						start: 0,
 					}
-				},
-				sort: {
-					field: 'score',
-					direction: 'DESC'
-				},
-				start: 0,
-			} as QueryNodeParams, null, 4)}'`}
+				},{
+					comment: 'Query for document(s) with url = https://enonic.com',
+					type: 'object',
+					example: {
+						count: 10,
+						query: {
+							boolean: {
+								must: {
+									term: {
+										field: 'url',
+										value: 'https://enonic.com'
+									}
+								}
+							}
+						},
+						sort: {
+							field: '_score',
+							direction: 'DESC'
+						},
+						start: 0,
+					}
+				}],
+				list: false,
+				type: 'object'
+			}}
 			headers={{
 				authorization: {
 					value: `Explorer-Api-Key ${apiKey}`,
@@ -510,18 +553,24 @@ export default function DocumentsApiDoc() {
 					required: false,
 					type: 'boolean'
 				},
-				returnMetadata: {
-					default: false,
-					description: 'When true, the metadata of the document(s) will be returned in the response.',
-					list: false,
-					required: false,
-					type: 'boolean'
-				}
 			}}
 			pattern={`${prefix}/query`}
+			responses={[{
+				status: 200,
+				body: {
+					count: 0,
+					total: 0,
+					hits: [{
+						id: '1',
+						collection: 'collectionName',
+						document: {}
+					}]
+				}
+			}]}
 		/>
+
 		<Action
-			key='delete-documents'
+			name='delete-documents'
 			apiKey={apiKey}
 			comment='Delete document(s)'
 			curl={`-H "authorization:Explorer-Api-Key ${apiKey}"`}
@@ -556,7 +605,7 @@ export default function DocumentsApiDoc() {
 		</Form>
 
 		<Action
-			key='get-document'
+			name='get-document'
 			apiKey={apiKey}
 			curl={`-H "authorization:Explorer-Api-Key ${apiKey}"`}
 			comment='Get a document'
@@ -569,15 +618,6 @@ export default function DocumentsApiDoc() {
 			}}
 			method="GET"
 			pattern={documentPath}
-			parameters={{
-				returnMetadata: {
-					default: false,
-					description: 'When true, the metadata of the document will be returned in the response.',
-					list: false,
-					required: false,
-					type: 'boolean'
-				}
-			}}
 			responses={[{
 				status: 200,
 				body: {
@@ -592,7 +632,7 @@ export default function DocumentsApiDoc() {
 		/>
 
 		<Action
-			key='patch-document'
+			name='patch-document'
 			apiKey={apiKey}
 			curl={`-H "authorization:Explorer-Api-Key ${apiKey}" -H "content-type:application/json"`}
 			comment='Patch a document'
@@ -636,7 +676,7 @@ export default function DocumentsApiDoc() {
 				authorization: {
 					value: `Explorer-Api-Key ${apiKey}`,
 					attributes: '<required>',
-					description: 'The API key (password) for the collection you want to create or update a document in.'
+					description: 'The API key (password) for the collection you want to create or modify a document in.'
 				},
 				'content-type': {
 					value: 'application/json;charset=utf-8',
@@ -655,7 +695,7 @@ export default function DocumentsApiDoc() {
 						<li>documentType url query.</li>
 						<li>documentTypeId property stored on the collection node.</li>
 					</ol>
-					If it's not provided by any of these ways, the document will NOT be created or updated.
+					If it's not provided by any of these ways, the document will NOT be created or modified.
 					</>,
 					list: false,
 					required: false,
@@ -663,14 +703,14 @@ export default function DocumentsApiDoc() {
 				},
 				// partial: {
 				// 	default: false,
-				// 	description: 'When true, values are only added or updated. Unprovided values are not removed.',
+				// 	description: 'When true, values are only added or modified. Unprovided values are not removed.',
 				// 	list: false,
 				// 	required: false,
 				// 	type: 'boolean'
 				// },
 				requireValid: {
 					default: true,
-					description: 'The data has to be valid, according to the field types, to be created or updated. If requireValid=true and the data is not strictly valid, an error will be returned.',
+					description: 'The data has to be valid, according to the field types, to be created or modified. If requireValid=true and the data is not strictly valid, an error will be returned.',
 					list: false,
 					required: false,
 					type: 'boolean'
@@ -682,19 +722,12 @@ export default function DocumentsApiDoc() {
 					required: false,
 					type: 'boolean'
 				},
-				returnMetadata: {
-					default: false,
-					description: 'When true, the metadata of the patched document will be returned in the response.',
-					list: false,
-					required: false,
-					type: 'boolean'
-				}
 			}}
 			pattern={documentPath}
 		/>
 
 		<Action
-			key='delete-document'
+			name='delete-document'
 			apiKey={apiKey}
 			curl={`-H "authorization:Explorer-Api-Key ${apiKey}"`}
 			comment='Delete a document'

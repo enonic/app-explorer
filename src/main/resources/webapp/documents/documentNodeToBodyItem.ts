@@ -10,30 +10,58 @@ import {
 import { startsWith } from '@enonic/js-utils/string/startsWith';
 // import { HTTP_RESPONSE_STATUS_CODES } from '../constants';
 
-export interface BodyItem {
-	action?: 'create' | 'read' | 'update' | 'delete'
-	id?: string // Not on failed create
-	error?: string
+
+export interface RequestItem {
+	action?: 'create' | 'get' | 'modify' | 'delete' // Only in bulk
+	id?: string // Not on create
+	// error?: string
 	document?: Record<string, unknown>
-	documentType?: string
-	documentTypeId?: string
-	metadata?: MetaData
 	name?: string
 	path?: string
 	status?: number // Only in bulk responses
+	// Metadata:
+	// collection?: string
+	// createdTime?: Date | string
+	documentType?: string
+	documentTypeId?: string
+	// modifiedTime?: Date | string
+	language?: string
+	stemmingLanguage?: string
+	valid?: boolean
 }
+
+
+export interface ResponseItem {
+	action?: 'create' | 'get' | 'modify' | 'delete' // Only in bulk
+	id?: string // Not on failed create
+	error?: string
+	message?: string
+	document?: Record<string, unknown>
+	// documentTypeId?: string
+	// name?: string
+	// path?: string
+	status?: number // Only in bulk responses
+	// Metadata:
+	collection?: string
+	createdTime?: Date | string
+	documentType?: string
+	language?: string
+	modifiedTime?: Date | string
+	stemmingLanguage?: string
+	valid?: boolean
+}
+
 
 export default function documentNodeToBodyItem({
 	documentNode,
 	includeDocument = true,
-	includeMetadata = false
 }: {
 	documentNode: DocumentNode
 	includeDocument?: boolean
-	includeMetadata?: boolean
-}): BodyItem {
-	const bodyItem: BodyItem = {
+}): ResponseItem {
+	const responseItem: ResponseItem = {
 		id: documentNode._id,
+		...documentNode[FieldPath.META]
 		// status: HTTP_RESPONSE_STATUS_CODES.OK // Added only for bulk reponses
 	};
 
@@ -47,12 +75,8 @@ export default function documentNodeToBodyItem({
 				document[k] = documentNode[k];
 			}
 		});
-		bodyItem.document = document;
+		responseItem.document = document;
 	}
 
-	if (includeMetadata) {
-		bodyItem.metadata = documentNode[FieldPath.META];
-	}
-
-	return bodyItem;
+	return responseItem;
 }

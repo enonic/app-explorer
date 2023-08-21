@@ -23,7 +23,7 @@ mapping.api.idProvider.system = default
 // 	HTTP_RESPONSE_STATUS_CODES
 // } from '../constants';
 // import { Node } from 'cheerio';
-import createOrUpdateMany from './createOrUpdateMany';
+import createOrUpdateMany from './createOrGetOrModifyOrDeleteMany';
 import documentation from './documentation'
 import deleteOne from './deleteOne';
 import deleteMany from './deleteMany';

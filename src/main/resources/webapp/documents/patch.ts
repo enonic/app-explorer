@@ -18,9 +18,9 @@ export type PatchRequest = Request<{
 
 
 export default function patch(request: PatchRequest) {
-    // log.debug('patch request:%s', toStr(request));
-    const {
-        method
-    } = request
-    return put(request, true);
+	// log.debug('patch request:%s', toStr(request));
+	const {
+		method
+	} = request
+	return put(request, true);
 }
