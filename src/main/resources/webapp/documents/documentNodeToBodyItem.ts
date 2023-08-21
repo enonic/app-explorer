@@ -11,11 +11,15 @@ import { startsWith } from '@enonic/js-utils/string/startsWith';
 // import { HTTP_RESPONSE_STATUS_CODES } from '../constants';
 
 export interface BodyItem {
-	action?: 'create' | 'update'
+	action?: 'create' | 'read' | 'update' | 'delete'
 	id?: string // Not on failed create
 	error?: string
 	document?: Record<string, unknown>
+	documentType?: string
+	documentTypeId?: string
 	metadata?: MetaData
+	name?: string
+	path?: string
 	status?: number // Only in bulk responses
 }
 
