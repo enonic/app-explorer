@@ -92,9 +92,6 @@ export default function documentation(request: Request<{
 			th, td {
 				padding: 1em;
 			}
-			.pre {
-				white-space: pre;
-			}
 			details {
 				border: 1px solid black;
 				border-radius: 4px;

@@ -40,7 +40,6 @@ const {startsWith} = string;
 
 export type QueryRequest = Request<{
 	returnDocument?: 'true'|'false'
-	returnMetadata?: 'true'|'false'
 }, {
 	collectionName?: string
 }>
@@ -61,7 +60,6 @@ export default function query(
 		// 	sort = 'score DESC',
 		// 	start: startParam = '0'
 			returnDocument: returnDocumentParam = 'false',
-			returnMetadata: returnMetadataParam = 'false'
 		} = {},
 		pathParams: {
 			collectionName = ''
@@ -175,7 +173,6 @@ export default function query(
 	// log.debug('count:%s', count);
 
 	const boolReturnDocument = returnDocumentParam !== 'false'; // Fallsback to false if something invalid is provided
-	const boolReturnMetadata = returnMetadataParam !== 'false'; // Fallsback to false if something invalid is provided
 
 	const repoId = `${COLLECTION_REPO_PREFIX}${collectionName}`;
 	//log.info(`repoId:${toStr(repoId)}`);
@@ -238,8 +235,7 @@ export default function query(
 	const body = forceArray(getRes).map((documentNode) => {
 		return documentNodeToBodyItem({
 			documentNode,
-			includeDocument: boolReturnDocument,
-			includeMetadata: boolReturnMetadata,
+			includeDocument: boolReturnDocument
 		});
 	});
 	// log.debug('body:%s', toStr(body));
