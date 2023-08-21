@@ -1,6 +1,7 @@
 import type { Node } from '@enonic-types/lib-node';
 import type { DocumentNode } from '/lib/explorer/types/Document';
 import type { Request } from '../../types/Request';
+import type { BodyItem } from './documentNodeToBodyItem';
 
 
 import {
@@ -22,6 +23,7 @@ import documentNodeToBodyItem from './documentNodeToBodyItem';
 const COLLECTOR_ID = `${APP_EXPLORER}:documentRestApi`;
 const COLLECTOR_VERSION = app.version;
 
+
 export type PutRequest = Request<{
 	collection?: string
 	documentType?: string
@@ -34,6 +36,7 @@ export type PutRequest = Request<{
 	collectionName?: string
 	documentId?: string
 }>
+
 
 export default function put(request: PutRequest, partial = false) {
 	const {
@@ -103,7 +106,7 @@ export default function put(request: PutRequest, partial = false) {
 		}
 	}
 
-	let data;
+	let data: BodyItem;
 	try {
 		data = JSON.parse(bodyJson);
 	} catch (e) {
@@ -137,18 +140,19 @@ export default function put(request: PutRequest, partial = false) {
 		};
 	}
 	const collectionId = collectionNode._id;
-	let documentTypeId: string|undefined;
-	let documentTypeName: string|undefined;
-	if (data._documentTypeId) {
-		documentTypeId = data._documentTypeId;
-		delete data._documentTypeId;
-	} else if (data._documentType) {
-		documentTypeName = data._documentType;
-		delete data._documentType;
-	} else if (documentTypeIdParam) {
-		documentTypeId = documentTypeIdParam;
-	} else if (documentTypeParam) {
-		documentTypeName = documentTypeParam;
+	const {
+		document
+	} = data;
+	let {
+		documentType,
+		documentTypeId
+	} = data;
+	if (!documentTypeId && !documentType) {
+		if (documentTypeIdParam) {
+			documentTypeId = documentTypeIdParam;
+		} else if (documentTypeParam) {
+			documentType = documentTypeParam;
+		}
 	}
 	let updatedNode: Node<DocumentNode>;
 	try { // Avoid internal errors to be exposed in the response
@@ -159,10 +163,10 @@ export default function put(request: PutRequest, partial = false) {
 			collectorVersion: COLLECTOR_VERSION,
 			data: {
 				_id: documentId,
-				...data
+				...document
 			},
 			documentTypeId,
-			documentTypeName,
+			documentTypeName: documentType,
 			partial,
 			requireValid: boolRequireValid
 		}));
