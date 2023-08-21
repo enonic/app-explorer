@@ -20,7 +20,6 @@ import documentNodeToBodyItem from './documentNodeToBodyItem';
 export type GetManyRequest = Request<{
 	collection?: string
 	id: string|string[]
-	returnMetadata?: 'true'|'false'
 },{
 	collectionName?: string
 }>
@@ -32,7 +31,6 @@ export default function getMany(request: GetManyRequest) {
 	const {
 		params: {
 			id: idParam = '',
-			returnMetadata: returnMetadataParam = 'false'
 		} = {},
 		pathParams: {
 			collectionName = '',
@@ -64,8 +62,6 @@ export default function getMany(request: GetManyRequest) {
 	if (maybeErrorResponse.status !== 200 ) {
 		return maybeErrorResponse;
 	}
-
-	const boolReturnMetadata = returnMetadataParam !== 'false'; // Fallsback to false if something invalid is provided
 
 	const repoId = `${COLLECTION_REPO_PREFIX}${collectionName}`;
 	//log.info(`repoId:${toStr(repoId)}`);
@@ -116,7 +112,6 @@ export default function getMany(request: GetManyRequest) {
 		} else {
 			const bodyItem = documentNodeToBodyItem({
 				documentNode,
-				includeMetadata: boolReturnMetadata,
 			});
 			bodyItem.status = HTTP_RESPONSE_STATUS_CODES.OK;
 			// log.debug('bodyItem:%s', toStr(bodyItem));

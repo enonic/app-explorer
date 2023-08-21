@@ -20,7 +20,6 @@ import documentNodeToBodyItem from './documentNodeToBodyItem';
 export type GetOneRequest = Request<{
 	collection?: string
 	id?: string
-	returnMetadata?: 'true'|'false'
 },{
 	collectionName?: string
 	documentId?: string
@@ -32,7 +31,6 @@ export default function getOne(request: GetOneRequest) {
 	const {
 		params: {
 			id: idParam = '',
-			returnMetadata: returnMetadataParam = 'false'
 		} = {},
 		pathParams: {
 			collectionName = '',
@@ -68,8 +66,6 @@ export default function getOne(request: GetOneRequest) {
 		}
 	}
 
-	const boolReturnMetadata = returnMetadataParam !== 'false'; // Fallsback to false if something invalid is provided
-
 	const repoId = `${COLLECTION_REPO_PREFIX}${collectionName}`;
 	//log.info(`repoId:${toStr(repoId)}`);
 	const connectParams = {
@@ -91,8 +87,7 @@ export default function getOne(request: GetOneRequest) {
 	}
 
 	const body = documentNodeToBodyItem({
-		documentNode,
-		includeMetadata: boolReturnMetadata
+		documentNode
 	});
 	// log.debug('body:%s', toStr(body));
 

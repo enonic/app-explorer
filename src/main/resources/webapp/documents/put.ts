@@ -1,7 +1,7 @@
 import type { Node } from '@enonic-types/lib-node';
 import type { DocumentNode } from '/lib/explorer/types/Document';
 import type { Request } from '../../types/Request';
-import type { BodyItem } from './documentNodeToBodyItem';
+import type { RequestItem } from './documentNodeToBodyItem';
 
 
 import {
@@ -31,7 +31,6 @@ export type PutRequest = Request<{
 	id?: string
 	requireValid?: 'true' | 'false'
 	returnDocument?: 'true' | 'false'
-	returnMetadata?: 'true' | 'false'
 },{
 	collectionName?: string
 	documentId?: string
@@ -47,7 +46,6 @@ export default function put(request: PutRequest, partial = false) {
 			id: idParam = '',
 			requireValid: requireValidParam = 'true',
 			returnDocument: returnDocumentParam = 'false',
-			returnMetadata: returnMetadataParam = 'false'
 		} = {},
 		pathParams: {
 			collectionName = '',
@@ -57,7 +55,6 @@ export default function put(request: PutRequest, partial = false) {
 
 	const boolRequireValid = requireValidParam !== 'false'; // Thus fallsback to true if something invalid provided
 	const boolReturnDocument = returnDocumentParam !== 'false'; // Fallsback to false if something invalid is provided
-	const boolReturnMetadata = returnMetadataParam !== 'false'; // Fallsback to false if something invalid is provided
 
 	if (!collectionName) {
 		return {
@@ -106,7 +103,7 @@ export default function put(request: PutRequest, partial = false) {
 		}
 	}
 
-	let data: BodyItem;
+	let data: RequestItem;
 	try {
 		data = JSON.parse(bodyJson);
 	} catch (e) {
@@ -184,8 +181,7 @@ export default function put(request: PutRequest, partial = false) {
 	return {
 		body: documentNodeToBodyItem({
 			documentNode: updatedNode,
-			includeDocument: boolReturnDocument,
-			includeMetadata: boolReturnMetadata
+			includeDocument: boolReturnDocument
 		}),
 		contentType: 'text/json;charset=utf-8',
 		status: HTTP_RESPONSE_STATUS_CODES.OK
