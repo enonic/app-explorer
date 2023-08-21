@@ -52,6 +52,14 @@ const JSON_SCHEMA_CREATE_OR_UPDATE_DOCUMENTS = {
 		"items": {
 			"type": "object",
 			"properties": {
+				"action": {
+					"enum": [
+						"create",
+						"read",
+						"update",
+						"delete",
+					]
+				},
 				"document": {
 					"type": "object",
 					// By default any additional properties are allowed.
@@ -60,9 +68,18 @@ const JSON_SCHEMA_CREATE_OR_UPDATE_DOCUMENTS = {
 				"documentType": {
 					"type": "string"
 				},
+				// "documentTypeId": {
+				// 	"type": "string"
+				// },
 				"id": {
 					"type": "string"
 				},
+				// "name": {
+				// 	"type": "string"
+				// },
+				// "path": {
+				// 	"type": "string"
+				// },
 			},
 			"additionalProperties": false,
 			"required": ["document"]
