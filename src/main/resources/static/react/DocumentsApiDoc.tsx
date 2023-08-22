@@ -103,10 +103,9 @@ export default function DocumentsApiDoc() {
 			}}
 			responses={[{
 				body: [{
-					id: '1',
 					collection: "enonic",
 					collector:{
-						id: "com.enonic.app.explorer:webcrawl",
+						id: "com.enonic.app.explorer:documentRestApi",
 						version: "2.0.0.SNAPSHOT"
 					},
 					createdTime: "2023-07-24T11:27:10.679Z",
@@ -115,7 +114,8 @@ export default function DocumentsApiDoc() {
 						title: 'Example Domain',
 						url: 'https://www.example.com'
 					},
-					documentType: "webpage",
+					documentType: "documentTypeName",
+					id: '1',
 					language: "en",
 					modifiedTime: "2023-08-07T08:54:42.294Z",
 					status: 200,
@@ -189,63 +189,6 @@ export default function DocumentsApiDoc() {
 	"id": "1"
 }]`,
 				examples: [{
-					comment: 'Create a document',
-					type: `{
-	action: 'create'
-	id: never
-	document: Record<string, unknown>
-	documentType?: string
-}`,
-					example: {
-						action: 'create',
-						document: {
-							text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
-							title: 'Hello World',
-							uri: 'https://www.example.com'
-						}
-					}
-				}, {
-					comment: 'Get a document',
-					type: `{
-	action: 'get'
-	id: string
-	document: never
-	documentType: never
-}`,
-					example: {
-						action: 'get',
-						id: '1',
-					}
-				}, {
-					comment: 'Modify a document',
-					type: `{
-	action: 'modify'
-	id: string
-	document: Record<string, unknown>
-	documentType?: string
-}`,
-					example: {
-						action: 'modify',
-						id: '1',
-						document: {
-							text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
-							title: 'Hello World',
-							uri: 'https://www.example.com'
-						}
-					}
-				}, {
-					comment: 'Delete a document',
-					type: `{
-	action: 'delete'
-	id: string
-	document: never
-	documentType: never
-}`,
-					example: {
-						action: 'delete',
-						id: '1',
-					}
-				}, {
 					comment: 'Create multiple documents',
 					type: `{
 	action: 'create'
@@ -657,6 +600,106 @@ export default function DocumentsApiDoc() {
 		/>
 
 		<h2>Single</h2>
+
+		<Action
+			name='create-document'
+			apiKey={apiKey}
+			comment='Create document'
+			curl={`-H "authorization:Explorer-Api-Key ${apiKey}" -H "content-type:application/json"`}
+			data={{
+				default: `{
+	"available": true,
+	"count": -999999999999999,
+	"date": "2021-01-01",
+	"datetime": "2021-01-01T00:00:00",
+	"instant": "2021-01-01T00:00:00Z",
+	"location": "59.9090442,10.7423389",
+	"price": -999999999999999.9,
+	"time": "00:00:00",
+	"text": "This domain is for use in illustrative examples in documents. You may use this domain in literature without prior coordination or asking for permission.",
+	"title": "Example Domain",
+	"url": "https://www.example.com"
+}`,
+				examples: [{
+					comment: 'Create a document',
+					type: `Record<string, unknown>`,
+					example: {
+						text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+						title: 'Hello World',
+						uri: 'https://www.example.com'
+					}
+				}],
+				list: false,
+				type: `Record<string, unknown>`
+			}}
+			headers={{
+				authorization: {
+					value: `Explorer-Api-Key ${apiKey}`,
+					attributes: '<required>',
+					description: 'The API key (password) for the collection you want to create or modify document(s) in.'
+				},
+				'content-type': {
+					value: 'application/json;charset=utf-8',
+					attributes: '<required>',
+					description: "The content type of the body. It must be application/json;charset=utf-8."
+				},
+			}}
+			method="POST"
+			parameters={{
+				documentType: {
+					description: <>The documentType is selected in the following order:
+					<ol>
+						<li>documentType url query.</li>
+						<li>documentTypeId property stored on the collection node.</li>
+					</ol>
+					If it's not provided by any of these ways, the document will NOT be created.
+					</>,
+					list: false,
+					required: false,
+					type: 'string'
+				},
+				requireValid: {
+					default: true,
+					description: 'The data has to be valid, according to the field types, to be created. If requireValid=true and the data is not strictly valid, an error will be returned.',
+					list: false,
+					required: false,
+					type: 'boolean'
+				},
+				returnDocument: {
+					default: false,
+					description: 'When true, the created document will be returned in the response, not just the id.',
+					list: false,
+					required: false,
+					type: 'boolean'
+				},
+			}}
+			pattern={`${prefix}`}
+			responses={[{
+				status: 200,
+				body: {
+					collection: "enonic",
+					collector:{
+						id: "com.enonic.app.explorer:documentRestApi",
+						version: "2.0.0.SNAPSHOT"
+					},
+					createdTime: "2023-07-24T11:27:10.679Z",
+					document: {
+						key: 'value'
+					},
+					documentType: "documentTypeName",
+					id: '1',
+					language: 'en',
+					status: 200,
+					stemmingLanguage: 'en',
+					valid: true
+				}
+			}, {
+					body: {
+						error: 'Something went wrong while trying to create a document!',
+					},
+					status: 500
+			}]}
+		/>
 
 		<Form>
 			<Form.Input
