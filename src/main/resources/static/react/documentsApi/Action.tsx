@@ -570,6 +570,35 @@ const JSON_SCHEMA_QUERY_DOCUMENTS = {
 					{"$ref": "#/$defs/term"},
 				]
 			},
+			"oneOfQueries": {
+				"oneOf": [
+					{"$ref": "#/$defs/booleanQueries"},
+					{"$ref": "#/$defs/existsQuery"},
+					{"$ref": "#/$defs/fulltext"},
+					{"$ref": "#/$defs/in"},
+					{"$ref": "#/$defs/like"},
+					{"$ref": "#/$defs/matchAll"},
+					{"$ref": "#/$defs/ngram"},
+					{"$ref": "#/$defs/pathMatch"},
+					{"$ref": "#/$defs/range"},
+					{"$ref": "#/$defs/stemmed"},
+					{"$ref": "#/$defs/term"},
+				],
+				"default": {}
+			},
+			"oneOrMoreQueries": {
+				"oneOf": [
+					{
+						"$ref": "#/$defs/oneOfQueries",
+						// "default": {}
+					},
+					{
+						"type": "array",
+						"items": {"$ref": "#/$defs/anyOfQueries"},
+						"default": [{}]
+					}
+				]
+			},
 			"booleanQueries": {
 				"type": "object",
 				"additionalProperties": false,
@@ -582,22 +611,10 @@ const JSON_SCHEMA_QUERY_DOCUMENTS = {
 								"type": "number",
 								"default": "1.0"
 							},
-							"filter": {
-								"type": "array",
-								"items": {"$ref": "#/$defs/anyOfQueries"}
-							},
-							"must": {
-								"type": "array",
-								"items": {"$ref": "#/$defs/anyOfQueries"}
-							},
-							"mustNot": {
-								"type": "array",
-								"items": {"$ref": "#/$defs/anyOfQueries"}
-							},
-							"should": {
-								"type": "array",
-								"items": {"$ref": "#/$defs/anyOfQueries"}
-							}
+							"filter": {"$ref": "#/$defs/oneOrMoreQueries"},
+							"must": {"$ref": "#/$defs/oneOrMoreQueries"},
+							"mustNot": {"$ref": "#/$defs/oneOrMoreQueries"},
+							"should": {"$ref": "#/$defs/oneOrMoreQueries"}
 						}
 					}
 				}
@@ -693,29 +710,11 @@ const JSON_SCHEMA_QUERY_DOCUMENTS = {
 				"default": 10,
 			},
 			"filters": {
-				"oneOf": [
-					{"$ref": "#/$defs/exists"},
-					{"$ref": "#/$defs/hasValue"},
-					{"$ref": "#/$defs/ids"},
-					{"$ref": "#/$defs/notExists"},
-					{"$ref": "#/$defs/booleanFilters"}
-				]
+				"$ref": "#/$defs/oneOrMoreFilters"
 			},
 			"query": {
-				"oneOf": [
-					{"$ref": "#/$defs/booleanQueries"},
-					{"$ref": "#/$defs/existsQuery"},
-					{"$ref": "#/$defs/fulltext"},
-					{"$ref": "#/$defs/in"},
-					{"$ref": "#/$defs/like"},
-					{"$ref": "#/$defs/matchAll"},
-					{"$ref": "#/$defs/ngram"},
-					{"$ref": "#/$defs/pathMatch"},
-					{"$ref": "#/$defs/range"},
-					{"$ref": "#/$defs/stemmed"},
-					{"$ref": "#/$defs/term"},
-				],
-				default: {}
+				"$ref": "#/$defs/oneOfQueries",
+				"default": {}
 			},
 			"sort": {
 				"oneOf": [
@@ -728,7 +727,8 @@ const JSON_SCHEMA_QUERY_DOCUMENTS = {
 								{"$ref": "#/$defs/sortObject"},
 								{"$ref": "#/$defs/geoDistanceSortObject"},
 							]
-						}
+						},
+						"default": []
 					}
 				]
 			},
