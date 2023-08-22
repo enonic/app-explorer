@@ -181,11 +181,31 @@ const JSON_SCHEMA_QUERY_DOCUMENTS = {
 			},
 			"anyOfFilters": {
 				"anyOf": [
+					{"$ref": "#/$defs/booleanFilters"},
 					{"$ref": "#/$defs/exists"},
 					{"$ref": "#/$defs/hasValue"},
 					{"$ref": "#/$defs/ids"},
 					{"$ref": "#/$defs/notExists"},
-					{"$ref": "#/$defs/booleanFilters"}
+				]
+			},
+			"oneOfFilters": {
+				"oneOf": [
+					{"$ref": "#/$defs/booleanFilters"},
+					{"$ref": "#/$defs/exists"},
+					{"$ref": "#/$defs/hasValue"},
+					{"$ref": "#/$defs/ids"},
+					{"$ref": "#/$defs/notExists"},
+				],
+				"default": {}
+			},
+			"oneOrMoreFilters": {
+				"oneOf": [
+					{"$ref": "#/$defs/oneOfFilters"},
+					{
+						"type": "array",
+						"items": {"$ref": "#/$defs/anyOfFilters"},
+						"default": [{}]
+					}
 				]
 			},
 			"booleanFilters": {
@@ -196,348 +216,393 @@ const JSON_SCHEMA_QUERY_DOCUMENTS = {
 						"type": "object",
 						"additionalProperties": false,
 						"properties": {
+							"must": {"$ref": "#/$defs/oneOrMoreFilters"},
+							"mustNot": {"$ref": "#/$defs/oneOrMoreFilters"},
+							"should": {"$ref": "#/$defs/oneOrMoreFilters"}
+						}
+					}
+				}
+			},
+			"matchAll": {
+				"type": "object",
+				"additionalProperties": false,
+				"properties": {
+					"matchAll": {
+						"type": "object",
+						"additionalProperties": false,
+						"properties": {
+							"boost": {
+								"type": "number",
+								"default": "1.0"
+							}
+						},
+						"default": {}
+					}
+				}
+			},
+			"existsQuery": {
+				"type": "object",
+				"additionalProperties": false,
+				"properties": {
+					"exists": {
+						"type": "object",
+						"additionalProperties": false,
+						"properties": {
+							"field": {
+								"type": "string"
+							},
+						},
+						"default": {
+							"field": ""
+						}
+					}
+				}
+			},
+			"fulltext": {
+				"type": "object",
+				"additionalProperties": false,
+				"properties": {
+					"fulltext": {
+						"type": "object",
+						"additionalProperties": false,
+						"properties": {
+							"fields": {
+								"type": "array",
+								"items": {
+									"type": "string"
+								}
+							},
+							"query": {
+								"type": "string"
+							},
+							"operator": {
+								"enum": [
+									"AND",
+									"OR"
+								]
+							},
+							"boost": {
+								"type": "number",
+								"default": "1.0"
+							}
+						},
+						"default": {
+							"fields": [""]
+						}
+					}
+				}
+			},
+			"ngram": {
+				"type": "object",
+				"additionalProperties": false,
+				"properties": {
+					"ngram": {
+						"type": "object",
+						"additionalProperties": false,
+						"properties": {
+							"fields": {
+								"type": "array",
+								"items": {
+									"type": "string"
+								}
+							},
+							"query": {
+								"type": "string"
+							},
+							"operator": {
+								"enum": [
+									"AND",
+									"OR"
+								]
+							},
+							"boost": {
+								"type": "number",
+								"default": "1.0"
+							}
+						},
+						"default": {
+							"fields": [""]
+						}
+					}
+				}
+			},
+			"stemmed": {
+				"type": "object",
+				"additionalProperties": false,
+				"properties": {
+					"stemmed": {
+						"type": "object",
+						"additionalProperties": false,
+						"properties": {
+							"fields": {
+								"type": "array",
+								"items": {
+									"type": "string"
+								}
+							},
+							"query": {
+								"type": "string"
+							},
+							"operator": {
+								"enum": [
+									"AND",
+									"OR"
+								]
+							},
+							"language": {
+								"type": "string"
+							},
+							"boost": {
+								"type": "number",
+								"default": "1.0"
+							}
+						},
+						"default": {
+							"fields": [""]
+						}
+					}
+				}
+			},
+			"in": {
+				"type": "object",
+				"additionalProperties": false,
+				"properties": {
+					"in": {
+						"type": "object",
+						"additionalProperties": false,
+						"properties": {
+							"boost": {
+								"type": "number",
+								"default": "1.0"
+							},
+							"field": {
+								"type": "string"
+							},
+							"values": {
+								"type": "array",
+								"items": {
+									"oneOf": [
+										{"type": "boolean"},
+										{"type": "number"},
+										{"type": "string"}
+									]
+								}
+							},
+							"type": {
+								"enum": [
+									"dateTime",
+									"time"
+								]
+							}
+						},
+						"default": {
+							"field": ""
+						}
+					}
+				}
+			},
+			"like": {
+				"type": "object",
+				"additionalProperties": false,
+				"properties": {
+					"like": {
+						"type": "object",
+						"additionalProperties": false,
+						"properties": {
+							"boost": {
+								"type": "number",
+								"default": "1.0"
+							},
+							"field": {
+								"type": "string"
+							},
+							"value": {
+								"oneOf": [
+									{"type": "boolean"},
+									{"type": "number"},
+									{"type": "string"}
+								]
+							},
+							"type": {
+								"enum": [
+									"dateTime",
+									"time"
+								]
+							}
+						},
+						"default": {
+							"field": ""
+						}
+					}
+				}
+			},
+			"range": {
+				"type": "object",
+				"additionalProperties": false,
+				"properties": {
+					"range": {
+						"type": "object",
+						"additionalProperties": false,
+						"properties": {
+							"boost": {
+								"type": "number",
+								"default": "1.0"
+							},
+							"field": {
+								"type": "string"
+							},
+							"lt": {
+								"oneOf": [
+									{"type": "boolean"},
+									{"type": "number"},
+									{"type": "string"}
+								]
+							},
+							"lte": {
+								"oneOf": [
+									{"type": "boolean"},
+									{"type": "number"},
+									{"type": "string"}
+								]
+							},
+							"gt": {
+								"oneOf": [
+									{"type": "boolean"},
+									{"type": "number"},
+									{"type": "string"}
+								]
+							},
+							"gte": {
+								"oneOf": [
+									{"type": "boolean"},
+									{"type": "number"},
+									{"type": "string"}
+								]
+							},
+							"type": {
+								"enum": [
+									"dateTime",
+									"time"
+								]
+							}
+						},
+						"default": {
+							"field": ""
+						}
+					}
+				}
+			},
+			"pathMatch": {
+				"type": "object",
+				"additionalProperties": false,
+				"properties": {
+					"pathMatch": {
+						"type": "object",
+						"additionalProperties": false,
+						"properties": {
+							"boost": {
+								"type": "number",
+								"default": "1.0"
+							},
+							"field": {
+								"type": "string"
+							},
+							"path": {
+								"type": "string"
+							},
+							"minimumMatch": {
+								"type": "number"
+							}
+						},
+						"default": {
+							"field": ""
+						}
+					}
+				}
+			},
+			"term": {
+				"type": "object",
+				"additionalProperties": false,
+				"properties": {
+					"term": {
+						"type": "object",
+						"additionalProperties": false,
+						"properties": {
+							"boost": {
+								"type": "number",
+								"default": "1.0"
+							},
+							"field": {
+								"type": "string"
+							},
+							"value": {
+								"oneOf": [
+									{"type": "boolean"},
+									{"type": "number"},
+									{"type": "string"}
+								]
+							},
+							"type": {
+								"enum": [
+									"dateTime",
+									"time"
+								]
+							}
+						},
+						"default": {
+							"field": ""
+						}
+					}
+				}
+			},
+			"anyOfQueries": {
+				"anyOf": [
+					{"$ref": "#/$defs/booleanQueries"},
+					{"$ref": "#/$defs/existsQuery"},
+					{"$ref": "#/$defs/fulltext"},
+					{"$ref": "#/$defs/in"},
+					{"$ref": "#/$defs/like"},
+					{"$ref": "#/$defs/matchAll"},
+					{"$ref": "#/$defs/ngram"},
+					{"$ref": "#/$defs/pathMatch"},
+					{"$ref": "#/$defs/range"},
+					{"$ref": "#/$defs/stemmed"},
+					{"$ref": "#/$defs/term"},
+				]
+			},
+			"booleanQueries": {
+				"type": "object",
+				"additionalProperties": false,
+				"properties": {
+					"boolean": {
+						"type": "object",
+						"additionalProperties": false,
+						"properties": {
+							"boost": {
+								"type": "number",
+								"default": "1.0"
+							},
+							"filter": {
+								"type": "array",
+								"items": {"$ref": "#/$defs/anyOfQueries"}
+							},
 							"must": {
 								"type": "array",
-								"items": {"$ref": "#/$defs/anyOfFilters"}
+								"items": {"$ref": "#/$defs/anyOfQueries"}
 							},
 							"mustNot": {
 								"type": "array",
-								"items": {"$ref": "#/$defs/anyOfFilters"}
+								"items": {"$ref": "#/$defs/anyOfQueries"}
 							},
 							"should": {
 								"type": "array",
-								"items": {"$ref": "#/$defs/anyOfFilters"}
+								"items": {"$ref": "#/$defs/anyOfQueries"}
 							}
 						}
 					}
 				}
-			}
-		}, // defs
-		"type": "object",
-		"additionalProperties": false,
-		"properties": {
-			"count": {
-				"type": "number",
-				"default": 10,
 			},
-			"filters": {
-				"oneOf": [
-					{"$ref": "#/$defs/exists"},
-					{"$ref": "#/$defs/hasValue"},
-					{"$ref": "#/$defs/ids"},
-					{"$ref": "#/$defs/notExists"},
-					{"$ref": "#/$defs/booleanFilters"}
-				]
-			},
-			"query": {
-				"oneOf": [{
-					"type": "object",
-					"additionalProperties": false,
-					"properties": {
-						"matchAll": {
-							"type": "object",
-							"additionalProperties": false,
-							"properties": {
-								"boost": {
-									"type": "number"
-								}
-							},
-							"default": {}
-						}
-					}
-				},{
-					"type": "object",
-					"additionalProperties": false,
-					"properties": {
-						"exists": {
-							"type": "object",
-							"additionalProperties": false,
-							"properties": {
-								"field": {
-									"type": "string"
-								},
-							},
-							"default": {
-								"field": ""
-							}
-						}
-					}
-				},{
-					"type": "object",
-					"additionalProperties": false,
-					"properties": {
-						"fulltext": {
-							"type": "object",
-							"additionalProperties": false,
-							"properties": {
-								"fields": {
-									"type": "array",
-									"items": {
-										"type": "string"
-									}
-								},
-								"query": {
-									"type": "string"
-								},
-								"operator": {
-									"enum": [
-										"AND",
-										"OR"
-									]
-								}
-							},
-							"default": {
-								"fields": [""]
-							}
-						}
-					}
-				},{
-					"type": "object",
-					"additionalProperties": false,
-					"properties": {
-						"ngram": {
-							"type": "object",
-							"additionalProperties": false,
-							"properties": {
-								"fields": {
-									"type": "array",
-									"items": {
-										"type": "string"
-									}
-								},
-								"query": {
-									"type": "string"
-								},
-								"operator": {
-									"enum": [
-										"AND",
-										"OR"
-									]
-								}
-							},
-							"default": {
-								"fields": [""]
-							}
-						}
-					}
-				},{
-					"type": "object",
-					"additionalProperties": false,
-					"properties": {
-						"stemmed": {
-							"type": "object",
-							"additionalProperties": false,
-							"properties": {
-								"fields": {
-									"type": "array",
-									"items": {
-										"type": "string"
-									}
-								},
-								"query": {
-									"type": "string"
-								},
-								"operator": {
-									"enum": [
-										"AND",
-										"OR"
-									]
-								},
-								"language": {
-									"type": "string"
-								}
-							},
-							"default": {
-								"fields": [""]
-							}
-						}
-					}
-				},{
-					"type": "object",
-					"additionalProperties": false,
-					"properties": {
-						"in": {
-							"type": "object",
-							"additionalProperties": false,
-							"properties": {
-								"boost": {
-									"type": "number"
-								},
-								"field": {
-									"type": "string"
-								},
-								"values": {
-									"type": "array",
-									"items": {
-										"oneOf": [
-											{"type": "boolean"},
-											{"type": "number"},
-											{"type": "string"}
-										]
-									}
-								},
-								"type": {
-									"enum": [
-										"dateTime",
-										"time"
-									]
-								}
-							},
-							"default": {
-								"field": ""
-							}
-						}
-					}
-				},{
-					"type": "object",
-					"additionalProperties": false,
-					"properties": {
-						"like": {
-							"type": "object",
-							"additionalProperties": false,
-							"properties": {
-								"boost": {
-									"type": "number"
-								},
-								"field": {
-									"type": "string"
-								},
-								"value": {
-									"oneOf": [
-										{"type": "boolean"},
-										{"type": "number"},
-										{"type": "string"}
-									]
-								},
-								"type": {
-									"enum": [
-										"dateTime",
-										"time"
-									]
-								}
-							},
-							"default": {
-								"field": ""
-							}
-						}
-					}
-				},{
-					"type": "object",
-					"additionalProperties": false,
-					"properties": {
-						"range": {
-							"type": "object",
-							"additionalProperties": false,
-							"properties": {
-								"boost": {
-									"type": "number"
-								},
-								"field": {
-									"type": "string"
-								},
-								"lt": {
-									"oneOf": [
-										{"type": "boolean"},
-										{"type": "number"},
-										{"type": "string"}
-									]
-								},
-								"lte": {
-									"oneOf": [
-										{"type": "boolean"},
-										{"type": "number"},
-										{"type": "string"}
-									]
-								},
-								"gt": {
-									"oneOf": [
-										{"type": "boolean"},
-										{"type": "number"},
-										{"type": "string"}
-									]
-								},
-								"gte": {
-									"oneOf": [
-										{"type": "boolean"},
-										{"type": "number"},
-										{"type": "string"}
-									]
-								},
-								"type": {
-									"enum": [
-										"dateTime",
-										"time"
-									]
-								}
-							},
-							"default": {
-								"field": ""
-							}
-						}
-					}
-				},{
-					"type": "object",
-					"additionalProperties": false,
-					"properties": {
-						"pathMatch": {
-							"type": "object",
-							"additionalProperties": false,
-							"properties": {
-								"boost": {
-									"type": "number"
-								},
-								"field": {
-									"type": "string"
-								},
-								"path": {
-									"type": "string"
-								},
-								"minimumMatch": {
-									"type": "number"
-								}
-							},
-							"default": {
-								"field": ""
-							}
-						}
-					}
-				},{
-					"type": "object",
-					"additionalProperties": false,
-					"properties": {
-						"term": {
-							"type": "object",
-							"additionalProperties": false,
-							"properties": {
-								"boost": {
-									"type": "number"
-								},
-								"field": {
-									"type": "string"
-								},
-								"value": {
-									"oneOf": [
-										{"type": "boolean"},
-										{"type": "number"},
-										{"type": "string"}
-									]
-								},
-								"type": {
-									"enum": [
-										"dateTime",
-										"time"
-									]
-								}
-							},
-							"default": {
-								"field": ""
-							}
-						}
-					}
-				}],
-				default: {}
-			},
-			"sort": {
+			"sortObject": {
 				"type": "object",
 				"additionalProperties": false,
 				"properties": {
@@ -557,6 +622,115 @@ const JSON_SCHEMA_QUERY_DOCUMENTS = {
 					"direction": "DESC",
 					"field": "_score"
 				}
+			},
+			"geoDistanceSortObject": {
+				"type": "object",
+				"additionalProperties": false,
+				"properties": {
+					"direction": {
+						"enum": [
+							"ASC",
+							"DESC"
+						],
+						"default": "DESC",
+					},
+					"field": {
+						"type": "string",
+						"default": "_score",
+					},
+					"unit": {
+						"enum": [
+							'm',
+							'meters',
+							'in',
+							'inch',
+							'yd',
+							'yards',
+							'ft',
+							'feet',
+							'km',
+							'kilometers',
+							'NM',
+							'nmi',
+							'nauticalmiles',
+							'mm',
+							'millimeters',
+							'cm',
+							'centimeters',
+							'mi',
+							'miles'
+						]
+					},
+					"location": {
+						"type": "object",
+						"additionalProperties": false,
+						"properties": {
+							"lat": {
+								"type": "number"
+							},
+							"lon": {
+								"type": "number"
+							}
+						}
+					}
+				},
+				"default": {
+					"direction": "ASC",
+					"field": "",
+					"unit": "",
+					"location": {
+						"lat": 0,
+						"lon": 0
+					}
+				}
+			} // geoDistanceSortObject
+		}, // defs
+		"type": "object",
+		"additionalProperties": false,
+		"properties": {
+			"count": {
+				"type": "number",
+				"default": 10,
+			},
+			"filters": {
+				"oneOf": [
+					{"$ref": "#/$defs/exists"},
+					{"$ref": "#/$defs/hasValue"},
+					{"$ref": "#/$defs/ids"},
+					{"$ref": "#/$defs/notExists"},
+					{"$ref": "#/$defs/booleanFilters"}
+				]
+			},
+			"query": {
+				"oneOf": [
+					{"$ref": "#/$defs/booleanQueries"},
+					{"$ref": "#/$defs/existsQuery"},
+					{"$ref": "#/$defs/fulltext"},
+					{"$ref": "#/$defs/in"},
+					{"$ref": "#/$defs/like"},
+					{"$ref": "#/$defs/matchAll"},
+					{"$ref": "#/$defs/ngram"},
+					{"$ref": "#/$defs/pathMatch"},
+					{"$ref": "#/$defs/range"},
+					{"$ref": "#/$defs/stemmed"},
+					{"$ref": "#/$defs/term"},
+				],
+				default: {}
+			},
+			"sort": {
+				"oneOf": [
+					{"$ref": "#/$defs/sortObject"},
+					{"$ref": "#/$defs/geoDistanceSortObject"},
+					{
+						"type": "array",
+						"items": {
+							"anyOf": [
+								{"$ref": "#/$defs/sortObject"},
+								{"$ref": "#/$defs/geoDistanceSortObject"},
+							]
+						}
+					}
+				]
 			},
 			"start": {
 				"type": "number",
