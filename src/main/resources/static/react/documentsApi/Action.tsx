@@ -17,8 +17,18 @@ const MONACO_FONT_SIZE = 14;
 const MONACO_LINE_HEIGHT = 21; // 14px font-size + 7px line-height
 
 const FILE_MATCH_ID_PATCH_DOCUMENT = 'patchDocument.json';
+const FILE_MATCH_ID_CREATE_DOCUMENT = 'createDocument.json';
 const FILE_MATCH_ID_CREATE_OR_GET_OR_MODIFY_OR_DELETE_DOCUMENTS = 'createOrGetOrModifyOrDeleteDocuments.json';
 const FILE_MATCH_ID_QUERY_DOCUMENTS = 'queryDocuments.json';
+
+const JSON_SCHEMA_CREATE_DOCUMENT = {
+	// "fileMatch": ["*"],
+	"fileMatch": [FILE_MATCH_ID_CREATE_DOCUMENT],
+	"uri": "http://www.enonic.com/schemas/createDocument.json",
+	"schema": {
+		"type": "object",
+	}
+};
 
 const JSON_SCHEMA_PATCH_DOCUMENT = {
 	// "fileMatch": ["*"],
@@ -26,18 +36,6 @@ const JSON_SCHEMA_PATCH_DOCUMENT = {
 	"uri": "http://www.enonic.com/schemas/patchDocument.json",
 	"schema": {
 		"type": "object",
-		"properties": {
-			"document": {
-				"type": "object",
-				// By default any additional properties are allowed.
-				// "properties": {} // shape of the documentType(s)
-			},
-			"documentType": {
-				"type": "string"
-			},
-		},
-		"additionalProperties": false,
-		"required": ["document"]
 	}
 };
 
@@ -1078,6 +1076,7 @@ export default function Action({
 									validate: true,
 									// schemas: data.list ? [JSON_SCHEMA_CREATE_OR_GET_OR_MODIFY_OR_DELETE_DOCUMENTS] : [JSON_SCHEMA_PATCH_DOCUMENT]
 									schemas: [
+										JSON_SCHEMA_CREATE_DOCUMENT,
 										JSON_SCHEMA_CREATE_OR_GET_OR_MODIFY_OR_DELETE_DOCUMENTS,
 										JSON_SCHEMA_PATCH_DOCUMENT,
 										JSON_SCHEMA_QUERY_DOCUMENTS
@@ -1089,9 +1088,11 @@ export default function Action({
 									'json', // language?: string
 									name === 'query-documents'
 										? `internal://server/${FILE_MATCH_ID_QUERY_DOCUMENTS}`
-										: data.list // uri?: Uri
-											? `internal://server/${FILE_MATCH_ID_CREATE_OR_GET_OR_MODIFY_OR_DELETE_DOCUMENTS}`
-											: `internal://server/${FILE_MATCH_ID_PATCH_DOCUMENT}`
+										: name === 'create-document'
+											? `internal://server/${FILE_MATCH_ID_CREATE_DOCUMENT}`
+											: data.list // uri?: Uri
+												? `internal://server/${FILE_MATCH_ID_CREATE_OR_GET_OR_MODIFY_OR_DELETE_DOCUMENTS}`
+												: `internal://server/${FILE_MATCH_ID_PATCH_DOCUMENT}`
 								);
 								editor.setModel(model);
 							}}
