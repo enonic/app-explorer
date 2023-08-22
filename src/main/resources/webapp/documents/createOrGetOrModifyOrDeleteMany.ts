@@ -20,9 +20,9 @@ import {
 	forceArray,
 	toStr
 } from '@enonic/js-utils';
-import {USER as EXPLORER_APP_USER} from '/lib/explorer/model/2/users/explorer';
-//import {get as getCollection} from '/lib/explorer/collection/get';
-//import {createOrModify} from '/lib/explorer/node/createOrModify';
+// import {USER as EXPLORER_APP_USER} from '/lib/explorer/model/2/users/explorer';
+// import {get as getCollection} from '/lib/explorer/collection/get';
+// import {createOrModify} from '/lib/explorer/node/createOrModify';
 import { connect } from '/lib/explorer/repo/connect';
 import { maybeCreate as maybeCreateRepoAndBranch } from '/lib/explorer/repo/maybeCreate';
 import { runAsSu } from '/lib/explorer/runAsSu';
@@ -35,6 +35,7 @@ import runWithExplorerRead from './runWithExplorerRead';
 import runWithExplorerWrite from './runWithExplorerWrite';
 import { RepoConnection } from '@enonic-types/lib-node';
 import { ACTION } from './constants';
+import createOne from './createOne';
 
 
 // const {includes: arrayIncludes} = array;
@@ -256,7 +257,7 @@ export default function createOrGetOrModifyOrDeleteMany(
 ): {
 	body?: {
 		error: string
-	} | any[]
+	} | ResponseItem | ResponseItem[]
 	contentType?: string
 	status: number
 } {
@@ -351,7 +352,20 @@ export default function createOrGetOrModifyOrDeleteMany(
 	const data = JSON.parse(body);
 	// log.debug('data:%s', toStr(data));
 
-	const dataArray = forceArray<RequestItem>(data);
+	if (!Array.isArray(data)) {
+		return createOne({
+			boolRequireValid,
+			// branchId,
+			collectionId,
+			collectionName,
+			data,
+			documentType: documentTypeParam,
+			documentTypeId: documentTypeIdParam,
+			// repoId
+		});
+	}
+
+	const dataArray = data as RequestItem[];
 	// log.debug('dataArray:%s', toStr(dataArray));
 
 	return runWithExplorerWrite(() => {
