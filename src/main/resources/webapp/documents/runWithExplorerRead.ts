@@ -12,7 +12,7 @@ import { run } from '/lib/xp/context';
 type UserWithoutModifiedTime = Omit<User,'modifiedTime'> // TODO remove when modifiedTime is optional #10221
 
 
-export default function runWithExplorerWrite<T extends () => unknown>(fn: T): ReturnType<T> {
+export default function runWithExplorerRead<T extends () => unknown>(fn: T): ReturnType<T> {
 	let user = getUser() as UserWithoutModifiedTime;
 	if (!user) {
 		// CreateNode tries to set owner, and fails when no user
@@ -31,10 +31,10 @@ export default function runWithExplorerWrite<T extends () => unknown>(fn: T): Re
 		attributes: {},
 		branch: 'master',
 
-		// This allows any user to write in app-explorer, journal and collections.
-		// So even though you are logged into Enonic XP admin with a user that does not have PRINCIPAL_EXPLORER_WRITE:
-		// You may still create/update the documentTypes and documents.
-		principals: [Principal.EXPLORER_WRITE],
+		// This allows any user to read from app-explorer, journal and collections.
+		// So even though you are logged into Enonic XP admin with a user that does not have PRINCIPAL_EXPLORER_READ:
+		// You may still get the documentTypes and documents.
+		principals: [Principal.EXPLORER_READ],
 		//principals: [],
 
 		//repository: 'system-repo',

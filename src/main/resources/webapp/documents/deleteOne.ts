@@ -1,4 +1,5 @@
 import type { Request } from '../../types/Request';
+import type { DocumentNode } from '/lib/explorer/types/Document';
 
 
 import {
@@ -9,6 +10,8 @@ import { toStr } from '@enonic/js-utils/value/toStr';
 import { connect } from '/lib/explorer/repo/connect';
 import { HTTP_RESPONSE_STATUS_CODES } from '../constants';
 import authorize from './authorize';
+import documentNodeToBodyItem from './documentNodeToBodyItem';
+import runWithExplorerRead from './runWithExplorerRead';
 import runWithExplorerWrite from './runWithExplorerWrite';
 
 
@@ -70,10 +73,22 @@ export default function deleteOne(request: DeleteOneRequest) {
 		repoId
 	});
 
-	if (!writeToCollectionBranchConnection.exists(documentId)) {
+	if (!runWithExplorerRead(() => writeToCollectionBranchConnection.exists(documentId))) {
 		return {
 			body: {
 				error: `Document with id "${documentId}" does not exist in collection "${collectionName}"!`,
+				id: documentId,
+			},
+			contentType: 'text/json;charset=utf-8',
+			status: HTTP_RESPONSE_STATUS_CODES.NOT_FOUND
+		}
+	}
+
+	const documentNode = runWithExplorerRead(() => writeToCollectionBranchConnection.get<DocumentNode>(documentId));
+	if (!documentNode) { // This will probably never happen
+		return {
+			body: {
+				error: `Document with id "${documentId}" in collection "${collectionName} is empty"!`,
 				id: documentId,
 			},
 			contentType: 'text/json;charset=utf-8',
@@ -108,10 +123,12 @@ export default function deleteOne(request: DeleteOneRequest) {
 		};
 	}
 
+	runWithExplorerWrite(() => writeToCollectionBranchConnection.refresh());
+
 	return {
-		body: {
-			id: documentId,
-		},
+		body: documentNodeToBodyItem({
+			documentNode
+		}),
 		contentType: 'text/json;charset=utf-8',
 		status: HTTP_RESPONSE_STATUS_CODES.OK
 	};

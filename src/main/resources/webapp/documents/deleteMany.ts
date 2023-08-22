@@ -1,4 +1,5 @@
 import type { Request } from '../../types/Request';
+import type { DocumentNode } from '/lib/explorer/types/Document';
 
 
 import {
@@ -14,7 +15,10 @@ import {
 import {connect} from '/lib/explorer/repo/connect';
 import { HTTP_RESPONSE_STATUS_CODES } from '../constants';
 import authorize from './authorize';
-
+import { ACTION } from './constants';
+import documentNodeToBodyItem from './documentNodeToBodyItem';
+import runWithExplorerRead from './runWithExplorerRead';
+import runWithExplorerWrite from './runWithExplorerWrite';
 
 // const {includes: arrayIncludes} = array;
 
@@ -22,9 +26,17 @@ import authorize from './authorize';
 export type RemoveRequest = Request<{
 	collection?: string
 	id: string | string[]
+	returnDocument?: 'true' | 'false'
 }, {
 	collectionName?: string
 }>
+
+interface DeleteResponseBodyItem {
+	action: 'delete'
+	id: string
+	error?: string
+	status?: number
+}
 
 
 export default function deleteMany(
@@ -38,7 +50,8 @@ export default function deleteMany(
 } {
 	const {
 		params: {
-			id: idParam
+			id: idParam,
+			returnDocument: returnDocumentParam = 'false',
 		} = {},
 		pathParams: {
 			collectionName = ''
@@ -69,6 +82,8 @@ export default function deleteMany(
 		return maybeErrorResponse;
 	}
 
+	const boolReturnDocument = returnDocumentParam !== 'false'; // Fallsback to false if something invalid is provided
+
 	const repoId = `${COLLECTION_REPO_PREFIX}${collectionName}`;
 	//log.info(`repoId:${toStr(repoId)}`);
 
@@ -89,14 +104,11 @@ export default function deleteMany(
 	const body = [];
 	idsArray.forEach((id) => {
 		//log.info(`ids:${toStr(ids)}`);
-		const getRes = readFromCollectionBranchConnection.get(id);
+		const getRes = runWithExplorerRead(() => readFromCollectionBranchConnection.get<DocumentNode>(id));
 		//log.info(`getRes:${toStr(getRes)}`);
 
-		let item: {
-			id?: string
-			error?: string
-			status?: number
-		} = {
+		let item: DeleteResponseBodyItem = {
+			action: ACTION.DELETE,
 			id
 		};
 		if (!getRes) { // getRes === null
@@ -106,9 +118,13 @@ export default function deleteMany(
 			item.error = `Found multiple document with id = ${id}!`;
 			item.status = HTTP_RESPONSE_STATUS_CODES.CONFLICT;
 		} else { // getRes === {}
-			const deleteRes = writeToCollectionBranchConnection.delete(id);
+			const deleteRes = runWithExplorerWrite(() => writeToCollectionBranchConnection.delete(id));
 			if (deleteRes.length === 1) {
-				writeToCollectionBranchConnection.refresh();
+				item = documentNodeToBodyItem({
+					documentNode: getRes,
+					includeDocument: boolReturnDocument
+				}) as DeleteResponseBodyItem;
+				item.action = ACTION.DELETE;
 				item.status = HTTP_RESPONSE_STATUS_CODES.OK;
 			} else {
 				item.error = `Unable to delete document with id = ${id}!`;
@@ -117,6 +133,8 @@ export default function deleteMany(
 		}
 		body.push(item);
 	}); // forEach key
+
+	runWithExplorerWrite(() => writeToCollectionBranchConnection.refresh());
 
 	return {
 		body,

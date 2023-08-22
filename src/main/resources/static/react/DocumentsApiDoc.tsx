@@ -414,7 +414,6 @@ export default function DocumentsApiDoc() {
 					// document: {
 					// 	key: 'value'
 					// },
-					// message: "Document created, got id '1'",
 					status: 200
 				},{
 					id: '2',
@@ -422,7 +421,6 @@ export default function DocumentsApiDoc() {
 					// document: {
 					// 	key: 'value'
 					// },
-					// message: "Document with id '2' modified.",
 					status: 200
 				},{
 					action: 'create',
@@ -436,6 +434,29 @@ export default function DocumentsApiDoc() {
 					action: 'modify',
 					error: "Something went wrong while trying to modify document with id '5'!",
 					status: 500
+				},{
+					action: 'delete',
+					collection: 'collectionName',
+					collector: {
+						id: 'com.enonic.app.explorer:documentRestApi',
+						version: '2.0.0'
+					},
+					createdTime:"2023-08-21T11:31:38.141Z",
+					document: {
+						key: 'value'
+					},
+					documentType: 'documentTypeName',
+					id: '1',
+					language: 'en',
+					modifiedTime:"2023-08-22T11:31:38.141Z",
+					status: 200,
+					stemmingLanguage: 'en',
+					valid: true
+				}, {
+					action: 'delete',
+					id: '2',
+					error: "Unable to find document with id = 2!",
+					status: 404,
 				}]
 			}]}
 		/>
@@ -590,8 +611,42 @@ export default function DocumentsApiDoc() {
 					required: true,
 					type: 'string'
 				},
+				returnDocument: {
+					default: false,
+					description: 'When true, the document(s) will be returned in the response, not just the id(s).',
+					list: false,
+					required: false,
+					type: 'boolean'
+				},
 			}}
 			pattern={`${prefix}`}
+			responses={[{
+				body: [{
+					action: 'delete',
+					collection: 'collectionName',
+					collector: {
+						id: 'com.enonic.app.explorer:documentRestApi',
+						version: '2.0.0'
+					},
+					createdTime:"2023-08-21T11:31:38.141Z",
+					document: {
+						key: 'value'
+					},
+					documentType: 'documentTypeName',
+					id: '1',
+					language: 'en',
+					modifiedTime:"2023-08-22T11:31:38.141Z",
+					status: 200,
+					stemmingLanguage: 'en',
+					valid: true
+				}, {
+					action: 'delete',
+					id: '2',
+					error: "Unable to find document with id = 2!",
+					status: 404,
+				}],
+				status: 200
+			}]}
 		/>
 
 		<h2>Single</h2>
@@ -626,7 +681,7 @@ export default function DocumentsApiDoc() {
 			}, {
 				status: 404,
 				body: {
-					message: 'Document with id "1" doesn\'t exist in collection "collectionName"!'
+					error: 'Document with id "1" doesn\'t exist in collection "collectionName"!'
 				}
 			}]}
 		/>
@@ -741,14 +796,29 @@ export default function DocumentsApiDoc() {
 			method="DELETE"
 			pattern={documentPath}
 			responses={[{
-				status: 200,
 				body: {
-					message: 'Deleted document with id:1',
-				}
+					collection: 'collectionName',
+					collector: {
+						id: 'com.enonic.app.explorer:documentRestApi',
+						version: '2.0.0'
+					},
+					createdTime:"2023-08-21T11:31:38.141Z",
+					document: {
+						key: 'value'
+					},
+					documentType: 'documentTypeName',
+					id: '1',
+					language: 'en',
+					modifiedTime:"2023-08-22T11:31:38.141Z",
+					stemmingLanguage: 'en',
+					valid: true
+				},
+				status: 200,
 			}, {
 				status: 404,
 				body: {
-					message: 'Document with id "1" does not exist in collection "collectionName"!'
+					id: '1',
+					error: 'Document with id "1" does not exist in collection "collectionName"!'
 				}
 			}]}
 		/>
