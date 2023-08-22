@@ -137,20 +137,6 @@ export default function put(request: PutRequest, partial = false) {
 		};
 	}
 	const collectionId = collectionNode._id;
-	const {
-		document
-	} = data;
-	let {
-		documentType,
-		documentTypeId
-	} = data;
-	if (!documentTypeId && !documentType) {
-		if (documentTypeIdParam) {
-			documentTypeId = documentTypeIdParam;
-		} else if (documentTypeParam) {
-			documentType = documentTypeParam;
-		}
-	}
 	let updatedNode: Node<DocumentNode>;
 	try { // Avoid internal errors to be exposed in the response
 		updatedNode = runWithExplorerWrite(() => update({
@@ -160,10 +146,10 @@ export default function put(request: PutRequest, partial = false) {
 			collectorVersion: COLLECTOR_VERSION,
 			data: {
 				_id: documentId,
-				...document
+				...data
 			},
-			documentTypeId,
-			documentTypeName: documentType,
+			documentTypeId: documentTypeIdParam,
+			documentTypeName: documentTypeParam,
 			partial,
 			requireValid: boolRequireValid
 		}));

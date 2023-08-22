@@ -146,7 +146,7 @@ export default function DocumentsApiDoc() {
 			curl={`-H "authorization:Explorer-Api-Key ${apiKey}" -H "content-type:application/json"`}
 			data={{
 				default: `[{
-	// "action": "create", // Create is assumed if action and id is missing.
+	"action": "create",
 	"document": {
 		"available": true,
 		"count": -999999999999999,
@@ -165,7 +165,7 @@ export default function DocumentsApiDoc() {
 	"action": "get",
 	"id": "1"
 },{
-	// "action": "modify", // Modify is assumed if action is missing, but id is present.
+	"action": "modify",
 	"id": "1",
 	"document": {
 		"available": false,
@@ -197,7 +197,7 @@ export default function DocumentsApiDoc() {
 	documentType?: string
 }`,
 					example: {
-						// action: 'create',
+						action: 'create',
 						document: {
 							text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
 							title: 'Hello World',
@@ -225,6 +225,7 @@ export default function DocumentsApiDoc() {
 	documentType?: string
 }`,
 					example: {
+						action: 'modify',
 						id: '1',
 						document: {
 							text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
@@ -253,12 +254,14 @@ export default function DocumentsApiDoc() {
 	documentType?: string
 }[]`,
 					example: [{
+						action: 'create',
 						document: {
 							text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
 							title: 'The standard Lorem Ipsum passage, used since the 1500s',
 							uri: 'https://www.example.com'
 						}
 					}, {
+						action: 'create',
 						document: {
 							text: 'Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?',
 							title: 'Section 1.10.32 of "de Finibus Bonorum et Malorum", written by Cicero in 45 BC',
@@ -289,6 +292,7 @@ export default function DocumentsApiDoc() {
 	documentType?: string
 }[]`,
 					example: [{
+						action: 'modify',
 						id: '1',
 						document: {
 							text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
@@ -296,6 +300,7 @@ export default function DocumentsApiDoc() {
 							uri: 'https://www.example.com'
 						}
 					}, {
+						action: 'modify',
 						id: '2',
 						document: {
 							text: 'Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?',
@@ -327,6 +332,7 @@ export default function DocumentsApiDoc() {
 	documentType?: string
 }[]`,
 					example: [{
+						action: 'create',
 						document: {
 							text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
 							title: 'The standard Lorem Ipsum passage, used since the 1500s',
@@ -336,6 +342,7 @@ export default function DocumentsApiDoc() {
 						action: 'get',
 						id: '1',
 					}, {
+						action: 'modify',
 						id: '1',
 						document: {
 							text: 'Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?',
@@ -693,39 +700,28 @@ export default function DocumentsApiDoc() {
 			comment='Patch a document'
 			data={{
 				default: `{
-	"document": {
-		"available": false,
-		"count": 0,
-		"date": "2023-01-01",
-		"datetime": "2023-01-01T00:00:00",
-		"instant": "2023-01-01T00:00:00Z",
-		"location": "59.9090442,10.7423389",
-		"price": 0,
-		// "time": "00:00:00",
-		"language": "norsk",
-		"text": "Hei!",
-		"title": "Tittel",
-		"url": "https://www.example.no"
-	},
-	// "documentType": "documentTypeName",
+	"available": false,
+	"count": 0,
+	"date": "2023-01-01",
+	"datetime": "2023-01-01T00:00:00",
+	"instant": "2023-01-01T00:00:00Z",
+	"location": "59.9090442,10.7423389",
+	"price": 0,
+	"text": "Hei!",
+	"title": "Tittel",
+	"url": "https://www.example.no"
 }`,
 				examples: [{
 					comment: 'Patch a document',
-					type: `{
-	document: Record<string, unknown>
-}`,
+					type: `Record<string, unknown>`,
 					example: {
-						document: {
-							text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
-							title: 'Hello World',
-							uri: 'https://www.example.com'
-						}
+						text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+						title: 'Hello World',
+						uri: 'https://www.example.com'
 					}
 				}],
 				list: false,
-				type: `{
-	document: Record<string, unknown>
-}`
+				type: `Record<string, unknown>`
 			}}
 			headers={{
 				authorization: {
@@ -744,8 +740,6 @@ export default function DocumentsApiDoc() {
 				documentType: {
 					description: <>The documentType is selected in the following order:
 					<ol>
-						{/* <li>documentTypeId property on each document in the body json.</li> */}
-						<li>documentType property on each item in the body json.</li>
 						{/* <li>documentTypeId url query parameter.</li> */}
 						<li>documentType url query.</li>
 						<li>documentTypeId property stored on the collection node.</li>
