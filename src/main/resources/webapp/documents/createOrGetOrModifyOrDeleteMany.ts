@@ -31,6 +31,7 @@ import { update } from '/lib/explorer/document/update';
 import { HTTP_RESPONSE_STATUS_CODES } from '../constants';
 import authorize from './authorize';
 import documentNodeToBodyItem from './documentNodeToBodyItem';
+import runWithExplorerRead from './runWithExplorerRead';
 import runWithExplorerWrite from './runWithExplorerWrite';
 import { RepoConnection } from '@enonic-types/lib-node';
 import { ACTION } from './constants';
@@ -45,7 +46,6 @@ export type PostRequest = Request<{
 	partial?: 'true' | 'false'
 	requireValid?: 'true' | 'false'
 	returnDocument?: 'true' | 'false'
-	returnMetadata?: 'true' | 'false'
 }, {
 	collectionName?: string
 }>
@@ -106,14 +106,15 @@ function createDocument({
 
 
 function deleteDocument({
+	boolReturnDocument,
 	id,
 	writeToCollectionBranchConnection
 }: {
+	boolReturnDocument: boolean
 	id: string
 	writeToCollectionBranchConnection: RepoConnection
 }) {
-	// NOTE: Not wrapped with runWithExplorerWrite
-	if (!writeToCollectionBranchConnection.exists(id)) {
+	if (!runWithExplorerRead(() => writeToCollectionBranchConnection.exists(id))) {
 		return {
 			action: ACTION.DELETE,
 			error: `Document with id "${id}" doesn't exist!`,
@@ -121,14 +122,36 @@ function deleteDocument({
 			status: HTTP_RESPONSE_STATUS_CODES.NOT_FOUND
 		}
 	}
-	let deleteRes = [];
-	try {
-		deleteRes = writeToCollectionBranchConnection.delete(id);
+
+	const documentNode = runWithExplorerRead(() => writeToCollectionBranchConnection.get<DocumentNode>(id));
+	if (!documentNode) { // This will probably never happen
 		return {
 			action: ACTION.DELETE,
+			error: `Document with id "${id}" is empty"!`,
 			id,
-			status: HTTP_RESPONSE_STATUS_CODES.OK
-		};
+			status: HTTP_RESPONSE_STATUS_CODES.NOT_FOUND
+		}
+	}
+
+	let deleteRes = [];
+	try {
+		deleteRes = runWithExplorerWrite(() => writeToCollectionBranchConnection.delete(id));
+		if (deleteRes.length !== 1) {
+			return {
+				action: ACTION.DELETE,
+				error: `Something went wrong while trying to delete document with id:${id}!`,
+				id,
+				status: HTTP_RESPONSE_STATUS_CODES.INTERNAL_SERVER_ERROR
+			};
+		}
+		// refresh() done after all bulk operations
+		const item = documentNodeToBodyItem({
+			documentNode,
+			includeDocument: boolReturnDocument
+		});
+		item.action = ACTION.DELETE;
+		item.status = HTTP_RESPONSE_STATUS_CODES.OK
+		return item;
 	} catch (e) {
 		log.error(`Something went wrong while trying to delete document with id:${id}!`, e); // Log the stack trace
 		return {
@@ -249,7 +272,6 @@ export default function createOrGetOrModifyOrDeleteMany(
 			partial: partialParam = 'false',
 			requireValid: requireValidParam = 'true',
 			returnDocument: returnDocumentParam = 'false',
-			returnMetadata: returnMetadataParam = 'false'
 		} = {},
 		pathParams: {
 			collectionName = ''
@@ -265,7 +287,6 @@ export default function createOrGetOrModifyOrDeleteMany(
 	const boolPartial = partialParam !== 'false'; // Fallsback to false if something invalid is provided
 	const boolRequireValid = requireValidParam !== 'false'; // Fallsback to true if something invalid is provided
 	const boolReturnDocument = returnDocumentParam !== 'false'; // Fallsback to false if something invalid is provided
-	const boolReturnMetadata = returnMetadataParam !== 'false'; // Fallsback to false if something invalid is provided
 
 
 	// log.debug('collectionName:%s', collectionName);
@@ -387,6 +408,7 @@ export default function createOrGetOrModifyOrDeleteMany(
 						}));
 					} else if (action === ACTION.DELETE) {
 						responseArray.push(deleteDocument({
+							boolReturnDocument,
 							id,
 							writeToCollectionBranchConnection
 						}));
@@ -427,6 +449,7 @@ export default function createOrGetOrModifyOrDeleteMany(
 						}));
 					} else if (action === ACTION.DELETE) {
 						responseArray.push(deleteDocument({
+							boolReturnDocument,
 							id: `/${name}`,
 							writeToCollectionBranchConnection
 						}));
@@ -467,6 +490,7 @@ export default function createOrGetOrModifyOrDeleteMany(
 						}));
 					} else if (action === ACTION.DELETE) {
 						responseArray.push(deleteDocument({
+							boolReturnDocument,
 							id: path,
 							writeToCollectionBranchConnection
 						}));
@@ -555,6 +579,10 @@ export default function createOrGetOrModifyOrDeleteMany(
 				}
 			} // try ... catch
 		} // for
+
+		// TODO, don't do this when all actions are GET?
+		runWithExplorerWrite(() => writeToCollectionBranchConnection.refresh());
+
 		return {
 			body: responseArray,
 			contentType: 'text/json;charset=utf-8',

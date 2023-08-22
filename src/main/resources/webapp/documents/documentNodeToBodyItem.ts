@@ -35,7 +35,7 @@ export interface ResponseItem {
 	action?: 'create' | 'get' | 'modify' | 'delete' // Only in bulk
 	id?: string // Not on failed create
 	error?: string
-	message?: string
+	// message?: string // NOTE: Currently not in use
 	document?: Record<string, unknown>
 	// documentTypeId?: string
 	// name?: string
