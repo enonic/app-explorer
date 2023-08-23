@@ -2,29 +2,31 @@ import type {
 	BooleanFilter,
 	Filter,
 	QueryDsl,
-	QueryNodeParams,
+	// QueryNodeParams,
 	SortDsl
 } from '@enonic-types/lib-node';
-import type { Headers } from '@enonic-types/lib-explorer/Request.d';
-import type { QueryFilters } from '@enonic-types/lib-explorer';
+// import type { Headers } from '@enonic-types/lib-explorer/Request.d';
+// import type { QueryFilters } from '@enonic-types/lib-explorer';
 import type { DocumentNode } from '/lib/explorer/types/Document';
 import type { Request } from '../../types/Request';
 
 
 import {
 	COLLECTION_REPO_PREFIX,
+	FieldPath,
 	NodeType,
 	Principal,
 	Role
 } from '@enonic/explorer-utils';
 import {
-	array,
+	// array,
 	forceArray,
-	string
+	// string
 } from '@enonic/js-utils';
 // import { includes as arrayIncludes } from '@enonic/js-utils/array/include'; // TODO Not export in @enonic/js-utils yet?
 import { isBooleanFilter } from '@enonic/js-utils/storage/query/filter/isBooleanFilter';
 // import lcKeys from '@enonic/js-utils/object/lcKeys';
+import { startsWith } from '@enonic/js-utils/string/startsWith';
 import { toStr } from '@enonic/js-utils/value/toStr';
 //import {get as getCollection} from '/lib/explorer/collection/get';
 import { connect } from '/lib/explorer/repo/connect';
@@ -35,7 +37,7 @@ import documentNodeToBodyItem from './documentNodeToBodyItem';
 
 
 // const {includes: arrayIncludes} = array;
-const {startsWith} = string;
+// const {startsWith} = string;
 
 
 export type QueryRequest = Request<{
@@ -72,6 +74,52 @@ interface QueryResponse {
 	},
 	contentType?: string // Not needed, when no content aka no body.
 	status: number
+}
+
+function replaceShortcutsInFilter(filter: Filter) {
+	// log.debug('replaceShortcutsInFilter:%s', toStr(filter));
+	if (filter['boolean']) {
+		['filter', 'must', 'mustNot', 'should'].forEach(clause => {
+			if (filter['boolean'][clause]) {
+				if (Array.isArray(filter['boolean'][clause])) {
+					replaceShortcutsInFilters(filter['boolean'][clause]);
+				} else {
+					replaceShortcutsInFilter(filter['boolean'][clause]);
+				}
+			}
+		}); // forEach clause
+	} else if (filter['exists']) {
+		if (
+			filter['exists']['field']
+			&& startsWith(filter['exists']['field'],'_')
+			&& !startsWith(filter['exists']['field'],'_id')
+		) {
+			filter['exists']['field'] = filter['exists']['field'].replace(/^_/, `${FieldPath.META}.`)
+		}
+	} else if (filter['hasValue']) {
+		if (
+			filter['hasValue']['field']
+			&& startsWith(filter['hasValue']['field'],'_')
+			&& !startsWith(filter['hasValue']['field'],'_id')
+		) {
+			filter['hasValue']['field'] = filter['hasValue']['field'].replace(/^_/, `${FieldPath.META}.`)
+		}
+	} else if (filter['notExists']) {
+		if (
+			filter['notExists']['field']
+			&& startsWith(filter['notExists']['field'],'_')
+			&& !startsWith(filter['notExists']['field'],'_id')
+		) {
+			filter['notExists']['field'] = filter['notExists']['field'].replace(/^_/, `${FieldPath.META}.`)
+		}
+	}
+}
+
+function replaceShortcutsInFilters(filters: Filter[]) {
+	// log.debug('replaceShortcutsInFilters:%s', toStr(filters));
+	for (let i = 0; i < filters.length; i++) {
+		replaceShortcutsInFilter(filters[i]);
+	} // for
 }
 
 export default function query(
@@ -163,37 +211,40 @@ export default function query(
 			contentType: 'text/json;charset=utf-8',
 			status: HTTP_RESPONSE_STATUS_CODES.BAD_REQUEST
 		};
-	} else {
-		if (!filters['boolean']) {
-			filters['boolean'] = {};
-		}
-		if (!(filters as BooleanFilter).boolean.must) {
-			(filters as BooleanFilter).boolean.must = [];
-		} else if (!Array.isArray((filters as BooleanFilter).boolean.should)) {
-			(filters as BooleanFilter).boolean.must = [(filters as BooleanFilter).boolean.must] as Filter[];
-		}
-		((filters as BooleanFilter).boolean.must as Filter[]).push({
-			hasValue: {
-				field: '_nodeType',
-				values: [NodeType.DOCUMENT]
-			}
-		});
-		//log.info(`idParam:${toStr(idParam)}`);
-		// if (idParam) {
-		// 	if (!filters.ids) {
-		// 		//@ts-ignore
-		// 		filters.ids = {};
-		// 	}
-		// 	if(!filters.ids.values) {
-		// 		filters.ids.values = [];
-		// 	}
-		// 	forceArray(idParam).forEach((id) => {
-		// 		filters.ids.values.push(id);
-
-		// 	});
-		// }
-		// log.debug('filters:%s', toStr(filters));
 	}
+
+	if (!filters['boolean']) {
+		filters['boolean'] = {};
+	}
+	if (!(filters as BooleanFilter).boolean.must) {
+		(filters as BooleanFilter).boolean.must = [];
+	} else if (!Array.isArray((filters as BooleanFilter).boolean.must)) {
+		(filters as BooleanFilter).boolean.must = [(filters as BooleanFilter).boolean.must] as Filter[];
+	}
+
+	replaceShortcutsInFilters((filters as BooleanFilter).boolean.must as Filter[]);
+
+	((filters as BooleanFilter).boolean.must as Filter[]).push({
+		hasValue: {
+			field: '_nodeType',
+			values: [NodeType.DOCUMENT]
+		}
+	});
+	//log.info(`idParam:${toStr(idParam)}`);
+	// if (idParam) {
+	// 	if (!filters.ids) {
+	// 		//@ts-ignore
+	// 		filters.ids = {};
+	// 	}
+	// 	if(!filters.ids.values) {
+	// 		filters.ids.values = [];
+	// 	}
+	// 	forceArray(idParam).forEach((id) => {
+	// 		filters.ids.values.push(id);
+
+	// 	});
+	// }
+	// log.debug('filters:%s', toStr(filters));
 
 	const safeCount = Math.max(1, // Don't allow < 1
 		Math.min(100, // Don't allow > 100
