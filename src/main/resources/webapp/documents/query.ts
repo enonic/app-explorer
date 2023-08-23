@@ -152,6 +152,7 @@ export default function query(
 		sort = 'score DESC',
 		start = 0,
 	} = queryNodeParams // as QueryNodeParams;
+	// log.debug('filters:%s', toStr(filters));
 
 	if (filters && !isBooleanFilter(filters)) {
 		log.error('The root filter must be of type boolean! queryNodeParams:%s', toStr(queryNodeParams));
@@ -169,7 +170,7 @@ export default function query(
 		if (!(filters as BooleanFilter).boolean.must) {
 			(filters as BooleanFilter).boolean.must = [];
 		} else if (!Array.isArray((filters as BooleanFilter).boolean.should)) {
-			(filters as BooleanFilter).boolean.must = [(filters as BooleanFilter).boolean.should] as Filter[];
+			(filters as BooleanFilter).boolean.must = [(filters as BooleanFilter).boolean.must] as Filter[];
 		}
 		((filters as BooleanFilter).boolean.must as Filter[]).push({
 			hasValue: {
