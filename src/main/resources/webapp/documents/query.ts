@@ -5,8 +5,6 @@ import type {
 	// QueryNodeParams,
 	SortDsl
 } from '@enonic-types/lib-node';
-// import type { Headers } from '@enonic-types/lib-explorer/Request.d';
-// import type { QueryFilters } from '@enonic-types/lib-explorer';
 import type { DocumentNode } from '/lib/explorer/types/Document';
 import type { Request } from '../../types/Request';
 
@@ -19,25 +17,17 @@ import {
 	Role
 } from '@enonic/explorer-utils';
 import {
-	// array,
 	forceArray,
-	// string
 } from '@enonic/js-utils';
-// import { includes as arrayIncludes } from '@enonic/js-utils/array/include'; // TODO Not export in @enonic/js-utils yet?
 import { isBooleanFilter } from '@enonic/js-utils/storage/query/filter/isBooleanFilter';
-// import lcKeys from '@enonic/js-utils/object/lcKeys';
 import { startsWith } from '@enonic/js-utils/string/startsWith';
+import { isString } from '@enonic/js-utils/value/isString';
 import { toStr } from '@enonic/js-utils/value/toStr';
-//import {get as getCollection} from '/lib/explorer/collection/get';
 import { connect } from '/lib/explorer/repo/connect';
 import { hasRole } from '/lib/xp/auth';
 import { HTTP_RESPONSE_STATUS_CODES } from '../constants';
 import authorize from './authorize';
 import documentNodeToBodyItem from './documentNodeToBodyItem';
-
-
-// const {includes: arrayIncludes} = array;
-// const {startsWith} = string;
 
 
 export type QueryRequest = Request<{
@@ -76,10 +66,10 @@ interface QueryResponse {
 	status: number
 }
 
-function replaceShortcutsInFilter(filter: Filter) {
+function replaceShortcutsInFilter(filter: Filter): void {
 	// log.debug('replaceShortcutsInFilter:%s', toStr(filter));
 	if (filter['boolean']) {
-		['filter', 'must', 'mustNot', 'should'].forEach(clause => {
+		['must', 'mustNot', 'should'].forEach(clause => {
 			if (filter['boolean'][clause]) {
 				if (Array.isArray(filter['boolean'][clause])) {
 					replaceShortcutsInFilters(filter['boolean'][clause]);
@@ -88,31 +78,20 @@ function replaceShortcutsInFilter(filter: Filter) {
 				}
 			}
 		}); // forEach clause
-	} else if (filter['exists']) {
-		if (
-			filter['exists']['field']
-			&& startsWith(filter['exists']['field'],'_')
-			&& !startsWith(filter['exists']['field'],'_id')
-		) {
-			filter['exists']['field'] = filter['exists']['field'].replace(/^_/, `${FieldPath.META}.`)
-		}
-	} else if (filter['hasValue']) {
-		if (
-			filter['hasValue']['field']
-			&& startsWith(filter['hasValue']['field'],'_')
-			&& !startsWith(filter['hasValue']['field'],'_id')
-		) {
-			filter['hasValue']['field'] = filter['hasValue']['field'].replace(/^_/, `${FieldPath.META}.`)
-		}
-	} else if (filter['notExists']) {
-		if (
-			filter['notExists']['field']
-			&& startsWith(filter['notExists']['field'],'_')
-			&& !startsWith(filter['notExists']['field'],'_id')
-		) {
-			filter['notExists']['field'] = filter['notExists']['field'].replace(/^_/, `${FieldPath.META}.`)
-		}
+		return;
 	}
+	['exists', 'hasValue', 'notExists'].forEach(expression => {
+		if (filter[expression]) {
+			if (
+				filter[expression].field
+				&& startsWith(filter[expression].field,'_')
+				&& !startsWith(filter[expression].field,'_id')
+			) {
+				filter[expression].field = filter[expression].field.replace(/^_/, `${FieldPath.META}.`)
+			}
+		}
+		return;
+	});
 }
 
 function replaceShortcutsInFilters(filters: Filter[]) {
@@ -120,6 +99,65 @@ function replaceShortcutsInFilters(filters: Filter[]) {
 	for (let i = 0; i < filters.length; i++) {
 		replaceShortcutsInFilter(filters[i]);
 	} // for
+}
+
+function replaceShortcutsInQueryDslArray(dslArray: QueryDsl[]): void {
+	for (let i = 0; i < dslArray.length; i++) {
+		replaceShortcutsInQueryDsl(dslArray[i]);
+	} // for
+}
+
+function replaceShortcutsInQueryDsl(dsl: QueryDsl): void {
+	if (dsl['boolean']) {
+		// log.debug('replaceShortcutsInQueryDsl boolean:%s', toStr(dsl['boolean']));
+		['filter', 'must', 'mustNot', 'should'].forEach(clause => {
+			if (dsl['boolean'][clause]) {
+				if (Array.isArray(dsl['boolean'][clause])) {
+					replaceShortcutsInQueryDslArray(dsl['boolean'][clause]);
+				} else {
+					replaceShortcutsInQueryDsl(dsl['boolean'][clause]);
+				}
+			}
+		}); // forEach clause
+		return;
+	}
+	['exists', 'in', 'like', 'pathMatch', 'range', 'term'].forEach(expression => {
+		if (dsl[expression]) {
+			// log.debug('replaceShortcutsInQueryDsl %s:%s', expression, toStr(dsl[expression]));
+			if (
+				dsl[expression].field
+				&& startsWith(dsl[expression].field,'_')
+				&& !startsWith(dsl[expression].field,'_id')
+			) {
+				dsl[expression].field = dsl[expression].field.replace(/^_/, `${FieldPath.META}.`);
+			}
+		}
+		return;
+	});
+	['fulltext', 'ngram', 'stemmed'].forEach(expression => {
+		if (dsl[expression]?.fields) {
+			// log.debug('replaceShortcutsInQueryDsl %s:%s', expression, toStr(dsl[expression]));
+			for (let i = 0; i < dsl[expression].fields.length; i++) {
+				const field = dsl[expression].fields[i];
+				if (
+					startsWith(field,'_')
+					&& !startsWith(field,'_id')
+				) {
+					dsl[expression].fields[i] = field.replace(/^_/, `${FieldPath.META}.`);
+				}
+			}
+		}
+		return;
+	});
+}
+
+function replaceShortcutsInQuery(query: string|QueryDsl): void {
+	if (isString(query)) {
+		return;
+	}
+	if (query) {
+		replaceShortcutsInQueryDsl(query);
+	}
 }
 
 export default function query(
@@ -268,8 +306,10 @@ export default function query(
 	const readFromCollectionBranchConnection = connect(connectParams);
 	//log.debug('connected using:%s', toStr(connectParams));
 
+	replaceShortcutsInQuery(query);
+
 	const queryParams = {
-		count,
+		count: safeCount,
 		filters,
 		query,
 		sort,
