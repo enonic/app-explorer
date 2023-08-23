@@ -708,7 +708,7 @@ const JSON_SCHEMA_QUERY_DOCUMENTS = {
 				"default": 10,
 			},
 			"filters": {
-				"$ref": "#/$defs/oneOrMoreFilters"
+				"$ref": "#/$defs/booleanFilters" // The root filter must be a BooleanFilter
 			},
 			"query": {
 				"$ref": "#/$defs/oneOfQueries",
