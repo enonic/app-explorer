@@ -219,6 +219,9 @@ const JSON_SCHEMA_QUERY_DOCUMENTS = {
 							"should": {"$ref": "#/$defs/oneOrMoreFilters"}
 						}
 					}
+				},
+				"default": {
+					boolean: {}
 				}
 			},
 			"matchAll": {
