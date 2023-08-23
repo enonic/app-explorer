@@ -527,16 +527,38 @@ export default function DocumentsApiDoc() {
 			}}
 			pattern={`${prefix}/query`}
 			responses={[{
-				status: 200,
 				body: {
-					count: 0,
-					total: 0,
+					count: 1,
+					total: 1,
 					hits: [{
-						id: '1',
 						collection: 'collectionName',
-						document: {}
+						collector: {
+							id: 'com.enonic.app.explorer:documentRestApi',
+							version: '2.0.0'
+						},
+						createdTime:"2023-08-21T11:31:38.141Z",
+						document: {
+							key: 'value'
+						},
+						documentType: 'documentTypeName',
+						id: '1',
+						language: 'en',
+						modifiedTime:"2023-08-22T11:31:38.141Z",
+						status: 200,
+						stemmingLanguage: 'en',
+						valid: true
 					}]
-				}
+				},
+				// contentType: 'text/json;charset=utf-8',
+				status: 200,
+			},{
+				body: {
+					error: 'Something went wrong when trying to query'
+				},
+				// contentType: 'text/json;charset=utf-8',
+				status: 500
+			},{
+				status: 401
 			}]}
 		/>
 

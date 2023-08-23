@@ -956,19 +956,23 @@ export default function Action({
 							},i) => <tr key={i}>
 								<th>{status}</th>
 								<td>application/json;charset=UTF-8</td>
-								<td><Segment>
-									<TypedReactJson
-										enableClipboard={false}
-										displayArrayKey={false}
-										displayDataTypes={false}
-										displayObjectSize={false}
-										indentWidth={2}
-										name={null}
-										quotesOnKeys={false}
-										sortKeys={true}
-										src={body}
-									/>
-								</Segment></td>
+								<td>{
+									body
+									? <Segment>
+										<TypedReactJson
+											enableClipboard={false}
+											displayArrayKey={false}
+											displayDataTypes={false}
+											displayObjectSize={false}
+											indentWidth={2}
+											name={null}
+											quotesOnKeys={false}
+											sortKeys={true}
+											src={body}
+										/>
+									</Segment>
+									: null
+								}</td>
 							</tr>)}
 						</tbody>
 					</table>

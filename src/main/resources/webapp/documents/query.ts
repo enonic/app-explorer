@@ -44,10 +44,39 @@ export type QueryRequest = Request<{
 	collectionName?: string
 }>
 
+interface QueryHit {
+	id: string
+	document: Record<string, unknown>
+	// status: 200
+	// Metadata:
+	collection: string
+	createdTime: Date | string
+	documentType?: string
+	language?: string
+	modifiedTime?: Date | string // Optional, because may never have been modified
+	stemmingLanguage?: string
+	valid?: boolean // TODO: Can validation be skipped? If so it might be missing
+}
+
+interface QueryResponse {
+	body?: { // Optional, because no body when auth fails
+		error?: string
+	}|{
+		count: number
+		hits: ({
+			id: string
+			error: string // When id in index, but get fails? Shouldn't happen.
+			status: number
+		}|QueryHit)[]
+		total: number
+	},
+	contentType?: string // Not needed, when no content aka no body.
+	status: number
+}
 
 export default function query(
 	request: QueryRequest
-) {
+): QueryResponse {
 	// log.debug('query request:%s', toStr(request));
 	const {
 		body: bodyJson,
@@ -232,12 +261,16 @@ export default function query(
 	// log.debug('getRes:%s', getRes); // Without toStr for running jest
 	// log.info(`getRes:${toStr(getRes)}`);
 
-	const body = forceArray(getRes).map((documentNode) => {
-		return documentNodeToBodyItem({
-			documentNode,
-			includeDocument: boolReturnDocument
-		});
-	});
+	const body = {
+		count: queryRes.count,
+		hits: forceArray(getRes).map((documentNode) => {
+			return documentNodeToBodyItem({
+				documentNode,
+				includeDocument: boolReturnDocument
+			}) as QueryHit;
+		}),
+		total: queryRes.total
+	};
 	// log.debug('body:%s', toStr(body));
 
 	return {
