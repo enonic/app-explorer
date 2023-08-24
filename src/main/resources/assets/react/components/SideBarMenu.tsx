@@ -149,9 +149,6 @@ export default function SideBarMenu({
 			<Menu.Item
 				active={location.pathname === '/api'}
 				as={Link}
-				onClick={() => {
-					setSideBarVisible(false);
-				}}
 				to='/api'
 			><Icon name='plug' style={ICON_STYLE}/> API</Menu.Item>
 			{[
