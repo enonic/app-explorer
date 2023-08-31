@@ -355,7 +355,6 @@ export function Collections(props :{
 											fields={fieldsObj}
 											loading={isLoading}
 											locales={locales}
-											licenseValid={licenseValid}
 											_name={collectionName}
 											afterClose={() => {
 												//console.debug('NewOrEditCollectionModal afterClose');
@@ -364,8 +363,11 @@ export function Collections(props :{
 											servicesBaseUrl={servicesBaseUrl}
 											setLicensedTo={setLicensedTo}
 											setLicenseValid={setLicenseValid}
+											showUploadLicense={
+												!licenseValid
+												&& index > 2 // This means it's allowed to edit collection 3, but not number 4
+											}
 											siteOptions={siteOptions}
-											totalNumberOfCollections={queryCollectionsGraph.total}
 										/>
 										{/*anyReindexTaskWithoutCollectionId
 											? <Popup
@@ -485,7 +487,6 @@ export function Collections(props :{
 							doCollect: false,
 							language: ''
 						} as CollectionFormValues}
-						licenseValid={licenseValid}
 						locales={locales}
 						afterClose={() => {
 							//console.debug('NewOrEditCollectionModal afterClose');
@@ -494,8 +495,11 @@ export function Collections(props :{
 						servicesBaseUrl={servicesBaseUrl}
 						setLicensedTo={setLicensedTo}
 						setLicenseValid={setLicenseValid}
+						showUploadLicense={
+							!licenseValid
+							&& queryCollectionsGraph.total > 2 // This means it will be allowed to create collection 3, but not number 4
+						}
 						siteOptions={siteOptions}
-						totalNumberOfCollections={queryCollectionsGraph.total}
 					/>
 				</Dimmer.Dimmable>
 			</Flex.Item>
@@ -508,6 +512,12 @@ export function Collections(props :{
 					collectionNames={queryCollectionsGraph.hits.map(({_name}) => _name)}
 					servicesBaseUrl={servicesBaseUrl}
 					setCopyModalCollectionId={setCopyModalCollectionId}
+					setLicensedTo={setLicensedTo}
+					setLicenseValid={setLicenseValid}
+					showUploadLicense={
+						!licenseValid
+						&& queryCollectionsGraph.total > 2 // This means it will be allowed to copy to collection 3, but not number 4
+					}
 				/>
 				: null
 		}

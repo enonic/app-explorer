@@ -21,13 +21,11 @@ type NewOrEditInterfaceModalProps = {
 	collectionOptions: DropdownItemProps[]
 	fieldNameToValueTypesState: FieldNameToValueTypes
 	interfaceNamesObj: InterfaceNamesObj
-	licenseValid: boolean
 	servicesBaseUrl: string
 	setLicensedTo: SetLicensedToFunction
 	setLicenseValid: SetLicenseValidFunction
 	stopWordOptions: DropdownItemProps[]
 	thesauriOptions: DropdownItemProps[]
-	total: number
 	// Optional
 	_id?: string
 	_name?: string
@@ -36,6 +34,7 @@ type NewOrEditInterfaceModalProps = {
 	defaultOpen?: boolean,
 	disabled?: boolean
 	loading?: boolean
+	showUploadLicense?: boolean
 }
 
 
@@ -45,13 +44,11 @@ export function NewOrEditInterfaceModal(props: NewOrEditInterfaceModalProps) {
 		collectionOptions,
 		fieldNameToValueTypesState,
 		interfaceNamesObj,
-		licenseValid,
 		servicesBaseUrl,
 		setLicensedTo,
 		setLicenseValid,
 		stopWordOptions,
 		thesauriOptions,
-		total,
 		// Optional
 		_id, // nullable
 		_name,
@@ -60,6 +57,7 @@ export function NewOrEditInterfaceModal(props: NewOrEditInterfaceModalProps) {
 		defaultOpen = false,
 		disabled = false,
 		loading = false,
+		showUploadLicense = true,
 	} = props;
 	//console.debug('initialValues', initialValues);
 
@@ -115,10 +113,13 @@ export function NewOrEditInterfaceModal(props: NewOrEditInterfaceModalProps) {
 				}
 			/>
 		}
-	>{licenseValid
-		|| (!_id && total <= 1) // Allowed to create interface number 2, but not number 3
-		|| (_id && total <= 2) // Allowed to edit interface number 2, but not number 3
-			? <>
+	>{showUploadLicense
+		? <UploadLicense
+			servicesBaseUrl={servicesBaseUrl}
+			setLicensedTo={setLicensedTo}
+			setLicenseValid={setLicenseValid}
+		/>
+		: <>
 				<Modal.Header>{header}</Modal.Header>
 				<NewOrEditInterface
 					_id={_id}
@@ -131,10 +132,6 @@ export function NewOrEditInterfaceModal(props: NewOrEditInterfaceModalProps) {
 					thesauriOptions={thesauriOptions}
 				/>
 			</>
-			: <UploadLicense
-				servicesBaseUrl={servicesBaseUrl}
-				setLicensedTo={setLicensedTo}
-				setLicenseValid={setLicenseValid}
-			/>}
+	}
 	</Modal>;
 } // NewOrEditInterfaceModal

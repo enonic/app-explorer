@@ -229,20 +229,28 @@ export function Interfaces({
 									collectionOptions={collectionOptions}
 									fieldNameToValueTypesState={fieldNameToValueTypesState}
 									interfaceNamesObj={interfaceNamesObj/* Currently not allowed to edit _name anyway */}
-									licenseValid={licenseValid}
 									loading={isLoading}
 									servicesBaseUrl={servicesBaseUrl}
 									setLicensedTo={setLicensedTo}
 									setLicenseValid={setLicenseValid}
+									showUploadLicense={
+										!licenseValid
+										&& index > 1 // Allowed to edit interface number 2, but not number 3
+									}
 									stopWordOptions={stopWordOptions}
 									thesauriOptions={thesauriOptions}
-									total={interfacesTotal}
 								/>
 								<CopyModal
 									afterClose={memoizedUpdateInterfacesCallback}
 									loading={isLoading}
 									name={_name}
 									servicesBaseUrl={servicesBaseUrl}
+									setLicensedTo={setLicensedTo}
+									setLicenseValid={setLicenseValid}
+									showUploadLicense={
+										!licenseValid
+										&& interfacesTotal > 2 // Allowed to copy to interface number 2, but not number 3
+									}
 								/>
 								{showDelete ? <DeleteModal
 									afterClose={memoizedUpdateInterfacesCallback}
@@ -265,14 +273,16 @@ export function Interfaces({
 				defaultOpen={newInterfaceModalOpen}
 				fieldNameToValueTypesState={fieldNameToValueTypesState}
 				interfaceNamesObj={interfaceNamesObj}
-				licenseValid={licenseValid}
 				loading={isLoading}
 				servicesBaseUrl={servicesBaseUrl}
 				setLicensedTo={setLicensedTo}
 				setLicenseValid={setLicenseValid}
+				showUploadLicense={
+					!licenseValid
+					&& interfacesTotal > 2 // Allowed to create interface number 2, but not number 3
+				}
 				stopWordOptions={stopWordOptions}
 				thesauriOptions={thesauriOptions}
-				total={interfacesTotal}
 			/>
 		</Flex.Item>
 	</Flex>;
