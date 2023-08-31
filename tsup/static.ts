@@ -3,7 +3,7 @@ import type { Options } from '.';
 
 import CopyWithHashPlugin from '@enonic/esbuild-plugin-copy-with-hash';
 import GlobalsPlugin from 'esbuild-plugin-globals';
-import manifestPlugin from 'esbuild-plugin-manifest';
+import EnonicManifestTsupPlugin from '@enonic/tsup-plugin-manifest';
 import { globSync } from 'glob';
 import {
 	DIR_DST,
@@ -15,7 +15,6 @@ export default function buildStaticConfig(): Options {
 	const DIR_DST_STATIC = `${DIR_DST}/static`;
 	const GLOB_EXTENSIONS_STATIC = '{tsx,ts,jsx,js}';
 	const FILES_STATIC = globSync(`${DIR_SRC_STATIC}/**/*.${GLOB_EXTENSIONS_STATIC}`);
-	const manifestObj = {};
 
 	const entry = {};
 	for (const element of FILES_STATIC) {
@@ -46,17 +45,18 @@ export default function buildStaticConfig(): Options {
 				react: 'React',
 				'react-dom': 'ReactDOM',
 			}),
-			manifestPlugin({
+			EnonicManifestTsupPlugin({
 				generate: (entries) => {// Executed once per format
 					// print(entries, { maxItems: Infinity });
+					const newEntries = {}
 					Object.entries(entries).forEach(([k,v]) => {
 						const ext = v.split('.').pop() as string;
 						const parts = k.replace(`${DIR_SRC_STATIC}/`, '').split('.');
 						parts.pop();
 						parts.push(ext);
-						manifestObj[parts.join('.')] = v.replace(`${DIR_DST_STATIC}/`, '');
+						newEntries[parts.join('.')] = v.replace(`${DIR_DST_STATIC}/`, '');
 					});
-					return manifestObj;
+					return newEntries;
 				}
 			}),
 		],

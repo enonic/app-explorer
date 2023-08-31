@@ -1642,6 +1642,13 @@
     set-value "^4"
     traverse "^0"
 
+"@enonic/tsup-plugin-manifest@^0.0.1":
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/@enonic/tsup-plugin-manifest/-/tsup-plugin-manifest-0.0.1.tgz#156974b4f896ddc02ee17e3e19c4a44ff034d189"
+  integrity sha512-AL3X7xm6S8iE6bDbFP4Fnb9pOUembe/YpiAVw5/Dfj494ckiT42eeRb3HEFEFyiWrRjqP5weGb18t+sqL+GZfw==
+  dependencies:
+    colorette "^2.0.20"
+
 "@esbuild/android-arm64@0.17.19":
   version "0.17.19"
   resolved "https://registry.yarnpkg.com/@esbuild/android-arm64/-/android-arm64-0.17.19.tgz#bafb75234a5d3d1b690e7c2956a599345e84a2fd"
@@ -5002,11 +5009,6 @@ esbuild-plugin-globals@^0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/esbuild-plugin-globals/-/esbuild-plugin-globals-0.2.0.tgz#e37786a5e23e22e5da5f4c1e84d6f0c66f306565"
   integrity sha512-y+6utQVWrETQWs0J8EGLV5gEOP59mmjX+fKWoQHn4TYwFMaj0FxQYflc566tHuokBCzl+uNW2iIlM1o1jfNy6w==
-
-esbuild-plugin-manifest@^0.6.0:
-  version "0.6.0"
-  resolved "https://registry.yarnpkg.com/esbuild-plugin-manifest/-/esbuild-plugin-manifest-0.6.0.tgz#48d5ecffbf9bad62b80dc1564647c31041db799e"
-  integrity sha512-Tm+bq9hqtkV0Zkrk/3YE6XxSkUowEqDBVD1McqVX0OKtlpW19QnXO/E4QiPyJY9Ci+CmKqAhoKdZ5Rva20JL1Q==
 
 esbuild-plugin-polyfill-node@^0.2.0:
   version "0.2.0"
