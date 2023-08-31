@@ -20,7 +20,7 @@ import * as React from 'react';
 import {Button, Icon, Modal, Popup} from 'semantic-ui-react';
 import {Collection} from './Collection';
 import HoverButton from '../components/buttons/HoverButton';
-import {UploadLicense} from '../components/UploadLicense';
+import { UploadLicense } from '../components/UploadLicense';
 
 
 export function NewOrEditCollectionModal({
@@ -31,13 +31,11 @@ export function NewOrEditCollectionModal({
 	contentTypeOptions,
 	initialValues,
 	fields,
-	licenseValid,
 	locales,
 	servicesBaseUrl,
 	setLicensedTo,
 	setLicenseValid,
 	siteOptions,
-	totalNumberOfCollections,
 	// Optional
 	_name,
 	afterClose = () => {/**/},
@@ -45,6 +43,7 @@ export function NewOrEditCollectionModal({
 	defaultOpen = false,
 	disabled = false,
 	loading = false,
+	showUploadLicense = true,
 }: {
 	// Required
 	collections: QueryCollectionsHits
@@ -53,13 +52,11 @@ export function NewOrEditCollectionModal({
 	contentTypeOptions: ContentTypeOptions
 	fields: Fields
 	initialValues: CollectionFormValues
-	licenseValid: boolean
 	locales: Locales
 	servicesBaseUrl: string
 	setLicensedTo: SetLicensedToFunction
 	setLicenseValid: SetLicenseValidFunction
 	siteOptions: SiteOptions
-	totalNumberOfCollections: number
 	// Optional
 	_name?: string
 	afterClose?: () => void
@@ -67,8 +64,8 @@ export function NewOrEditCollectionModal({
 	defaultOpen?: boolean
 	disabled?: boolean
 	loading?: boolean
+	showUploadLicense?: boolean
 }) {
-	//console.debug('totalNumberOfCollections',totalNumberOfCollections);
 	const [state, setState] = React.useState({
 		open: defaultOpen
 	});
@@ -124,13 +121,13 @@ export function NewOrEditCollectionModal({
 				</Button>
 		}
 	>{
-		(
-			licenseValid
-			|| _name
-				? totalNumberOfCollections <= 3 // This means it will be allowed to edit collection 3, but not number 4
-				: totalNumberOfCollections <= 2 // This means it will be allowed to create collection 3, but not number 4
-		)
-			? <>
+		showUploadLicense
+			? <UploadLicense
+				servicesBaseUrl={servicesBaseUrl}
+				setLicensedTo={setLicensedTo}
+				setLicenseValid={setLicenseValid}
+			/>
+			: <>
 				<Modal.Header>{_name ? `Edit collection ${_name}`: 'New collection'}</Modal.Header>
 				<Collection
 					collections={collections}
@@ -145,10 +142,6 @@ export function NewOrEditCollectionModal({
 					siteOptions={siteOptions}
 				/>
 			</>
-			: <UploadLicense
-				servicesBaseUrl={servicesBaseUrl}
-				setLicensedTo={setLicensedTo}
-				setLicenseValid={setLicenseValid}
-			/>}
+	}
 	</Modal>;
 } // NewOrEditModal
