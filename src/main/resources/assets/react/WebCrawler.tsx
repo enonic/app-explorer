@@ -21,7 +21,7 @@ import {useWebCrawlerState} from './useWebCrawlerState';
 import {DEFAULT_UA} from '../../tasks/webcrawl/constants';
 
 
-export const Collector = React.forwardRef(({
+export const CollectorForm = React.forwardRef(({
 	collectorConfig,
 	//explorer,
 	setCollectorConfig,
@@ -144,4 +144,4 @@ export const Collector = React.forwardRef(({
 		/>
 	</Form>;
 }); // Collector
-Collector.displayName = 'Collector';
+CollectorForm.displayName = 'Collector';

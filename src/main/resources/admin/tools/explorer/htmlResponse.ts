@@ -297,7 +297,7 @@ services: {}, // Workaround for i18nUrl BUG
 			${Object.keys(collectorsObj).map((collectorId) => `collectorComponents['${collectorId}'] = ${collectorsObj[collectorId].componentPath}`)}
 			propsObj.collectorComponents = collectorComponents;
 			const root = ReactDOM.createRoot(document.getElementById('${ID_REACT_EXPLORER_CONTAINER}'));
-			root.render(React.createElement(window.LibExplorer.App, propsObj));
+			root.render(React.createElement(window.Explorer.App, propsObj));
 		</script>
 	</body>
 </html>`,
