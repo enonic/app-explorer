@@ -671,7 +671,7 @@ const CLIENT_ES_CONFIG = {
 		filename: '[name].esm.js',
 		//library: 'LIB', // If you try to load to files with the same library name the latter will overwrite the first!!!
 
-		library: 'Lib[name]',
+		library: '[name]',
 		// Library name base (Libreact/Explorer) must be a valid identifier when using a var declaring library type.
 		// Either use a valid identifier (e. g. Libreact_Explorer) or use a different library type
 		// (e. g. 'type: "global"', which assign a property on the global scope instead of declaring a variable).
