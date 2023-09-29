@@ -24,8 +24,6 @@ import {list as listTasks} from '/lib/xp/task';
 
 const ID_REACT_EXPLORER_CONTAINER = 'reactExplorerContainer';
 
-const EXPLORER_URL = getToolUrl(app.name, 'explorer');
-
 
 // @ts-ignore
 // const {currentTimeMillis} = Java.type('java.lang.System') as {
@@ -121,7 +119,7 @@ export function htmlResponse({
 	}
 
 	const propsObj: Partial<ExplorerProps> = {
-		basename: EXPLORER_URL,
+		basename: getToolUrl(app.name, 'explorer'), // Fix #873 getToolUrl must be run on each request, because of vhost
 		licensedTo: getIssuedTo(),
 		licenseValid: isLicenseValid(),
 		servicesBaseUrl: serviceUrl({service: ''}),
