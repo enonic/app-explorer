@@ -131,6 +131,7 @@ export function overrideable(request: InterfaceRequest, fn = authorize): Respons
 	const { // HTTP/2 uses lowercased header keys
 		[HTTP_HEADERS.EXPLORER_INTERFACE_NAME]: interfaceName,
 		'explorer-log-query': logQueryHeader, // '1'
+		'explorer-log-query-result': logQueryResultHeader, // '1'
 		'explorer-log-synonyms-query': logSynonymsQueryHeader, // '1'
 		'explorer-log-synonyms-query-result': logSynonymsQueryResultHeader // '1'
 	} = lcKeys(request.headers) as Headers;
@@ -155,6 +156,7 @@ export function overrideable(request: InterfaceRequest, fn = authorize): Respons
 		allowedInterfaces,
 		interfaceName,
 		logQuery: logQueryHeader === '1',
+		logQueryResult: logQueryResultHeader === '1',
 		logSynonymsQuery: logSynonymsQueryHeader === '1',
 		logSynonymsQueryResult: logSynonymsQueryResultHeader === '1'//,
 		//query
