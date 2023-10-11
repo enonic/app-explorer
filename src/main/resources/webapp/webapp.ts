@@ -21,7 +21,7 @@ import {
 	GETTER_ROOT,
 } from '../constants';
 import {
-	DOCUMENT_REST_API_VERSION,
+	DOCUMENT_REST_API_PATH,
 	HTTP_RESPONSE_STATUS_CODES
 } from './constants';
 import {
@@ -41,9 +41,10 @@ import immutableGetter from './immutableGetter';
 import { post as interfacePost } from './interface';
 
 
+// const LOG_LEVEL = 'info';
+
 const router = Router();
 
-// router.post('/api/graphql', (r: InterfaceRequest) => interfacePost(r));
 router.post('/api/graphql/?', (r: InterfaceRequest) => interfacePost(r));
 //router.all('/api/graphql', (r :InterfaceRequest) => listInterfaces(r)); // TODO GraphiQL instead
 
@@ -51,42 +52,33 @@ router.post('/api/graphql/?', (r: InterfaceRequest) => interfacePost(r));
 // Batch/Bulk/Many
 //──────────────────────────────────────────────────────────────────────────────
 
-// router.delete(`/api/v${DOCUMENT_REST_API_VERSION}/documents/{collectionName}`, (r: EnonicXpRequest) => deleteMany(r));
-router.delete(`/api/v${DOCUMENT_REST_API_VERSION}/documents/{collectionName}/?`, (r: EnonicXpRequest) => deleteMany(r));
+router.delete(`${DOCUMENT_REST_API_PATH}/{collectionName}/?`, (r: EnonicXpRequest) => deleteMany(r));
 
-// router.get(`/api/v${DOCUMENT_REST_API_VERSION}/documents/{collectionName}`, (r: EnonicXpRequest) => getMany(r));
-router.get(`/api/v${DOCUMENT_REST_API_VERSION}/documents/{collectionName}/?`, (r: EnonicXpRequest) => getMany(r));
+router.get(`${DOCUMENT_REST_API_PATH}/{collectionName}/?`, (r: EnonicXpRequest) => getMany(r));
 
-// router.post(`/api/v${DOCUMENT_REST_API_VERSION}/documents/{collectionName}`, (r: EnonicXpRequest) => createOrUpdateMany(r));
-router.post(`/api/v${DOCUMENT_REST_API_VERSION}/documents/{collectionName}/?`, (r: EnonicXpRequest) => createOrUpdateMany(r));
+router.post(`${DOCUMENT_REST_API_PATH}/{collectionName}/?`, (r: EnonicXpRequest) => createOrUpdateMany(r));
 
-// router.post(`/api/v${DOCUMENT_REST_API_VERSION}/documents/{collectionName}/query`, (r: EnonicXpRequest) => query(r));
-router.post(`/api/v${DOCUMENT_REST_API_VERSION}/documents/{collectionName}/query/?`, (r: EnonicXpRequest) => query(r));
+router.post(`${DOCUMENT_REST_API_PATH}/{collectionName}/query/?`, (r: EnonicXpRequest) => query(r));
 
 //──────────────────────────────────────────────────────────────────────────────
 // One/Single
 //──────────────────────────────────────────────────────────────────────────────
-// router.delete(`/api/v${DOCUMENT_REST_API_VERSION}/documents/{collectionName}/{documentId}`, (r: EnonicXpRequest) => deleteOne(r));
-router.delete(`/api/v${DOCUMENT_REST_API_VERSION}/documents/{collectionName}/{documentId}/?`, (r: EnonicXpRequest) => deleteOne(r));
+router.delete(`${DOCUMENT_REST_API_PATH}/{collectionName}/{documentId}/?`, (r: EnonicXpRequest) => deleteOne(r));
 
-// router.get(`/api/v${DOCUMENT_REST_API_VERSION}/documents/{collectionName}/{documentId}`, (r: EnonicXpRequest) => getOne(r));
-router.get(`/api/v${DOCUMENT_REST_API_VERSION}/documents/{collectionName}/{documentId}/?`, (r: EnonicXpRequest) => getOne(r));
+router.get(`${DOCUMENT_REST_API_PATH}/{collectionName}/{documentId}/?`, (r: EnonicXpRequest) => getOne(r));
 
-// router.put(`/api/v${DOCUMENT_REST_API_VERSION}/documents/{collectionName}/{documentId}`, (r: EnonicXpRequest) => put(r));
-// router.put(`/api/v${DOCUMENT_REST_API_VERSION}/documents/{collectionName}/{documentId}/`, (r: EnonicXpRequest) => put(r));
+// router.put(`${DOCUMENT_REST_API_PATH}/{collectionName}/{documentId}/?`, (r: EnonicXpRequest) => put(r));
 
 // Method PATCH isn't part of the HTTP/1.1 standard.
 // It is supported by some frameworks, but currently NOT Enonic XP, NOR lib-router:
 // https://github.com/enonic/xp/issues/9131
 // https://github.com/enonic/lib-router/issues/108
-// router.post(`/api/v${DOCUMENT_REST_API_VERSION}/documents/{collectionName}/{documentId}`, (r: EnonicXpRequest) => patch(r));
-router.post(`/api/v${DOCUMENT_REST_API_VERSION}/documents/{collectionName}/{documentId}/?`, (r: EnonicXpRequest) => patch(r));
+router.post(`${DOCUMENT_REST_API_PATH}/{collectionName}/{documentId}/?`, (r: EnonicXpRequest) => patch(r));
 
 //──────────────────────────────────────────────────────────────────────────────
 // Documentation
 //──────────────────────────────────────────────────────────────────────────────
-// router.get(`/api/v${DOCUMENT_REST_API_VERSION}/documents`, (r: EnonicXpRequest) => documentation(r));
-router.get(`/api/v${DOCUMENT_REST_API_VERSION}/documents/?`, (r: EnonicXpRequest) => documentation(r));
+router.get(`${DOCUMENT_REST_API_PATH}/?`, (r: EnonicXpRequest) => documentation(r));
 
 function respondToRootRequest(/*request: EnonicXpRequest*/) {
 	if (!(
@@ -107,7 +99,7 @@ function respondToRootRequest(/*request: EnonicXpRequest*/) {
 	<body>
 		<h1>Explorer Webapp</h1>
 		<p>Version: ${app.version}</p>
-		<p><a href="/webapp/com.enonic.app.explorer/api/v${DOCUMENT_REST_API_VERSION}/documents">/api/v${DOCUMENT_REST_API_VERSION}/documents</a></p>
+		<p><a href="/webapp/com.enonic.app.explorer${DOCUMENT_REST_API_PATH}">${DOCUMENT_REST_API_PATH}</a></p>
 		<p><a href="/webapp/com.enonic.app.explorer/api/graphql">/api/graphql</a></p>
 	</body>
 </html>`,
@@ -116,31 +108,31 @@ function respondToRootRequest(/*request: EnonicXpRequest*/) {
 	};
 }
 
-// router.get('', respondToRootRequest);
 router.get('/?', respondToRootRequest);
 
-router.all(`/${GETTER_ROOT}/{path:.+}`, (r: Request) => {
-	// log.info('request:%s', toStr(r));
+router.all(`${DOCUMENT_REST_API_PATH}/${GETTER_ROOT}/{path:.+}`, (r: Request) => {
+	// log[LOG_LEVEL]('static request:%s', toStr(r));
 	// "path": "/webapp/com.enonic.app.explorer/static/semantic-ui-css/themes/default/assets/fonts/icons.ttf",
 	// "rawPath": "/webapp/com.enonic.app.explorer/static/semantic-ui-css/themes/default/assets/fonts/icons.ttf",
 	// "url": "http://localhost:8080/webapp/com.enonic.app.explorer/static/semantic-ui-css/themes/default/assets/fonts/icons.ttf",
 	const path = r.path.split(`/${GETTER_ROOT}/`, 2)[1];
-	// log.debug('path:%s', toStr(path));
+	// log[LOG_LEVEL]('static path:%s', toStr(path)); // react/DocumentsApiDoc-6F3Z3JSZ.mjs
 
 	const immuteableUrl = getImmuteableUrl({
 		manifestPath: FILEPATH_MANIFEST_NODE_MODULES,
-		path
+		path,
+		request: r
 	});
-	// log.debug('immuteableUrl:%s', toStr(immuteableUrl));
+	// log[LOG_LEVEL]('static immuteableUrl:%s', toStr(immuteableUrl));
 
 	const postFix = immuteableUrl.split(`/${GETTER_ROOT}/`, 2)[1];
-	// log.debug('postFix:%s', toStr(postFix));
+	// log[LOG_LEVEL]('static postFix:%s', toStr(postFix));
 
 	if (postFix === 'undefined') {
 		const immuteableResponse = immutableGetter(r);
-		// log.debug('immuteableResponse:%s', toStr(immuteableResponse));
+		// log[LOG_LEVEL]('static immuteableResponse:%s', toStr(immuteableResponse));
 		if (immuteableResponse.status !== HTTP_RESPONSE_STATUS_CODES.OK) {
-			log.warning('immuteableResponse:%s url:%s', toStr(immuteableResponse), r.url); // This can happen if the file doesn't exist.
+			log.warning('static immuteableResponse:%s url:%s', toStr(immuteableResponse), r.url); // This can happen if the file doesn't exist.
 		}
 		return immuteableResponse;
 	} else {
@@ -148,15 +140,18 @@ router.all(`/${GETTER_ROOT}/{path:.+}`, (r: Request) => {
 		modifiedRequest.path = `${r.path.split(`/${GETTER_ROOT}/`, 2)[0]}/${postFix}`;
 		modifiedRequest.rawPath = `${r.rawPath.split(`/${GETTER_ROOT}/`, 2)[0]}/${postFix}`;
 		modifiedRequest.url = `${r.url.split(`/${GETTER_ROOT}/`, 2)[0]}/${postFix}`;
+		// log[LOG_LEVEL]('static modifiedRequest:%s', toStr(modifiedRequest));
+
 		const etagResponse = etagGetter(modifiedRequest);
-		// log.debug('etagResponse:%s', toStr(etagResponse));
+		// log[LOG_LEVEL]('static etagResponse:%s', toStr(etagResponse));
+
 		if (
 			etagResponse.status !== HTTP_RESPONSE_STATUS_CODES.OK
 			&& etagResponse.status !== HTTP_RESPONSE_STATUS_CODES.NOT_MODIFIED
 		) {
 			// This probably can't happen.
 			log.warning(
-				'etagResponse:%s origUrl:%s modifiedUrl:%s',
+				'static etagResponse:%s origUrl:%s modifiedUrl:%s',
 				toStr(etagResponse),
 				r.url,
 				modifiedRequest.url

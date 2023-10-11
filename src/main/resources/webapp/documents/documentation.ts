@@ -18,7 +18,6 @@ import authorize from './authorize';
 
 
 const ID_REACT_CONTAINER = 'react-container';
-const PATH_PREFIX = `/api/v${DOCUMENT_REST_API_VERSION}/documents`;
 
 
 export default function documentation(request: Request<{
@@ -33,7 +32,8 @@ export default function documentation(request: Request<{
 		contentType?: string
 		status?: number
 } {
-	// log.debug('documentation request:%s', toStr(request));
+	// log.info('documentation request:%s', toStr(request));
+
 	if (!hasRole(Role.EXPLORER_READ)) {
 		const maybeErrorResponse = authorize(
 			request,
@@ -47,6 +47,9 @@ export default function documentation(request: Request<{
 
 	const {
 		headers,
+		// host, // can be used to match vhost.host
+		// path, // can be used to match vhost.source
+		// rawPath, // can be used to match vhost.target
 		url
 	} = request;
 	const lcHeaders = lcKeys(headers) as typeof headers;
@@ -59,7 +62,8 @@ export default function documentation(request: Request<{
 	};
 	const documentsApiDocUrl = getImmuteableUrl({
 		manifestPath: FILEPATH_MANIFEST,
-		path: 'react/DocumentsApiDoc.mjs'
+		path: 'react/DocumentsApiDoc.mjs',
+		request
 	});
 	return {
 		body: `<html>
@@ -67,15 +71,18 @@ export default function documentation(request: Request<{
 		<meta name="robots" content="noindex,nofollow">
 		<script type="text/javascript" src="${getImmuteableUrl({
 			manifestPath: FILEPATH_MANIFEST_NODE_MODULES,
-			path: 'react/umd/react.development.js'
+			path: 'react/umd/react.development.js',
+			request
 		})}"></script>
 		<script type="text/javascript" src="${getImmuteableUrl({
 			manifestPath: FILEPATH_MANIFEST_NODE_MODULES,
-			path: 'react-dom/umd/react-dom.development.js'
+			path: 'react-dom/umd/react-dom.development.js',
+			request
 		})}"></script>
 		<link rel="stylesheet" type="text/css" href="${getImmuteableUrl({
 			manifestPath: FILEPATH_MANIFEST_NODE_MODULES,
-			path: 'semantic-ui-css/semantic.min.css'
+			path: 'semantic-ui-css/semantic.min.css',
+			request
 		})}">
 		<script>
 			window.__EXPLORER_API_KEY__ = '${apiKey}';
