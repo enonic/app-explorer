@@ -157,6 +157,7 @@ task webpack(type:NodeTask) {
 	script = file('node_modules/webpack-cli/bin/cli.js')
 }
 jar.dependsOn webpack
+javadoc.dependsOn webpack
 
 // task swc(type:YarnTask) {
 // 	dependsOn webpack
@@ -179,6 +180,7 @@ task tsup(
 	outputs.dir './build/resources/main' // processResources will delete the directory if this is not present
 }
 jar.dependsOn tsup
+javadoc.dependsOn tsup
 
 
 task watch(type:NodeTask) {
