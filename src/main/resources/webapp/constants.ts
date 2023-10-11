@@ -1,6 +1,7 @@
 export const AUTH_PREFIX = 'Explorer-Api-Key ';
 
 export const DOCUMENT_REST_API_VERSION = '2';
+export const DOCUMENT_REST_API_PATH = `/api/v${DOCUMENT_REST_API_VERSION}/documents`;
 
 export enum HTTP_RESPONSE_STATUS_CODES {
 	OK = 200,

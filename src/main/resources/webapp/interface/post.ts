@@ -41,6 +41,7 @@ import { HTTP_RESPONSE_STATUS_CODES } from '../constants';
 export type InterfaceRequest = EnonicXpRequest<EmptyObject>
 
 
+// const LOG_LEVEL = 'info';
 const AUTHORIZATION_PREFIX = 'Explorer-Api-Key ';
 
 
@@ -49,12 +50,12 @@ function authorize({
 }: {
 	request: EnonicXpRequest
 }): Response {
-	// log.debug('isUnauthorized interfaceName:%s request:%s', interfaceName, toStr(request));
+	// log[LOG_LEVEL]('isUnauthorized request:%s', toStr(request));
 	const {
 		 // HTTP/2 uses lowercase header keys
 		'authorization': authorization//, // 'Explorer-Api-Key XXXX
 	} = lcKeys(request.headers) as Headers;
-	// log.debug(`authorization:${toStr(authorization)}`);
+	// log[LOG_LEVEL](`authorization:${toStr(authorization)}`);
 	if(!authorization) {
 		log.error(`Authorization header missing!`);
 		return { status: HTTP_RESPONSE_STATUS_CODES.UNAUTHORIZED };
@@ -64,13 +65,13 @@ function authorize({
 		return { status: HTTP_RESPONSE_STATUS_CODES.BAD_REQUEST };
 	}
 	const apiKey = authorization.substring(AUTHORIZATION_PREFIX.length);
-	// log.debug(`apiKey:${toStr(apiKey)}`);
+	// log[LOG_LEVEL](`apiKey:${toStr(apiKey)}`);
 	if (!apiKey) {
 		log.error(`ApiKey not found in Authorization header:${authorization}!`);
 		return { status: HTTP_RESPONSE_STATUS_CODES.BAD_REQUEST };
 	}
 	const hashedApiKey = hash(apiKey);
-	// log.debug(`hashedApiKey:${toStr(hashedApiKey)}`);
+	// log[LOG_LEVEL](`hashedApiKey:${toStr(hashedApiKey)}`);
 
 	const explorerRepoReadConnection = connect({ principals: [PRINCIPAL_EXPLORER_READ] });
 	const matchingApiKeys = explorerRepoReadConnection.query({
@@ -92,7 +93,7 @@ function authorize({
 		},
 		query: ''
 	});
-	// log.debug(`matchingApiKeys:${toStr(matchingApiKeys)}`);
+	// log[LOG_LEVEL](`matchingApiKeys:${toStr(matchingApiKeys)}`);
 	if(matchingApiKeys.total !== 1) {
 		log.error(`API key hashedApiKey:${hashedApiKey} not found!`);
 		return {
@@ -103,13 +104,13 @@ function authorize({
 			status: HTTP_RESPONSE_STATUS_CODES.FORBIDDEN
 		};
 	}
-	// log.debug('matchingApiKeys.hits[0].id:%s', matchingApiKeys.hits[0].id);
+	// log[LOG_LEVEL]('matchingApiKeys.hits[0].id:%s', matchingApiKeys.hits[0].id);
 
 	const apiKeyNode = explorerRepoReadConnection.get<ApiKeyNode>(matchingApiKeys.hits[0].id);
-	// log.debug('apiKeyNode:%s', toStr(apiKeyNode));
+	// log[LOG_LEVEL]('apiKeyNode:%s', toStr(apiKeyNode));
 	let {interfaces = []} = apiKeyNode;
 	if (!Array.isArray(interfaces)) { interfaces = [interfaces]; }
-	// log.debug(`interfaces:${toStr(interfaces)}`);
+	// log[LOG_LEVEL](`interfaces:${toStr(interfaces)}`);
 
 	return { // Authorized
 		body: JSON.stringify({
@@ -122,7 +123,7 @@ function authorize({
 
 
 export function overrideable(request: InterfaceRequest, fn = authorize): Response {
-	// log.debug('overrideable request:%s', toStr(request));
+	// log[LOG_LEVEL]('overrideable request:%s', toStr(request));
 
 	const {
 		body: bodyJson = '{}',
@@ -146,12 +147,12 @@ export function overrideable(request: InterfaceRequest, fn = authorize): Respons
 	}
 
 	const { allowedInterfaces = [] } = JSON.parse(maybeResponse.body);
-	// log.debug('allowedInterfaces:%s', toStr(allowedInterfaces));
+	// log[LOG_LEVEL]('allowedInterfaces:%s', toStr(allowedInterfaces));
 
 	const requestBody = JSON.parse(bodyJson);
 	const {query, variables} = requestBody;
-	// log.debug('query:%s', query);
-	// log.debug(`variables:${toStr(variables)}`);
+	// log[LOG_LEVEL]('query:%s', query);
+	// log[LOG_LEVEL](`variables:${toStr(variables)}`);
 	const context: GraphQLContext = {
 		allowedInterfaces,
 		interfaceName,
@@ -161,7 +162,7 @@ export function overrideable(request: InterfaceRequest, fn = authorize): Respons
 		logSynonymsQueryResult: logSynonymsQueryResultHeader === '1'//,
 		//query
 	};
-	// log.debug('context:%s', toStr(context));
+	// log[LOG_LEVEL]('context:%s', toStr(context));
 
 	const schema = getCachedSchema();
 
@@ -174,8 +175,8 @@ export function overrideable(request: InterfaceRequest, fn = authorize): Respons
 
 
 export function post(request: InterfaceRequest): Response {
-	// log.debug('post request:%s', toStr(request));
+	// log[LOG_LEVEL]('post request:%s', toStr(request));
 	const response = overrideable(request, authorize);
-	// log.debug('post response:%s', toStr(response));
+	// log[LOG_LEVEL]('post response:%s', toStr(response));
 	return response;
 }

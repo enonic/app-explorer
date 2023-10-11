@@ -1,4 +1,7 @@
-import {toStr} from '@enonic/js-utils';
+import type { Request } from '../types/Request';
+
+
+// import {toStr} from '@enonic/js-utils/value/toStr';
 import {
 	getResource,
 	readText
@@ -52,10 +55,16 @@ const manifests = {
 export default function getImmuteableUrl({
 	manifestPath = FILEPATH_MANIFEST,
 	path,
+	request
 }: {
 	manifestPath?: string
 	path: string,
+	request: Request
 }) {
+	// log.info('getImmuteableUrl manifestPath:%s path:%s', manifestPath, path);
 	manifests[manifestPath] = jsonParseResource(manifestPath);
-	return webappUrl(`${GETTER_ROOT}/${manifests[manifestPath][path]}`);
+	return webappUrl({
+		path: `${GETTER_ROOT}/${manifests[manifestPath][path]}`,
+		request
+	});
 }

@@ -12,6 +12,7 @@ export type Request<
 		accept?: string
 		authorization?: string
 	}
+	host: string
 	method?: string
 	params?: Params
 	path: string
