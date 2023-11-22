@@ -179,21 +179,18 @@ export function run({
 	collectionId,
 	collectorId,
 	configJson,
-	language,
-	name // Collection name
+	language
 }) {
 	// log.debug('webcrawl: collectionId:%s', collectionId);
 	// log.debug('webcrawl: collectorId:%s', collectorId);
 	// log.debug('webcrawl: configJson:%s', configJson);
 	// log.debug('webcrawl: language:%s', language);
-	// log.debug('webcrawl: name:%s', name);
 
 	const collector = new Collector<WebCrawlConfig>({
 		collectionId,
 		collectorId,
 		configJson,
-		language,
-		name
+		language
 	});
 	if (!collector.config.baseUri) { throw new Error('Config is missing required parameter baseUri!'); }
 	collector.start();
@@ -208,7 +205,7 @@ export function run({
 		resume = false,
 		userAgent = DEFAULT_UA
 	} = collector.config;
-	DEBUG && log.debug('keepHtml:%s', keepHtml);
+	TRACE && log.debug('keepHtml:%s', keepHtml);
 	DEBUG && log.debug('userAgent:%s', userAgent);
 
 	const excludeRegExps = forceArray(excludes).map(str => new RegExp(str));
@@ -226,9 +223,13 @@ export function run({
 	DEBUG && log.debug('scheme:%s', scheme);
 
 	const robots = getRobotsTxt(userAgent, scheme, domain); // object with functions
+	TRACE && log.debug('robots:%s', toStr(robots));
 
 	const seenUrisObj = {[normalizedentryPointUrl]: true};
+	TRACE && log.debug('seenUrisObj:%s', toStr(seenUrisObj));
+
 	const queueArr = [normalizedentryPointUrl];
+	TRACE && log.debug('queueArr:%s', toStr(queueArr));
 
 	function throwIfExcluded(urlWithoutSchemeAndDomain: string) {
 		for (let i = 0; i < excludeRegExps.length; i += 1) {
@@ -251,6 +252,7 @@ export function run({
 	let pageCounter = 0;
 	whileQueueLoop:
 	while(queueArr.length) {
+		TRACE && log.debug('pageCounter:%s', toStr(pageCounter));
 		if (pageCounter >= maxPages || collector.shouldStop()) {
 			break whileQueueLoop;
 		}
@@ -260,7 +262,7 @@ export function run({
 		DEBUG && log.debug('url:%s', url);
 
 		const baseUrlObj = parse(url);
-		// log.debug(toStr({baseUrlObj}));
+		TRACE && log.debug('baseUrlObj:%s', toStr(baseUrlObj));
 
 		try {
 			collector.taskProgressObj.info.uri = url; // eslint-disable-line no-param-reassign

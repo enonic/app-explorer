@@ -1,4 +1,4 @@
-//import {toStr} from '@enonic/js-utils';
+// import {toStr} from '@enonic/js-utils/value/toStr';
 
 const DIRECTIVE_ALLOW = 'allow';
 const DIRECTIVE_DISALLOW = 'disallow';
@@ -93,6 +93,6 @@ export function parseRobotsTxt(txt: string) {
 			prevToken = NON_GROUP;
 		} // switch directive
 	} // for lines
-	// log.debug('parseRobotsTxt result:%s', result);
+	// log.debug('parseRobotsTxt result:%s', toStr(result));
 	return result;
 } // function parse
