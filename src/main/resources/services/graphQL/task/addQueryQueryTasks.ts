@@ -1,4 +1,4 @@
-import type {Task} from '@enonic-types/lib-explorer/'
+import type {Task} from '@enonic-types/lib-explorer'
 import type {Glue} from '../Glue';
 
 
@@ -7,16 +7,15 @@ import {
 	TASK_STATE_FAILED,
 	TASK_STATE_FINISHED,
 	TASK_STATE_RUNNING,
-	TASK_STATE_WAITING/*,
-	toStr*/
+	TASK_STATE_WAITING
 } from '@enonic/js-utils';
+// import {toStr} from '@enonic/js-utils/value/toStr';
 import {
 	GraphQLBoolean,
 	GraphQLString,
 	list
-	//@ts-ignore
+	// @ts-expect-error No types yet.
 } from '/lib/graphql';
-//@ts-ignore
 import {list as listTasks} from '/lib/xp/task';
 import {queryCollectors} from '../collector/queryCollectors';
 import {
@@ -27,14 +26,14 @@ import {
 
 export function addQueryQueryTasks({
 	glue
-} :{
-	glue :Glue
+}: {
+	glue: Glue
 }) {
 	return glue.addQuery<{
-		appName ?:string
-		name ?:string
-		onlyRegisteredCollectorTasks ?:boolean
-		state ?:typeof TASK_STATE_FAILED|typeof TASK_STATE_FINISHED|typeof TASK_STATE_RUNNING|typeof TASK_STATE_WAITING
+		appName?: string
+		name?: string
+		onlyRegisteredCollectorTasks?: boolean
+		state?: typeof TASK_STATE_FAILED|typeof TASK_STATE_FINISHED|typeof TASK_STATE_RUNNING|typeof TASK_STATE_WAITING
 	}>({
 		name: 'queryTasks',
 		args: {
@@ -47,35 +46,22 @@ export function addQueryQueryTasks({
 			args: {
 				appName = undefined,
 				name,
-				onlyRegisteredCollectorTasks = false,
+				onlyRegisteredCollectorTasks = true,
 				state
 			}
 		}) {
-			//const activeCollections = {};
-			let taskList :Array<Task> = listTasks({
+			// log.info('onlyRegisteredCollectorTasks:%s', onlyRegisteredCollectorTasks);
+
+			let taskList: Task[] = listTasks({
 				name,
 				state
 			});
-			//log.info(`taskList:${toStr(taskList)}`);
-
-			/*{
-			    "description": "Collect",
-			    "id": "c4e62533-4853-4da2-998a-096cc3c783fb",
-			    "name": "com.enonic.app.explorer:webcrawl",
-			    "state": "RUNNING",
-			    "application": "com.enonic.app.explorer",
-			    "user": "user:system:su",
-			    "startTime": "2021-06-16T12:09:41.477186Z",
-			    "progress": {
-			        "info": "{\"name\":\"a-enonic-com\",\"message\":\"Processing https://www.enonic.com/\",\"startTime\":1623845381500,\"currentTime\":1623845382453,\"uri\":\"https://www.enonic.com/\"}",
-			        "current": 0,
-			        "total": 1
-			    }
-			}*/
+			// log.info('taskList:%s', toStr(taskList));
 
 			if (onlyRegisteredCollectorTasks) {
 				const collectorsRes = queryCollectors();
-				//log.info(`collectorsRes:${toStr(collectorsRes)}`);
+				// log.info('collectorsRes:%s', toStr(collectorsRes));
+
 				const registeredCollectors = {};
 				collectorsRes.hits.forEach(({
 					appName,
@@ -83,9 +69,10 @@ export function addQueryQueryTasks({
 				}) => {
 					registeredCollectors[`${appName}:${taskName}`] = true;
 				});
-				//log.info(`registeredCollectors:${toStr(registeredCollectors)}`);
+				// log.info('registeredCollectors:%s', toStr(registeredCollectors));
+
 				taskList = taskList.filter(({name}) => registeredCollectors[name]);
-				//log.info(`filtered taskList:${toStr(taskList)}`);
+				// log.info('filtered taskList:%s', toStr(taskList));
 			} // if onlyRegisteredCollectorTasks
 
 			if(appName) {
@@ -108,30 +95,3 @@ export function addQueryQueryTasks({
 		type: list(glue.getObjectType(GQL_TYPE_TASK))
 	});
 }
-
-/* Example query
-query GetTasks(
-  $descriptor: String,
-  $onlyRegisteredCollectorTasks: Boolean,
-  $state: String
-) {
-	queryTasks(
-		name: $descriptor
-		onlyRegisteredCollectorTasks: $onlyRegisteredCollectorTasks
-		state: $state
-	) {
-		application
-		description
-		id
-		name
-		progress {
-			current
-			info # Can be JSON
-			total
-		}
-		startTime
-		state
-		user
-	}
-}
-*/
