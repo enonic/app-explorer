@@ -51,13 +51,13 @@ import {useCollectionsState} from './useCollectionsState';
 // }`;
 
 
-export function Collections(props :{
-	collectorComponents :CollectorComponents
-	licenseValid :boolean
+export function Collections(props: {
+	collectorComponents: CollectorComponents
+	licenseValid: boolean
 	newCollectionModalOpen?: boolean
-	servicesBaseUrl :string
-	setLicensedTo :SetLicensedToFunction
-	setLicenseValid :SetLicenseValidFunction
+	servicesBaseUrl: string
+	setLicensedTo: SetLicensedToFunction
+	setLicenseValid: SetLicenseValidFunction
 }) {
 	const {
 		collectorComponents,
@@ -216,7 +216,7 @@ export function Collections(props :{
 									<Table.Cell collapsing>
 										{
 											collector && collector.name
-												? collectionsTaskState[collectionName]
+												? (collectionsTaskState[collectionName] && collectionsTaskState[collectionName].state)
 													? {
 														WAITING: <Popup
 															content={`Collector is in waiting state`}
@@ -235,12 +235,25 @@ export function Collections(props :{
 														FINISHED: <Popup
 															content={`Finished collecting to ${collectionName}`}
 															inverted
-															trigger={<HoverButton color='green' disabled={!boolCollectorSelectedAndInitialized} icon='checkmark'/>}/>,
+															trigger={
+																<HoverButton
+																	color='green'
+																	disabled={!boolCollectorSelectedAndInitialized || busy}
+																	icon='checkmark'
+																	onClick={() => {
+																		fetch(`${servicesBaseUrl}/collectionCollect?id=${collectionId}&name=${collectionName}`, {
+																			method: 'POST'
+																		}).then(() => {
+																			pollTasksWhileActive();
+																		});
+																	}}
+																/>
+															}/>,
 														FAILED: <Popup
 															content={`Something went wrong while collecting to ${collectionName}`}
 															inverted
 															trigger={<HoverButton color='red' disabled={!boolCollectorSelectedAndInitialized} icon='warning'/>}/>
-													}[collectionsTaskState[collectionName]]
+													}[collectionsTaskState[collectionName].state]
 													: anyTaskWithoutCollectionName
 														? <Popup
 															content={`Some collector task is starting...`}
@@ -311,7 +324,7 @@ export function Collections(props :{
 											{showSchedule ? <Table.Cell>{
 												collectorNameOrEmpty
 													? jobsObj[collectionId]
-														? jobsObj[collectionId].map(({enabled, value}, i :number) => {
+														? jobsObj[collectionId].map(({enabled, value}, i: number) => {
 															if (jobsObj[collectionId].length === 1 && !enabled) {
 																return 'Inactive';
 															}

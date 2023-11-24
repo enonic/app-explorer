@@ -1,4 +1,7 @@
-import type {TaskInfo} from '@enonic-types/lib-task';
+import type {
+	TaskInfo,
+	TaskStateType
+} from '@enonic-types/lib-task';
 import {useWhenInitAsync} from '@seamusleahy/init-hooks';
 import type {StrictTableHeaderCellProps} from 'semantic-ui-react';
 import type {
@@ -13,7 +16,11 @@ import type {
 } from './index.d';
 
 
-import {COLON_SIGN} from '@enonic/js-utils';
+import {
+	COLON_SIGN,
+	TASK_STATE_RUNNING,
+	TASK_STATE_WAITING,
+} from '@enonic/js-utils';
 import * as gql from 'gql-query-builder';
 import { useManualQuery } from 'graphql-hooks';
 import * as React from 'react';
@@ -267,7 +274,10 @@ export function useCollectionsState({
 		})
 		: [];
 
-	const collectionsTaskState = {};
+	const collectionsTaskState = {} as {
+		currentTime: number // To compare which is the last one
+		state: TaskStateType
+	};
 	let anyTaskWithoutCollectionName = false;
 	const objCollectionsBeingReindexed = {};
 	let anyReindexTaskWithoutCollectionId = false;
@@ -282,16 +292,39 @@ export function useCollectionsState({
 	}) => {
 		if (collectorsObj[taskDescriptor]) { // This is a collector task
 			try {
-				const {name} = JSON.parse(info);
+				const {
+					currentTime = 0, // Defaulting to 0 to be able to compare, when missing
+					name
+				} = JSON.parse(info);
 				if (name) {
-					collectionsTaskState[name] = state;
+					// NOTE: Assuming there is only one task in either WAITING or RUNNING state for each collection.
+					if ([TASK_STATE_RUNNING, TASK_STATE_WAITING].includes(state)) {
+						collectionsTaskState[name] = {
+							currentTime: 9999999999999,
+							state
+						};
+					}
+					// At this point state is either FINISHED or FAILED
+					if (collectionsTaskState[name]) { // More than one task for this collection in the list of tasks.
+						if (currentTime > collectionsTaskState[name].currentTime) {
+							collectionsTaskState[name] = {
+								currentTime,
+								state
+							};
+						}
+					} else { // First task for this collection in the list of tasks.
+						collectionsTaskState[name] = {
+							currentTime,
+							state
+						};
+					}
 				} else {
 					anyTaskWithoutCollectionName = true;
 				}
 			} catch (e) {
 				// This happens while a collector task is beeing started.
 				// This can also happen when a collector task is finished with errors.
-				if (['WAITING', 'RUNNING'].includes(state)) {
+				if ([TASK_STATE_WAITING, TASK_STATE_RUNNING].includes(state)) {
 					anyTaskWithoutCollectionName = true;
 				}
 			}
