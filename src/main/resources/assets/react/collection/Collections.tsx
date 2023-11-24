@@ -17,7 +17,6 @@ import {
 import {parseExpression as parseCronExpression} from 'cron-parser';
 import {Link} from 'react-router-dom';
 import {
-	Dimmer,
 	Header,
 	Loader,
 	Popup,
@@ -82,6 +81,7 @@ export function Collections(props :{
 		// direction,
 		fieldsObj,
 		intInitializedCollectorComponents,
+		isBlurred,
 		isLoading,
 		jobsObj,
 		locales,
@@ -144,19 +144,14 @@ export function Collections(props :{
 					onClick={memoizedFetchOnUpdate}
 				/>
 				<div className='cl-b'/>
-				<Header
-					as='h1'
-					disabled={isLoading}
-				>Collections</Header>
-				<Dimmer.Dimmable dimmed={isLoading}>
-					<Dimmer active={isLoading} inverted>
-						<Loader size='large'>Loading</Loader>
-					</Dimmer>
+				<Header as='h1'>Collections</Header>
+
+				<div className='p-r'>
 					<Table
 						celled
 						compact
-						disabled={isLoading}
 						striped
+						className={isBlurred ? 'filt-b-5-g-0-7' : ''}
 					>
 						<Table.Header>
 							<Table.Row>
@@ -460,50 +455,58 @@ export function Collections(props :{
 							})}
 						</Table.Body>
 					</Table>
-					<NewOrEditCollectionModal
-						collections={queryCollectionsGraph.hits}
-						collectorOptions={collectorOptions}
-						collectorComponents={collectorComponents}
-						contentTypeOptions={contentTypeOptions}
-						disabled={!intInitializedCollectorComponents || isLoading}
-						defaultOpen={newCollectionModalOpen}
-						loading={isLoading}
-						fields={fieldsObj}
-						initialValues={{
-							_name: '',
-							collector: {
-								//config: {}, // CollectorSelector onChange will set this.
-								//configJson: '{}',
-								name: ''//,
-								//taskName: 'collect'//, // TODO
-							},
-							cron: [{ // Default once a week
-								month: '*',
-								dayOfMonth: '*',
-								dayOfWeek: '0',
-								minute: '0',
-								hour: '0'
-							}],
-							doCollect: false,
-							language: ''
-						} as CollectionFormValues}
-						locales={locales}
-						afterClose={() => {
-							//console.debug('NewOrEditCollectionModal afterClose');
-							memoizedFetchOnUpdate();
-						}}
-						servicesBaseUrl={servicesBaseUrl}
-						setLicensedTo={setLicensedTo}
-						setLicenseValid={setLicenseValid}
-						showUploadLicense={
-							!licenseValid
-							&& queryCollectionsGraph.total > 2 // This means it will be allowed to create collection 3, but not number 4
-						}
-						siteOptions={siteOptions}
-					/>
-				</Dimmer.Dimmable>
+					{
+						isBlurred
+							? <div className='br-table h-100p l-0 p-a t-0 w-100p'>
+								<Loader active size='massive'/>
+							</div>
+							: null
+					}
+
+				</div>{/*<!-- position relative -->*/}
 			</Flex.Item>
 		</Flex>
+		<NewOrEditCollectionModal
+			collections={queryCollectionsGraph.hits}
+			collectorOptions={collectorOptions}
+			collectorComponents={collectorComponents}
+			contentTypeOptions={contentTypeOptions}
+			disabled={!intInitializedCollectorComponents || isLoading}
+			defaultOpen={newCollectionModalOpen}
+			loading={isLoading}
+			fields={fieldsObj}
+			initialValues={{
+				_name: '',
+				collector: {
+					//config: {}, // CollectorSelector onChange will set this.
+					//configJson: '{}',
+					name: ''//,
+					//taskName: 'collect'//, // TODO
+				},
+				cron: [{ // Default once a week
+					month: '*',
+					dayOfMonth: '*',
+					dayOfWeek: '0',
+					minute: '0',
+					hour: '0'
+				}],
+				doCollect: false,
+				language: ''
+			} as CollectionFormValues}
+			locales={locales}
+			afterClose={() => {
+				//console.debug('NewOrEditCollectionModal afterClose');
+				memoizedFetchOnUpdate();
+			}}
+			servicesBaseUrl={servicesBaseUrl}
+			setLicensedTo={setLicensedTo}
+			setLicenseValid={setLicenseValid}
+			showUploadLicense={
+				!licenseValid
+				&& queryCollectionsGraph.total > 2 // This means it will be allowed to create collection 3, but not number 4
+			}
+			siteOptions={siteOptions}
+		/>
 		{
 			copyModalCollectionId
 				? <CollectionCopyModal

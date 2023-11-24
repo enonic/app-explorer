@@ -1,4 +1,5 @@
 import type {TaskInfo} from '@enonic-types/lib-task';
+import {useWhenInitAsync} from '@seamusleahy/init-hooks';
 import type {StrictTableHeaderCellProps} from 'semantic-ui-react';
 import type {
 	Collector,
@@ -189,6 +190,17 @@ export function useCollectionsState({
 	servicesBaseUrl: string
 }) {
 	const [isLoading, setIsLoading] = React.useState(false);
+	const [isBlurred, internalSetBlurred] = React.useState(false);
+
+	function setBlurred(blurred: boolean) {
+		if (blurred) { // Show right away
+			internalSetBlurred(blurred);
+		} else { // Wait X ms when removing
+			setTimeout(() => {
+				internalSetBlurred(blurred);
+			}, 400);
+		}
+	}
 
 	const [jobsObj, setJobsObj] = React.useState({});
 	const [locales, setLocales] = React.useState([]);
@@ -366,6 +378,7 @@ export function useCollectionsState({
 	} // jobsObjFromArr
 
 	const memoizedFetchOnMount = React.useCallback(() => {
+		// setBlurred(true); // No need for blurring when table is not visible
 		setIsLoading(true);
 		fetch(`${servicesBaseUrl}/graphQL`, {
 			method: 'POST',
@@ -384,6 +397,7 @@ export function useCollectionsState({
 					setJobsObjFromArr(res.data.listScheduledJobs);
 					setDocumentTypes(res.data.queryDocumentTypes.hits);
 					setTasks(res.data.queryTasks);
+					// setBlurred(false);
 					setIsLoading(false);
 				} // if
 			}); // then
@@ -392,6 +406,7 @@ export function useCollectionsState({
 	]);
 
 	const memoizedFetchOnUpdate = React.useCallback(() => {
+		setBlurred(true);
 		setIsLoading(true);
 		fetch(`${servicesBaseUrl}/graphQL`, {
 			method: 'POST',
@@ -409,6 +424,7 @@ export function useCollectionsState({
 					setJobsObjFromArr(res.data.listScheduledJobs);
 					setDocumentTypes(res.data.queryDocumentTypes.hits);
 					setTasks(res.data.queryTasks);
+					setBlurred(false);
 					setIsLoading(false);
 				}
 			});
@@ -417,6 +433,7 @@ export function useCollectionsState({
 	]);
 
 	const memoizedFetchCollections = React.useCallback(() => {
+		setBlurred(true);
 		setIsLoading(true);
 		fetch(`${servicesBaseUrl}/graphQL`, {
 			method: 'POST',
@@ -430,6 +447,7 @@ export function useCollectionsState({
 				if (res && res.data && res.data.queryCollections) {
 					setQueryCollectionsGraph(res.data.queryCollections);
 				}
+				setBlurred(false);
 				setIsLoading(false);
 			});
 	}, [
@@ -439,6 +457,7 @@ export function useCollectionsState({
 	const [ fetchTasks ] = useManualQuery<FetchTasksData>(GQL_QUERY_QUERY_TASKS.query);
 	const [pollTasks, setPollTasks] = React.useState(false);
 	const pollTasksWhileActive = () => {
+		// NOTE: We're not applying blurring here :)
 		setIsLoading(true);
 		fetchTasks().then(res => {
 			if (res && res.data && res.data.queryTasks) {
@@ -456,6 +475,7 @@ export function useCollectionsState({
 					}
 				}));
 			}
+			setBlurred(false); // NOTE: In case multiple fetches are active.
 			setIsLoading(false);
 		});
 	};
@@ -465,9 +485,7 @@ export function useCollectionsState({
 		}
 	}, 1000);
 
-	React.useEffect(() => memoizedFetchOnMount(), [
-		memoizedFetchOnMount
-	]); // Only once
+	useWhenInitAsync(() => memoizedFetchOnMount());
 
 	const shemaIdToName = {};
 	documentTypes.forEach(({_id, _name}) => {
@@ -506,6 +524,7 @@ export function useCollectionsState({
 		direction,
 		fieldsObj,
 		intInitializedCollectorComponents,
+		isBlurred,
 		isLoading,
 		jobsObj,
 		locales,
