@@ -3,11 +3,15 @@ import {
 	toStr
 } from '@enonic/js-utils';
 import {
+	COLLECTION_REPO_PREFIX,
 	NodeType,
 	Principal
 } from '@enonic/explorer-utils';
 import { connect } from '/lib/explorer/repo/connect';
 import { listExplorerJobsThatStartWithName } from '/lib/explorer/scheduler/listExplorerJobsThatStartWithName';
+// @ts-expect-error No types yet
+import { GraphQLBoolean } from '/lib/graphql';
+import { delete as deleteRepo } from '/lib/xp/repo';
 import { delete as deleteJob } from '/lib/xp/scheduler';
 import { executeFunction } from '/lib/xp/task';
 import {
@@ -21,16 +25,19 @@ export default function addMutationCollectionDelete({glue}) {
 		name: GQL_MUTATION_COLLECTION_DELETE_NAME,
 		args: {
 			_id: glue.getScalarType('_id'),
+			deleteRepo: GraphQLBoolean
 		},
-		resolve(env :{
-			args :{
+		resolve(env: {
+			args: {
 				_id: string
+				deleteRepo: boolean
 			}
 		}) {
 			//log.debug('env:%s', toStr(env));
 			const {
 				args: {
 					_id,
+					deleteRepo: boolDeleteRepo,
 				}
 			} = env;
 			// log.debug('_id:%s', _id);
@@ -60,6 +67,25 @@ export default function addMutationCollectionDelete({glue}) {
 					});
 				}
 			});
+
+			if (boolDeleteRepo) {
+				const repoName = `${COLLECTION_REPO_PREFIX}${collectionNode._name}`;
+				executeFunction({
+					description: `Delete repo with name:${repoName}`,
+					func: () => {
+						log.info('Deleting repo with name:%s...', repoName);
+						if (deleteRepo(repoName)) {
+							log.info('Repo with name:%s, deleted.', repoName);
+						} else {
+							log.warning(
+								'Repository with name:%s was not found! While deleteing collection with path:%s',
+								repoName,
+								collectionNode._path
+							);
+						}
+					}
+				});
+			}
 
 			const deleteCollectionRes = writeConnection.delete(_id);
 			// log.debug('deleteCollectionRes:%s', toStr(deleteCollectionRes));
