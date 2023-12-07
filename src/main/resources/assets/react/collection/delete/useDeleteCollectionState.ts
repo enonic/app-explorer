@@ -1,9 +1,44 @@
-import {useWhenInitAsync} from '@seamusleahy/init-hooks';
-import * as gql from 'gql-query-builder';
+import type { IQueryBuilderOptions } from 'gql-query-builder-ts';
+
+import { useWhenInitAsync } from '@seamusleahy/init-hooks';
+import { mutation, query } from 'gql-query-builder-ts';
 import { useManualQuery } from 'graphql-hooks';
 import * as React from 'react';
-import {useUpdateEffect} from '../../utils/useUpdateEffect';
+import { COLLECTION_REPO_PREFIX } from '@enonic/explorer-utils';
+import { useUpdateEffect } from '../../utils/useUpdateEffect';
 
+
+declare module 'gql-query-builder-ts' {
+	function query<Variables = any>(options: IQueryBuilderOptions | IQueryBuilderOptions[], adapter?: any, config?: any): {
+		variables: Variables;
+		query: string;
+	};
+	interface IMutationAdapter {
+		mutationBuilder: () => {
+			variables: any;
+			query: string;
+		};
+		mutationsBuilder: (options: IQueryBuilderOptions[]) => {
+			variables: any;
+			query: string;
+		};
+	}
+	function mutation<Variables = any>(options: IQueryBuilderOptions | IQueryBuilderOptions[], adapter?: IMutationAdapter, config?: any): {
+		variables: Variables;
+		query: string;
+	};
+}
+
+interface DeleteCollectionVariables {
+	_id: string
+	deleteRepo: boolean
+}
+
+interface DeleteCollectionResponseData {
+	deleteCollection: {
+		_id: string
+	}
+}
 
 export interface QueryInterfacesResponseData {
 	queryInterfaces: {
@@ -14,7 +49,18 @@ export interface QueryInterfacesResponseData {
 	}
 }
 
-const GQL_MUTATION_COLLECTION_DELETE = gql.mutation({
+export interface ListReposVariables {
+	id: string
+}
+
+export interface ListReposResponseData {
+	listRepos: {
+		id: string
+	}[]
+}
+
+
+const GQL_MUTATION_COLLECTION_DELETE = mutation<DeleteCollectionVariables>({
 	operation: 'deleteCollection',
 	fields: [
 		'_id',
@@ -23,14 +69,18 @@ const GQL_MUTATION_COLLECTION_DELETE = gql.mutation({
 		_id: {
 			list: false,
 			required: true,
-			type: 'ID',
-			// value:
+			type: 'ID'
+		},
+		deleteRepo: {
+			list: false,
+			required: false,
+			type: 'Boolean'
 		}
 	}
 });
 
 
-const GQL_QUERY_INTERFACES_WITH_COLLECTION = gql.query({
+const GQL_QUERY_INTERFACES_WITH_COLLECTION = query({
 	operation: 'queryInterfaces',
 	fields: [{
 		hits: [
@@ -42,18 +92,34 @@ const GQL_QUERY_INTERFACES_WITH_COLLECTION = gql.query({
 		query: {
 			list: false,
 			required: false,
-			type: 'String',
-			// value:
+			type: 'String'
 		}
 	},
 });
 
 
+const GQL_QUERY_LIST_REPOS = query<ListReposVariables>({
+	operation: 'listRepos',
+	variables: {
+		id: {
+			list: false,
+			required: false,
+			type: 'ID',
+		}
+	},
+	fields: [
+		'id'
+	]
+});
+
+
 export default function useDeleteCollectionState({
 	collectionId,
+	collectionName,
 	onClose
 }: {
 	collectionId: string
+	collectionName: string
 	onClose: () => void
 }) {
 	//──────────────────────────────────────────────────────────────────────────
@@ -65,14 +131,15 @@ export default function useDeleteCollectionState({
 		// data: dataDeleteCollection,
 		// error: errorDeleteCollection,
 		loading: loadingDeleteCollection,
-	}] = useManualQuery(GQL_MUTATION_COLLECTION_DELETE.query);
+	}] = useManualQuery<DeleteCollectionResponseData,DeleteCollectionVariables>(GQL_MUTATION_COLLECTION_DELETE.query);
 
 	const fetchDeleteCollectionAndClose = async () => {
 		const {
 			data: localDataDeleteCollection,
 		} = await fetchDeleteCollection({
 			variables: {
-				_id: collectionId
+				_id: collectionId,
+				deleteRepo
 			}
 		});
 		// console.debug('dataDeleteCollection', dataDeleteCollection); // undefined
@@ -94,11 +161,28 @@ export default function useDeleteCollectionState({
 		}
 	});
 
+	const [fetchRepoList] = useManualQuery<ListReposResponseData, ListReposVariables>(
+		GQL_QUERY_LIST_REPOS.query,
+		{
+			variables: {
+				id: `${COLLECTION_REPO_PREFIX}${collectionName}`
+			}
+		}
+	);
+	const [hasRepo, setHasRepo] = React.useState<boolean>();
+	const [deleteRepo, setDeleteRepo] = React.useState(false);
+
 	//──────────────────────────────────────────────────────────────────────────
 	// Init
 	//──────────────────────────────────────────────────────────────────────────
 	useWhenInitAsync(() => {
 		fetchInterfacesWithCollection();
+		fetchRepoList().then(({
+			data: {
+				listRepos
+			}}) => {
+			setHasRepo(listRepos.length > 0);
+		});
 	});
 
 	//──────────────────────────────────────────────────────────────────────────
@@ -114,7 +198,9 @@ export default function useDeleteCollectionState({
 	// Returns
 	//──────────────────────────────────────────────────────────────────────────
 	return {
+		deleteRepo, setDeleteRepo,
 		fetchDeleteCollectionAndClose,
+		hasRepo,
 		loading,
 		loadingDeleteCollection,
 		usedInInterfaces,
