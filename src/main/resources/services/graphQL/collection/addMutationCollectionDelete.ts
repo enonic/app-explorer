@@ -3,6 +3,7 @@ import {
 	toStr
 } from '@enonic/js-utils';
 import {
+	APP_EXPLORER,
 	COLLECTION_REPO_PREFIX,
 	NodeType,
 	Principal
@@ -59,8 +60,9 @@ export default function addMutationCollectionDelete({glue}) {
 			executeFunction({
 				description: `Delete any scheduled job relating to collection with path:${collectionNode._path}`,
 				func: () => {
-					const explorerJobsThatStartWithName = listExplorerJobsThatStartWithName({name: collectionNode._id});
-					log.debug(`collection path:${collectionNode._path} explorerJobsThatStartWithName:${toStr(explorerJobsThatStartWithName)}`);
+					const jobName = `${APP_EXPLORER}.${collectionNode._id}`;
+					const explorerJobsThatStartWithName = listExplorerJobsThatStartWithName({name: jobName});
+					log.debug('collection path:%s explorerJobsThatStartWithName:%s', collectionNode._path, toStr(explorerJobsThatStartWithName));
 					explorerJobsThatStartWithName.forEach(({name}) => {
 						log.info(`Deleting job name:${name}, while deleting collection with path:${collectionNode._path}`);
 						deleteJob({name});
