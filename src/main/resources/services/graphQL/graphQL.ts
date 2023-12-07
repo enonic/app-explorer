@@ -82,6 +82,8 @@ import addGetMemberships from './auth/addGetMemberships'
 import {addGetProfile} from './profile/addGetProfile';
 import {addModifyProfile} from './profile/addModifyProfile';
 
+import { addListRepos } from './repo/addListRepos';
+
 import {generateScheduledJobsListField} from './scheduler/generateScheduledJobsListField';
 import {generateSchedulerTypes} from './scheduler/generateSchedulerTypes';
 import {generateDocumentTypeFields} from './documentType/generateDocumentTypeFields';
@@ -276,6 +278,8 @@ addQueryInterfaceGet({glue});
 const queryInterfaces = generateQueryInterfacesField({glue});
 
 const queryJournals = generateQueryJournalsField({glue});
+
+addListRepos({glue});
 
 addStopWordsTypes({glue});
 addStopWordsCreate({glue});
