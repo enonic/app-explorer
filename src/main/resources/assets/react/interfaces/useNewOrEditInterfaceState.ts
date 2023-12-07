@@ -3,7 +3,7 @@ import type {
 	InterfaceField,
 	TermQuery
 } from '@enonic-types/lib-explorer/Interface.d';
-import type IQueryBuilderOptions from 'gql-query-builder/build/IQueryBuilderOptions.d';
+import type IQueryBuilderOptions from 'gql-query-builder-ts/build/IQueryBuilderOptions.d';
 import type {DropdownItemProps} from 'semantic-ui-react/index.d';
 import type {
 	FieldPathToValueOptions,
@@ -22,7 +22,7 @@ import {
 import {useWhenInitAsync} from '@seamusleahy/init-hooks';
 import {useWhenValuesChange} from '@seamusleahy/values-changes-hooks';
 import fastDeepEqual from 'fast-deep-equal/react';
-import * as gql from 'gql-query-builder';
+import * as gql from 'gql-query-builder-ts';
 import {useManualQuery} from 'graphql-hooks';
 import * as React from 'react';
 import {FIELD_SHORTCUT_COLLECTION} from '../../../services/graphQL/constants';

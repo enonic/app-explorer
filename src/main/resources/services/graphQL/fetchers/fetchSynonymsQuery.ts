@@ -2,7 +2,7 @@ import type {BucketsAggregationResult} from '/lib/xp/node';
 import type {QueriedSynonym} from '@enonic-types/lib-explorer';
 
 
-import * as gql from 'gql-query-builder';
+import * as gql from 'gql-query-builder-ts';
 import type {JSONResponse}  from './index.d';
 
 

@@ -5,7 +5,7 @@ import type {
 //import type {JSONResponse}  from './index.d';
 
 
-import * as gql from 'gql-query-builder';
+import * as gql from 'gql-query-builder-ts';
 import {
 	FIELD_SHORTCUT_COLLECTION,
 	FIELD_SHORTCUT_DOCUMENT_TYPE

@@ -6,7 +6,7 @@ import type {License} from '../index.d';
 
 
 import {useWhenInitAsync} from '@seamusleahy/init-hooks';
-import * as gql from 'gql-query-builder';
+import * as gql from 'gql-query-builder-ts';
 import { useManualQuery } from 'graphql-hooks';
 import * as React from 'react';
 import {useLocation} from 'react-router-dom';

@@ -7,7 +7,7 @@ type ModifyProfileResponse = JSONResponse<{
 }>
 
 import fastDeepEqual from 'fast-deep-equal/react';
-import * as gql from 'gql-query-builder';
+import * as gql from 'gql-query-builder-ts';
 
 
 export async function persistColumns({

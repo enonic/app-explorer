@@ -8,7 +8,7 @@ import type {
 
 import {isFunction} from '@enonic/js-utils';
 import fastDeepEqual from 'fast-deep-equal/react';
-import * as gql from 'gql-query-builder';
+import * as gql from 'gql-query-builder-ts';
 import * as React from 'react';
 import {GQL_MUTATION_CREATE_COLLECTION} from '../../../services/graphQL/collection/mutationCreateCollection';
 import {GQL_MUTATION_UPDATE_COLLECTION} from '../../../services/graphQL/collection/mutationUpdateCollection';

@@ -8,7 +8,7 @@ import type {InterfaceField} from '@enonic-types/lib-explorer/Interface.d';
 
 import {HTTP_HEADERS} from '@enonic/explorer-utils';
 import {useWhenInitAsync} from '@seamusleahy/init-hooks';
-import * as gql from 'gql-query-builder';
+import * as gql from 'gql-query-builder-ts';
 import * as React from 'react';
 import useJsonModalState from '../../components/modals/useJsonModalState';
 import useSearchInterface from '../useSearchInterface';

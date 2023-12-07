@@ -1,4 +1,4 @@
-import type IQueryBuilderOptions from 'gql-query-builder/build/IQueryBuilderOptions.d';
+import type IQueryBuilderOptions from 'gql-query-builder-ts/build/IQueryBuilderOptions.d';
 import type {
 	//Synonym,
 	Thesaurus
@@ -14,7 +14,7 @@ import type {JSONResponse}  from '../../../../services/graphQL/fetchers/index.d'
 
 
 import fastDeepEqual from 'fast-deep-equal/react';
-import * as gql from 'gql-query-builder';
+import * as gql from 'gql-query-builder-ts';
 import * as React from 'react';
 
 // NOTE: Must resolve transpile- and bundle- time.

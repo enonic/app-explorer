@@ -18,7 +18,7 @@ import {
 	getIn,
 	isSet,
 } from '@enonic/js-utils';
-import * as gql from 'gql-query-builder';
+import * as gql from 'gql-query-builder-ts';
 import {
 	Button,
 	Dropdown,
