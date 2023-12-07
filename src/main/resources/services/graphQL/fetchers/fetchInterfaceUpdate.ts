@@ -2,7 +2,7 @@ import type {InterfaceField} from '@enonic-types/lib-explorer';
 import type {TermQuery} from '@enonic-types/lib-explorer/Interface.d';
 
 
-import * as gql from 'gql-query-builder';
+import * as gql from 'gql-query-builder-ts';
 import {
 	GQL_INPUT_TYPE_INTERFACE_FIELD_NAME,
 	GQL_INPUT_TYPE_INTERFACE_TERM_QUERY_NAME

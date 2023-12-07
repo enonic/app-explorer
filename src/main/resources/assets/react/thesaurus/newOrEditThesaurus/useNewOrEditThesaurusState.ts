@@ -3,7 +3,7 @@ import type {JSONResponse}  from '../../../../services/graphQL/fetchers/index.d'
 
 
 import fastDeepEqual from 'fast-deep-equal/react';
-import * as gql from 'gql-query-builder';
+import * as gql from 'gql-query-builder-ts';
 import * as React from 'react';
 import {mustStartWithALowercaseLetter} from '../../utils/mustStartWithALowercaseLetter';
 import {notDoubleUnderscore} from '../../utils/notDoubleUnderscore';

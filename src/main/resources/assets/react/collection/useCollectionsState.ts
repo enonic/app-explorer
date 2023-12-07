@@ -21,7 +21,7 @@ import {
 	TASK_STATE_RUNNING,
 	TASK_STATE_WAITING,
 } from '@enonic/js-utils';
-import * as gql from 'gql-query-builder';
+import * as gql from 'gql-query-builder-ts';
 import { useManualQuery } from 'graphql-hooks';
 import * as React from 'react';
 import {useInterval} from '../utils/useInterval';

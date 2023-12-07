@@ -3,7 +3,7 @@ import type {
 	SetLicenseValidFunction
 } from '../index.d';
 
-import * as gql from 'gql-query-builder';
+import * as gql from 'gql-query-builder-ts';
 import * as React from 'react';
 import {Button, Icon, Input, Message, Modal} from 'semantic-ui-react';
 import { UploadLicense } from '../components/UploadLicense';

@@ -8,7 +8,7 @@ import type {
 
 
 import {HTTP_HEADERS} from '@enonic/explorer-utils';
-import * as gql from 'gql-query-builder';
+import * as gql from 'gql-query-builder-ts';
 import * as React from 'react';
 import {
 	POST_TAG,

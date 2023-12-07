@@ -10,7 +10,7 @@ type GetProfileResponse = JSONResponse<{
 
 
 import {forceArray} from '@enonic/js-utils';
-import * as gql from 'gql-query-builder';
+import * as gql from 'gql-query-builder-ts';
 import {GQL_QUERY_PROFILE_GET_NAME} from '../../../services/graphQL/constants';
 import {SELECTED_COLUMNS_DEFAULT} from './constants';
 

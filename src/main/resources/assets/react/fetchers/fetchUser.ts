@@ -1,4 +1,4 @@
-import type Fields from 'gql-query-builder/build/Fields';
+import type Fields from 'gql-query-builder-ts/build/Fields';
 import type {
 	// Group,
 	Principal,
@@ -12,7 +12,7 @@ type ExtendedPrincipal = Principal & {
 	// memberships?: ExtendedPrincipal[]
 }
 
-import * as gql from 'gql-query-builder';
+import * as gql from 'gql-query-builder-ts';
 import {GQL_QUERY_USER_GET_NAME} from '../../../services/graphQL/constants';
 
 

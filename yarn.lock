@@ -6106,10 +6106,10 @@ got@^11.8.5:
     p-cancelable "^2.0.0"
     responselike "^2.0.0"
 
-gql-query-builder@^3:
-  version "3.8.0"
-  resolved "https://registry.yarnpkg.com/gql-query-builder/-/gql-query-builder-3.8.0.tgz#d182d127f88abb7d39f7bec2c64f8b4570812e2f"
-  integrity sha512-q0PncZTrLDeyiH4R7YH1ISM+XGB4NvQ8eTm/Wr/sHSuquFZvqvDpGyMhbgoCZDc8kNAK8GOdfh3nI2GCLREFvw==
+gql-query-builder-ts@^3.9.0:
+  version "3.9.0"
+  resolved "https://registry.yarnpkg.com/gql-query-builder-ts/-/gql-query-builder-ts-3.9.0.tgz#313bfd8a0f4bb3c1c9c64059b28fa918b801253a"
+  integrity sha512-S9Vg2GqfIwQbuolp0NpLq8kaoxLgDhj4k0g0K60+l0IynGOAoideiO1w4FlLwVIGWdVaEb0/eKlMbHCYQXSekQ==
 
 graceful-fs@^4.1.11, graceful-fs@^4.1.2, graceful-fs@^4.2.10, graceful-fs@^4.2.4, graceful-fs@^4.2.9:
   version "4.2.11"

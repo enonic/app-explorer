@@ -13,7 +13,7 @@ import {
 import {FieldPath} from '@enonic/explorer-utils';
 import {useWhenInitAsync} from '@seamusleahy/init-hooks';
 import {useDebounce} from 'use-debounce';
-import * as gql from 'gql-query-builder';
+import * as gql from 'gql-query-builder-ts';
 import {difference} from 'lodash';
 import * as React from 'react';
 // import traverse from 'traverse';

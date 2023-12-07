@@ -9,7 +9,7 @@ import {
 	TASK_STATE_RUNNING,
 	TASK_STATE_WAITING
 } from '@enonic/js-utils';
-import * as gql from 'gql-query-builder';
+import * as gql from 'gql-query-builder-ts';
 import * as React from 'react';
 import {Button, Form, Header, Progress, Segment} from 'semantic-ui-react';
 import {GQL_QUERY_SYNONYMS_NAME} from '../../../../services/graphQL/constants';
