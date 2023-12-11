@@ -1,7 +1,30 @@
 [{
 	"_name": "webpage",
 	"addFields": false,
+	"documentTypeVersion": 4.1,
 	"properties": [{
+		"active": true,
+		"enabled": true,
+		"fulltext": true,
+		"includeInAllText": true,
+		"max": 1,
+		"min": 0,
+		"name": "displayName",
+		"nGram": true,
+		"path": false,
+		"valueType": "string"
+	},{
+		"active": true,
+		"enabled": true,
+		"fulltext": true,
+		"includeInAllText": false,
+		"max": 1,
+		"min": 1,
+		"name": "domain",
+		"nGram": true,
+		"path": false,
+		"valueType": "string"
+	},{
 		"active": true,
 		"enabled": true,
 		"fulltext": false,
@@ -22,6 +45,61 @@
 		"name": "links",
 		"nGram": false,
 		"path": false,
+		"valueType": "string"
+	},{
+		"active": true,
+		"enabled": true,
+		"fulltext": true,
+		"includeInAllText": true,
+		"max": 1,
+		"min": 0,
+		"name": "og_description",
+		"nGram": true,
+		"path": false,
+		"valueType": "string"
+	},{
+		"active": true,
+		"enabled": true,
+		"fulltext": false,
+		"includeInAllText": false,
+		"max": 1,
+		"min": 0,
+		"name": "og_locale",
+		"nGram": false,
+		"path": false,
+		"valueType": "string"
+	},{
+		"active": true,
+		"enabled": true,
+		"fulltext": true,
+		"includeInAllText": false,
+		"max": 1,
+		"min": 0,
+		"name": "og_site_name",
+		"nGram": true,
+		"path": false,
+		"valueType": "string"
+	},{
+		"active": true,
+		"enabled": true,
+		"fulltext": true,
+		"includeInAllText": false,
+		"max": 1,
+		"min": 0,
+		"name": "og_title",
+		"nGram": true,
+		"path": false,
+		"valueType": "string"
+	},{
+		"active": true,
+		"enabled": true,
+		"fulltext": true,
+		"includeInAllText": false,
+		"max": 1,
+		"min": 1,
+		"name": "path",
+		"nGram": true,
+		"path": true,
 		"valueType": "string"
 	},{
 		"active": true,
