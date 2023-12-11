@@ -60,13 +60,21 @@ import throwIfNotIndexable from './throwIfNotIndexable';
 
 
 interface WebCrawlDocument {
-	// displayName: string
-	links?: string[]
-	text: string
-	title: string
+	// Required
+	domain: string
+	path: string
 	url: string
-	_id?: string
+	// Optional
+	_id?: string // Will be added if previous document is found
+	displayname?: string
+	links?: string[]
+	og_description?: string
+	og_locale?: string
+	og_site_name?: string
+	og_title?: string
 	html?: string
+	text?: string
+	title?: string
 }
 
 const DEBUG = true;
@@ -212,6 +220,7 @@ export function run({
 
 	if (!baseUri.includes('://')) { baseUri = `https://${baseUri}`;}
 	const entryPointUrlObj = parse(baseUri);
+	DEBUG && log.debug('entryPointUrlObj:%s', entryPointUrlObj);
 
 	const normalizedentryPointUrl = normalize(baseUri);
 	DEBUG && log.debug('normalizedentryPointUrl:%s', normalizedentryPointUrl);
@@ -263,6 +272,7 @@ export function run({
 
 		const baseUrlObj = parse(url);
 		TRACE && log.debug('baseUrlObj:%s', toStr(baseUrlObj));
+		const { path } = baseUrlObj;
 
 		try {
 			collector.taskProgressObj.info.uri = url; // eslint-disable-line no-param-reassign
@@ -280,7 +290,9 @@ export function run({
 						connection: collector.collection.connection,
 						_name: nodeName
 					});
-					const {links} = node as Node<WebCrawlDocument>;
+					const {
+						links = [] // Can be undefined
+					} = node as Node<WebCrawlDocument>;
 					forceArray(links).forEach(normalized => handleNormalizedUri(normalized));
 				} // exists
 			} else { // !resume
@@ -381,6 +393,18 @@ export function run({
 				const title = titleEl ? getText(titleEl) : '';
 				DEBUG && log.debug(`title:${toStr(title)}`);
 
+				const ogTitleEl = querySelector(headEl, "meta[property='og:title'][content]");
+				const ogTitle = ogTitleEl ? getAttributeValue(ogTitleEl, 'content') : '';
+
+				const ogDescriptionEl = querySelector(headEl, "meta[property='og:description'][content]");
+				const ogDescription = ogDescriptionEl ? getAttributeValue(ogDescriptionEl, 'content') : '';
+
+				const ogSiteNameEl = querySelector(headEl, "meta[property='og:site_name'][content]");
+				const ogSiteName = ogSiteNameEl ? getAttributeValue(ogSiteNameEl, 'content') : '';
+
+				const ogLocaleEl = querySelector(headEl, "meta[property='og:locale'][content]");
+				const ogLocale = ogLocaleEl ? getAttributeValue(ogLocaleEl, 'content') : '';
+
 				const bodyElWithNothingRemoved = querySelector(rootNode, 'body');
 				const cleanedBodyEl = bodyElWithNothingRemoved.clone();
 
@@ -464,17 +488,15 @@ export function run({
 						robots,
 						userAgent
 					});
-					const documentToPersist: {
-						// displayName: string
-						links?: string[]
-						text: string
-						title: string
-						url: string
-						_id?: string
-						html?: string
-					} = {
-						// displayName: title, // This has no field definition by default
+					const documentToPersist: WebCrawlDocument = {
+						displayname: ogTitle || title, // This has no field definition by default
+						domain,
+						og_description: ogDescription,
+						og_locale: ogLocale,
+						og_site_name: ogSiteName,
+						og_title: ogTitle,
 						links,
+						path,
 						text: getText(cleanedBodyEl),
 						title,
 						url,

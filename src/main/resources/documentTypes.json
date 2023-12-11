@@ -9,7 +9,7 @@
 		"includeInAllText": true,
 		"max": 1,
 		"min": 0,
-		"name": "displayName",
+		"name": "displayname",
 		"nGram": true,
 		"path": false,
 		"valueType": "string"
