@@ -1,25 +1,25 @@
-import type {DocumentTypeFields} from '@enonic-types/lib-explorer';
+import type { DocumentTypesJson } from '@enonic-types/lib-explorer';
 
 
 import {fold} from '@enonic/js-utils';
 import {createDocumentType} from '/lib/explorer/documentType/createDocumentType';
 import {exists as documentTypeExists} from '/lib/explorer/documentType/exists';
-//@ts-ignore
+import { maybeUpdateManagedDocumentType } from '/lib/explorer/documentType/maybeUpdateManagedDocumentType';
 import {getResource, readText} from '/lib/xp/io';
 
 
-declare const Java :{
-	type :<T>(s :string) => T
+declare const Java: {
+	type: <T>(s: string) => T
 };
 
 
-const RESOURCE_KEY = Java.type<{ from :(resourcePath :string) => unknown}>('com.enonic.xp.resource.ResourceKey');
+const RESOURCE_KEY = Java.type<{ from: (resourcePath: string) => unknown}>('com.enonic.xp.resource.ResourceKey');
 
 
 export function createFromDocumentTypesJson({
 	applicationKey
-} :{
-	applicationKey :string
+}: {
+	applicationKey: string
 }) {
 	const filePath = 'documentTypes.json';
 	const resourcePath = `${applicationKey}:${filePath}`;
@@ -28,14 +28,10 @@ export function createFromDocumentTypesJson({
 		return;
 	}
 
-	const resourceJson :string = readText(resource.getStream());
+	const resourceJson: string = readText(resource.getStream());
 	//log.debug(`resourcePath:${resourcePath} resourceJson:${resourceJson}`);
 
-	let resourceData :Array<{
-			_name :string
-			addFields ?:boolean
-			properties ?:DocumentTypeFields
-		}>;
+	let resourceData: DocumentTypesJson;
 	try {
 		resourceData = JSON.parse(resourceJson);
 	} catch (e) {
@@ -45,14 +41,24 @@ export function createFromDocumentTypesJson({
 
 	resourceData.forEach(({
 		_name,
-		addFields = true,
-		properties = []
+		addFields = true, // NOTE: Only overrides undefined, not null.
+		documentTypeVersion = 0, // NOTE: Only overrides undefined, not null.
+		properties = [] // NOTE: Only overrides undefined, not null.
 	}) => {
 		const foldedLowerCaseName = fold(_name.toLowerCase());
 		if (!documentTypeExists({_name: foldedLowerCaseName})) {
 			createDocumentType({
 				_name: foldedLowerCaseName,
 				addFields,
+				documentTypeVersion,
+				managedBy: applicationKey,
+				properties
+			});
+		} else {
+			maybeUpdateManagedDocumentType({
+				_name: foldedLowerCaseName,
+				addFields,
+				documentTypeVersion,
 				managedBy: applicationKey,
 				properties
 			});
