@@ -9,7 +9,7 @@ import {GQL_MUTATION_DOCUMENT_TYPE_UPDATE} from '../mutations/documentTypeUpdate
 
 
 export type FetchDocumentTypeUpdateData = {
-	updateDocumentType :DocumentType
+	updateDocumentType: DocumentType
 }
 
 
@@ -28,20 +28,20 @@ export async function fetchDocumentTypeUpdate({
 			return data;
 		} else {
 			// handle the graphql errors
-    		const error = new Error(errors?.map(e => e.message).join('\n') ?? 'unknown');
-    		return Promise.reject(error);
+			const error = new Error(errors?.map(e => e.message).join('\n') ?? 'unknown');
+			return Promise.reject(error);
 		}
 	}
-} :{
-	url :string
-	variables :{
-		_id :string
-		_name :string
-		_versionKey :string
-		addFields ?:boolean
-		properties ?:DocumentTypeFields
+}: {
+	url: string
+	variables: {
+		_id: string
+		_name: string
+		_versionKey: string
+		addFields?: boolean
+		properties?: DocumentTypeFields
 	},
-	handleResponse ?:(response :Response) => Promise<FetchDocumentTypeUpdateData>
+	handleResponse?: (response: Response) => Promise<FetchDocumentTypeUpdateData>
 }) {
 	return fetch(url, {
 		method: 'POST',

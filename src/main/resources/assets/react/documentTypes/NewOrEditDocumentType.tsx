@@ -70,27 +70,32 @@ export function NewOrEditDocumentType({
 								render: () => <Tab.Pane>
 									<FieldsList
 										collectionNames={documentTypes[_name] ? documentTypes[_name].collectionNames || [] : []}
-										interfaceNames={documentTypes[_name] ? documentTypes[_name].interfaceNames || [] : [] /* TODO I suspect this doesn't exist anymore */}
+										interfaceNames={
+											documentTypes[_name]
+												? documentTypes[_name].interfaceNames || []
+												: [] // TODO I suspect this doesn't exist anymore
+										}
 										servicesBaseUrl={servicesBaseUrl}
 										properties={state.properties}
 										updateOrDeleteProperties={
 											function(
-												newValues :DocumentTypeField,
-												index :number
+												newValues: DocumentTypeField,
+												index: number
 											) {
 												// Uncomment if we actually want to submit the value in addOrEditLocalFieldModal
 												// createOrUpdateDocument(state, () => {
 												setState(prev => {
-													const next :NewOrEditDocumentTypeState = JSON.parse(JSON.stringify(prev)); // deref, so state gets new object id
+													const next: NewOrEditDocumentTypeState = JSON.parse(JSON.stringify(prev)); // deref, so state gets new object id
 													if (newValues == null) {
-														delete(next.properties[index]);
+														// delete(next.properties[index]); // Caused #893: This creates a sparse array with an empty slot :(
+														next.properties.splice(index, 1); // This removes an array element by changing the contents of the array :)
 													} else {
-														next.properties[index] = {...newValues};
+														next.properties[index] = {...newValues}; // Another deref
 													}
 
-													/*return { // deref, so state gets new object id
-														...next
-													};*/
+													// return { // deref, so state gets new object id
+													// 	...next
+													// };
 													return next;
 												});
 												// });
@@ -120,8 +125,7 @@ export function NewOrEditDocumentType({
 											<Form.Input
 												fluid
 												onChange={(
-													//@ts-ignore
-													event :unknown,
+													_event: unknown,
 													data
 												) => {
 													// setName(data.value);
@@ -144,8 +148,7 @@ export function NewOrEditDocumentType({
 											label='Add new fields automatically when creating/updating documents?'
 											name='addFields'
 											onChange= {(
-												//@ts-ignore
-												event :unknown,
+												_event: unknown,
 												data
 											) => {
 												setState(prev => {

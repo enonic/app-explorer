@@ -24,6 +24,7 @@ export const GQL_MUTATION_DOCUMENT_TYPE_CREATE = `mutation CreateDocumentTypeMut
 			name
 			nGram
 			path
+			stemmed
 			valueType
 		}
 	}

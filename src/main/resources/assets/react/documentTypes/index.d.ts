@@ -61,18 +61,19 @@ export type NewOrEditDocumentTypeState = {
 }
 
 export type AddOrEditLocalFieldModalState = {
-	open: boolean,
+	open: boolean
 	state?: {
-		active: boolean,
-		enabled: boolean,
-		includeInAllText: boolean,
-		index: number,
-		fulltext: boolean,
-		max: number,
-		min: number,
-		name: string,
-		nGram: boolean,
-		path: boolean,
+		active: boolean
+		enabled: boolean
+		includeInAllText: boolean
+		index: number
+		fulltext: boolean
+		max: number
+		min: number
+		name: string
+		nGram: boolean
+		path: boolean
+		stemmed: boolean
 		valueType: string
 	}
 }

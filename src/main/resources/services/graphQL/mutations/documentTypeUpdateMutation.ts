@@ -28,6 +28,7 @@ export const GQL_MUTATION_DOCUMENT_TYPE_UPDATE = `mutation UpdateDocumentTypeMut
 			name
 			nGram
 			path
+			stemmed
 			valueType
 		}
 	}

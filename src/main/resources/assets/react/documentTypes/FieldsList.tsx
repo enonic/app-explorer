@@ -38,6 +38,7 @@ const ADD_OR_EDIT_MODAL_STATE_DEFAULT: AddOrEditLocalFieldModalState = {
 		name: '',
 		nGram: true,
 		path: false,
+		stemmed: false,
 		valueType: VALUE_TYPE_STRING
 	}
 };
@@ -93,10 +94,11 @@ export const FieldsList = ({
 						<Table.HeaderCell>Value type</Table.HeaderCell>
 						<Table.HeaderCell collapsing textAlign='center'>Min</Table.HeaderCell>
 						<Table.HeaderCell collapsing textAlign='center'>Max</Table.HeaderCell>
-						<Table.HeaderCell collapsing textAlign='center'>Indexing</Table.HeaderCell>
+						<Table.HeaderCell collapsing textAlign='center'>Index</Table.HeaderCell>
 						<Table.HeaderCell collapsing textAlign='center'>Include in _allText</Table.HeaderCell>
 						<Table.HeaderCell collapsing textAlign='center'>Fulltext</Table.HeaderCell>
 						<Table.HeaderCell collapsing textAlign='center'>Ngram</Table.HeaderCell>
+						<Table.HeaderCell collapsing textAlign='center'>Stemmed</Table.HeaderCell>
 						<Table.HeaderCell collapsing textAlign='center'>Path</Table.HeaderCell>
 						<Table.HeaderCell collapsing textAlign='center'>Delete</Table.HeaderCell>
 					</Table.Row>
@@ -113,6 +115,7 @@ export const FieldsList = ({
 						max,
 						min,
 						nGram,
+						stemmed,
 						path
 					}, i: number) => <Table.Row className={active ? null : 'strikeout'} key={i}>
 						<Table.Cell collapsing style={cellStyle} textAlign='center'>
@@ -136,6 +139,7 @@ export const FieldsList = ({
 												name,
 												nGram,
 												path,
+												stemmed,
 												valueType
 											},
 											open: true
@@ -154,6 +158,7 @@ export const FieldsList = ({
 						<Table.Cell collapsing style={cellStyle} textAlign='center'>{enabled ? <Checkmark checked={includeInAllText} size='large'/>: null}</Table.Cell>
 						<Table.Cell collapsing style={cellStyle} textAlign='center'>{enabled ? <Checkmark checked={fulltext} size='large'/>: null}</Table.Cell>
 						<Table.Cell collapsing style={cellStyle} textAlign='center'>{enabled ? <Checkmark checked={nGram} size='large'/>: null}</Table.Cell>
+						<Table.Cell collapsing style={cellStyle} textAlign='center'>{enabled ? <Checkmark checked={stemmed} size='large'/>: null}</Table.Cell>
 						<Table.Cell collapsing style={cellStyle} textAlign='center'>{enabled ? <Checkmark checked={path} size='large'/>: null}</Table.Cell>
 						<Table.Cell collapsing style={cellStyle} textAlign='center'>
 							<Button.Group>
@@ -176,6 +181,7 @@ export const FieldsList = ({
 														name,
 														nGram,
 														path,
+														stemmed,
 														valueType
 													},
 													open: true
