@@ -387,6 +387,10 @@ export function run({
 				DEBUG && log.debug(`boolFollow:${toStr(boolFollow)}`);
 				DEBUG && log.debug(`boolIndex:${toStr(boolIndex)}`);
 
+				const htmlWithLangEl = querySelector(rootNode,'html[lang]');
+				const lang = htmlWithLangEl ? getAttributeValue(htmlWithLangEl, 'lang') : '';
+				// log.info('lang:%s', lang);
+
 				const titleEl = querySelector(headEl, 'title');
 				// log.debug(`titleEl:${toStr(titleEl)}`); // JSON.stringify got a cyclic data structure
 
@@ -550,7 +554,8 @@ export function run({
 					const persistedDocument = collector.persistDocument(
 						documentToPersist, {
 							// Must be identical to a _name in src/main/resources/documentTypes.json
-							documentTypeName: 'webpage'
+							documentTypeName: 'webpage',
+							language: lang || ogLocale
 						}
 					);
 					DEBUG && log.debug('persistedDocument:%s', toStr(persistedDocument));
