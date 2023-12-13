@@ -53,6 +53,7 @@ export function generateDocumentTypeTypes({
 			name: { type: glue.getScalarType('_name') },
 			[INDEX_CONFIG_N_GRAM]: { type: nonNull(GraphQLBoolean) },
 			path: { type: nonNull(GraphQLBoolean) },
+			stemmed: { type: nonNull(GraphQLBoolean) },
 			valueType: { type: nonNull(glue.addEnumType({
 				name: 'EnumValueTypes',
 				values: [
@@ -91,7 +92,7 @@ export function generateDocumentTypeTypes({
 
 			addFields: {
 				type: nonNull(GraphQLBoolean),
-				resolve(env :DocumentTypeEnv) {
+				resolve(env: DocumentTypeEnv) {
 					//log.debug('addFields env:%s', toStr(env));
 					return coerseDocumentTypeAddFields(env.source.addFields);
 				}
@@ -100,7 +101,7 @@ export function generateDocumentTypeTypes({
 				type: GraphQLString
 			},
 			properties: {
-				resolve: (env :DocumentTypeEnv) => {
+				resolve: (env: DocumentTypeEnv) => {
 					//log.debug('properties env:%s', toStr(env));
 					return coerseDocumentTypeProperties(env.source.properties)
 				},

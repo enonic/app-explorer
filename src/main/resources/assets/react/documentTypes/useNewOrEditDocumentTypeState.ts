@@ -191,7 +191,7 @@ export function useNewOrEditDocumentTypeState({
 			if (_id) {
 				doClose();
 			} else {
-				const resultDocumentType: DocumentType = (data['createDocumentType'] || data['updateDocumentType']) as DocumentType;
+				const resultDocumentType: DocumentType = (data['createDocumentType'] || data['updateDocumentType']) as DocumentType;
 				const updateId = resultDocumentType._id;
 				const updateName = resultDocumentType._name;
 

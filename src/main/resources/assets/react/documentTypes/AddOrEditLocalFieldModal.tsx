@@ -75,15 +75,16 @@ export const AddOrEditLocalFieldModal = ({
 			name: propName = '',
 			nGram: propNgram = true,
 			path: propPath = false,
+			stemmed: propStemmed = false,
 			valueType: propValueType = VALUE_TYPE_STRING
 		}
 	},
 	onClose = () => { return },
-} :{
-	modalState :AddOrEditLocalFieldModalState
-	properties :DocumentTypeFields
-	updateOrDeleteProperties :UpdateOrDeletePropertiesFunction
-	onClose ?:() => void
+}: {
+	modalState: AddOrEditLocalFieldModalState
+	properties: DocumentTypeFields
+	updateOrDeleteProperties: UpdateOrDeletePropertiesFunction
+	onClose?:() => void
 }) => {
 
 	const usedNames = {};
@@ -101,6 +102,7 @@ export const AddOrEditLocalFieldModal = ({
 	const [name, setName] = React.useState(propName);
 	const [nGram, setNgram] = React.useState(propNgram);
 	const [path, setPath] = React.useState(propPath);
+	const [stemmed, setStemmed] = React.useState(propStemmed);
 	const [valueType, setValueType] = React.useState(propValueType);
 	const [active, setActive] = React.useState(propActive);
 
@@ -111,6 +113,26 @@ export const AddOrEditLocalFieldModal = ({
 	React.useEffect(() => {
 		setHeader(propName || name ? `Edit field ${propName || name}` : `Add field`);
 	}, [propName, name]);
+
+	React.useEffect(() => {
+		if (valueType !== VALUE_TYPE_STRING) {
+			if (includeInAllText) {
+				setIncludeInAllText(false);
+			}
+			if (fulltext) {
+				setFulltext(false);
+			}
+			if (nGram) {
+				setNgram(false);
+			}
+			if (path) {
+				setPath(false);
+			}
+			if (stemmed) {
+				setStemmed(false);
+			}
+		}
+	}, [valueType]);
 
 	/*
 	Since I'm doing {open ? <AddOrEditLocalFieldModal> : null} outside the
@@ -154,7 +176,7 @@ export const AddOrEditLocalFieldModal = ({
 			)
 			: undefined;
 
-	const msg =  errorMsg ? <Message
+	const msg = errorMsg ? <Message
 		content={errorMsg}
 		icon='warning'
 		negative
@@ -194,8 +216,7 @@ export const AddOrEditLocalFieldModal = ({
 				fluid
 				label='Name'
 				onChange={(
-					//@ts-ignore
-					event,
+					_event,
 					{value: newName}
 				) => {
 					setName(fold(newName.toLowerCase()));
@@ -211,10 +232,11 @@ export const AddOrEditLocalFieldModal = ({
 						<Table.HeaderCell>Value type</Table.HeaderCell>
 						<Table.HeaderCell collapsing textAlign='center'>Min</Table.HeaderCell>
 						<Table.HeaderCell collapsing textAlign='center'>Max</Table.HeaderCell>
-						<Table.HeaderCell collapsing textAlign='center'>Indexing</Table.HeaderCell>
+						<Table.HeaderCell collapsing textAlign='center'>Index</Table.HeaderCell>
 						<Table.HeaderCell collapsing textAlign='center'>Include in _allText</Table.HeaderCell>
 						<Table.HeaderCell collapsing textAlign='center'>Fulltext</Table.HeaderCell>
 						<Table.HeaderCell collapsing textAlign='center'>Ngram</Table.HeaderCell>
+						<Table.HeaderCell collapsing textAlign='center'>Stemmed</Table.HeaderCell>
 						<Table.HeaderCell collapsing textAlign='center'>Path</Table.HeaderCell>
 					</Table.Row>
 				</Table.Header>
@@ -222,9 +244,8 @@ export const AddOrEditLocalFieldModal = ({
 					<Table.Row>
 						<Table.Cell><Dropdown
 							onChange={(
-								//@ts-ignore
-								event,
-								{value: newValueType}: {value :string}
+								_event,
+								{value: newValueType}: {value: string}
 							) => {
 								setValueType(newValueType);
 							}}
@@ -236,8 +257,7 @@ export const AddOrEditLocalFieldModal = ({
 						<Table.Cell collapsing><Input
 							min={0}
 							onChange={(
-								//@ts-ignore
-								event,
+								_event,
 								{value: newMinString}
 							) => {
 								const newMinInt = parseInt(newMinString);
@@ -252,8 +272,7 @@ export const AddOrEditLocalFieldModal = ({
 						<Table.Cell collapsing><Input
 							min={0}
 							onChange={(
-								//@ts-ignore
-								event,
+								_event,
 								{value: newMaxString}
 							) => {
 								const newMaxInt = parseInt(newMaxString);
@@ -268,8 +287,7 @@ export const AddOrEditLocalFieldModal = ({
 						<Table.Cell collapsing><Radio
 							checked={enabled}
 							onChange={(
-								//@ts-ignore
-								event :unknown,
+								_event: unknown,
 								{checked}
 							) => {
 								setEnabled(checked);
@@ -278,9 +296,9 @@ export const AddOrEditLocalFieldModal = ({
 						/></Table.Cell>
 						<Table.Cell collapsing>{enabled ? <Radio
 							checked={includeInAllText}
+							disabled={valueType !== VALUE_TYPE_STRING}
 							onChange={(
-								//@ts-ignore
-								event :unknown,
+								_event: unknown,
 								{checked}
 							) => {
 								setIncludeInAllText(checked);
@@ -289,9 +307,9 @@ export const AddOrEditLocalFieldModal = ({
 						/> : null}</Table.Cell>
 						<Table.Cell collapsing>{enabled ? <Radio
 							checked={fulltext}
+							disabled={valueType !== VALUE_TYPE_STRING}
 							onChange={(
-								//@ts-ignore
-								event :unknown,
+								_event: unknown,
 								{checked}
 							) => {
 								setFulltext(checked);
@@ -300,9 +318,9 @@ export const AddOrEditLocalFieldModal = ({
 						/> : null}</Table.Cell>
 						<Table.Cell collapsing>{enabled ? <Radio
 							checked={nGram}
+							disabled={valueType !== VALUE_TYPE_STRING}
 							onChange={(
-								//@ts-ignore
-								event :unknown,
+								_event: unknown,
 								{checked}
 							) => {
 								setNgram(checked);
@@ -310,10 +328,21 @@ export const AddOrEditLocalFieldModal = ({
 							toggle
 						/> : null}</Table.Cell>
 						<Table.Cell collapsing>{enabled ? <Radio
-							checked={path}
+							checked={stemmed}
+							disabled={valueType !== VALUE_TYPE_STRING}
 							onChange={(
-								//@ts-ignore
-								event :unknown,
+								_event: unknown,
+								{checked}
+							) => {
+								setStemmed(checked);
+							}}
+							toggle
+						/> : null}</Table.Cell>
+						<Table.Cell collapsing>{enabled ? <Radio
+							checked={path}
+							disabled={valueType !== VALUE_TYPE_STRING}
+							onChange={(
+								_event: unknown,
 								{checked}
 							) => {
 								setPath(checked);
@@ -337,6 +366,7 @@ export const AddOrEditLocalFieldModal = ({
 					name,
 					[INDEX_CONFIG_N_GRAM]: nGram,
 					path,
+					stemmed,
 					valueType
 				}, isSet(propIndex) ? propIndex : properties.length);
 				onClose();

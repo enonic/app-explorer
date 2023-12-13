@@ -12,6 +12,7 @@
 		"name": "displayname",
 		"nGram": true,
 		"path": false,
+		"stemmed": true,
 		"valueType": "string"
 	},{
 		"active": true,
@@ -23,6 +24,7 @@
 		"name": "domain",
 		"nGram": true,
 		"path": false,
+		"stemmed": false,
 		"valueType": "string"
 	},{
 		"active": true,
@@ -34,6 +36,7 @@
 		"name": "html",
 		"nGram": false,
 		"path": false,
+		"stemmed": false,
 		"valueType": "string"
 	},{
 		"active": true,
@@ -45,6 +48,7 @@
 		"name": "links",
 		"nGram": false,
 		"path": false,
+		"stemmed": false,
 		"valueType": "string"
 	},{
 		"active": true,
@@ -56,6 +60,7 @@
 		"name": "og_description",
 		"nGram": true,
 		"path": false,
+		"stemmed": true,
 		"valueType": "string"
 	},{
 		"active": true,
@@ -67,6 +72,7 @@
 		"name": "og_locale",
 		"nGram": false,
 		"path": false,
+		"stemmed": false,
 		"valueType": "string"
 	},{
 		"active": true,
@@ -78,6 +84,7 @@
 		"name": "og_site_name",
 		"nGram": true,
 		"path": false,
+		"stemmed": false,
 		"valueType": "string"
 	},{
 		"active": true,
@@ -89,6 +96,7 @@
 		"name": "og_title",
 		"nGram": true,
 		"path": false,
+		"stemmed": true,
 		"valueType": "string"
 	},{
 		"active": true,
@@ -100,6 +108,7 @@
 		"name": "path",
 		"nGram": true,
 		"path": true,
+		"stemmed": false,
 		"valueType": "string"
 	},{
 		"active": true,
@@ -111,6 +120,7 @@
 		"name": "text",
 		"nGram": true,
 		"path": false,
+		"stemmed": true,
 		"valueType": "string"
 	},{
 		"active": true,
@@ -122,6 +132,7 @@
 		"name": "title",
 		"nGram": true,
 		"path": false,
+		"stemmed": true,
 		"valueType": "string"
 	},{
 		"active": true,
@@ -133,6 +144,7 @@
 		"name": "url",
 		"nGram": false,
 		"path": false,
+		"stemmed": false,
 		"valueType": "string"
 	}]
 }]

@@ -16,6 +16,7 @@ export const GQL_QUERY_DOCUMENT_TYPE_GET = `query GetDocumentTypeQuery($_id: ID!
 			name
 			nGram
 			path
+			stemmed
 			valueType
 		}
 		_referencedBy(
