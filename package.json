@@ -99,6 +99,7 @@
     "@enonic-types/lib-context": "^7",
     "@enonic-types/lib-event": "^7",
     "@enonic-types/lib-io": "^7",
+    "@enonic-types/lib-mail": "^7",
     "@enonic-types/lib-node": "^7",
     "@enonic-types/lib-portal": "^7",
     "@enonic-types/lib-repo": "^7",

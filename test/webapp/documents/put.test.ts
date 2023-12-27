@@ -19,7 +19,8 @@ import type {
 	Repository,
 	get as getRepo
 } from '@enonic-types/lib-repo';
-import type { PostRequest } from '../../../src/main/resources/webapp/documents/createOrUpdateMany';
+import type { DocumentNode } from '/lib/explorer/types/Document';
+import type { PostRequest } from '../../../src/main/resources/webapp/documents/createOrGetOrModifyOrDeleteMany';
 import type { PutRequest } from '../../../src/main/resources/webapp/documents/put';
 
 
@@ -49,8 +50,8 @@ const log = Log.createLogger({
 	// loglevel: 'debug'
 	// loglevel: 'info'
 	// loglevel: 'warn'
-	// loglevel: 'error'
-	loglevel: 'silent'
+	loglevel: 'error'
+	// loglevel: 'silent'
 });
 
 //──────────────────────────────────────────────────────────────────────────────
@@ -191,10 +192,9 @@ describe('webapp', () => {
 				repoId: COLLECTION_REPO_ID
 			});
 
-			import('../../../src/main/resources/webapp/documents/createOrUpdateMany').then((moduleName) => {
+			import('../../../src/main/resources/webapp/documents/createOrGetOrModifyOrDeleteMany').then((moduleName) => {
 				const createOrUpdateManyResponse = moduleName.default({
 					body: JSON.stringify({
-						_documentTypeId: createdDocumentTypeNode._id,
 						key: 'value'
 					}),
 					contentType: 'application/json',
@@ -202,6 +202,7 @@ describe('webapp', () => {
 						authorization: `Explorer-Api-Key ${API_KEY}`
 					},
 					params: {
+						documentTypeId: createdDocumentTypeNode._id,
 						requireValid: 'false'
 					},
 					pathParams: {
@@ -231,16 +232,19 @@ describe('webapp', () => {
 				import('../../../src/main/resources/webapp/documents/put').then((moduleName) => {
 					expect(moduleName.default({
 						body: JSON.stringify({
-							// _documentTypeId: createdDocumentTypeNode._id,
 							newKey: 'value'
 						}),
+						params: {
+							documentTypeId: createdDocumentTypeNode._id,
+						},
 						pathParams: {
 							collectionName: COLLECTION_NAME,
 							documentId: '71cffa3d-2c3f-464a-a2b0-19bd447b4b95'
 						}
 					} as PutRequest)).toStrictEqual({
 						body: {
-							message: 'Document with id "71cffa3d-2c3f-464a-a2b0-19bd447b4b95" does not exist in collection "my_collection"!'
+							id: '71cffa3d-2c3f-464a-a2b0-19bd447b4b95',
+							error: 'Document with id "71cffa3d-2c3f-464a-a2b0-19bd447b4b95" does not exist in collection "my_collection"!'
 						},
 						contentType: 'text/json;charset=utf-8',
 						status: HTTP_RESPONSE_STATUS_CODES.NOT_FOUND
@@ -264,7 +268,10 @@ describe('webapp', () => {
 					});
 					// log.debug('queryRes: %s', queryRes);
 
-					const cleanedNode = collectionConnection.get(queryRes.hits[0].id);
+					const documentNode = collectionConnection.get(queryRes.hits[0].id);
+					// log.error('documentNode: %s', documentNode);
+
+					const cleanedNode = JSON.parse(JSON.stringify(documentNode)) as DocumentNode;
 					delete cleanedNode['_indexConfig'];
 					delete cleanedNode['_inheritsPermissions'];
 					delete cleanedNode['_nodeType'];
@@ -279,21 +286,37 @@ describe('webapp', () => {
 					// delete cleanedNode['key'];
 
 					cleanedNode['newkey'] = 'value'; // Yes, property keys are contrained.
+					// log.error('cleanedNode: %s', cleanedNode);
 
 					const putResponse = moduleName.default({
 						body: JSON.stringify({
-							// _documentTypeId: createdDocumentTypeNode._id,
 							newKey: 'value'
 						}),
+						params: {
+							documentTypeId: createdDocumentTypeNode._id,
+							returnDocument: 'true'
+						},
 						pathParams: {
 							collectionName: COLLECTION_NAME,
 							documentId: queryRes.hits[0].id
 						}
 					} as PutRequest);
-					cleanedNode[FieldPath.META]['modifiedTime'] = putResponse.body[FieldPath.META]['modifiedTime'];
+					// log.error('putResponse: %s', putResponse);
 
 					expect(putResponse).toStrictEqual({
-						body: cleanedNode,
+						body: {
+							collection: documentNode['document_metadata']['collection'],
+								collector: documentNode['document_metadata']['collector'],
+								createdTime: documentNode['document_metadata']['createdTime'],
+								document: {
+									key: documentNode['key'],
+									newkey: 'value',
+								},
+								documentType: documentNode['document_metadata']['documentType'],
+								id: queryRes.hits[0].id,
+								modifiedTime: putResponse.body['modifiedTime'],
+								valid: documentNode['document_metadata']['valid'],
+						},
 						contentType: 'text/json;charset=utf-8',
 						status: HTTP_RESPONSE_STATUS_CODES.OK
 					});

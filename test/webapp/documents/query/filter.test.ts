@@ -19,8 +19,8 @@ import type {
 	Repository,
 	get as getRepo
 } from '@enonic-types/lib-repo';
-// import type { DocumentNode } from '/lib/explorer/types/Document';
-import type { PostRequest } from '../../../../src/main/resources/webapp/documents/createOrUpdateMany';
+import type { DocumentNode } from '/lib/explorer/types/Document';
+import type { PostRequest } from '../../../../src/main/resources/webapp/documents/createOrGetOrModifyOrDeleteMany';
 import type { QueryRequest } from '../../../../src/main/resources/webapp/documents/query';
 
 
@@ -45,8 +45,8 @@ const log = Log.createLogger({
 	// loglevel: 'debug'
 	// loglevel: 'info'
 	// loglevel: 'warn'
-	// loglevel: 'error'
-	loglevel: 'silent'
+	loglevel: 'error'
+	// loglevel: 'silent'
 });
 
 //──────────────────────────────────────────────────────────────────────────────
@@ -197,12 +197,18 @@ describe('webapp', () => {
 	describe('documents', () => {
 		describe('query', () => {
 			it('filter and query works', () => {
-				import('../../../../src/main/resources/webapp/documents/createOrUpdateMany').then((createOrUpdateManyModule) => {
+				import('../../../../src/main/resources/webapp/documents/createOrGetOrModifyOrDeleteMany').then((createOrUpdateManyModule) => {
 					createOrUpdateManyModule.default({
 						body: JSON.stringify([{
-							key1: 'value1'
+							action: 'create',
+							document: {
+								key1: 'value1'
+							}
 						},{
-							key2: 'value2'
+							action: 'create',
+							document: {
+								key2: 'value2'
+							}
 						}]),
 						contentType: 'application/json',
 						headers: {
@@ -220,6 +226,23 @@ describe('webapp', () => {
 						branch: 'master',
 						repoId: COLLECTION_REPO_ID
 					});
+					// const queryRes = collectionConnection.query({
+					// 	query: {
+					// 		boolean: {
+					// 			must: {
+					// 				term: {
+					// 					field: '_nodeType',
+					// 					value: NodeType.DOCUMENT
+					// 				}
+					// 			}
+					// 		}
+					// 	}
+					// });
+					// // log.error('queryRes: %s', queryRes);
+					// queryRes.hits.forEach(({id}) => {
+					// 	const documentNode = collectionConnection.get(id) as unknown as DocumentNode;
+					// 	log.error('documentNode: %s', documentNode);
+					// });
 
 					const nodeQueryRes = collectionConnection.query({
 						filters: {
@@ -251,7 +274,8 @@ describe('webapp', () => {
 							}
 						}
 					});
-					// log.debug('nodeQueryRes', nodeQueryRes);
+					// log.error('nodeQueryRes', nodeQueryRes); // Should be empty
+
 					import('../../../../src/main/resources/webapp/documents/query').then((queryModule) => {
 						const queryResponse = queryModule.default({
 							body: JSON.stringify({
@@ -287,7 +311,11 @@ describe('webapp', () => {
 						} as QueryRequest);
 						// log.debug('queryResponse', queryResponse);
 						expect(queryResponse).toStrictEqual({
-							body: [],
+							body: {
+								count: 0,
+								hits:[],
+								total: 0
+							},
 							contentType: 'text/json;charset=utf-8',
 							status: HTTP_RESPONSE_STATUS_CODES.OK
 						});

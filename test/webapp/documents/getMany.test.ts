@@ -20,7 +20,7 @@ import type {
 	get as getRepo
 } from '@enonic-types/lib-repo';
 import type { DocumentNode } from '/lib/explorer/types/Document';
-import type { PostRequest } from '../../../src/main/resources/webapp/documents/createOrUpdateMany';
+import type { PostRequest } from '../../../src/main/resources/webapp/documents/createOrGetOrModifyOrDeleteMany';
 import type { GetManyRequest } from '../../../src/main/resources/webapp/documents/getMany';
 
 
@@ -49,8 +49,8 @@ const log = Log.createLogger({
 	// loglevel: 'debug'
 	// loglevel: 'info'
 	// loglevel: 'warn'
-	// loglevel: 'error'
-	loglevel: 'silent'
+	loglevel: 'error'
+	// loglevel: 'silent'
 });
 
 //──────────────────────────────────────────────────────────────────────────────
@@ -191,12 +191,18 @@ describe('webapp', () => {
 				repoId: COLLECTION_REPO_ID
 			});
 
-			import('../../../src/main/resources/webapp/documents/createOrUpdateMany').then((moduleName) => {
+			import('../../../src/main/resources/webapp/documents/createOrGetOrModifyOrDeleteMany').then((moduleName) => {
 				moduleName.default({
 					body: JSON.stringify([{
-						key: 'value1'
+						action: 'create',
+						document: {
+							key: 'value1'
+						}
 					},{
-						key: 'value2'
+						action: 'create',
+						document: {
+							key: 'value2'
+						}
 					}]),
 					contentType: 'application/json',
 					headers: {
@@ -210,6 +216,23 @@ describe('webapp', () => {
 						collectionName: COLLECTION_NAME
 					}
 				} as PostRequest);
+				// const queryRes = collectionConnection.query({
+				// 	query: {
+				// 		boolean: {
+				// 			must: {
+				// 				term: {
+				// 					field: '_nodeType',
+				// 					value: NodeType.DOCUMENT
+				// 				}
+				// 			}
+				// 		}
+				// 	}
+				// });
+				// // log.error('queryRes: %s', queryRes);
+				// queryRes.hits.forEach(({id}) => {
+				// 	const documentNode = collectionConnection.get(id) as unknown as DocumentNode;
+				// 	log.error('documentNode: %s', documentNode);
+				// });
 			});
 
 			it('returns 404 Not found when there are no documents with documentId', () => {
@@ -222,11 +245,12 @@ describe('webapp', () => {
 							collectionName: COLLECTION_NAME,
 						}
 					} as GetManyRequest)).toStrictEqual({
-						body: {
-							message: "Didn't find any documents for ids:nonexistent_document_id"
-						},
+						body: [{
+							id: 'nonexistent_document_id',
+							status: HTTP_RESPONSE_STATUS_CODES.NOT_FOUND,
+						}],
 						contentType: 'text/json;charset=utf-8',
-						status: HTTP_RESPONSE_STATUS_CODES.NOT_FOUND
+						status: HTTP_RESPONSE_STATUS_CODES.OK
 					}); // expect
 					expect(moduleName.default({
 						params: {
@@ -239,11 +263,15 @@ describe('webapp', () => {
 							collectionName: COLLECTION_NAME,
 						}
 					} as GetManyRequest)).toStrictEqual({
-						body: {
-							message: "Didn't find any documents for ids:nonexistent_document_id1,nonexistent_document_id2"
-						},
+						body: [{
+							id: 'nonexistent_document_id1',
+							status: HTTP_RESPONSE_STATUS_CODES.NOT_FOUND,
+						},{
+							id: 'nonexistent_document_id2',
+							status: HTTP_RESPONSE_STATUS_CODES.NOT_FOUND,
+						}],
 						contentType: 'text/json;charset=utf-8',
-						status: HTTP_RESPONSE_STATUS_CODES.NOT_FOUND
+						status: HTTP_RESPONSE_STATUS_CODES.OK
 					}); // expect
 				});
 			}); // it
@@ -262,27 +290,37 @@ describe('webapp', () => {
 							}
 						}
 					});
-					// log.debug('queryRes: %s', queryRes);
+					// log.error('queryRes: %s', queryRes);
 
-					import('../../../src/main/resources/webapp/documents/stripDocumentNode').then((stripDocumentNodeModule) => {
-						expect(moduleName.default({
-							params: {
-								id: [
-									queryRes.hits[0].id,
-									queryRes.hits[1].id,
-								]
-							},
-							pathParams: {
-								collectionName: COLLECTION_NAME,
-							}
-						} as GetManyRequest)).toStrictEqual({
-							body: queryRes.hits.map(({id}) => {
-								const documentNode = collectionConnection.get(id) as unknown as DocumentNode;
-								return stripDocumentNodeModule.default(documentNode);
-							}),
-							contentType: 'text/json;charset=utf-8',
-							status: HTTP_RESPONSE_STATUS_CODES.OK
-						});
+					const getManyRes = moduleName.default({
+						params: {
+							id: [
+								queryRes.hits[0].id,
+								queryRes.hits[1].id,
+							]
+						},
+						pathParams: {
+							collectionName: COLLECTION_NAME,
+						}
+					} as GetManyRequest);
+					expect(getManyRes).toStrictEqual({
+						body: queryRes.hits.map(({id}) => {
+							const documentNode = collectionConnection.get(id) as unknown as DocumentNode;
+							return {
+								collection: documentNode['document_metadata']['collection'],
+								collector: documentNode['document_metadata']['collector'],
+								createdTime: documentNode['document_metadata']['createdTime'],
+								document: {
+									key: documentNode['key'],
+								},
+								documentType: documentNode['document_metadata']['documentType'],
+								id,
+								status: HTTP_RESPONSE_STATUS_CODES.OK,
+								valid: documentNode['document_metadata']['valid'],
+							};
+						}),
+						contentType: 'text/json;charset=utf-8',
+						status: HTTP_RESPONSE_STATUS_CODES.OK
 					});
 				});
 			}); // it

@@ -20,7 +20,7 @@ import type {
 	get as getRepo
 } from '@enonic-types/lib-repo';
 import type { GetOneRequest } from '../../../src/main/resources/webapp/documents/getOne';
-import type { PostRequest } from '../../../src/main/resources/webapp/documents/createOrUpdateMany';
+import type { PostRequest } from '../../../src/main/resources/webapp/documents/createOrGetOrModifyOrDeleteMany';
 
 
 import {
@@ -48,8 +48,8 @@ const log = Log.createLogger({
 	// loglevel: 'debug'
 	// loglevel: 'info'
 	// loglevel: 'warn'
-	// loglevel: 'error'
-	loglevel: 'silent'
+	loglevel: 'error'
+	// loglevel: 'silent'
 });
 
 //──────────────────────────────────────────────────────────────────────────────
@@ -190,10 +190,9 @@ describe('webapp', () => {
 				repoId: COLLECTION_REPO_ID
 			});
 
-			import('../../../src/main/resources/webapp/documents/createOrUpdateMany').then((moduleName) => {
+			import('../../../src/main/resources/webapp/documents/createOrGetOrModifyOrDeleteMany').then((moduleName) => {
 				const createOrUpdateManyResponse = moduleName.default({
 					body: JSON.stringify({
-						_documentTypeId: createdDocumentTypeNode._id,
 						key: 'value'
 					}),
 					contentType: 'application/json',
@@ -201,6 +200,7 @@ describe('webapp', () => {
 						authorization: `Explorer-Api-Key ${API_KEY}`
 					},
 					params: {
+						documentTypeId: createdDocumentTypeNode._id,
 						requireValid: 'false'
 					},
 					pathParams: {
@@ -211,6 +211,19 @@ describe('webapp', () => {
 
 			it('returns 404 Not found when there are no documents with documentId', () => {
 				import('../../../src/main/resources/webapp/documents/getOne').then((moduleName) => {
+					// const queryRes = collectionConnection.query({
+					// 	query: {
+					// 		boolean: {
+					// 			must: {
+					// 				term: {
+					// 					field: '_nodeType',
+					// 					value: NodeType.DOCUMENT
+					// 				}
+					// 			}
+					// 		}
+					// 	}
+					// });
+					// log.error('queryRes: %s', queryRes);
 					expect(moduleName.default({
 						pathParams: {
 							collectionName: COLLECTION_NAME,
@@ -236,17 +249,10 @@ describe('webapp', () => {
 							}
 						}
 					});
-					// log.debug('queryRes: %s', queryRes);
+					// log.error('queryRes: %s', queryRes);
 
-					const cleanedNode = collectionConnection.get(queryRes.hits[0].id);
-					delete cleanedNode['_indexConfig'];
-					delete cleanedNode['_inheritsPermissions'];
-					delete cleanedNode['_nodeType'];
-					delete cleanedNode['_permissions'];
-					delete cleanedNode['_state'];
-					delete cleanedNode['_ts'];
-					delete cleanedNode['_versionKey'];
-					// delete cleanedNode['document_metadata']; // TODO: Should this be deleted?
+					const documentNode = collectionConnection.get(queryRes.hits[0].id);
+					// log.error('documentNode: %s', documentNode);
 
 					expect(moduleName.default({
 						pathParams: {
@@ -254,7 +260,17 @@ describe('webapp', () => {
 							documentId: queryRes.hits[0].id
 						}
 					} as GetOneRequest)).toStrictEqual({
-						body: cleanedNode,
+						body: {
+							collection: documentNode['document_metadata']['collection'],
+							collector: documentNode['document_metadata']['collector'],
+							createdTime: documentNode['document_metadata']['createdTime'],
+							document: {
+								key: 'value'
+							},
+							documentType: documentNode['document_metadata']['documentType'],
+							id: queryRes.hits[0].id,
+							valid: documentNode['document_metadata']['valid'],
+						},
 						contentType: 'text/json;charset=utf-8',
 						status: HTTP_RESPONSE_STATUS_CODES.OK
 					});

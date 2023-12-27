@@ -340,7 +340,7 @@ describe('webapp', () => {
 							}
 						} as Request, 'another_collection')).toStrictEqual({
 							body: {
-								message: "The API key doesn't have access to any collections!"
+								error: "The API key doesn't have access to any collections!"
 							},
 							contentType: 'text/json;charset=utf-8',
 							status: HTTP_RESPONSE_STATUS_CODES.BAD_REQUEST
@@ -361,7 +361,7 @@ describe('webapp', () => {
 							}
 						} as Request, 'another_collection')).toStrictEqual({
 							body: {
-								message: "Bad Request"
+								error: "Bad Request"
 							},
 							contentType: 'text/json;charset=utf-8',
 							status: HTTP_RESPONSE_STATUS_CODES.BAD_REQUEST

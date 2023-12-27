@@ -19,7 +19,7 @@ import type {
 	Repository,
 	get as getRepo
 } from '@enonic-types/lib-repo';
-import type { PostRequest } from '../../../src/main/resources/webapp/documents/createOrUpdateMany';
+import type { PostRequest } from '../../../src/main/resources/webapp/documents/createOrGetOrModifyOrDeleteMany';
 import type { RemoveRequest } from '../../../src/main/resources/webapp/documents/deleteMany';
 
 
@@ -33,7 +33,7 @@ import { JavaBridge } from '@enonic/mock-xp/src/JavaBridge';
 import Log from '@enonic/mock-xp/src/Log';
 import {
 	COLLECTION_REPO_PREFIX,
-	FieldPath,
+	// FieldPath,
 	Folder,
 	NodeType,
 	Path,
@@ -49,8 +49,8 @@ const log = Log.createLogger({
 	// loglevel: 'debug'
 	// loglevel: 'info'
 	// loglevel: 'warn'
-	// loglevel: 'error'
-	loglevel: 'silent'
+	loglevel: 'error'
+	// loglevel: 'silent'
 });
 
 //──────────────────────────────────────────────────────────────────────────────
@@ -191,11 +191,13 @@ describe('webapp', () => {
 				repoId: COLLECTION_REPO_ID
 			});
 
-			import('../../../src/main/resources/webapp/documents/createOrUpdateMany').then((moduleName) => {
+			import('../../../src/main/resources/webapp/documents/createOrGetOrModifyOrDeleteMany').then((moduleName) => {
 				moduleName.default({
 					body: JSON.stringify([{
+						action: 'create',
 						key: 'value1'
 					},{
+						action: 'create',
 						key: 'value2'
 					}]),
 					contentType: 'application/json',
@@ -240,7 +242,10 @@ describe('webapp', () => {
 						}
 					} as RemoveRequest)).toStrictEqual({
 						body: [{
-							error: 'Unable to find document with _id = 71cffa3d-2c3f-464a-a2b0-19bd447b4b95!'
+							action: 'delete',
+							error: 'Unable to find document with id = 71cffa3d-2c3f-464a-a2b0-19bd447b4b95!',
+							id: '71cffa3d-2c3f-464a-a2b0-19bd447b4b95',
+							status: HTTP_RESPONSE_STATUS_CODES.NOT_FOUND
 						}],
 						contentType: 'text/json;charset=utf-8',
 						status: HTTP_RESPONSE_STATUS_CODES.OK
@@ -258,9 +263,15 @@ describe('webapp', () => {
 						}
 					} as RemoveRequest)).toStrictEqual({
 						body: [{
-							error: 'Unable to find document with _id = 71cffa3d-2c3f-464a-a2b0-19bd447b4b95!'
+							action: 'delete',
+							error: 'Unable to find document with id = 71cffa3d-2c3f-464a-a2b0-19bd447b4b95!',
+							id: '71cffa3d-2c3f-464a-a2b0-19bd447b4b95',
+							status: HTTP_RESPONSE_STATUS_CODES.NOT_FOUND
 						},{
-							error: 'Unable to find document with _id = 71cffa3d-2c3f-464a-a2b0-19bd447b4b96!'
+							action: 'delete',
+							error: 'Unable to find document with id = 71cffa3d-2c3f-464a-a2b0-19bd447b4b96!',
+							id: '71cffa3d-2c3f-464a-a2b0-19bd447b4b96',
+							status: HTTP_RESPONSE_STATUS_CODES.NOT_FOUND
 						}],
 						contentType: 'text/json;charset=utf-8',
 						status: HTTP_RESPONSE_STATUS_CODES.OK
@@ -282,7 +293,10 @@ describe('webapp', () => {
 							}
 						}
 					});
-					// log.debug('queryRes: %s', queryRes);
+					// log.error('queryRes: %s', queryRes);
+
+					const documentNode1 = collectionConnection.get(queryRes.hits[0].id);
+					const documentNode2 = collectionConnection.get(queryRes.hits[1].id);
 
 					const deleteResponse = moduleName.default({
 						params: {
@@ -295,9 +309,23 @@ describe('webapp', () => {
 
 					expect(deleteResponse).toStrictEqual({
 						body: [{
-							_id: queryRes.hits[0].id,
+							action: 'delete',
+							collection: documentNode1['document_metadata']['collection'],
+							collector: documentNode1['document_metadata']['collector'],
+							createdTime: documentNode1['document_metadata']['createdTime'],
+							documentType: documentNode1['document_metadata']['documentType'],
+							id: queryRes.hits[0].id,
+							status: HTTP_RESPONSE_STATUS_CODES.OK,
+							valid: documentNode1['document_metadata']['valid']
 						},{
-							_id: queryRes.hits[1].id,
+							action: 'delete',
+							collection: documentNode2['document_metadata']['collection'],
+							collector: documentNode2['document_metadata']['collector'],
+							createdTime: documentNode2['document_metadata']['createdTime'],
+							documentType: documentNode2['document_metadata']['documentType'],
+							id: queryRes.hits[1].id,
+							status: HTTP_RESPONSE_STATUS_CODES.OK,
+							valid: documentNode2['document_metadata']['valid']
 						}],
 						contentType: 'text/json;charset=utf-8',
 						status: HTTP_RESPONSE_STATUS_CODES.OK
