@@ -1,9 +1,16 @@
 // import type { NestedRecord } from "/lib/explorer/types";
 
+export type HttpRequestHeader = {
+	error?: string // Should only be used by the UI, not persisted to the server
+	name: string
+	value: string
+}
+
 // Use type instead of interface, because interface doesn't satify AnyObject
 export type CollectorConfig = {
 	baseUri?: string
 	excludes?: string|string[]
+	httpRequestHeaders?: HttpRequestHeader[]
 	keepHtml?: boolean
 	maxPages?: number
 	userAgent?: string
@@ -19,6 +26,7 @@ export type RobotsTxt = {
 export type WebCrawlConfig = {
 	baseUri?: string
 	excludes?: string|string[]
+	httpRequestHeaders?: HttpRequestHeader[]
 	keepHtml?: boolean
 	maxPages?: number
 	userAgent?: string

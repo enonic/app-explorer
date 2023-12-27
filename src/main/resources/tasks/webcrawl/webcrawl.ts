@@ -19,11 +19,8 @@ import 'core-js/stable/array/includes';
 // TypeError: Object.getOwnPropertyDescriptors is not a function
 require('object.getownpropertydescriptors').shim(); // eslint-disable-line @typescript-eslint/no-var-requires
 
-import {
-	// VALUE_TYPE_STRING,
-	forceArray,
-	toStr
-} from '@enonic/js-utils';
+import {forceArray} from '@enonic/js-utils/array/forceArray';
+import {toStr} from '@enonic/js-utils/value/toStr';
 
 // Cheerio import causes:
 // TypeError: Cannot read property "TYPED_ARRAY_SUPPORT" from undefined
@@ -208,6 +205,7 @@ export function run({
 	} = collector.config;
 	const {
 		excludes = [],
+		httpRequestHeaders = [],
 		keepHtml = false,
 		maxPages = 1000,
 		resume = false,
@@ -216,6 +214,7 @@ export function run({
 	TRACE && log.debug('keepHtml:%s', keepHtml);
 	DEBUG && log.debug('userAgent:%s', userAgent);
 
+	// NOTE: This forceArray is probably not needed, as configJson comes from collectorNode.collector.configJson
 	const excludeRegExps = forceArray(excludes).map(str => new RegExp(str));
 
 	if (!baseUri.includes('://')) { baseUri = `https://${baseUri}`;}
@@ -309,11 +308,16 @@ export function run({
 					.replace(/^.*?\//, '/') // domain www.enonic.com
 				TRACE && log.debug('urlWithoutSchemeAndDomain:%s', urlWithoutSchemeAndDomain);
 				throwIfExcluded(urlWithoutSchemeAndDomain);
+				const headers = { // HTTP/2 uses lowercase header keys
+					'user-agent': userAgent
+				};
+				httpRequestHeaders.forEach(({name, value}) => {
+					headers[name.toLowerCase()] = value;
+				});
+				TRACE && log.debug('headers:%s', toStr(headers));
 				const res = httpClientRequest({
 					followRedirects: true, // https://www.enonic.com uses 302
-					headers: { // HTTP/2 uses lowercase header keys
-						'user-agent': userAgent
-					},
+					headers,
 					url
 				}) as Response; TRACE && log.debug('res:%s', toStr(res));
 
@@ -552,7 +556,8 @@ export function run({
 
 					// log.error('documentToPersist:%s', documentToPersist);
 					const persistedDocument = collector.persistDocument(
-						documentToPersist, {
+						documentToPersist,
+						{
 							// Must be identical to a _name in src/main/resources/documentTypes.json
 							documentTypeName: 'webpage',
 							language: lang || ogLocale
