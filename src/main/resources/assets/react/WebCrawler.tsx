@@ -17,8 +17,9 @@ import {DeleteItemButton} from './components/DeleteItemButton';
 import {InsertButton} from './components/InsertButton';
 import {MoveDownButton} from './components/MoveDownButton';
 import {MoveUpButton} from './components/MoveUpButton';
-import {useWebCrawlerState} from './useWebCrawlerState';
 import {DEFAULT_UA} from '../../tasks/webcrawl/constants';
+import { HttpRequestHeaders } from './webcrawler/HttpRequestHeaders';
+import { useWebCrawlerState } from './webcrawler/useWebCrawlerState';
 
 
 export const CollectorForm = React.forwardRef(({
@@ -33,6 +34,7 @@ export const CollectorForm = React.forwardRef(({
 		baseUriOnBlur,
 		baseUriOnChange,
 		excludesArray,
+		httpRequestHeaders, setHttpRequestHeaders,
 		keepHtml,
 		maxPages, setMaxPages,
 		setExcludesArray,
@@ -141,6 +143,10 @@ export const CollectorForm = React.forwardRef(({
 			onChange={(_event,{value}) => setUserAgent(value)}
 			placeholder={`Leave empty to use ${DEFAULT_UA}`}
 			value={userAgent}
+		/>
+		<HttpRequestHeaders
+			httpRequestHeaders={httpRequestHeaders}
+			setHttpRequestHeaders={setHttpRequestHeaders}
 		/>
 	</Form>;
 }); // Collector

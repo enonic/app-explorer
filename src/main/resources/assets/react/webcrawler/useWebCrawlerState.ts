@@ -3,7 +3,10 @@ import type {
 	CollectorComponentAfterResetFunction,
 	CollectorComponentValidateFunction
 } from '@enonic-types/lib-explorer';
-import type { CollectorConfig } from '/tasks/webcrawl/webcrawl.d';
+import type {
+	CollectorConfig,
+	HttpRequestHeader
+} from '/tasks/webcrawl/webcrawl.d';
 
 
 import {
@@ -11,7 +14,7 @@ import {
 	isSet,
 } from '@enonic/js-utils';
 import * as React from 'react';
-import {useUpdateEffect} from './utils/useUpdateEffect';
+import {useUpdateEffect} from '../utils/useUpdateEffect';
 
 
 export function useWebCrawlerState({
@@ -76,6 +79,17 @@ export function useWebCrawlerState({
 		return {
 			...prevCollectorConfig,
 			userAgent: newUserAgent
+		};
+	});
+
+	const httpRequestHeaders = collectorConfig && collectorConfig.httpRequestHeaders ? forceArray(collectorConfig.httpRequestHeaders) : [];
+	// console.debug('httpRequestHeaders', httpRequestHeaders);
+
+	const setHttpRequestHeaders = (newHttpRequestHeaders: HttpRequestHeader[]) => setCollectorConfig(prevCollectorConfig => {
+		// console.debug('setHttpRequestHeaders newHttpRequestHeaders', newHttpRequestHeaders);
+		return {
+			...prevCollectorConfig,
+			httpRequestHeaders: newHttpRequestHeaders
 		};
 	});
 
@@ -154,9 +168,13 @@ export function useWebCrawlerState({
 	//──────────────────────────────────────────────────────────────────────────
 	useUpdateEffect(() => {
 		//console.debug('Collector component baseUriError changed', baseUriError);
-		setCollectorConfigErrorCount(baseUriError ? 1 : 0);
+		let newErrorCount = httpRequestHeaders.filter(({error}) => error).length;
+		if (baseUriError) newErrorCount++;
+		// console.debug('newErrorCount', newErrorCount);
+		setCollectorConfigErrorCount(newErrorCount);
 	}, [
-		baseUriError
+		baseUriError,
+		httpRequestHeaders
 	]);
 
 	return {
@@ -165,6 +183,7 @@ export function useWebCrawlerState({
 		baseUriOnChange,
 		baseUriError,
 		excludesArray,
+		httpRequestHeaders, setHttpRequestHeaders,
 		keepHtml,
 		maxPages, setMaxPages,
 		setExcludesArray,
