@@ -5,19 +5,10 @@ import type {
 import type { CollectorConfig } from '/tasks/webcrawl/webcrawl.d';
 
 import * as React from 'react';
-import {
-	Button,
-	Form,
-	Header,
-	Icon,
-	Input,
-	Table
-} from 'semantic-ui-react';
-import {DeleteItemButton} from './components/DeleteItemButton';
-import {InsertButton} from './components/InsertButton';
-import {MoveDownButton} from './components/MoveDownButton';
-import {MoveUpButton} from './components/MoveUpButton';
-import {DEFAULT_UA} from '../../tasks/webcrawl/constants';
+import { Form } from 'semantic-ui-react';
+
+import { DEFAULT_UA } from '../../tasks/webcrawl/constants';
+import { Excludes } from './webcrawler/Excludes';
 import { HttpRequestHeaders } from './webcrawler/HttpRequestHeaders';
 import { useWebCrawlerState } from './webcrawler/useWebCrawlerState';
 
@@ -57,72 +48,10 @@ export const CollectorForm = React.forwardRef(({
 			required
 			value={baseUri}
 		/>
-		{excludesArray && Array.isArray(excludesArray) && excludesArray.length
-			? <>
-				<Header as='h4' content='Exclude pattern(s)' dividing/>
-				<Table celled compact selectable striped>
-					<Table.Header>
-						<Table.Row>
-							<Table.HeaderCell collapsing>Regular expression</Table.HeaderCell>
-							<Table.HeaderCell collapsing>Actions</Table.HeaderCell>
-						</Table.Row>
-					</Table.Header>
-					<Table.Body>{excludesArray.map((
-						exclude = '',
-						index
-					) => {
-						return <Table.Row key={index}>
-							<Table.Cell>
-								<Input
-									fluid
-									onChange={(_event,{value}) => {
-										const deref = JSON.parse(JSON.stringify(excludesArray));
-										deref[index] = value;
-										setExcludesArray(deref);
-									}}
-									value={exclude}
-								/>
-							</Table.Cell>
-							<Table.Cell collapsing>
-								<Button.Group>
-									<InsertButton
-										array={excludesArray}
-										insertAtIndex={index + 1}
-										setArrayFunction={setExcludesArray}
-										valueToInsert=''
-									/>
-									<MoveDownButton
-										array={excludesArray}
-										index={index}
-										setArrayFunction={setExcludesArray}
-									/>
-									<MoveUpButton
-										array={excludesArray}
-										index={index}
-										setArrayFunction={setExcludesArray}
-									/>
-									<DeleteItemButton
-										array={excludesArray}
-										disabled={false}
-										index={index}
-										setArrayFunction={setExcludesArray}
-									/>
-								</Button.Group>
-							</Table.Cell>
-						</Table.Row>;
-					})}</Table.Body>
-				</Table>
-			</>
-			: <Form.Field>
-				<Button
-					onClick={() => {
-						setExcludesArray(['']);
-					}}
-				>
-					<Icon color='green' name='plus'/>Add exclude pattern(s)
-				</Button>
-			</Form.Field>
-		}
+		<Excludes
+			excludesArray={excludesArray}
+			setExcludesArray={setExcludesArray}
+		/>
 		<Form.Input
 			label='Max pages'
 			max={100000}
