@@ -8,6 +8,7 @@ import * as React from 'react';
 import { Form } from 'semantic-ui-react';
 
 import { DEFAULT_UA } from '../../tasks/webcrawl/constants';
+import { Browserless } from './webcrawler/Browserless';
 import { Excludes } from './webcrawler/Excludes';
 import { HttpRequestHeaders } from './webcrawler/HttpRequestHeaders';
 import { useWebCrawlerState } from './webcrawler/useWebCrawlerState';
@@ -24,6 +25,7 @@ export const CollectorForm = React.forwardRef(({
 		baseUriError,
 		baseUriOnBlur,
 		baseUriOnChange,
+		browserlessUrl, setBrowserlessUrl,
 		excludesArray,
 		httpRequestHeaders, setHttpRequestHeaders,
 		keepHtml,
@@ -76,6 +78,10 @@ export const CollectorForm = React.forwardRef(({
 		<HttpRequestHeaders
 			httpRequestHeaders={httpRequestHeaders}
 			setHttpRequestHeaders={setHttpRequestHeaders}
+		/>
+		<Browserless
+			browserlessUrl={browserlessUrl}
+			setBrowserlessUrl={setBrowserlessUrl}
 		/>
 	</Form>;
 }); // Collector
