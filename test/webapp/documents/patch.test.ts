@@ -19,7 +19,8 @@ import type {
 	Repository,
 	get as getRepo
 } from '@enonic-types/lib-repo';
-import type { PostRequest } from '../../../src/main/resources/webapp/documents/createOrUpdateMany';
+import type { DocumentNode } from '/lib/explorer/types/Document';
+import type { PostRequest } from '../../../src/main/resources/webapp/documents/createOrGetOrModifyOrDeleteMany';
 import type { PatchRequest } from '../../../src/main/resources/webapp/documents/patch';
 
 
@@ -49,8 +50,8 @@ const log = Log.createLogger({
 	// loglevel: 'debug'
 	// loglevel: 'info'
 	// loglevel: 'warn'
-	// loglevel: 'error'
-	loglevel: 'silent'
+	loglevel: 'error'
+	// loglevel: 'silent'
 });
 
 //──────────────────────────────────────────────────────────────────────────────
@@ -191,10 +192,9 @@ describe('webapp', () => {
 				repoId: COLLECTION_REPO_ID
 			});
 
-			import('../../../src/main/resources/webapp/documents/createOrUpdateMany').then((moduleName) => {
+			import('../../../src/main/resources/webapp/documents/createOrGetOrModifyOrDeleteMany').then((moduleName) => {
 				const createOrUpdateManyResponse = moduleName.default({
 					body: JSON.stringify({
-						_documentTypeId: createdDocumentTypeNode._id,
 						key: 'value'
 					}),
 					contentType: 'application/json',
@@ -202,12 +202,30 @@ describe('webapp', () => {
 						authorization: `Explorer-Api-Key ${API_KEY}`
 					},
 					params: {
+						documentTypeId: createdDocumentTypeNode._id,
 						requireValid: 'false'
 					},
 					pathParams: {
 						collectionName: COLLECTION_NAME
 					}
 				} as PostRequest);
+				// const queryRes = collectionConnection.query({
+				// 	query: {
+				// 		boolean: {
+				// 			must: {
+				// 				term: {
+				// 					field: '_nodeType',
+				// 					value: NodeType.DOCUMENT
+				// 				}
+				// 			}
+				// 		}
+				// 	}
+				// });
+				// // log.error('queryRes: %s', queryRes);
+				// queryRes.hits.forEach(({id}) => {
+				// 	const documentNode = collectionConnection.get(id) as unknown as DocumentNode;
+				// 	log.error('documentNode: %s', documentNode);
+				// });
 			});
 
 			it('returns 404 Not found when there are no documents with documentId', () => {
@@ -229,18 +247,20 @@ describe('webapp', () => {
 				// 	log.debug('documentNode: %s', documentNode);
 				// });
 				import('../../../src/main/resources/webapp/documents/patch').then((moduleName) => {
-					expect(moduleName.default({
+					const patchRes = moduleName.default({
 						body: JSON.stringify({
-							// _documentTypeId: createdDocumentTypeNode._id,
 							newKey: 'value'
 						}),
 						pathParams: {
 							collectionName: COLLECTION_NAME,
 							documentId: '71cffa3d-2c3f-464a-a2b0-19bd447b4b95'
 						}
-					} as PatchRequest)).toStrictEqual({
+					} as PatchRequest);
+					// log.error('patchRes: %s', patchRes);
+					expect(patchRes).toStrictEqual({
 						body: {
-							message: 'Document with id "71cffa3d-2c3f-464a-a2b0-19bd447b4b95" does not exist in collection "my_collection"!'
+							error: 'Document with id "71cffa3d-2c3f-464a-a2b0-19bd447b4b95" does not exist in collection "my_collection"!',
+							id: '71cffa3d-2c3f-464a-a2b0-19bd447b4b95'
 						},
 						contentType: 'text/json;charset=utf-8',
 						status: HTTP_RESPONSE_STATUS_CODES.NOT_FOUND
@@ -262,9 +282,12 @@ describe('webapp', () => {
 							}
 						}
 					});
-					// log.debug('queryRes: %s', queryRes);
+					// log.error('queryRes: %s', queryRes);
 
-					const cleanedNode = collectionConnection.get(queryRes.hits[0].id);
+					const documentNode = collectionConnection.get(queryRes.hits[0].id);
+					// log.error('documentNode: %s', documentNode);
+
+					const cleanedNode = JSON.parse(JSON.stringify(documentNode)) as DocumentNode;
 					delete cleanedNode['_indexConfig'];
 					delete cleanedNode['_inheritsPermissions'];
 					delete cleanedNode['_nodeType'];
@@ -274,21 +297,36 @@ describe('webapp', () => {
 					delete cleanedNode['_versionKey'];
 					// delete cleanedNode['document_metadata']; // TODO: Should this be deleted?
 					cleanedNode['newkey'] = 'value'; // Yes, property keys are contrained.
+					// log.error('cleanedNode: %s', cleanedNode);
 
 					const patchResponse = moduleName.default({
 						body: JSON.stringify({
-							// _documentTypeId: createdDocumentTypeNode._id,
 							newKey: 'value'
 						}),
+						params: {
+							returnDocument: 'true'
+						},
 						pathParams: {
 							collectionName: COLLECTION_NAME,
 							documentId: queryRes.hits[0].id
 						}
 					} as PatchRequest);
-					cleanedNode[FieldPath.META]['modifiedTime'] = patchResponse.body[FieldPath.META]['modifiedTime'];
+					// log.error('patchResponse: %s', patchResponse);
 
 					expect(patchResponse).toStrictEqual({
-						body: cleanedNode,
+						body: {
+							collection: documentNode['document_metadata']['collection'],
+							collector: documentNode['document_metadata']['collector'],
+							createdTime: documentNode['document_metadata']['createdTime'],
+							document: {
+								key: documentNode['key'],
+								newkey: 'value',
+							},
+							documentType: documentNode['document_metadata']['documentType'],
+							id: queryRes.hits[0].id,
+							modifiedTime: patchResponse.body['modifiedTime'],
+							valid: documentNode['document_metadata']['valid'],
+						},
 						contentType: 'text/json;charset=utf-8',
 						status: HTTP_RESPONSE_STATUS_CODES.OK
 					});

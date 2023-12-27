@@ -28,8 +28,10 @@ import mockLibXpContext from '../../mocks/libXpContext';
 import mockLibXpCommon from '../../mocks/libXpCommon';
 import mockLibXpMail from '../../mocks/libXpMail';
 import mockLibXpEvent from '../../mocks/libXpEvent';
+import mockLibXpIo from '../../mocks/libXpIo';
 import mockLibXpNode from '../../mocks/libXpNode';
 import mockLibXpRepo from '../../mocks/libXpRepo';
+import mockLibXpScheduler from '../../mocks/libXpScheduler';
 import mockLibXpTask from '../../mocks/libXpTask';
 import mockLibXpValue from '../../mocks/libXpValue';
 
@@ -47,7 +49,6 @@ const COLLECTOR_CONFIG2 = {
 }
 const CONFIG_JSON = JSON.stringify(COLLECTOR_CONFIG);
 const LANGUAGE = 'en';
-const NAME = 'name';
 
 //──────────────────────────────────────────────────────────────────────────────
 // Globals
@@ -74,14 +75,15 @@ global.Java = {
 	})
 }
 
-// @ts-expect-error TS2339: Property 'log' does not exist on type 'typeof globalThis'.
-global.log = Log.createLogger({
+const log = Log.createLogger({
 	// loglevel: 'debug'
 	// loglevel: 'info'
 	// loglevel: 'warn'
 	// loglevel: 'error'
 	loglevel: 'silent'
 });
+// @ts-expect-error TS2339: Property 'log' does not exist on type 'typeof globalThis'.
+global.log = log;
 
 const javaBridge = new JavaBridge({
 	app: {
@@ -137,8 +139,9 @@ mockLibXpContext({
 		attributes: {}
 	}
 });
-mockLibXpEvent();
-mockLibXpMail();
+mockLibXpEvent({ log });
+mockLibXpIo();
+mockLibXpMail({ log });
 const {
 	connect
 } = mockLibXpNode({
@@ -147,6 +150,7 @@ const {
 mockLibXpRepo({
 	javaBridge
 });
+mockLibXpScheduler();
 mockLibXpTask();
 mockLibXpValue();
 
@@ -267,7 +271,6 @@ describe('webcrawl', () => {
 				collectorId: createdDocumentType._id, // COLLECTOR_ID,
 				configJson: CONFIG_JSON,
 				language: LANGUAGE,
-				name: NAME,
 			})
 			// javaBridge.repo.list().forEach((repo) => {
 			// 	// log.debug('repo:%s', repo);
@@ -326,7 +329,6 @@ describe('webcrawl', () => {
 				collectorId: createdDocumentType._id, // COLLECTOR_ID,
 				configJson: JSON.stringify(COLLECTOR_CONFIG2),
 				language: LANGUAGE,
-				name: NAME,
 			})
 			// javaBridge.repo.list().forEach((repo) => {
 			// 	// log.debug('repo:%s', repo);

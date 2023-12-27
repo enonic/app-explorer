@@ -20,7 +20,7 @@ import type {
 	get as getRepo
 } from '@enonic-types/lib-repo';
 import type { DocumentNode } from '/lib/explorer/types/Document';
-import type { PostRequest } from '../../../src/main/resources/webapp/documents/createOrUpdateMany';
+import type { PostRequest } from '../../../src/main/resources/webapp/documents/createOrGetOrModifyOrDeleteMany';
 
 
 import {
@@ -44,8 +44,8 @@ const log = Log.createLogger({
 	// loglevel: 'debug'
 	// loglevel: 'info'
 	// loglevel: 'warn'
-	// loglevel: 'error'
-	loglevel: 'silent'
+	loglevel: 'error'
+	// loglevel: 'silent'
 });
 
 //──────────────────────────────────────────────────────────────────────────────
@@ -219,10 +219,9 @@ describe('webapp', () => {
 			});
 
 			it('creates a single document and modifies the documentType', () => {
-				import('../../../src/main/resources/webapp/documents/createOrUpdateMany').then((moduleName) => {
+				import('../../../src/main/resources/webapp/documents/createOrGetOrModifyOrDeleteMany').then((moduleName) => {
 					const createOrUpdateManyResponse = moduleName.default({
 						body: JSON.stringify({
-							_documentTypeId: createdDocumentTypeNode._id,
 							key: 'value'
 						}),
 						contentType: 'application/json',
@@ -230,12 +229,18 @@ describe('webapp', () => {
 							authorization: `Explorer-Api-Key ${API_KEY}`
 						},
 						params: {
-							requireValid: 'false'
+							// documentType: createdDocumentTypeNode._name,
+							documentTypeId: createdDocumentTypeNode._id,
+							// partial: 'false',
+							requireValid: 'false',
+							// returnDocument: 'true'
 						},
 						pathParams: {
 							collectionName: COLLECTION_NAME
 						}
 					} as PostRequest);
+					// log.error('createOrUpdateManyResponse', createOrUpdateManyResponse);
+
 					const queryRes = collectionConnection.query({
 						query: {
 							boolean: {
@@ -248,7 +253,8 @@ describe('webapp', () => {
 							}
 						}
 					});
-					// log.debug('queryRes', queryRes);
+					// log.error('queryRes', queryRes);
+
 					expect(queryRes.total).toBe(1);
 					let documentNode: DocumentNode;
 					queryRes.hits.forEach(({id}) => {
@@ -256,9 +262,19 @@ describe('webapp', () => {
 						// log.debug('documentNode', documentNode);
 					});
 					expect(createOrUpdateManyResponse).toStrictEqual({
-						body: [{
-							_id: documentNode._id,
-						}],
+						body: {
+							collection: documentNode['document_metadata']['collection'],
+							collector: documentNode['document_metadata']['collector'],
+							createdTime: documentNode['document_metadata']['createdTime'],
+							document: {
+								key: 'value'
+							},
+							documentType: documentNode['document_metadata']['documentType'],
+							id: documentNode._id,
+							language: documentNode['document_metadata']['language'],
+							stemmingLanguage: documentNode['document_metadata']['stemmingLanguage'],
+							valid: documentNode['document_metadata']['valid'],
+						},
 						contentType: 'text/json;charset=utf-8',
 						status: 200
 					});
@@ -284,32 +300,41 @@ describe('webapp', () => {
 						name: 'key',
 						nGram: false,
 						path: false,
+						stemmed: false,
 						valueType: 'string'
 					}]);
 				});
 			}); // it
 
 			it('creates multiple documents', () => {
-				import('../../../src/main/resources/webapp/documents/createOrUpdateMany').then((moduleName) => {
+				import('../../../src/main/resources/webapp/documents/createOrGetOrModifyOrDeleteMany').then((moduleName) => {
 					const createOrUpdateManyResponse = moduleName.default({
 						body: JSON.stringify([{
-							_documentType: createdDocumentTypeNode._name,
-							key: 'value1'
+							action: 'create',
+							document: {
+								key: 'value1'
+							}
 						},{
-							key: 'value2'
+							action: 'create',
+							document: {
+								key: 'value2'
+							}
 						}]),
 						contentType: 'application/json',
 						headers: {
 							authorization: `Explorer-Api-Key ${API_KEY}`
 						},
 						params: {
-							documentTypeId: createdDocumentTypeNode._id,
+							documentType: createdDocumentTypeNode._name,
+							// documentTypeId: createdDocumentTypeNode._id,
 							requireValid: 'false'
 						},
 						pathParams: {
 							collectionName: COLLECTION_NAME
 						}
 					} as PostRequest);
+					// log.error('createOrUpdateManyResponse', createOrUpdateManyResponse);
+
 					const queryRes = collectionConnection.query({
 						query: {
 							boolean: {
@@ -322,18 +347,38 @@ describe('webapp', () => {
 							}
 						}
 					});
-					log.debug('queryRes', queryRes);
+					// log.error('queryRes', queryRes);
+
 					expect(queryRes.total).toBe(2);
 					// queryRes.hits.forEach(({id}) => {
 					// 	const documentNode = collectionConnection.get(id) as unknown as DocumentNode;
 					// 	log.debug('documentNode', documentNode);
 					// });
 					expect(createOrUpdateManyResponse).toStrictEqual({
-						body: [{
-							_id: queryRes.hits[0].id,
-						},{
-							_id: queryRes.hits[1].id,
-						}],
+						body: queryRes.hits.map(({id}) => {
+							const documentNode = collectionConnection.get(id) as unknown as DocumentNode;
+							const {
+								collection,
+								collector,
+								createdTime,
+								documentType,
+								language,
+								stemmingLanguage,
+								valid
+							} = documentNode.document_metadata;
+							return {
+								action: 'create',
+								collection,
+								collector,
+								createdTime,
+								documentType,
+								id,
+								language,
+								status: 200,
+								stemmingLanguage,
+								valid
+							};
+						}),
 						contentType: 'text/json;charset=utf-8',
 						status: 200
 					});
@@ -346,7 +391,7 @@ describe('webapp', () => {
 			}); // it
 
 			it('creates document using query param documentType', () => {
-				import('../../../src/main/resources/webapp/documents/createOrUpdateMany').then((moduleName) => {
+				import('../../../src/main/resources/webapp/documents/createOrGetOrModifyOrDeleteMany').then((moduleName) => {
 					const createOrUpdateManyResponse = moduleName.default({
 						body: JSON.stringify({
 							key: 'value'
@@ -363,6 +408,8 @@ describe('webapp', () => {
 							collectionName: COLLECTION_NAME
 						}
 					} as PostRequest);
+					// log.error('createOrUpdateManyResponse', createOrUpdateManyResponse);
+
 					const queryRes = collectionConnection.query({
 						query: {
 							boolean: {
@@ -375,16 +422,36 @@ describe('webapp', () => {
 							}
 						}
 					});
-					// log.debug('queryRes', queryRes);
+					// log.error('queryRes', queryRes);
+
 					expect(queryRes.total).toBe(1);
-					// queryRes.hits.forEach(({id}) => {
-					// 	const documentNode = collectionConnection.get(id) as unknown as DocumentNode;
-					// 	log.debug('documentNode', documentNode);
-					// });
+
+					const documentNode = collectionConnection.get(queryRes.hits[0].id) as unknown as DocumentNode;
+					// log.error('documentNode', documentNode);
+					const {
+						collection,
+						collector,
+						createdTime,
+						documentType,
+						language,
+						stemmingLanguage,
+						valid
+					} = documentNode.document_metadata;
+
 					expect(createOrUpdateManyResponse).toStrictEqual({
-						body: [{
-							_id: queryRes.hits[0].id,
-						}],
+						body: {
+							collection,
+							collector,
+							createdTime,
+							document: {
+								key: 'value'
+							},
+							documentType,
+							id: documentNode._id,
+							language,
+							stemmingLanguage,
+							valid
+						},
 						contentType: 'text/json;charset=utf-8',
 						status: 200
 					});
@@ -395,11 +462,14 @@ describe('webapp', () => {
 			}); // it
 
 			it("does NOT create a document when it's unable to determine documentType", () => {
-				import('../../../src/main/resources/webapp/documents/createOrUpdateMany').then((moduleName) => {
+				import('../../../src/main/resources/webapp/documents/createOrGetOrModifyOrDeleteMany').then((moduleName) => {
 					const createOrUpdateManyResponse = moduleName.default({
-						body: JSON.stringify({
-							key: 'value'
-						}),
+						body: JSON.stringify([{
+							action: 'create',
+							document: {
+								key: 'value'
+							}
+						}]),
 						contentType: 'application/json',
 						headers: {
 							authorization: `Explorer-Api-Key ${API_KEY}`
@@ -411,7 +481,8 @@ describe('webapp', () => {
 							collectionName: COLLECTION_NAME
 						}
 					} as PostRequest);
-					// log.debug('createOrUpdateManyResponse', createOrUpdateManyResponse);
+					// log.error('createOrUpdateManyResponse', createOrUpdateManyResponse);
+
 					const queryRes = collectionConnection.query({
 						query: {
 							boolean: {
@@ -424,7 +495,8 @@ describe('webapp', () => {
 							}
 						}
 					});
-					// log.debug('queryRes', queryRes);
+					// log.error('queryRes', queryRes);
+
 					expect(queryRes.total).toBe(0);
 					expect(createOrUpdateManyResponse).toStrictEqual({
 						body: [{
@@ -437,10 +509,9 @@ describe('webapp', () => {
 			}); // it
 
 			it('creates a single document when documentType is only stored in the collection', () => {
-				import('../../../src/main/resources/webapp/documents/createOrUpdateMany').then((moduleName) => {
+				import('../../../src/main/resources/webapp/documents/createOrGetOrModifyOrDeleteMany').then((moduleName) => {
 					const createOrUpdateManyResponse = moduleName.default({
 						body: JSON.stringify({
-							_documentTypeId: createdDocumentTypeNode._id,
 							key: 'value'
 						}),
 						contentType: 'application/json',
@@ -448,12 +519,15 @@ describe('webapp', () => {
 							authorization: `Explorer-Api-Key ${API_KEY}`
 						},
 						params: {
+							documentTypeId: createdDocumentTypeNode._id,
 							requireValid: 'false'
 						},
 						pathParams: {
 							collectionName: COLLECTION_NAME2
 						}
 					} as PostRequest);
+					// log.error('createOrUpdateManyResponse', createOrUpdateManyResponse);
+
 					const queryRes = collection2Connection.query({
 						query: {
 							boolean: {
@@ -466,7 +540,8 @@ describe('webapp', () => {
 							}
 						}
 					});
-					// log.debug('queryRes', queryRes);
+					// log.error('queryRes', queryRes);
+
 					expect(queryRes.total).toBe(1);
 					let documentNode: DocumentNode;
 					queryRes.hits.forEach(({id}) => {
@@ -474,9 +549,17 @@ describe('webapp', () => {
 						// log.debug('documentNode', documentNode);
 					});
 					expect(createOrUpdateManyResponse).toStrictEqual({
-						body: [{
-							_id: documentNode._id,
-						}],
+						body: {
+							collection: documentNode['document_metadata']['collection'],
+							collector: documentNode['document_metadata']['collector'],
+							createdTime: documentNode['document_metadata']['createdTime'],
+							document: {
+								key: 'value'
+							},
+							documentType: documentNode['document_metadata']['documentType'],
+							id: documentNode._id,
+							valid: documentNode['document_metadata']['valid'],
+						},
 						contentType: 'text/json;charset=utf-8',
 						status: 200
 					});

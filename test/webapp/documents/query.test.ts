@@ -20,7 +20,7 @@ import type {
 	get as getRepo
 } from '@enonic-types/lib-repo';
 import type { DocumentNode } from '/lib/explorer/types/Document';
-import type { PostRequest } from '../../../src/main/resources/webapp/documents/createOrUpdateMany';
+import type { PostRequest } from '../../../src/main/resources/webapp/documents/createOrGetOrModifyOrDeleteMany';
 import type { QueryRequest } from '../../../src/main/resources/webapp/documents/query';
 
 
@@ -46,8 +46,8 @@ const log = Log.createLogger({
 	// loglevel: 'debug'
 	// loglevel: 'info'
 	// loglevel: 'warn'
-	// loglevel: 'error'
-	loglevel: 'silent'
+	loglevel: 'error'
+	// loglevel: 'silent'
 });
 
 //──────────────────────────────────────────────────────────────────────────────
@@ -198,12 +198,18 @@ describe('webapp', () => {
 	describe('documents', () => {
 		describe('query', () => {
 			it('An empty query without filters returns all documents', () => {
-				import('../../../src/main/resources/webapp/documents/createOrUpdateMany').then((createOrUpdateManyModule) => {
+				import('../../../src/main/resources/webapp/documents/createOrGetOrModifyOrDeleteMany').then((createOrUpdateManyModule) => {
 					createOrUpdateManyModule.default({
 						body: JSON.stringify([{
-							key1: 'value1'
+							action: 'create',
+							document: {
+								key1: 'value1'
+							}
 						},{
-							key2: 'value2'
+							action: 'create',
+							document: {
+								key2: 'value2'
+							}
 						}]),
 						contentType: 'application/json',
 						headers: {
@@ -234,7 +240,8 @@ describe('webapp', () => {
 							}
 						}
 					});
-					// log.debug('nodeQueryRes', nodeQueryRes);
+					// log.error('nodeQueryRes', nodeQueryRes);
+
 					import('../../../src/main/resources/webapp/documents/query').then((moduleName) => {
 						const queryResponse = moduleName.default({
 							// body: JSON.stringify({
@@ -246,16 +253,40 @@ describe('webapp', () => {
 							// 	sort: 'score DESC',
 							// 	start: 0
 							// }),
+							// params: {
+							// 	returnDocument: 'true'
+							// },
 							pathParams: {
 								collectionName: COLLECTION_NAME
 							}
 						} as QueryRequest);
-						// log.debug('queryResponse', queryResponse);
+						// log.error('queryResponse', queryResponse);
+
 						import('../../../src/main/resources/webapp/documents/stripDocumentNode').then((stripDocumentNodeModule) => {
 							expect(queryResponse).toStrictEqual({
-								body: nodeQueryRes.hits.map(({id}) =>
-									stripDocumentNodeModule.default(collectionConnection.get(id) as unknown as DocumentNode)
-								),
+								body: {
+									count: 2,
+									hits: nodeQueryRes.hits.map(({id}) => {
+										const documentNode = collectionConnection.get(id) as unknown as DocumentNode;
+										const stripped = stripDocumentNodeModule.default(documentNode);
+										return {
+											collection: documentNode['document_metadata']['collection'],
+											collector: documentNode['document_metadata']['collector'],
+											createdTime: documentNode['document_metadata']['createdTime'],
+											// document: {
+											// 	key1: documentNode['key1'],
+											// 	key2: documentNode['key2'],
+											// },
+											documentType: documentNode['document_metadata']['documentType'],
+											id,
+											language: 'en',
+											stemmingLanguage: 'en',
+											valid: documentNode['document_metadata']['valid'],
+										};
+										}
+									),
+									total: 2
+								},
 								contentType: 'text/json;charset=utf-8',
 								status: HTTP_RESPONSE_STATUS_CODES.OK
 							});
