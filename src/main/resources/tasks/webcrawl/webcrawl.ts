@@ -202,17 +202,23 @@ export function run({
 
 	let {
 		baseUri,
+		userAgent = DEFAULT_UA // Doesn't handle '' or null
 	} = collector.config;
+
+	if (!userAgent) {
+		userAgent = DEFAULT_UA;
+	}
+	DEBUG && log.debug('userAgent:%s', userAgent);
+
 	const {
+		browserlessUrl,
 		excludes = [],
 		httpRequestHeaders = [],
 		keepHtml = false,
 		maxPages = 1000,
 		resume = false,
-		userAgent = DEFAULT_UA
 	} = collector.config;
 	TRACE && log.debug('keepHtml:%s', keepHtml);
-	DEBUG && log.debug('userAgent:%s', userAgent);
 
 	// NOTE: This forceArray is probably not needed, as configJson comes from collectorNode.collector.configJson
 	const excludeRegExps = forceArray(excludes).map(str => new RegExp(str));
@@ -315,11 +321,35 @@ export function run({
 					headers[name.toLowerCase()] = value;
 				});
 				TRACE && log.debug('headers:%s', toStr(headers));
-				const res = httpClientRequest({
+
+				TRACE && log.debug('browserlessUrl:%s', browserlessUrl);
+
+				const headersWithoutUserAgent = {...headers};
+				delete headersWithoutUserAgent['user-agent'];
+
+				const requestParams = browserlessUrl ? {
+					// NOTE: https://chrome.browserless.io/docs/#/Browser%20API/post_content
+					body: JSON.stringify({
+						// The user-agent that Browserless uses when requesting the internet is:
+						// 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/119.0.0.0 Safari/537.36'
+						// Overriding it:
+						userAgent,
+						url
+					}),
+					contentType: 'application/json',
+					followRedirects: true,
+					headers: headersWithoutUserAgent,
+					method: 'POST',
+					url: browserlessUrl
+				} : {
 					followRedirects: true, // https://www.enonic.com uses 302
 					headers,
 					url
-				}) as Response; TRACE && log.debug('res:%s', toStr(res));
+				};
+				DEBUG && log.debug('requestParams:%s', toStr(requestParams));
+
+				const res: Response = httpClientRequest(requestParams);
+				TRACE && log.debug('res:%s', toStr(res));
 
 				if (res.status === 404) {
 					throw new NotFoundException(url);
