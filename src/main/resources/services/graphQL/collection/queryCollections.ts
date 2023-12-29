@@ -1,32 +1,70 @@
+import type { Filter } from '@enonic-types/core';
+import type { Guillotine } from '@enonic/js-utils/types/node/query/Filters.d';
+import type { AggregationArg } from '../types';
+
+
+import { forceArray } from '@enonic/js-utils/array/forceArray';
+// import { toStr } from '@enonic/js-utils/value/toStr';
 import {PRINCIPAL_EXPLORER_READ} from '/lib/explorer/model/2/constants';
 import {connect} from '/lib/explorer/repo/connect';
 import {getDocumentCount} from '/lib/explorer/collection/getDocumentCount';
 import {query as qC} from '/lib/explorer/collection/query';
 import {usedInInterfaces} from '/lib/explorer/collection/usedInInterfaces';
+import {
+	createAggregation,
+	createFilters,
+	// @ts-expect-error No types yet
+} from '/lib/guillotine/util/factory';
 import {getManagedDocumentTypes} from '../collector/addGetManagedDocumentTypes';
 
 
+type GuillotineFilter = Guillotine.BasicFilters | Guillotine.BooleanFilter
+
+
 export function queryCollections({
+	aggregations: aggregationsArg,
 	//count, // Preferring perPage for now
+	filters: filtersArg,
 	page,
 	perPage,
 	query,
 	sort/*,
 	start*/ // Preferring page for now
 } :{
-	page ?:string//number
-	perPage ?:string//number
-	query ?:string
-	sort ?:string
+	aggregations?: AggregationArg[]
+	filters?: GuillotineFilter | GuillotineFilter[]
+	page?: string//number
+	perPage?: string//number
+	query?: string
+	sort?: string
 } = {}) {
-	//log.info(`count:${toStr(count)}`);
-	//log.info(`page:${toStr(page)}`);
-	//log.info(`perPage:${toStr(perPage)}`);
-	//log.info(`sort:${toStr(sort)}`);
+	// log.info(`count:${toStr(count)}`);
+	// log.info(`page:${toStr(page)}`);
+	// log.info(`perPage:${toStr(perPage)}`);
+	// log.info(`sort:${toStr(sort)}`);
+
+	const aggregations = {};
+	if (aggregationsArg) {
+		forceArray(aggregationsArg).forEach((aggregationArg) => {
+			createAggregation(aggregations, aggregationArg)
+		});
+	}
+	// log.debug('aggregations:%s', toStr(aggregations));
+
+	// let filters;
+	let filtersArray: Filter[] = [];
+	if (filtersArg) {
+		// log.info('filtersArg:%s', toStr(filtersArg));
+		filtersArray = createFilters(filtersArg);
+		// log.info('filtersArray:%s', toStr(filtersArray));
+	}
+
 	const connection = connect({ principals: [PRINCIPAL_EXPLORER_READ] });
 	const qr = qC({
+		aggregations,
 		connection,
 		//count,
+		filters: filtersArray,
 		page,
 		perPage,
 		query,
@@ -54,6 +92,7 @@ export function queryCollections({
 	});*/
 	//log.info(`activeCollections:${toStr(activeCollections)}`);
 	const rv = {
+		aggregationsAsJson: qr.aggregations,
 		count: qr.count,
 		page: qr.page,
 		pageEnd: qr.pageEnd,

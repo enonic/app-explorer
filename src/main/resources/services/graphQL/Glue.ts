@@ -20,7 +20,7 @@ import {
 
 
 export type GraphQLFields<T> = {
-	[P in keyof T] :{
+	[P in keyof T]: {
 		resolve?: ({
 			args,
 			context,
@@ -191,12 +191,12 @@ export class Glue<Context extends object = EmptyObject> {
 		name: string
 		values: string[]
 	}) {
-		//log.debug(`addEnumType({name:${name}})`);
-		if(this._enumTypes[name]) {
-			throw new Error(`Enum type ${name} already defined!`);
-		}
-		if(this._uniqueNames[name]) {
+		// log.debug(`addEnumType({name:${name}})`);
+		if(this._uniqueNames[name] && this._uniqueNames[name] !== 'enumType') {
 			throw new Error(`Name ${name} already used as ${this._uniqueNames[name]}!`);
+		}
+		if(this._enumTypes[name]) {
+			return this._enumTypes[name];
 		}
 		this._uniqueNames[name] = 'enumType';
 		this._enumTypes[name] = this.schemaGenerator.createEnumType({
@@ -231,7 +231,7 @@ export class Glue<Context extends object = EmptyObject> {
 	addInputFields<InputFields extends AnyObject = AnyObject>({
 		name,
 		fields
-	}:  {
+	}: {
 		name: string
 		fields: InputFields
 	}) {
@@ -252,11 +252,13 @@ export class Glue<Context extends object = EmptyObject> {
 	// InputType
 	//──────────────────────────────────────────────────────────────────────────────
 
-	addInputType({
+	addInputType<
+		T extends object = EmptyObject
+	>({
 		fields,
 		name
 	}: {
-		fields: Fields
+		fields: Fields<T>
 		name: string
 	}) {
 		//log.debug(`addInputType({name:${name},fields:${toStr(fields)}})`);
@@ -337,7 +339,7 @@ export class Glue<Context extends object = EmptyObject> {
 	}
 
 	addMutation<Args extends AnyObject = AnyObject>({
-		//@ts-ignore
+		// @ts-ignore
 		args = {} as AnyObject,
 		name,
 		resolve,
@@ -350,9 +352,9 @@ export class Glue<Context extends object = EmptyObject> {
 		}>
 		type: ObjectType
 	}) {
-		//log.debug(`addEnumType({name:${name}})`);
+		//log.debug(`addMutation({name:${name}})`);
 		if(this._mutations[name]) {
-			throw new Error(`Enum type ${name} already defined!`);
+			throw new Error(`Mutation ${name} already defined!`);
 		}
 		if(this._uniqueFieldNames[name]) {
 			throw new Error(`Name ${name} already used as ${this._uniqueFieldNames[name]}!`);
@@ -385,7 +387,7 @@ export class Glue<Context extends object = EmptyObject> {
 		}, OneOrMore<T>>
 		type: OneOrMore<ObjectType<T>|UnionType<T>>
 	}) {
-		//log.debug(`addEnumType({name:${name}})`);
+		//log.debug(`addQuery({name:${name}})`);
 		if(this._queries[name]) {
 			return this._queries[name];
 			// throw new Error(`Query ${name} already defined!`);
