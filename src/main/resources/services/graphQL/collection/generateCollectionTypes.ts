@@ -138,6 +138,7 @@ export function generateCollectionTypes({
 	glue.addObjectType({
 		name: GQL_TYPE_COLLECTIONS_QUERY_RESULT,
 		fields: {
+			aggregationsAsJson: { type: GraphQLJson },
 			total: { type: nonNull(GraphQLInt) },
 			count: { type: nonNull(GraphQLInt) },
 			page: { type: GraphQLInt },

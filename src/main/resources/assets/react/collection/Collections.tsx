@@ -18,6 +18,7 @@ import {parseExpression as parseCronExpression} from 'cron-parser';
 import {Link} from 'react-router-dom';
 import {
 	Header,
+	Form,
 	Loader,
 	Popup,
 	Progress,
@@ -27,6 +28,7 @@ import {
 } from 'semantic-ui-react';
 import HoverButton from '../components/buttons/HoverButton';
 import RefreshButton from '../components/buttons/RefreshButton';
+import SearchInput from '../components/inputs/SearchInput';
 import Flex from '../components/Flex';
 import {Cron} from '../utils/Cron';
 import {
@@ -85,12 +87,12 @@ export function Collections(props: {
 		isLoading,
 		jobsObj,
 		locales,
-		memoizedFetchCollections,
-		memoizedFetchOnUpdate,
+		fetchOnUpdate,
 		objCollectionsBeingReindexed,
 		pollTasksWhileActive,
 		queryCollectionsGraph,
 		shemaIdToName,
+		searchString, setSearchString, fetchCollections,
 		setShowCollector,
 		setShowDelete,
 		setShowDocumentType,
@@ -116,37 +118,78 @@ export function Collections(props: {
 			justifyContent='center'
 		>
 			<Flex.Item
-				className='w-ma-fullExceptGutters w-fullExceptGutters-mobileDown'
-				overflowX='overlay'
+				className={[
+					'w-ma-fullExceptGutters',
+					'w-ma-widescreenExceptGutters-widescreenUp',
+					'w-mi-tabletExceptGutters-tabletUp',
+					'w-fullExceptGutters-mobileDown',
+				].join(' ')}
+				overflowX='hidden'
 			>
-				<Segment className='button-padding' floated='left'>
-					<Radio
-						label='Show all fields'
-						checked={showCollector}
-						onChange={(
-							_event: unknown,
-							{ checked }
-						) => {
-							setShowCollector(checked);
-							// setShowDocumentCount(checked);
-							setShowLanguage(checked);
-							setShowDocumentType(checked);
-							//setShowInterfaces(checked);
-							setShowSchedule(checked);
-							setShowDelete(checked);
-						}}
-						toggle
-					/>
-				</Segment>
-				<RefreshButton
-					floated='right'
-					loading={isLoading}
-					onClick={memoizedFetchOnUpdate}
-				/>
-				<div className='cl-b'/>
 				<Header as='h1'>Collections</Header>
-
-				<div className='p-r'>
+				<Flex
+					justifyContent='space-between'
+					gap
+					marginBottom
+				>
+					<Flex.Item>
+						<Form style={{margin:0}}>
+							<Form.Group style={{margin:0}}>
+								<SearchInput
+									disabled={isBlurred || isLoading}
+									loading={isBlurred || isLoading}
+									onChange={(
+										_event: React.ChangeEvent<HTMLInputElement>,
+										{value}
+									) => {setSearchString(value)}}
+									onKeyUp={(event: {
+										which: number
+									}) => {
+										if(event.which == 10 || event.which == 13) {
+											fetchCollections();
+										}
+									}}
+									value={searchString}
+								/>
+								<Form.Field>
+									<Segment style={{
+										height: 38
+									}}>
+										<Radio
+											label='Show all fields'
+											checked={showCollector}
+											onChange={(
+												_event: unknown,
+												{ checked }
+											) => {
+												setShowCollector(checked);
+												// setShowDocumentCount(checked);
+												setShowLanguage(checked);
+												setShowDocumentType(checked);
+												//setShowInterfaces(checked);
+												setShowSchedule(checked);
+												setShowDelete(checked);
+											}}
+											style={{
+												top: '50%',
+												transform: 'translate(0%, -50%)'
+											}}
+											toggle
+										/>
+									</Segment>
+								</Form.Field>
+							</Form.Group>
+						</Form>
+					</Flex.Item>
+					<Flex.Item>
+						<RefreshButton
+							floated='right'
+							loading={isLoading}
+							onClick={fetchOnUpdate}
+						/>
+					</Flex.Item>
+				</Flex>
+				<div className='p-r'>{/* Use to position the blur overlay */}
 					<Table
 						celled
 						compact
@@ -366,7 +409,7 @@ export function Collections(props: {
 											_name={collectionName}
 											afterClose={() => {
 												//console.debug('NewOrEditCollectionModal afterClose');
-												memoizedFetchOnUpdate();
+												fetchOnUpdate();
 											}}
 											servicesBaseUrl={servicesBaseUrl}
 											setLicensedTo={setLicensedTo}
@@ -479,6 +522,7 @@ export function Collections(props: {
 				</div>{/*<!-- position relative -->*/}
 			</Flex.Item>
 		</Flex>
+
 		<NewOrEditCollectionModal
 			collections={queryCollectionsGraph.hits}
 			collectorOptions={collectorOptions}
@@ -509,7 +553,7 @@ export function Collections(props: {
 			locales={locales}
 			afterClose={() => {
 				//console.debug('NewOrEditCollectionModal afterClose');
-				memoizedFetchOnUpdate();
+				fetchOnUpdate();
 			}}
 			servicesBaseUrl={servicesBaseUrl}
 			setLicensedTo={setLicensedTo}
@@ -523,7 +567,7 @@ export function Collections(props: {
 		{
 			copyModalCollectionId
 				? <CollectionCopyModal
-					afterSuccess={() => {memoizedFetchOnUpdate()}}
+					afterSuccess={() => {fetchOnUpdate()}}
 					collectionId={copyModalCollectionId}
 					collectionNames={queryCollectionsGraph.hits.map(({_name}) => _name)}
 					servicesBaseUrl={servicesBaseUrl}
@@ -548,7 +592,7 @@ export function Collections(props: {
 							collectionName: '',
 							open: false,
 						})
-						memoizedFetchCollections();
+						fetchOnUpdate();
 					}}
 				/>
 				: null

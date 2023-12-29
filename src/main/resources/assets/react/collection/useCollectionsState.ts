@@ -26,7 +26,54 @@ import { useManualQuery } from 'graphql-hooks';
 import * as React from 'react';
 import {useInterval} from '../utils/useInterval';
 import {useUpdateEffect} from '../utils/useUpdateEffect';
+import { set } from 'lodash';
 
+
+interface FetchCollectionsData {
+	queryCollections: QueryCollectionsGraph
+}
+
+interface FetchOnUpdateData {
+	listScheduledJobs: {
+		collectionId: string
+		descriptor: string
+		enabled: boolean
+		schedule: {
+			timeZone: string
+			type: string
+			value: string
+		}
+	}[]
+	queryCollections: QueryCollectionsGraph
+	queryCollectors: {
+		count: number
+		hits: Collector[]
+		total: number
+	}
+	queryDocumentTypes: {
+		hits: {
+			_id: string
+			_name: string
+		}[]
+	}
+	queryFields: {
+		count: number
+		hits: {
+			_name: string
+			key: string
+		}[]
+		total: number
+	}
+	queryTasks: TaskInfo[]
+}
+
+type FetchOnMountData = FetchOnUpdateData & {
+	getLocales: {
+		country?: string
+		displayName: string
+		tag: string
+	}[]
+}
 
 interface FetchTasksData {
 	queryTasks: TaskInfo[]
@@ -34,8 +81,15 @@ interface FetchTasksData {
 
 
 const COLLECTIONS_GQL = `queryCollections(
+	aggregations: {
+		name: "language"
+		terms: {
+			field: "language"
+		}
+	}
 	perPage: -1
 ) {
+	aggregationsAsJson
 	total
 	count
 	page
@@ -56,6 +110,68 @@ const COLLECTIONS_GQL = `queryCollections(
 		documentTypeId
 	}
 }`;
+
+const COLLECTIONS_GQL_2 = gql.query({
+	operation: 'queryCollections',
+	variables: {
+		aggregations: {
+			list: false,
+			required: false,
+			type: 'AggregationInput',
+		},
+		filters: {
+			list: true,
+			required: false,
+			type: 'FilterInput',
+		},
+		page: {
+			list: false,
+			required: false,
+			type: 'Int',
+		},
+		perPage: {
+			list: false,
+			required: false,
+			type: 'Int',
+		},
+		query: {
+			list: false,
+			required: false,
+			type: 'String'
+		},
+		sort: {
+			list: false,
+			required: false,
+			type: 'String'
+		}
+	},
+	fields: [
+		'aggregationsAsJson',
+		'total',
+		'count',
+		'page',
+		'pageStart',
+		'pageEnd',
+		'pagesTotal',
+		{
+			hits: [
+				'_id',
+				'_name',
+				'_path',
+				{
+					collector: [
+						'name',
+						'configJson',
+						'managedDocumentTypes'
+					]
+				},
+				'documentCount',
+				'language',
+				'documentTypeId'
+			]
+		},
+	]
+});
 
 const COLLECTORS_GQL = `queryCollectors {
 	total
@@ -83,9 +199,9 @@ const JOBS_GQL = `listScheduledJobs {
 	enabled
 	descriptor
 	schedule {
-  		timeZone
-  		type
-  		value
+		timeZone
+		type
+		value
 	}
 }`;
 
@@ -410,82 +526,88 @@ export function useCollectionsState({
 		setJobsObj(obj);
 	} // jobsObjFromArr
 
-	const memoizedFetchOnMount = React.useCallback(() => {
+	const [languageOptions, setLanguageOptions] = React.useState<{
+		text: string
+		value: string
+	}[]>([]);
+	console.debug('languageOptions', languageOptions);
+
+	const [ _fetchOnMount ] = useManualQuery<FetchOnMountData>(MOUNT_GQL);
+	function fetchOnMount() {
 		// setBlurred(true); // No need for blurring when table is not visible
 		setIsLoading(true);
-		fetch(`${servicesBaseUrl}/graphQL`, {
-			method: 'POST',
-			headers: { // HTTP/2 uses lowercase header keys
-				'content-type': 'application/json'
-			},
-			body: JSON.stringify({ query: MOUNT_GQL })
-		})
-			.then(res => res.json())
-			.then(res => {
-				if (res && res.data) {
-					setLocales(res.data.getLocales);
-					setQueryCollectionsGraph(res.data.queryCollections);
-					setQueryCollectorsGraph(res.data.queryCollectors);
-					setQueryFieldsGraph(res.data.queryFields);
-					setJobsObjFromArr(res.data.listScheduledJobs);
-					setDocumentTypes(res.data.queryDocumentTypes.hits);
-					setTasks(res.data.queryTasks);
-					// setBlurred(false);
-					setIsLoading(false);
-				} // if
-			}); // then
-	}, [
-		servicesBaseUrl
-	]);
+		_fetchOnMount().then(res => {
+			if (res && res.data) {
+				if (res.data.queryCollections.aggregationsAsJson) {
+					setLanguageOptions(res.data.queryCollections.aggregationsAsJson['language']['buckets'].map(({
+						docCount,
+						key
+					}) => ({
+						text: `${key} (${docCount})`,
+						value: key
+					})));
+				}
+				setLocales(res.data.getLocales);
+				setQueryCollectionsGraph(res.data.queryCollections);
+				setQueryCollectorsGraph(res.data.queryCollectors);
+				setQueryFieldsGraph(res.data.queryFields);
+				setJobsObjFromArr(res.data.listScheduledJobs);
+				setDocumentTypes(res.data.queryDocumentTypes.hits);
+				setTasks(res.data.queryTasks);
+				// setBlurred(false);
+				setIsLoading(false);
+			} // if
+		});
+	}
 
-	const memoizedFetchOnUpdate = React.useCallback(() => {
+	const [ _fetchOnUpdate ] = useManualQuery<FetchOnUpdateData>(UPDATE_GQL);
+	function fetchOnUpdate() {
 		setBlurred(true);
 		setIsLoading(true);
-		fetch(`${servicesBaseUrl}/graphQL`, {
-			method: 'POST',
-			headers: { // HTTP/2 uses lowercase header keys
-				'content-type': 'application/json'
-			},
-			body: JSON.stringify({ query: UPDATE_GQL })
-		})
-			.then(res => res.json())
-			.then(res => {
-				if (res && res.data) {
-					setQueryCollectionsGraph(res.data.queryCollections);
-					setQueryCollectorsGraph(res.data.queryCollectors);
-					setQueryFieldsGraph(res.data.queryFields);
-					setJobsObjFromArr(res.data.listScheduledJobs);
-					setDocumentTypes(res.data.queryDocumentTypes.hits);
-					setTasks(res.data.queryTasks);
-					setBlurred(false);
-					setIsLoading(false);
+		setSearchString('');
+		_fetchOnMount().then(res => {
+			if (res && res.data) {
+				if (res.data.queryCollections.aggregationsAsJson) {
+					setLanguageOptions(res.data.queryCollections.aggregationsAsJson['language']['buckets'].map(({
+						docCount,
+						key
+					}) => ({
+						text: `${key} (${docCount})`,
+						value: key
+					})));
 				}
-			});
-	}, [
-		servicesBaseUrl
-	]);
-
-	const memoizedFetchCollections = React.useCallback(() => {
-		setBlurred(true);
-		setIsLoading(true);
-		fetch(`${servicesBaseUrl}/graphQL`, {
-			method: 'POST',
-			headers: { // HTTP/2 uses lowercase header keys
-				'content-type': 'application/json'
-			},
-			body: JSON.stringify({ query: `{${COLLECTIONS_GQL}}` })
-		})
-			.then(res => res.json())
-			.then(res => {
-				if (res && res.data && res.data.queryCollections) {
-					setQueryCollectionsGraph(res.data.queryCollections);
-				}
+				setQueryCollectionsGraph(res.data.queryCollections);
+				setQueryCollectorsGraph(res.data.queryCollectors);
+				setQueryFieldsGraph(res.data.queryFields);
+				setJobsObjFromArr(res.data.listScheduledJobs);
+				setDocumentTypes(res.data.queryDocumentTypes.hits);
+				setTasks(res.data.queryTasks);
 				setBlurred(false);
 				setIsLoading(false);
-			});
-	}, [
-		servicesBaseUrl
-	]);
+			}
+		});
+	}
+
+	const [ searchString, setSearchString ] = React.useState('');
+	const [ _fetchCollections ] = useManualQuery<FetchCollectionsData>(COLLECTIONS_GQL_2.query);
+
+	function fetchCollections() {
+		setBlurred(true);
+		setIsLoading(true);
+		_fetchCollections({
+			variables: {
+				perPage: -1,
+				query: `_name LIKE '*${searchString}*'`,
+				// sort: '_name ASC'
+			}
+		}).then(res => {
+			if (res && res.data && res.data.queryCollections) {
+				setQueryCollectionsGraph(res.data.queryCollections);
+			}
+			setBlurred(false);
+			setIsLoading(false);
+		});
+	}
 
 	const [ fetchTasks ] = useManualQuery<FetchTasksData>(GQL_QUERY_QUERY_TASKS.query);
 	const [pollTasks, setPollTasks] = React.useState(false);
@@ -518,7 +640,7 @@ export function useCollectionsState({
 		}
 	}, 1000);
 
-	useWhenInitAsync(() => memoizedFetchOnMount());
+	useWhenInitAsync(() => fetchOnMount());
 
 	const shemaIdToName = {};
 	documentTypes.forEach(({_id, _name}) => {
@@ -561,12 +683,12 @@ export function useCollectionsState({
 		isLoading,
 		jobsObj,
 		locales,
-		memoizedFetchCollections,
-		memoizedFetchOnUpdate,
+		fetchOnUpdate,
 		objCollectionsBeingReindexed,
 		pollTasksWhileActive,
 		queryCollectionsGraph,
 		shemaIdToName,
+		searchString, setSearchString, fetchCollections,
 		setShowCollector,
 		setShowDelete,
 		setShowDocumentType,
