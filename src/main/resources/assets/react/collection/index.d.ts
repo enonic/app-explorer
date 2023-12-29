@@ -38,11 +38,12 @@ export type QueryCollectionsHit = {
 export type QueryCollectionsHits = Array<QueryCollectionsHit>
 
 export type QueryCollectionsGraph = {
-	total :number
-	count :number
-	page ?:number
-	pageStart ?:number
-	pageEnd ?:number
-	pagesTotal ?:number
-	hits :QueryCollectionsHits
+	aggregationsAsJson?: Record<string, unknown>
+	total: number
+	count: number
+	page?: number
+	pageStart?: number
+	pageEnd?: number
+	pagesTotal?: number
+	hits: QueryCollectionsHits
 }

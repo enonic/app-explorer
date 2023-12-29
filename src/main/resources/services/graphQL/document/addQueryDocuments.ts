@@ -3,6 +3,7 @@ import type {
 	// AggregationsResult,
 	BucketsAggregationResult,
 	BooleanFilter,
+	Filter,
 	QueryDsl,
 	SingleValueMetricAggregationResult,
 	StatsAggregationResult
@@ -23,6 +24,7 @@ import type {
 import type {
 	Highlight
 } from '@enonic-types/lib-explorer/GraphQL.d';
+import type { AggregationArg } from '../types';
 
 
 import {
@@ -39,6 +41,7 @@ import {
 } from '@enonic/js-utils';
 import {getCollectionIds} from '/lib/explorer/collection/getCollectionIds';
 import {queryDocumentTypes} from '/lib/explorer/documentType/queryDocumentTypes';
+import {addAggregationInput} from '/lib/explorer/interface/graphql/aggregations/guillotine/input/addAggregationInput';
 import {addFilterInput} from '/lib/explorer/interface/graphql/filters/guillotine/input/addFilterInput';
 import {addInputTypeHighlight} from '/lib/explorer/interface/graphql/highlight/input/addInputTypeHighlight';
 import {highlightGQLArgToEnonicXPQuery} from '/lib/explorer/interface/graphql/highlight/input/highlightGQLArgToEnonicXPQuery';
@@ -55,18 +58,18 @@ import {
 	list,
 	nonNull,
 	reference
-	//@ts-ignore
+	// @ts-expect-error No types yet
 } from '/lib/graphql';
 import {
 	// createAggregation,
 	createFilters
-	//@ts-ignore
+	// @ts-expect-error No types yet
 } from '/lib/guillotine/util/factory';
 import {
 	FIELD_SHORTCUT_COLLECTION,
 	FIELD_SHORTCUT_DOCUMENT_TYPE,
 	GQL_INPUT_TYPE_AGGREGATION,
-	//GQL_INPUT_TYPE_AGGREGATION_COUNT,
+	// GQL_INPUT_TYPE_AGGREGATION_COUNT,
 	GQL_INPUT_TYPE_AGGREGATION_TERMS,
 	GQL_INPUT_TYPE_QUERY_DSL_BOOLEAN_CLAUSE,
 	GQL_QUERY_DOCUMENTS,
@@ -79,19 +82,19 @@ import {
 import {addMatchAll} from '../inputTypes/queryDSL/addMatchAll';
 
 
-type AggregationArg = {
-	name: string
-	count?: {
-		fields: Array<string>
-	}
-	subAggregations?: Array<AggregationArg>
-	terms?: {
-		field: string
-		order?: string
-		size?: number
-		minDocCount?: number
-	}
-}
+// type AggregationArg = {
+// 	name: string
+// 	count?: {
+// 		fields: Array<string>
+// 	}
+// 	subAggregations?: Array<AggregationArg>
+// 	terms?: {
+// 		field: string
+// 		order?: string
+// 		size?: number
+// 		minDocCount?: number
+// 	}
+// }
 
 // type AggregationOutput = Record<string, AggregationsResult> // Includes SingleValueMetricAggregationResult
 type AggregationOutput = Record<string,
@@ -101,7 +104,7 @@ type AggregationOutput = Record<string,
 >
 type MyNodeMultiRepoQueryResult = NodeMultiRepoQueryResult<AggregationOutput>;
 
-
+type GuillotineFilter = Guillotine.BasicFilters | Guillotine.BooleanFilter
 
 
 // Name must be non-null, non-empty and match [_A-Za-z][_0-9A-Za-z]*
@@ -115,7 +118,7 @@ const FIELD_VALUE_COUNT_AGGREGATION_PREFIX = '_count_Field_';
 function aggregationsArgToQuery({
 	aggregationsArg = []
 }: {
-	aggregationsArg?: Array<AggregationArg>
+	aggregationsArg?: AggregationArg[]
 }) {
 	const obj = {};
 	for (let i = 0; i < aggregationsArg.length; i++) {
@@ -319,40 +322,41 @@ export function addQueryDocuments({
 	glue.addQuery({
 		name: GQL_QUERY_DOCUMENTS,
 		args: {
-			aggregations: list(glue.addInputType({
-				name: GQL_INPUT_TYPE_AGGREGATION,
-				fields: {
-					name: { type: nonNull(GraphQLString) },
-					/*count: { type: glue.addInputType({
-						name: GQL_INPUT_TYPE_AGGREGATION_COUNT,
-						fields: {
-							fields: {
-								type: nonNull(list(GraphQLString))
-							}
-						}
-					})},*/
-					subAggregations: {
-						type: list(reference(GQL_INPUT_TYPE_AGGREGATION))
-					},
-					terms: { type: glue.addInputType({
-						name: GQL_INPUT_TYPE_AGGREGATION_TERMS,
-						fields: {
-							field: {
-								type: nonNull(GraphQLString)
-							},
-							order: {
-								type: GraphQLString
-							},
-							size: {
-								type: GraphQLInt
-							},
-							minDocCount: {
-								type: GraphQLInt
-							}
-						}
-					})},
-				}
-			})),
+			aggregations: list(addAggregationInput({glue})),
+			// aggregations: list(glue.addInputType({
+			// 	name: GQL_INPUT_TYPE_AGGREGATION,
+			// 	fields: {
+			// 		name: { type: nonNull(GraphQLString) },
+			// 		/*count: { type: glue.addInputType({
+			// 			name: GQL_INPUT_TYPE_AGGREGATION_COUNT,
+			// 			fields: {
+			// 				fields: {
+			// 					type: nonNull(list(GraphQLString))
+			// 				}
+			// 			}
+			// 		})},*/
+			// 		subAggregations: {
+			// 			type: list(reference(GQL_INPUT_TYPE_AGGREGATION))
+			// 		},
+			// 		terms: { type: glue.addInputType({
+			// 			name: GQL_INPUT_TYPE_AGGREGATION_TERMS,
+			// 			fields: {
+			// 				field: {
+			// 					type: nonNull(GraphQLString)
+			// 				},
+			// 				order: {
+			// 					type: GraphQLString
+			// 				},
+			// 				size: {
+			// 					type: GraphQLInt
+			// 				},
+			// 				minDocCount: {
+			// 					type: GraphQLInt
+			// 				}
+			// 			}
+			// 		})},
+			// 	}
+			// })),
 			collectionIds: list(GraphQLID),
 			collections: list(GraphQLString),
 			count: GraphQLInt,
@@ -364,12 +368,12 @@ export function addQueryDocuments({
 		},
 		resolve(env: {
 			args: {
-				aggregations?: Array<AggregationArg>
+				aggregations?: AggregationArg[]
 				count?: number
 				countFieldValues?: boolean
 				collectionIds?: Array<string>
 				collections?: Array<string>
-				filters?: Guillotine.BooleanFilter
+				filters?: GuillotineFilter | GuillotineFilter[]
 				highlight?: Highlight
 				query?: QueryDsl|string
 				start?: number
@@ -545,12 +549,12 @@ export function addQueryDocuments({
 					})
 				});
 
-				let filtersArray: Array<AnyObject>;
+				let filtersArray: Filter[];
 				if (filtersArg) {
 					// This works magically because fieldType is an Enum?
 					filtersArray = createFilters(filtersArg);
 					//log.debug('filtersArray:%s', toStr(filtersArray));
-					filtersArray.push(staticFilters as unknown as AnyObject);
+					filtersArray.push(staticFilters as unknown as Filter);
 					//log.debug('filtersArray:%s', toStr(filtersArray));
 				}
 
