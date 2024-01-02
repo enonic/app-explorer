@@ -38,7 +38,26 @@ export type QueryCollectionsHit = {
 export type QueryCollectionsHits = Array<QueryCollectionsHit>
 
 export type QueryCollectionsGraph = {
-	aggregationsAsJson?: Record<string, unknown>
+	aggregationsAsJson?: {
+		collector?: {
+			buckets: {
+				key: string
+				docCount: number
+			}[]
+		}
+		documentTypeId?: {
+			buckets: {
+				key: string
+				docCount: number
+			}[]
+		}
+		language?: {
+			buckets: {
+				key: string
+				docCount: number
+			}[]
+		}
+	}
 	total: number
 	count: number
 	page?: number
