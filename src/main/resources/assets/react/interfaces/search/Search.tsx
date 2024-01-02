@@ -81,19 +81,13 @@ export function Search(props: SearchProps) {
 					disabled={!interfaceCollectionCount || !interfaceDocumentCount}
 					fluid
 					loading={false}
-					onKeyUp={(event :{
-						which :number
-					}) => {
-						//console.debug('onKeyUp event.which',event.which);
-						if(event.which == 10 || event.which == 13) {
-							//console.debug('onKeyUp searchString',searchString);
-							setPage(1);
-							// setStart(0);
-							searchFunction({
-								searchString,
-								start: 0
-							});
-						}
+					onSubmit={() => {
+						setPage(1);
+						// setStart(0);
+						searchFunction({
+							searchString,
+							start: 0
+						});
 					}}
 					onChange={(
 						_event,

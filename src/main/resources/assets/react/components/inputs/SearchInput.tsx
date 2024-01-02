@@ -12,22 +12,28 @@ import {
 
 function SearchInput({
 	borderRadius = 19,
-	onKeyUp = () => undefined,
+	onSubmit = () => () => {},
 	...rest
 }: Omit<StrictInputProps, 'icon'> & {
 	borderRadius?: number
-	onKeyUp?: (event: React.KeyboardEvent<HTMLInputElement>) => void
+	onSubmit?: () => void
 	value: string
 }) {
 	return <Input
 		icon
-		onKeyUp={onKeyUp}
+		onKeyUp={(event: React.KeyboardEvent<HTMLInputElement>) => {
+			if (event.key == 'Enter' || event.key == 'Return') {
+				onSubmit();
+			}
+		}}
 		{...rest}
 	>
 		<input style={{
 			borderRadius
 		}}/>
-		<Icon name='search'/>
+		<Icon link name='search' onClick={() => {
+			onSubmit();
+		}}/>
 	</Input>
 }
 

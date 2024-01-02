@@ -82,26 +82,20 @@ export function Documents({
 								disabled={loading}
 								loading={loading}
 								onChange={(
-									_event :React.ChangeEvent<HTMLInputElement>,
+									_event: React.ChangeEvent<HTMLInputElement>,
 									{value}
 								) => {setQuery(value as string)}}
-								onKeyUp={(event :{
-									which :number
-								}) => {
-									//console.debug('onKeyUp event.which',event.which);
-									if(event.which == 10 || event.which == 13) {
-										//console.debug('onKeyUp searchString',searchString);
-										queryDocuments({
-											collectionsFilter: selectedCollections,
-											documentsTypesFilter: selectedDocumentTypes,
-											fragmentSize,
-											query,
-											operator: operatorState,
-											perPage,
-											selectedColumns: selectedColumnsState,
-											start: 0 // Explicitly reset to 0 when query changes
-										});
-									}
+								onSubmit={() => {
+									queryDocuments({
+										collectionsFilter: selectedCollections,
+										documentsTypesFilter: selectedDocumentTypes,
+										fragmentSize,
+										query,
+										operator: operatorState,
+										perPage,
+										selectedColumns: selectedColumnsState,
+										start: 0 // Explicitly reset to 0 when query changes
+									});
 								}}
 								value={query}
 							/>
@@ -114,7 +108,7 @@ export function Documents({
 										disabled={loading}
 										label={operatorState}
 										onChange={(
-											_event :React.ChangeEvent<HTMLInputElement>,
+											_event: React.ChangeEvent<HTMLInputElement>,
 											{checked}
 										) => {
 											// console.debug('checked', checked);

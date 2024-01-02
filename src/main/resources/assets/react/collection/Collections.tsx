@@ -148,13 +148,7 @@ export function Collections(props: {
 										_event: React.ChangeEvent<HTMLInputElement>,
 										{value}
 									) => {setSearchString(value)}}
-									onKeyUp={(event: {
-										which: number
-									}) => {
-										if(event.which == 10 || event.which == 13) {
-											fetchCollections();
-										}
-									}}
+									onSubmit={fetchCollections}
 									value={searchString}
 								/>
 								<Form.Field>
