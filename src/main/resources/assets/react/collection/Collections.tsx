@@ -17,6 +17,7 @@ import {
 import {parseExpression as parseCronExpression} from 'cron-parser';
 import {Link} from 'react-router-dom';
 import {
+	Dropdown,
 	Header,
 	Form,
 	Loader,
@@ -29,6 +30,7 @@ import {
 import HoverButton from '../components/buttons/HoverButton';
 import RefreshButton from '../components/buttons/RefreshButton';
 import SearchInput from '../components/inputs/SearchInput';
+import {HoverPopup} from '../components/HoverPopup';
 import Flex from '../components/Flex';
 import {Cron} from '../utils/Cron';
 import {
@@ -75,17 +77,22 @@ export function Collections(props: {
 		anyTaskWithoutCollectionName,
 		collectionsTaskState,
 		collectorIdToDisplayName, // setCollectorIdToDisplayName,
-		collectorOptions,
+		collectorOptions, selectedCollectors, setSelectedCollectors,
+		collectorsHoverOpen, setCollectorsHoverOpen,
 		// column,
 		contentTypeOptions,
 		copyModalCollectionId, setCopyModalCollectionId,
 		deleteCollectionModalState, setDeleteCollectionModalState,
 		// direction,
+		documentTypeOptions, selectedDocumentTypes, setSelectedDocumentTypes,
+		documentTypesHoverOpen, setDocumentTypesHoverOpen,
 		fieldsObj,
 		intInitializedCollectorComponents,
 		isBlurred,
 		isLoading,
 		jobsObj,
+		languageOptions, selectedLanguages, setSelectedLanguages,
+		languagesHoverOpen, setLanguagesHoverOpen,
 		locales,
 		fetchOnUpdate,
 		objCollectionsBeingReindexed,
@@ -108,8 +115,7 @@ export function Collections(props: {
 		showSchedule,
 		siteOptions
 	} = useCollectionsState({
-		collectorComponents,
-		servicesBaseUrl
+		collectorComponents
 	});
 
 	return <>
@@ -151,6 +157,89 @@ export function Collections(props: {
 									}}
 									value={searchString}
 								/>
+								<Form.Field>
+									<HoverPopup
+										content={<Dropdown
+											clearable
+											multiple
+											name='collectors'
+											onChange={(
+												_event: React.ChangeEvent<HTMLInputElement>,
+												{value}
+											) => {
+												const newSelectedCollectors = value as string[];
+												setSelectedCollectors(newSelectedCollectors);
+											}}
+											disabled={isLoading}
+											options={collectorOptions}
+											search
+											selection
+											style={{marginTop:6}}
+											value={selectedCollectors}
+										/>}
+										header='Collectors'
+										icon={{
+											color: selectedCollectors.length > 0 ? 'blue' : 'grey',
+											name: 'cog'
+										}}
+										open={collectorsHoverOpen}
+										setOpen={setCollectorsHoverOpen}
+									/>
+									<HoverPopup
+										content={<Dropdown
+											clearable
+											multiple
+											name='documentTypes'
+											onChange={(
+												_event: React.ChangeEvent<HTMLInputElement>,
+												{value}
+											) => {
+												const newSelectedDocumentTypes = value as string[];
+												setSelectedDocumentTypes(newSelectedDocumentTypes);
+											}}
+											disabled={isLoading}
+											options={documentTypeOptions}
+											search
+											selection
+											style={{marginTop:6}}
+											value={selectedDocumentTypes}
+										/>}
+										header='Document types'
+										icon={{
+											color: selectedDocumentTypes.length > 0 ? 'blue' : 'grey',
+											name: 'file code'
+										}}
+										open={documentTypesHoverOpen}
+										setOpen={setDocumentTypesHoverOpen}
+									/>
+									<HoverPopup
+										content={<Dropdown
+											clearable
+											multiple
+											name='languages'
+											onChange={(
+												_event: React.ChangeEvent<HTMLInputElement>,
+												{value}
+											) => {
+												const newSelectedLanguages = value as string[];
+												setSelectedLanguages(newSelectedLanguages);
+											}}
+											disabled={isLoading}
+											options={languageOptions}
+											search
+											selection
+											style={{marginTop:6}}
+											value={selectedLanguages}
+										/>}
+										header='Languages'
+										icon={{
+											color: selectedLanguages.length > 0 ? 'blue' : 'grey',
+											name: 'flag'
+										}}
+										open={languagesHoverOpen}
+										setOpen={setLanguagesHoverOpen}
+									/>
+								</Form.Field>
 								<Form.Field>
 									<Segment style={{
 										height: 38

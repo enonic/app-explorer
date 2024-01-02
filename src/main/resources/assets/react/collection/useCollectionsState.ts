@@ -81,12 +81,26 @@ interface FetchTasksData {
 
 
 const COLLECTIONS_GQL = `queryCollections(
-	aggregations: {
-		name: "language"
-		terms: {
-			field: "language"
+	aggregations: [
+		{
+			name: "collector"
+			terms: {
+				field: "collector.name"
+			}
 		}
-	}
+		{
+			name: "documentTypeId"
+			terms: {
+				field: "documentTypeId"
+			}
+		}
+		{
+			name: "language"
+			terms: {
+				field: "language"
+			}
+		}
+	]
 	perPage: -1
 ) {
 	aggregationsAsJson
@@ -115,7 +129,7 @@ const COLLECTIONS_GQL_2 = gql.query({
 	operation: 'queryCollections',
 	variables: {
 		aggregations: {
-			list: false,
+			list: true,
 			required: false,
 			type: 'AggregationInput',
 		},
@@ -306,11 +320,9 @@ const UPDATE_GQL = `{
 
 
 export function useCollectionsState({
-	collectorComponents,
-	servicesBaseUrl
+	collectorComponents
 }: {
 	collectorComponents: CollectorComponents
-	servicesBaseUrl: string
 }) {
 	const [isLoading, setIsLoading] = React.useState(false);
 	const [isBlurred, internalSetBlurred] = React.useState(false);
@@ -526,11 +538,27 @@ export function useCollectionsState({
 		setJobsObj(obj);
 	} // jobsObjFromArr
 
+	// const [collectorOptions, setCollectorOptions] = React.useState<{
+	// 	text: string
+	// 	value: string
+	// }[]>([]);
+	// console.debug('collectorOptions', collectorOptions);
+	const [selectedCollectors, setSelectedCollectors] = React.useState<string[]>([]);
+	const [collectorsHoverOpen, setCollectorsHoverOpen] = React.useState(false);
+
+	const [documentTypeOptions, setDocumentTypeOptions] = React.useState<{
+		text: string
+		value: string
+	}[]>([]);
+	const [selectedDocumentTypes, setSelectedDocumentTypes] = React.useState<string[]>([]);
+	const [documentTypesHoverOpen, setDocumentTypesHoverOpen] = React.useState(false);
+
 	const [languageOptions, setLanguageOptions] = React.useState<{
 		text: string
 		value: string
 	}[]>([]);
-	console.debug('languageOptions', languageOptions);
+	const [selectedLanguages, setSelectedLanguages] = React.useState<string[]>([]);
+	const [languagesHoverOpen, setLanguagesHoverOpen] = React.useState(false);
 
 	const [ _fetchOnMount ] = useManualQuery<FetchOnMountData>(MOUNT_GQL);
 	function fetchOnMount() {
@@ -539,16 +567,47 @@ export function useCollectionsState({
 		_fetchOnMount().then(res => {
 			if (res && res.data) {
 				if (res.data.queryCollections.aggregationsAsJson) {
-					setLanguageOptions(res.data.queryCollections.aggregationsAsJson['language']['buckets'].map(({
-						docCount,
-						key
-					}) => ({
-						text: `${key} (${docCount})`,
-						value: key
-					})));
+					// console.debug('aggregationsAsJson', res.data.queryCollections.aggregationsAsJson);
+					// if (res.data.queryCollections.aggregationsAsJson?.collector?.buckets) {
+					// 	setCollectorOptions(res.data.queryCollections.aggregationsAsJson.collector.buckets.map(({
+					// 		docCount,
+					// 		key
+					// 	}) => ({
+					// 		text: `${key} (${docCount})`,
+					// 		value: key
+					// 	})));
+					// }
+					if (
+						res.data.queryCollections.aggregationsAsJson?.documentTypeId?.buckets
+						&& res.data.queryDocumentTypes.hits.length
+					) {
+						const documentTypeIdToName = res.data.queryDocumentTypes.hits.reduce((acc, {
+							_id,
+							_name
+						}) => {
+							acc[_id] = _name;
+							return acc;
+						}, {});
+						setDocumentTypeOptions(res.data.queryCollections.aggregationsAsJson.documentTypeId.buckets.map(({
+							docCount,
+							key
+						}) => ({
+							text: `${documentTypeIdToName[key]} (${docCount})`,
+							value: key
+						})));
+					}
+					if (res.data.queryCollections.aggregationsAsJson?.language?.buckets) {
+						setLanguageOptions(res.data.queryCollections.aggregationsAsJson.language.buckets.map(({
+							docCount,
+							key
+						}) => ({
+							text: `${key} (${docCount})`,
+							value: key
+						})));
+					}
 				}
 				setLocales(res.data.getLocales);
-				setQueryCollectionsGraph(res.data.queryCollections);
+				setQueryCollectionsGraph(res.data.queryCollections); // Will include aggregationsAsJson
 				setQueryCollectorsGraph(res.data.queryCollectors);
 				setQueryFieldsGraph(res.data.queryFields);
 				setJobsObjFromArr(res.data.listScheduledJobs);
@@ -564,11 +623,14 @@ export function useCollectionsState({
 	function fetchOnUpdate() {
 		setBlurred(true);
 		setIsLoading(true);
+		setSelectedCollectors([]);
+		setSelectedDocumentTypes([]);
+		setSelectedLanguages([]);
 		setSearchString('');
 		_fetchOnMount().then(res => {
 			if (res && res.data) {
 				if (res.data.queryCollections.aggregationsAsJson) {
-					setLanguageOptions(res.data.queryCollections.aggregationsAsJson['language']['buckets'].map(({
+					setLanguageOptions(res.data.queryCollections.aggregationsAsJson.language.buckets.map(({
 						docCount,
 						key
 					}) => ({
@@ -594,15 +656,43 @@ export function useCollectionsState({
 	function fetchCollections() {
 		setBlurred(true);
 		setIsLoading(true);
+		const filters = [];
+		if (selectedCollectors.length) {
+			filters.push({
+				hasValue: {
+					field: 'collector.name',
+					stringValues: selectedCollectors
+				}
+			});
+		}
+		if (selectedDocumentTypes.length) {
+			filters.push({
+				hasValue: {
+					field: 'documentTypeId',
+					stringValues: selectedDocumentTypes
+				}
+			});
+		}
+		if (selectedLanguages.length) {
+			filters.push({
+				hasValue: {
+					field: 'language',
+					stringValues: selectedLanguages
+				}
+			});
+		}
 		_fetchCollections({
 			variables: {
+				filters,
 				perPage: -1,
 				query: `_name LIKE '*${searchString}*'`,
 				// sort: '_name ASC'
 			}
 		}).then(res => {
-			if (res && res.data && res.data.queryCollections) {
-				setQueryCollectionsGraph(res.data.queryCollections);
+			if (res && res.data) {
+				if(res.data.queryCollections) {
+					setQueryCollectionsGraph(res.data.queryCollections);
+				}
 			}
 			setBlurred(false);
 			setIsLoading(false);
@@ -664,24 +754,37 @@ export function useCollectionsState({
 		setCollectorIdToDisplayName(newCollectors);
 	}, [
 		queryCollectorsGraph
-	])
+	]);
+
+	useUpdateEffect(() => {
+		fetchCollections();
+	}, [
+		selectedCollectors,
+		selectedDocumentTypes,
+		selectedLanguages
+	]);
 
 	return {
 		anyReindexTaskWithoutCollectionId,
 		anyTaskWithoutCollectionName,
 		collectionsTaskState,
 		collectorIdToDisplayName, // setCollectorIdToDisplayName,
-		collectorOptions,
+		collectorOptions, selectedCollectors, setSelectedCollectors,
+		collectorsHoverOpen, setCollectorsHoverOpen,
 		column,
 		contentTypeOptions,
 		copyModalCollectionId, setCopyModalCollectionId,
 		deleteCollectionModalState, setDeleteCollectionModalState,
+		documentTypeOptions, selectedDocumentTypes, setSelectedDocumentTypes,
+		documentTypesHoverOpen, setDocumentTypesHoverOpen,
 		direction,
 		fieldsObj,
 		intInitializedCollectorComponents,
 		isBlurred,
 		isLoading,
 		jobsObj,
+		languageOptions, selectedLanguages, setSelectedLanguages,
+		languagesHoverOpen, setLanguagesHoverOpen,
 		locales,
 		fetchOnUpdate,
 		objCollectionsBeingReindexed,
