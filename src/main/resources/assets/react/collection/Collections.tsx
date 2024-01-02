@@ -79,11 +79,9 @@ export function Collections(props: {
 		collectorIdToDisplayName, // setCollectorIdToDisplayName,
 		collectorOptions, selectedCollectors, setSelectedCollectors,
 		collectorsHoverOpen, setCollectorsHoverOpen,
-		// column,
 		contentTypeOptions,
 		copyModalCollectionId, setCopyModalCollectionId,
 		deleteCollectionModalState, setDeleteCollectionModalState,
-		// direction,
 		documentTypeOptions, selectedDocumentTypes, setSelectedDocumentTypes,
 		documentTypesHoverOpen, setDocumentTypesHoverOpen,
 		fieldsObj,
@@ -113,7 +111,8 @@ export function Collections(props: {
 		//showInterfaces,
 		showLanguage,
 		showSchedule,
-		siteOptions
+		siteOptions,
+		sort, setSort
 	} = useCollectionsState({
 		collectorComponents
 	});
@@ -276,24 +275,73 @@ export function Collections(props: {
 					<Table
 						celled
 						compact
+						sortable
 						striped
 						className={isBlurred ? 'filt-b-5-g-0-7' : ''}
 					>
 						<Table.Header>
 							<Table.Row>
 								{/* Width is X columns of total 16 */}
-								<Table.HeaderCell>Collect</Table.HeaderCell>
+								<Table.HeaderCell className='pe-n'>Collect</Table.HeaderCell>
 								<Table.HeaderCell
-									onClick={null/*handleSortGenerator('displayName')*/}
-									sorted={/*column === '_name' ? direction : */null}
+									onClick={() => {
+										setSort(prev => `_name ${
+											prev.startsWith('_name')
+												? sort.endsWith('ASC')
+													? 'DESC'
+													: 'ASC'
+												: 'ASC'
+										}`);
+									}}
+									sorted={
+										sort.startsWith('_name')
+											? sort.endsWith('ASC')
+												? 'ascending'
+												: 'descending'
+											: null
+									}
 								>Name</Table.HeaderCell>
-								{showCollector ? <Table.HeaderCell>Collector</Table.HeaderCell> : null}
-								{showDocumentCount ? <Table.HeaderCell>Documents</Table.HeaderCell> : null}
-								{showLanguage ? <Table.HeaderCell>Language</Table.HeaderCell> : null}
-								{showDocumentType ? <Table.HeaderCell>Document Type</Table.HeaderCell> : null}
+								{showCollector ? <Table.HeaderCell
+									onClick={() => {
+										setSort(prev => `collector.name ${
+											prev.startsWith('collector.name')
+												? sort.endsWith('ASC')
+													? 'DESC'
+													: 'ASC'
+												: 'ASC'
+										}`);
+									}}
+									sorted={
+										sort.startsWith('collector.name')
+											? sort.endsWith('ASC')
+												? 'ascending'
+												: 'descending'
+											: null
+									}
+								>Collector</Table.HeaderCell> : null}
+								{showDocumentCount ? <Table.HeaderCell className='pe-n'>Documents</Table.HeaderCell> : null}
+								{showLanguage ? <Table.HeaderCell
+									onClick={() => {
+										setSort(prev => `language ${
+											prev.startsWith('language')
+												? sort.endsWith('ASC')
+													? 'DESC'
+													: 'ASC'
+												: 'ASC'
+										}`);
+									}}
+									sorted={
+										sort.startsWith('language')
+											? sort.endsWith('ASC')
+												? 'ascending'
+												: 'descending'
+											: null
+									}
+								>Language</Table.HeaderCell> : null}
+								{showDocumentType ? <Table.HeaderCell className='pe-n'>Document Type</Table.HeaderCell> : null}
 								{/*showInterfaces ? <Table.HeaderCell>Interfaces</Table.HeaderCell> : null*/}
-								{showSchedule ? <Table.HeaderCell>Schedule</Table.HeaderCell> : null }
-								<Table.HeaderCell>Actions</Table.HeaderCell>
+								{showSchedule ? <Table.HeaderCell className='pe-n'>Schedule</Table.HeaderCell> : null }
+								<Table.HeaderCell className='pe-n'>Actions</Table.HeaderCell>
 							</Table.Row>
 						</Table.Header>
 						<Table.Body>

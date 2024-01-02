@@ -480,33 +480,14 @@ export function useCollectionsState({
 
 	const intInitializedCollectorComponents = Object.keys(collectorComponents).length;
 
-	const [state/*, setState*/] = React.useState({
-		column: '_name',
-		contentTypeOptions: [],
-		direction: 'ascending',
-		page: 1,
-		perPage: 10,
-		siteOptions: [],
-		sort: '_name ASC'
-	} as {
-		column: string
-		contentTypeOptions: ContentTypeOptions
-		direction: StrictTableHeaderCellProps['sorted']
-		siteOptions: SiteOptions
-	});
-
 	const [deleteCollectionModalState, setDeleteCollectionModalState] = React.useState({
 		collectionId: '',
 		collectionName: '',
 		open: false,
 	});
 
-	const {
-		column,
-		contentTypeOptions,
-		direction,
-		siteOptions
-	} = state;
+	const contentTypeOptions: ContentTypeOptions = [];
+	const siteOptions: SiteOptions = [];
 
 	function setJobsObjFromArr(arr: Array<{
 		collectionId: string
@@ -627,6 +608,7 @@ export function useCollectionsState({
 		setSelectedDocumentTypes([]);
 		setSelectedLanguages([]);
 		setSearchString('');
+		setSort('_name ASC');
 		_fetchOnMount().then(res => {
 			if (res && res.data) {
 				if (res.data.queryCollections.aggregationsAsJson) {
@@ -652,6 +634,7 @@ export function useCollectionsState({
 
 	const [ searchString, setSearchString ] = React.useState('');
 	const [ _fetchCollections ] = useManualQuery<FetchCollectionsData>(COLLECTIONS_GQL_2.query);
+	const [sort, setSort] = React.useState('_name ASC');
 
 	function fetchCollections() {
 		setBlurred(true);
@@ -686,7 +669,7 @@ export function useCollectionsState({
 				filters,
 				perPage: -1,
 				query: `_name LIKE '*${searchString}*'`,
-				// sort: '_name ASC'
+				sort
 			}
 		}).then(res => {
 			if (res && res.data) {
@@ -761,7 +744,8 @@ export function useCollectionsState({
 	}, [
 		selectedCollectors,
 		selectedDocumentTypes,
-		selectedLanguages
+		selectedLanguages,
+		sort
 	]);
 
 	return {
@@ -771,13 +755,11 @@ export function useCollectionsState({
 		collectorIdToDisplayName, // setCollectorIdToDisplayName,
 		collectorOptions, selectedCollectors, setSelectedCollectors,
 		collectorsHoverOpen, setCollectorsHoverOpen,
-		column,
 		contentTypeOptions,
 		copyModalCollectionId, setCopyModalCollectionId,
 		deleteCollectionModalState, setDeleteCollectionModalState,
 		documentTypeOptions, selectedDocumentTypes, setSelectedDocumentTypes,
 		documentTypesHoverOpen, setDocumentTypesHoverOpen,
-		direction,
 		fieldsObj,
 		intInitializedCollectorComponents,
 		isBlurred,
@@ -805,6 +787,7 @@ export function useCollectionsState({
 		showInterfaces,
 		showLanguage,
 		showSchedule,
-		siteOptions
+		siteOptions,
+		sort, setSort,
 	};
 }
