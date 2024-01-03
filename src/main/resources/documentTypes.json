@@ -1,7 +1,7 @@
 [{
 	"_name": "webpage",
 	"addFields": false,
-	"documentTypeVersion": 4.1,
+	"version": 2,
 	"properties": [{
 		"active": true,
 		"enabled": true,
