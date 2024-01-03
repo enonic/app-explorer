@@ -601,6 +601,10 @@ export function useCollectionsState({
 	}
 
 	const [ _fetchOnUpdate ] = useManualQuery<FetchOnUpdateData>(UPDATE_GQL);
+	const [ searchString, setSearchString ] = React.useState('');
+	const [ _fetchCollections ] = useManualQuery<FetchCollectionsData>(COLLECTIONS_GQL_2.query);
+	const [sort, _setSort] = React.useState('_name ASC');
+
 	function fetchOnUpdate() {
 		setBlurred(true);
 		setIsLoading(true);
@@ -608,7 +612,7 @@ export function useCollectionsState({
 		setSelectedDocumentTypes([]);
 		setSelectedLanguages([]);
 		setSearchString('');
-		setSort('_name ASC');
+		_setSort('_name ASC');
 		_fetchOnMount().then(res => {
 			if (res && res.data) {
 				if (res.data.queryCollections.aggregationsAsJson) {
@@ -631,10 +635,6 @@ export function useCollectionsState({
 			}
 		});
 	}
-
-	const [ searchString, setSearchString ] = React.useState('');
-	const [ _fetchCollections ] = useManualQuery<FetchCollectionsData>(COLLECTIONS_GQL_2.query);
-	const [sort, setSort] = React.useState('_name ASC');
 
 	function fetchCollections() {
 		setBlurred(true);
@@ -682,6 +682,16 @@ export function useCollectionsState({
 		});
 	}
 
+	function setSort(field: string) {
+		_setSort(prev => `${field} ${
+			prev.startsWith(field)
+				? prev.endsWith('ASC')
+					? 'DESC'
+					: 'ASC'
+				: 'ASC'
+		}`);
+	}
+
 	const [ fetchTasks ] = useManualQuery<FetchTasksData>(GQL_QUERY_QUERY_TASKS.query);
 	const [pollTasks, setPollTasks] = React.useState(false);
 	const pollTasksWhileActive = () => {
@@ -707,6 +717,7 @@ export function useCollectionsState({
 			setIsLoading(false);
 		});
 	};
+
 	useInterval(() => {
 		if (pollTasks) {
 			pollTasksWhileActive();

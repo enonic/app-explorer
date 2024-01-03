@@ -285,13 +285,7 @@ export function Collections(props: {
 								<Table.HeaderCell className='pe-n'>Collect</Table.HeaderCell>
 								<Table.HeaderCell
 									onClick={() => {
-										setSort(prev => `_name ${
-											prev.startsWith('_name')
-												? sort.endsWith('ASC')
-													? 'DESC'
-													: 'ASC'
-												: 'ASC'
-										}`);
+										setSort('_name');
 									}}
 									sorted={
 										sort.startsWith('_name')
@@ -303,13 +297,7 @@ export function Collections(props: {
 								>Name</Table.HeaderCell>
 								{showCollector ? <Table.HeaderCell
 									onClick={() => {
-										setSort(prev => `collector.name ${
-											prev.startsWith('collector.name')
-												? sort.endsWith('ASC')
-													? 'DESC'
-													: 'ASC'
-												: 'ASC'
-										}`);
+										setSort('collector.name');
 									}}
 									sorted={
 										sort.startsWith('collector.name')
@@ -322,13 +310,7 @@ export function Collections(props: {
 								{showDocumentCount ? <Table.HeaderCell className='pe-n'>Documents</Table.HeaderCell> : null}
 								{showLanguage ? <Table.HeaderCell
 									onClick={() => {
-										setSort(prev => `language ${
-											prev.startsWith('language')
-												? sort.endsWith('ASC')
-													? 'DESC'
-													: 'ASC'
-												: 'ASC'
-										}`);
+										setSort('language');
 									}}
 									sorted={
 										sort.startsWith('language')
