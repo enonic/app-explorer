@@ -210,8 +210,13 @@ export function run({
 	}
 	DEBUG && log.debug('userAgent:%s', userAgent);
 
+	DEBUG && log.debug('app.config:%s', app.config);
 	const {
-		browserlessUrl,
+		browserlessUrl
+	} = app.config;
+	TRACE && log.debug('browserlessUrl:%s', browserlessUrl);
+
+	const {
 		excludes = [],
 		httpRequestHeaders = [],
 		keepHtml = false,
@@ -321,8 +326,6 @@ export function run({
 					headers[name.toLowerCase()] = value;
 				});
 				TRACE && log.debug('headers:%s', toStr(headers));
-
-				TRACE && log.debug('browserlessUrl:%s', browserlessUrl);
 
 				const headersWithoutUserAgent = {...headers};
 				delete headersWithoutUserAgent['user-agent'];

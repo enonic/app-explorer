@@ -9,7 +9,6 @@ export type HttpRequestHeader = {
 // Use type instead of interface, because interface doesn't satify AnyObject
 export type CollectorConfig = {
 	baseUri?: string
-	browserlessUrl?: string
 	excludes?: string|string[]
 	httpRequestHeaders?: HttpRequestHeader[]
 	keepHtml?: boolean
@@ -26,7 +25,6 @@ export type RobotsTxt = {
 // NOTE: Using type instead of interface, because interface doesn't satify NestedRecord
 export type WebCrawlConfig = {
 	baseUri?: string
-	browserlessUrl?: string
 	excludes?: string|string[]
 	httpRequestHeaders?: HttpRequestHeader[]
 	keepHtml?: boolean
