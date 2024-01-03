@@ -93,14 +93,6 @@ export function useWebCrawlerState({
 		};
 	});
 
-	const browserlessUrl = collectorConfig && typeof collectorConfig.browserlessUrl === 'string' ? collectorConfig.browserlessUrl : undefined;
-	const setBrowserlessUrl = (newBrowserlessUrl: string) => setCollectorConfig(prevCollectorConfig => {
-		return {
-			...prevCollectorConfig,
-			browserlessUrl: newBrowserlessUrl
-		};
-	});
-
 	//──────────────────────────────────────────────────────────────────────────
 	// State
 	//──────────────────────────────────────────────────────────────────────────
@@ -190,7 +182,6 @@ export function useWebCrawlerState({
 		baseUriOnBlur,
 		baseUriOnChange,
 		baseUriError,
-		browserlessUrl, setBrowserlessUrl,
 		excludesArray,
 		httpRequestHeaders, setHttpRequestHeaders,
 		keepHtml,
