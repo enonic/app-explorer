@@ -42,7 +42,7 @@ export function createFromDocumentTypesJson({
 	resourceData.forEach(({
 		_name,
 		addFields = true, // NOTE: Only overrides undefined, not null.
-		documentTypeVersion = 0, // NOTE: Only overrides undefined, not null.
+		version = 0, // NOTE: Only overrides undefined, not null.
 		properties = [] // NOTE: Only overrides undefined, not null.
 	}) => {
 		const foldedLowerCaseName = fold(_name.toLowerCase());
@@ -50,7 +50,7 @@ export function createFromDocumentTypesJson({
 			createDocumentType({
 				_name: foldedLowerCaseName,
 				addFields,
-				documentTypeVersion,
+				version,
 				managedBy: applicationKey,
 				properties
 			});
@@ -58,7 +58,7 @@ export function createFromDocumentTypesJson({
 			maybeUpdateManagedDocumentType({
 				_name: foldedLowerCaseName,
 				addFields,
-				documentTypeVersion,
+				version,
 				managedBy: applicationKey,
 				properties
 			});
