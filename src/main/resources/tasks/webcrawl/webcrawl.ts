@@ -474,6 +474,9 @@ export function run({
 				remove(cleanedBodyEl, '[aria-hidden=true]');
 				remove(cleanedBodyEl, '[hidden]');
 
+				// https://developers.google.com/search/docs/crawling-indexing/robots-meta-tag#data-nosnippet-attr
+				remove(cleanedBodyEl, '[data-noindex]');
+
 				// log.debug(`cleanedBodyEl:${toStr(cleanedBodyEl)}`); // JSON.stringify got a cyclic data structure
 				// log.debug(safeStringify({body: body.html()}));
 
@@ -486,6 +489,7 @@ export function run({
 						const el = linkEls[i];
 						// log.debug(`el:${safeStringify(el)}`); // JSON.stringify got a cyclic data structure
 						const rel = getAttributeValue(el, 'rel');
+						// https://developers.google.com/search/docs/crawling-indexing/qualify-outbound-links#nofollow
 						if (rel && rel.toUpperCase().includes('NOFOLLOW')) {
 							continue linksForLoop;
 						}
