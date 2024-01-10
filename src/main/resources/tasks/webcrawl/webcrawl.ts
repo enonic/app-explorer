@@ -37,7 +37,7 @@ import { ElementType } from "domelementtype";
 // WARNING: Causes TypeError: Cannot read property "Symbol" from undefined in production mode!
 // NOTE: Now that the server files are build using tsup, the error seems gone on my laptop.
 import { // Runtime Errors with MAP and symbol?
-	normalize, parse, resolve, serialize
+	parse, resolve, serialize
 } from 'uri-js';
 
 // @ts-ignore
@@ -54,6 +54,7 @@ import NotFoundException from './NotFoundException';
 import RobotsException from './RobotsException';
 import throwIfNotAllowed from './throwIfNotAllowed';
 import throwIfNotIndexable from './throwIfNotIndexable';
+import {normalizeWithoutEndingSlash} from './utils/normalizeWithoutEndingSlash';
 
 
 interface WebCrawlDocument {
@@ -229,17 +230,12 @@ export function run({
 	const excludeRegExps = forceArray(excludes).map(str => new RegExp(str));
 
 	if (!baseUri.includes('://')) { baseUri = `https://${baseUri}`;}
-	const entryPointUrlObj = parse(baseUri);
-	DEBUG && log.debug('entryPointUrlObj:%s', entryPointUrlObj);
-
-	const normalizedentryPointUrl = normalize(baseUri);
-	DEBUG && log.debug('normalizedentryPointUrl:%s', normalizedentryPointUrl);
-
-	const domain = entryPointUrlObj.host;
+	const {host: domain, scheme} = parse(baseUri);
 	DEBUG && log.debug('domain:%s', domain);
-
-	const scheme = entryPointUrlObj.scheme;
 	DEBUG && log.debug('scheme:%s', scheme);
+
+	const normalizedentryPointUrl = normalizeWithoutEndingSlash(baseUri);
+	DEBUG && log.debug('normalizedentryPointUrl:%s', normalizedentryPointUrl);
 
 	const robots = getRobotsTxt(userAgent, scheme, domain); // object with functions
 	TRACE && log.debug('robots:%s', toStr(robots));
@@ -303,7 +299,9 @@ export function run({
 					const {
 						links = [] // Can be undefined
 					} = node as Node<WebCrawlDocument>;
-					forceArray(links).forEach(normalized => handleNormalizedUri(normalized));
+					forceArray(links).forEach(normalized => handleNormalizedUri(
+						normalizeWithoutEndingSlash(normalized) // Can't assume that historic data contains normalized urls
+					));
 				} // exists
 			} else { // !resume
 				collector.taskProgressObj.info.message = `Processing ${url}`;
@@ -480,7 +478,7 @@ export function run({
 				// log.debug(`cleanedBodyEl:${toStr(cleanedBodyEl)}`); // JSON.stringify got a cyclic data structure
 				// log.debug(safeStringify({body: body.html()}));
 
-				const links = [];
+				const links: string[] = [];
 				if (boolFollow) {
 					const linkEls = querySelectorAll(bodyElWithNothingRemoved, "a[href]:not([href^='#']):not([href^='mailto:']):not([href^='tel:']):not([href^='content:'])");
 					DEBUG && log.debug('linkEls.length:%s', linkEls.length);
@@ -512,7 +510,7 @@ export function run({
 
 							if (currentHost === domain) {
 								delete uriObj.fragment;
-								const normalized = normalize(serialize(uriObj));
+								const normalized = normalizeWithoutEndingSlash(serialize(uriObj));
 								DEBUG && log.debug('normalized:%s', normalized);
 
 								if (!links.includes(normalized)) {
@@ -541,7 +539,7 @@ export function run({
 						og_site_name: ogSiteName,
 						og_title: ogTitle,
 						links,
-						path,
+						path: path || '/',
 						text: getText(cleanedBodyEl),
 						title,
 						url,

@@ -470,7 +470,7 @@ describe('webcrawl', () => {
 			// log.error('documentNode:%s', documentNode);
 			expect(documentNode.links.length).toBe(51);
 			expect(documentNode.title).toBe('Take control of your content: Composable content platform without limitations');
-			expect(documentNode.url).toBe('https://www.enonic.com/');
+			expect(documentNode.url).toBe('https://www.enonic.com');
 		}); // it
 	}); // describe collection
 
@@ -514,7 +514,7 @@ describe('webcrawl', () => {
 			expect(documentNode.links).toBe(undefined);
 			expect(documentNode.text).toBe('');
 			expect(documentNode.title).toBe('');
-			expect(documentNode.url).toBe('https://www.example.com/');
+			expect(documentNode.url).toBe('https://www.example.com');
 		}); // it
 	}); // describe collection example
 
@@ -555,6 +555,14 @@ describe('webcrawl', () => {
 		it("persists the correct title", () => {
 			const documentNode = collectionConnection3.get('00000000-0000-4000-8000-000000000002');
 			expect(documentNode.title).toBe('Head Title');
+		});
+
+		it("persists the correct links", () => {
+			const documentNode = collectionConnection3.get('00000000-0000-4000-8000-000000000002');
+			expect(documentNode.links).toStrictEqual([
+				'https://www.features.com',
+				'https://www.features.com/path'
+			]);
 		});
 	}); // describe collection features
 }); // describe webcrawl

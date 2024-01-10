@@ -34,7 +34,7 @@ Noindex: /platform`,
 					status: 200
 				};
 			} else if (
-				url === 'https://www.enonic.com/'
+				url === 'https://www.enonic.com'
 				|| url === 'https://www.enonic.com/platform/overview'
 				|| url === 'https://www.enonic.com/resources/case-studies/nav-headless-next-js'
 			) {
@@ -44,7 +44,7 @@ Noindex: /platform`,
 					headers: {},
 					status: 200
 				}
-			} else if (url.startsWith('https://www.enonic.com/')) {
+			} else if (url.startsWith('https://www.enonic.com')) {
 				return {
 					status: 404,
 				};
@@ -52,7 +52,7 @@ Noindex: /platform`,
 				return {
 					status: 404,
 				};
-			} else if (url === 'https://www.example.com/') {
+			} else if (url === 'https://www.example.com') {
 				return {
 					body: `<html/>`,
 					contentType: 'text/html; charset=utf-8',
@@ -63,7 +63,7 @@ Noindex: /platform`,
 				return {
 					status: 404,
 				};
-			} else if (url === 'https://www.features.com/') {
+			} else if (url === 'https://www.features.com' || url === 'https://www.features.com/path') {
 				return {
 					body: readFileSync(join(__dirname, 'features.com.html')).toString(),
 					contentType: 'text/html; charset=utf-8',
