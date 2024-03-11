@@ -9,11 +9,9 @@ export function normalizeWithoutEndingSlash(url: string): string {
 		host,
 		port,
 		path,
-		query,
-		fragment
 	} = parse(url);
 	if (endsWith(path, '/')) {
 		path = path.substring(0, path.length - 1);
 	}
-	return `${scheme}://${host}${port ? `:${port}` : ''}${path}${query ? `?${query}` : ''}${fragment ? `#${fragment}` : ''}`;
+	return `${scheme}://${host}${port ? `:${port}` : ''}${path}`;
 }
