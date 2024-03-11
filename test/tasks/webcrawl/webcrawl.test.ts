@@ -402,6 +402,11 @@ const journalConnection = connect({
 
 beforeAll((done) => {
 	// console.log('1 - beforeAll')
+	collectionConnection.create({
+		_nodeType: 'com.enonic.app.explorer:document',
+		// This urls needs to be linked to from one of the crawled pages
+		url: 'https://www.enonic.com/blog/top-10-ai-tools-for-content-editors'
+	});
 	import('../../../src/main/resources/tasks/webcrawl/webcrawl').then((moduleName) => {
 		moduleName.run({
 			collectionId: createdCollection._id,
@@ -431,6 +436,43 @@ beforeAll((done) => {
 //──────────────────────────────────────────────────────────────────────────────
 describe('webcrawl', () => {
 	describe('collection enonic', () => {
+		it('deletes old documents, even though they match exclude pattern', () => {
+			const queryRes = collectionConnection.query({
+				query: {
+					boolean: {
+						must: {
+							term: {
+								field: 'url',
+								value: 'https://www.enonic.com/blog/top-10-ai-tools-for-content-editors'
+							}
+						}
+					}
+				}
+			});
+			// log.error('queryRes:%s', queryRes);
+			expect(queryRes.hits.length).toBe(0);
+			// queryRes.hits.forEach((hit) => {
+			// 	const {id} = hit;
+			// 	const node = collectionConnection.get(id);
+			// 	const {
+			// 		_path,
+			// 		_nodeType
+			// 	} = node;
+			// 	if (_nodeType === 'com.enonic.app.explorer:document') {
+			// 		log.error('node:%s', {...node,
+			// 			_indexConfig: undefined,
+			// 			links: undefined,
+			// 			text: undefined,
+			// 		});
+			// 	} else {
+			// 		log.error('node:%s', {
+			// 			_path,
+			// 			_nodeType
+			// 		});
+			// 	}
+			// });
+		});
+
 		it('creates a journal and a document', () => {
 			// javaBridge.repo.list().forEach((repo) => {
 			// 	// log.debug('repo:%s', repo);
@@ -452,9 +494,36 @@ describe('webcrawl', () => {
 			const journalNode = journalConnection.get<JournalNode>('00000000-0000-4000-8000-000000000002');
 			// log.error('journalNode:%s', journalNode);
 			expect(journalNode.errorCount).toBe(0);
-			expect(journalNode.successCount).toBe(2);
+
+			expect(journalNode.successCount).toBe(3);
+			expect(journalNode.successes).toEqual([{
+				message: 'https://www.enonic.com'
+			},{
+				message: 'https://www.enonic.com/resources/case-studies/nav-headless-next-js'
+			},{
+				message: 'url:https://www.enonic.com/blog/top-10-ai-tools-for-content-editors deleted'
+			}]);
+
 			expect(journalNode.warningCount).toBe(38);
-			expect(journalNode.informations.length).toBe(11);
+
+			expect(journalNode.informations.length).toBe(8);
+			expect(journalNode.informations).toEqual([{
+				message: '/platform/overview Not indexable in robots.txt'
+			},{
+				message: '/company/about Not allowed in robots.txt'
+			},{
+				message: '/company/timeline Not allowed in robots.txt'
+			},{
+				message: '/company/careers Not allowed in robots.txt'
+			},{
+				message: '/company/our-services Not allowed in robots.txt'
+			},{
+				message: '/company/partner-list Not allowed in robots.txt'
+			},{
+				message: '/company/contact-us Not allowed in robots.txt'
+			},{
+				message: '/company Not allowed in robots.txt'
+			}]);
 
 			// const queryRes = collectionConnection.query({
 			// 	count: -1,
@@ -466,9 +535,9 @@ describe('webcrawl', () => {
 				links: string[]
 				title: string
 				url: string
-			}>>('00000000-0000-4000-8000-000000000002');
+			}>>('00000000-0000-4000-8000-000000000004');
 			// log.error('documentNode:%s', documentNode);
-			expect(documentNode.links.length).toBe(51);
+			expect(documentNode.links.length).toBe(48);
 			expect(documentNode.title).toBe('Take control of your content: Composable content platform without limitations');
 			expect(documentNode.url).toBe('https://www.enonic.com');
 		}); // it

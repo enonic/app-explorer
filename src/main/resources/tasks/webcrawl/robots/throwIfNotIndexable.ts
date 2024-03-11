@@ -1,7 +1,7 @@
-import type { RobotsTxt } from './webcrawl.d';
+import type { RobotsTxt } from './RobotsTxt';
 
 
-import RobotsException from './RobotsException';
+import RobotsException from '../exceptions/RobotsException';
 
 
 export default function throwIfNotIndexable({

@@ -3,16 +3,16 @@ import {
 	expect,
 	test as it
 } from '@jest/globals';
-import {normalizeWithoutEndingSlash} from '../../../../src/main/resources/tasks/webcrawl/utils/normalizeWithoutEndingSlash';
+import {normalizeWithoutEndingSlash} from '../../../../src/main/resources/tasks/webcrawl/uri/normalizeWithoutEndingSlash';
 
 
 const URI_STRING = 'https://www.example.com:8080?page=2#top';
 const URI_STRING_WITH_SLASH = 'https://www.example.com:8080/?page=2#top';
-const URI_STRING_NORMALIZED = 'https://www.example.com:8080';
+const URI_STRING_NORMALIZED = 'https://www.example.com:8080?page=2';
 
-const URI_STRING_WITH_PATH = 'https://www.example.com:8080/path?page=2#top';
-const URI_STRING_WITH_PATH_AND_SLASH = 'https://www.example.com:8080/path/?page=2#top';
-const URI_STRING_WITH_PATH_NORMALIZED = 'https://www.example.com:8080/path';
+const URI_STRING_WITH_PATH = 'https://www.example.com:8080/%7Epath?page=2#top';
+const URI_STRING_WITH_PATH_AND_SLASH = 'https://www.example.com:8080/%7Epath/?page=2#top';
+const URI_STRING_WITH_PATH_NORMALIZED = 'https://www.example.com:8080/~path?page=2';
 
 
 describe('webcrawl', () => {

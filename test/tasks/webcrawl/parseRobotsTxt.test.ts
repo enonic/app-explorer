@@ -4,7 +4,7 @@ import {
 	test as it
 } from '@jest/globals';
 import Log from '@enonic/mock-xp/dist/Log';
-import {parseRobotsTxt} from '../../../src/main/resources/tasks/webcrawl/parseRobotsTxt';
+import {parseRobotsTxt} from '../../../src/main/resources/tasks/webcrawl/robots/parseRobotsTxt';
 
 //──────────────────────────────────────────────────────────────────────────────
 // Globals
