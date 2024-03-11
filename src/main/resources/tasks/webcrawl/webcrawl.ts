@@ -37,7 +37,7 @@ import { ElementType } from "domelementtype";
 // WARNING: Causes TypeError: Cannot read property "Symbol" from undefined in production mode!
 // NOTE: Now that the server files are build using tsup, the error seems gone on my laptop.
 import { // Runtime Errors with MAP and symbol?
-	parse, resolve, serialize
+	parse, resolve,
 } from 'uri-js';
 
 // @ts-ignore
@@ -47,14 +47,24 @@ import {exists} from '/lib/explorer/node/exists';
 import {get} from '/lib/explorer/node/get';
 import {hash} from '/lib/explorer/string/hash';
 import {Collector} from '/lib/explorer/collector/Collector';
-import { DEFAULT_UA } from './constants';
-import ContentTypeException from './ContentTypeException';
-import getRobotsTxt from './getRobotsTxt';
-import NotFoundException from './NotFoundException';
-import RobotsException from './RobotsException';
-import throwIfNotAllowed from './throwIfNotAllowed';
-import throwIfNotIndexable from './throwIfNotIndexable';
-import {normalizeWithoutEndingSlash} from './utils/normalizeWithoutEndingSlash';
+
+import {DEFAULT_UA} from './constants';
+
+import ContentTypeException from './exceptions/ContentTypeException';
+import NotFoundException from './exceptions/NotFoundException';
+import RobotsException from './exceptions/RobotsException';
+
+import getRobotsTxt from './robots/getRobotsTxt';
+import throwIfNotAllowed from './robots/throwIfNotAllowed';
+import throwIfNotIndexable from './robots/throwIfNotIndexable';
+import {throwIfExcluded} from './robots/throwIfExcluded';
+
+import {matchesExcludeRegexp} from './uri/matchesExcludeRegexp';
+import {normalizeUriObj} from './uri/normalizeUriObj';
+import {normalizeWithoutEndingSlash} from './uri/normalizeWithoutEndingSlash';
+import {pathFromResolvedUri} from './uri/pathFromResolvedUri';
+import {serializeNormalizedUriObjWithQuery} from './uri/serializeNormalizedUriObjWithQuery';
+import {canonizeNormalizedUriObj} from './uri/canonizeNormalizedUriObj';
 
 
 interface WebCrawlDocument {
@@ -230,10 +240,12 @@ export function run({
 	const excludeRegExps = forceArray(excludes).map(str => new RegExp(str));
 
 	if (!baseUri.includes('://')) { baseUri = `https://${baseUri}`;}
-	const {host: domain, scheme} = parse(baseUri);
+	const normalizedBaseUriObj = normalizeUriObj(baseUri); // Not using parse, because that doesn't covert "%7E" to "~", etc.
+	const {host: domain, scheme} = normalizedBaseUriObj;
 	DEBUG && log.debug('domain:%s', domain);
 	DEBUG && log.debug('scheme:%s', scheme);
 
+	// NOTE: Can't use serialize on normalizedBaseUriObj here, because that adds a trailing slash :(
 	const normalizedentryPointUrl = normalizeWithoutEndingSlash(baseUri);
 	DEBUG && log.debug('normalizedentryPointUrl:%s', normalizedentryPointUrl);
 
@@ -243,16 +255,10 @@ export function run({
 	const seenUrisObj = {[normalizedentryPointUrl]: true};
 	TRACE && log.debug('seenUrisObj:%s', toStr(seenUrisObj));
 
+	const persistedCanonicalUrls = {};
+
 	const queueArr = [normalizedentryPointUrl];
 	TRACE && log.debug('queueArr:%s', toStr(queueArr));
-
-	function throwIfExcluded(urlWithoutSchemeAndDomain: string) {
-		for (let i = 0; i < excludeRegExps.length; i += 1) {
-			if (excludeRegExps[i].test(urlWithoutSchemeAndDomain)) {
-				throw new RobotsException(urlWithoutSchemeAndDomain, 'Matches an exclude regexp!');
-			}
-		}
-	}
 
 	function handleNormalizedUri(normalized: string) {
 		if (
@@ -273,12 +279,13 @@ export function run({
 		}
 		pageCounter += 1;
 
-		const url = queueArr.shift(); // Normalized before added to queue
+		// Normalized before adding to queue, still contains query though, in case of pagination.
+		const url = queueArr.shift();
 		DEBUG && log.debug('url:%s', url);
 
+		// NOTE: Not switching to normalizeUrlObj here, because that may break robots functionality.
 		const baseUrlObj = parse(url);
 		TRACE && log.debug('baseUrlObj:%s', toStr(baseUrlObj));
-		const { path } = baseUrlObj;
 
 		try {
 			collector.taskProgressObj.info.uri = url; // eslint-disable-line no-param-reassign
@@ -316,7 +323,7 @@ export function run({
 					.replace(/^.*?:\/\//, '') // scheme http://
 					.replace(/^.*?\//, '/') // domain www.enonic.com
 				TRACE && log.debug('urlWithoutSchemeAndDomain:%s', urlWithoutSchemeAndDomain);
-				throwIfExcluded(urlWithoutSchemeAndDomain);
+				throwIfExcluded({ excludeRegExps, urlWithoutSchemeAndDomain });
 				const headers = { // HTTP/2 uses lowercase header keys
 					'user-agent': userAgent
 				};
@@ -502,22 +509,32 @@ export function run({
 							const resolved = resolve(url, href);
 							DEBUG && log.debug('resolved:%s', resolved);
 
-							const uriObj = parse(resolved);
-							DEBUG && log.debug('uriObj:%s', uriObj);
+							const normalizedUriObj = normalizeUriObj(resolved);
+							DEBUG && log.debug('uriObj:%s', normalizedUriObj);
 
-							const currentHost = uriObj.host;
+							const currentHost = normalizedUriObj.host;
 							DEBUG && log.debug('currentHost:%s', currentHost);
 
-							if (currentHost === domain) {
-								delete uriObj.fragment;
-								const normalized = normalizeWithoutEndingSlash(serialize(uriObj));
-								DEBUG && log.debug('normalized:%s', normalized);
-
-								if (!links.includes(normalized)) {
-									links.push(normalized);
-								}
-								handleNormalizedUri(normalized);
+							if (currentHost !== domain) {
+								continue linksForLoop;
 							}
+
+							if (matchesExcludeRegexp({
+								excludeRegExps,
+								urlWithoutSchemeAndDomain: pathFromResolvedUri(resolved)
+							})) {
+								continue linksForLoop;
+							}
+
+							const normalized = serializeNormalizedUriObjWithQuery(normalizedUriObj);
+							DEBUG && log.debug('normalized:%s', normalized);
+
+							if (!links.includes(normalized)) {
+								links.push(normalized);
+							}
+
+							handleNormalizedUri(normalized);
+
 						} catch (e) {
 							// Just log and ignore links that we don't support
 							log.error(`${url}: Something went wrong while processing a[href]:${href} ${e.message}`, e);
@@ -525,12 +542,23 @@ export function run({
 					} // for linkEls
 				} // boolFollow
 
+				const canonizedUrl = canonizeNormalizedUriObj(normalizeUriObj(url));
+				if (persistedCanonicalUrls[canonizedUrl]) {
+					if (url !== canonizedUrl) {
+						log.info(`Skipping already persisted variant:${url} of canonizedUrl:${canonizedUrl}`);
+					} else {
+						log.info(`Skipping already persisted canonizedUrl:${canonizedUrl}`);
+					}
+					boolIndex = false;
+				}
+
 				if (boolIndex) {
 					throwIfNotIndexable({
 						path: baseUrlObj.path,
 						robots,
 						userAgent
 					});
+					const { path } = baseUrlObj; // TODO WARNING baseUrlObj is not normalized.
 					const documentToPersist: WebCrawlDocument = {
 						displayname: ogTitle || title, // This has no field definition by default
 						domain,
@@ -539,11 +567,12 @@ export function run({
 						og_site_name: ogSiteName,
 						og_title: ogTitle,
 						links,
-						path: path || '/',
+						path: path || '/', // TODO WARNING: This path is currently not normalized!
 						text: getText(cleanedBodyEl),
 						title,
-						url,
+						url: canonizedUrl,
 					};
+
 					if (keepHtml) {
 						documentToPersist.html = res.body;
 					}
@@ -559,7 +588,7 @@ export function run({
 								must: {
 									term: {
 										field: 'url',
-										value: url
+										value: canonizedUrl
 									}
 								}
 							}
@@ -575,7 +604,7 @@ export function run({
 						for (let i = 0; i < documentsRes.hits.length; i++) {
 							const {id} = documentsRes.hits[i]
 							const {url: anUrl} = collector.getDocumentNode(id);
-							if (anUrl === url) { // Direct case sensitive match
+							if (anUrl === canonizedUrl) { // Direct case sensitive match
 								documentToPersist._id = documentsRes.hits[0].id;
 							}
 						}
@@ -599,6 +628,8 @@ export function run({
 						}
 					);
 					DEBUG && log.debug('persistedDocument:%s', toStr(persistedDocument));
+
+					persistedCanonicalUrls[canonizedUrl] = true;
 				} // indexable
 			} // resume ... else
 			log.debug(`success url:${toStr(url)}`);

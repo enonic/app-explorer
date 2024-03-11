@@ -2,7 +2,7 @@ import type {
 	HttpClientRequest,
 	Response
 } from '@enonic-types/lib-explorer';
-import type { RobotsTxt } from './webcrawl.d';
+import type { RobotsTxt } from './RobotsTxt';
 
 
 // import {startsWith} from '@enonic/js-utils/string/startsWith';

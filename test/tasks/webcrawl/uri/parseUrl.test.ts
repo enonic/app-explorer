@@ -3,7 +3,7 @@ import {
 	expect,
 	test as it
 } from '@jest/globals';
-import {parseUrl} from '../../../../src/main/resources/tasks/webcrawl/utils/parseUrl';
+import {parseUrl} from '../../../../src/main/resources/tasks/webcrawl/uri/parseUrl';
 
 
 describe('webcrawl', () => {

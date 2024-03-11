@@ -6,7 +6,7 @@ import {
 import Log from '@enonic/mock-xp/dist/Log';
 import guard from 'robots-txt-guard';
 import { DEFAULT_UA } from '../../../src/main/resources/tasks/webcrawl/constants';
-import throwIfNotAllowed from '../../../src/main/resources/tasks/webcrawl/throwIfNotAllowed';
+import throwIfNotAllowed from '../../../src/main/resources/tasks/webcrawl/robots/throwIfNotAllowed';
 
 //──────────────────────────────────────────────────────────────────────────────
 // Globals
