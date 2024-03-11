@@ -685,7 +685,7 @@ export function run({
 		} // if res.hits.length
 	} // function deleteOldNodes
 
-	if (!collector.shouldStop()) {
+	if (!collector.shouldStop() && !collector.journal.errors.length) {
 		deleteOldNodes();
 	}
 

@@ -59,6 +59,19 @@ Noindex: /platform`,
 					headers: {},
 					status: 200,
 				};
+			} else if (url === 'https://www.error.com/robots.txt') {
+				return {
+					status: 404,
+				};
+			} else if (url === 'https://www.error.com') {
+				throw new Error('HttpHeadersTimeoutException');
+			} else if (url === 'https://www.error.com/oldDocument') {
+				return {
+					body: `<html><body><h1>Old document</h1></body></html>`,
+					contentType: 'text/html; charset=utf-8',
+					headers: {},
+					status: 200,
+				};
 			} else if (url === 'https://www.features.com/robots.txt') {
 				return {
 					status: 404,
