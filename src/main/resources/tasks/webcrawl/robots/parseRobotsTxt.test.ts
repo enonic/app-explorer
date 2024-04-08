@@ -3,8 +3,8 @@ import {
 	expect,
 	test as it
 } from '@jest/globals';
-import Log from '@enonic/mock-xp/dist/Log';
-import {parseRobotsTxt} from '../../../src/main/resources/tasks/webcrawl/robots/parseRobotsTxt';
+import {Log} from '@enonic/mock-xp';
+import {parseRobotsTxt} from './parseRobotsTxt';
 
 //──────────────────────────────────────────────────────────────────────────────
 // Globals

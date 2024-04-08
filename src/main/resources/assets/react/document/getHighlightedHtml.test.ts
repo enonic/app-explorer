@@ -6,11 +6,11 @@ import {
 	expect,
 	test
 } from '@jest/globals';
-import getHighlightedHtml from '../../../../src/main/resources/assets/react/document/getHighlightedHtml';
+import getHighlightedHtml from './getHighlightedHtml';
 import {
     POST_TAG,
 	PRE_TAG,
-} from '../../../../src/main/resources/assets/react/document/constants';
+} from './constants';
 
 
 const LORUM                                  = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.';
@@ -21,7 +21,7 @@ const LORUM_SHORT_MIDDLE = `m ${PRE_TAG}ipsum${POST_TAG} d`;
 
 
 describe('getHighlightedHtml', () => {
-    
+
     test('returns fallback stripped to fragmentSize plus ELLIPSIS when _highlight is undefined', () => {
         expect(getHighlightedHtml({
             fallback: 'fallback',

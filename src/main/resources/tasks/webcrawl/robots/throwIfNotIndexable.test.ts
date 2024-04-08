@@ -3,10 +3,10 @@ import {
 	expect,
 	test as it
 } from '@jest/globals';
-import Log from '@enonic/mock-xp/dist/Log';
+import {Log} from '@enonic/mock-xp';
 import guard from 'robots-txt-guard';
-import { DEFAULT_UA } from '../../../src/main/resources/tasks/webcrawl/constants';
-import throwIfNotAllowed from '../../../src/main/resources/tasks/webcrawl/robots/throwIfNotAllowed';
+import { DEFAULT_UA } from '../constants';
+import throwIfNotIndexable from './throwIfNotIndexable';
 
 //──────────────────────────────────────────────────────────────────────────────
 // Globals
@@ -23,7 +23,7 @@ global.log = Log.createLogger({
 //──────────────────────────────────────────────────────────────────────────────
 // Tests
 //──────────────────────────────────────────────────────────────────────────────
-describe('throwIfNotAllowed', () => {
+describe('throwIfNotIndexable', () => {
 	const robots = guard({
 		extensions: [{
 			extension: "sitemap",
@@ -35,7 +35,7 @@ describe('throwIfNotAllowed', () => {
 			],
 			"rules": [{
 				"path": "/docs/",
-				"rule": "disallow",
+				"rule": "noindex",
 			}],
 		},{
 			"agents": [
@@ -43,14 +43,14 @@ describe('throwIfNotAllowed', () => {
 			],
 			"rules": [{
 				"path": "/docs/",
-				"rule": "disallow",
+				"rule": "noindex",
 			},{
 				"path": "/example/",
-				"rule": "disallow",
+				"rule": "noindex",
 			}],
 		}]
 	});
-	it("does NOT throw when allowed (all browsers)", () => {
+	it("does NOT throw when indexable (all browsers)", () => {
 		[
 			'/',
 			'/docs',
@@ -59,14 +59,14 @@ describe('throwIfNotAllowed', () => {
 			'/docsaddenum',
 			'/example/'
 		].forEach(path => {
-			expect(() => throwIfNotAllowed({
+			expect(() => throwIfNotIndexable({
 				path,
 				robots,
 				userAgent: '',
 			})).not.toThrow();
 		});
 	});
-	it("does NOT throw when allowed (EnonicXpExplorerCollectorWebcrawlerBot)", () => {
+	it("does NOT throw when indexable (EnonicXpExplorerCollectorWebcrawlerBot)", () => {
 		[
 			'/',
 			'/docs',
@@ -74,14 +74,14 @@ describe('throwIfNotAllowed', () => {
 			'/docs#',
 			'/docsaddenum',
 		].forEach(path => {
-			expect(() => throwIfNotAllowed({
+			expect(() => throwIfNotIndexable({
 				path,
 				robots,
 				userAgent: DEFAULT_UA,
 			})).not.toThrow();
 		});
 	});
-	it("throws when NOT allowed (all browsers)", () => {
+	it("throws when NOT indexable (all browsers)", () => {
 		[
 			'/docs/',
 			'/docs/?',
@@ -89,14 +89,14 @@ describe('throwIfNotAllowed', () => {
 			'/docs/index.html',
 			'/docs/index.html?foo=bar',
 		].forEach(path => {
-			expect(() => throwIfNotAllowed({
+			expect(() => throwIfNotIndexable({
 				path,
 				robots,
 				userAgent: '',
-			})).toThrow('Not allowed in robots.txt');
+			})).toThrow('Not indexable in robots.txt');
 		})
 	});
-	it("throws when NOT allowed (EnonicXpExplorerCollectorWebcrawlerBot)", () => {
+	it("throws when NOT indexable (EnonicXpExplorerCollectorWebcrawlerBot)", () => {
 		[
 			'/docs/',
 			'/docs/?',
@@ -105,11 +105,11 @@ describe('throwIfNotAllowed', () => {
 			'/docs/index.html?foo=bar',
 			'/example/'
 		].forEach(path => {
-			expect(() => throwIfNotAllowed({
+			expect(() => throwIfNotIndexable({
 				path,
 				robots,
 				userAgent: DEFAULT_UA,
-			})).toThrow('Not allowed in robots.txt');
+			})).toThrow('Not indexable in robots.txt');
 		})
 	});
 });

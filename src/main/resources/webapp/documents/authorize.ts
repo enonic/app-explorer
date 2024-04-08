@@ -29,7 +29,7 @@ export default function authorize(request: Request, collectionName: string): {
 	contentType?: string
 	status: number
 } {
-	//log.info(`request:${toStr(request)}`);
+	// log.info(`request:${toStr(request)}`);
 
 	if (
 		hasRole(Role.SYSTEM_ADMIN)

@@ -1,6 +1,18 @@
+export const APP_NAME = 'com.enonic.app.explorer';
+export const EXPLORER_VERSION = '4.4.4';
+
+const DIR_SRC = 'src/main/resources';
+const AND_BELOW = '**';
+const SOURCE_FILES = `*.{ts,tsx}`;
+const DECLARATION_FILES = `*.d.{ts,tsx}`;
+const TEST_EXT = `{spec,test}.{ts,tsx}`;
+const TEST_FILES = `*.${TEST_EXT}`;
+
+
 export default {
 	collectCoverageFrom: [
-		'src/main/resources/**/*.{ts,tsx}'
+		`${DIR_SRC}/${AND_BELOW}/${SOURCE_FILES}`,
+		`!${DIR_SRC}/${AND_BELOW}/${DECLARATION_FILES}`
 	],
 
 	coveragePathIgnorePatterns: [
@@ -14,25 +26,10 @@ export default {
 
 	globals: {
 		app: {
-			name: 'com.enonic.app.explorer',
-			version: '2.0.0'
+			config: {},
+			name: APP_NAME,
+			version: EXPLORER_VERSION
 		},
-		// Didn't work when running more than one test
-		// Java: {
-		// 	type: (path: string) => {
-		// 		if (path === 'java.util.Locale') {
-		// 			return {
-		// 				forLanguageTag: (locale: string) => locale
-		// 			}
-		// 		} else if (path === 'java.lang.System') {
-		// 			return {
-		// 				currentTimeMillis: () => 0
-		// 			};
-		// 		} else {
-		// 			throw new Error(`Unmocked Java.type path: '${path}'`);
-		// 		}
-		// 	}
-		// }
 	},
 
 	// It seems mocks doesn't apply to mapped modules?
@@ -50,11 +47,21 @@ export default {
 	preset: 'ts-jest/presets/js-with-babel-legacy',
 	// preset: 'ts-jest/presets/js-with-babel',
 
+	// A list of paths to modules that run some code to configure or set up the
+	// testing environment. Each setupFile will be run once per test file. Since
+	// every test runs in its own environment, these scripts will be executed in
+	// the testing environment before executing setupFilesAfterEnv and before
+	// the test code itself.
+	setupFiles: [
+		'<rootDir>/test/setupFile.ts'
+	],
+
 	// testEnvironment: 'jsdom', // Doesn't change Uncovered Lines
 	testEnvironment: 'node',
 
 	testMatch: [
-		'<rootDir>/test/**/*.(spec|test).{ts,tsx}'
+		`<rootDir>/${DIR_SRC}/${AND_BELOW}/${TEST_FILES}`,
+		`<rootDir>/test/${AND_BELOW}/${TEST_FILES}`
 	],
 
 	transform: {
@@ -67,6 +74,6 @@ export default {
 	},
 
 	transformIgnorePatterns: [
-		'/node_modules/(?!@enonic/mock-xp/src)',
+		'/node_modules/(?!@enonic/(js-utils|mock-xp))',
 	]
 }

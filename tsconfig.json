@@ -5,10 +5,13 @@
 		"allowJs": true,
 		"allowSyntheticDefaultImports": true,
 
-		// Lets you set a base directory to resolve non-absolute module names.
-		// If you get tired of imports always looking like "../" or "./", or needing
-		// to change them as you move files, this is a great way to fix that.
-		// "baseUrl": "./",
+		// Sets a base directory from which to resolve bare specifier module names.
+		// This resolution has higher priority than lookups from node_modules.
+		// This feature was designed for use in conjunction with AMD module
+		// loaders in the browser, and is not recommended in any other context.
+		// As of TypeScript 4.1, baseUrl is no longer required to be set when
+		// using paths.
+		"baseUrl": ".",
 
 		"declaration": false,
 		"declarationMap": false,
@@ -48,10 +51,15 @@
 		"noUnusedLocals": false,
 		"noUnusedParameters": true,
 		"outDir": "build/tsc",
+
+		// A series of entries which re-map imports to lookup locations relative
+		// to the baseUrl if set, or to the tsconfig file itself otherwise.
 		"paths": {
 			// Development (should be commented out when commiting)
 			// "@enonic/js-utils/*": ["../enonic-js-utils/src/*"],
 			// Production (should be commented in when commiting)
+			// "@enonic-types/lib-explorer/*": ["./symlinks/lib-explorer/src/main/resources/lib/explorer/types/*"],
+			"@enonic-types/lib-explorer/*": ["../lib-explorer/src/main/resources/lib/explorer/types/*"],
 			"@enonic/js-utils": ["./node_modules/@enonic/js-utils"],
 			"@enonic/js-utils/*": ["./node_modules/@enonic/js-utils/*"],
 			"@enonic/nashorn-polyfills": ["./src/main/resources/lib/nashorn/index.ts"],
@@ -61,6 +69,7 @@
 			// "/webapp/*": ["./src/main/resources/webapp/*"], // Doesn't work
 			// "/*": ["./src/main/resources/*"],
 		},
+
 		"preserveWatchOutput": false,
 		"pretty": true,
 		"removeComments": true,
@@ -116,6 +125,12 @@
 		// 2. The environment tsup transpiles to (set in tsconfig.tsup.json via tsup.config.ts)
 		"target": "ES2020", // What bundle-require inside tsup uses to load tsup.config.ts
 
+		// By default all visible ”@types” packages are included in your compilation.
+		// Packages in node_modules/@types of any enclosing folder are considered visible.
+		// For example, that means packages within ./node_modules/@types/,
+		// ../node_modules/@types/, ../../node_modules/@types/, and so on.
+		// If typeRoots is specified, only packages under typeRoots will be included.
+		// All paths are relative to the tsconfig.json
 		"typeRoots": [
 
 			// Nope, enonic-types should not be available in the node build env,
@@ -129,17 +144,36 @@
 		// 	"mocha"
 		// ],
 	},
+
+	// Specifies an array of filenames or patterns to include in the program.
+	// These filenames are resolved relative to the directory containing the
+	// tsconfig.json file.
+	"include": [
+		// Make sure default types matches Nashorn
+		"node_modules/typescript/lib/lib.es5.d.ts",
+
+		"src/main/resources/**/*.ts",
+		"src/main/resources/**/*.tsx"
+	],
+
+	// Specifies an array of filenames or patterns that should be skipped when
+	// resolving include.
+	// Important: exclude only changes which files are included as a result of
+	// the include setting. A file specified by exclude can still become part of
+	// your codebase due to an import statement in your code, a types inclusion,
+	// a /// <reference directive, or being specified in the files list.
+	// It is not a mechanism that prevents a file from being included in the
+	// codebase - it simply changes what the include setting finds.
 	"exclude": [
 		//"node_modules/@types/node/globals.global.d.ts", // Does not help
 		//"node_modules/semantic-ui-react/dist/commonjs/**/*", // Does not help
 		//"src/main/resources/lib/nashorn/global.ts", // Does not help
 		"**/*.d.ts",
+		"**/*.d.tsx",
 		"build/**/*",
 		"node_modules/**/*",
+		"src/main/resources/**/*.test.ts",
 		"../enonic-js-utils/**/*",
 		"../lib-explorer/**/*"
 	],
-	// "include": [ // TODO make a separate test/tsconfig.json
-	// 	"./test/**/*.test.ts"
-	// ]
 }

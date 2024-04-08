@@ -1,7 +1,4 @@
-import type { UserKey } from '@enonic-types/lib-auth';
-
-
-import {
+	import {
 	describe,
 	expect,
 	jest,
@@ -15,21 +12,29 @@ import {
 	Path,
 	Repo
 } from '@enonic/explorer-utils'
-import { JavaBridge } from '@enonic/mock-xp';
-import Log from '@enonic/mock-xp/dist/Log';
-import mockLibGalimatias from '../../mocks/libGalimatias';
-import mockLibHttpClient from '../../mocks/libHttpClient';
-import mockLibXpAuth from '../../mocks/libXpAuth';
-import mockLibXpContext from '../../mocks/libXpContext';
-import mockLibXpCommon from '../../mocks/libXpCommon';
-import mockLibXpMail from '../../mocks/libXpMail';
-import mockLibXpEvent from '../../mocks/libXpEvent';
-import mockLibXpIo from '../../mocks/libXpIo';
-import mockLibXpNode from '../../mocks/libXpNode';
-import mockLibXpRepo from '../../mocks/libXpRepo';
-import mockLibXpScheduler from '../../mocks/libXpScheduler';
-import mockLibXpTask from '../../mocks/libXpTask';
-import mockLibXpValue from '../../mocks/libXpValue';
+import {
+	App,
+	Log,
+	Server
+} from '@enonic/mock-xp';
+import fnv = require('fnv-plus');
+import {
+	APP_NAME,
+	EXPLORER_VERSION
+} from '../../../../../jest.config';
+import mockLibGalimatias from '../../../../../test/mocks/libGalimatias';
+import mockLibHttpClient from '../../../../../test/mocks/libHttpClient';
+import mockLibXpAuth from '../../../../../test/mocks/libXpAuth';
+import mockLibXpContext from '../../../../../test/mocks/libXpContext';
+import mockLibXpCommon from '../../../../../test/mocks/libXpCommon';
+import mockLibXpMail from '../../../../../test/mocks/libXpMail';
+import mockLibXpEvent from '../../../../../test/mocks/libXpEvent';
+import mockLibXpIo from '../../../../../test/mocks/libXpIo';
+import mockLibXpNode from '../../../../../test/mocks/libXpNode';
+import mockLibXpRepo from '../../../../../test/mocks/libXpRepo';
+import mockLibXpScheduler from '../../../../../test/mocks/libXpScheduler';
+import mockLibXpTask from '../../../../../test/mocks/libXpTask';
+import mockLibXpValue from '../../../../../test/mocks/libXpValue';
 
 //──────────────────────────────────────────────────────────────────────────────
 // Constants
@@ -43,104 +48,51 @@ const CONFIG_JSON = JSON.stringify(COLLECTOR_CONFIG);
 const COLLECTION_NAME = 'error_collection';
 const REPO_COLLECTION_TEST = `${COLLECTION_REPO_PREFIX}${COLLECTION_NAME}`;
 
-//──────────────────────────────────────────────────────────────────────────────
-// Globals
-//──────────────────────────────────────────────────────────────────────────────
-// @ts-expect-error TS2339: Property 'app' does not exist on type 'typeof globalThis'.
-global.app = {
-	config: {},
-	name: APP_EXPLORER,
-	version: '0.0.1-SNAPSHOT'
-}
-
-global.Java = {
-	//from: jest.fn().mockImplementation((obj: any) => obj),
-	type: jest.fn().mockImplementation((path: string) => {
-		if (path === 'java.util.Locale') {
-			return {
-				forLanguageTag: jest.fn().mockImplementation((locale: string) => locale)
-			}
-		} else if (path === 'java.lang.System') {
-			return {
-				currentTimeMillis: jest.fn().mockReturnValue(1) // Needs a truthy value :)
-			};
-		} else {
-			throw new Error(`Unmocked Java.type path: '${path}'`);
-		}
-	})
-}
-
-const log = Log.createLogger({
-	// loglevel: 'debug'
-	// loglevel: 'info'
-	// loglevel: 'warn'
-	loglevel: 'error'
-	// loglevel: 'silent'
-});
-// @ts-expect-error TS2339: Property 'log' does not exist on type 'typeof globalThis'.
-global.log = log;
-
-const javaBridge = new JavaBridge({
-	app: {
-		config: {},
-		name: APP_EXPLORER,
-		version: '0.0.1-SNAPSHOT'
-	},
-	log
-});
-javaBridge.repo.create({
+const server = new Server({
+	// loglevel: 'error',
+	loglevel: 'silent',
+}).createRepo({
 	id: Repo.EXPLORER
-});
-javaBridge.repo.create({
+}).createRepo({
 	id: Repo.JOURNALS
-});
-javaBridge.repo.create({
+}).createRepo({
 	id: REPO_COLLECTION_TEST
 });
+
+const app = new App({
+	config: {},
+	key: APP_NAME,
+	version: EXPLORER_VERSION
+});
+
+// eslint-disable-next-line @typescript-eslint/no-namespace
+declare module globalThis {
+	let log: Log
+}
+
+globalThis.log = server.log;
+
 
 //──────────────────────────────────────────────────────────────────────────────
 // Mocks
 //──────────────────────────────────────────────────────────────────────────────
+jest.mock('/lib/explorer/string/hash', () => ({
+	hash: jest.fn().mockImplementation((
+		value: string,
+		bitlength: number = 128
+	) => fnv.hash(value, bitlength).str())
+}), { virtual: true });
+
 mockLibGalimatias();
 mockLibHttpClient();
-const user = {
-	displayName: 'System Administrator',
-	key: 'user:system:su' as UserKey,
-	login: 'su',
-	disabled: false,
-	// email: ,
-	modifiedTime: '1970-01-01T00:00:00Z',
-	idProvider: 'system',
-	type: 'user' as const,
-}
-mockLibXpAuth({
-	user
-});
+mockLibXpAuth({ server });
 mockLibXpCommon();
-mockLibXpContext({
-	context: {
-		branch: 'master',
-		repository: 'com.enonic.app.explorer',
-		authInfo: {
-			principals: [
-				'role:system.admin'
-			],
-			user
-		},
-		attributes: {}
-	}
-});
-mockLibXpEvent({ log });
-mockLibXpIo();
+mockLibXpContext({ server });
+mockLibXpEvent({ server });
+mockLibXpIo({ app });
 mockLibXpMail({ log });
-const {
-	connect
-} = mockLibXpNode({
-	javaBridge
-});
-mockLibXpRepo({
-	javaBridge
-});
+mockLibXpNode({ server });
+mockLibXpRepo({ server });
 mockLibXpScheduler();
 mockLibXpTask();
 mockLibXpValue();
@@ -148,8 +100,8 @@ mockLibXpValue();
 //──────────────────────────────────────────────────────────────────────────────
 // Test data
 //──────────────────────────────────────────────────────────────────────────────
-const nodeConnection = connect({
-	branch: 'master',
+const nodeConnection = server.connect({
+	branchId: 'master',
 	repoId: Repo.EXPLORER
 });
 nodeConnection.create({
@@ -337,9 +289,9 @@ const LANGUAGE = 'en';
 describe('webcrawl', () => {
 	describe('HttpHeadersTimeoutException on entrypointUrl', () => {
 		it('should NOT delete any old documents', async () => {
-			import('../../../src/main/resources/tasks/webcrawl/webcrawl').then(({run}) => {
-				const documentConnection = connect({
-					branch: 'master',
+			import('./webcrawl').then(({run}) => {
+				const documentConnection = server.connect({
+					branchId: 'master',
 					repoId: REPO_COLLECTION_TEST
 				});
 				documentConnection.create({
@@ -408,7 +360,7 @@ describe('webcrawl', () => {
 
 				const oldDocument = documentConnection.get('00000000-0000-4000-8000-000000000002');
 				// log.error('oldDocument:%s', oldDocument);
-				expect(oldDocument.url).toBe('https://www.error.com/oldDocument');
+				expect(oldDocument['url']).toBe('https://www.error.com/oldDocument');
 			});
 		});
 	});

@@ -1,4 +1,4 @@
-import type Log from '@enonic/mock-xp/dist/Log';
+import type { Log } from '@enonic/mock-xp';
 
 import type { send } from '@enonic-types/lib-mail';
 import { jest } from '@jest/globals';

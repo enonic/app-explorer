@@ -11,16 +11,8 @@ import type {
 	listener,
 	send
 } from '@enonic-types/lib-event';
-import type {
-	RepoConnection,
-	connect
-} from '@enonic-types/lib-node';
-import type {
-	Repository,
-	get as getRepo
-} from '@enonic-types/lib-repo';
-import type { DocumentNode } from '/lib/explorer/types/Document';
-import type { PostRequest } from '../../../src/main/resources/webapp/documents/createOrGetOrModifyOrDeleteMany';
+import type { DocumentNode } from '@enonic-types/lib-explorer/Document.d';
+import type { PostRequest } from './createOrGetOrModifyOrDeleteMany';
 
 
 import {
@@ -29,8 +21,10 @@ import {
 	jest,
 	test as it
 } from '@jest/globals';
-import { JavaBridge } from '@enonic/mock-xp/src/JavaBridge';
-import Log from '@enonic/mock-xp/src/Log';
+import {
+	Log,
+	Server,
+} from '@enonic/mock-xp';
 import {
 	COLLECTION_REPO_PREFIX,
 	Folder,
@@ -38,15 +32,9 @@ import {
 	Path,
 	Repo,
 } from '@enonic/explorer-utils';
-
-
-const log = Log.createLogger({
-	// loglevel: 'debug'
-	// loglevel: 'info'
-	// loglevel: 'warn'
-	loglevel: 'error'
-	// loglevel: 'silent'
-});
+import fnv = require('fnv-plus');
+import mockLibXpNode from '../../../../../test/mocks/libXpNode';
+import mockLibXpRepo from '../../../../../test/mocks/libXpRepo';
 
 //──────────────────────────────────────────────────────────────────────────────
 // Constants
@@ -71,51 +59,27 @@ const USER = {
 } as User;
 
 //──────────────────────────────────────────────────────────────────────────────
-// Globals
-//──────────────────────────────────────────────────────────────────────────────
-global.Java = {
-	//from: jest.fn().mockImplementation((obj: any) => obj),
-	type: jest.fn().mockImplementation((path: string) => {
-		if (path === 'java.util.Locale') {
-			return {
-				forLanguageTag: jest.fn().mockImplementation((locale: string) => locale)
-			}
-		} else if (path === 'java.lang.System') {
-			return {
-				currentTimeMillis: jest.fn().mockReturnValue(1) // Needs a truthy value :)
-			};
-		} else {
-			throw new Error(`Unmocked Java.type path: '${path}'`);
-		}
-	})
-}
-// @ts-ignore TS2339: Property 'log' does not exist on type 'typeof globalThis'.
-global.log = log
-
-//──────────────────────────────────────────────────────────────────────────────
 // Mocks
 //──────────────────────────────────────────────────────────────────────────────
-const javaBridge = new JavaBridge({
-	app: {
-		config: {},
-		name: 'app-explorer',
-		version: '2.0.0'
-	},
-	log
-});
-javaBridge.repo.create({
+const server = new Server({
+	loglevel: 'silent',
+}).createRepo({
 	id: Repo.EXPLORER
-});
-javaBridge.repo.create({
+}).createRepo({
 	id: COLLECTION_REPO_ID
-});
-javaBridge.repo.create({
+}).createRepo({
 	id: COLLECTION_REPO_ID2
 });
 
+// eslint-disable-next-line @typescript-eslint/no-namespace
+declare module globalThis {
+	let log: Log
+}
 
-const explorerNodeConnection = javaBridge.connect({
-	branch: 'master',
+globalThis.log = server.log;
+
+const explorerNodeConnection = server.connect({
+	branchId: 'master',
 	repoId: Repo.EXPLORER
 });
 
@@ -165,6 +129,12 @@ explorerNodeConnection.create({
 	key: API_KEY_HASHED
 });
 
+jest.mock('/lib/explorer/string/hash', () => ({
+	hash: jest.fn().mockImplementation((
+		value: string,
+		bitlength: number = 128
+	) => fnv.hash(value, bitlength).str())
+}), { virtual: true });
 
 jest.mock('/lib/xp/auth', () => ({
 	getUser: jest.fn<typeof getUser>().mockReturnValue(USER),
@@ -192,13 +162,8 @@ jest.mock('/lib/xp/event', () => ({
 	send: jest.fn<typeof send>().mockReturnValue(undefined)
 }), { virtual: true });
 
-jest.mock('/lib/xp/node', () => ({
-	connect: jest.fn<typeof connect>((params) => javaBridge.connect(params) as unknown as RepoConnection)
-}), { virtual: true });
-
-jest.mock('/lib/xp/repo', () => ({
-	get: jest.fn<typeof getRepo>((repoId) => javaBridge.repo.get(repoId) as Repository)
-}), { virtual: true });
+mockLibXpNode({server});
+mockLibXpRepo({server});
 
 jest.mock('/lib/xp/value', () => ({
 }), { virtual: true });
@@ -209,17 +174,17 @@ jest.mock('/lib/xp/value', () => ({
 describe('webapp', () => {
 	describe('documents', () => {
 		describe('createOrUpdateMany', () => {
-			const collectionConnection = javaBridge.connect({
-				branch: 'master',
+			const collectionConnection = server.connect({
+				branchId: 'master',
 				repoId: COLLECTION_REPO_ID
 			});
-			const collection2Connection = javaBridge.connect({
-				branch: 'master',
+			const collection2Connection = server.connect({
+				branchId: 'master',
 				repoId: COLLECTION_REPO_ID2
 			});
 
 			it('creates a single document and modifies the documentType', () => {
-				import('../../../src/main/resources/webapp/documents/createOrGetOrModifyOrDeleteMany').then((moduleName) => {
+				import('./createOrGetOrModifyOrDeleteMany').then((moduleName) => {
 					const createOrUpdateManyResponse = moduleName.default({
 						body: JSON.stringify({
 							key: 'value'
@@ -307,7 +272,7 @@ describe('webapp', () => {
 			}); // it
 
 			it('creates multiple documents', () => {
-				import('../../../src/main/resources/webapp/documents/createOrGetOrModifyOrDeleteMany').then((moduleName) => {
+				import('./createOrGetOrModifyOrDeleteMany').then((moduleName) => {
 					const createOrUpdateManyResponse = moduleName.default({
 						body: JSON.stringify([{
 							action: 'create',
@@ -391,7 +356,7 @@ describe('webapp', () => {
 			}); // it
 
 			it('creates document using query param documentType', () => {
-				import('../../../src/main/resources/webapp/documents/createOrGetOrModifyOrDeleteMany').then((moduleName) => {
+				import('./createOrGetOrModifyOrDeleteMany').then((moduleName) => {
 					const createOrUpdateManyResponse = moduleName.default({
 						body: JSON.stringify({
 							key: 'value'
@@ -462,7 +427,7 @@ describe('webapp', () => {
 			}); // it
 
 			it("does NOT create a document when it's unable to determine documentType", () => {
-				import('../../../src/main/resources/webapp/documents/createOrGetOrModifyOrDeleteMany').then((moduleName) => {
+				import('./createOrGetOrModifyOrDeleteMany').then((moduleName) => {
 					const createOrUpdateManyResponse = moduleName.default({
 						body: JSON.stringify([{
 							action: 'create',
@@ -509,7 +474,7 @@ describe('webapp', () => {
 			}); // it
 
 			it('creates a single document when documentType is only stored in the collection', () => {
-				import('../../../src/main/resources/webapp/documents/createOrGetOrModifyOrDeleteMany').then((moduleName) => {
+				import('./createOrGetOrModifyOrDeleteMany').then((moduleName) => {
 					const createOrUpdateManyResponse = moduleName.default({
 						body: JSON.stringify({
 							key: 'value'
