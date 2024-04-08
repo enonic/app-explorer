@@ -4,7 +4,7 @@ import {
 	test as it
 } from '@jest/globals';
 // import {serialize} from 'uri-js';
-import {normalizeUriObj} from '../../../../src/main/resources/tasks/webcrawl/uri/normalizeUriObj';
+import {normalizeUriObj} from './normalizeUriObj';
 
 
 const URI_STRING = 'https://www.example.com:8080?page=2#top';

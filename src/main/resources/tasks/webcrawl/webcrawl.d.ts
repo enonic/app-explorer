@@ -31,3 +31,21 @@ export type WebCrawlConfig = {
 // 	resume?: boolean
 // 	// [propertyKey: PropertyKey]: NestedRecord | unknown // So that it satisfies NestedRecord
 // }
+
+export interface WebCrawlDocument {
+	// Required
+	domain: string
+	path: string
+	url: string
+	// Optional
+	_id?: string // Will be added if previous document is found
+	displayname?: string
+	links?: string[]
+	og_description?: string
+	og_locale?: string
+	og_site_name?: string
+	og_title?: string
+	html?: string
+	text?: string
+	title?: string
+}

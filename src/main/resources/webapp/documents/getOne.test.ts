@@ -19,9 +19,8 @@ import type {
 	Repository,
 	get as getRepo
 } from '@enonic-types/lib-repo';
-import type { DocumentNode } from '/lib/explorer/types/Document';
-import type { DeleteOneRequest } from '../../../src/main/resources/webapp/documents/deleteOne';
-import type { PostRequest } from '../../../src/main/resources/webapp/documents/createOrGetOrModifyOrDeleteMany';
+import type { GetOneRequest } from './getOne';
+import type { PostRequest } from './createOrGetOrModifyOrDeleteMany';
 
 
 import {
@@ -30,29 +29,24 @@ import {
 	jest,
 	test as it
 } from '@jest/globals';
-import { JavaBridge } from '@enonic/mock-xp/src/JavaBridge';
-import Log from '@enonic/mock-xp/src/Log';
+import {
+	Log,
+	Server,
+} from '@enonic/mock-xp';
 import {
 	COLLECTION_REPO_PREFIX,
-	FieldPath,
 	Folder,
 	NodeType,
 	Path,
 	Repo,
 } from '@enonic/explorer-utils';
+import fnv = require('fnv-plus');
+import mockLibXpNode from '../../../../../test/mocks/libXpNode';
+import mockLibXpRepo from '../../../../../test/mocks/libXpRepo';
 import {
 	HTTP_RESPONSE_STATUS_CODES
-} from '../../../src/main/resources/webapp/constants';
+} from '../constants';
 // import { query } from '@enonic-types/lib-content';
-
-
-const log = Log.createLogger({
-	// loglevel: 'debug'
-	// loglevel: 'info'
-	// loglevel: 'warn'
-	loglevel: 'error'
-	// loglevel: 'silent'
-});
 
 //──────────────────────────────────────────────────────────────────────────────
 // Constants
@@ -73,47 +67,25 @@ const USER = {
 } as User;
 
 //──────────────────────────────────────────────────────────────────────────────
-// Globals
-//──────────────────────────────────────────────────────────────────────────────
-global.Java = {
-	//from: jest.fn().mockImplementation((obj: any) => obj),
-	type: jest.fn().mockImplementation((path: string) => {
-		if (path === 'java.util.Locale') {
-			return {
-				forLanguageTag: jest.fn().mockImplementation((locale: string) => locale)
-			}
-		} else if (path === 'java.lang.System') {
-			return {
-				currentTimeMillis: jest.fn().mockReturnValue(1) // Needs a truthy value :)
-			};
-		} else {
-			throw new Error(`Unmocked Java.type path: '${path}'`);
-		}
-	})
-}
-// @ts-ignore TS2339: Property 'log' does not exist on type 'typeof globalThis'.
-global.log = log
-
-//──────────────────────────────────────────────────────────────────────────────
 // Mocks
 //──────────────────────────────────────────────────────────────────────────────
-const javaBridge = new JavaBridge({
-	app: {
-		config: {},
-		name: 'app-explorer',
-		version: '2.0.0'
-	},
-	log
-});
-javaBridge.repo.create({
+const server = new Server({
+	loglevel: 'silent'
+}).createRepo({
 	id: Repo.EXPLORER
-});
-javaBridge.repo.create({
+}).createRepo({
 	id: COLLECTION_REPO_ID
 });
 
-const explorerNodeConnection = javaBridge.connect({
-	branch: 'master',
+// eslint-disable-next-line @typescript-eslint/no-namespace
+declare module globalThis {
+	let log: Log
+}
+
+globalThis.log = server.log;
+
+const explorerNodeConnection = server.connect({
+	branchId: 'master',
 	repoId: Repo.EXPLORER
 });
 
@@ -143,6 +115,13 @@ explorerNodeConnection.create({
 	// language: 'no', // optional?
 });
 
+jest.mock('/lib/explorer/string/hash', () => ({
+	hash: jest.fn().mockImplementation((
+		value: string,
+		bitlength: number = 128
+	) => fnv.hash(value, bitlength).str())
+}), { virtual: true });
+
 jest.mock('/lib/xp/auth', () => ({
 	getUser: jest.fn<typeof getUser>().mockReturnValue(USER),
 	hasRole: jest.fn<typeof hasRole>().mockReturnValue(true)
@@ -169,13 +148,8 @@ jest.mock('/lib/xp/event', () => ({
 	send: jest.fn<typeof send>().mockReturnValue(undefined)
 }), { virtual: true });
 
-jest.mock('/lib/xp/node', () => ({
-	connect: jest.fn<typeof connect>((params) => javaBridge.connect(params) as unknown as RepoConnection)
-}), { virtual: true });
-
-jest.mock('/lib/xp/repo', () => ({
-	get: jest.fn<typeof getRepo>((repoId) => javaBridge.repo.get(repoId) as Repository)
-}), { virtual: true });
+mockLibXpNode({server});
+mockLibXpRepo({server});
 
 jest.mock('/lib/xp/value', () => ({
 }), { virtual: true });
@@ -186,13 +160,13 @@ jest.mock('/lib/xp/value', () => ({
 //──────────────────────────────────────────────────────────────────────────────
 describe('webapp', () => {
 	describe('documents', () => {
-		describe('deleteOne', () => {
-			const collectionConnection = javaBridge.connect({
-				branch: 'master',
+		describe('getOne', () => {
+			const collectionConnection = server.connect({
+				branchId: 'master',
 				repoId: COLLECTION_REPO_ID
 			});
 
-			import('../../../src/main/resources/webapp/documents/createOrGetOrModifyOrDeleteMany').then((moduleName) => {
+			import('./createOrGetOrModifyOrDeleteMany').then((moduleName) => {
 				const createOrUpdateManyResponse = moduleName.default({
 					body: JSON.stringify({
 						key: 'value'
@@ -209,63 +183,36 @@ describe('webapp', () => {
 						collectionName: COLLECTION_NAME
 					}
 				} as PostRequest);
-				// const queryRes = collectionConnection.query({
-				// 	query: {
-				// 		boolean: {
-				// 			must: {
-				// 				term: {
-				// 					field: '_nodeType',
-				// 					value: NodeType.DOCUMENT
-				// 				}
-				// 			}
-				// 		}
-				// 	}
-				// });
-				// // log.error('queryRes: %s', queryRes);
-				// queryRes.hits.forEach(({id}) => {
-				// 	const documentNode = collectionConnection.get(id) as unknown as DocumentNode;
-				// 	log.error('documentNode: %s', documentNode);
-				// });
 			});
 
 			it('returns 404 Not found when there are no documents with documentId', () => {
-				// const queryRes = collectionConnection.query({
-				// 	query: {
-				// 		boolean: {
-				// 			must: {
-				// 				term: {
-				// 					field: '_nodeType',
-				// 					value: NodeType.DOCUMENT
-				// 				}
-				// 			}
-				// 		}
-				// 	}
-				// });
-				// log.debug('queryRes: %s', queryRes);
-				// queryRes.hits.forEach(({id}) => {
-				// 	const documentNode = collectionConnection.get(id);
-				// 	log.debug('documentNode: %s', documentNode);
-				// });
-				import('../../../src/main/resources/webapp/documents/deleteOne').then((moduleName) => {
+				import('./getOne').then((moduleName) => {
+					// const queryRes = collectionConnection.query({
+					// 	query: {
+					// 		boolean: {
+					// 			must: {
+					// 				term: {
+					// 					field: '_nodeType',
+					// 					value: NodeType.DOCUMENT
+					// 				}
+					// 			}
+					// 		}
+					// 	}
+					// });
+					// log.error('queryRes: %s', queryRes);
 					expect(moduleName.default({
 						pathParams: {
 							collectionName: COLLECTION_NAME,
-							documentId: '71cffa3d-2c3f-464a-a2b0-19bd447b4b95'
+							documentId: '123'
 						}
-					} as DeleteOneRequest)).toStrictEqual({
-						body: {
-							id: '71cffa3d-2c3f-464a-a2b0-19bd447b4b95',
-							error: 'Document with id "71cffa3d-2c3f-464a-a2b0-19bd447b4b95" does not exist in collection "my_collection"!'
-							// status: HTTP_RESPONSE_STATUS_CODES.NOT_FOUND,
-						},
-						contentType: 'text/json;charset=utf-8',
+					} as GetOneRequest)).toStrictEqual({
 						status: HTTP_RESPONSE_STATUS_CODES.NOT_FOUND
 					});
 				});
 			}); // it
 
-			it('returns 200 Ok and overwrites the document when found', () => {
-				import('../../../src/main/resources/webapp/documents/deleteOne').then((moduleName) => {
+			it('returns 200 Ok and the document when found', () => {
+				import('./getOne').then((moduleName) => {
 					const queryRes = collectionConnection.query({
 						query: {
 							boolean: {
@@ -279,22 +226,22 @@ describe('webapp', () => {
 						}
 					});
 					// log.error('queryRes: %s', queryRes);
-					const documentNode = collectionConnection.get(queryRes.hits[0].id) as unknown as DocumentNode;
 
-					const deleteResponse = moduleName.default({
+					const documentNode = collectionConnection.get(queryRes.hits[0].id);
+					// log.error('documentNode: %s', documentNode);
+
+					expect(moduleName.default({
 						pathParams: {
 							collectionName: COLLECTION_NAME,
 							documentId: queryRes.hits[0].id
 						}
-					} as DeleteOneRequest);
-
-					expect(deleteResponse).toStrictEqual({
+					} as GetOneRequest)).toStrictEqual({
 						body: {
 							collection: documentNode['document_metadata']['collection'],
 							collector: documentNode['document_metadata']['collector'],
 							createdTime: documentNode['document_metadata']['createdTime'],
 							document: {
-								key: documentNode['key'],
+								key: 'value'
 							},
 							documentType: documentNode['document_metadata']['documentType'],
 							id: queryRes.hits[0].id,

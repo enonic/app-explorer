@@ -3,7 +3,7 @@ import {
 	expect,
 	test as it
 } from '@jest/globals';
-import {normalizeWithoutEndingSlash} from '../../../../src/main/resources/tasks/webcrawl/uri/normalizeWithoutEndingSlash';
+import {normalizeWithoutEndingSlash} from './normalizeWithoutEndingSlash';
 
 
 const URI_STRING = 'https://www.example.com:8080?page=2#top';

@@ -11,16 +11,8 @@ import type {
 	listener,
 	send
 } from '@enonic-types/lib-event';
-import type {
-	RepoConnection,
-	connect
-} from '@enonic-types/lib-node';
-import type {
-	Repository,
-	get as getRepo
-} from '@enonic-types/lib-repo';
-import type { GetOneRequest } from '../../../src/main/resources/webapp/documents/getOne';
-import type { PostRequest } from '../../../src/main/resources/webapp/documents/createOrGetOrModifyOrDeleteMany';
+import type { PostRequest } from './createOrGetOrModifyOrDeleteMany';
+import type { RemoveRequest } from './deleteMany';
 
 
 import {
@@ -29,28 +21,24 @@ import {
 	jest,
 	test as it
 } from '@jest/globals';
-import { JavaBridge } from '@enonic/mock-xp/src/JavaBridge';
-import Log from '@enonic/mock-xp/src/Log';
+import {
+	Log,
+	Server } from '@enonic/mock-xp';
 import {
 	COLLECTION_REPO_PREFIX,
+	// FieldPath,
 	Folder,
 	NodeType,
 	Path,
 	Repo,
 } from '@enonic/explorer-utils';
+import fnv = require('fnv-plus');
+import mockLibXpNode from '../../../../../test/mocks/libXpNode';
+import mockLibXpRepo from '../../../../../test/mocks/libXpRepo';
 import {
 	HTTP_RESPONSE_STATUS_CODES
-} from '../../../src/main/resources/webapp/constants';
+} from '../constants';
 // import { query } from '@enonic-types/lib-content';
-
-
-const log = Log.createLogger({
-	// loglevel: 'debug'
-	// loglevel: 'info'
-	// loglevel: 'warn'
-	loglevel: 'error'
-	// loglevel: 'silent'
-});
 
 //──────────────────────────────────────────────────────────────────────────────
 // Constants
@@ -70,48 +58,27 @@ const USER = {
 	idProvider: 'system'
 } as User;
 
-//──────────────────────────────────────────────────────────────────────────────
-// Globals
-//──────────────────────────────────────────────────────────────────────────────
-global.Java = {
-	//from: jest.fn().mockImplementation((obj: any) => obj),
-	type: jest.fn().mockImplementation((path: string) => {
-		if (path === 'java.util.Locale') {
-			return {
-				forLanguageTag: jest.fn().mockImplementation((locale: string) => locale)
-			}
-		} else if (path === 'java.lang.System') {
-			return {
-				currentTimeMillis: jest.fn().mockReturnValue(1) // Needs a truthy value :)
-			};
-		} else {
-			throw new Error(`Unmocked Java.type path: '${path}'`);
-		}
-	})
-}
-// @ts-ignore TS2339: Property 'log' does not exist on type 'typeof globalThis'.
-global.log = log
 
 //──────────────────────────────────────────────────────────────────────────────
 // Mocks
 //──────────────────────────────────────────────────────────────────────────────
-const javaBridge = new JavaBridge({
-	app: {
-		config: {},
-		name: 'app-explorer',
-		version: '2.0.0'
-	},
-	log
-});
-javaBridge.repo.create({
+const server = new Server({
+	loglevel: 'silent'
+}).createRepo({
 	id: Repo.EXPLORER
-});
-javaBridge.repo.create({
+}).createRepo({
 	id: COLLECTION_REPO_ID
 });
 
-const explorerNodeConnection = javaBridge.connect({
-	branch: 'master',
+// eslint-disable-next-line @typescript-eslint/no-namespace
+declare module globalThis {
+	let log: Log
+}
+
+globalThis.log = server.log;
+
+const explorerNodeConnection = server.connect({
+	branchId: 'master',
 	repoId: Repo.EXPLORER
 });
 
@@ -141,6 +108,13 @@ explorerNodeConnection.create({
 	// language: 'no', // optional?
 });
 
+jest.mock('/lib/explorer/string/hash', () => ({
+	hash: jest.fn().mockImplementation((
+		value: string,
+		bitlength: number = 128
+	) => fnv.hash(value, bitlength).str())
+}), { virtual: true });
+
 jest.mock('/lib/xp/auth', () => ({
 	getUser: jest.fn<typeof getUser>().mockReturnValue(USER),
 	hasRole: jest.fn<typeof hasRole>().mockReturnValue(true)
@@ -167,13 +141,8 @@ jest.mock('/lib/xp/event', () => ({
 	send: jest.fn<typeof send>().mockReturnValue(undefined)
 }), { virtual: true });
 
-jest.mock('/lib/xp/node', () => ({
-	connect: jest.fn<typeof connect>((params) => javaBridge.connect(params) as unknown as RepoConnection)
-}), { virtual: true });
-
-jest.mock('/lib/xp/repo', () => ({
-	get: jest.fn<typeof getRepo>((repoId) => javaBridge.repo.get(repoId) as Repository)
-}), { virtual: true });
+mockLibXpNode({server});
+mockLibXpRepo({server});
 
 jest.mock('/lib/xp/value', () => ({
 }), { virtual: true });
@@ -184,17 +153,21 @@ jest.mock('/lib/xp/value', () => ({
 //──────────────────────────────────────────────────────────────────────────────
 describe('webapp', () => {
 	describe('documents', () => {
-		describe('getOne', () => {
-			const collectionConnection = javaBridge.connect({
-				branch: 'master',
+		describe('deleteMany', () => {
+			const collectionConnection = server.connect({
+				branchId: 'master',
 				repoId: COLLECTION_REPO_ID
 			});
 
-			import('../../../src/main/resources/webapp/documents/createOrGetOrModifyOrDeleteMany').then((moduleName) => {
-				const createOrUpdateManyResponse = moduleName.default({
-					body: JSON.stringify({
-						key: 'value'
-					}),
+			import('./createOrGetOrModifyOrDeleteMany').then((moduleName) => {
+				moduleName.default({
+					body: JSON.stringify([{
+						action: 'create',
+						key: 'value1'
+					},{
+						action: 'create',
+						key: 'value2'
+					}]),
 					contentType: 'application/json',
 					headers: {
 						authorization: `Explorer-Api-Key ${API_KEY}`
@@ -209,34 +182,73 @@ describe('webapp', () => {
 				} as PostRequest);
 			});
 
-			it('returns 404 Not found when there are no documents with documentId', () => {
-				import('../../../src/main/resources/webapp/documents/getOne').then((moduleName) => {
-					// const queryRes = collectionConnection.query({
-					// 	query: {
-					// 		boolean: {
-					// 			must: {
-					// 				term: {
-					// 					field: '_nodeType',
-					// 					value: NodeType.DOCUMENT
-					// 				}
-					// 			}
-					// 		}
-					// 	}
-					// });
-					// log.error('queryRes: %s', queryRes);
+			it('returns 200 Ok when there are no documents with documentId', () => {
+				// const queryRes = collectionConnection.query({
+				// 	query: {
+				// 		boolean: {
+				// 			must: {
+				// 				term: {
+				// 					field: '_nodeType',
+				// 					value: NodeType.DOCUMENT
+				// 				}
+				// 			}
+				// 		}
+				// 	}
+				// });
+				// log.debug('queryRes: %s', queryRes);
+				// queryRes.hits.forEach(({id}) => {
+				// 	const documentNode = collectionConnection.get(id);
+				// 	log.debug('documentNode: %s', documentNode);
+				// });
+				import('./deleteMany').then((moduleName) => {
 					expect(moduleName.default({
+						params: {
+							id: '71cffa3d-2c3f-464a-a2b0-19bd447b4b95'
+						},
 						pathParams: {
 							collectionName: COLLECTION_NAME,
-							documentId: '123'
 						}
-					} as GetOneRequest)).toStrictEqual({
-						status: HTTP_RESPONSE_STATUS_CODES.NOT_FOUND
-					});
+					} as RemoveRequest)).toStrictEqual({
+						body: [{
+							action: 'delete',
+							error: 'Unable to find document with id = 71cffa3d-2c3f-464a-a2b0-19bd447b4b95!',
+							id: '71cffa3d-2c3f-464a-a2b0-19bd447b4b95',
+							status: HTTP_RESPONSE_STATUS_CODES.NOT_FOUND
+						}],
+						contentType: 'text/json;charset=utf-8',
+						status: HTTP_RESPONSE_STATUS_CODES.OK
+					}); // expect
+
+					expect(moduleName.default({
+						params: {
+							id: [
+								'71cffa3d-2c3f-464a-a2b0-19bd447b4b95',
+								'71cffa3d-2c3f-464a-a2b0-19bd447b4b96'
+							]
+						},
+						pathParams: {
+							collectionName: COLLECTION_NAME,
+						}
+					} as RemoveRequest)).toStrictEqual({
+						body: [{
+							action: 'delete',
+							error: 'Unable to find document with id = 71cffa3d-2c3f-464a-a2b0-19bd447b4b95!',
+							id: '71cffa3d-2c3f-464a-a2b0-19bd447b4b95',
+							status: HTTP_RESPONSE_STATUS_CODES.NOT_FOUND
+						},{
+							action: 'delete',
+							error: 'Unable to find document with id = 71cffa3d-2c3f-464a-a2b0-19bd447b4b96!',
+							id: '71cffa3d-2c3f-464a-a2b0-19bd447b4b96',
+							status: HTTP_RESPONSE_STATUS_CODES.NOT_FOUND
+						}],
+						contentType: 'text/json;charset=utf-8',
+						status: HTTP_RESPONSE_STATUS_CODES.OK
+					}); // expect
 				});
 			}); // it
 
-			it('returns 200 Ok and the document when found', () => {
-				import('../../../src/main/resources/webapp/documents/getOne').then((moduleName) => {
+			it('returns 200 Ok and overwrites the document when found', () => {
+				import('./deleteMany').then((moduleName) => {
 					const queryRes = collectionConnection.query({
 						query: {
 							boolean: {
@@ -251,26 +263,38 @@ describe('webapp', () => {
 					});
 					// log.error('queryRes: %s', queryRes);
 
-					const documentNode = collectionConnection.get(queryRes.hits[0].id);
-					// log.error('documentNode: %s', documentNode);
+					const documentNode1 = collectionConnection.get(queryRes.hits[0].id);
+					const documentNode2 = collectionConnection.get(queryRes.hits[1].id);
 
-					expect(moduleName.default({
+					const deleteResponse = moduleName.default({
+						params: {
+							id: queryRes.hits.map(({id}) => id)
+						},
 						pathParams: {
 							collectionName: COLLECTION_NAME,
-							documentId: queryRes.hits[0].id
 						}
-					} as GetOneRequest)).toStrictEqual({
-						body: {
-							collection: documentNode['document_metadata']['collection'],
-							collector: documentNode['document_metadata']['collector'],
-							createdTime: documentNode['document_metadata']['createdTime'],
-							document: {
-								key: 'value'
-							},
-							documentType: documentNode['document_metadata']['documentType'],
+					} as RemoveRequest);
+
+					expect(deleteResponse).toStrictEqual({
+						body: [{
+							action: 'delete',
+							collection: documentNode1['document_metadata']['collection'],
+							collector: documentNode1['document_metadata']['collector'],
+							createdTime: documentNode1['document_metadata']['createdTime'],
+							documentType: documentNode1['document_metadata']['documentType'],
 							id: queryRes.hits[0].id,
-							valid: documentNode['document_metadata']['valid'],
-						},
+							status: HTTP_RESPONSE_STATUS_CODES.OK,
+							valid: documentNode1['document_metadata']['valid']
+						},{
+							action: 'delete',
+							collection: documentNode2['document_metadata']['collection'],
+							collector: documentNode2['document_metadata']['collector'],
+							createdTime: documentNode2['document_metadata']['createdTime'],
+							documentType: documentNode2['document_metadata']['documentType'],
+							id: queryRes.hits[1].id,
+							status: HTTP_RESPONSE_STATUS_CODES.OK,
+							valid: documentNode2['document_metadata']['valid']
+						}],
 						contentType: 'text/json;charset=utf-8',
 						status: HTTP_RESPONSE_STATUS_CODES.OK
 					});

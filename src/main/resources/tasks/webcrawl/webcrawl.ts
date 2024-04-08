@@ -5,7 +5,10 @@ import type {
 	SelectorType
 } from 'cheerio';
 import type { Response } from '@enonic-types/lib-explorer';
-import type { WebCrawlConfig } from './webcrawl.d';
+import type {
+	WebCrawlConfig,
+	WebCrawlDocument,
+} from './webcrawl.d';
 
 
 import 'core-js/stable/array/from';
@@ -16,8 +19,11 @@ import 'core-js/stable/string/trim-end';
 import 'core-js/stable/array/find';
 import 'core-js/stable/array/find-index';
 import 'core-js/stable/array/includes';
+
 // TypeError: Object.getOwnPropertyDescriptors is not a function
-require('object.getownpropertydescriptors').shim(); // eslint-disable-line @typescript-eslint/no-var-requires
+// require('object.getownpropertydescriptors').shim(); // eslint-disable-line @typescript-eslint/no-var-requires
+import getDescriptors = require('object.getownpropertydescriptors');
+getDescriptors.shim();
 
 import {forceArray} from '@enonic/js-utils/array/forceArray';
 import {toStr} from '@enonic/js-utils/value/toStr';
@@ -66,24 +72,6 @@ import {pathFromResolvedUri} from './uri/pathFromResolvedUri';
 import {serializeNormalizedUriObjWithQuery} from './uri/serializeNormalizedUriObjWithQuery';
 import {canonizeNormalizedUriObj} from './uri/canonizeNormalizedUriObj';
 
-
-interface WebCrawlDocument {
-	// Required
-	domain: string
-	path: string
-	url: string
-	// Optional
-	_id?: string // Will be added if previous document is found
-	displayname?: string
-	links?: string[]
-	og_description?: string
-	og_locale?: string
-	og_site_name?: string
-	og_title?: string
-	html?: string
-	text?: string
-	title?: string
-}
 
 const DEBUG = true;
 const TRACE = false;

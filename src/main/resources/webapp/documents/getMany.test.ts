@@ -11,17 +11,9 @@ import type {
 	listener,
 	send
 } from '@enonic-types/lib-event';
-import type {
-	RepoConnection,
-	connect
-} from '@enonic-types/lib-node';
-import type {
-	Repository,
-	get as getRepo
-} from '@enonic-types/lib-repo';
-import type { DocumentNode } from '/lib/explorer/types/Document';
-import type { PostRequest } from '../../../src/main/resources/webapp/documents/createOrGetOrModifyOrDeleteMany';
-import type { GetManyRequest } from '../../../src/main/resources/webapp/documents/getMany';
+import type { DocumentNode } from '@enonic-types/lib-explorer/Document.d';
+import type { PostRequest } from './createOrGetOrModifyOrDeleteMany';
+import type { GetManyRequest } from './getMany';
 
 
 import {
@@ -30,8 +22,10 @@ import {
 	jest,
 	test as it
 } from '@jest/globals';
-import { JavaBridge } from '@enonic/mock-xp/src/JavaBridge';
-import Log from '@enonic/mock-xp/src/Log';
+import {
+	Log,
+	Server,
+} from '@enonic/mock-xp';
 import {
 	COLLECTION_REPO_PREFIX,
 	Folder,
@@ -39,19 +33,13 @@ import {
 	Path,
 	Repo,
 } from '@enonic/explorer-utils';
+import fnv = require('fnv-plus');
+import mockLibXpNode from '../../../../../test/mocks/libXpNode';
+import mockLibXpRepo from '../../../../../test/mocks/libXpRepo';
 import {
 	HTTP_RESPONSE_STATUS_CODES
-} from '../../../src/main/resources/webapp/constants';
+} from '../constants';
 // import { query } from '@enonic-types/lib-content';
-
-
-const log = Log.createLogger({
-	// loglevel: 'debug'
-	// loglevel: 'info'
-	// loglevel: 'warn'
-	loglevel: 'error'
-	// loglevel: 'silent'
-});
 
 //──────────────────────────────────────────────────────────────────────────────
 // Constants
@@ -71,48 +59,27 @@ const USER = {
 	idProvider: 'system'
 } as User;
 
-//──────────────────────────────────────────────────────────────────────────────
-// Globals
-//──────────────────────────────────────────────────────────────────────────────
-global.Java = {
-	//from: jest.fn().mockImplementation((obj: any) => obj),
-	type: jest.fn().mockImplementation((path: string) => {
-		if (path === 'java.util.Locale') {
-			return {
-				forLanguageTag: jest.fn().mockImplementation((locale: string) => locale)
-			}
-		} else if (path === 'java.lang.System') {
-			return {
-				currentTimeMillis: jest.fn().mockReturnValue(1) // Needs a truthy value :)
-			};
-		} else {
-			throw new Error(`Unmocked Java.type path: '${path}'`);
-		}
-	})
-}
-// @ts-ignore TS2339: Property 'log' does not exist on type 'typeof globalThis'.
-global.log = log
 
 //──────────────────────────────────────────────────────────────────────────────
 // Mocks
 //──────────────────────────────────────────────────────────────────────────────
-const javaBridge = new JavaBridge({
-	app: {
-		config: {},
-		name: 'app-explorer',
-		version: '2.0.0'
-	},
-	log
-});
-javaBridge.repo.create({
+const server = new Server({
+	loglevel: 'silent'
+}).createRepo({
 	id: Repo.EXPLORER
-});
-javaBridge.repo.create({
+}).createRepo({
 	id: COLLECTION_REPO_ID
 });
 
-const explorerNodeConnection = javaBridge.connect({
-	branch: 'master',
+// eslint-disable-next-line @typescript-eslint/no-namespace
+declare module globalThis {
+	let log: Log
+}
+
+globalThis.log = server.log;
+
+const explorerNodeConnection = server.connect({
+	branchId: 'master',
 	repoId: Repo.EXPLORER
 });
 
@@ -142,6 +109,13 @@ explorerNodeConnection.create({
 	// language: 'no', // optional?
 });
 
+jest.mock('/lib/explorer/string/hash', () => ({
+	hash: jest.fn().mockImplementation((
+		value: string,
+		bitlength: number = 128
+	) => fnv.hash(value, bitlength).str())
+}), { virtual: true });
+
 jest.mock('/lib/xp/auth', () => ({
 	getUser: jest.fn<typeof getUser>().mockReturnValue(USER),
 	hasRole: jest.fn<typeof hasRole>().mockReturnValue(true)
@@ -168,13 +142,8 @@ jest.mock('/lib/xp/event', () => ({
 	send: jest.fn<typeof send>().mockReturnValue(undefined)
 }), { virtual: true });
 
-jest.mock('/lib/xp/node', () => ({
-	connect: jest.fn<typeof connect>((params) => javaBridge.connect(params) as unknown as RepoConnection)
-}), { virtual: true });
-
-jest.mock('/lib/xp/repo', () => ({
-	get: jest.fn<typeof getRepo>((repoId) => javaBridge.repo.get(repoId) as Repository)
-}), { virtual: true });
+mockLibXpNode({server});
+mockLibXpRepo({server});
 
 jest.mock('/lib/xp/value', () => ({
 }), { virtual: true });
@@ -186,12 +155,12 @@ jest.mock('/lib/xp/value', () => ({
 describe('webapp', () => {
 	describe('documents', () => {
 		describe('getMany', () => {
-			const collectionConnection = javaBridge.connect({
-				branch: 'master',
+			const collectionConnection = server.connect({
+				branchId: 'master',
 				repoId: COLLECTION_REPO_ID
 			});
 
-			import('../../../src/main/resources/webapp/documents/createOrGetOrModifyOrDeleteMany').then((moduleName) => {
+			import('./createOrGetOrModifyOrDeleteMany').then((moduleName) => {
 				moduleName.default({
 					body: JSON.stringify([{
 						action: 'create',
@@ -236,7 +205,7 @@ describe('webapp', () => {
 			});
 
 			it('returns 404 Not found when there are no documents with documentId', () => {
-				import('../../../src/main/resources/webapp/documents/getMany').then((moduleName) => {
+				import('./getMany').then((moduleName) => {
 					expect(moduleName.default({
 						params: {
 							id: 'nonexistent_document_id'
@@ -277,7 +246,7 @@ describe('webapp', () => {
 			}); // it
 
 			it('returns 200 Ok and the document(s) when found', () => {
-				import('../../../src/main/resources/webapp/documents/getMany').then((moduleName) => {
+				import('./getMany').then((moduleName) => {
 					const queryRes = collectionConnection.query({
 						query: {
 							boolean: {

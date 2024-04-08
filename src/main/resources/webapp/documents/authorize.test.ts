@@ -1,17 +1,9 @@
 import type {
 	User,
-	getUser,
 	hasRole
 } from '@enonic-types/lib-auth';
-import type {
-	get,
-	run
-} from '@enonic-types/lib-context';
-import type {
-	RepoConnection,
-	connect
-} from '@enonic-types/lib-node';
-import type { Request } from '../../../src/main/resources/types/Request';
+import type { get } from '@enonic-types/lib-context';
+import type { Request } from '../../types/Request';
 
 
 import {
@@ -28,42 +20,17 @@ import {
 	Repo,
 	Role
 } from '@enonic/explorer-utils';
-import { JavaBridge } from '@enonic/mock-xp/src/JavaBridge';
-import Log from '@enonic/mock-xp/src/Log';
+import {
+	Log,
+	Server,
+} from '@enonic/mock-xp';
+import fnv = require('fnv-plus');
+import mockLibXpNode from '../../../../../test/mocks/libXpNode';
 import {
 	AUTH_PREFIX,
 	HTTP_RESPONSE_STATUS_CODES
-} from '../../../src/main/resources/webapp/constants';
+} from '../constants';
 
-const log = Log.createLogger({
-	// loglevel: 'debug'
-	// loglevel: 'info'
-	// loglevel: 'warn'
-	// loglevel: 'error'
-	loglevel: 'silent'
-});
-
-//──────────────────────────────────────────────────────────────────────────────
-// Globals
-//──────────────────────────────────────────────────────────────────────────────
-global.Java = {
-	//from: jest.fn().mockImplementation((obj: any) => obj),
-	type: jest.fn().mockImplementation((path: string) => {
-		if (path === 'java.util.Locale') {
-			return {
-				forLanguageTag: jest.fn().mockImplementation((locale: string) => locale)
-			}
-		} else if (path === 'java.lang.System') {
-			return {
-				currentTimeMillis: jest.fn().mockReturnValue(1) // Needs a truthy value :)
-			};
-		} else {
-			throw new Error(`Unmocked Java.type path: '${path}'`);
-		}
-	})
-}
-// @ts-ignore TS2339: Property 'log' does not exist on type 'typeof globalThis'.
-global.log = log
 
 //──────────────────────────────────────────────────────────────────────────────
 // Constants
@@ -97,22 +64,23 @@ const USER = {
 //──────────────────────────────────────────────────────────────────────────────
 // Static Mocks
 //──────────────────────────────────────────────────────────────────────────────
-const javaBridge = new JavaBridge({
-	app: {
-		config: {},
-		name: 'app-explorer',
-		version: '2.0.0'
-	},
-	log
-});
-javaBridge.repo.create({
+const server = new Server({
+	loglevel: 'silent'
+}).createRepo({
 	id: Repo.EXPLORER
-});
-javaBridge.repo.create({
+}).createRepo({
 	id: COLLECTION_REPO_ID
 });
-const explorerNodeConnection = javaBridge.connect({
-	branch: 'master',
+
+// eslint-disable-next-line @typescript-eslint/no-namespace
+declare module globalThis {
+	let log: Log
+}
+
+globalThis.log = server.log;
+
+const explorerNodeConnection = server.connect({
+	branchId: 'master',
 	repoId: Repo.EXPLORER
 });
 explorerNodeConnection.create({
@@ -155,6 +123,12 @@ explorerNodeConnection.create({
 	key: API_KEY_HASHED4
 });
 function staticMocks() {
+	jest.mock('/lib/explorer/string/hash', () => ({
+		hash: jest.fn().mockImplementation((
+			value: string,
+			bitlength: number = 128
+		) => fnv.hash(value, bitlength).str())
+	}), { virtual: true });
 	jest.mock('/lib/xp/context', () => ({
 		get: jest.fn<typeof get>().mockReturnValue({
 			attributes: {},
@@ -166,9 +140,10 @@ function staticMocks() {
 			}
 		}),
 	}), { virtual: true });
-	jest.mock('/lib/xp/node', () => ({
-		connect: jest.fn<typeof connect>((params) => javaBridge.connect(params) as unknown as RepoConnection)
-	}), { virtual: true });
+	// jest.mock('/lib/xp/node', () => ({
+	// 	connect: jest.fn<typeof connect>((params) => server.connect(params) as unknown as RepoConnection)
+	// }), { virtual: true });
+	mockLibXpNode({server});
 } // staticMocks
 
 // getUser: jest.fn<typeof getUser>().mockReturnValue({
@@ -195,7 +170,7 @@ describe('webapp', () => {
 					jest.mock('/lib/xp/auth', () => ({
 						hasRole: jest.fn<typeof hasRole>((role) => role === Role.SYSTEM_ADMIN)
 					}), { virtual: true });
-					import('../../../src/main/resources/webapp/documents/authorize').then((moduleName) => {
+					import('./authorize').then((moduleName) => {
 						expect(moduleName.default({} as Request, COLLECTION_NAME)).toStrictEqual({
 							status: 200
 						});
@@ -208,7 +183,7 @@ describe('webapp', () => {
 					jest.mock('/lib/xp/auth', () => ({
 						hasRole: jest.fn<typeof hasRole>((role) => role === Role.EXPLORER_ADMIN)
 					}), { virtual: true });
-					import('../../../src/main/resources/webapp/documents/authorize').then((moduleName) => {
+					import('./authorize').then((moduleName) => {
 						expect(moduleName.default({} as Request, COLLECTION_NAME)).toStrictEqual({
 							status: 200
 						});
@@ -221,7 +196,7 @@ describe('webapp', () => {
 					jest.mock('/lib/xp/auth', () => ({
 						hasRole: jest.fn<typeof hasRole>((role) => role === Role.EXPLORER_WRITE)
 					}), { virtual: true });
-					import('../../../src/main/resources/webapp/documents/authorize').then((moduleName) => {
+					import('./authorize').then((moduleName) => {
 						expect(moduleName.default({} as Request, COLLECTION_NAME)).toStrictEqual({
 							status: 200
 						});
@@ -234,7 +209,7 @@ describe('webapp', () => {
 					jest.mock('/lib/xp/auth', () => ({
 						hasRole: jest.fn<typeof hasRole>((role) => role === Role.EXPLORER_READ)
 					}), { virtual: true });
-					import('../../../src/main/resources/webapp/documents/authorize').then((moduleName) => {
+					import('./authorize').then((moduleName) => {
 						expect(moduleName.default({} as Request, COLLECTION_NAME)).toStrictEqual({
 							status: HTTP_RESPONSE_STATUS_CODES.UNAUTHORIZED
 						});
@@ -250,7 +225,7 @@ describe('webapp', () => {
 					jest.mock('/lib/xp/auth', () => ({
 						hasRole: jest.fn<typeof hasRole>().mockReturnValue(false)
 					}), { virtual: true });
-					import('../../../src/main/resources/webapp/documents/authorize').then((moduleName) => {
+					import('./authorize').then((moduleName) => {
 						expect(moduleName.default({
 							headers: {}
 						} as Request, COLLECTION_NAME)).toStrictEqual({
@@ -265,7 +240,7 @@ describe('webapp', () => {
 					jest.mock('/lib/xp/auth', () => ({
 						hasRole: jest.fn<typeof hasRole>().mockReturnValue(false)
 					}), { virtual: true });
-					import('../../../src/main/resources/webapp/documents/authorize').then((moduleName) => {
+					import('./authorize').then((moduleName) => {
 						expect(moduleName.default({
 							headers: {
 								authorization: 'invalid'
@@ -282,7 +257,7 @@ describe('webapp', () => {
 					jest.mock('/lib/xp/auth', () => ({
 						hasRole: jest.fn<typeof hasRole>().mockReturnValue(false)
 					}), { virtual: true });
-					import('../../../src/main/resources/webapp/documents/authorize').then((moduleName) => {
+					import('./authorize').then((moduleName) => {
 						expect(moduleName.default({
 							headers: {
 								authorization: AUTH_PREFIX
@@ -299,7 +274,7 @@ describe('webapp', () => {
 					jest.mock('/lib/xp/auth', () => ({
 						hasRole: jest.fn<typeof hasRole>().mockReturnValue(false)
 					}), { virtual: true });
-					import('../../../src/main/resources/webapp/documents/authorize').then((moduleName) => {
+					import('./authorize').then((moduleName) => {
 						expect(moduleName.default({
 							headers: {
 								authorization: `${AUTH_PREFIX} nonExistentApiKey`
@@ -316,7 +291,7 @@ describe('webapp', () => {
 					jest.mock('/lib/xp/auth', () => ({
 						hasRole: jest.fn<typeof hasRole>().mockReturnValue(false)
 					}), { virtual: true });
-					import('../../../src/main/resources/webapp/documents/authorize').then((moduleName) => {
+					import('./authorize').then((moduleName) => {
 						expect(moduleName.default({
 							headers: {
 								authorization: `${AUTH_PREFIX} ${API_KEY}`
@@ -333,7 +308,7 @@ describe('webapp', () => {
 					jest.mock('/lib/xp/auth', () => ({
 						hasRole: jest.fn<typeof hasRole>().mockReturnValue(false)
 					}), { virtual: true });
-					import('../../../src/main/resources/webapp/documents/authorize').then((moduleName) => {
+					import('./authorize').then((moduleName) => {
 						expect(moduleName.default({
 							headers: {
 								authorization: `${AUTH_PREFIX} ${API_KEY3}`
@@ -354,7 +329,7 @@ describe('webapp', () => {
 					jest.mock('/lib/xp/auth', () => ({
 						hasRole: jest.fn<typeof hasRole>().mockReturnValue(false)
 					}), { virtual: true });
-					import('../../../src/main/resources/webapp/documents/authorize').then((moduleName) => {
+					import('./authorize').then((moduleName) => {
 						expect(moduleName.default({
 							headers: {
 								authorization: `${AUTH_PREFIX} ${API_KEY4}`
@@ -375,7 +350,7 @@ describe('webapp', () => {
 					jest.mock('/lib/xp/auth', () => ({
 						hasRole: jest.fn<typeof hasRole>().mockReturnValue(false)
 					}), { virtual: true });
-					import('../../../src/main/resources/webapp/documents/authorize').then((moduleName) => {
+					import('./authorize').then((moduleName) => {
 						expect(moduleName.default({
 							headers: {
 								authorization: `${AUTH_PREFIX} ${API_KEY4}`
@@ -392,7 +367,7 @@ describe('webapp', () => {
 					jest.mock('/lib/xp/auth', () => ({
 						hasRole: jest.fn<typeof hasRole>().mockReturnValue(false)
 					}), { virtual: true });
-					import('../../../src/main/resources/webapp/documents/authorize').then((moduleName) => {
+					import('./authorize').then((moduleName) => {
 						expect(moduleName.default({
 							headers: {
 								authorization: `${AUTH_PREFIX} ${API_KEY4}`

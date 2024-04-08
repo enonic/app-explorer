@@ -1,19 +1,19 @@
-import type { UserKey } from '@enonic-types/lib-auth';
-import type { Node } from '@enonic-types/lib-node';
 import type { JournalNode } from '/lib/explorer/types/index.d';
+import type { WebCrawlDocument } from './webcrawl.d';
 
 
 import {
-	// afterAll,
-	// afterEach,
 	beforeAll,
-	// beforeEach,
 	describe,
 	expect,
 	jest,
 	test as it
 } from '@jest/globals';
-import { JavaBridge } from '@enonic/mock-xp';
+import {
+	App,
+	Log,
+	Server
+} from '@enonic/mock-xp';
 import {
 	APP_EXPLORER,
 	COLLECTION_REPO_PREFIX,
@@ -21,26 +21,29 @@ import {
 	NodeType,
 	Path,
 	Repo
-} from '@enonic/explorer-utils'
-import Log from '@enonic/mock-xp/dist/Log';
-import mockLibGalimatias from '../../mocks/libGalimatias';
-import mockLibHttpClient from '../../mocks/libHttpClient';
-import mockLibXpAuth from '../../mocks/libXpAuth';
-import mockLibXpContext from '../../mocks/libXpContext';
-import mockLibXpCommon from '../../mocks/libXpCommon';
-import mockLibXpMail from '../../mocks/libXpMail';
-import mockLibXpEvent from '../../mocks/libXpEvent';
-import mockLibXpIo from '../../mocks/libXpIo';
-import mockLibXpNode from '../../mocks/libXpNode';
-import mockLibXpRepo from '../../mocks/libXpRepo';
-import mockLibXpScheduler from '../../mocks/libXpScheduler';
-import mockLibXpTask from '../../mocks/libXpTask';
-import mockLibXpValue from '../../mocks/libXpValue';
+} from '@enonic/explorer-utils';
+import fnv = require('fnv-plus');
+import {
+	APP_NAME,
+	EXPLORER_VERSION
+} from '../../../../../jest.config';
+import mockLibGalimatias from '../../../../../test/mocks/libGalimatias';
+import mockLibHttpClient from '../../../../../test/mocks/libHttpClient';
+import mockLibXpAuth from '../../../../../test/mocks/libXpAuth';
+import mockLibXpContext from '../../../../../test/mocks/libXpContext';
+import mockLibXpCommon from '../../../../../test/mocks/libXpCommon';
+import mockLibXpMail from '../../../../../test/mocks/libXpMail';
+import mockLibXpEvent from '../../../../../test/mocks/libXpEvent';
+import mockLibXpIo from '../../../../../test/mocks/libXpIo';
+import mockLibXpNode from '../../../../../test/mocks/libXpNode';
+import mockLibXpRepo from '../../../../../test/mocks/libXpRepo';
+import mockLibXpScheduler from '../../../../../test/mocks/libXpScheduler';
+import mockLibXpTask from '../../../../../test/mocks/libXpTask';
+import mockLibXpValue from '../../../../../test/mocks/libXpValue';
 
 //──────────────────────────────────────────────────────────────────────────────
 // Constants
 //──────────────────────────────────────────────────────────────────────────────
-// const COLLECTOR_ID = 'collectorId';
 const COLLECTOR_CONFIG = {
 	baseUri: "https://www.enonic.com",
 	excludes: ["^/blog.*$"],
@@ -55,112 +58,59 @@ const COLLECTOR_CONFIG3 = {
 const CONFIG_JSON = JSON.stringify(COLLECTOR_CONFIG);
 const LANGUAGE = 'en';
 
-//──────────────────────────────────────────────────────────────────────────────
-// Globals
-//──────────────────────────────────────────────────────────────────────────────
-// @ts-expect-error TS2339: Property 'app' does not exist on type 'typeof globalThis'.
-global.app = {
-	config: {},
-	name: APP_EXPLORER,
-	version: '0.0.1-SNAPSHOT'
-}
-global.Java = {
-	//from: jest.fn().mockImplementation((obj: any) => obj),
-	type: jest.fn().mockImplementation((path: string) => {
-		if (path === 'java.util.Locale') {
-			return {
-				forLanguageTag: jest.fn().mockImplementation((locale: string) => locale)
-			}
-		} else if (path === 'java.lang.System') {
-			return {
-				currentTimeMillis: jest.fn().mockReturnValue(1) // Needs a truthy value :)
-			};
-		} else {
-			throw new Error(`Unmocked Java.type path: '${path}'`);
-		}
-	})
-}
 
-const log = Log.createLogger({
-	// loglevel: 'debug'
-	// loglevel: 'info'
-	// loglevel: 'warn'
-	loglevel: 'error'
-	// loglevel: 'silent'
-});
-// @ts-expect-error TS2339: Property 'log' does not exist on type 'typeof globalThis'.
-global.log = log;
-
-const javaBridge = new JavaBridge({
-	app: {
-		config: {},
-		name: APP_EXPLORER,
-		version: '0.0.1-SNAPSHOT'
-	},
-	log
-});
-javaBridge.repo.create({
-	id: Repo.EXPLORER
-});
-javaBridge.repo.create({
-	id: Repo.JOURNALS
-});
 const REPO_COLLECTION_TEST = `${COLLECTION_REPO_PREFIX}test_collection`;
 const REPO_COLLECTION_TEST2 = `${COLLECTION_REPO_PREFIX}test_collection2`;
 const REPO_COLLECTION_TEST3 = `${COLLECTION_REPO_PREFIX}test_collection3`;
-javaBridge.repo.create({
+
+const server = new Server({
+	loglevel: 'silent',
+	// loglevel: 'error',
+}).createRepo({
+	id: Repo.EXPLORER
+}).createRepo({
+	id: Repo.JOURNALS
+}).createRepo({
 	id: REPO_COLLECTION_TEST
-});
-javaBridge.repo.create({
+}).createRepo({
 	id: REPO_COLLECTION_TEST2
-});
-javaBridge.repo.create({
+}).createRepo({
 	id: REPO_COLLECTION_TEST3
+}).su();
+
+const app = new App({
+	config: {},
+	key: APP_NAME,
+	version: EXPLORER_VERSION
 });
+
+// eslint-disable-next-line @typescript-eslint/no-namespace
+declare module globalThis {
+	let log: Log
+}
+
+globalThis.log = server.log;
 
 //──────────────────────────────────────────────────────────────────────────────
 // Mocks
 //──────────────────────────────────────────────────────────────────────────────
+jest.mock('/lib/explorer/string/hash', () => ({
+	hash: jest.fn().mockImplementation((
+		value: string,
+		bitlength: number = 128
+	) => fnv.hash(value, bitlength).str())
+}), { virtual: true });
+
 mockLibGalimatias();
 mockLibHttpClient();
-const user = {
-	displayName: 'System Administrator',
-	key: 'user:system:su' as UserKey,
-	login: 'su',
-	disabled: false,
-	// email: ,
-	modifiedTime: '1970-01-01T00:00:00Z',
-	idProvider: 'system',
-	type: 'user' as const,
-}
-mockLibXpAuth({
-	user
-});
+mockLibXpAuth({ server });
 mockLibXpCommon();
-mockLibXpContext({
-	context: {
-		branch: 'master',
-		repository: 'com.enonic.app.explorer',
-		authInfo: {
-			principals: [
-				'role:system.admin'
-			],
-			user
-		},
-		attributes: {}
-	}
-});
-mockLibXpEvent({ log });
-mockLibXpIo();
+mockLibXpContext({ server });
+mockLibXpEvent({ server });
+mockLibXpIo({ app });
 mockLibXpMail({ log });
-const {
-	connect
-} = mockLibXpNode({
-	javaBridge
-});
-mockLibXpRepo({
-	javaBridge
-});
+mockLibXpNode({ server });
+mockLibXpRepo({ server });
 mockLibXpScheduler();
 mockLibXpTask();
 mockLibXpValue();
@@ -168,8 +118,8 @@ mockLibXpValue();
 //──────────────────────────────────────────────────────────────────────────────
 // Test data
 //──────────────────────────────────────────────────────────────────────────────
-const nodeConnection = connect({
-	branch: 'master',
+const nodeConnection = server.connect({
+	branchId: 'master',
 	repoId: Repo.EXPLORER
 });
 nodeConnection.create({
@@ -372,69 +322,62 @@ const createdDocumentType = nodeConnection.create({
 	]
 });
 
-const collectionConnection = connect({
-	branch: 'master',
+const collectionConnection = server.connect({
+	branchId: 'master',
 	repoId: REPO_COLLECTION_TEST
 });
 
-const collectionConnection2 = connect({
-	branch: 'master',
+const collectionConnection2 = server.connect({
+	branchId: 'master',
 	repoId: REPO_COLLECTION_TEST2
 });
 
-const collectionConnection3 = connect({
-	branch: 'master',
+const collectionConnection3 = server.connect({
+	branchId: 'master',
 	repoId: REPO_COLLECTION_TEST3
 });
 
-const journalConnection = connect({
-	branch: 'master',
+const journalConnection = server.connect({
+	branchId: 'master',
 	repoId: Repo.JOURNALS
 });
 
-//──────────────────────────────────────────────────────────────────────────────
-// (A)syncronous hooks. Use done() to signal completion.
-//──────────────────────────────────────────────────────────────────────────────
-// beforeAll(() => console.log('1 - beforeAll'));
-// afterAll(() => console.log('1 - afterAll'));
-// beforeEach(() => console.log('1 - beforeEach'));
-// afterEach(() => console.log('1 - afterEach'));
-
-beforeAll((done) => {
-	// console.log('1 - beforeAll')
-	collectionConnection.create({
-		_nodeType: 'com.enonic.app.explorer:document',
-		// This urls needs to be linked to from one of the crawled pages
-		url: 'https://www.enonic.com/blog/top-10-ai-tools-for-content-editors'
-	});
-	import('../../../src/main/resources/tasks/webcrawl/webcrawl').then((moduleName) => {
-		moduleName.run({
-			collectionId: createdCollection._id,
-			collectorId: createdDocumentType._id, // COLLECTOR_ID,
-			configJson: CONFIG_JSON,
-			language: LANGUAGE,
-		});
-		moduleName.run({
-			collectionId: createdCollection2._id,
-			collectorId: createdDocumentType._id, // COLLECTOR_ID,
-			configJson: JSON.stringify(COLLECTOR_CONFIG2),
-			language: LANGUAGE,
-		});
-		moduleName.run({
-			collectionId: createdCollection3._id,
-			collectorId: createdDocumentType._id, // COLLECTOR_ID,
-			configJson: JSON.stringify(COLLECTOR_CONFIG3),
-			language: LANGUAGE,
-		}); // run
-		// console.log('1 - beforeAll - done')
-		done();
-	});
-});
 
 //──────────────────────────────────────────────────────────────────────────────
 // Tests
 //──────────────────────────────────────────────────────────────────────────────
 describe('webcrawl', () => {
+	beforeAll((done) => {
+		// console.log('1 - beforeAll')
+		collectionConnection.create({
+			_nodeType: 'com.enonic.app.explorer:document',
+			// This urls needs to be linked to from one of the crawled pages
+			url: 'https://www.enonic.com/blog/top-10-ai-tools-for-content-editors'
+		});
+		import('./webcrawl').then((moduleName) => {
+			moduleName.run({
+				collectionId: createdCollection._id,
+				collectorId: createdDocumentType._id, // COLLECTOR_ID,
+				configJson: CONFIG_JSON,
+				language: LANGUAGE,
+			});
+			moduleName.run({
+				collectionId: createdCollection2._id,
+				collectorId: createdDocumentType._id, // COLLECTOR_ID,
+				configJson: JSON.stringify(COLLECTOR_CONFIG2),
+				language: LANGUAGE,
+			});
+			moduleName.run({
+				collectionId: createdCollection3._id,
+				collectorId: createdDocumentType._id, // COLLECTOR_ID,
+				configJson: JSON.stringify(COLLECTOR_CONFIG3),
+				language: LANGUAGE,
+			}); // run
+			// console.log('1 - beforeAll - done')
+			done();
+		});
+	});
+
 	describe('collection enonic', () => {
 		it('deletes old documents, even though they match exclude pattern', () => {
 			const queryRes = collectionConnection.query({
@@ -474,24 +417,26 @@ describe('webcrawl', () => {
 		});
 
 		it('creates a journal and a document', () => {
-			// javaBridge.repo.list().forEach((repo) => {
+			// server.listRepos().forEach((repo) => {
 			// 	// log.debug('repo:%s', repo);
 			// 	const { id: repoId } = repo;
-			// 	log.error('repoId:%s', repoId);
-			// 	const nodeConnection = connect({
-			// 		branch: 'master',
-			// 		repoId
-			// 	});
-			// 	const queryRes = nodeConnection.query({});
-			// 	// log.debug('queryRes:%s', queryRes);
-			// 	queryRes.hits.forEach((hit) => {
-			// 		const {id} = hit;
-			// 		const node = nodeConnection.get(id);
-			// 		log.error('node:%s', node);
-			// 	});
+				// const repoId = Repo.JOURNALS;
+				// const repoId = REPO_COLLECTION_TEST;
+				// log.error('repoId:%s', repoId);
+				// const nodeConnection = server.connect({
+				// 	branchId: 'master',
+				// 	repoId
+				// });
+				// const queryRes = nodeConnection.query({});
+				// // log.debug('queryRes:%s', queryRes);
+				// queryRes.hits.forEach((hit) => {
+				// 	const {id} = hit;
+				// 	const node = nodeConnection.get(id);
+				// 	log.error('node:%s', node);
+				// });
 			// });
 
-			const journalNode = journalConnection.get<JournalNode>('00000000-0000-4000-8000-000000000002');
+			const journalNode = journalConnection.get/*<JournalNode>*/('00000000-0000-4000-8000-000000000002') as JournalNode;
 			// log.error('journalNode:%s', journalNode);
 			expect(journalNode.errorCount).toBe(0);
 
@@ -531,11 +476,7 @@ describe('webcrawl', () => {
 			// });
 			// log.error('queryRes:%s', queryRes);
 
-			const documentNode = collectionConnection.get<Node<{
-				links: string[]
-				title: string
-				url: string
-			}>>('00000000-0000-4000-8000-000000000004');
+			const documentNode = collectionConnection.get('00000000-0000-4000-8000-000000000005') as unknown as WebCrawlDocument;
 			// log.error('documentNode:%s', documentNode);
 			expect(documentNode.links.length).toBe(48);
 			expect(documentNode.title).toBe('Take control of your content: Composable content platform without limitations');
@@ -545,7 +486,7 @@ describe('webcrawl', () => {
 
 	describe('collection example', () => {
 		it('handles invalid html', () => {
-			// javaBridge.repo.list().forEach((repo) => {
+			// server.listRepos().forEach((repo) => {
 			// 	// log.debug('repo:%s', repo);
 			// 	const { id: repoId } = repo;
 			// 	log.error('repoId:%s', repoId);
@@ -561,7 +502,7 @@ describe('webcrawl', () => {
 			// 		log.error('node:%s', node);
 			// 	});
 			// });
-			const journalNode = journalConnection.get<JournalNode>('00000000-0000-4000-8000-000000000004');
+			const journalNode = journalConnection.get/*<JournalNode>*/('00000000-0000-4000-8000-000000000004') as JournalNode;
 			// log.error('journalNode:%s', journalNode);
 			expect(journalNode.errorCount).toBe(0);
 			expect(journalNode.successCount).toBe(1);
@@ -573,12 +514,7 @@ describe('webcrawl', () => {
 			// });
 			// log.error('queryRes:%s', queryRes);
 
-			const documentNode = collectionConnection2.get<Node<{
-				links: string[]
-				text: string
-				title: string
-				url: string
-			}>>('00000000-0000-4000-8000-000000000002');
+			const documentNode = collectionConnection2.get('00000000-0000-4000-8000-000000000003') as unknown as WebCrawlDocument;
 			// log.error('documentNode:%s', documentNode);
 			expect(documentNode.links).toBe(undefined);
 			expect(documentNode.text).toBe('');
@@ -600,34 +536,34 @@ describe('webcrawl', () => {
 			// 	log.error('node:%s', node);
 			// });
 
-			const documentNode = collectionConnection3.get('00000000-0000-4000-8000-000000000002');
+			const documentNode = collectionConnection3.get('00000000-0000-4000-8000-000000000003') as unknown as WebCrawlDocument;
 			// log.error('documentNode:%s', documentNode);
 
 			expect(documentNode.displayname).toBe('Head Title');
 		}); // it
 
 		it("persists the correct domain", () => {
-			const documentNode = collectionConnection3.get('00000000-0000-4000-8000-000000000002');
+			const documentNode = collectionConnection3.get('00000000-0000-4000-8000-000000000003') as unknown as WebCrawlDocument;
 			expect(documentNode.domain).toBe('www.features.com');
 		});
 
 		it("persists the correct path", () => {
-			const documentNode = collectionConnection3.get('00000000-0000-4000-8000-000000000002');
+			const documentNode = collectionConnection3.get('00000000-0000-4000-8000-000000000003') as unknown as WebCrawlDocument;
 			expect(documentNode.path).toBe('/');
 		});
 
 		it("persists the correct text (without data-noindex elements)", () => {
-			const documentNode = collectionConnection3.get('00000000-0000-4000-8000-000000000002');
+			const documentNode = collectionConnection3.get('00000000-0000-4000-8000-000000000003') as unknown as WebCrawlDocument;
 			expect(documentNode.text).toBe('Body H1 \n\t\t index');
 		});
 
 		it("persists the correct title", () => {
-			const documentNode = collectionConnection3.get('00000000-0000-4000-8000-000000000002');
+			const documentNode = collectionConnection3.get('00000000-0000-4000-8000-000000000003') as unknown as WebCrawlDocument;
 			expect(documentNode.title).toBe('Head Title');
 		});
 
 		it("persists the correct links", () => {
-			const documentNode = collectionConnection3.get('00000000-0000-4000-8000-000000000002');
+			const documentNode = collectionConnection3.get('00000000-0000-4000-8000-000000000003') as unknown as WebCrawlDocument;
 			expect(documentNode.links).toStrictEqual([
 				'https://www.features.com',
 				'https://www.features.com/path'

@@ -15,8 +15,10 @@ import {
 	jest,
 	test
 } from '@jest/globals';
-import { JavaBridge } from '@enonic/mock-xp/dist/JavaBridge';
-import Log from '@enonic/mock-xp/dist/Log';
+import {
+	Log,
+	Server
+} from '@enonic/mock-xp';
 import {
 	Repo,
 	Folder,
@@ -24,6 +26,7 @@ import {
 	NodeType,
 	COLLECTION_REPO_PREFIX
 } from '@enonic/explorer-utils';
+import fnv = require('fnv-plus');
 
 
 //──────────────────────────────────────────────────────────────────────────────
@@ -36,53 +39,25 @@ const COLLECTION_NAME = 'my_collection';
 const INTERFACE_NAME = 'my_interface';
 
 //──────────────────────────────────────────────────────────────────────────────
-// Globals
-//──────────────────────────────────────────────────────────────────────────────
-global.Java = {
-	//from: jest.fn().mockImplementation((obj: any) => obj),
-	type: jest.fn().mockImplementation((path: string) => {
-		if (path === 'java.util.Locale') {
-			return {
-				forLanguageTag: jest.fn().mockImplementation((locale: string) => locale)
-			}
-		} else if (path === 'java.lang.System') {
-			return {
-				currentTimeMillis: jest.fn().mockReturnValue(0)
-			};
-		} else {
-			throw new Error(`Unmocked Java.type path: '${path}'`);
-		}
-	})
-}
-
-// @ts-ignore TS2339: Property 'log' does not exist on type 'typeof globalThis'.
-global.log = Log.createLogger({
-	// loglevel: 'debug'
-	// loglevel: 'info'
-	// loglevel: 'warn'
-	// loglevel: 'error'
-	loglevel: 'silent'
-});
-
-//──────────────────────────────────────────────────────────────────────────────
 // Mocks
 //──────────────────────────────────────────────────────────────────────────────
-const javaBridge = new JavaBridge({
-	app: {
-		config: {},
-		name: 'app-explorer',
-		version: '1.0.0'
-	},
-	log
-});
-javaBridge.repo.create({
+const server = new Server({
+	loglevel: 'silent',
+}).createRepo({
 	id: Repo.EXPLORER
-});
-javaBridge.repo.create({
+}).createRepo({
 	id: `${COLLECTION_REPO_PREFIX}${COLLECTION_NAME}`
 });
-const nodeConnection = javaBridge.connect({
-	branch: 'master',
+
+// eslint-disable-next-line @typescript-eslint/no-namespace
+declare module globalThis {
+	let log: Log
+}
+
+globalThis.log = server.log;
+
+const nodeConnection = server.connect({
+	branchId: 'master',
 	repoId: Repo.EXPLORER
 });
 nodeConnection.create({
@@ -148,6 +123,13 @@ jest.mock('/lib/cache', () => ({
 
 // jest.mock('/lib/explorer/repo/connect', () => ({
 // }), { virtual: true });
+
+jest.mock('/lib/explorer/string/hash', () => ({
+	hash: jest.fn().mockImplementation((
+		value: string,
+		bitlength: number = 128
+	) => fnv.hash(value, bitlength).str())
+}), { virtual: true });
 
 // jest.mock('/lib/explorer/synonym/query', () => ({
 // }), { virtual: true });
@@ -216,8 +198,8 @@ jest.mock('/lib/xp/node', () => ({
 		branch,
 		repoId
 	}) => {
-		const connection = javaBridge.connect({
-			branch,
+		const connection = server.connect({
+			branchId: branch,
 			repoId
 		}) as unknown as RepoConnection
 		// @ts-ignore
@@ -279,7 +261,7 @@ describe('webapp', () => {
 			// });
 
 			test('returns 401 Unauthorized when Authorization header missing', () => {
-				import('../../../src/main/resources/webapp/interface/post').then((moduleName) => {
+				import('./post').then((moduleName) => {
 					expect(moduleName.post({
 						headers: {
 							"explorer-interface-name": INTERFACE_NAME
@@ -291,7 +273,7 @@ describe('webapp', () => {
 			});
 
 			test("returns 400 Bad Request when Authorization doesn't start with 'Explorer-Api-Key '", () => {
-				import('../../../src/main/resources/webapp/interface/post').then((moduleName) => {
+				import('./post').then((moduleName) => {
 					expect(moduleName.post({
 						headers: {
 							'authorization': 'nope',
@@ -301,10 +283,10 @@ describe('webapp', () => {
 						status: 400
 					});
 				});
-			});
+			});''
 
 			test("returns 400 Bad Request when ApiKey not found in Authorization header", () => {
-				import('../../../src/main/resources/webapp/interface/post').then((moduleName) => {
+				import('./post').then((moduleName) => {
 					expect(moduleName.post({
 						headers: {
 							'authorization': 'Explorer-Api-Key ',
@@ -317,7 +299,7 @@ describe('webapp', () => {
 			});
 
 			test("returns 403 Forbidden when api-key is not found in explorer repo", () => {
-				import('../../../src/main/resources/webapp/interface/post').then((moduleName) => {
+				import('./post').then((moduleName) => {
 					expect(moduleName.post({
 						headers: {
 							'authorization': `Explorer-Api-Key ${API_KEY}`,
@@ -341,7 +323,7 @@ describe('webapp', () => {
 					key: API_KEY_HASHED
 				});
 				apiKeyNodeId = createdApiKeyNode._id;
-				import('../../../src/main/resources/webapp/interface/post').then((moduleName) => {
+				import('./post').then((moduleName) => {
 					const response = moduleName.post({
 						headers: {
 							'authorization': `Explorer-Api-Key ${API_KEY}`,
@@ -358,13 +340,13 @@ describe('webapp', () => {
 				nodeConnection.modify({
 					key: apiKeyNodeId,
 					editor: (node) => {
-						node.interfaces = ['non-existant'];
+						node['interfaces'] = ['non-existant'];
 						return node;
 					},
 				});
 				// log.debug('modifiedApiKeyNode:%s', modifiedApiKeyNode);
 
-				import('../../../src/main/resources/webapp/interface/post').then((moduleName) => {
+				import('./post').then((moduleName) => {
 					const response = moduleName.post({
 						headers: {
 							'authorization': `Explorer-Api-Key ${API_KEY}`,
@@ -381,12 +363,12 @@ describe('webapp', () => {
 				nodeConnection.modify({
 					key: apiKeyNodeId,
 					editor: (node) => {
-						node.interfaces = INTERFACE_NAME;
+						node['interfaces'] = INTERFACE_NAME;
 						return node;
 					},
 				});
 				// log.debug('modifiedApiKeyNode:%s', modifiedApiKeyNode);
-				import('../../../src/main/resources/webapp/interface/post').then((moduleName) => {
+				import('./post').then((moduleName) => {
 					const response = moduleName.post({
 						body: JSON.stringify({
 							"query": "\n    query IntrospectionQuery {\n      __schema {\n        queryType { name }\n        mutationType { name }\n        subscriptionType { name }\n        types {\n          ...FullType\n        }\n        directives {\n          name\n          description\n          locations\n          args {\n            ...InputValue\n          }\n        }\n      }\n    }\n\n    fragment FullType on __Type {\n      kind\n      name\n      description\n      fields(includeDeprecated: true) {\n        name\n        description\n        args {\n          ...InputValue\n        }\n        type {\n          ...TypeRef\n        }\n        isDeprecated\n        deprecationReason\n      }\n      inputFields {\n        ...InputValue\n      }\n      interfaces {\n        ...TypeRef\n      }\n      enumValues(includeDeprecated: true) {\n        name\n        description\n        isDeprecated\n        deprecationReason\n      }\n      possibleTypes {\n        ...TypeRef\n      }\n    }\n\n    fragment InputValue on __InputValue {\n      name\n      description\n      type { ...TypeRef }\n      defaultValue\n    }\n\n    fragment TypeRef on __Type {\n      kind\n      name\n      ofType {\n        kind\n        name\n        ofType {\n          kind\n          name\n          ofType {\n            kind\n            name\n            ofType {\n              kind\n              name\n              ofType {\n                kind\n                name\n                ofType {\n                  kind\n                  name\n                  ofType {\n                    kind\n                    name\n                  }\n                }\n              }\n            }\n          }\n        }\n      }\n    }\n  "
@@ -402,7 +384,7 @@ describe('webapp', () => {
 			});
 
 			test('returns 200 Ok even though explorer-interface-name is not in the request headers', () => {
-				import('../../../src/main/resources/webapp/interface/post').then((moduleName) => {
+				import('./post').then((moduleName) => {
 					expect(moduleName.post({
 						body: JSON.stringify({
 							"query": "\n    query IntrospectionQuery {\n      __schema {\n        queryType { name }\n        mutationType { name }\n        subscriptionType { name }\n        types {\n          ...FullType\n        }\n        directives {\n          name\n          description\n          locations\n          args {\n            ...InputValue\n          }\n        }\n      }\n    }\n\n    fragment FullType on __Type {\n      kind\n      name\n      description\n      fields(includeDeprecated: true) {\n        name\n        description\n        args {\n          ...InputValue\n        }\n        type {\n          ...TypeRef\n        }\n        isDeprecated\n        deprecationReason\n      }\n      inputFields {\n        ...InputValue\n      }\n      interfaces {\n        ...TypeRef\n      }\n      enumValues(includeDeprecated: true) {\n        name\n        description\n        isDeprecated\n        deprecationReason\n      }\n      possibleTypes {\n        ...TypeRef\n      }\n    }\n\n    fragment InputValue on __InputValue {\n      name\n      description\n      type { ...TypeRef }\n      defaultValue\n    }\n\n    fragment TypeRef on __Type {\n      kind\n      name\n      ofType {\n        kind\n        name\n        ofType {\n          kind\n          name\n          ofType {\n            kind\n            name\n            ofType {\n              kind\n              name\n              ofType {\n                kind\n                name\n                ofType {\n                  kind\n                  name\n                  ofType {\n                    kind\n                    name\n                  }\n                }\n              }\n            }\n          }\n        }\n      }\n    }\n  "
