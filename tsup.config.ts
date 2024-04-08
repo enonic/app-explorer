@@ -1,7 +1,7 @@
 import { polyfillNode } from "esbuild-plugin-polyfill-node";
 import { globSync } from 'glob';
 // import { globbySync } from 'globby';
-import { print } from 'q-i';
+// import { print } from 'q-i';
 import { defineConfig, type Options } from 'tsup';
 
 
@@ -9,30 +9,32 @@ interface MyOptions extends Options {
 	d?: string
 }
 
-
-const RESOURCES_PATH = 'src/main/resources';
-const ASSETS_PATH = `${RESOURCES_PATH}/assets`;
+const DIR_SRC = 'src/main/resources';
+const AND_BELOW = '**';
+const TEST_EXT = `{spec,test}.{ts,tsx}`;
+const TEST_FILES = `*.${TEST_EXT}`;
+const ASSETS_PATH = `${DIR_SRC}/assets`;
 // const CLIENT_GLOB_EXTENSIONS = '{tsx,ts,jsx,js}';
 
-const DECLARATION_FILES = globSync(`${RESOURCES_PATH}/**/*.d.ts`);
-// const DECLARATION_FILES = globbySync(`${RESOURCES_PATH}/**/*.d.ts`);
+const DECLARATION_FILES = globSync(`${DIR_SRC}/${AND_BELOW}/*.d.ts`);
+// const DECLARATION_FILES = globbySync(`${RESOURCES_PATH}/${AND_BELOW}/*.d.ts`);
 // print({DECLARATION_FILES}, { maxItems: Infinity }); process.exit(0);
 
-const ASSET_FILES = globSync(`${ASSETS_PATH}/**/*.*`);
-// const ASSET_FILES = globbySync(`${ASSETS_PATH}/**/*.*`);
+const ASSET_FILES = globSync(`${ASSETS_PATH}/${AND_BELOW}/*.*`);
+// const ASSET_FILES = globbySync(`${ASSETS_PATH}/${AND_BELOW}/*.*`);
 // print({ASSET_FILES}, { maxItems: Infinity }); process.exit(0);
 
 const SERVER_FILES = globSync(
-	`${RESOURCES_PATH}/**/*.ts`,
+	`${DIR_SRC}/${AND_BELOW}/*.ts`,
 	{
 		absolute: false,
-		ignore: [].concat(
-			DECLARATION_FILES,
+		ignore: DECLARATION_FILES.concat(
 			ASSET_FILES,
+			globSync(`${DIR_SRC}/${AND_BELOW}/${TEST_FILES}`)
 		),
 	}
 );
-print({SERVER_FILES}, { maxItems: Infinity }); // process.exit(0);
+// print({SERVER_FILES}, { maxItems: Infinity }); // process.exit(0);
 
 
 export default defineConfig((options: MyOptions) => {
