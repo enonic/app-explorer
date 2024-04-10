@@ -13,6 +13,12 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Checkout Lib Exporer
+        uses: actions/checkout@v4
+        with:
+          repository: 'lib-explorer'
+          path: 'symlinks/lib-explorer'
+
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
