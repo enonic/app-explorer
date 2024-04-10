@@ -16,7 +16,7 @@ jobs:
       - name: Checkout Lib Exporer
         uses: actions/checkout@v4
         with:
-          repository: 'lib-explorer'
+          repository: 'enonic/lib-explorer'
           path: 'symlinks/lib-explorer'
 
       - name: Set up Node
