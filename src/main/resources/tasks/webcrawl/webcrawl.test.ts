@@ -1,4 +1,4 @@
-import type { JournalNode } from '/lib/explorer/types/index.d';
+import type { JournalNode } from '@enonic-types/lib-explorer/index.d';
 import type { WebCrawlDocument } from './webcrawl.d';
 
 

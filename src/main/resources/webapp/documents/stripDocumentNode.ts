@@ -1,4 +1,4 @@
-import type { DocumentNode } from '/lib/explorer/types/Document';
+import type { DocumentNode } from '@enonic-types/lib-explorer/Document';
 
 
 import { startsWith } from '@enonic/js-utils/string/startsWith';
