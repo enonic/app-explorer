@@ -1,5 +1,5 @@
 import type { Request } from '../../types/Request';
-import type { DocumentNode } from '/lib/explorer/types/Document';
+import type { DocumentNode } from '@enonic-types/lib-explorer/Document';
 
 
 import {
