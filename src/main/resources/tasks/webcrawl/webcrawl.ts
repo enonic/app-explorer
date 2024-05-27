@@ -73,8 +73,8 @@ import {serializeNormalizedUriObjWithQuery} from './uri/serializeNormalizedUriOb
 import {canonizeNormalizedUriObj} from './uri/canonizeNormalizedUriObj';
 
 
-const DEBUG = true;
 const TRACE = false;
+
 
 const querySelector = (
 	node: Cheerio<AnyNode>,
@@ -109,7 +109,7 @@ const remove = (
 ) => {
 	const elsToRemove = querySelectorAll(node, selector);
 	elsToRemove.forEach((elToRemove) => {
-		// log.info('Removing outerHTML:%s', pretty(outerHTML(elToRemove)));
+		TRACE && log.debug('Removing outerHTML:%s', outerHTML(elToRemove));
 		elToRemove.remove();
 	});
 }
@@ -121,10 +121,10 @@ const removeDisplayNoneAndVisibilityHidden = (
 	const elsWithStyleAttribute = querySelectorAll(node, '[style]');
 	for (let i = 0; i < elsWithStyleAttribute.length; i++) {
 		const elWithStyleAttribute = elsWithStyleAttribute[i];
-		// log.info('Looking at outerHTML:%s', pretty(outerHTML(elWithStyleAttribute)));
+		TRACE && log.debug('Looking at outerHTML:%s', outerHTML(elWithStyleAttribute));
 
 		// const styleValue = getAttributeValue(elWithStyleAttribute, 'style');
-		// log.info('styleValue:%s', toStr(styleValue));
+		// TRACE && log.debug('styleValue:%s', toStr(styleValue));
 
 		const {
 			display,
@@ -132,46 +132,72 @@ const removeDisplayNoneAndVisibilityHidden = (
 		} = elWithStyleAttribute.css(['display', 'visibility']);
 
 		// const display = elWithStyleAttribute.css('display');
-		// log.info('display:%s', toStr(display));
+		TRACE && log.debug('display:%s', toStr(display));
 
 		// const visibility = elWithStyleAttribute.css('visibility');
-		// log.info('visibility:%s', toStr(visibility));
+		TRACE && log.debug('visibility:%s', toStr(visibility));
 
 		if (
 			display === 'none'
 			|| visibility === 'hidden'
 		) {
-			// log.info('Removing outerHTML:%s', pretty(outerHTML(elWithStyleAttribute)));
+			TRACE && log.debug('Removing outerHTML:%s', outerHTML(elWithStyleAttribute));
 			elWithStyleAttribute.remove();
 		}
 	}
 }
 
-// const textContent = node => node.text();
 const outerHTML = (node: Cheerio<AnyNode>) => node.clone().wrap('<div>').parent().html();
-// const innerHTML = node => node.html();
 
 const REPLACEMENT = '&#129'; // HOP illegal in html :)
 const REPLACE_ALL_REPLACEMENT_REGEXP = new RegExp(`${REPLACEMENT}+`, 'g');
+
 function getText(node: Cheerio<AnyNode>) {
-	TRACE && log.debug('getText(%s)', node);
-	// Note that while textContent gets the content of all elements, including <script> and <style> elements, innerText, doesn't.
-	// innerText is also aware of style and will not return the text of hidden elements, whereas textContent will.
-	// log.info('textContent:%s', node.prop('textContent'));
-	// log.info('innerText:%s', node.prop('innerText')); // These doesn't seem to be differences in whitespace between textContent and innerText
-	TRACE && log.info('getText innerHTML:%s', node.prop('innerHTML'));
-	// return node.prop('innerText').replace(/(\r\n|\n|\r)/gm, ' '); // No whitespace bewteen elements :(
-	const innerHTML = node.prop('innerHTML');
-	if (!innerHTML) {
-		DEBUG && log.warning('getText innerHTML is empty!');
-		return '';
+	// TRACE && log.debug('getText(%s)', node); // Error: JSON.stringify got a cyclic data structure
+
+	// log.debug('.nodeType:%s', node['nodeType']); // undefined
+	// log.debug('.type:%s', node['type']); // undefined
+
+	let str = '';
+	try {
+		// https://cheerio.js.org/docs/api/classes/Cheerio#prop
+		// Method for getting and setting properties.
+		// Gets the property value for only the first element in the matched set.
+		// "innerText" | "outerHTML" | "textContent" | "innerHTML"
+		//
+		// Note that while textContent gets the content of all elements, including <script> and <style> elements, innerText, doesn't.
+		// innerText is also aware of style and will not return the text of hidden elements, whereas textContent will.
+		// log.debug('textContent:%s', node.prop('textContent'));
+		// log.debug('innerText:%s', node.prop('innerText')); // There doesn't seem to be differences in whitespace between textContent and innerText
+		// return node.prop('innerText').replace(/(\r\n|\n|\r)/gm, ' '); // No whitespace between elements :(
+		str = node.prop('innerHTML');
+		// log.debug('innerHTML:%s', str);
+
+		if (!str) {
+			log.warning('getText innerHTML is empty!');
+			return '';
+		}
+
+		// NOTE: node.html() can also trigger: Cannot read property "children" from undefined
+		// node.html() might be the same as innerHTML or outerHTML ?
+	} catch (e) {
+		if (e.message !== 'Cannot read property "children" from undefined') {
+			log.error(`node.prop('innerHTML'): Unknown error:${e.message}`, e);
+		}
+		str = node
+			// https://cheerio.js.org/docs/api/classes/Cheerio#text
+			// Get the combined text contents of each element in the set of matched elements, including their descendants.
+			.text() // No whitespace bewteen elements :(
+			.replace(/\s\s+/g, ' ') // This will replace newlines, tabs etc...;
+
+		// https://cheerio.js.org/docs/api/classes/Cheerio#contents
+		// Gets the children of each element in the set of matched elements, including text and comment nodes.
+		//
+		// NOTE: Perhaps a better fallback could be a combination of .contents and .prop('innerText')?
 	}
-	return innerHTML
- 	// return node
- 		// .text() // No whitespace bewteen elements :(
-		// .html() // is this the same as innerHTML or outerHTML ?
-		// .prop('innerHTML')
- 		//.replaceAll(/<\/?[a-zA-Z0-9=" ]*>/g, ' ') // This doesn't handle <!-- --> and more
+
+	return str
+		//.replaceAll(/<\/?[a-zA-Z0-9=" ]*>/g, ' ') // This doesn't handle <!-- --> and more
 		// How to handle tags inside comments... <!-- <div></div> -->
 		.replace(/<\/?[^>]+>/g, REPLACEMENT)
 		//.replace(/\s\s+/g, ' ') // This will replace newlines, tabs etc...
@@ -207,9 +233,9 @@ export function run({
 	if (!userAgent) {
 		userAgent = DEFAULT_UA;
 	}
-	DEBUG && log.debug('userAgent:%s', userAgent);
+	log.debug('userAgent:%s', userAgent);
 
-	DEBUG && log.debug('app.config:%s', app.config);
+	log.debug('app.config:%s', app.config);
 	const {
 		browserlessUrl
 	} = app.config;
@@ -230,12 +256,12 @@ export function run({
 	if (!baseUri.includes('://')) { baseUri = `https://${baseUri}`;}
 	const normalizedBaseUriObj = normalizeUriObj(baseUri); // Not using parse, because that doesn't covert "%7E" to "~", etc.
 	const {host: domain, scheme} = normalizedBaseUriObj;
-	DEBUG && log.debug('domain:%s', domain);
-	DEBUG && log.debug('scheme:%s', scheme);
+	log.debug('domain:%s', domain);
+	log.debug('scheme:%s', scheme);
 
 	// NOTE: Can't use serialize on normalizedBaseUriObj here, because that adds a trailing slash :(
 	const normalizedentryPointUrl = normalizeWithoutEndingSlash(baseUri);
-	DEBUG && log.debug('normalizedentryPointUrl:%s', normalizedentryPointUrl);
+	log.debug('normalizedentryPointUrl:%s', normalizedentryPointUrl);
 
 	const robots = getRobotsTxt(userAgent, scheme, domain); // object with functions
 	TRACE && log.debug('robots:%s', toStr(robots));
@@ -269,7 +295,7 @@ export function run({
 
 		// Normalized before adding to queue, still contains query though, in case of pagination.
 		const url = queueArr.shift();
-		DEBUG && log.debug('url:%s', url);
+		log.debug('url:%s', url);
 
 		// NOTE: Not switching to normalizeUrlObj here, because that may break robots functionality.
 		const baseUrlObj = parse(url);
@@ -342,7 +368,7 @@ export function run({
 					headers,
 					url
 				};
-				DEBUG && log.debug('requestParams:%s', toStr(requestParams));
+				log.debug('requestParams:%s', toStr(requestParams));
 
 				const res: Response = httpClientRequest(requestParams);
 				TRACE && log.debug('res:%s', toStr(res));
@@ -414,30 +440,35 @@ export function run({
 						}
 					}
 				}
-				DEBUG && log.debug(`boolFollow:${toStr(boolFollow)}`);
-				DEBUG && log.debug(`boolIndex:${toStr(boolIndex)}`);
+				log.debug(`boolFollow:${toStr(boolFollow)}`);
+				log.debug(`boolIndex:${toStr(boolIndex)}`);
 
 				const htmlWithLangEl = querySelector(rootNode,'html[lang]');
+
 				const lang = htmlWithLangEl ? getAttributeValue(htmlWithLangEl, 'lang') : '';
-				// log.info('lang:%s', lang);
+				TRACE && log.debug('lang:%s', lang);
 
 				const titleEl = querySelector(headEl, 'title');
-				// log.debug(`titleEl:${toStr(titleEl)}`); // JSON.stringify got a cyclic data structure
+				TRACE && log.debug('titleEl:%s', outerHTML(titleEl));
 
 				const title = titleEl ? getText(titleEl) : '';
-				DEBUG && log.debug(`title:${toStr(title)}`);
+				log.debug('title:%s', title);
 
 				const ogTitleEl = querySelector(headEl, "meta[property='og:title'][content]");
 				const ogTitle = ogTitleEl ? getAttributeValue(ogTitleEl, 'content') : '';
+				TRACE && log.debug('ogTitle:%s', ogTitle);
 
 				const ogDescriptionEl = querySelector(headEl, "meta[property='og:description'][content]");
 				const ogDescription = ogDescriptionEl ? getAttributeValue(ogDescriptionEl, 'content') : '';
+				TRACE && log.debug('ogDescription:%s', ogDescription);
 
 				const ogSiteNameEl = querySelector(headEl, "meta[property='og:site_name'][content]");
 				const ogSiteName = ogSiteNameEl ? getAttributeValue(ogSiteNameEl, 'content') : '';
+				TRACE && log.debug('ogSiteName:%s', ogSiteName);
 
 				const ogLocaleEl = querySelector(headEl, "meta[property='og:locale'][content]");
 				const ogLocale = ogLocaleEl ? getAttributeValue(ogLocaleEl, 'content') : '';
+				TRACE && log.debug('ogLocale:%s', ogLocale);
 
 				const bodyElWithNothingRemoved = querySelector(rootNode, 'body');
 				const cleanedBodyEl = bodyElWithNothingRemoved.clone();
@@ -476,7 +507,7 @@ export function run({
 				const links: string[] = [];
 				if (boolFollow) {
 					const linkEls = querySelectorAll(bodyElWithNothingRemoved, "a[href]:not([href^='#']):not([href^='mailto:']):not([href^='tel:']):not([href^='content:'])");
-					DEBUG && log.debug('linkEls.length:%s', linkEls.length);
+					log.debug('linkEls.length:%s', linkEls.length);
 					linksForLoop:
 					for (let i = 0; i < linkEls.length; i += 1) {
 						const el = linkEls[i];
@@ -487,7 +518,7 @@ export function run({
 							continue linksForLoop;
 						}
 						const href = getAttributeValue(el, 'href'); // javascript:void(0)
-						DEBUG && log.debug('href:%s', href);
+						log.debug('href:%s', href);
 
 						try {
 							if (href.startsWith('javascript:')) {
@@ -495,13 +526,13 @@ export function run({
 							}
 
 							const resolved = resolve(url, href);
-							DEBUG && log.debug('resolved:%s', resolved);
+							log.debug('resolved:%s', resolved);
 
 							const normalizedUriObj = normalizeUriObj(resolved);
-							DEBUG && log.debug('uriObj:%s', normalizedUriObj);
+							log.debug('uriObj:%s', normalizedUriObj);
 
 							const currentHost = normalizedUriObj.host;
-							DEBUG && log.debug('currentHost:%s', currentHost);
+							log.debug('currentHost:%s', currentHost);
 
 							if (currentHost !== domain) {
 								continue linksForLoop;
@@ -515,7 +546,7 @@ export function run({
 							}
 
 							const normalized = serializeNormalizedUriObjWithQuery(normalizedUriObj);
-							DEBUG && log.debug('normalized:%s', normalized);
+							log.debug('normalized:%s', normalized);
 
 							if (!links.includes(normalized)) {
 								links.push(normalized);
@@ -531,6 +562,8 @@ export function run({
 				} // boolFollow
 
 				const canonizedUrl = canonizeNormalizedUriObj(normalizeUriObj(url));
+				TRACE && log.debug('canonizedUrl:%s', canonizedUrl);
+
 				if (persistedCanonicalUrls[canonizedUrl]) {
 					if (url !== canonizedUrl) {
 						log.info(`Skipping already persisted variant:${url} of canonizedUrl:${canonizedUrl}`);
@@ -546,7 +579,13 @@ export function run({
 						robots,
 						userAgent
 					});
+
 					const { path } = baseUrlObj; // TODO WARNING baseUrlObj is not normalized.
+					TRACE && log.debug('path:%s', path);
+
+					const text = getText(cleanedBodyEl);
+					TRACE && log.debug('text:%s', text);
+
 					const documentToPersist: WebCrawlDocument = {
 						displayname: ogTitle || title, // This has no field definition by default
 						domain,
@@ -556,7 +595,7 @@ export function run({
 						og_title: ogTitle,
 						links,
 						path: path || '/', // TODO WARNING: This path is currently not normalized!
-						text: getText(cleanedBodyEl),
+						text,
 						title,
 						url: canonizedUrl,
 					};
@@ -615,7 +654,7 @@ export function run({
 							language: lang || ogLocale
 						}
 					);
-					DEBUG && log.debug('persistedDocument:%s', toStr(persistedDocument));
+					log.debug('persistedDocument:%s', toStr(persistedDocument));
 
 					persistedCanonicalUrls[canonizedUrl] = true;
 				} // indexable
@@ -689,7 +728,7 @@ export function run({
 			// log.debug(`nodeId2Uri:${toStr(nodeId2Uri)}`);
 
 			if (idsToDelete.length) {
-				DEBUG && log.debug('deleting ids:%s paths:%s', toStr(idsToDelete), toStr(pathsToDelete));
+				log.debug('deleting ids:%s paths:%s', toStr(idsToDelete), toStr(pathsToDelete));
 				const deleteRes = collector.collection.connection.delete(idsToDelete);
 				// log.debug(toStr({deleteRes}));
 				const urls = deleteRes.map(nodeId => nodeId2Uri[nodeId]);
