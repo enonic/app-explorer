@@ -67,7 +67,8 @@ dependencies {
 	include 'com.enonic.lib:lib-http-client:3.2.2'
 	include 'com.enonic.lib:lib-license:3.1.0'
 	include 'com.enonic.lib:lib-router:3.1.0'
-	include 'com.enonic.lib:lib-static:1.0.3'
+	// include 'com.enonic.lib:lib-asset:1.0.0'
+	include 'com.enonic.lib:lib-static:2.0.0-B6'
 	include 'com.enonic.lib:lib-explorer:4.4.5'
 	include 'com.enonic.lib:lib-util:3.1.1'
 	include 'com.enonic.lib:lib-galimatias:1.0.0-B1'
@@ -184,7 +185,6 @@ task watch(type:NodeTask) {
 	]
 }
 
-
 processResources {
 	exclude '**/.gitkeep'
 
@@ -205,4 +205,19 @@ processResources {
 	exclude '**/*.scss'
 	exclude '**/*.styl'
 	exclude '**/*.ts'
+	exclude '**/*.tsx'
 }
+
+tasks.register('compressAssets', NpmTask) {
+	dependsOn npmBuild
+	dependsOn webpack
+	dependsOn processResources
+	args = ['run', 'compress:assets']
+	environment = [
+		'FORCE_COLOR': 'true',
+	]
+	inputs.dir 'build/resources/main/assets'
+	outputs.dir 'build/resources/main/assets'
+}
+// TODO: Use if switch to lib-asset
+// jar.dependsOn compressAssets
