@@ -113,6 +113,7 @@ export default defineConfig((options: MyOptions) => {
 			},
 			external: [ // All these are available runtime in the jar file:
 				'/lib/cache',
+				'/lib/enonic/asset',
 				'/lib/enonic/static',
 				/^\/lib\/explorer/,
 				'/lib/galimatias',

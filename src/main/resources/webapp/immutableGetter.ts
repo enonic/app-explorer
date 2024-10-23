@@ -1,35 +1,39 @@
 import type { Request } from '../types/index.d';
 import type { Response } from '@enonic-types/lib-explorer';
 
-// import {toStr} from '@enonic/js-utils/value/toStr';
-// @ts-expect-error TS2307: Cannot find module '/lib/enonic/static' or its corresponding type declarations.
-import { buildGetter } from '/lib/enonic/static';
-import {GETTER_ROOT} from '../constants';
+import {
+	mappedRelativePath,
+	requestHandler
+} from '/lib/enonic/static';
 import {DOCUMENT_REST_API_PATH} from './constants';
 
 
-// const LOG_LEVEL = 'debug';
-
-
-const immutableGetter = buildGetter({
-	etag: false, // default is true in production and false in development
-	getCleanPath: (request: Request) => {
-		// log[LOG_LEVEL]('immutableGetter request:%s', toStr(request));
-		// log[LOG_LEVEL]('immutableGetter contextPath:%s', request.contextPath);
-		// log[LOG_LEVEL]('immutableGetter rawPath:%s', request.rawPath);
-
-		const prefix = request.contextPath;
-
-		let cleanPath = prefix ? request.rawPath.substring(prefix.length) : request.rawPath;
-		// log[LOG_LEVEL]('immutableGetter cleanPath:%s', cleanPath);
-
-		cleanPath = cleanPath.replace(`${DOCUMENT_REST_API_PATH}/${GETTER_ROOT}/`, '');
-		// log[LOG_LEVEL]('immutableGetter cleanPath:%s', cleanPath);
-
-		return cleanPath;
-	},
-	root: GETTER_ROOT
-}) as (_request: Request) => Response;
+const immutableGetter = (request) => requestHandler(
+	request,
+	{
+		contentType: ({
+			path,
+			// resource
+		}) => {
+			if (
+				path.substring(path.length - 3) === '.js'
+				|| path.substring(path.length - 4) === '.mjs'
+			) {
+				return 'text/javascript';
+			} else if (path.substring(path.length - 4) === '.css') {
+				return 'text/css';
+			} else if (path.substring(path.length - 6) === '.woff2') {
+				return 'font/woff';
+			} else if (path.substring(path.length - 5) === '.woff') {
+				return 'font/woff';
+			} else if (path.substring(path.length - 4) === '.ttf') {
+				return 'font/ttf';
+			}
+			return 'octet/stream';
+		},
+		index: false,
+		relativePath: mappedRelativePath(`${DOCUMENT_REST_API_PATH}/static`),
+	}) as ((_request: Request) => Response);
 
 
 export default immutableGetter;

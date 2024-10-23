@@ -137,9 +137,9 @@ router.all(`${DOCUMENT_REST_API_PATH}/${GETTER_ROOT}/{path:.+}`, (r: Request) =>
 		return immuteableResponse;
 	} else {
 		const modifiedRequest = JSON.parse(JSON.stringify(r)) as typeof r; // dereference
-		modifiedRequest.path = `${r.path.split(`/${GETTER_ROOT}/`, 2)[0]}/${postFix}`;
-		modifiedRequest.rawPath = `${r.rawPath.split(`/${GETTER_ROOT}/`, 2)[0]}/${postFix}`;
-		modifiedRequest.url = `${r.url.split(`/${GETTER_ROOT}/`, 2)[0]}/${postFix}`;
+		modifiedRequest.path = `${r.path.split(`/${GETTER_ROOT}/`, 2)[0]}/${GETTER_ROOT}/${postFix}`;
+		modifiedRequest.rawPath = `${r.rawPath.split(`/${GETTER_ROOT}/`, 2)[0]}/${GETTER_ROOT}/${postFix}`;
+		modifiedRequest.url = `${r.url.split(`/${GETTER_ROOT}/`, 2)[0]}/${GETTER_ROOT}/${postFix}`;
 		// log[LOG_LEVEL]('static modifiedRequest:%s', toStr(modifiedRequest));
 
 		const etagResponse = etagGetter(modifiedRequest);
