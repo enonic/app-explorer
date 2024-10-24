@@ -1,152 +1,173 @@
 {
-	"include": [
+  "include": [
     // Make sure default types matches Nashorn
-		"./node_modules/typescript/lib/lib.es5.d.ts",
-		"./src/main/resources/**/*.ts",
-	],
+    // "./node_modules/typescript/lib/lib.es5.d.ts",
+
+    // Unfortunalty brings string.startsWith which is not supported by Nashorn
+    // "./node_modules/typescript/lib/lib.es2015.core.d.ts",
+    // "./node_modules/typescript/lib/lib.es2015.d.ts",
+
+    "./src/main/resources/**/*.ts",
+  ],
   "exclude": [
-    "**/*.d.ts",
-		// "**/*.d.tsx",
+    "./node_modules/@types/node/console.d.ts",
+    "./node_modules/@types/node/globals.d.ts",
+    "./node_modules/@types/node/**/*.d.ts",
     "./src/main/resources/**/*.test.ts",
-		"./src/main/resources/assets/**/*.ts",
-		// "./src/main/resources/assets/**/*.tsx",
-		"./src/main/resources/static/**/*.ts",
-    // "./src/main/resources/static/**/*.tsx",
-	],
-	"compilerOptions": {
+    "./src/main/resources/assets/**/*",
+    "./src/main/resources/static/**/*",
+    // "./**/*.d.ts",
+  ],
+  "compilerOptions": {
     "allowJs": true,
-		"allowSyntheticDefaultImports": true,
-    "declaration": false,
-		"declarationMap": false,
-		"downlevelIteration": true,
-		"esModuleInterop": true,
-		"experimentalDecorators": true,
-		"importHelpers": true,
-		"importsNotUsedAsValues": "remove",
-		"inlineSourceMap": false,
-		"inlineSources": false,
-		"lib": [
-			//"es5",
-			//"es6", // alias for es2015
-			//"es7", // alias for es2016
-			//"es2015",
-			"ES2015.Core", // string.startsWith
-			//"es2016",
-			"ES2016.Array.Include",
-			//"es2017",
-			//"es2018",
-			//"es2019",
-			//"es2020",
-			//"es2021",
-			//"esnext",
-			//"ScriptHost",
-			//"WebWorker"
-		],
-		"listEmittedFiles": false,
-		"listFiles": false,
-		"module": "commonjs",
-		"moduleResolution": "node",
-		"noEmitOnError": true, // Do not emit compiler output files like JavaScript source code, source-maps or declarations if any errors were reported.
-		"noErrorTruncation": true,
-		"noImplicitAny": false,
-		"noPropertyAccessFromIndexSignature": true,
-		"noUncheckedIndexedAccess": true,
-		"noUnusedLocals": false,
-		"noUnusedParameters": true,
-		"outDir": "build/tsc",
-		"paths": {
-			// Development (should be commented out when commiting)
+    "allowSyntheticDefaultImports": true,
+    "composite": true,
+
+    // "declaration": false, // Composite projects may not disable declaration emit
+    "declaration": true,
+
+    "declarationMap": false,
+    "downlevelIteration": true,
+    "esModuleInterop": true,
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "importsNotUsedAsValues": "remove",
+
+    // "incremental": false, // Avoid *.tsbuildinfo files // Composite projects may not disable incremental compilation
+
+    "inlineSourceMap": false,
+    "inlineSources": false,
+    "lib": [
+      "ES5"
+    	//"es6", // alias for es2015
+    	//"es7", // alias for es2016
+    	//"es2015",
+    	// "ES2015.Core", // string.startsWith
+    	//"es2016",
+    	// "ES2016.Array.Include",
+    	//"es2017",
+    	//"es2018",
+    	//"es2019",
+    	//"es2020",
+    	//"es2021",
+    	//"esnext",
+    	//"ScriptHost",
+    	//"WebWorker"
+    ],
+    "listEmittedFiles": false,
+    "listFiles": false,
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "noEmitOnError": true, // Do not emit compiler output files like JavaScript source code, source-maps or declarations if any errors were reported.
+    "noErrorTruncation": true,
+    "noImplicitAny": false,
+    // "noLib": true, // This causes type errors when decontructing arrays :(
+    "noPropertyAccessFromIndexSignature": true,
+    "noUncheckedIndexedAccess": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": true,
+    "outDir": "build/tsc",
+    "paths": {
+      // Development (should be commented out when commiting)
       // "@enonic/js-utils/*": ["../enonic-js-utils/src/*"],
-			// "@enonic-types/lib-repo": ["../../../../xp/modules/lib/lib-repo/src/main/resources/lib/xp/repo.ts"],
-			// "@enonic-types/lib-repo": ["../../../../xp/modules/lib/lib-repo/build/typescript/lib/xp/repo.d.ts"],
-			// "/lib/xp/node": ["../../../../xp/modules/lib/lib-node/src/main/resources/lib/xp/node.ts"],
-			// "/lib/xp/node": ["../../../../xp/modules/lib/lib-node/build/typescript/lib/xp/node.d.ts"],
-			// "/lib/xp/repo": ["../../../../xp/modules/lib/lib-repo/src/main/resources/lib/xp/repo.ts"],
-			// "/lib/xp/repo": ["../../../../xp/modules/lib/lib-repo/build/typescript/lib/xp/repo.d.ts"],
+      // "@enonic-types/lib-repo": ["../../../../xp/modules/lib/lib-repo/src/main/resources/lib/xp/repo.ts"],
+      // "@enonic-types/lib-repo": ["../../../../xp/modules/lib/lib-repo/build/typescript/lib/xp/repo.d.ts"],
+      // "/lib/xp/node": ["../../../../xp/modules/lib/lib-node/src/main/resources/lib/xp/node.ts"],
+      // "/lib/xp/node": ["../../../../xp/modules/lib/lib-node/build/typescript/lib/xp/node.d.ts"],
+      // "/lib/xp/repo": ["../../../../xp/modules/lib/lib-repo/src/main/resources/lib/xp/repo.ts"],
+      // "/lib/xp/repo": ["../../../../xp/modules/lib/lib-repo/build/typescript/lib/xp/repo.d.ts"],
       //
-			// Production (should be commented in when commiting)
-			// "@enonic/app-explorer/*": ["./src/main/resources/*"],
-			"@enonic/app-explorer/*": ["./*"],
+      // Production (should be commented in when commiting)
+      // "@enonic/app-explorer/*": ["./src/main/resources/*"],
+      "@enonic/app-explorer/*": ["./*"],
       "@enonic/js-utils": ["./node_modules/@enonic/js-utils"],
-			"@enonic/js-utils/*": ["./node_modules/@enonic/js-utils/*"],
-			"@enonic/nashorn-polyfills": ["./src/main/resources/lib/nashorn/index.ts"],
+      "@enonic/js-utils/*": ["./node_modules/@enonic/js-utils/*"],
+      "@enonic/nashorn-polyfills": ["./src/main/resources/lib/nashorn/index.ts"],
       "/lib/licensing": ["./src/main/resources/lib/licensing.ts"],
-			// "/constants": ["./src/main/resources/constants"], // Doesn't work
+      // "/constants": ["./src/main/resources/constants"], // Doesn't work
       // "/lib/enonic/asset": ["./node_modules/@enonic-types/lib-asset"],
       "/lib/enonic/static": ["./node_modules/@enonic-types/lib-static"],
-			"/lib/xp/*": ["./node_modules/@enonic-types/lib-*"],
+      "/lib/xp/*": ["./node_modules/@enonic-types/lib-*"],
 
-			// There is no @enonic-types/lib-explorer yet, so these are workarounds
-			"@enonic-types/lib-explorer": ["./symlinks/lib-explorer/src/main/resources/lib/explorer/types/index.d"],
-			"@enonic-types/lib-explorer/*": ["./symlinks/lib-explorer/src/main/resources/lib/explorer/types/*"],
+      // There is no @enonic-types/lib-explorer yet, so these are workarounds
+      "@enonic-types/lib-explorer": ["./symlinks/lib-explorer/src/main/resources/lib/explorer/types/index.d"],
+      "@enonic-types/lib-explorer/*": ["./symlinks/lib-explorer/src/main/resources/lib/explorer/types/*"],
 
-			// lib-explorer is an external, but we still want the code editor to resolve types
-			"/lib/explorer/*": ["./symlinks/lib-explorer/src/main/resources/lib/explorer/*"],
+      // lib-explorer is an external, but we still want the code editor to resolve types
+      "/lib/explorer/*": ["./symlinks/lib-explorer/src/main/resources/lib/explorer/*"],
 
-			// Fallback
-			// "/*": ["./src/main/resources/*"],
-			// "/webapp/*": ["./webapp/*"], Doesn't work
-			"/*": ["./*"], // Doesn't work?
-		},
+      // Fallback
+      // "/*": ["./src/main/resources/*"],
+      // "/webapp/*": ["./webapp/*"], Doesn't work
+      "/*": ["./*"], // Doesn't work?
+    },
 
     "preserveWatchOutput": false,
-		"pretty": true,
-		"removeComments": true,
-		"resolveJsonModule": true,
+    "pretty": true,
+    "removeComments": true,
+    "resolveJsonModule": true,
 
-		// Default: The longest common path of all non-declaration input files.
-		//
-		// If composite is set, the default is instead the directory containing
-		// the tsconfig.json file.
-		//
-		// When TypeScript compiles files, it keeps the same directory structure
-		// in the output directory as exists in the input directory.
-		//
-		// Importantly, rootDir does not affect which files become part of the
-		// compilation. It has no interaction with the include, exclude, or
-		// files tsconfig.json settings.
-		//
-		// Note that TypeScript will never write an output file to a directory
-		// outside of outDir, and will never skip emitting a file. For this
-		// reason, rootDir also enforces that all files which need to be emitted
-		// are underneath the rootDir path.
-		"rootDir": ".", // Needed while types are only available via symlinks
+    // Default: The longest common path of all non-declaration input files.
+    //
+    // If composite is set, the default is instead the directory containing
+    // the tsconfig.json file.
+    //
+    // When TypeScript compiles files, it keeps the same directory structure
+    // in the output directory as exists in the input directory.
+    //
+    // Importantly, rootDir does not affect which files become part of the
+    // compilation. It has no interaction with the include, exclude, or
+    // files tsconfig.json settings.
+    //
+    // Note that TypeScript will never write an output file to a directory
+    // outside of outDir, and will never skip emitting a file. For this
+    // reason, rootDir also enforces that all files which need to be emitted
+    // are underneath the rootDir path.
+    "rootDir": ".", // Needed while types are only available via symlinks
 
-		// Using rootDirs, you can inform the compiler that there are many
-		// “virtual” directories acting as a single root. This allows the
-		// compiler to resolve relative module imports within these “virtual”
-		// directories, as if they were merged in to one directory.
-		//
-		// This does not affect how TypeScript emits JavaScript, it only
-		// emulates the assumption that they will be able to work via those
-		// relative paths at runtime.
-		//
-		// rootDirs can be used to provide a separate “type layer” to files that
-		// are not TypeScript or JavaScript by providing a home for generated
-		// .d.ts files in another folder. This technique is useful for bundled
-		// applications where you use import of files that aren’t necessarily
-		// code.
-		"rootDirs": [
-			"./src/main/resources",
-			// "../../../symlinks/lib-explorer",
-		],
+    // Using rootDirs, you can inform the compiler that there are many
+    // “virtual” directories acting as a single root. This allows the
+    // compiler to resolve relative module imports within these “virtual”
+    // directories, as if they were merged in to one directory.
+    //
+    // This does not affect how TypeScript emits JavaScript, it only
+    // emulates the assumption that they will be able to work via those
+    // relative paths at runtime.
+    //
+    // rootDirs can be used to provide a separate “type layer” to files that
+    // are not TypeScript or JavaScript by providing a home for generated
+    // .d.ts files in another folder. This technique is useful for bundled
+    // applications where you use import of files that aren’t necessarily
+    // code.
+    "rootDirs": [
+      "./src/main/resources",
+      // "../../../symlinks/lib-explorer",
+    ],
 
     // Even though the setting disables type checking for d.ts files,
-		// TypeScript still type checks the code you specifically
-		// refer to in your application's source code.
-		"skipLibCheck": true, // Disable type checking for node_modules
+    // TypeScript still type checks the code you specifically
+    // refer to in your application's source code.
+    "skipLibCheck": true, // Disable type checking for node_modules
 
-		"sourceMap": false,
-		"strict": false,
-		"strictNullChecks": false,
+    "sourceMap": false,
+    "strict": false,
+    "strictNullChecks": false,
 
-		// There are actually two "targets"
-		// 1. The environment tsup runs in (set in this file)
-		// 2. The environment tsup transpiles to (set in tsconfig.tsup.json via tsup.config.ts)
-		"target": "ES2020", // What bundle-require inside tsup uses to load tsup.config.ts
+    // There are actually two "targets"
+    // 1. The environment tsup runs in (set in this file)
+    // 2. The environment tsup transpiles to (set in tsconfig.tsup.json via tsup.config.ts)
+    "target": "ES2020", // What bundle-require inside tsup uses to load tsup.config.ts
 
+    // NOTE: Setting target to something other than ES3 or ES5 brings in the type for the console object :(
+    // "target": "ES5",
+    // "typeRoots": [
+    //   "./node_modules/@enonic-types",
+      // "./node_modules/@types", // Does this help avoiding the type for the console object? Nope
+      // "./node_modules/typescript/lib",
+    // ],
     "types": [
-			"@enonic-types/global"
-		]
-	}
+      // "global",
+      "@enonic-types/global"
+    ]
+  }
 }
