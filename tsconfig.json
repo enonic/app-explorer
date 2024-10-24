@@ -2,11 +2,11 @@
   "files": [],
   "references": [
     {
-      "path": "tsconfig.tsup.json"
-    },
-    {
       "path": "tsconfig.xp.nashorn.json"
     },
+    // {
+    //   "path": "tsconfig.tsup.json"
+    // },
     {
       "path": "tsconfig.assets.json"
     },

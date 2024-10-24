@@ -3,7 +3,12 @@
 		"./src/main/resources/static/**/*.ts",
 		"./src/main/resources/static/**/*.tsx",
 	],
+  "exclude": [
+    "./**/*.d.ts",
+  ],
   "compilerOptions": {
+    "composite": true,
+    // "incremental": false, // Avoid *.tsbuildinfo files // Composite projects may not disable incremental compilation
 		"jsx": "react-jsx",
 		"lib": [
 			"dom"
