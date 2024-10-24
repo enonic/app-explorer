@@ -105,7 +105,7 @@
     "@enonic-types/lib-portal": "^7",
     "@enonic-types/lib-repo": "^7",
     "@enonic-types/lib-scheduler": "^7",
-    "@enonic-types/lib-static": "^2.0.0-B6",
+    "@enonic-types/lib-static": "^2.0.0",
     "@enonic-types/lib-task": "^7",
     "@enonic-types/lib-value": "^7",
     "@enonic-types/lib-vhost": "^7",
