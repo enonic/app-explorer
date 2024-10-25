@@ -17,7 +17,7 @@ const appHelper = __.newBean<{
 
 const etagService = __.newBean<{
 	getEtag: (path: string, etagOverride?: number) => Record<string,string>
-}>('lib.enonic.libStatic.etag.EtagService');
+}>('com.enonic.app.explorer.etag.EtagService');
 
 const getEtag = ({
 	appName,
