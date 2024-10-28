@@ -1,34 +1,68 @@
 import type {TaskInfo} from '/lib/xp/task';
-import type {ExplorerProps} from '/index.d';
+import type {ExplorerProps} from '../../../../../explorer/index.d';
 
 
 import {
-	Principal,
+	// Principal,
 	Repo
 } from '@enonic/explorer-utils';
 // import {toStr} from '@enonic/js-utils';
 import serialize from 'serialize-javascript';
+import {assetUrl} from '/lib/enonic/asset';
 // @ts-ignore
 import {isLicenseValid, getIssuedTo} from '/lib/licensing';
 import {getToolUrl} from '/lib/xp/admin';
 import {
-	assetUrl,
+	// assetUrl,
 	serviceUrl,
 } from '/lib/xp/portal';
 import {getLauncherPath} from '/lib/xp/admin';
-import {connect} from '/lib/explorer/repo/connect';
-import {query as queryCollectors} from '/lib/explorer/collector/query';
+// import {connect} from '/lib/explorer/repo/connect';
+// import {query as queryCollectors} from '/lib/explorer/collector/query';
 import {runAsSu} from '/lib/explorer/runAsSu';
 import {get as getRepo} from '/lib/xp/repo';
 import {list as listTasks} from '/lib/xp/task';
+import {jsonParseResource} from '../../../lib/app/explorer/jsonParseResource';
 
 const ID_REACT_EXPLORER_CONTAINER = 'reactExplorerContainer';
 
+const SERVICE_NAME = 'explorerAssets';
+
+const FILEPATH_MANIFEST = `/services/${SERVICE_NAME}/files/manifest.json`;
+const FILEPATH_MANIFEST_NODE_MODULES = `/services/${SERVICE_NAME}/files/node_modules_manifest.json`;
+
+const MANIFESTS = {
+	[FILEPATH_MANIFEST]: jsonParseResource(FILEPATH_MANIFEST),
+	[FILEPATH_MANIFEST_NODE_MODULES]: jsonParseResource(FILEPATH_MANIFEST_NODE_MODULES),
+}
+// log.debug('MANIFESTS:%s', JSON.stringify(MANIFESTS, null, 4));
 
 // @ts-ignore
 // const {currentTimeMillis} = Java.type('java.lang.System') as {
 // 	currentTimeMillis: () => number
 // }
+
+function getImmuteableUrl({
+	manifestPath = FILEPATH_MANIFEST_NODE_MODULES,
+	path,
+}: {
+	manifestPath?: string
+	path: string,
+}) {
+	const manifest = MANIFESTS[manifestPath];
+	if (!manifest) {
+		const msg = `getImmuteableUrl manifestPath:${manifestPath} not found! manifests:${JSON.stringify(Object.keys(MANIFESTS), null, 4)}`;
+		log.error(msg);
+		throw new Error(msg);
+	}
+	const pathWithHash = manifest[path];
+	if (!pathWithHash) {
+		const msg = `getImmuteableUrl path:${path} not found in manifestPath:${manifestPath}! manifest:${JSON.stringify(manifest, null, 4)}`;
+		log.error(msg);
+		throw new Error(msg);
+	}
+	return `/_/service/${app.name}/${SERVICE_NAME}/${pathWithHash}`;
+}
 
 
 export function htmlResponse({
@@ -48,6 +82,7 @@ export function htmlResponse({
 					info: 'Starting task...',
 					total: 15
 				},
+				// @ts-expect-error Custom value, not matching TaskStateType
 				state: 'STARTING'
 			};
 		}
@@ -123,35 +158,35 @@ export function htmlResponse({
 		licensedTo: getIssuedTo(),
 		licenseValid: isLicenseValid(),
 		servicesBaseUrl: serviceUrl({service: ''}),
-		wsBaseUrl: serviceUrl({service: '', type: 'absolute'}).replace('http', 'ws')
+		// wsBaseUrl: serviceUrl({service: '', type: 'absolute'}).replace('http', 'ws')
 	};
 	//const propsJson = JSON.stringify(propsObj);
 	//log.info(`propsJson:${propsJson}`);
 
-	const collectorsAppToUri = {};
-	const collectorsObj = {};
-	queryCollectors({
-		connection: connect({principals: [Principal.EXPLORER_READ]})
-	}).hits.forEach(({
-		//_name: collectorId,
-		appName,
-		taskName,
-		componentPath,
-		configAssetPath
-	}) => {
-		const collectorId = `${appName}:${taskName}`;
-		collectorsAppToUri[collectorId] = assetUrl({
-			application: appName,
-			path: configAssetPath
-		});
-		collectorsObj[collectorId] = {
-			componentPath,
-			url: assetUrl({
-				application: appName,
-				path: configAssetPath
-			})
-		};
-	});
+	// const collectorsAppToUri = {};
+	// const collectorsObj = {};
+	// queryCollectors({
+	// 	connection: connect({principals: [Principal.EXPLORER_READ]})
+	// }).hits.forEach(({
+	// 	//_name: collectorId,
+	// 	appName,
+	// 	taskName,
+	// 	componentPath,
+	// 	configAssetPath
+	// }) => {
+	// 	const collectorId = `${appName}:${taskName}`;
+	// 	collectorsAppToUri[collectorId] = assetUrl({
+	// 		application: appName,
+	// 		path: configAssetPath
+	// 	});
+	// 	collectorsObj[collectorId] = {
+	// 		componentPath,
+	// 		url: assetUrl({
+	// 			application: appName,
+	// 			path: configAssetPath
+	// 		})
+	// 	};
+	// });
 	//log.info(toStr({collectorsAppToUri}));
 
 	/*
@@ -237,17 +272,19 @@ services: {}, // Workaround for i18nUrl BUG
 //const semantic = {Header, Icon, List, Menu, Modal, Popup, Sidebar};
 */
 
+
+
 	return {
 		body: `<html>
 	<head>
 		<meta name="robots" content="noindex,nofollow">
-		<script type="text/javascript" src="${assetUrl({path: 'react/react.development.js'})}"></script>
-		<script type="text/javascript" src="${assetUrl({path: 'react-dom/react-dom.development.js'})}"></script>
-		<link rel="shortcut icon" href="${assetUrl({path: 'favicon.ico'})}">
-		<link rel="stylesheet" type="text/css" href="${assetUrl({path: 'graphiql/graphiql.min.css'})}">
-		<link rel="stylesheet" type="text/css" href="${assetUrl({path: 'nice-react-gantt/style.css'})}">
-		<link rel="stylesheet" type="text/css" href="${assetUrl({path: 'semantic-ui-css/semantic.css'})}">
-		<link rel="stylesheet" type="text/css" href="${assetUrl({path: 'react-semantic-ui-datepickers/react-semantic-ui-datepickers.css'})}">
+		<link rel="shortcut icon" href="${getImmuteableUrl({manifestPath: FILEPATH_MANIFEST, path: 'favicon.ico'})}">
+		<script type="text/javascript" src="${getImmuteableUrl({path: 'react/umd/react.development.js'})}"></script>
+		<script type="text/javascript" src="${getImmuteableUrl({path: 'react-dom/umd/react-dom.development.js'})}"></script>
+		<link rel="stylesheet" type="text/css" href="${getImmuteableUrl({path: 'graphiql/graphiql.min.css'})}">
+		<link rel="stylesheet" type="text/css" href="${getImmuteableUrl({path: 'nice-react-gantt/lib/css/style.css'})}">
+		<link rel="stylesheet" type="text/css" href="${getImmuteableUrl({path: 'semantic-ui-css/semantic.css'})}">
+		<link rel="stylesheet" type="text/css" href="${getImmuteableUrl({path: 'react-semantic-ui-datepickers/dist/react-semantic-ui-datepickers.css'})}">
 		<link rel="stylesheet" type="text/css" href="${assetUrl({path: 'style/bundle.css'})}">
 		<title>Explorer</title>
 		<style type="text/css">
@@ -283,19 +320,36 @@ services: {}, // Workaround for i18nUrl BUG
 	</head>
 	<body style="background-color: white !important;">
 		<div id="${ID_REACT_EXPLORER_CONTAINER}"/>
-		<script type="text/javascript" src="${assetUrl({path: 'explorer.js'})}"></script>
-		<script type="text/javascript" src="${assetUrl({path: 'react/Explorer.esm.js'})}"></script>
+		${
+			//<script type="text/javascript" src="${assetUrl({path: 'explorer.js'})}"></script>
+			''
+		}
+		${
+			//<script type="text/javascript" src="${getImmuteableUrl({manifestPath: FILEPATH_MANIFEST, path: 'Explorer.mjs'})}"></script>
+			''
+		}
 		<script type="text/javascript" src="${getLauncherPath()}" data-config-theme="dark" async></script>
-		${Object.keys(collectorsAppToUri).map((a) => `<script type="text/javascript" src="${collectorsAppToUri[a]}"></script>`)
-		.join('\n')}
+		${
+			// Object.keys(collectorsAppToUri)
+			// 	.map((a) => `<script type="text/javascript" src="${collectorsAppToUri[a]}"></script>`)
+			// 	.join('\n')
+			''
+		}
 		<script type='module' defer>
+			import {App} from '${getImmuteableUrl({manifestPath: FILEPATH_MANIFEST, path: 'Explorer.mjs'})}';
 			const propsObj = eval(${serialize(propsObj)});
 			//console.debug('propsObj', propsObj);
 			const collectorComponents = {};
-			${Object.keys(collectorsObj).map((collectorId) => `collectorComponents['${collectorId}'] = ${collectorsObj[collectorId].componentPath}`)}
-			propsObj.collectorComponents = collectorComponents;
+			${
+				// Object
+				// 	.keys(collectorsObj)
+				// 	.map((collectorId) => `collectorComponents['${collectorId}'] = ${collectorsObj[collectorId].componentPath}`)
+				''
+			}
+			// propsObj.collectorComponents = collectorComponents;
 			const root = ReactDOM.createRoot(document.getElementById('${ID_REACT_EXPLORER_CONTAINER}'));
-			root.render(React.createElement(window.Explorer.App, propsObj));
+			// root.render(React.createElement(window.Explorer.App, propsObj));
+			root.render(React.createElement(App, propsObj));
 		</script>
 	</body>
 </html>`,

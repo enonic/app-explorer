@@ -1,0 +1,6 @@
+<service>
+	<allow>
+		<principal>role:com.enonic.app.explorer.admin</principal>
+		<principal>role:system.admin</principal>
+	</allow>
+</service>

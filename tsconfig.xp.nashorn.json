@@ -8,6 +8,7 @@
     // "./node_modules/typescript/lib/lib.es2015.d.ts",
 
     "./src/main/resources/**/*.ts",
+    "./src/webcrawler/task/**/*.ts",
   ],
   "exclude": [
     "./node_modules/@types/node/console.d.ts",
@@ -85,7 +86,7 @@
       "@enonic/nashorn-polyfills": ["./src/main/resources/lib/nashorn/index.ts"],
       "/lib/licensing": ["./src/main/resources/lib/licensing.ts"],
       // "/constants": ["./src/main/resources/constants"], // Doesn't work
-      // "/lib/enonic/asset": ["./node_modules/@enonic-types/lib-asset"],
+      "/lib/enonic/asset": ["./node_modules/@enonic-types/lib-asset"],
       "/lib/enonic/static": ["./node_modules/@enonic-types/lib-static"],
       "/lib/xp/*": ["./node_modules/@enonic-types/lib-*"],
 
