@@ -1,7 +1,10 @@
 {
 	"include": [
+    "./src/explorer/**/*.tsx",
+    // "./src/explorer/index.d.ts",
 		"./src/main/resources/assets/**/*.tsx",
 		"./src/main/resources/assets/**/*.ts",
+    "./src/webcrawler/form/**/*.ts",
 	],
   "exclude": [
     "./**/*.d.ts",
