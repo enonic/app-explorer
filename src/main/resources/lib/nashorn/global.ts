@@ -5,11 +5,6 @@ type MyGlobal = {
 	globalThis: typeof globalThis
 	self: typeof globalThis
 	window: typeof globalThis
-	//crypto :typeof globalThis['crypto']
-	//crypto :Window['crypto']
-	crypto: {
-		getRandomValues: Crypto['getRandomValues']
-	}
 }
 /* Google uses this:
 type GlobalThis = typeof globalThis & Window & {
@@ -26,30 +21,6 @@ global.global = global;
 (global as unknown as MyGlobal).frames = global;
 (global as unknown as MyGlobal).self = global;
 (global as unknown as MyGlobal).window = global;
-
-//const window = global;
-// Avoid Error: Secure random number generation is not supported by this browser. Use Chrome, Firefox or Internet Explorer 11
-// Which comes from the randombytes node module, which is used runtime by serialize-javascript
-// Offending code
-//var crypto = global.crypto || global.msCrypto;
-//if (crypto && crypto.getRandomValues)
-//module.exports = randomBytes;
-//} else {
-//module.exports = oldBrowser;
-//}
-// The crypto node module v0.0.1 and v0.0.3 has no reference to getRandomValues??? (1.0.0 and 1.0.1 are empty)
-// crypto-js does not define getRandomValues it tries to use it
-// crypto-browserify does not mention getRandomValues
-// get-random-values-polypony uses crypto node module?
-
-// Actually works, but:
-// WARNING Prefer a proper cryptographic entropy source over this module. If you are out of luck you can use this in a pinch
-(global as unknown as MyGlobal).crypto = {
-	getRandomValues: require('polyfill-crypto.getrandomvalues') as Crypto['getRandomValues'] // eslint-disable-line @typescript-eslint/no-var-requires
-};
-
-// get-random-values uses crypto node module randomBytes()
-//global.crypto = { getRandomValues: require('get-random-values') };
 
 // Attempt at avoiding ReferenceError: "console" is not defined
 /*global.console = {

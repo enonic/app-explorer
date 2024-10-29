@@ -13,13 +13,13 @@ import { useWebCrawlerState } from './useWebCrawlerState';
 
 // Although this exists in ../task/constants.ts.
 // It's redefined here to avoid complicating the build process, nor sharing code bewteen server and client.
-export const DEFAULT_UA = 'Mozilla/5.0 (compatible; EnonicXpExplorerCollectorWebcrawlerBot/2.0.0; +http://www.enonic.com)';
+const DEFAULT_UA = 'Mozilla/5.0 (compatible; EnonicXpExplorerCollectorWebcrawlerBot/2.0.0; +http://www.enonic.com)';
 
-export const CollectorForm = React.forwardRef(
+const CollectorForm = React.forwardRef(
 	(
 		{
 			collectorConfig,
-			//explorer,
+			// explorer,
 			setCollectorConfig,
 			setCollectorConfigErrorCount
 		}: CollectorProps<CollectorConfig>,
@@ -88,5 +88,6 @@ export const CollectorForm = React.forwardRef(
 ); // forwardRef
 CollectorForm.displayName = 'Collector';
 
-// Make sure WebCrawler exists on the window object
-window['WebCrawler'].CollectorForm = CollectorForm;
+export default { // Vite is setup to expose the default export on window.WebCrawler
+	CollectorForm
+}

@@ -1,32 +1,30 @@
-//import {toStr} from '@enonic/js-utils';
+// import {toStr} from '@enonic/js-utils';
 
 import {
 	GraphQLBoolean,
 	GraphQLString,
 	nonNull
-	//@ts-ignore
+	// @ts-expect-error no types
 } from '/lib/graphql';
-//@ts-ignore
-import {validateLicense} from '/lib/license';
+import {isLicenseValid, getIssuedTo} from '/lib/licensing';
 
 
 export function generateGetLicenseField({
 	glue
 }) {
 	return {
-		resolve: (/*env*/) => {
-			//log.info(`env:${toStr(env)}`);
-			const licenseDetails = validateLicense({appKey: app.name});
-			const licenseValid = !!(licenseDetails && !licenseDetails.expired);
-			const licensedTo = licenseDetails ? `Licensed to ${licenseDetails.issuedTo}` : 'Unlicensed';
+		resolve: (
+			// env
+		) => {
+			// log.debug('env:%s', toStr(env));
 			return {
-				licensedTo,
-				licenseValid
+				licensedTo: getIssuedTo(),
+				licenseValid: isLicenseValid()
 			};
 		},
 		type: glue.addObjectType({
 			name: 'License',
-			//description:
+			// description:
 			fields: {
 				licensedTo: { type: nonNull(GraphQLString) },
 				licenseValid: { type: nonNull(GraphQLBoolean) }

@@ -15,6 +15,20 @@ import fetchUser from '../fetchers/fetchUser';
 import {useUpdateEffect} from '../utils/useUpdateEffect';
 
 
+const GQL_GET_LICENSE = gql.query({
+	operation: 'getLicense',
+	fields: [
+		'licensedTo',
+		'licenseValid',
+	]
+});
+
+interface GetLicenseResponseData {
+	getLicense: {
+		licensedTo: string // 'Unlicensed' | 'Licensed to Enonic AS'
+		licenseValid: boolean
+	}
+}
 
 const GQL_BODY_QUERY_INTERFACES_DEFAULT = JSON.stringify(gql.query({
 	operation: 'queryInterfaces',
@@ -55,14 +69,12 @@ const GQL_QUERY_INTERFACES = gql.query({
 
 
 function useExplorerState({
-	initialLicensedTo,
-	initialLicenseValid,
 	servicesBaseUrl
 } :{
-	initialLicensedTo :string
-	initialLicenseValid :boolean
-	servicesBaseUrl :string
+	servicesBaseUrl: string
 }) {
+	const [fetchLicense, { data: licenseData }] = useManualQuery<GetLicenseResponseData>(GQL_GET_LICENSE.query);
+
 	const [fetchInterfaces,{
 		// loading,
 		// error,
@@ -81,8 +93,8 @@ function useExplorerState({
 	//console.debug('Explorer initialLicenseValid', initialLicenseValid);
 	//const [wsColor, setWsColor] = React.useState('#888888');
 	//const [wsStatus, setWsStatus] = React.useState('');
-	const [licenseValid, setLicenseValid] = React.useState(initialLicenseValid);
-	const [licensedTo, setLicensedTo] = React.useState(initialLicensedTo);
+	const [licenseValid, setLicenseValid] = React.useState(false);
+	const [licensedTo, setLicensedTo] = React.useState('Unlicensed');
 	const [defaultInterfaceFields, setDefaultInterfaceFields] = React.useState<Array<InterfaceField>>([]);
 	//const [pusherStyle, setPusherStyle] = React.useState(PUSHER_STYLE_SIDEBAR_SHOW);
 	const [sideBarVisible, setSideBarVisible] = React.useState(false);
@@ -132,6 +144,7 @@ function useExplorerState({
 	// Init
 	//──────────────────────────────────────────────────────────────────────────
 	useWhenInitAsync(() => {
+		fetchLicense();
 		fetchInterfaces();
 		setLoadingModalState(prev => {
 			const deref = {...prev};
@@ -279,6 +292,13 @@ function useExplorerState({
 		// console.debug('newInterfaceOptions', newInterfaceOptions);
 		setInterfaceOptions(newInterfaceOptions)
 	}, [data]);
+
+	useUpdateEffect(() => {
+		if (licenseData) {
+			setLicensedTo(licenseData.getLicense.licensedTo);
+			setLicenseValid(licenseData.getLicense.licenseValid);
+		}
+	}, [licenseData]);
 
 	//──────────────────────────────────────────────────────────────────────────
 	// Returns

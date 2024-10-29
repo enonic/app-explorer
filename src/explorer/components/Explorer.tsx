@@ -1,6 +1,3 @@
-import type {ExplorerProps} from '/index.d';
-
-
 import {
 	Route,
 	Routes,
@@ -53,11 +50,11 @@ import useExplorerState from './useExplorerState';
 
 function Explorer({
 	basename,
-	collectorComponents,
-	licensedTo: initialLicensedTo,
-	licenseValid: initialLicenseValid,
 	servicesBaseUrl,
-}: ExplorerProps) {
+}: {
+	basename: string
+	servicesBaseUrl: string
+}) {
 	// console.debug('basename', basename);
 	const {
 		defaultInterfaceFields,
@@ -72,8 +69,6 @@ function Explorer({
 		sideBarVisible, setSideBarVisible,
 		userState, // setUserState,
 	} = useExplorerState({
-		initialLicensedTo,
-		initialLicenseValid,
 		servicesBaseUrl
 	});
 	return <>
@@ -114,14 +109,12 @@ function Explorer({
 						/>
 					</>}/>
 					<Route path="/collections" element={<Collections
-						collectorComponents={collectorComponents}
 						licenseValid={licenseValid}
 						servicesBaseUrl={servicesBaseUrl}
 						setLicensedTo={setLicensedTo}
 						setLicenseValid={setLicenseValid}
 					/>}/>
 					<Route path="/collections/create" element={<Collections
-						collectorComponents={collectorComponents}
 						licenseValid={licenseValid}
 						newCollectionModalOpen={true}
 						servicesBaseUrl={servicesBaseUrl}

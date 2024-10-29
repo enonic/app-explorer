@@ -1,7 +1,10 @@
 import type {Controller} from '../../../../../../xp-comlock-9742/modules/lib/core/index';
 
 import endsWith from '@enonic/js-utils/string/endsWith';
-import {requestHandler} from '/lib/enonic/static';
+import {
+	RESPONSE_CACHE_CONTROL,
+	requestHandler
+} from '/lib/enonic/static';
 // @ts-expect-error no types
 import Router from '/lib/router';
 import {jsonParseResource} from '../../lib/app/explorer/jsonParseResource';
@@ -46,7 +49,7 @@ router.all('{path:.*}', (request) => requestHandler(request, {
 	},
 	index: false,
 	notFound: ({
-		cacheControl,
+		// cacheControl,
 		contentType,
 		etag,
 		index,
@@ -58,7 +61,7 @@ router.all('{path:.*}', (request) => requestHandler(request, {
 		return requestHandler(
 			request,
 			{
-				cacheControl,
+				cacheControl: () => RESPONSE_CACHE_CONTROL.SAFE,
 				contentType,
 				etag,
 				index,
