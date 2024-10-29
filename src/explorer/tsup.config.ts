@@ -1,6 +1,7 @@
 import copyWithHashPlugin from '@enonic/esbuild-plugin-copy-with-hash';
 import GlobalsPlugin from 'esbuild-plugin-globals';
 import manifestPlugin from 'esbuild-plugin-manifest';
+import { sassPlugin } from 'esbuild-sass-plugin';
 import { resolve } from 'path';
 import { defineConfig } from 'tsup';
 
@@ -23,12 +24,14 @@ export default defineConfig(() => {
 		entry: {
 			Explorer: resolve(__dirname, 'App.tsx'),
 			favicon: resolve(__dirname, 'favicon.ico'),
+			styles: resolve(__dirname, 'style/main.sass'),
 		},
 		esbuildPlugins: [
 			GlobalsPlugin({
 				react: 'React',
 				'react-dom': 'ReactDOM',
 			}),
+			sassPlugin(),
 			manifestPlugin({
 				shortNames: true
 			}),

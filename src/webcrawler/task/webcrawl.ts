@@ -29,7 +29,7 @@ import {toStr} from '@enonic/js-utils/value/toStr';
 
 // Cheerio import causes:
 // TypeError: Cannot read property "TYPED_ARRAY_SUPPORT" from undefined
-// And requires global to be provided by webpack.
+// And requires global to be provided.
 import cheerio from 'cheerio'; // uses Array.from
 // cheerio: str.trimEnd is not a function
 // import cheerio from '/lib/cheerio';
