@@ -1,6 +1,7 @@
 {
 	"include": [
     "./src/explorer/**/*.tsx",
+    "./src/explorer/**/*.ts",
     // "./src/explorer/index.d.ts",
 		"./src/main/resources/assets/**/*.tsx",
 		"./src/main/resources/assets/**/*.ts",
@@ -11,6 +12,7 @@
   ],
 	"compilerOptions": {
     "composite": true,
+    "esModuleInterop": true,
     // "incremental": false, // Avoid *.tsbuildinfo files // Composite projects may not disable incremental compilation
 		"jsx": "react-jsx",
 		"lib": [

@@ -1,24 +1,13 @@
 import type {TaskInfo} from '/lib/xp/task';
-import type {ExplorerProps} from '../../../../../explorer/index.d';
-
 
 import {
 	// Principal,
 	Repo
 } from '@enonic/explorer-utils';
 // import {toStr} from '@enonic/js-utils';
-import serialize from 'serialize-javascript';
 import {assetUrl} from '/lib/enonic/asset';
-// @ts-ignore
-import {isLicenseValid, getIssuedTo} from '/lib/licensing';
 import {getToolUrl} from '/lib/xp/admin';
-import {
-	// assetUrl,
-	serviceUrl,
-} from '/lib/xp/portal';
 import {getLauncherPath} from '/lib/xp/admin';
-// import {connect} from '/lib/explorer/repo/connect';
-// import {query as queryCollectors} from '/lib/explorer/collector/query';
 import {runAsSu} from '/lib/explorer/runAsSu';
 import {get as getRepo} from '/lib/xp/repo';
 import {list as listTasks} from '/lib/xp/task';
@@ -35,7 +24,6 @@ const MANIFESTS = {
 	[FILEPATH_MANIFEST]: jsonParseResource(FILEPATH_MANIFEST),
 	[FILEPATH_MANIFEST_NODE_MODULES]: jsonParseResource(FILEPATH_MANIFEST_NODE_MODULES),
 }
-// log.debug('MANIFESTS:%s', JSON.stringify(MANIFESTS, null, 4));
 
 // @ts-ignore
 // const {currentTimeMillis} = Java.type('java.lang.System') as {
@@ -153,134 +141,18 @@ export function htmlResponse({
 		}
 	}
 
-	const propsObj: Partial<ExplorerProps> = {
-		basename: getToolUrl(app.name, 'explorer'), // Fix #873 getToolUrl must be run on each request, because of vhost
-		licensedTo: getIssuedTo(),
-		licenseValid: isLicenseValid(),
-		servicesBaseUrl: serviceUrl({service: ''}),
-		// wsBaseUrl: serviceUrl({service: '', type: 'absolute'}).replace('http', 'ws')
-	};
-	//const propsJson = JSON.stringify(propsObj);
-	//log.info(`propsJson:${propsJson}`);
+	// <script type="text/javascript" src="${assetUrl({path: 'frappe-gantt/frappe-gantt.min.js'})}"></script>
+	// <link rel="stylesheet" type="text/css" href="${assetUrl({path: 'frappe-gantt/frappe-gantt.css'})}">
 
-	// const collectorsAppToUri = {};
-	// const collectorsObj = {};
-	// queryCollectors({
-	// 	connection: connect({principals: [Principal.EXPLORER_READ]})
-	// }).hits.forEach(({
-	// 	//_name: collectorId,
-	// 	appName,
-	// 	taskName,
-	// 	componentPath,
-	// 	configAssetPath
-	// }) => {
-	// 	const collectorId = `${appName}:${taskName}`;
-	// 	collectorsAppToUri[collectorId] = assetUrl({
-	// 		application: appName,
-	// 		path: configAssetPath
-	// 	});
-	// 	collectorsObj[collectorId] = {
-	// 		componentPath,
-	// 		url: assetUrl({
-	// 			application: appName,
-	// 			path: configAssetPath
-	// 		})
-	// 	};
-	// });
-	//log.info(toStr({collectorsAppToUri}));
-
-	/*
-<script type="text/javascript" src="${assetUrl({path: 'react/react.production.min.js'})}"></script>
-<script type="text/javascript" src="${assetUrl({path: 'react-dom/react-dom.production.min.js'})}"></script>
-<script type="text/javascript" src="${assetUrl({path: 'frappe-gantt/frappe-gantt.min.js'})}"></script>
-<link rel="stylesheet" type="text/css" href="${assetUrl({path: 'style.css'})}">
-<link rel="stylesheet" type="text/css" href="${assetUrl({path: 'frappe-gantt/frappe-gantt.css'})}">
-
-// Not needed for the XP Menu
-<link rel="stylesheet" type="text/css" href="${assetUrl({path: '/admin/common/styles/lib.css'})}">
-<script type="text/javascript" src="${assetUrl({path: '/admin/common/js/lib.js'})}"></script>
-
-// Destroys icons in semantic-ui
-<script type="text/javascript">
-var CONFIG = {
-adminUrl: '${getBaseUri()}',
-appId: '${app.name}',
-launcherUrl: '${getLauncherUrl()}',
-services: {}, // Workaround for i18nUrl BUG
-};
-</script>
-<script type="text/javascript" src="${getLauncherPath()}" async></script>
-
-<script type="text/javascript" src="${assetUrl({path: 'js/tablesort.js'})}"></script>
-<script type="text/javascript">
-	/*$(document).ready(function() {
-		$('select.dropdown').dropdown();
-		$('table').tablesort();
-
-		const headerHeight = parseInt($('header').css('height'));
-		$('#mySidebar').css('padding-top', headerHeight);
-		//$('#myPusher').css('margin-top', headerHeight);
-		$('#myPusher').css('padding', 14);
-		$('#myPusher').css('padding-top', 14 + headerHeight);
-
-		if ($('#mySidebar').sidebar('is mobile')) {
-			$('#mySidebar').sidebar({
-				closable: true,
-				dimPage: true,
-				mobileTransition: 'overlay',
-				onHide: () => $('#myIcon').removeClass('close').addClass('sidebar'),
-				onVisible: () => $('#myIcon').removeClass('sidebar').addClass('close')
-			});
-			$('#myPusher').css('width', 'auto');
-			$('#mySidebar').sidebar('hide');
-		} else {
-			$('#mySidebar').sidebar({
-				closable: false,
-				dimPage: false,
-				onHide: () => $('#myIcon').removeClass('close').addClass('sidebar'),
-				onVisible: () => $('#myIcon').removeClass('sidebar').addClass('close'),
-				transition: 'push'
-			});
-		}
-
-		jQuery(window).resize(function() {
-			if (Math.max(document.documentElement.clientWidth, window.innerWidth || 0) < 768) {
-				$('#mySidebar').sidebar('hide');
-			} else {
-				$('#mySidebar').sidebar('show');
-			}
-		});
-	});
-</script>
-<script src="https://cdn.jsdelivr.net/gh/cferdinandi/smooth-scroll/dist/smooth-scroll.polyfills.min.js"></script>
-
-<script type="text/javascript">
-	var scroll = new SmoothScroll('a[href*="#"]');
-</script>
-<script type="text/javascript" src="${assetUrl({path: 'jquery/jquery.js'})}"></script>
-<script type="text/javascript">
-	jQuery = $; // Needed by semantic-ui
-</script>
-<script type="text/javascript" src="${assetUrl({path: 'semantic-ui/semantic.js'})}"></script>
-<!--script type="text/javascript" src="${assetUrl({path: 'semantic-ui-react/umd/semantic-ui-react.min.js'})}"></script-->
-<!--script type="text/javascript" src="${assetUrl({path: 'semantic-ui-react/commonjs/index.js'})}"></script-->
-<!--script type="text/javascript" src="${assetUrl({path: 'semantic-ui-react/commonjs/umd.js'})}"></script-->
-//import * from '${assetUrl({path: 'semantic-ui-react/umd/semantic-ui-react.min.js'})}';
-//import {Header} from '${assetUrl({path: 'semantic-ui-react/commonjs/index.js'})}';
-//import {Header, Icon, List, Menu, Modal, Popup, Sidebar} from '${assetUrl({path: 'semantic-ui-react/commonjs/umd.js'})}';
-//import {Header, Icon, List, Menu, Modal, Popup, Sidebar} from '${assetUrl({path: 'semantic-ui-react/es/index.js'})}';
-//const semantic = {Header, Icon, List, Menu, Modal, Popup, Sidebar};
-*/
-
-
+	const REACT_MODE_POSTFIX = 'development.js'; // 'production.min.js';
 
 	return {
 		body: `<html>
 	<head>
 		<meta name="robots" content="noindex,nofollow">
 		<link rel="shortcut icon" href="${getImmuteableUrl({manifestPath: FILEPATH_MANIFEST, path: 'favicon.ico'})}">
-		<script type="text/javascript" src="${getImmuteableUrl({path: 'react/umd/react.development.js'})}"></script>
-		<script type="text/javascript" src="${getImmuteableUrl({path: 'react-dom/umd/react-dom.development.js'})}"></script>
+		<script type="text/javascript" src="${getImmuteableUrl({path: `react/umd/react.${REACT_MODE_POSTFIX}`})}"></script>
+		<script type="text/javascript" src="${getImmuteableUrl({path: `react-dom/umd/react-dom.${REACT_MODE_POSTFIX}`})}"></script>
 		<link rel="stylesheet" type="text/css" href="${getImmuteableUrl({path: 'graphiql/graphiql.min.css'})}">
 		<link rel="stylesheet" type="text/css" href="${getImmuteableUrl({path: 'nice-react-gantt/lib/css/style.css'})}">
 		<link rel="stylesheet" type="text/css" href="${getImmuteableUrl({path: 'semantic-ui-css/semantic.css'})}">
@@ -321,45 +193,22 @@ services: {}, // Workaround for i18nUrl BUG
 	<body style="background-color: white !important;">
 		<div id="${ID_REACT_EXPLORER_CONTAINER}"/>
 		${
-			//<script type="text/javascript" src="${assetUrl({path: 'explorer.js'})}"></script>
-			''
-		}
-		${
 			//<script type="text/javascript" src="${getImmuteableUrl({manifestPath: FILEPATH_MANIFEST, path: 'Explorer.mjs'})}"></script>
 			''
 		}
 		<script type="text/javascript" src="${getLauncherPath()}" data-config-theme="dark" async></script>
-		${
-			// Object.keys(collectorsAppToUri)
-			// 	.map((a) => `<script type="text/javascript" src="${collectorsAppToUri[a]}"></script>`)
-			// 	.join('\n')
-			''
-		}
 		<script type='module' defer>
 			import {App} from '${getImmuteableUrl({manifestPath: FILEPATH_MANIFEST, path: 'Explorer.mjs'})}';
-			const propsObj = eval(${serialize(propsObj)});
-			//console.debug('propsObj', propsObj);
-			const collectorComponents = {};
-			${
-				// Object
-				// 	.keys(collectorsObj)
-				// 	.map((collectorId) => `collectorComponents['${collectorId}'] = ${collectorsObj[collectorId].componentPath}`)
-				''
-			}
-			// propsObj.collectorComponents = collectorComponents;
 			const root = ReactDOM.createRoot(document.getElementById('${ID_REACT_EXPLORER_CONTAINER}'));
-			// root.render(React.createElement(window.Explorer.App, propsObj));
-			root.render(React.createElement(App, propsObj));
+			// root.render(React.createElement(window.Explorer.App));
+			root.render(React.createElement(App));
 		</script>
 	</body>
 </html>`,
 		contentType: 'text/html; charset=utf-8',
+		headers: {
+			'explorer-tool-url': getToolUrl(app.name, 'explorer') // Fix #873 getToolUrl must be run on each request, because of vhost
+		},
 		status
 	};
 }
-//const propsObj = JSON.parse('${propsJson}');
-
-/*
-$('.ui.checkbox').checkbox();
-<script type="text/javascript" src="${assetUrl({path: 'scripts.js'})}"></script>
-*/

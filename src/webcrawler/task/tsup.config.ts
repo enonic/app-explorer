@@ -2,7 +2,7 @@ import { polyfillNode } from 'esbuild-plugin-polyfill-node';
 import { resolve } from 'path';
 import { defineConfig } from 'tsup';
 
-const outDir = resolve(__dirname,'../../../build/resources/main/tasks/webcrawler');
+const outDir = resolve(__dirname,'../../../build/resources/main/tasks/webcrawl');
 
 export default defineConfig(() => {
 	return {
@@ -99,6 +99,7 @@ export default defineConfig(() => {
 		shims: false,
 		splitting: true,
 		sourcemap: false,
+		target: 'es5', // Important or shorthand properties wont be converted!
 		// tsconfig: '../../../tsconfig.tsup.json'
 	};
 });

@@ -323,11 +323,7 @@ const UPDATE_GQL = `{
 }`;
 
 
-export function useCollectionsState({
-	// collectorComponents
-}: {
-	// collectorComponents: CollectorComponents
-}) {
+export function useCollectionsState() {
 	const [isLoading, setIsLoading] = React.useState(false);
 	const [isBlurred, internalSetBlurred] = React.useState(false);
 
@@ -758,7 +754,6 @@ export function useCollectionsState({
 				await importWithMap(`dynamic${configAssetPath}`, importMap);//.then((/*{CollectorForm}*/) => {
 				const p = componentPath.split('.').slice(1).join('.');
 				const component = getIn(window, p);
-				// const component = eval(componentPath);
 				if (component) {
 					setCollectorComponents(prev => ({
 						...prev,
@@ -784,7 +779,7 @@ export function useCollectionsState({
 			newCollectors[collectorName] = displayName;
 			importMap.imports[`dynamic${configAssetPath}`] = `./_/service/com.enonic.app.explorer/collectorAssets/${appName}/${configAssetPath}`;
 		} // for
-		console.log('importMap', importMap);
+		// console.debug('importMap', importMap);
 		setCollectorIdToDisplayName(newCollectors);
 		importCollectorComponents({
 			collectors: hits,

@@ -114,10 +114,6 @@ export const NODE_MODULES :{
 	header: 'Semantic UI React', // app-explorer
 	href: 'https://github.com/jhudson8/react-semantic-ui/blob/master/LICENSE'
 },{
-	header: 'Serialize JavaScript', // app-explorer
-	href: 'https://github.com/yahoo/serialize-javascript/blob/main/LICENSE',
-	description: LICENSE_BSD_3_CLAUSE
-},{
 	header: 'traverse',
 	//description: 'MIT/X11',
 	href: 'https://github.com/substack/js-traverse/blob/master/LICENSE'

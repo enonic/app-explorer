@@ -1,36 +1,36 @@
 import {
 	validateLicense,
 	installLicense as install
-	//@ts-ignore
+	// @ts-expect-error no types
 } from '/lib/license';
 
 
 type InstallLicenseParams = {
-	appKey :string
-	license :string
-	publicKey ?:string
+	appKey: string
+	license: string
+	publicKey?: string
 }
 
 type LicenseDetailsObject = {
-	expired :boolean
-	issuedTo :string
+	expired: boolean
+	issuedTo: string
 }
 
 type ValidateLicenseParams = {
-	appKey ?:string
-	license ?:string
+	appKey?: string
+	license?: string
 }
 
 
-const typedValidateLicense = (params :ValidateLicenseParams) :LicenseDetailsObject => validateLicense(params);
-const typedInstallLicense = (params :InstallLicenseParams) :boolean => install(params);
+const typedValidateLicense = (params: ValidateLicenseParams): LicenseDetailsObject => validateLicense(params);
+const typedInstallLicense = (params: InstallLicenseParams): boolean => install(params);
 
 
 const subscriptionKey = 'enonic.platform.subscription';
 
 
-const getLicenseDetails = (license ?:string) => {
-	const params :ValidateLicenseParams = {
+const getLicenseDetails = (license?: string) => {
+	const params: ValidateLicenseParams = {
 		appKey: subscriptionKey,
 	};
 	if (license) {
@@ -41,7 +41,7 @@ const getLicenseDetails = (license ?:string) => {
 }
 
 
-export const isLicenseValid = (license ?:string) => {
+export const isLicenseValid = (license?: string) => {
 	const licenseDetails = getLicenseDetails(license);
 
 	return licenseDetails && !licenseDetails.expired;
@@ -57,7 +57,7 @@ export const getIssuedTo = () => {
 }
 
 
-export const installLicense = (license :string) => {
+export const installLicense = (license: string) => {
 	if (!isLicenseValid(license)) {
 		return false;
 	}

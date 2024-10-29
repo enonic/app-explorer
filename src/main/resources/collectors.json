@@ -1,6 +1,6 @@
 [{
 	"displayName": "Web crawler",
-	"formAssetPath": "react/WebCrawler.esm.js",
+	"formAssetPath": "react/WebCrawler.umd.js",
 	"formLibraryName": "WebCrawler",
 	"taskName": "webcrawl"
 }]

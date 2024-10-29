@@ -1,6 +1,5 @@
 import type {CollectionFormValues} from '@enonic-types/lib-explorer';
 import type {
-	CollectorComponents,
 	SetLicensedToFunction,
 	SetLicenseValidFunction
 } from '../index.d';
@@ -56,7 +55,6 @@ import {useCollectionsState} from './useCollectionsState';
 
 
 export function Collections(props: {
-	// collectorComponents: CollectorComponents
 	licenseValid: boolean
 	newCollectionModalOpen?: boolean
 	servicesBaseUrl: string
@@ -64,7 +62,6 @@ export function Collections(props: {
 	setLicenseValid: SetLicenseValidFunction
 }) {
 	const {
-		// collectorComponents,
 		licenseValid,
 		newCollectionModalOpen = false,
 		servicesBaseUrl,
@@ -114,9 +111,7 @@ export function Collections(props: {
 		showSchedule,
 		siteOptions,
 		sort, setSort
-	} = useCollectionsState({
-		// collectorComponents
-	});
+	} = useCollectionsState();
 
 	return <>
 		<Flex
