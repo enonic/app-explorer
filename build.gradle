@@ -67,7 +67,7 @@ dependencies {
 	include 'com.enonic.lib:lib-http-client:3.2.2'
 	include 'com.enonic.lib:lib-license:3.1.0'
 	include 'com.enonic.lib:lib-router:3.1.0'
-	include 'com.enonic.lib:lib-asset:1.0.0'
+	// include 'com.enonic.lib:lib-asset:1.0.0'
 	include 'com.enonic.lib:lib-static:2.0.0'
 	include 'com.enonic.lib:lib-explorer:4.4.5'
 	include 'com.enonic.lib:lib-util:3.1.1'
@@ -90,9 +90,6 @@ node {
 	version = "${nodeVersion}"
 }
 
-//──────────────────────────────────────────────────────────────────────────────
-// Webpack
-//──────────────────────────────────────────────────────────────────────────────
 sourceSets {
 	main {
 		resources { // Paths relative to src/main/resources
@@ -132,33 +129,6 @@ task cleanCoverage(type:Delete) {
 }
 clean.dependsOn cleanCoverage
 
-task webpack(type:NodeTask) {
-	dependsOn npmInstall
-	environment = [
-		'FORCE_COLOR': 'true',
-		'LOG_LEVEL_FROM_GRADLE': gradle.startParameter.logLevel.toString(),
-		'NODE_ENV': project.hasProperty('dev') || project.hasProperty('development') ? 'development' : 'production'
-	]
-	args = [
-		'--color'
-	]
-	inputs.dir 'src/main/resources'
-	outputs.dir './build/resources/main' // processResources will delete the directory if this is not present
-	script = file('node_modules/webpack-cli/bin/cli.js')
-}
-jar.dependsOn webpack
-javadoc.dependsOn webpack
-
-// task swc(type:NpmTask) {
-// 	dependsOn webpack
-// 	mustRunAfter webpack
-// 	args = [
-// 		'run',
-// 		'swc'
-// 	]
-// 	outputs.dir './build/resources/main' // processResources will delete the directory if this is not present
-// }
-
 tasks.register('npmBuild', NpmTask) {
 	args = [
 		'run',
@@ -176,15 +146,6 @@ tasks.register('npmBuild', NpmTask) {
 jar.dependsOn npmBuild
 javadoc.dependsOn npmBuild
 
-
-task watch(type:NodeTask) {
-	script = file('node_modules/webpack-cli/bin/cli.js')
-	args = [
-		'--color',
-		'--watch'
-	]
-}
-
 processResources {
 	exclude '**/.gitkeep'
 
@@ -195,7 +156,7 @@ processResources {
 	exclude 'tsconfig.json'
 	exclude 'assets/tsconfig.json'
 
-	// Let webpack handle these (rather than gradle)
+	// Let tsup/vite handle these (rather than gradle)
 	exclude '**/*.css'
 	exclude '**/*.es'
 	exclude '**/*.js'
@@ -210,7 +171,6 @@ processResources {
 
 tasks.register('compressAssets', NpmTask) {
 	dependsOn npmBuild
-	dependsOn webpack
 	dependsOn processResources
 	args = ['run', 'compress:assets']
 	environment = [

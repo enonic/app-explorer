@@ -133,10 +133,7 @@
     "@vitejs/plugin-react": "^4.3.3",
     "babel-loader": "^9",
     "buffer": "^6",
-    "case-sensitive-paths-webpack-plugin": "^2",
-    "clean-webpack-plugin": "^4",
     "concurrently": "^8.2.0",
-    "copy-webpack-plugin": "^11",
     "css-loader": "^7",
     "doctoc": "^2",
     "dynamic-importmap": "^0.1.0",
@@ -145,6 +142,7 @@
     "esbuild-plugin-globals": "^0.2.0",
     "esbuild-plugin-manifest": "^1.0.5",
     "esbuild-plugin-polyfill-node": "^0.3.0",
+    "esbuild-sass-plugin": "^3.3.1",
     "eslint": "^9",
     "eslint-config-airbnb-base": "^15",
     "eslint-plugin-import": "^2",
@@ -174,16 +172,13 @@
     "sass": "^1",
     "sass-loader": "^14",
     "string-width": "4.1.0",
-    "terser-webpack-plugin": "^5",
     "ts-jest": "^29",
     "ts-node": "^10",
     "tslib": "^2",
     "tsup": "^8",
     "typescript": "^5",
     "vite": "^5.4.10",
-    "vite-plugin-static-copy": "^2.0.0",
-    "webpack": "^5",
-    "webpack-cli": "^5"
+    "vite-plugin-static-copy": "^2.0.0"
   },
   "license": "Apache-2.0",
   "optionalDependencies": {
@@ -207,6 +202,7 @@
     "build:webcrawlertask": "npx tsup --config src/webcrawler/task/tsup.config.ts",
     "clean": "del-cli build coverage",
     "compress:assets": "precompress build/resources/main/assets",
+    "compress:explorerAssets": "precompress build/resources/main/services/explorerAssets/files",
     "concat:graphql": "n-concat src/main/resources/lib/esbuild/getOwnPropertyDescriptors.js build/esbuild/services/graphQL/graphQL.js | n-pipe build/concat/services/graphQL/graphQL.js",
     "concat:init": "n-concat src/main/resources/lib/esbuild/getOwnPropertyDescriptors.js build/esbuild/tasks/init/init.js | n-pipe build/concat/tasks/init/init.js",
     "concat:migrate": "n-concat src/main/resources/lib/esbuild/getOwnPropertyDescriptors.js build/esbuild/tasks/migrate/migrate.js | n-pipe build/concat/tasks/migrate/migrate.js",
@@ -217,6 +213,7 @@
     "esbuild:all": "npx esbuild --bundle --external:/lib/cache --external:/lib/explorer* --external:/lib/galimatias --external:/lib/graphql* --external:/lib/guillotine* --external:/lib/http-client --external:/lib/license --external:/lib/router --external:/lib/util/* --external:/lib/xp/* --format=cjs --minify --outbase=src/main/resources --outdir=build/esbuild --tsconfig=tsconfig.esbuild.json $(find src/main/resources/ -name '*.ts' -a ! -name '*.d.ts')",
     "eslint": "npx eslint src/main/resources/**/*.ts src/main/resources/**/*.tsx",
     "doctoc": "npx doctoc --github README.md",
+    "postbuild:explorer": "npm run compress:explorerAssets",
     "postbuild:static": "precompress  build/resources/main/static",
     "preconcat:graphql": "npm run esbuild:graphql",
     "preconcat:init": "npm run esbuild:init",
@@ -234,9 +231,7 @@
     "tsc": "npx tsc --pretty",
     "verify:types": "npm run verify:types:assets && npm run verify:types:server",
     "verify:types:assets": "npx tsc --noEmit -p tsconfig.assets.json",
-    "verify:types:server": "npx tsc --noEmit -p tsconfig.xp.nashorn.json",
-    "watch": "node_modules/webpack-cli/bin/cli.js -w --stdin",
-    "webpack": "node_modules/webpack-cli/bin/cli.js"
+    "verify:types:server": "npx tsc --noEmit -p tsconfig.xp.nashorn.json"
   },
   "type": "commonjs"
 }

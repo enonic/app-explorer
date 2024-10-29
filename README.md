@@ -9,9 +9,6 @@
     - [Node](#node)
       - [NVM (Node Version Manager)](#nvm-node-version-manager)
       - [AVN (Automatic Version Switching for Node)](#avn-automatic-version-switching-for-node)
-    - [Webpack](#webpack)
-      - [Webpack dependencies](#webpack-dependencies)
-      - [Webpack development mode](#webpack-development-mode)
     - [Enonic XP development mode](#enonic-xp-development-mode)
     - [Watching (using Gradle or Node)](#watching-using-gradle-or-node)
     - [Browser sync](#browser-sync)
@@ -97,25 +94,6 @@ Then you can simply cd into a project folder an AVN will active the correct vers
 ```sh
 $ cd app-explorer
 avn activated v10.16.0 (avn-nvm v10.16.0)
-```
-
-#### Webpack
-
-##### Webpack dependencies
-
-You will also have to get the source for these into the parent folder of app-explorer:
-
-- https://github.com/enonic/lib-explorer
-- https://github.com/enonic/lib-util
-
-
-##### Webpack development mode
-
-Then you will have to change to development mode in ```.webpack.constants.js```:
-
-```javascript
-const MODE = 'development';
-//const MODE = 'production';
 ```
 
 #### Enonic XP development mode

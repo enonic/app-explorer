@@ -5,7 +5,6 @@ import {
 	Repo
 } from '@enonic/explorer-utils';
 // import {toStr} from '@enonic/js-utils';
-import {assetUrl} from '/lib/enonic/asset';
 import {getToolUrl} from '/lib/xp/admin';
 import {getLauncherPath} from '/lib/xp/admin';
 import {runAsSu} from '/lib/explorer/runAsSu';
@@ -141,8 +140,8 @@ export function htmlResponse({
 		}
 	}
 
-	// <script type="text/javascript" src="${assetUrl({path: 'frappe-gantt/frappe-gantt.min.js'})}"></script>
-	// <link rel="stylesheet" type="text/css" href="${assetUrl({path: 'frappe-gantt/frappe-gantt.css'})}">
+	// <script type="text/javascript" src="${getImmuteableUrl({path: 'frappe-gantt/frappe-gantt.min.js'})}"></script>
+	// <link rel="stylesheet" type="text/css" href="${getImmuteableUrl({path: 'frappe-gantt/frappe-gantt.css'})}">
 
 	const REACT_MODE_POSTFIX = 'development.js'; // 'production.min.js';
 
@@ -157,7 +156,7 @@ export function htmlResponse({
 		<link rel="stylesheet" type="text/css" href="${getImmuteableUrl({path: 'nice-react-gantt/lib/css/style.css'})}">
 		<link rel="stylesheet" type="text/css" href="${getImmuteableUrl({path: 'semantic-ui-css/semantic.css'})}">
 		<link rel="stylesheet" type="text/css" href="${getImmuteableUrl({path: 'react-semantic-ui-datepickers/dist/react-semantic-ui-datepickers.css'})}">
-		<link rel="stylesheet" type="text/css" href="${assetUrl({path: 'style/bundle.css'})}">
+		<link rel="stylesheet" type="text/css" href="${getImmuteableUrl({manifestPath: FILEPATH_MANIFEST, path: 'styles.css'})}">
 		<title>Explorer</title>
 		<style type="text/css">
 			/*
