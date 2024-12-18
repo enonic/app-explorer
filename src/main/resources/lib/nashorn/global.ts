@@ -13,9 +13,10 @@ type GlobalThis = typeof globalThis & Window & {
 };*/
 
 // https://stackoverflow.com/questions/9107240/1-evalthis-vs-evalthis-in-javascript
-//@ts-ignore TS2451: Cannot redeclare block-scoped variable 'global'.
-const global :typeof globalThis = (1, eval)('this'); // eslint-disable-line no-eval
+// @ts-expect-error TS2451: Cannot redeclare block-scoped variable 'global'.
+const global: typeof globalThis = (1, eval)('this'); // eslint-disable-line no-eval
 
+// @ts-expect-error TS2339: Property 'global' does not exist on type 'typeof globalThis'.
 global.global = global;
 (global as unknown as MyGlobal).globalThis = global;
 (global as unknown as MyGlobal).frames = global;

@@ -1,9 +1,9 @@
+import type { Request } from '@enonic-types/core';
 import type {
 	User,
 	hasRole
 } from '@enonic-types/lib-auth';
 import type { get } from '@enonic-types/lib-context';
-import type { Request } from '../../types/Request';
 
 
 import {
@@ -30,6 +30,8 @@ import {
 	AUTH_PREFIX,
 	HTTP_RESPONSE_STATUS_CODES
 } from '../constants';
+
+type MockedRequest = Request;;
 
 
 //──────────────────────────────────────────────────────────────────────────────
@@ -245,7 +247,7 @@ describe('webapp', () => {
 							headers: {
 								authorization: 'invalid'
 							}
-						} as Request, COLLECTION_NAME)).toStrictEqual({
+						} as unknown as MockedRequest, COLLECTION_NAME)).toStrictEqual({
 							status: HTTP_RESPONSE_STATUS_CODES.BAD_REQUEST
 						});
 					});
@@ -262,7 +264,7 @@ describe('webapp', () => {
 							headers: {
 								authorization: AUTH_PREFIX
 							}
-						} as Request, COLLECTION_NAME)).toStrictEqual({
+						} as unknown as MockedRequest, COLLECTION_NAME)).toStrictEqual({
 							status: HTTP_RESPONSE_STATUS_CODES.BAD_REQUEST
 						});
 					});
@@ -279,7 +281,7 @@ describe('webapp', () => {
 							headers: {
 								authorization: `${AUTH_PREFIX} nonExistentApiKey`
 							}
-						} as Request, COLLECTION_NAME)).toStrictEqual({
+						} as unknown as MockedRequest, COLLECTION_NAME)).toStrictEqual({
 							status: HTTP_RESPONSE_STATUS_CODES.FORBIDDEN
 						});
 					});
@@ -296,7 +298,7 @@ describe('webapp', () => {
 							headers: {
 								authorization: `${AUTH_PREFIX} ${API_KEY}`
 							}
-						} as Request, COLLECTION_NAME)).toStrictEqual({
+						} as unknown as MockedRequest, COLLECTION_NAME)).toStrictEqual({
 							status: HTTP_RESPONSE_STATUS_CODES.FORBIDDEN
 						});
 					});
@@ -313,7 +315,7 @@ describe('webapp', () => {
 							headers: {
 								authorization: `${AUTH_PREFIX} ${API_KEY3}`
 							}
-						} as Request, 'another_collection')).toStrictEqual({
+						} as unknown as MockedRequest, 'another_collection')).toStrictEqual({
 							body: {
 								error: "The API key doesn't have access to any collections!"
 							},
@@ -334,7 +336,7 @@ describe('webapp', () => {
 							headers: {
 								authorization: `${AUTH_PREFIX} ${API_KEY4}`
 							}
-						} as Request, 'another_collection')).toStrictEqual({
+						} as unknown as MockedRequest, 'another_collection')).toStrictEqual({
 							body: {
 								error: "Bad Request"
 							},
@@ -355,7 +357,7 @@ describe('webapp', () => {
 							headers: {
 								authorization: `${AUTH_PREFIX} ${API_KEY4}`
 							}
-						} as Request, COLLECTION_NAME)).toStrictEqual({
+						} as unknown as MockedRequest, COLLECTION_NAME)).toStrictEqual({
 							status: HTTP_RESPONSE_STATUS_CODES.OK
 						});
 					});
@@ -372,7 +374,7 @@ describe('webapp', () => {
 							headers: {
 								authorization: `${AUTH_PREFIX} ${API_KEY4}`
 							}
-						} as Request, undefined)).toStrictEqual({
+						} as unknown as MockedRequest, undefined)).toStrictEqual({
 							status: HTTP_RESPONSE_STATUS_CODES.OK
 						});
 					});
