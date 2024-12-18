@@ -1,11 +1,7 @@
-import type { Request } from '../types/Request';
+import type { Request } from '@enonic-types/core';
 
 
 // import {toStr} from '@enonic/js-utils/value/toStr';
-import {
-	getResource,
-	readText
-} from '/lib/xp/io';
 import {
 	FILEPATH_MANIFEST,
 	FILEPATH_MANIFEST_NODE_MODULES,

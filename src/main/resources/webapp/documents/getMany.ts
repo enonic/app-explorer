@@ -1,6 +1,5 @@
-// import type { EnonicXpRequest } from '@enonic-types/lib-explorer';
+import type { Request } from '@enonic-types/core';
 import type { DocumentNode } from '@enonic-types/lib-explorer/Document';
-import type { Request } from '../../types/Request';
 
 
 import {
@@ -18,11 +17,15 @@ import documentNodeToBodyItem from './documentNodeToBodyItem';
 
 
 export type GetManyRequest = Request<{
-	collection?: string
-	id: string|string[]
-},{
-	collectionName?: string
-}>
+	params: {
+		collection?: string
+		id: string|string[]
+	},
+}> & {
+	pathParams: {
+		collectionName?: string
+	}
+}
 
 
 export default function getMany(request: GetManyRequest) {

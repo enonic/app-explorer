@@ -1,16 +1,10 @@
 import type { OneOrMore } from '@enonic-types/lib-explorer';
 import type {
-	// Group,
-	Principal,
-	// Role,
 	User,
 	UserKey,
 } from '/lib/xp/auth';
-import type {
-	Glue,
-	ObjectType,
-	UnionType,
-} from '../Glue';
+import type { Glue } from '../Glue';
+import type { ExtendedPrincipal } from '../types/ExtendedPrincipal';
 
 
 import {
@@ -21,7 +15,6 @@ import {
 } from '/lib/graphql';
 import {getUser} from '/lib/xp/auth';
 import {
-	// GQL_QUERY_MEMBERSHIPS_GET_NAME,
 	GQL_QUERY_USER_GET_NAME,
 	GQL_TYPE_USER_NAME,
 } from '../constants';
@@ -29,8 +22,7 @@ import addGetMemberships from './addGetMemberships'
 
 
 type ExtendedUser = User & {
-	// memberships: (ObjectType<Principal>|UnionType<Principal>)[]
-	getMemberships: OneOrMore<ObjectType<Principal>|UnionType<Principal>>
+	getMemberships: OneOrMore<ExtendedPrincipal>
 }
 
 
@@ -71,6 +63,9 @@ function addGetUser({
 							key
 						}
 					}: {
+						args: {
+							transitive?: boolean
+						}
 						source: {
 							key: UserKey
 						}
@@ -92,4 +87,4 @@ function addGetUser({
 }
 
 
-export default addGetUser
+export default addGetUser;

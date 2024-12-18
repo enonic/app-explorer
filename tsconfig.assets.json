@@ -26,14 +26,14 @@
 			// Production (should be commented in when commiting)
 			"@enonic/semantic-ui-react-form": ["./node_modules/@enonic/semantic-ui-react-form/src"],
 			// There is no @enonic-types/lib-explorer yet, so these are workarounds
-			"@enonic-types/lib-explorer": ["./../lib-explorer/src/main/resources/lib/explorer/types/index.d"],
-			"@enonic-types/lib-explorer/*": ["./../lib-explorer/src/main/resources/lib/explorer/types/*"],
+			"@enonic-types/lib-explorer": ["./symlinks/lib-explorer/src/main/resources/lib/explorer/types/index.d"],
+			"@enonic-types/lib-explorer/*": ["./symlinks/lib-explorer/src/main/resources/lib/explorer/types/*"],
 
 			// I don't like this type of import in assets, cause it's to a "jar"
 			"/lib/xp/*": ["./node_modules/@enonic-types/lib-*"],
 
 			// lib-explorer is an external, but we still use types from it
-			"/lib/explorer/*": ["./../lib-explorer/src/main/resources/lib/explorer/*"],
+			"/lib/explorer/*": ["./symlinks/lib-explorer/src/main/resources/lib/explorer/*"],
 
 			"/*": ["../*"],
 		},

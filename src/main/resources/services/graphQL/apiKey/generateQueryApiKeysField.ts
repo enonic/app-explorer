@@ -1,3 +1,4 @@
+import type { Filter } from '@enonic-types/core'
 import type {ApiKeyNode} from '../../../types/ApiKey';
 
 import {
@@ -58,7 +59,7 @@ export function generateQueryApiKeysField({
 				filters: addQueryFilter({
 					clause: 'must',
 					filter: hasValue('_nodeType', [NodeType.API_KEY]),
-					filters: {}
+					filters: {} as Filter
 				}),
 				query: '',
 				sort,

@@ -1,3 +1,4 @@
+import type { Request } from '@enonic-types/core';
 import type {
 	BooleanFilter,
 	Filter,
@@ -6,7 +7,6 @@ import type {
 	SortDsl
 } from '@enonic-types/lib-node';
 import type { DocumentNode } from '@enonic-types/lib-explorer/Document';
-import type { Request } from '../../types/Request';
 
 
 import {
@@ -31,10 +31,14 @@ import documentNodeToBodyItem from './documentNodeToBodyItem';
 
 
 export type QueryRequest = Request<{
-	returnDocument?: 'true'|'false'
-}, {
-	collectionName?: string
-}>
+	params: {
+		returnDocument?: 'true'|'false'
+	}
+}> & {
+	pathParams: {
+		collectionName?: string
+	}
+};
 
 interface QueryHit {
 	id: string

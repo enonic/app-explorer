@@ -11,16 +11,14 @@ import type {
 import type {
 	Glue,
 	// ObjectType,
-	QueriesItem,
 	// Reference,
 	// UnionType,
 } from '../Glue';
+import type { ExtendedPrincipal } from '../types/ExtendedPrincipal';
 
 
-import {
-	arrayIncludes,
-	// toStr,
-} from '@enonic/js-utils';
+import { includes as arrayIncludes } from '@enonic/js-utils/array/includes';
+import { toStr } from '@enonic/js-utils/value/toStr';
 import {
 	GraphQLBoolean,
 	GraphQLString,
@@ -50,12 +48,6 @@ import addPrincipalType from './addPrincipalType';
 // 	modifiedTime: string;
 // 	description?: string;
 // }
-
-type ExtendedPrincipal = Principal & {
-	inherited?: boolean
-	// memberships?: ExtendedPrincipal[]
-	parent?: ExtendedPrincipal
-}
 
 //──────────────────────────────────────────────────────────────────────────────
 // Using DTB I can look at the nodes stored for users, groups, and roles?
@@ -302,10 +294,12 @@ function addGetMemberships<Context extends object = EmptyObject>({
 	// 	typeResolver: glue.getUnionTypeObj<Group|Role>(GQL_UNION_TYPE_GROUP_OR_ROLE).typeResolver
 	// });
 
-	const query = glue.addQuery<{
-			principalKey?: GroupKey|UserKey
+	return glue.addQuery<{
+			principalKey?: GroupKey | UserKey
 			transitive?: boolean
-		}, undefined, Principal
+		}, {
+			key?: GroupKey | UserKey
+		}, ExtendedPrincipal, Context
 	>({
 		args: {
 			principalKey: GraphQLString,
@@ -318,11 +312,12 @@ function addGetMemberships<Context extends object = EmptyObject>({
 				transitive = false
 			},
 		}) {
+			// log.info('%s: principalKey:%s transitive:%s', GQL_QUERY_MEMBERSHIPS_GET_NAME, principalKey, transitive);
 			const { allMembershipsRef: memberships } = getAllGroupsAndRoles({
 				principalKey,
 				transitive
 			});
-			// log.info('memberships:%s', toStr(memberships));
+			// log.info('%s: memberships:%s', GQL_QUERY_MEMBERSHIPS_GET_NAME, toStr(memberships));
 			return memberships;
 		},
 
@@ -338,10 +333,7 @@ function addGetMemberships<Context extends object = EmptyObject>({
 			// glue.getUnionTypeObj<Group|Role>(GQL_UNION_TYPE_GROUP_OR_ROLE).type
 		)
 	});
-	return query as QueriesItem<{
-			principalKey?: GroupKey|UserKey
-	}, Context, undefined, ExtendedPrincipal>;
 }
 
 
-export default addGetMemberships
+export default addGetMemberships;

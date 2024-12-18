@@ -1,4 +1,9 @@
 import type {
+	BooleanFilter,
+	HasValueFilter,
+	IdsFilter,
+} from '@enonic-types/core'
+import type {
 	AnyObject,
 	MultiRepoConnectionQueryNode
 } from '@enonic-types/lib-explorer';
@@ -21,13 +26,13 @@ export function hasField({
 	collections = collectionName ? [collectionName] : [], // NOTE: empty sources no longer allowed!
 	count = -1,
 	field,
-	filters = {}
+	filters
 } :{
-	collectionName :string
-	field ?:string
-	collections ?:Array<string>
-	count ?:number
-	filters ?:AnyObject
+	collectionName: string
+	field?: string
+	collections?: string[]
+	count?: number
+	filters?: BooleanFilter | HasValueFilter | IdsFilter
 }) {
 	const queryParams = {
 		// WARNING Can't aggregate on branch and repoId as they are not actual fields :(

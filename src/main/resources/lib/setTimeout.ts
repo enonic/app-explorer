@@ -47,7 +47,7 @@ export const setTimeout = (fn, millis) => {
 			}
 
 			try {
-				fn.apply(context, args);
+				fn.apply(globalThis, args);
 			} catch (e) {
 				//print(e); // type of DOM print conflicts with Nashorn print, using Enonic XP log.error instead
 				log.error(e.message, e);

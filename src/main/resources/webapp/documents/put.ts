@@ -1,6 +1,6 @@
+import type { Request } from '@enonic-types/core';
 import type { Node } from '@enonic-types/lib-node';
 import type { DocumentNode } from '@enonic-types/lib-explorer/Document';
-import type { Request } from '../../types/Request';
 import type { RequestItem } from './documentNodeToBodyItem';
 
 
@@ -25,16 +25,20 @@ const COLLECTOR_VERSION = app.version;
 
 
 export type PutRequest = Request<{
-	collection?: string
-	documentType?: string
-	documentTypeId?: string
-	id?: string
-	requireValid?: 'true' | 'false'
-	returnDocument?: 'true' | 'false'
-},{
-	collectionName?: string
-	documentId?: string
-}>
+	params: {
+		collection?: string
+		documentType?: string
+		documentTypeId?: string
+		id?: string
+		requireValid?: 'true' | 'false'
+		returnDocument?: 'true' | 'false'
+	}
+}> & {
+	pathParams:{
+		collectionName?: string
+		documentId?: string
+	}
+};
 
 
 export default function put(request: PutRequest, partial = false) {

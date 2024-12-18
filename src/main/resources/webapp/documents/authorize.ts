@@ -1,5 +1,8 @@
-import type { Headers } from '@enonic-types/lib-explorer/Request.d';
-import type { Request } from '../../types/Request';
+import type {
+	DefaultRequestHeaders,
+	Request,
+	Response
+} from '@enonic-types/core';
 
 
 import {
@@ -11,7 +14,7 @@ import { forceArray } from '@enonic/js-utils/array/forceArray';
 import { includes as arrayIncludes } from '@enonic/js-utils/array/includes';
 import lcKeys from '@enonic/js-utils/object/lcKeys';
 import { startsWith } from '@enonic/js-utils/string/startsWith';
-import { toStr } from '@enonic/js-utils/value/toStr';
+// import { toStr } from '@enonic/js-utils/value/toStr';
 import { connect } from '/lib/explorer/repo/connect';
 import { hash } from '/lib/explorer/string/hash';
 import { hasRole } from '/lib/xp/auth';
@@ -22,13 +25,14 @@ import {
 } from '../constants';
 
 
-export default function authorize(request: Request, collectionName: string): {
+export default function authorize(
+	request: Request,
+	collectionName?: string
+): Response<{
 	body?: {
 		error: string
 	}
-	contentType?: string
-	status: number
-} {
+}> {
 	// log.info(`request:${toStr(request)}`);
 
 	if (
@@ -46,7 +50,7 @@ export default function authorize(request: Request, collectionName: string): {
 
 	const { // HTTP/2 uses lowercase header keys
 		'authorization': authorization // 'Explorer-Api-Key XXXX'
-	} = lcKeys(request.headers || {}) as Headers;
+	} = lcKeys(request.headers || {}) as DefaultRequestHeaders;
 
 
 	if(!authorization) {

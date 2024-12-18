@@ -1,4 +1,4 @@
-import type { Request } from '../../types/Request';
+import type { Request } from '@enonic-types/core';
 import type { DocumentNode } from '@enonic-types/lib-explorer/Document';
 
 
@@ -24,12 +24,16 @@ import runWithExplorerWrite from './runWithExplorerWrite';
 
 
 export type RemoveRequest = Request<{
-	collection?: string
-	id: string | string[]
-	returnDocument?: 'true' | 'false'
-}, {
-	collectionName?: string
-}>
+	params: {
+		collection?: string
+		id: string | string[]
+		returnDocument?: 'true' | 'false'
+	}
+}> & {
+	pathParams: {
+		collectionName?: string
+	}
+}
 
 interface DeleteResponseBodyItem {
 	action: 'delete'

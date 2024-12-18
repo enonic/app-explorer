@@ -21,6 +21,7 @@ import {
 
 export type GraphQLFields<T> = {
 	[P in keyof T]: {
+		args?: object // TODO fields can have args Record<string, GraphQLInputType>
 		resolve?: ({
 			args,
 			context,
@@ -29,7 +30,7 @@ export type GraphQLFields<T> = {
 			args?: object
 			context?: object
 			source?: object
-		}) => T
+		}) => T[P]
 		type: T[P]
 	}
 }
@@ -371,7 +372,8 @@ export class Glue<Context extends object = EmptyObject> {
 	addQuery<
 		Args extends object = EmptyObject,
 		Source extends null|object = null,
-		T extends object = object
+		T extends object = object,
+		Context extends object = EmptyObject
 	>({
 		args,
 		name,
@@ -389,7 +391,7 @@ export class Glue<Context extends object = EmptyObject> {
 	}) {
 		//log.debug(`addQuery({name:${name}})`);
 		if(this._queries[name]) {
-			return this._queries[name];
+			return this._queries[name] as QueriesItem<Args, Context, Source, T>;
 			// throw new Error(`Query ${name} already defined!`);
 		}
 		/*if(this._uniqueFieldNames[name]) {
