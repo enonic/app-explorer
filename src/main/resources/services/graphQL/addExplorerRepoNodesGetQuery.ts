@@ -1,4 +1,4 @@
-import type {BooleanFilter} from '@enonic/js-utils/src/types/index.d';
+import type { BooleanFilter } from '@enonic-types/core';
 
 
 import {
@@ -7,9 +7,9 @@ import {
 } from '@enonic/explorer-utils';
 import {
 	addQueryFilter,
-	isNotSet//,
-	//toStr
+	isNotSet,
 } from '@enonic/js-utils';
+import { toStr } from '@enonic/js-utils/value/toStr';
 import {NT_DOCUMENT_TYPE} from '/lib/explorer/documentType/constants';
 import {hasValue} from '/lib/explorer/query/hasValue';
 import {connect} from '/lib/explorer/repo/connect';
@@ -36,12 +36,12 @@ export const addExplorerRepoNodesGetQuery = ({glue}) => {
 			start: GraphQLInt
 		},
 		name: GQL_QUERY_EXPLORER_REPO_NODES_GET_NAME,
-		resolve(env :{
-			args :{
-				count ?:number
-				nodeTypes ?:Array<string>
-				query ?:string
-				start ?:number
+		resolve(env: {
+			args: {
+				count?: number
+				nodeTypes?: string[]
+				query?: string
+				start?: number
 			}
 		}) {
 			//log.debug(`env:${toStr(env)}`);
@@ -65,11 +65,11 @@ export const addExplorerRepoNodesGetQuery = ({glue}) => {
 			if (isNotSet(query)) {query = '';}
 			if (isNotSet(start)) {start = 0;}
 			const readConnection = connect({principals: [Principal.EXPLORER_READ]});
-			const queryParams :{
-				count :number
-				filters ?:BooleanFilter
-				query :string
-				start :number
+			const queryParams: {
+				count: number
+				filters?: BooleanFilter
+				query: string
+				start: number
 			} = {
 				count,
 				query,
@@ -78,9 +78,9 @@ export const addExplorerRepoNodesGetQuery = ({glue}) => {
 			if (nodeTypes) {
 				queryParams.filters = addQueryFilter({
 					filter: hasValue('_nodeType', nodeTypes)
-				});
+				}) as BooleanFilter;
 			}
-			//log.debug(`queryParams:${toStr(queryParams)}`);
+			// log.info(`%s: queryParams:%s`, GQL_QUERY_EXPLORER_REPO_NODES_GET_NAME, toStr(queryParams));
 
 			const queryRes = readConnection.query(queryParams);
 			//log.debug(`queryRes:${toStr(queryRes)}`);

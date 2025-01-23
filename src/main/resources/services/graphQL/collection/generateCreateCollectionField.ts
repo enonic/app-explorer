@@ -13,6 +13,7 @@ import {
 	ROOT_PERMISSIONS_EXPLORER
 } from '@enonic/explorer-utils';
 //import {toStr} from '@enonic/js-utils';
+import {startsWith} from '@enonic/js-utils/string/startsWith';
 import {coerseCollectionType} from '/lib/explorer/collection/coerseCollectionType';
 import {createDocumentType} from '/lib/explorer/documentType/createDocumentType';
 import {exists} from '/lib/explorer/node/exists';
@@ -129,8 +130,8 @@ export function generateCreateCollectionField({
 				//log.debug(`createdDocumentTypeNode:${toStr(createdDocumentTypeNode)}`);
 				documentTypeId = createdDocumentTypeNode._id;
 			}
-			if (documentTypeId && !documentTypeId.startsWith('_')) {
-				nodeToBeCreated.documentTypeId = referenceValue(documentTypeId);
+			if (documentTypeId && !startsWith(documentTypeId.toString(), '_')) {
+				nodeToBeCreated.documentTypeId = referenceValue(documentTypeId.toString());
 			}
 			//log.debug(`nodeToBeCreated:${toStr(nodeToBeCreated)}`);
 

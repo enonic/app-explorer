@@ -1,4 +1,4 @@
-import type {Controller} from '../../../../../../xp-comlock-9742/modules/lib/core/index';
+import type {Controller} from '@enonic-types/core';
 
 import endsWith from '@enonic/js-utils/string/endsWith';
 import {

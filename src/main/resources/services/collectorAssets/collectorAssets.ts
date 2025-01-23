@@ -2,7 +2,7 @@ import type {
 	Controller,
 	Request,
 	ResourceKey
-} from '../../../../../../xp-comlock-9742/modules/lib/core/index';
+} from '@enonic-types/core';
 
 import lcKeys from '@enonic/js-utils/object/lcKeys';
 import {startsWith} from '@enonic/js-utils/string/startsWith';

@@ -1,6 +1,5 @@
-// import type { EnonicXpRequest } from '@enonic-types/lib-explorer';
+import type { Request } from '@enonic-types/core';
 import type { DocumentNode } from '@enonic-types/lib-explorer/Document';
-import type { Request } from '../../types/Request';
 
 
 import {
@@ -8,7 +7,6 @@ import {
 	Principal,
 	Role
 } from '@enonic/explorer-utils';
-import { startsWith } from '@enonic/js-utils/string/startsWith';
 // import { toStr } from '@enonic/js-utils/value/toStr';
 import { connect } from '/lib/explorer/repo/connect';
 import { hasRole } from '/lib/xp/auth';
@@ -18,11 +16,14 @@ import documentNodeToBodyItem from './documentNodeToBodyItem';
 
 
 export type GetOneRequest = Request<{
-	collection?: string
-	id?: string
-},{
-	collectionName?: string
-	documentId?: string
+	params: {
+		collection?: string
+		id?: string
+	},
+	pathParams: {
+		collectionName?: string
+		documentId?: string
+	}
 }>
 
 export default function getOne(request: GetOneRequest) {

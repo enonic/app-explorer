@@ -1,13 +1,5 @@
-import type { Principal } from '/lib/xp/auth';
 import type { Glue } from '../Glue';
-
-
-type ExtendedPrincipal = Principal & {
-	inherited?: boolean
-	// memberships?: ExtendedPrincipal[]
-	parent?: ExtendedPrincipal
-}
-
+import type { ExtendedPrincipal } from '../types/ExtendedPrincipal';
 
 import {
 	GraphQLBoolean,

@@ -1,4 +1,4 @@
-import type { Request } from '../../types/Request';
+import type { Request } from '@enonic-types/core';
 
 
 // import { toStr } from '@enonic/js-utils/value/toStr';
@@ -6,14 +6,18 @@ import put from './put';
 
 
 export type PatchRequest = Request<{
-	collection?: string
-	id?: string
-	requireValid?: 'true' | 'false'
-	returnDocument?: 'true' | 'false'
-},{
-	collectionName?: string
-	documentId?: string
-}>;
+	params: {
+		collection?: string
+		id?: string
+		requireValid?: 'true' | 'false'
+		returnDocument?: 'true' | 'false'
+	}
+}> & {
+	pathParams: {
+		collectionName?: string
+		documentId?: string
+	}
+};
 
 
 export default function patch(request: PatchRequest) {

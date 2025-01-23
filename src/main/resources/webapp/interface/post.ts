@@ -1,13 +1,10 @@
 import type {
-	EnonicXpRequest,
-	Headers
-} from '@enonic-types/lib-explorer/Request.d';
-import type { Response } from '@enonic-types/lib-explorer/Response.d';
+	DefaultRequestHeaders,
+	Request,
+	Response,
+} from '@enonic-types/core';
 import {GraphQLContext} from '/lib/explorer/interface/graphql/output/index.d';
-import type {
-	ApiKeyNode,
-	EmptyObject
-} from '../../types';
+import type { ApiKeyNode } from '../../types';
 
 // These imports works when treeshake: false, but gives error when treeshake: true
 // ReferenceError: "Reflect" is not defined
@@ -38,7 +35,7 @@ import {getCachedSchema} from '/lib/explorer/interface/graphql/getCachedSchema';
 import { HTTP_RESPONSE_STATUS_CODES } from '../constants';
 
 
-export type InterfaceRequest = EnonicXpRequest<EmptyObject>
+export type InterfaceRequest = Request;
 
 
 // const LOG_LEVEL = 'info';
@@ -48,13 +45,13 @@ const AUTHORIZATION_PREFIX = 'Explorer-Api-Key ';
 function authorize({
 	request
 }: {
-	request: EnonicXpRequest
+	request: Request
 }): Response {
 	// log[LOG_LEVEL]('isUnauthorized request:%s', toStr(request));
 	const {
 		 // HTTP/2 uses lowercase header keys
 		'authorization': authorization//, // 'Explorer-Api-Key XXXX
-	} = lcKeys(request.headers) as Headers;
+	} = lcKeys(request.headers) as DefaultRequestHeaders;
 	// log[LOG_LEVEL](`authorization:${toStr(authorization)}`);
 	if(!authorization) {
 		log.error(`Authorization header missing!`);
@@ -135,7 +132,7 @@ export function overrideable(request: InterfaceRequest, fn = authorize): Respons
 		'explorer-log-query-result': logQueryResultHeader, // '1'
 		'explorer-log-synonyms-query': logSynonymsQueryHeader, // '1'
 		'explorer-log-synonyms-query-result': logSynonymsQueryResultHeader // '1'
-	} = lcKeys(request.headers) as Headers;
+	} = lcKeys(request.headers) as DefaultRequestHeaders;
 
 	const maybeResponse = fn({
 		// interfaceName,

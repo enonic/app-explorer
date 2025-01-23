@@ -9,7 +9,6 @@ export {
 	Application
 } from './Application.d';
 export {Log} from './Log.d';
-export {Request} from './Request.d';
 export {
 	AnyObject,
 	EmptyObject

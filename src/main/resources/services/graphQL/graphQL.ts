@@ -10,8 +10,8 @@
      ^               ^                                        Loose│
      └───────────────┴─────────────────────────────────────────────┘
 */
+import type {Request} from '@enonic-types/core';
 import type {EmptyObject} from '@enonic-types/lib-explorer';
-import type {Request} from '../../types/index.d';
 
 // This fails when tsup code splitting: true
 // import {currentTimeMillis} from '/lib/explorer/time/currentTimeMillis';

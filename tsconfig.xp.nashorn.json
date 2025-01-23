@@ -9,6 +9,7 @@
 
     "./src/main/resources/**/*.ts",
     "./src/webcrawler/task/**/*.ts",
+    "./symlinks/lib-explorer/src/main/resources/lib/explorer/**/*.ts",
   ],
   "exclude": [
     "./node_modules/@types/node/console.d.ts",
