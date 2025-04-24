@@ -130,7 +130,7 @@
     "@types/traverse": "^0",
     "@typescript-eslint/eslint-plugin": "^7",
     "@typescript-eslint/parser": "^7",
-    "@vitejs/plugin-react": "^4.3.3",
+    "@vitejs/plugin-react": "^4.4.1",
     "babel-loader": "^9",
     "buffer": "^6",
     "concurrently": "^8.2.0",
@@ -177,8 +177,8 @@
     "tslib": "^2",
     "tsup": "^8",
     "typescript": "^5",
-    "vite": "^5.4.14",
-    "vite-plugin-static-copy": "^2.0.0"
+    "vite": "^6.3.3",
+    "vite-plugin-static-copy": "^2.3.1"
   },
   "license": "Apache-2.0",
   "optionalDependencies": {
