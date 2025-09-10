@@ -178,7 +178,7 @@
     "tsup": "^8",
     "typescript": "^5",
     "vite": "^6.3.6",
-    "vite-plugin-static-copy": "^2.3.1"
+    "vite-plugin-static-copy": "^2.3.2"
   },
   "license": "Apache-2.0",
   "optionalDependencies": {
