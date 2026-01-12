@@ -82,6 +82,8 @@ import addGetMemberships from './auth/addGetMemberships'
 import {addGetProfile} from './profile/addGetProfile';
 import {addModifyProfile} from './profile/addModifyProfile';
 
+import { addListProjects } from './project/addListProjects';
+
 import { addListRepos } from './repo/addListRepos';
 
 import {generateScheduledJobsListField} from './scheduler/generateScheduledJobsListField';
@@ -222,6 +224,8 @@ addGetMemberships({glue});
 addGetUser({glue});
 addGetProfile({glue});
 addModifyProfile({glue});
+
+addListProjects({ glue });
 
 addQueryDocuments({glue});
 

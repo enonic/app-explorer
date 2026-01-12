@@ -102,6 +102,7 @@
     "@enonic-types/lib-mail": "^7",
     "@enonic-types/lib-node": "^7",
     "@enonic-types/lib-portal": "^7",
+    "@enonic-types/lib-project": "^7",
     "@enonic-types/lib-repo": "^7",
     "@enonic-types/lib-scheduler": "^7",
     "@enonic-types/lib-static": "^2.0.0",

@@ -14,6 +14,14 @@ export const SERVICE_NAME = 'graphQL';
 export const FIELD_SHORTCUT_COLLECTION = '_collectionName';
 export const FIELD_SHORTCUT_DOCUMENT_TYPE = '_documentTypeName';
 
+export const GQL_UNIQ_TYPE = {
+	OBJECT_PROJECT: 'Project',
+	OBJECT_PROJECT_PERMISSION: 'ProjectPermission',
+	OBJECT_PROJECT_READ_ACCESS: 'ProjectReadAccess',
+	QUERY_PROJECT_LIST: 'listProjects',
+} as const;
+
+
 export const GQL_ENUM_TASK_STATES = 'EnumTaskStates';
 
 export const GQL_FIELDS_DOCUMENT_TYPE_PROPERTY_NAME = 'DocumentTypePropertyFields';
