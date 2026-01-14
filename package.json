@@ -13,7 +13,7 @@
     "cron-parser": "^4",
     "deep-object-diff": "^1",
     "del-cli": "^5.0.0",
-    "diff": "^5",
+    "diff": "^8",
     "fast-deep-equal": "^3",
     "gql-query-builder-ts": "^3.9.0",
     "graphql-hooks": "^6.1.0",
