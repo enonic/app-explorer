@@ -22,11 +22,11 @@ import {
 	// toStr
 } from '@enonic/js-utils';
 // import prettyMs from 'pretty-ms';
-//@ts-ignore
+// @ts-ignore
 import {newCache} from '/lib/cache';
 import {
 	execute
-	//@ts-ignore
+	// @ts-ignore
 } from '/lib/graphql';
 // @ts-expect-error TS2307: Cannot find module '/lib/router' or its corresponding type declarations.
 import Router from '/lib/router';
@@ -46,10 +46,8 @@ import {addInputTypes} from './addInputTypes';
 import {addGraphQLInterfaceTypes} from './addGraphQLInterfaceTypes';
 import {addObjectTypes} from './addObjectTypes';
 
-import {generateGetContentTypesField} from './generateGetContentTypesField';
 import {generateGetLicenseField} from './generateGetLicenseField';
 import {generateGetLocalesField} from './generateGetLocalesField';
-import {generateGetSitesField} from './generateGetSitesField';
 import {generateQueryJournalsField} from './generateQueryJournalsField';
 import {generateReferencedByField} from './generateReferencedByField';
 
@@ -59,6 +57,9 @@ import {addMutationApiKeyDelete} from './apiKey/addMutationApiKeyDelete';
 import {addMutationApiKeyUpdate} from './apiKey/addMutationApiKeyUpdate';
 import {generateQueryApiKeysField} from './apiKey/generateQueryApiKeysField';
 
+import { addAppObject } from './app/addAppObject';
+import { addGetApp } from './app/addGetApp';
+import { addListApps } from './app/addListApps';
 
 import addMutationCollectionDelete from './collection/addMutationCollectionDelete'
 import {generateCollectionFields} from './collection/generateCollectionFields';
@@ -66,6 +67,9 @@ import {addGetManagedDocumentTypes} from './collector/addGetManagedDocumentTypes
 import {generateQueryCollectorsField} from './collector/generateQueryCollectorsField';
 import {generateFieldsField} from './field/generateFieldsField';
 import {addQueryFieldGet} from './field/addQueryFieldGet';
+
+import { addGetContentTypes } from './content/addGetContentTypes';
+import { addGetSites } from './content/addGetSites';
 
 import {addQueryDocuments} from './document/addQueryDocuments';
 
@@ -88,6 +92,9 @@ import { addListRepos } from './repo/addListRepos';
 
 import {generateScheduledJobsListField} from './scheduler/generateScheduledJobsListField';
 import {generateSchedulerTypes} from './scheduler/generateSchedulerTypes';
+
+import { addListSchemas } from './schema/addListSchemas';
+
 import {generateDocumentTypeFields} from './documentType/generateDocumentTypeFields';
 import {generateSynonymFields} from './synonym/generateSynonymFields';
 
@@ -223,7 +230,16 @@ addGetMembers({glue});
 addGetMemberships({glue});
 addGetUser({glue});
 addGetProfile({glue});
+
 addModifyProfile({glue});
+
+addListSchemas({ glue }); // Must come before addListApps
+
+addAppObject({ glue });
+addGetApp({ glue });
+addListApps({ glue });
+
+
 
 addListProjects({ glue });
 
@@ -244,7 +260,7 @@ const {
 } = generateFieldsField({glue});
 addQueryFieldGet({glue});
 
-const getContentTypesField = generateGetContentTypesField({glue});
+addGetContentTypes({ glue }); // Must be before addGetSites
 
 generateSchedulerTypes({glue});
 
@@ -269,7 +285,9 @@ addMutationThesaurusImport({glue});
 
 const getLicense = generateGetLicenseField({glue});
 const getLocales = generateGetLocalesField({glue});
-const getSites = generateGetSitesField({glue});
+
+addGetSites({ glue }); // Must be after addGetContentTypes
+
 const listScheduledJobs = generateScheduledJobsListField({glue});
 addGetManagedDocumentTypes({glue});
 const queryCollectors = generateQueryCollectorsField({glue});
@@ -323,11 +341,9 @@ const mutation = glue.schemaGenerator.createObjectType({
 
 const sortedQueriesObj = sortKeys({
 	...glue.getQueries(),
-	getContentTypes: getContentTypesField,
 	getLicense,
 	getLocales,
 	getDocumentType: getDocumentTypeField,
-	getSites,
 	hasField,
 	listScheduledJobs,
 	queryApiKeys: queryApiKeysField,
@@ -371,30 +387,30 @@ export const SCHEMA = getCachedSchema();
 
 export function graphQLResponse(request: Request) {
 	// const requestStartTimeMs = currentTimeMillis();
-	//log.info(`request:${toStr(request)}`);
+	// log.info(`request:${toStr(request)}`);
 
 	const {body: bodyJson} = request;
-	//log.info(`bodyJson:${toStr(bodyJson)}`);
+	// log.info(`bodyJson:${toStr(bodyJson)}`);
 
 	const body = JSON.parse(bodyJson);
-	//log.info(`body:${toStr(body)}`);
+	// log.info(`body:${toStr(body)}`);
 
 	const {query, variables} = body;
-	//log.info(`query:${toStr(query)}`);
-	//log.info(`variables:${toStr(variables)}`);
+	// log.info(`query:${toStr(query)}`);
+	// log.info(`variables:${toStr(variables)}`);
 
 	const context = {
 		/*types: [
 			GQL_INTERFACE_NODE // This is not the place to add interfaceTypes. lib-guillotine context is something else...
 		]*/
 	};
-	//log.info(`context:${toStr(context)}`);
+	// log.info(`context:${toStr(context)}`);
 
-	//const before = currentTimeMillis();
+	// const before = currentTimeMillis();
 	const obj = execute(SCHEMA, query, variables, context);
-	//const after = currentTimeMillis();
-	//const duration = after - before;
-	//log.debug(`Duration: ${duration}ms Query:${query}`);
+	// const after = currentTimeMillis();
+	// const duration = after - before;
+	// log.debug(`Duration: ${duration}ms Query:${query}`);
 
 
 	// const endTimeMs = currentTimeMillis();
@@ -403,7 +419,7 @@ export function graphQLResponse(request: Request) {
 	// log.info('Since service-start:%s request-start:%s ', prettyMs(durationSinceServiceStartMs), prettyMs(durationSinceRequestStartMs));
 	return {
 		contentType: RESPONSE_TYPE_JSON,
-		body: //JSON.stringify( // TODO This is causeing problems, commenting it out until I can look at all of them.
+		body: // JSON.stringify( // TODO This is causeing problems, commenting it out until I can look at all of them.
 			// NOTE This add null values for missing properties
 			obj
 		//)

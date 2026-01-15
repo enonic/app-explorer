@@ -17,6 +17,12 @@ import { GQL_UNIQ_TYPE } from '../constants';
 
 const TRACE = false;
 
+type ProjectInterim = Project & { projectSiteConfigAsJson: Project['siteConfig'] };
+
+type ProjectObjectType = Omit<Partial<Project>, 'siteConfig'> & {
+	projectSiteConfigAsJson: Project['siteConfig']
+};
+
 export function addListProjects({
 	glue
 }: {
@@ -40,9 +46,7 @@ export function addListProjects({
 		}
 	});
 
-	const projectObjectType = glue.addObjectType<
-		Partial<Project> & { siteConfigAsJson: Record<string, unknown>}
-	>({
+	const projectObjectType = glue.addObjectType<ProjectObjectType>({
 		name: GQL_UNIQ_TYPE.OBJECT_PROJECT,
 		fields: {
 			description: { type: GraphQLString },
@@ -53,17 +57,21 @@ export function addListProjects({
 			parents: { type: nonNull(list(nonNull(GraphQLString))) },
 			permissions: { type: glue.getObjectType(GQL_UNIQ_TYPE.OBJECT_PROJECT_PERMISSION) },
 			readAccess: { type: glue.getObjectType(GQL_UNIQ_TYPE.OBJECT_PROJECT_READ_ACCESS) },
-			siteConfigAsJson: { type: GraphQLJson },
+			projectSiteConfigAsJson: { type: GraphQLJson },
 		}
 	});
 
-	glue.addQuery({
+	glue.addQuery<{},{},ProjectObjectType>({
 		args: {},
 		name: GQL_UNIQ_TYPE.QUERY_PROJECT_LIST,
 		resolve: () => {
-			const projectList = listProjects();
+			const projectList = listProjects() as ProjectInterim[];
+			for (const project of projectList) {
+				project.projectSiteConfigAsJson = project.siteConfig;
+				delete project.siteConfig;
+			}
 			if (TRACE) log.info('projectList:%s', toStr(projectList));
-			return projectList;
+			return projectList as ProjectObjectType[];
 		},
 		type: list(projectObjectType),
 	});

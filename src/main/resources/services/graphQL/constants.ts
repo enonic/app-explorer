@@ -15,10 +15,26 @@ export const FIELD_SHORTCUT_COLLECTION = '_collectionName';
 export const FIELD_SHORTCUT_DOCUMENT_TYPE = '_documentTypeName';
 
 export const GQL_UNIQ_TYPE = {
+	ENUM_SORT_DIRECTION: 'SortDirection',
+	ENUM_CONTENT_TYPES_SORT_FIELD: 'ContentTypesSortField',
+	ENUM_SCHEMA_TYPE: 'SchemaType',
+	INPUT_CONTENT_TYPES_SORT: 'SortContentTypes',
+	OBJECT_ATTACHMENT: 'Attachment',
+	OBJECT_APPLICATION: 'Application',
+	OBJECT_CONTENT_TYPE: 'ContentType',
+	OBJECT_CONTENT_TYPE_ICON: 'ContentTypeIcon',
+	OBJECT_SCHEMA_CONTENT: 'SchemaContent',
+	OBJECT_SITE: 'Site',
+	OBJECT_SITES_GET: 'GetSites',
 	OBJECT_PROJECT: 'Project',
 	OBJECT_PROJECT_PERMISSION: 'ProjectPermission',
 	OBJECT_PROJECT_READ_ACCESS: 'ProjectReadAccess',
+	QUERY_APP_GET: 'getApp',
+	QUERY_APP_LIST: 'listApps',
+	QUERY_CONTENT_TYPES_GET: 'getContentTypes',
 	QUERY_PROJECT_LIST: 'listProjects',
+	QUERY_SCHEMA_LIST: 'listSchemas',
+	QUERY_SITES_GET: 'getSites',
 } as const;
 
 
