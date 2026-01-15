@@ -97,6 +97,11 @@
       // lib-explorer is an external, but we still want the code editor to resolve types
       "/lib/explorer/*": ["./symlinks/lib-explorer/src/main/resources/lib/explorer/*"],
 
+      "/lib/*": [
+        "./node_modules/@item-enonic-types/lib-*",
+        "./src/main/resources/lib/*"
+      ],
+
       // Fallback
       // "/*": ["./src/main/resources/*"],
       // "/webapp/*": ["./webapp/*"], Doesn't work

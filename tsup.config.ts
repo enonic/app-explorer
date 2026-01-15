@@ -125,6 +125,7 @@ export default defineConfig((options: MyOptions) => {
 				'/lib/router',
 				'/lib/util',
 				'/lib/vanilla',
+				'/lib/text-encoding',
 				'/lib/thymeleaf',
 				'/lib/xp/admin',
 				'/lib/xp/app',
