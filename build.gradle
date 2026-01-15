@@ -23,7 +23,7 @@ app {
 	group = 'com.enonic.app'
 	displayName = 'Explorer'
 	vendorName = 'Enonic AS'
-	vendorUrl = 'http://enonic.com'
+	vendorUrl = 'https://enonic.com'
 	systemVersion = "${xpVersion}"
 }
 
@@ -72,7 +72,7 @@ dependencies {
 	include 'com.enonic.lib:lib-router:3.2.0'
 	// include 'com.enonic.lib:lib-asset:1.0.0'
 	include 'com.enonic.lib:lib-static:2.1.1'
-	include 'com.enonic.lib:lib-explorer:4.4.5'
+	include 'com.enonic.lib:lib-explorer:4.5.0-SNAPSHOT'
 	include 'com.enonic.lib:lib-util:3.1.1'
 	include 'com.enonic.lib:lib-galimatias:1.0.0-B1'
 	// include 'com.enonic.lib:lib-text-encoding:2.0.0'
@@ -128,7 +128,7 @@ tasks.register('npmTest', NpmTask) {
 // Also @enonic-types/lib-explorer is not available on npm yet, which also prevents tests from running on github.
 // test.dependsOn npmTest
 
-task cleanCoverage(type:Delete) {
+tasks.register('cleanCoverage', Delete) {
 	delete 'coverage'
 }
 clean.dependsOn cleanCoverage
