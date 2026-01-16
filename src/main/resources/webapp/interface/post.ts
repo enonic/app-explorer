@@ -1,12 +1,11 @@
 import type {
-	EnonicXpRequest,
 	Headers
 } from '@enonic-types/lib-explorer/Request.d';
-import type { Response } from '@enonic-types/lib-explorer/Response.d';
 import {GraphQLContext} from '/lib/explorer/interface/graphql/output/index.d';
 import type {
 	ApiKeyNode,
-	EmptyObject
+	EmptyObject,
+	Request
 } from '../../types';
 
 // These imports works when treeshake: false, but gives error when treeshake: true
@@ -38,7 +37,13 @@ import {getCachedSchema} from '/lib/explorer/interface/graphql/getCachedSchema';
 import { HTTP_RESPONSE_STATUS_CODES } from '../constants';
 
 
-export type InterfaceRequest = EnonicXpRequest<EmptyObject>
+export type Response = {
+	body?: string
+	contentType?: string
+	status: number
+}
+
+export type InterfaceRequest = Request<EmptyObject>
 
 
 // const LOG_LEVEL = 'info';
@@ -48,7 +53,7 @@ const AUTHORIZATION_PREFIX = 'Explorer-Api-Key ';
 function authorize({
 	request
 }: {
-	request: EnonicXpRequest
+	request: Request
 }): Response {
 	// log[LOG_LEVEL]('isUnauthorized request:%s', toStr(request));
 	const {

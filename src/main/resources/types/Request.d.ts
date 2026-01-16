@@ -7,16 +7,17 @@ export type Request<
 > = {
 	body?: string
 	contentType?: string
-	contextPath: string
+	contextPath?: string
 	headers?: { // HTTPS/2 uses lowercase header keys
 		accept?: string
 		authorization?: string
+		[key: string]: string | undefined
 	}
-	host: string
+	host?: string
 	method?: string
 	params?: Params
-	path: string
+	path?: string
 	pathParams?: PathParams
-	rawPath: string
-	url: string
+	rawPath?: string
+	url?: string
 }
