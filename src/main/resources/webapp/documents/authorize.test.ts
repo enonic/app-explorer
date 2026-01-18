@@ -56,6 +56,7 @@ const USER = {
 	displayName: 'John Doe',
 	modifiedTime: '',
 	disabled: false,
+	hasPassword: true,
 	email: 'john.doe@example.com',
 	login: 'john.doe',
 	idProvider: 'system'
@@ -152,6 +153,7 @@ function staticMocks() {
 // 	displayName: 'Super User',
 // 	modifiedTime: '',
 // 	disabled: false,
+// 	hasPassword: true,
 // 	// email: '',
 // 	login: 'su',
 // 	idProvider: 'system'

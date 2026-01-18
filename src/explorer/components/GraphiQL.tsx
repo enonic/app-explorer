@@ -1,5 +1,5 @@
 import { sanitize } from '@enonic/js-utils';
-import { useExplorerPlugin } from '@graphiql/plugin-explorer';
+import { explorerPlugin } from '@graphiql/plugin-explorer';
 import { createGraphiQLFetcher } from '@graphiql/toolkit';
 import { GraphiQL as GraphiQLOrig } from 'graphiql';
 import * as React from 'react';
@@ -10,6 +10,11 @@ function graphqlSanitize(str: string) {
 	// in addition we don't want the string to start with an underscore
 	return sanitize(str).replace(/^[0-9_]+/, '')
 }
+
+// Create the explorer plugin once, outside the component
+const explorer = explorerPlugin({
+	showAttribution: false
+});
 
 
 function GraphiQL({
@@ -28,7 +33,7 @@ function GraphiQL({
 		url
 	});
 
-	const [query, setQuery] = React.useState(`query ${graphqlSanitize(searchString) || 'MyQuery'} {
+	const defaultQuery = `query ${graphqlSanitize(searchString) || 'MyQuery'} {
 	interface {
 		querySynonyms(searchString: "${searchString}") {
 			search(
@@ -64,19 +69,12 @@ function GraphiQL({
 			} # synonyms
 		}
 	}
-}`);
-
-	const explorerPlugin = useExplorerPlugin({
-		query,
-		onEdit: setQuery,
-		showAttribution: false
-	});
+}`;
 
 	return <GraphiQLOrig
+		defaultQuery={defaultQuery}
 		fetcher={fetcher}
-		onEditQuery={setQuery}
-		plugins={[explorerPlugin]}
-		query={query}
+		plugins={[explorer]}
 	/>
 }
 

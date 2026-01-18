@@ -19,6 +19,7 @@ export default function runWithExplorerRead<T extends () => unknown>(fn: T): Ret
 		user = {
 			displayName: EXPLORER_APP_USER.displayName,
 			disabled: false,
+			hasPassword: false,
 			idProvider: EXPLORER_APP_USER.idProvider, // 'system',
 			key: `user:${EXPLORER_APP_USER.idProvider}:${EXPLORER_APP_USER.name}`, // `user:system:${USER_EXPLORER_APP_NAME}`,
 			login: EXPLORER_APP_USER.name, //USER_EXPLORER_APP_NAME,

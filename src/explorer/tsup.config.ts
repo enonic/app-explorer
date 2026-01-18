@@ -43,7 +43,7 @@ export default defineConfig(() => {
 
 				manifest: 'node_modules_manifest.json',
 				patterns: [
-					'graphiql/graphiql.min.css',
+					'graphiql/dist/graphiql.css',
 					'nice-react-gantt/lib/css/style.css',
 					'react/umd/*.js',
 					'react-dom/umd/*.js',

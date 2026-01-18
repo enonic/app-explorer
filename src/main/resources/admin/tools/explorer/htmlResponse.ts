@@ -152,7 +152,7 @@ export function htmlResponse({
 		<link rel="shortcut icon" href="${getImmuteableUrl({manifestPath: FILEPATH_MANIFEST, path: 'favicon.ico'})}">
 		<script type="text/javascript" src="${getImmuteableUrl({path: `react/umd/react.${REACT_MODE_POSTFIX}`})}"></script>
 		<script type="text/javascript" src="${getImmuteableUrl({path: `react-dom/umd/react-dom.${REACT_MODE_POSTFIX}`})}"></script>
-		<link rel="stylesheet" type="text/css" href="${getImmuteableUrl({path: 'graphiql/graphiql.min.css'})}">
+		<link rel="stylesheet" type="text/css" href="${getImmuteableUrl({path: 'graphiql/dist/graphiql.css'})}">
 		<link rel="stylesheet" type="text/css" href="${getImmuteableUrl({path: 'nice-react-gantt/lib/css/style.css'})}">
 		<link rel="stylesheet" type="text/css" href="${getImmuteableUrl({path: 'semantic-ui-css/semantic.css'})}">
 		<link rel="stylesheet" type="text/css" href="${getImmuteableUrl({path: 'react-semantic-ui-datepickers/dist/react-semantic-ui-datepickers.css'})}">

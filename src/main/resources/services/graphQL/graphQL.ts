@@ -450,7 +450,7 @@ function graphiQLAppResponse(request: Request) {
 		})}"></script>
 		<link rel="stylesheet" type="text/css" href="${getImmuteableUrl({
 			manifestPath: FILEPATH_MANIFEST_NODE_MODULES,
-			path: 'graphiql/graphiql.min.css'
+			path: 'graphiql/dist/graphiql.css'
 		})}">
 		<title>GraphiQL</title>
 	</head>
