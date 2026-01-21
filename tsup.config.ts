@@ -116,7 +116,6 @@ export default defineConfig((options: MyOptions) => {
 				'/lib/enonic/asset',
 				'/lib/enonic/static',
 				/^\/lib\/explorer/,
-				'/lib/galimatias',
 				'/lib/graphql',
 				'/lib/graphql-connection',
 				/^\/lib\/guillotine/,
