@@ -100,6 +100,12 @@ export default defineConfig(() => {
 			'use-debounce',
 		],
 		outDir: OUT_DIR,
+		esbuildOptions(options) {
+			options.define = {
+				...options.define,
+				global: 'globalThis',
+			};
+		},
     	platform: 'browser',
 		silent: ['QUIET', 'WARN']
 			.includes(process.env.LOG_LEVEL_FROM_GRADLE||''),
