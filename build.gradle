@@ -74,7 +74,6 @@ dependencies {
 	include 'com.enonic.lib:lib-static:2.1.1'
 	include 'com.enonic.lib:lib-explorer:4.5.0'
 	include 'com.enonic.lib:lib-util:3.1.1'
-	include 'com.enonic.lib:lib-galimatias:1.0.0-B1'
 	// include 'com.enonic.lib:lib-text-encoding:2.0.0'
 
 	// WARNING: Do NOT use include files, jar file will be missing dependencies!

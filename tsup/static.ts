@@ -33,7 +33,7 @@ export default function buildStaticConfig(): Options {
 				context: 'node_modules',
 				manifest: `node_modules-manifest.json`,
 				patterns: [
-					'graphiql/graphiql.min.css',
+					'graphiql/dist/graphiql.css',
 					'react/{cjs,umd}/*.js',
 					'react-dom/{cjs,umd}/*.js',
 					'semantic-ui-css/*.css',

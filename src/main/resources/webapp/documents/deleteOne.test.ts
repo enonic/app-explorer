@@ -63,6 +63,7 @@ const USER = {
 	displayName: 'John Doe',
 	modifiedTime: '',
 	disabled: false,
+	hasPassword: true,
 	email: 'john.doe@example.com',
 	login: 'john.doe',
 	idProvider: 'system'

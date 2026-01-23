@@ -43,7 +43,7 @@ export default defineConfig(() => {
 
 				manifest: 'node_modules_manifest.json',
 				patterns: [
-					'graphiql/graphiql.min.css',
+					'graphiql/dist/graphiql.css',
 					'nice-react-gantt/lib/css/style.css',
 					'react/umd/*.js',
 					'react-dom/umd/*.js',
@@ -100,6 +100,12 @@ export default defineConfig(() => {
 			'use-debounce',
 		],
 		outDir: OUT_DIR,
+		esbuildOptions(options) {
+			options.define = {
+				...options.define,
+				global: 'globalThis',
+			};
+		},
     	platform: 'browser',
 		silent: ['QUIET', 'WARN']
 			.includes(process.env.LOG_LEVEL_FROM_GRADLE||''),
