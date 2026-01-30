@@ -294,7 +294,7 @@ function useExplorerState({
 	}, [data]);
 
 	useUpdateEffect(() => {
-		if (licenseData) {
+		if (licenseData?.getLicense) {
 			setLicensedTo(licenseData.getLicense.licensedTo);
 			setLicenseValid(licenseData.getLicense.licenseValid);
 		}
