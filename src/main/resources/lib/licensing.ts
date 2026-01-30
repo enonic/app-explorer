@@ -44,7 +44,7 @@ const getLicenseDetails = (license?: string) => {
 export const isLicenseValid = (license?: string) => {
 	const licenseDetails = getLicenseDetails(license);
 
-	return licenseDetails && !licenseDetails.expired;
+	return !!(licenseDetails && !licenseDetails.expired);
 }
 
 
