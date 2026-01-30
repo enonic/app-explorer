@@ -1,27 +1,27 @@
-@import './_variables.sass'
+@use '_variables.sass'
 
 // @mixin max-width($width)
 // 	@media only screen and (max-width: $width)
 // 		@content
 
 @mixin mobileDown
-	@media only screen and (max-width: $largestMobileScreen)
+	@media only screen and (max-width: variables.$largestMobileScreen)
 		@content
 
 @mixin tabletUp
-	@media only screen and (min-width: $tabletBreakpoint)
+	@media only screen and (min-width: variables.$tabletBreakpoint)
 		@content
 
 @mixin computerUp
-	@media only screen and (min-width: $computerBreakpoint)
+	@media only screen and (min-width: variables.$computerBreakpoint)
 		@content
 
 @mixin largeUp
-	@media only screen and (min-width: $largeMonitorBreakpoint)
+	@media only screen and (min-width: variables.$largeMonitorBreakpoint)
 		@content
 
 @mixin widescreenUp
-	@media only screen and (min-width: $widescreenMonitorBreakpoint)
+	@media only screen and (min-width: variables.$widescreenMonitorBreakpoint)
 		@content
 
 //──────────────────────────────────────────────────────────────────────────────

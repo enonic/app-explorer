@@ -20,7 +20,6 @@ import {
 	forceArray,
 	toStr
 } from '@enonic/js-utils';
-import {detailedDiff} from 'deep-object-diff';
 import deepEqual from 'fast-deep-equal';
 
 import {ignoreErrors} from '/lib/explorer/ignoreErrors';
@@ -311,7 +310,6 @@ export function model9({
 			interfaceParams.modifiedTime = new Date();
 			maybeChangedInterface.modifiedTime = interfaceParams.modifiedTime;
 			ignoreErrors(() => {
-				log.info(`Changes detected, updating default interface. Diff:${toStr(detailedDiff(existingInterfaceNode, maybeChangedInterface))}`);
 				writeConnection.modify({
 					key: existingInterfaceNode._id,
 					editor: (node) => {

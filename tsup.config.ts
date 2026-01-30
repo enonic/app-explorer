@@ -184,18 +184,11 @@ export default defineConfig((options: MyOptions) => {
 				'cheerio', //
 				'gql-query-builder', //
 				'core-js', //
-				// 'd3-dsv', //
-				'deep-object-diff', //
-				// 'diff', //
 				'fast-deep-equal', //
 				'human-object-diff', //
 				// 'is-generator-function', // my_node_modules/util
 				'object.getownpropertydescriptors', // tasks/webcrawl/webcrawl
-				'polyfill-crypto.getrandomvalues', //
-				// 'reflect-metadata', //
 				'robots-txt-guard', //
-				'serialize-javascript', //
-				// 'traverse', //
 				'uri-js', //
 
 				// Without it TypeError: null is not a function

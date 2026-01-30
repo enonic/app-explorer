@@ -1,20 +1,20 @@
-@import './components/_addOrEditLocalFieldModal.sass'
-@import './components/_button.sass'
-@import './components/_container.sass'
-@import './components/_dimmer.sass'
-@import './components/_fieldsList.sass'
-@import './components/_flex.sass'
-@import './components/_menu.sass'
-@import './components/_menuItem.sass'
-@import './components/_form.sass'
-@import './components/_popup.sass'
-@import './components/_page.sass'
-@import './components/_segment.sass'
-@import './components/_svg.sass'
-@import './components/_table.sass'
-@import './components/_transition.sass'
-@import './features/_layout.sass'
-@import './_variables.sass'
+@use 'components/_addOrEditLocalFieldModal.sass'
+@use 'components/_button.sass'
+@use 'components/_container.sass'
+@use 'components/_dimmer.sass'
+@use 'components/_fieldsList.sass'
+@use 'components/_flex.sass'
+@use 'components/_menu.sass'
+@use 'components/_menuItem.sass'
+@use 'components/_form.sass'
+@use 'components/_popup.sass'
+@use 'components/_page.sass'
+@use 'components/_segment.sass'
+@use 'components/_svg.sass'
+@use 'components/_table.sass'
+@use 'components/_transition.sass'
+@use 'features/_layout.sass'
+@use '_variables.sass'
 
 // Global variables used by css (not compile time)
 ::root
@@ -82,7 +82,7 @@ th.disabled
 
 .ui.header.mt-1rem, // 0.3.0
 .mt-1rem
-	margin-top: $padding-vertical-default
+	margin-top: variables.$padding-vertical-default
 
 .p-a
 	position: absolute
@@ -98,7 +98,7 @@ th.disabled
 	pointer-events: none
 
 .pt-1rem
-	padding-top: $padding-vertical-default
+	padding-top: variables.$padding-vertical-default
 
 .t-0
 	top: 0
