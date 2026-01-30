@@ -1,4 +1,4 @@
-@import '../_mixins.sass'
+@use '../_mixins.sass'
 
 .ui.table
 	&,
@@ -20,7 +20,7 @@
 // When specificity is equal the latest rule will win.
 // 0.4.0
 .ui.table.collapsing.explorer-responsive
-	@include mobileDown
+	@include mixins.mobileDown
 		width: 100%
 
 .ui.table

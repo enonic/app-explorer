@@ -34,10 +34,6 @@ import cheerio from 'cheerio'; // uses Array.from
 // cheerio: str.trimEnd is not a function
 // import cheerio from '/lib/cheerio';
 import { ElementType } from "domelementtype";
-// import pretty from 'pretty';
-
-// import safeStringify from 'fast-safe-stringify';
-// import {parseDOM} from 'htmlparser2';
 
 // WARNING: Causes TypeError: Cannot read property "Symbol" from undefined in production mode!
 // NOTE: Now that the server files are build using tsup, the error seems gone on my laptop.

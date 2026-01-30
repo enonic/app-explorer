@@ -35,7 +35,7 @@ export default {
 	// It seems mocks doesn't apply to mapped modules?
 	moduleNameMapper: {
 		// '@enonic/mock-xp/(.*)': '<rootDir>/symlinks/enonic-mock-xp/$1',
-		// '@enonic/js-utils/(.*)': '<rootDir>/symlinks/enonic-js-utils/$1',
+		'@enonic/js-utils/(.*)': '<rootDir>/node_modules/@enonic/js-utils/dist/cjs/$1.cjs',
 
 		// There is no @enonic-types/lib-explorer yet, so these are workarounds
 		'@enonic-types/lib-explorer': '<rootDir>/symlinks/lib-explorer/src/main/resources/lib/explorer/types/index.d',
@@ -44,8 +44,7 @@ export default {
 		'/lib/explorer/(.*)': '<rootDir>/symlinks/lib-explorer/src/main/resources/lib/explorer/$1',
 	},
 
-	preset: 'ts-jest/presets/js-with-babel-legacy',
-	// preset: 'ts-jest/presets/js-with-babel',
+	preset: 'ts-jest',
 
 	// A list of paths to modules that run some code to configure or set up the
 	// testing environment. Each setupFile will be run once per test file. Since

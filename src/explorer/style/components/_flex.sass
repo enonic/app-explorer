@@ -1,4 +1,5 @@
-@import '../_variables.sass'
+@use '../_variables.sass'
+@use "../mixins"
 
 .d-f
 	display: flex
@@ -43,26 +44,26 @@
 	overflow-y: visible
 
 .w-ma-fullExceptGutters
-	max-width: calc(100% - $emSize - $emSize)
+	max-width: calc(100% - variables.$emSize - variables.$emSize)
 
-@include mobileDown
+@include mixins.mobileDown
 	.w-fullExceptGutters-mobileDown
-		width: calc(100% - $emSize - $emSize)
+		width: calc(100% - variables.$emSize - variables.$emSize)
 
-@include tabletUp
+@include mixins.tabletUp
 	.w-mi-tabletExceptGutters-tabletUp
-		min-width: $tabletBreakpoint - $emSize - $emSize
+		min-width: variables.$tabletBreakpoint - variables.$emSize - variables.$emSize
 
-@include computerUp
+@include mixins.computerUp
 	.w-mi-computerExceptGutters-computerUp
-		min-width: $computerBreakpoint - $emSize - $emSize
+		min-width: variables.$computerBreakpoint - variables.$emSize - variables.$emSize
 
-@include largeUp
+@include mixins.largeUp
 	.w-mi-largeExceptGutters-largeUp
-		min-width: $largeMonitorBreakpoint - $emSize - $emSize
+		min-width: variables.$largeMonitorBreakpoint - variables.$emSize - variables.$emSize
 
-@include widescreenUp
+@include mixins.widescreenUp
 	.w-ma-widescreenExceptGutters-widescreenUp
-		max-width: $widescreenMonitorBreakpoint - $emSize - $emSize
+		max-width: variables.$widescreenMonitorBreakpoint - variables.$emSize - variables.$emSize
 	.w-mi-widescreenExceptGutters-widescreenUp
-		min-width: $widescreenMonitorBreakpoint - $emSize - $emSize
+		min-width: variables.$widescreenMonitorBreakpoint - variables.$emSize - variables.$emSize

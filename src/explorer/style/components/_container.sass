@@ -1,6 +1,6 @@
-@import '../_mixins.sass'
-@import '../_variables.sass'
+@use '../_mixins.sass'
+@use '../_variables.sass'
 
 .ui.container
-	@include widescreenUp
-		width: $widescreenMonitorWidth
+	@include mixins.widescreenUp
+		width: variables.$widescreenMonitorWidth
