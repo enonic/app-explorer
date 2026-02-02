@@ -51,11 +51,11 @@ const router = Router();
 
 router.all('{path:.*}', (request: Request) => {
 	// log.info('request:%s', JSON.stringify(request, null, 4));
-	const {path, contextPath} = request;
-	if (!startsWith(path, contextPath)) {
+	const {rawPath, contextPath} = request;
+	if (!startsWith(rawPath, contextPath)) {
 		throw new Error('collectorAssets service: Request path does not start with contextPath!');
 	}
-	const relPath = path.substring(contextPath.length + 1);
+	const relPath = rawPath.substring(contextPath.length + 1);
 	// log.info('relPath:%s', relPath);
 
 	const parts = relPath.split('/');
