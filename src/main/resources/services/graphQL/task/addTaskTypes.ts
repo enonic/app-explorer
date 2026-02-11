@@ -1,12 +1,5 @@
 import type {Glue} from '../Glue';
 
-
-import {
-	TASK_STATE_FAILED,
-	TASK_STATE_FINISHED,
-	TASK_STATE_RUNNING,
-	TASK_STATE_WAITING
-} from '@enonic/js-utils';
 import {
 	GraphQLID,
 	GraphQLInt,
@@ -16,7 +9,6 @@ import {
 	//@ts-ignore
 } from '/lib/graphql';
 import {
-	GQL_ENUM_TASK_STATES,
 	GQL_TYPE_TASK,
 	GQL_TYPE_TASK_SUBMITTED
 } from '../constants';
@@ -27,16 +19,6 @@ export function addTaskTypes({
 } :{
 	glue :Glue
 }) {
-	glue.addEnumType({
-		name: GQL_ENUM_TASK_STATES,
-		values: [
-			TASK_STATE_FAILED,
-			TASK_STATE_FINISHED,
-			TASK_STATE_RUNNING,
-			TASK_STATE_WAITING
-		]
-	});
-
 	glue.addObjectType({
 		name: GQL_TYPE_TASK,
 		fields: {

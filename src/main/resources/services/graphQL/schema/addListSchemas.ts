@@ -50,15 +50,6 @@ export function addListSchemas({
 }: {
 	glue: Glue
 }) {
-	glue.addEnumType({
-		name: GQL_UNIQ_TYPE.ENUM_SCHEMA_TYPE,
-		values: [
-			'CONTENT_TYPE',
-			'MIXIN',
-			'XDATA'
-		]
-	});
-
 	glue.addObjectType({
 		name: GQL_UNIQ_TYPE.OBJECT_SCHEMA_CONTENT,
 		fields: {
