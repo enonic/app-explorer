@@ -83,9 +83,11 @@ export function queryContentsResolver<
 	} = args;
 	const projectId = localContext.projectId || args.projectId;
 	if (TRACE) log.info('query:%s', toStr(query));
-	let modifiedQuery: QueryDsl = query || {} as QueryDsl;
+	let modifiedQuery: QueryDsl | undefined = query;
+	if (TRACE) log.info('modifiedQuery:%s', toStr(modifiedQuery));
 
 	if (sitePath) {
+		if (!modifiedQuery) modifiedQuery = {} as QueryDsl;
 		if (!modifiedQuery['boolean']) modifiedQuery['boolean'] = {};
 		if (!modifiedQuery['boolean']['must']) modifiedQuery['boolean']['must'] = [];
 		if (!Array.isArray(modifiedQuery['boolean']['must'])) modifiedQuery['boolean']['must'] = [modifiedQuery['boolean']['must']];
