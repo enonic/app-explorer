@@ -10,11 +10,11 @@
      ^               ^                                        Loose│
      └───────────────┴─────────────────────────────────────────────┘
 */
-import type {EmptyObject} from '@enonic-types/lib-explorer';
-import type {Request} from '../../types/index.d';
+import type { EmptyObject } from '@enonic-types/lib-explorer';
+import type { Request } from '../../types/index.d';
 
 // This fails when tsup code splitting: true
-// import {currentTimeMillis} from '/lib/explorer/time/currentTimeMillis';
+// import { currentTimeMillis } from '/lib/explorer/time/currentTimeMillis';
 
 import {
 	RESPONSE_TYPE_JSON,
@@ -23,7 +23,7 @@ import {
 } from '@enonic/js-utils';
 // import prettyMs from 'pretty-ms';
 // @ts-ignore
-import {newCache} from '/lib/cache';
+import { newCache } from '/lib/cache';
 import {
 	execute
 	// @ts-ignore
@@ -39,92 +39,94 @@ import immutableGetter from './immutableGetter';
 import getImmuteableUrl from './getImmuteableUrl';
 
 
-import {Glue} from './Glue';
+import { Glue } from './Glue';
 
-import {addScalarTypes} from './addScalarTypes';
-import {addInputTypes} from './addInputTypes';
-import {addGraphQLInterfaceTypes} from './addGraphQLInterfaceTypes';
-import {addObjectTypes} from './addObjectTypes';
+import { addScalarTypes } from './addScalarTypes';
+import { addEnumTypes } from './addEnumTypes';
+import { addInputTypes } from './addInputTypes';
+import { addGraphQLInterfaceTypes } from './addGraphQLInterfaceTypes';
+import { addObjectTypes } from './addObjectTypes';
 
-import {generateGetLicenseField} from './generateGetLicenseField';
-import {generateGetLocalesField} from './generateGetLocalesField';
-import {generateQueryJournalsField} from './generateQueryJournalsField';
-import {generateReferencedByField} from './generateReferencedByField';
+import { generateGetLicenseField } from './generateGetLicenseField';
+import { generateGetLocalesField } from './generateGetLocalesField';
+import { generateQueryJournalsField } from './generateQueryJournalsField';
+import { generateReferencedByField } from './generateReferencedByField';
 
-import {addApiKeyTypes} from './apiKey/addApiKeyTypes';
-import {addMutationApiKeyCreate} from './apiKey/addMutationApiKeyCreate';
-import {addMutationApiKeyDelete} from './apiKey/addMutationApiKeyDelete';
-import {addMutationApiKeyUpdate} from './apiKey/addMutationApiKeyUpdate';
-import {generateQueryApiKeysField} from './apiKey/generateQueryApiKeysField';
+import { addApiKeyTypes } from './apiKey/addApiKeyTypes';
+import { addMutationApiKeyCreate } from './apiKey/addMutationApiKeyCreate';
+import { addMutationApiKeyDelete } from './apiKey/addMutationApiKeyDelete';
+import { addMutationApiKeyUpdate } from './apiKey/addMutationApiKeyUpdate';
+import { generateQueryApiKeysField } from './apiKey/generateQueryApiKeysField';
 
 import { addAppObject } from './app/addAppObject';
 import { addGetApp } from './app/addGetApp';
 import { addListApps } from './app/addListApps';
 
 import addMutationCollectionDelete from './collection/addMutationCollectionDelete'
-import {generateCollectionFields} from './collection/generateCollectionFields';
-import {addGetManagedDocumentTypes} from './collector/addGetManagedDocumentTypes';
-import {generateQueryCollectorsField} from './collector/generateQueryCollectorsField';
-import {generateFieldsField} from './field/generateFieldsField';
-import {addQueryFieldGet} from './field/addQueryFieldGet';
+import { generateCollectionFields } from './collection/generateCollectionFields';
+import { addGetManagedDocumentTypes } from './collector/addGetManagedDocumentTypes';
+import { generateQueryCollectorsField } from './collector/generateQueryCollectorsField';
+import { generateFieldsField } from './field/generateFieldsField';
+import { addQueryFieldGet } from './field/addQueryFieldGet';
 
 import { addGetContentTypes } from './content/addGetContentTypes';
 import { addGetSites } from './content/addGetSites';
+import { addQueryContents } from './content/addQueryContents';
 
-import {addQueryDocuments} from './document/addQueryDocuments';
+import { addQueryDocuments } from './document/addQueryDocuments';
 
 import {addInterfaceTypes as addExplorerInterfaceTypes} from './interface/addInterfaceTypes';
-import {addMutationInterfaceCreate} from './interface/addMutationInterfaceCreate';
-import {addMutationInterfaceDelete} from './interface/addMutationInterfaceDelete';
-import {addMutationInterfaceUpdate} from './interface/addMutationInterfaceUpdate';
-import {addQueryInterfaceGet} from './interface/addQueryInterfaceGet';
-import {generateQueryInterfacesField} from './interface/generateQueryInterfacesField';
+import { addMutationInterfaceCreate } from './interface/addMutationInterfaceCreate';
+import { addMutationInterfaceDelete } from './interface/addMutationInterfaceDelete';
+import { addMutationInterfaceUpdate } from './interface/addMutationInterfaceUpdate';
+import { addQueryInterfaceGet } from './interface/addQueryInterfaceGet';
+import { generateQueryInterfacesField } from './interface/generateQueryInterfacesField';
 
 import addGetUser from './auth/addGetUser';
 import addGetMembers from './auth/addGetMembers'
 import addGetMemberships from './auth/addGetMemberships'
-import {addGetProfile} from './profile/addGetProfile';
-import {addModifyProfile} from './profile/addModifyProfile';
+import { addGetProfile } from './profile/addGetProfile';
+import { addModifyProfile } from './profile/addModifyProfile';
 
 import { addListProjects } from './project/addListProjects';
 
 import { addListRepos } from './repo/addListRepos';
 
-import {generateScheduledJobsListField} from './scheduler/generateScheduledJobsListField';
-import {generateSchedulerTypes} from './scheduler/generateSchedulerTypes';
+import { generateScheduledJobsListField } from './scheduler/generateScheduledJobsListField';
+import { generateSchedulerTypes } from './scheduler/generateSchedulerTypes';
 
 import { addListSchemas } from './schema/addListSchemas';
 
-import {generateDocumentTypeFields} from './documentType/generateDocumentTypeFields';
-import {generateSynonymFields} from './synonym/generateSynonymFields';
+import { generateDocumentTypeFields } from './documentType/generateDocumentTypeFields';
+import { generateSynonymFields } from './synonym/generateSynonymFields';
 
-import {addGetThesaurus} from './thesaurus/addGetThesaurus'
-import {addMutationThesaurusCreate} from './thesaurus/addMutationThesaurusCreate'
-import {addMutationThesaurusUpdate} from './thesaurus/addMutationThesaurusUpdate'
-import {addThesaurusTypes} from './thesaurus/addThesaurusTypes';
-import {generateThesaurusFields} from './thesaurus/generateThesaurusFields';
-import {addMutationMigrateThesaurusSynonyms_v1_to_v2} from './thesaurus/addMutationMigrateThesaurusSynonyms_v1_to_v2';
-import {addMutationThesaurusImport} from './thesaurus/addMutationThesaurusImport'
+import { addGetThesaurus } from './thesaurus/addGetThesaurus'
+import { addMutationThesaurusCreate } from './thesaurus/addMutationThesaurusCreate'
+import { addMutationThesaurusUpdate } from './thesaurus/addMutationThesaurusUpdate'
+import { addThesaurusTypes } from './thesaurus/addThesaurusTypes';
+import { generateThesaurusFields } from './thesaurus/generateThesaurusFields';
+import { addMutationMigrateThesaurusSynonyms_v1_to_v2 } from './thesaurus/addMutationMigrateThesaurusSynonyms_v1_to_v2';
+import { addMutationThesaurusImport } from './thesaurus/addMutationThesaurusImport'
 
-import {addStopWordsTypes} from './stopWords/addStopWordsTypes';
-import {generateQueryStopWordsField} from './stopWords/generateQueryStopWordsField';
-import {addStopWordsCreate} from './stopWords/addStopWordsCreate';
-import {addStopWordsDelete} from './stopWords/addStopWordsDelete';
-import {addStopWordsUpdate} from './stopWords/addStopWordsUpdate';
+import { addStopWordsTypes } from './stopWords/addStopWordsTypes';
+import { generateQueryStopWordsField } from './stopWords/generateQueryStopWordsField';
+import { addStopWordsCreate } from './stopWords/addStopWordsCreate';
+import { addStopWordsDelete } from './stopWords/addStopWordsDelete';
+import { addStopWordsUpdate } from './stopWords/addStopWordsUpdate';
 
-import {addTaskTypes} from './task/addTaskTypes';
-import {addQueryGetTask} from './task/addQueryGetTask';
-import {addQueryQueryTasks} from './task/addQueryQueryTasks';
+import { addTaskTypes } from './task/addTaskTypes';
+import { addQueryGetTask } from './task/addQueryGetTask';
+import { addQueryQueryTasks } from './task/addQueryQueryTasks';
 
 
-import {hasFieldQuery} from './hasFieldQuery';
-import {addUnionTypes} from './addUnionTypes';
-import {addExplorerRepoNodesGetQuery} from './addExplorerRepoNodesGetQuery';
-import {createObjectTypesUsingUnionTypes} from './createObjectTypesUsingUnionTypes';
+import { hasFieldQuery } from './hasFieldQuery';
+import { addUnionTypes } from './addUnionTypes';
+import { addExplorerRepoNodesGetQuery } from './addExplorerRepoNodesGetQuery';
+import { createObjectTypesUsingUnionTypes } from './createObjectTypesUsingUnionTypes';
 
 
 // @ts-ignore
-// const {currentTimeMillis} = Java.type('java.lang.System') as {
+// const { currentTimeMillis } = Java.type('java.lang.System') as {
 // 	currentTimeMillis: () => number
 // }
 // const serviveStartTimeMs = currentTimeMillis();
@@ -170,28 +172,29 @@ const glue = new Glue<EmptyObject>();
 // lets see if lib-graphql.reference can be used?
 
 
-// Can be first since it doesn't depend on anything
-addScalarTypes({glue});
+// Can be first since they don't depend on anything:
+addScalarTypes({ glue });
+addEnumTypes({ glue });
 
 // Must be after ScalarTypes!
 // Should be before InterfaceTypes (unless we use lib-graphql.reference)
 // Must be before ObjectTypes?
-addInputTypes({glue});
+addInputTypes({ glue });
 
 // Must be before InterfaceTypes!
-addUnionTypes({glue});
-addExplorerRepoNodesGetQuery({glue});
+addUnionTypes({ glue });
+addExplorerRepoNodesGetQuery({ glue });
 
 // Must be after ScalarTypes!
 // Must be after InputTypes
 // Must be after UnionTypes
 // Must be before ObjectTypes
-addGraphQLInterfaceTypes({glue});
+addGraphQLInterfaceTypes({ glue });
 
 // Must be after ScalarTypes!
 // Must be after InputTypes?
 // Must be after InterfaceTypes
-addObjectTypes({glue});
+addObjectTypes({ glue });
 
 
 // GIVEN we want to define an interfaceType fields,
@@ -209,29 +212,29 @@ addObjectTypes({glue});
 // https://github.com/enonic/lib-graphql/blob/master/docs/api.adoc#createobjecttype
 // interfaces: Array<GraphQLInterfaceType OR GraphQLTypeReference>
 
-const referencedBy = generateReferencedByField({glue});
+const referencedBy = generateReferencedByField({ glue });
 
-addApiKeyTypes({glue});
-addMutationApiKeyCreate({glue});
-addMutationApiKeyDelete({glue});
-addMutationApiKeyUpdate({glue});
-const queryApiKeysField = generateQueryApiKeysField({glue});
+addApiKeyTypes({ glue });
+addMutationApiKeyCreate({ glue });
+addMutationApiKeyDelete({ glue });
+addMutationApiKeyUpdate({ glue });
+const queryApiKeysField = generateQueryApiKeysField({ glue });
 
-const hasField = hasFieldQuery({glue});
+const hasField = hasFieldQuery({ glue });
 
 const {
 	createCollectionField,
 	reindexCollectionsField,
 	updateCollectionField
-} = generateCollectionFields({glue});
-addMutationCollectionDelete({glue});
+} = generateCollectionFields({ glue });
+addMutationCollectionDelete({ glue });
 
-addGetMembers({glue});
-addGetMemberships({glue});
-addGetUser({glue});
-addGetProfile({glue});
+addGetMembers({ glue });
+addGetMemberships({ glue });
+addGetUser({ glue });
+addGetProfile({ glue });
 
-addModifyProfile({glue});
+addModifyProfile({ glue });
 
 addListSchemas({ glue }); // Must come before addListApps
 
@@ -239,82 +242,84 @@ addAppObject({ glue });
 addGetApp({ glue });
 addListApps({ glue });
 
-
-
-addListProjects({ glue });
-
-addQueryDocuments({glue});
+addQueryDocuments({ glue }); // Must come before addQueryContents
 
 const {
 	createDocumentTypeField,
 	deleteDocumentTypeField,
 	getDocumentTypeField,
 	updateDocumentTypeField
-} = generateDocumentTypeFields({glue});
+} = generateDocumentTypeFields({ glue });
 
 const {
 	createFieldField,
 	deleteFieldField,
 	queryFieldsField,
 	updateFieldField
-} = generateFieldsField({glue});
-addQueryFieldGet({glue});
+} = generateFieldsField({ glue });
+addQueryFieldGet({ glue });
 
+addQueryContents({ glue }); // Must come before addQueryDocuments
 addGetContentTypes({ glue }); // Must be before addGetSites
 
-generateSchedulerTypes({glue});
+generateSchedulerTypes({ glue });
 
 const {
 	deleteSynonymField
-} = generateSynonymFields({glue});
+} = generateSynonymFields({ glue });
 
-addTaskTypes({glue});
+addTaskTypes({ glue });
 addThesaurusTypes({
 	glue
 });
-addMutationThesaurusCreate({glue});
-addMutationThesaurusUpdate({glue});
-addGetThesaurus({glue});
+addMutationThesaurusCreate({ glue });
+addMutationThesaurusUpdate({ glue });
+addGetThesaurus({ glue });
 const {
 	deleteThesaurusField,
 	queryThesauriField,
-} = generateThesaurusFields({glue});
-addMutationMigrateThesaurusSynonyms_v1_to_v2({glue});
-addMutationThesaurusImport({glue});
+} = generateThesaurusFields({ glue });
+addMutationMigrateThesaurusSynonyms_v1_to_v2({ glue });
+addMutationThesaurusImport({ glue });
 
 
-const getLicense = generateGetLicenseField({glue});
-const getLocales = generateGetLocalesField({glue});
+const getLicense = generateGetLicenseField({ glue });
+const getLocales = generateGetLocalesField({ glue });
 
-addGetSites({ glue }); // Must be after addGetContentTypes
+// Must be after addGetContentTypes
+// Must be before addListProjects
+addGetSites({ glue });
 
-const listScheduledJobs = generateScheduledJobsListField({glue});
-addGetManagedDocumentTypes({glue});
-const queryCollectors = generateQueryCollectorsField({glue});
+// Must be after addGetSites
+addListProjects({ glue });
 
-addExplorerInterfaceTypes({glue});
-addMutationInterfaceCreate({glue});
-addMutationInterfaceDelete({glue});
-addMutationInterfaceUpdate({glue});
-addQueryInterfaceGet({glue});
-const queryInterfaces = generateQueryInterfacesField({glue});
+const listScheduledJobs = generateScheduledJobsListField({ glue });
+addGetManagedDocumentTypes({ glue });
+const queryCollectors = generateQueryCollectorsField({ glue });
 
-const queryJournals = generateQueryJournalsField({glue});
+addExplorerInterfaceTypes({ glue });
+addMutationInterfaceCreate({ glue });
+addMutationInterfaceDelete({ glue });
+addMutationInterfaceUpdate({ glue });
+addQueryInterfaceGet({ glue });
+const queryInterfaces = generateQueryInterfacesField({ glue });
 
-addListRepos({glue});
+const queryJournals = generateQueryJournalsField({ glue });
 
-addStopWordsTypes({glue});
-addStopWordsCreate({glue});
-addStopWordsDelete({glue});
-addStopWordsUpdate({glue});
-const queryStopWords = generateQueryStopWordsField({glue});
+addListRepos({ glue });
 
-addQueryGetTask({glue});
-addQueryQueryTasks({glue});
+addStopWordsTypes({ glue });
+addStopWordsCreate({ glue });
+addStopWordsDelete({ glue });
+addStopWordsUpdate({ glue });
+const queryStopWords = generateQueryStopWordsField({ glue });
+
+addQueryGetTask({ glue });
+addQueryQueryTasks({ glue });
 
 const {
 	queryDocumentTypesField
-} = createObjectTypesUsingUnionTypes({glue});
+} = createObjectTypesUsingUnionTypes({ glue });
 
 const sortedMutationsObj = sortKeys({
 	...glue.getMutations(),
@@ -410,7 +415,7 @@ export function graphQLResponse(request: Request) {
 	const obj = execute(SCHEMA, query, variables, context);
 	// const after = currentTimeMillis();
 	// const duration = after - before;
-	// log.debug(`Duration: ${duration}ms Query:${query}`);
+	// log.debug(`Duration: ${ duration }ms Query:${ query }`);
 
 
 	// const endTimeMs = currentTimeMillis();
@@ -428,7 +433,7 @@ export function graphQLResponse(request: Request) {
 
 
 function graphiQLAppResponse(request: Request) {
-	const {url} = request;
+	const { url } = request;
 	const propsObj = {
 		url
 	};
@@ -455,13 +460,13 @@ function graphiQLAppResponse(request: Request) {
 		<title>GraphiQL</title>
 	</head>
 	<body style="margin:0">
-		<div id="${ID_REACT_CONTAINER}"/>
-		<!--script type="module" src="./${graphiQLAppUrl}"></script-->
+		<div id="${ ID_REACT_CONTAINER }"/>
+		<!--script type="module" src="./${ graphiQLAppUrl }"></script-->
 		<script type='module' defer>
-			import { GraphiQLApp } from './${graphiQLAppUrl}';
+			import { GraphiQLApp } from './${ graphiQLAppUrl }';
 			const propsObj = eval(${JSON.stringify(propsObj)});
 			//console.debug('propsObj', propsObj);
-			const root = ReactDOM.createRoot(document.getElementById('${ID_REACT_CONTAINER}'));
+			const root = ReactDOM.createRoot(document.getElementById('${ ID_REACT_CONTAINER }'));
 			root.render(React.createElement(GraphiQLApp, propsObj));
 		</script>
 	</body>
@@ -476,7 +481,7 @@ router.get('', (r: Request) => graphiQLAppResponse(r));
 router.post('/', (r: Request) => graphQLResponse(r));
 router.post('', (r: Request) => graphQLResponse(r));
 
-router.all(`/${GETTER_ROOT}/{path:.+}`, (r: Request) => {
+router.all(`/${ GETTER_ROOT }/{path:.+}`, (r: Request) => {
 	// log.info('request:%s', toStr(r));
 	return immutableGetter(r);
 });

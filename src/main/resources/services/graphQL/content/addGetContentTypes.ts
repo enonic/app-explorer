@@ -11,43 +11,23 @@ import {
 	nonNull
 	// @ts-ignore
 } from '/lib/graphql';
-// @ts-ignore
-import {
-	type ContentType,
-	type Icon,
-	type SortDirection,
-	getTypes
-} from '/lib/xp/content';
+import { getTypes } from '/lib/xp/content';
 import {
 	get as getContext,
 	run as runInContext,
 } from '/lib/xp/context';
 import { serviceUrl } from '/lib/xp/portal';
+
 import { GQL_UNIQ_TYPE } from '../constants';
 
+import type {
+	ContentTypeObjectType,
+	GetContentTypesArgs,
+	IconWithUrl,
+} from './types';
+
+
 const TRACE = false;
-
-type IconWithUrl = Omit<Icon, 'data'> & {
-	url: string;
-}
-
-export type ContentTypeObjectType = Omit<ContentType, 'form'|'icon'> & {
-	_docCount?: number;
-	formJson: string; // TODO Remove this in next major release?
-	formAsJson: Record<string, unknown>;
-	icon?: IconWithUrl;
-	supertype?: ContentType['superType']; // TODO Remove this in next major release?
-};
-
-export interface SortContentTypes {
-	direction?: SortDirection;
-	field?: 'docCount'|'name';
-}
-
-export interface GetContentTypesArgs {
-	names?: string[];
-	sort?: SortContentTypes;
-}
 
 interface GetContentTypesEnv {
 	args: GetContentTypesArgs;
@@ -143,22 +123,6 @@ export function addGetContentTypes({
 			supertype: { type: GraphQLString }, // TODO Remove this in next major release?
 			superType: { type: GraphQLString } // I think this is optional
 		}
-	});
-
-	glue.addEnumType({
-		name: GQL_UNIQ_TYPE.ENUM_SORT_DIRECTION,
-		values: [
-			'ASC',
-			'DESC'
-		]
-	});
-
-	glue.addEnumType({
-		name: GQL_UNIQ_TYPE.ENUM_CONTENT_TYPES_SORT_FIELD,
-		values: [
-			'docCount',
-			'name',
-		]
 	});
 
 	glue.addInputType({

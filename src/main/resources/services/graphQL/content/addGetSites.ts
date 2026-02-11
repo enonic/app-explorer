@@ -1,9 +1,4 @@
-import type {
-	Attachment,
-	Site,
-} from '@enonic-types/lib-content';
-import type { Glue } from '../Glue';
-
+import { includes } from '@enonic/js-utils/array/includes';
 import { sortByProperty } from '@enonic/js-utils/array/sortBy';
 import { toStr } from '@enonic/js-utils/value/toStr';
 import {
@@ -24,29 +19,108 @@ import { serviceUrl } from '/lib/xp/portal';
 import { list as listProjects } from '/lib/xp/project';
 // @ts-ignore
 import { getSites as gS } from '/lib/util/content/getSites';
+
+import type {
+	Env,
+	Glue,
+} from '../Glue';
 import { GQL_UNIQ_TYPE } from '../constants';
+
+import { getContentTypesResolver } from './addGetContentTypes';
+import type {
+	AttachmentObjectType,
+	GetContentTypesArgs,
+	GetSitesArgs,
+	GetSitesObjectType,
+	QueryContentsArgs,
+	QueryContentsObjectType,
+	SiteObjectType,
+} from './types';
 import {
-	type ContentTypeObjectType,
-	type GetContentTypesArgs,
-	getContentTypesResolver,
-} from './addGetContentTypes';
+	getQueryContentsArgs,
+	queryContentsResolver,
+} from './addQueryContents';
+
 
 const TRACE = false;
 
-type AttachmentObjectType = Attachment & {
-	url?: string;
-}
 
-type SiteObjectType = Pick<
-	Site<Record<string, unknown>>,
-	'_id'
-	| '_name'
-	| '_path'
-	| 'displayName'
-> & {
-	_project: string;
-	attachments: AttachmentObjectType[];
-	[GQL_UNIQ_TYPE.QUERY_CONTENT_TYPES_GET]: ContentTypeObjectType[];
+export function getSitesResolver<
+	CONTEXT extends object = Record<string, unknown>,
+	SOURCE extends null | object = null
+>(env: Env<GetSitesArgs, CONTEXT, SOURCE>): GetSitesObjectType {
+	if (TRACE) log.info('env:%s', toStr(env));
+
+	const { args, context: localContext } = env;
+	if (TRACE) log.info('args:%s', toStr(args));
+	if (TRACE) log.info('getSitesResolver: localContext:%s', toStr(localContext));
+
+	const {
+		sitePaths = [],
+		projectIds = []
+	} = args;
+
+	const sitesQueryRes: GetSitesObjectType = {
+		count: 0,
+		hits: [],
+		total: 0
+	}
+	const context = getContext();
+	if (TRACE) log.info('context:%s', toStr(context));
+	context.branch = 'master';
+	let filteredProjectIds = listProjects().map(({id}) => id);
+	if (projectIds.length) {
+		filteredProjectIds = filteredProjectIds
+			.filter((projectId) => includes(projectIds, projectId));
+	}
+	for (const projectId of filteredProjectIds) {
+		context.repository = `com.enonic.cms.${projectId}`;
+		if (TRACE) log.info('context:%s', toStr(context));
+		let query;
+		if (sitePaths.length) {
+			query = {
+				boolean: {
+					must: {
+						in: {
+							field: '_path',
+							values: sitePaths.map(sitePath => `/content${sitePath}`)
+						}
+					}
+				}
+			}
+		}
+		if (TRACE) log.info('query:%s', toStr(query));
+
+		const sitesInProject = gS({
+			context,
+			query
+		});
+		if (TRACE) log.info('sitesInProject:%s', toStr(sitesInProject));
+
+		sitesQueryRes.count += sitesInProject.count;
+		sitesQueryRes.total += sitesInProject.total;
+		for (const hit of sitesInProject.hits) {
+			hit._project = projectId;
+			const newAttachments: AttachmentObjectType[] = [];
+			const attachmentObject = (hit as SiteObjectType).attachments;
+			for (const attachmentName in attachmentObject) {
+				const attachment = attachmentObject[attachmentName];
+				(attachment as AttachmentObjectType).url = runInContext(context, () => serviceUrl({
+					service: 'attachment',
+					params: {
+						contentId: hit._id,
+						name: attachmentName,
+						project: projectId,
+					}
+				}));
+				newAttachments.push(attachment);
+			}
+			hit.attachments = newAttachments;
+			sitesQueryRes.hits.push(hit);
+		}
+	} // for filteredProjectIds
+	if (TRACE) log.info('sites:%s', toStr(sitesQueryRes));
+	return sitesQueryRes;
 }
 
 export function addGetSites({
@@ -92,6 +166,7 @@ export function addGetSites({
 								direction: sortDirection = 'DESC',
 							} = {}
 						},
+						// context: localContext,
 						source: {
 							_path,
 							_project,
@@ -160,62 +235,54 @@ export function addGetSites({
 				},
 				type: list(glue.getObjectType(GQL_UNIQ_TYPE.OBJECT_CONTENT_TYPE)),
 			},
+			[GQL_UNIQ_TYPE.QUERY_CONTENT_QUERY]: {
+				args: {
+					...getQueryContentsArgs({ glue }),
+					projectId: undefined, // available in source
+					sitePath: undefined, // available in source
+				},
+				type: glue.getObjectType<QueryContentsObjectType>(GQL_UNIQ_TYPE.OBJECT_CONTENT_QUERY_RESULT),
+				// @ts-ignore
+				resolve: (env: Env<QueryContentsArgs, ContextWithProjectId, SiteObjectType>) => {
+					const { args, context: localContext, source } = env;
+					// log.info('getSites.queryContents: args:%s', toStr(args));
+					// log.info('getSites.queryContents: localContext:%s', toStr(localContext));
+					const {
+						sitePath,
+						...restArgs
+					} = args;
+					const { _path, _project } = source;
+					return queryContentsResolver<SiteObjectType>({
+						args: {
+							...restArgs,
+							projectId: _project,
+							sitePath: _path
+						},
+						context: {
+							...localContext,
+							projectId: _project,
+						},
+						source,
+					});
+				}
+			}
 		}
 	});
 
-	glue.addQuery({
+	glue.addQuery<GetSitesArgs>({
 		name: GQL_UNIQ_TYPE.QUERY_SITES_GET,
-		args: {},
-		resolve: (env: unknown) => {
-			if (TRACE) log.info('env:%s', toStr(env));
-			const sitesQueryRes = {
-				count: 0,
-				hits: [],
-				total: 0
-			}
-			const context = getContext();
-			if (TRACE) log.info('context:%s', toStr(context));
-			context.branch = 'master';
-			const projectIds = listProjects().map(({id}) => id);
-			for (const projectId of projectIds) {
-				context.repository = `com.enonic.cms.${projectId}`;
-				if (TRACE) log.info('context:%s', toStr(context));
-				const sitesInProject = gS({
-					context
-				});
-				if (TRACE) log.info('sitesInProject:%s', toStr(sitesInProject));
-				sitesQueryRes.count += sitesInProject.count;
-				sitesQueryRes.total += sitesInProject.total;
-				for (const hit of sitesInProject.hits) {
-					hit._project = projectId;
-					const newAttachments: AttachmentObjectType[] = [];
-					const attachmentObject = (hit as SiteObjectType).attachments;
-					for (const attachmentName in attachmentObject) {
-						const attachment = attachmentObject[attachmentName];
-						(attachment as AttachmentObjectType).url = runInContext(context, () => serviceUrl({
-							service: 'attachment',
-							params: {
-								contentId: hit._id,
-								name: attachmentName,
-								project: projectId,
-							}
-						}));
-						newAttachments.push(attachment);
-					}
-					hit.attachments = newAttachments;
-					sitesQueryRes.hits.push(hit);
-				}
-			} // for projectIds
-			if (TRACE) log.info('sites:%s', toStr(sitesQueryRes));
-			return sitesQueryRes;
+		args: {
+			projectIds: list(GraphQLString),
+			sitePaths: list(GraphQLString),
 		},
-		type: glue.addObjectType({
+		resolve: getSitesResolver,
+		type: glue.addObjectType<GetSitesObjectType>({
 			name: GQL_UNIQ_TYPE.OBJECT_SITES_GET,
 			// description:
 			fields: {
-				count: { type: glue.getScalarType('count') },
+				count: { type: glue.getScalarType<number>('count') },
 				hits: { type: list(SITE_OBJECT_TYPE) },
-				total: { type: glue.getScalarType('total') }
+				total: { type: glue.getScalarType<number>('total') }
 			} // fields
 		})
 	});

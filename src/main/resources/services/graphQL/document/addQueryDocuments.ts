@@ -25,6 +25,7 @@ import type {
 	Highlight
 } from '@enonic-types/lib-explorer/GraphQL.d';
 import type { AggregationArg } from '../types';
+import type { Glue } from '../Glue';
 
 
 import {
@@ -57,7 +58,6 @@ import {
 	Json as GraphQLJson,
 	list,
 	nonNull,
-	reference
 	// @ts-expect-error No types yet
 } from '/lib/graphql';
 import {
@@ -68,16 +68,14 @@ import {
 import {
 	FIELD_SHORTCUT_COLLECTION,
 	FIELD_SHORTCUT_DOCUMENT_TYPE,
-	GQL_INPUT_TYPE_AGGREGATION,
 	// GQL_INPUT_TYPE_AGGREGATION_COUNT,
-	GQL_INPUT_TYPE_AGGREGATION_TERMS,
 	GQL_INPUT_TYPE_QUERY_DSL_BOOLEAN_CLAUSE,
 	GQL_QUERY_DOCUMENTS,
-	GQL_TYPE_AGGREGATION_TERMS_BUCKET_NAME,
 	GQL_TYPE_AGGREGATION_TERMS_NAME,
 	GQL_TYPE_DOCUMENT_NAME,
 	GQL_TYPE_DOCUMENT_QUERY_RESULT_FIELD_COUNT,
-	GQL_TYPE_DOCUMENT_QUERY_RESULT_NAME
+	GQL_TYPE_DOCUMENT_QUERY_RESULT_NAME,
+	GQL_UNIQ_TYPE,
 } from '../constants';
 import {addMatchAll} from '../inputTypes/queryDSL/addMatchAll';
 
@@ -115,12 +113,12 @@ const FIELD_NAME_TO_PATH = {
 
 const FIELD_VALUE_COUNT_AGGREGATION_PREFIX = '_count_Field_';
 
-function aggregationsArgToQuery({
+export function aggregationsArgToQuery({
 	aggregationsArg = []
 }: {
 	aggregationsArg?: AggregationArg[]
-}) {
-	const obj = {};
+}): Aggregations {
+	const obj: Aggregations = {};
 	for (let i = 0; i < aggregationsArg.length; i++) {
 		const {
 			name,
@@ -161,7 +159,7 @@ function aggregationsArgToQuery({
 } // aggregationsArgToQuery
 
 
-function processAggregationsRes({
+export function processAggregationsRes({
 	aggregations = {},
 	fieldNameToPath = {}
 }: {
@@ -232,7 +230,7 @@ export function addQueryDocuments({
 	const filterInput = addFilterInput({glue});
 
 	const fulltextInputType = glue.addInputType({
-		name: 'QueryDSLExpressionFulltext',
+		name: GQL_UNIQ_TYPE.INPUT_QUERY_DSL_EXPRESSION_FULLTEXT,
 		fields: {
 			//field: { type: nonNull(GraphQLString) },
 			fields: { type: nonNull(list(GraphQLString)) },
@@ -244,7 +242,7 @@ export function addQueryDocuments({
 	});
 
 	const ngramInputType = glue.addInputType({
-		name: 'QueryDSLExpressionNgram',
+		name: GQL_UNIQ_TYPE.INPUT_QUERY_DSL_EXPRESSION_NGRAM,
 		fields: {
 			//field: { type: nonNull(GraphQLString) },
 			fields: { type: nonNull(list(GraphQLString)) },
@@ -256,7 +254,7 @@ export function addQueryDocuments({
 	});
 
 	const stemmedInputType = glue.addInputType({
-		name: 'QueryDSLExpressionStemmed',
+		name: GQL_UNIQ_TYPE.INPUT_QUERY_DSL_EXPRESSION_STEMMED,
 		fields: {
 			//field: { type: nonNull(GraphQLString) },
 			fields: { type: nonNull(list(GraphQLString)) },
@@ -269,7 +267,7 @@ export function addQueryDocuments({
 	});
 
 	const termInputType = glue.addInputType({
-		name: 'QueryDSLTermExpression',
+		name: GQL_UNIQ_TYPE.INPUT_QUERY_DSL_TERM_EXPRESSION,
 		fields: {
 			boost: {
 				type: GraphQLInt
@@ -295,11 +293,11 @@ export function addQueryDocuments({
 	});
 
 	const queryInput = glue.addInputType({
-		name: 'QueryDSL',
+		name: GQL_UNIQ_TYPE.INPUT_QUERY_DSL,
 		fields: {
 			boolean: {
 				type: glue.addInputType({
-					name: 'QueryDSLBoolean',
+					name: GQL_UNIQ_TYPE.INPUT_QUERY_DSL_BOOLEAN,
 					fields: {
 						must: {
 							type: list(queryDslBooleanClauseInput)
@@ -687,20 +685,7 @@ export function addQueryDocuments({
 		type: glue.addObjectType({
 			name: GQL_TYPE_DOCUMENT_QUERY_RESULT_NAME,
 			fields: {
-				aggregations: { type: list(glue.addObjectType({
-					name: GQL_TYPE_AGGREGATION_TERMS_NAME,
-					fields: {
-						name: { type: nonNull(GraphQLString) },
-						buckets: { type: list(glue.addObjectType({
-							name: GQL_TYPE_AGGREGATION_TERMS_BUCKET_NAME,
-							fields: {
-								docCount: { type: nonNull(GraphQLInt) },
-								key: { type: nonNull(GraphQLString) },
-								aggregations: { type: list(reference(GQL_TYPE_AGGREGATION_TERMS_NAME))}
-							}
-						}))},
-					}
-				}))},
+				aggregations: { type: list(glue.getObjectType(GQL_TYPE_AGGREGATION_TERMS_NAME))},
 				// aggregationsAsJson: { type: GraphQLJson },
 				count: { type: nonNull(GraphQLInt) },
 				fieldValueCounts: { type: list(glue.addObjectType({
