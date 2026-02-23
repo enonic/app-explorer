@@ -45,11 +45,13 @@ export interface SortContentTypes {
 }
 
 export interface GetContentTypesArgs {
+	branch?: 'master' | 'draft';
 	names?: string[];
 	sort?: SortContentTypes;
 }
 
 export interface GetSitesArgs {
+	branch?: 'master' | 'draft';
 	sitePaths?: string[];
 	projectIds?: string[];
 };
@@ -61,6 +63,7 @@ export type SiteObjectType = Pick<
 	| '_path'
 	| 'displayName'
 > & {
+	_branch: 'master' | 'draft'
 	_project: string;
 	attachments: AttachmentObjectType[];
 	[GQL_UNIQ_TYPE.QUERY_CONTENT_TYPES_GET]: ContentTypeObjectType[];
@@ -78,6 +81,7 @@ type GuillotineFilter = Guillotine.BasicFilters | Guillotine.BooleanFilter
 
 export interface QueryContentsArgs {
 	aggregations?: AggregationArg[];
+	branch?: 'master' | 'draft';
 	contentTypes?: string[];
 	count?: number;
 	filters?: GuillotineFilter | GuillotineFilter[]
@@ -93,6 +97,7 @@ export type ContentObjectType = Omit<
 	Content,
 	'attachments' | 'data' | 'page' | 'publish' | 'workflow' | 'x'
 > & {
+	_branch: 'master' | 'draft';
 	_highlight: HighlightResult;
 	attachmentsAsJson: Content['attachments'];
 	dataAsJson: Content['data'],

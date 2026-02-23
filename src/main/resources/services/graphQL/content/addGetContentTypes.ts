@@ -37,6 +37,7 @@ export function getContentTypesResolver(env: GetContentTypesEnv) {
 	if (TRACE) log.info('env:%s', toStr(env));
 	const {
 		args: {
+			branch = 'master',
 			names,
 			sort: {
 				direction: sortDirection = 'ASC',
@@ -48,7 +49,7 @@ export function getContentTypesResolver(env: GetContentTypesEnv) {
 	const context = getContext();
 	if (TRACE) log.info('context:%s', toStr(context));
 
-	context.branch = 'master';
+	context.branch = branch;
 	if (TRACE) log.info('modified context:%s', toStr(context));
 
 	let contentTypes = getTypes();
@@ -136,8 +137,10 @@ export function addGetContentTypes({
 	glue.addQuery<GetContentTypesArgs>({
 		name: GQL_UNIQ_TYPE.QUERY_CONTENT_TYPES_GET,
 		args: {
+			// @ts-ignore TODO
+			branch: glue.getEnumType(GQL_UNIQ_TYPE.ENUM_PROJECT_BRANCH),
 			names: list(GraphQLString),
-			// @ts-ignore
+			// @ts-ignore TODO
 			sort: glue.getInputType(GQL_UNIQ_TYPE.INPUT_CONTENT_TYPES_SORT),
 		},
 		resolve: getContentTypesResolver,

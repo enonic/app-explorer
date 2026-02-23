@@ -15,9 +15,10 @@ export const FIELD_SHORTCUT_COLLECTION = '_collectionName';
 export const FIELD_SHORTCUT_DOCUMENT_TYPE = '_documentTypeName';
 
 export const GQL_UNIQ_TYPE = {
-	ENUM_SORT_DIRECTION: 'SortDirection',
+	ENUM_PROJECT_BRANCH: 'ProjectBranch',
 	ENUM_CONTENT_TYPES_SORT_FIELD: 'ContentTypesSortField',
 	ENUM_SCHEMA_TYPE: 'SchemaType',
+	ENUM_SORT_DIRECTION: 'SortDirection',
 	ENUM_VALUE_TYPES: 'ValueTypes',
 	INPUT_CONTENT_TYPES_SORT: 'SortContentTypes',
 	INPUT_FIELD_SORT_DSL: 'FieldSortDsl',

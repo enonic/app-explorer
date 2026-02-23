@@ -26,6 +26,14 @@ export function addEnumTypes({
 	glue
 }) {
 	glue.addEnumType({
+		name: GQL_UNIQ_TYPE.ENUM_PROJECT_BRANCH,
+		values: [
+			'master',
+			'draft',
+		]
+	});
+
+	glue.addEnumType({
 		name: GQL_UNIQ_TYPE.ENUM_CONTENT_TYPES_SORT_FIELD,
 		values: [
 			'docCount',

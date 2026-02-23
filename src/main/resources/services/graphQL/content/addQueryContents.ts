@@ -72,6 +72,7 @@ export function queryContentsResolver<
 	if (TRACE) log.info('queryContentsResolver: localContext:%s', toStr(localContext));
 	const {
 		aggregations: aggregationsArg = [],
+		branch = 'master',
 		contentTypes = [],
 		count = 10,
 		filters: filtersArg,
@@ -90,7 +91,9 @@ export function queryContentsResolver<
 		if (!modifiedQuery) modifiedQuery = {} as QueryDsl;
 		if (!modifiedQuery['boolean']) modifiedQuery['boolean'] = {};
 		if (!modifiedQuery['boolean']['must']) modifiedQuery['boolean']['must'] = [];
-		if (!Array.isArray(modifiedQuery['boolean']['must'])) modifiedQuery['boolean']['must'] = [modifiedQuery['boolean']['must']];
+		if (!Array.isArray(modifiedQuery['boolean']['must'])) {
+			modifiedQuery['boolean']['must'] = [modifiedQuery['boolean']['must']];
+		}
 		modifiedQuery['boolean']['must'].push({
 			like: {
 				field: "_path",
@@ -103,7 +106,7 @@ export function queryContentsResolver<
 	const context = getContext();
 	if (TRACE) log.info('initial context:%s', toStr(context));
 
-	context.branch = 'master';
+	context.branch = branch;
 	context.repository = `com.enonic.cms.${projectId}`;
 	if (TRACE) log.info('used context:%s', toStr(context));
 
@@ -128,7 +131,10 @@ export function queryContentsResolver<
 	};
 	if (TRACE) log.info('contentQueryParams:%s', toStr(contentQueryParams));
 
-	const contentQueryResult = runInContext(context, () => queryContent<Content<unknown>, Aggregations>(contentQueryParams));
+	const contentQueryResult = runInContext(
+		context,
+		() => queryContent<Content<unknown>, Aggregations>(contentQueryParams)
+	);
 	if (TRACE) log.info('contentQueryResult:%s', toStr(contentQueryResult));
 
 	const {
@@ -153,6 +159,7 @@ export function queryContentsResolver<
 			x,
 			...rest
 		}) => ({
+			_branch: branch,
 			_id,
 			_highlight: contentQueryResult.highlight[_id] || null,
 			attachmentsAsJson: attachments,
@@ -174,6 +181,8 @@ export function getQueryContentsArgs({
 }): GraphQLArgs<QueryContentsArgs> {
 	return {
 		aggregations: list(addAggregationInput({ glue })),
+		// @ts-ignore TODO
+		branch: glue.getEnumType(GQL_UNIQ_TYPE.ENUM_PROJECT_BRANCH),
 		contentTypes: list(GraphQLString),
 		count: GraphQLInt,
 		filters: list(addFilterInput({ glue })),
@@ -208,6 +217,7 @@ export function addQueryContents({
 					type: list(glue.addObjectType<ContentObjectType>({
 						name: GQL_UNIQ_TYPE.OBJECT_CONTENT,
 						fields: {
+							_branch: { type: glue.getEnumType(GQL_UNIQ_TYPE.ENUM_PROJECT_BRANCH) },
 							_highlight: { type: GraphQLJson },
 							_id: { type: nonNull(GraphQLString) },
 							_name: { type: nonNull(GraphQLString) },

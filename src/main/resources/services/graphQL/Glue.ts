@@ -456,11 +456,11 @@ export class Glue<Context extends object = EmptyObject> {
 		return type;
 	}
 
-	getEnumType(name: string) {
+	getEnumType<T>(name: string) {
 		if (!hasOwnProperty(this._enumTypes, name)) { // true also when property is set to undefined
 			throw new Error(`enumTypes[${name}] not found! Perhaps you're trying to use it before it's defined?`);
 		}
-		return this._enumTypes[name];
+		return this._enumTypes[name] as T;
 	}
 
 	getFields(name: string) {

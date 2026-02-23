@@ -56,6 +56,7 @@ export function getSitesResolver<
 	if (TRACE) log.info('getSitesResolver: localContext:%s', toStr(localContext));
 
 	const {
+		branch = 'master',
 		sitePaths = [],
 		projectIds = []
 	} = args;
@@ -67,7 +68,7 @@ export function getSitesResolver<
 	}
 	const context = getContext();
 	if (TRACE) log.info('context:%s', toStr(context));
-	context.branch = 'master';
+	context.branch = branch;
 	let filteredProjectIds = listProjects().map(({id}) => id);
 	if (projectIds.length) {
 		filteredProjectIds = filteredProjectIds
@@ -100,6 +101,7 @@ export function getSitesResolver<
 		sitesQueryRes.count += sitesInProject.count;
 		sitesQueryRes.total += sitesInProject.total;
 		for (const hit of sitesInProject.hits) {
+			hit._branch = branch;
 			hit._project = projectId;
 			const newAttachments: AttachmentObjectType[] = [];
 			const attachmentObject = (hit as SiteObjectType).attachments;
@@ -143,6 +145,7 @@ export function addGetSites({
 		name: GQL_UNIQ_TYPE.OBJECT_SITE,
 		// description:,
 		fields: {
+			_branch: { type: nonNull(glue.getEnumType(GQL_UNIQ_TYPE.ENUM_PROJECT_BRANCH)) },
 			_id: { type: glue.getScalarType('_id') },
 			_name: { type: glue.getScalarType('_name') },
 			_path: { type: glue.getScalarType('_path') },
@@ -166,8 +169,9 @@ export function addGetSites({
 								direction: sortDirection = 'DESC',
 							} = {}
 						},
-						// context: localContext,
+						// context: localContextFromSiteObject,
 						source: {
+							_branch = 'master',
 							_path,
 							_project,
 						}
@@ -175,7 +179,7 @@ export function addGetSites({
 					if (TRACE) log.info('_path:%s', toStr(_path));
 					const context = getContext();
 					if (TRACE) log.info('context:%s', toStr(context));
-					context.branch = 'master';
+					context.branch = _branch;
 					context.repository = `com.enonic.cms.${_project}`;
 					if (TRACE) log.info('modified context:%s', toStr(context));
 					const contentQueryRes = runInContext(context, () => queryContent({
@@ -211,6 +215,7 @@ export function addGetSites({
 						}
 					} = contentQueryRes;
 					const keyToDocCount: Record<string, number> = {};
+					env.args.branch = _branch;
 					env.args.names = [];
 					for(const { docCount, key } of buckets) {
 						env.args.names.push(key);
@@ -238,6 +243,7 @@ export function addGetSites({
 			[GQL_UNIQ_TYPE.QUERY_CONTENT_QUERY]: {
 				args: {
 					...getQueryContentsArgs({ glue }),
+					branch: undefined, // available in source
 					projectId: undefined, // available in source
 					sitePath: undefined, // available in source
 				},
@@ -251,10 +257,11 @@ export function addGetSites({
 						sitePath,
 						...restArgs
 					} = args;
-					const { _path, _project } = source;
+					const { _branch, _path, _project } = source;
 					return queryContentsResolver<SiteObjectType>({
 						args: {
 							...restArgs,
+							branch: _branch,
 							projectId: _project,
 							sitePath: _path
 						},
@@ -272,6 +279,8 @@ export function addGetSites({
 	glue.addQuery<GetSitesArgs>({
 		name: GQL_UNIQ_TYPE.QUERY_SITES_GET,
 		args: {
+			// @ts-ignore TODO
+			branch: glue.getEnumType(GQL_UNIQ_TYPE.ENUM_PROJECT_BRANCH),
 			projectIds: list(GraphQLString),
 			sitePaths: list(GraphQLString),
 		},
