@@ -11,7 +11,7 @@
     "./**/*.d.ts",
   ],
 	"compilerOptions": {
-    "composite": true,
+    "composite": false,
     "esModuleInterop": true,
     // "incremental": false, // Avoid *.tsbuildinfo files // Composite projects may not disable incremental compilation
 		"jsx": "react-jsx",

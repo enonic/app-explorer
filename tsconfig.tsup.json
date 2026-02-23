@@ -1,5 +1,6 @@
 { // This file is used by tsup transpiling source code
 	"compilerOptions": {
+    "composite": false,
 		"paths": {
 			"@enonic/js-utils": ["./node_modules/@enonic/js-utils"],
 			"@enonic/js-utils/*": ["./node_modules/@enonic/js-utils/*"],
