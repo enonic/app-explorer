@@ -22,7 +22,7 @@
   "compilerOptions": {
     "allowJs": true,
     "allowSyntheticDefaultImports": true,
-    "composite": true,
+    "composite": false,
 
     // "declaration": false, // Composite projects may not disable declaration emit
     "declaration": true,

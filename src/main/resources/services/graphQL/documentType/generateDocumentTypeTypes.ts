@@ -2,18 +2,7 @@ import type {DocumentTypeEnv} from './index.d';
 
 
 import {
-	INDEX_CONFIG_N_GRAM,
-	VALUE_TYPE_ANY,
-	VALUE_TYPE_BOOLEAN,
-	VALUE_TYPE_DOUBLE,
-	VALUE_TYPE_GEO_POINT,
-	VALUE_TYPE_INSTANT,
-	VALUE_TYPE_LOCAL_DATE,
-	VALUE_TYPE_LOCAL_DATE_TIME,
-	VALUE_TYPE_LOCAL_TIME,
-	VALUE_TYPE_LONG,
-	VALUE_TYPE_SET,
-	VALUE_TYPE_STRING//,
+	INDEX_CONFIG_N_GRAM//,
 	//toStr
 } from '@enonic/js-utils';
 
@@ -34,7 +23,8 @@ import {
 	GQL_FIELDS_DOCUMENT_TYPE_PROPERTY_NAME,
 	GQL_INPUT_TYPE_DOCUMENT_TYPE_PROPERTIES_NAME,
 	GQL_INTERFACE_NODE_NAME,
-	GQL_TYPE_DOCUMENT_TYPE_NAME
+	GQL_TYPE_DOCUMENT_TYPE_NAME,
+	GQL_UNIQ_TYPE,
 } from '../constants';
 
 
@@ -54,22 +44,7 @@ export function generateDocumentTypeTypes({
 			[INDEX_CONFIG_N_GRAM]: { type: nonNull(GraphQLBoolean) },
 			path: { type: nonNull(GraphQLBoolean) },
 			stemmed: { type: nonNull(GraphQLBoolean) },
-			valueType: { type: nonNull(glue.addEnumType({
-				name: 'EnumValueTypes',
-				values: [
-					VALUE_TYPE_ANY,
-					VALUE_TYPE_BOOLEAN,
-					VALUE_TYPE_DOUBLE,
-					VALUE_TYPE_GEO_POINT,
-					VALUE_TYPE_INSTANT,
-					VALUE_TYPE_LOCAL_DATE,
-					VALUE_TYPE_LOCAL_DATE_TIME,
-					VALUE_TYPE_LOCAL_TIME,
-					VALUE_TYPE_LONG,
-					VALUE_TYPE_SET,
-					VALUE_TYPE_STRING
-				]
-			})) }
+			valueType: { type: nonNull(glue.getEnumType(GQL_UNIQ_TYPE.ENUM_VALUE_TYPES)) }
 		}
 	});
 
