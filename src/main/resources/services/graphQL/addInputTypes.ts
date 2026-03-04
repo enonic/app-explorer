@@ -8,13 +8,22 @@ import {
 
 import {
 	GQL_INPUT_TYPE_FILTERS_NAME,
-	GQL_INPUT_TYPE_FILTERS_BOOLEAN_NAME
+	GQL_INPUT_TYPE_FILTERS_BOOLEAN_NAME,
+	GQL_UNIQ_TYPE,
 } from './constants';
 
 
 export function addInputTypes({
 	glue
 }) {
+	glue.addInputType({
+		name: GQL_UNIQ_TYPE.INPUT_FIELD_SORT_DSL,
+		fields: {
+			field: { type: nonNull(GraphQLString) },
+			direction: { type: glue.getEnumType(GQL_UNIQ_TYPE.ENUM_SORT_DIRECTION) },
+		}
+	});
+
 	glue.addInputType({
 		name: GQL_INPUT_TYPE_FILTERS_NAME,
 		fields: {

@@ -1,0 +1,87 @@
+import {
+	TASK_STATE_FAILED,
+	TASK_STATE_FINISHED,
+	TASK_STATE_RUNNING,
+	TASK_STATE_WAITING,
+	VALUE_TYPE_ANY,
+	VALUE_TYPE_BOOLEAN,
+	VALUE_TYPE_DOUBLE,
+	VALUE_TYPE_GEO_POINT,
+	VALUE_TYPE_INSTANT,
+	VALUE_TYPE_LOCAL_DATE,
+	VALUE_TYPE_LOCAL_DATE_TIME,
+	VALUE_TYPE_LOCAL_TIME,
+	VALUE_TYPE_LONG,
+	VALUE_TYPE_SET,
+	VALUE_TYPE_STRING
+} from '@enonic/js-utils';
+
+import {
+	GQL_ENUM_TASK_STATES,
+	GQL_UNIQ_TYPE
+} from './constants';
+
+
+export function addEnumTypes({
+	glue
+}) {
+	glue.addEnumType({
+		name: GQL_UNIQ_TYPE.ENUM_PROJECT_BRANCH,
+		values: [
+			'master',
+			'draft',
+		]
+	});
+
+	glue.addEnumType({
+		name: GQL_UNIQ_TYPE.ENUM_CONTENT_TYPES_SORT_FIELD,
+		values: [
+			'docCount',
+			'name',
+		]
+	});
+
+	glue.addEnumType({
+		name: GQL_UNIQ_TYPE.ENUM_SCHEMA_TYPE,
+		values: [
+			'CONTENT_TYPE',
+			'MIXIN',
+			'XDATA'
+		]
+	});
+
+	glue.addEnumType({
+		name: GQL_UNIQ_TYPE.ENUM_SORT_DIRECTION,
+		values: [
+			'ASC',
+			'DESC'
+		]
+	});
+
+	glue.addEnumType({
+		name: GQL_ENUM_TASK_STATES,
+		values: [
+			TASK_STATE_FAILED,
+			TASK_STATE_FINISHED,
+			TASK_STATE_RUNNING,
+			TASK_STATE_WAITING
+		]
+	});
+
+	glue.addEnumType({
+		name: GQL_UNIQ_TYPE.ENUM_VALUE_TYPES,
+		values: [
+			VALUE_TYPE_ANY,
+			VALUE_TYPE_BOOLEAN,
+			VALUE_TYPE_DOUBLE,
+			VALUE_TYPE_GEO_POINT,
+			VALUE_TYPE_INSTANT,
+			VALUE_TYPE_LOCAL_DATE,
+			VALUE_TYPE_LOCAL_DATE_TIME,
+			VALUE_TYPE_LOCAL_TIME,
+			VALUE_TYPE_LONG,
+			VALUE_TYPE_SET,
+			VALUE_TYPE_STRING
+		]
+	});
+} // addEnumTypes

@@ -34,7 +34,7 @@ export type GraphQLFields<T> = {
 	}
 }
 
-type GraphQLArgs<T> = {
+export type GraphQLArgs<T> = {
 	[P in keyof T] :{
 		type: T[P]
 	}
@@ -87,20 +87,20 @@ interface EnvObject {
 	source?: object
 }
 
-// type Env<
-// 	Args extends object = EmptyObject,
-// 	Context extends object = EmptyObject,
-// 	Source extends null|object = null
-// > = {
-// 	args: Args
-// 	context?: Context
-// 	source?: Source
-// }
+export type Env<
+	ARGS extends object = EmptyObject,
+	CONTEXT extends object = EmptyObject,
+	SOURCE extends null | object = null
+> = {
+	args: ARGS;
+	context?: CONTEXT;
+	source?: SOURCE;
+}
 
-type FieldResolver<
-	Env extends EnvObject,
-	ResultGraph = unknown
-> = (env: Env) => ResultGraph
+export type FieldResolver<
+	ENV extends EnvObject,
+	RESULT_GRAPH = unknown
+> = (env: ENV) => RESULT_GRAPH
 
 
 export type QueriesItem<
@@ -456,11 +456,11 @@ export class Glue<Context extends object = EmptyObject> {
 		return type;
 	}
 
-	getEnumType(name: string) {
+	getEnumType<T>(name: string) {
 		if (!hasOwnProperty(this._enumTypes, name)) { // true also when property is set to undefined
 			throw new Error(`enumTypes[${name}] not found! Perhaps you're trying to use it before it's defined?`);
 		}
-		return this._enumTypes[name];
+		return this._enumTypes[name] as T;
 	}
 
 	getFields(name: string) {
@@ -568,7 +568,7 @@ export class Glue<Context extends object = EmptyObject> {
 		return this._objectTypes;
 	}
 
-	getScalarType(name: string) {
+	getScalarType<T = string>(name: string) {
 		//log.debug(`getScalarType(${name})`);
 		if (!hasOwnProperty(this._scalarTypes, name)) { // true also when property is set to undefined
 			if (this._uniqueNames[name]) {
@@ -581,7 +581,7 @@ export class Glue<Context extends object = EmptyObject> {
 			throw new Error(`scalarType name:${name} is falsy!`);
 		}
 		//log.debug(`getScalarType(${name}) --> ${typeof type}`);
-		return type;
+		return type as T;
 	}
 
 	getSortedObjectTypeNames() {
