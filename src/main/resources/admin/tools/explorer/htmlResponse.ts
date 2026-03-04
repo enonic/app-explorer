@@ -7,6 +7,7 @@ import {
 // import {toStr} from '@enonic/js-utils';
 import {getToolUrl} from '/lib/xp/admin';
 import {getLauncherPath} from '/lib/xp/admin';
+import {serviceUrl} from '/lib/xp/portal';
 import {runAsSu} from '/lib/explorer/runAsSu';
 import {get as getRepo} from '/lib/xp/repo';
 import {list as listTasks} from '/lib/xp/task';
@@ -48,7 +49,7 @@ function getImmuteableUrl({
 		log.error(msg);
 		throw new Error(msg);
 	}
-	return `/_/service/${app.name}/${SERVICE_NAME}/${pathWithHash}`;
+	return `${serviceUrl({service: SERVICE_NAME, type: 'server'})}/${pathWithHash}`;
 }
 
 
