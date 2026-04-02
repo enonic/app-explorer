@@ -16,7 +16,7 @@
     "graphql-hooks": "^6.1.0",
     "human-object-diff": "^3",
     "jsuri": "^1",
-    "lodash": "^4.17.23",
+    "lodash": "^4.18.1",
     "moment": "^2",
     "ms": "^2.1.3",
     "nice-react-gantt": "^2",
