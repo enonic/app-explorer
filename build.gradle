@@ -2,14 +2,9 @@ plugins {
 	id 'java' // Needed for assemble and build
 	id 'maven-publish' // Provides publishing and publishToMavenLocal
 	id 'com.enonic.defaults' version '2.1.6' // Publishing
-	id 'com.enonic.xp.app' version '3.6.2'
+	id 'com.enonic.xp.app'
 	id 'com.github.node-gradle.node' version '7.1.0'
 }
-
-// XP 7.12 and below requires Java 11
-// compileJava {
-// 	options.release = 17
-// }
 
 repositories {
 	mavenLocal()
@@ -18,63 +13,48 @@ repositories {
 }
 
 
-app {
-	name = project.appName
-	group = 'com.enonic.app'
-	displayName = 'Explorer'
-	vendorName = 'Enonic AS'
-	vendorUrl = 'https://enonic.com'
-	systemVersion = "${xpVersion}"
-}
-
-
 dependencies {
-	implementation "com.enonic.xp:core-api:${xpVersion}"
-	implementation "com.enonic.xp:portal-api:${xpVersion}"
+	implementation xplibs.api.core
+	implementation xplibs.api.portal
 
 	//──────────────────────────────────────────────────────────────────────────
 	// Core libs (com.enonic.xp)
 	//──────────────────────────────────────────────────────────────────────────
 
-	include "com.enonic.xp:lib-admin:${xpVersion}"
-	include "com.enonic.xp:lib-app:${xpVersion}"
-	include "com.enonic.xp:lib-auth:${xpVersion}"
-	include "com.enonic.xp:lib-cluster:${xpVersion}" // src/main/resources/main.ts:import {isMaster} from '/lib/xp/cluster';
-	include "com.enonic.xp:lib-common:${xpVersion}"
-	include "com.enonic.xp:lib-context:${xpVersion}" // Needed by lib-explorer
-	include "com.enonic.xp:lib-event:${xpVersion}"
-	include "com.enonic.xp:lib-i18n:${xpVersion}" // Needed by lib-explorer
-	include "com.enonic.xp:lib-io:${xpVersion}"
-	include "com.enonic.xp:lib-mail:${xpVersion}" // Needed by lib-explorer
-	include "com.enonic.xp:lib-node:${xpVersion}" // Needed by lib-explorer
-	include "com.enonic.xp:lib-portal:${xpVersion}"
-	include "com.enonic.xp:lib-project:${xpVersion}"
-	include "com.enonic.xp:lib-repo:${xpVersion}"
-	include "com.enonic.xp:lib-scheduler:${xpVersion}"
-	include "com.enonic.xp:lib-schema:${xpVersion}"
-	include "com.enonic.xp:lib-task:${xpVersion}"
-	//include "com.enonic.xp:lib-thymeleaf:${xpVersion}"
-	include "com.enonic.xp:lib-vhost:${xpVersion}"
-	include "com.enonic.xp:lib-websocket:${xpVersion}"
+	include xplibs.admin
+	include xplibs.app
+	include xplibs.auth
+	include xplibs.cluster // src/main/resources/main.ts:import {isMaster} from '/lib/xp/cluster';
+	include xplibs.common
+	include xplibs.context // Needed by lib-explorer
+	include xplibs.event
+	include xplibs.i18n // Needed by lib-explorer
+	include xplibs.io
+	include xplibs.mail // Needed by lib-explorer
+	include xplibs.node // Needed by lib-explorer
+	include xplibs.portal
+	include xplibs.project
+	include xplibs.repo
+	include xplibs.scheduler
+	include xplibs.schema
+	include xplibs.task
+	//include xplibs.thymeleaf
+	include xplibs.vhost
+	include xplibs.websocket
 
 	//──────────────────────────────────────────────────────────────────────────
 	// Other enonic libs (com.enonic.lib)
 	//──────────────────────────────────────────────────────────────────────────
 
-	//include 'com.enonic.lib:lib-admin-ui:3.0.0' // Not needed for the XP Menu
-
-	include 'com.enonic.lib:lib-cache:2.2.1'
-	include 'com.enonic.lib:lib-graphql:2.1.0'
-	//include 'com.enonic.lib:lib-graphql-playground:0.0.1'
-	include 'com.enonic.lib:lib-guillotine:6.2.1'
-	include 'com.enonic.lib:lib-http-client:3.2.2'
-	include 'com.enonic.lib:lib-license:3.1.0'
-	include 'com.enonic.lib:lib-router:3.2.0'
-	// include 'com.enonic.lib:lib-asset:1.0.0'
-	include 'com.enonic.lib:lib-static:2.1.1'
-	include 'com.enonic.lib:lib-explorer:4.5.0'
-	include 'com.enonic.lib:lib-util:3.1.1' //lib/util/content/getSites
-	// include 'com.enonic.lib:lib-text-encoding:2.0.0'
+	include libs.lib.cache
+	include libs.lib.graphql
+	include libs.lib.guillotine
+	include libs.lib.http.client
+	include libs.lib.license
+	include libs.lib.router
+	include libs.lib.static
+	include libs.lib.explorer
+	include libs.lib.util
 
 	// WARNING: Do NOT use include files, jar file will be missing dependencies!
 }
@@ -82,10 +62,6 @@ dependencies {
 
 tasks.withType(Copy) {
   includeEmptyDirs = false
-}
-
-wrapper {
-	distributionUrl = "${gradleDistributionUrl}"
 }
 
 node {
