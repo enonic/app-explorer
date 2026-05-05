@@ -6,8 +6,8 @@ lib-http-client = "3.2.2"
 lib-license = "3.1.0"
 lib-router = "3.2.0"
 lib-static = "2.1.1"
-lib-explorer = "4.5.0"
-lib-util = "3.1.1"
+lib-explorer = "5.0.0-SNAPSHOT"
+lib-util = "4.0.0-SNAPSHOT"
 
 [libraries]
 lib-cache = { module = "com.enonic.lib:lib-cache", version.ref = "lib-cache" }
