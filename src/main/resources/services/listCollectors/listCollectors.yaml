@@ -1,0 +1,11 @@
+kind: "Service"
+title: "listCollectors"
+allow:
+  - "role:cms.admin"
+  - "role:cms.cm.app"
+  - "role:cms.expert"
+  - "role:com.enonic.app.explorer.admin"
+  - "role:system.admin"
+  - "role:system.admin.login"
+  - "role:system.authenticated"
+  - "role:system.everyone"

@@ -1,0 +1,8 @@
+kind: "AdminTool"
+title:
+  text: "Explorer"
+description:
+  text: "Enterprise search"
+allow:
+  - "role:com.enonic.app.explorer.admin"
+  - "role:system.admin"

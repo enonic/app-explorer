@@ -1,0 +1,27 @@
+kind: "Task"
+description: "Import CSV to Thesaurus"
+form:
+  - type: "TextLine"
+    name: "csv"
+    label: "csv"
+    occurrences:
+      min: 1
+      max: 1
+  - type: "TextLine"
+    name: "fromLocale"
+    label: "fromLocale"
+    occurrences:
+      min: 1
+      max: 1
+  - type: "TextLine"
+    name: "thesaurusId"
+    label: "thesaurusId"
+    occurrences:
+      min: 1
+      max: 1
+  - type: "TextLine"
+    name: "toLocale"
+    label: "toLocale"
+    occurrences:
+      min: 1
+      max: 1

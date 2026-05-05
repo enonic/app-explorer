@@ -1,0 +1,5 @@
+kind: "Service"
+title: "collectorAssets"
+allow:
+  - "role:com.enonic.app.explorer.admin"
+  - "role:system.admin"
