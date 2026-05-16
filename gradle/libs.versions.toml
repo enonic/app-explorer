@@ -7,7 +7,6 @@ lib-license = "3.1.0"
 lib-router = "3.2.0"
 lib-static = "2.1.1"
 lib-explorer = "5.0.0-SNAPSHOT"
-lib-util = "4.0.0-SNAPSHOT"
 
 [libraries]
 lib-cache = { module = "com.enonic.lib:lib-cache", version.ref = "lib-cache" }
@@ -18,4 +17,3 @@ lib-license = { module = "com.enonic.lib:lib-license", version.ref = "lib-licens
 lib-router = { module = "com.enonic.lib:lib-router", version.ref = "lib-router" }
 lib-static = { module = "com.enonic.lib:lib-static", version.ref = "lib-static" }
 lib-explorer = { module = "com.enonic.lib:lib-explorer", version.ref = "lib-explorer" }
-lib-util = { module = "com.enonic.lib:lib-util", version.ref = "lib-util" }

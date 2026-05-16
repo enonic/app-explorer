@@ -123,7 +123,6 @@ export default defineConfig((options: MyOptions) => {
 				'/lib/http-client',
 				'/lib/license',
 				'/lib/router',
-				'/lib/util',
 				'/lib/vanilla',
 				'/lib/text-encoding',
 				'/lib/thymeleaf',

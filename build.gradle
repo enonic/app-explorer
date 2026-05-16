@@ -54,7 +54,6 @@ dependencies {
 	include libs.lib.router
 	include libs.lib.static
 	include libs.lib.explorer
-	include libs.lib.util
 
 	// WARNING: Do NOT use include files, jar file will be missing dependencies!
 }
