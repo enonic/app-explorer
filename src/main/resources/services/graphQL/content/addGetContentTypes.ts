@@ -55,7 +55,13 @@ export function getContentTypesResolver(env: GetContentTypesEnv) {
 	let contentTypes = getTypes();
 	if (TRACE) log.info('contentTypes.length:%s', toStr(contentTypes.length));
 	if (names) {
-		contentTypes = contentTypes.filter(({name}) => includes(names, name));
+		// WARNING: When getContentTypes is called inside getSites there are two issues:
+		// 1. getTypes() returns more types than aggregation on the type field.
+		//    For example media:audio, media:data and media:executable is missing.
+		// 2. There is also a case mismatch: Search index fields are lower-cased.
+		//    https://github.com/enonic/xp/issues/9466
+		const lcNames = names.map(n => n.toLocaleLowerCase());
+		contentTypes = contentTypes.filter(({name}) => includes(lcNames, name.toLocaleLowerCase()));
 		if (TRACE) log.info('filtered contentTypes.length:%s', toStr(contentTypes.length));
 	}
 	if (!(sortField === 'name' && sortDirection === 'ASC')) {
