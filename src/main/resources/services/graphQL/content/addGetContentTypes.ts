@@ -53,12 +53,15 @@ export function getContentTypesResolver(env: GetContentTypesEnv) {
 	if (TRACE) log.info('modified context:%s', toStr(context));
 
 	let contentTypes = getTypes();
+	if (TRACE) log.info('contentTypes.length:%s', toStr(contentTypes.length));
 	if (names) {
 		contentTypes = contentTypes.filter(({name}) => includes(names, name));
+		if (TRACE) log.info('filtered contentTypes.length:%s', toStr(contentTypes.length));
 	}
 	if (!(sortField === 'name' && sortDirection === 'ASC')) {
 		if (sortField === 'name' && sortDirection === 'DESC') {
 			contentTypes = contentTypes.reverse();
+			if (TRACE) log.info('reversed contentTypes.length:%s', toStr(contentTypes.length));
 		}
 		// Sorting on _docCount is done in addGetSites
 	}
@@ -81,7 +84,7 @@ export function getContentTypesResolver(env: GetContentTypesEnv) {
 		name,
 		...rest
 	}) as unknown as ContentTypeObjectType);
-	if (TRACE) log.info('contentObjects:%s', toStr(contentObjects));
+	if (TRACE) log.info('contentObjects.length:%s', toStr(contentObjects.length));
 	return contentObjects;
 }
 
