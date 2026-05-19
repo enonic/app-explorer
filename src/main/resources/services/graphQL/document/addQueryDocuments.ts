@@ -2,11 +2,21 @@ import type {
 	Aggregations,
 	// AggregationsResult,
 	BucketsAggregationResult,
+	BooleanDslExpression,
 	BooleanFilter,
+	ExistsDslExpression,
 	Filter,
+	FulltextDslExpression,
+	LikeDslExpression,
+	NgramDslExpression,
+	PathMatchDslExpression,
 	QueryDsl,
+	RangeDslExpression,
 	SingleValueMetricAggregationResult,
-	StatsAggregationResult
+	StatsAggregationResult,
+	StemmedDslExpression,
+	TermDslExpression,
+	InDslExpression,
 } from '@enonic-types/core';
 import type {
 	// NodeQueryResultHit // NOTE: highlight is optional
@@ -226,13 +236,22 @@ export function processAggregationsRes({
 
 export function addQueryDocuments({
 	glue
+}: {
+	glue: Glue;
 }) {
-	const filterInput = addFilterInput({glue});
+	const filterInput = addFilterInput({ glue });
 
-	const fulltextInputType = glue.addInputType({
+	const existsInputType = glue.addInputType<ExistsDslExpression>({
+		name: GQL_UNIQ_TYPE.INPUT_QUERY_DSL_EXPRESSION_EXISTS,
+		fields: {
+			field: { type: nonNull(GraphQLString) },
+			boost: { type: GraphQLFloat },
+		}
+	});
+
+	const fulltextInputType = glue.addInputType<FulltextDslExpression>({
 		name: GQL_UNIQ_TYPE.INPUT_QUERY_DSL_EXPRESSION_FULLTEXT,
 		fields: {
-			//field: { type: nonNull(GraphQLString) },
 			fields: { type: nonNull(list(GraphQLString)) },
 			query: { type: nonNull(GraphQLString) },
 			// Optional
@@ -241,7 +260,31 @@ export function addQueryDocuments({
 		}
 	});
 
-	const ngramInputType = glue.addInputType({
+	const inInputType = glue.addInputType<InDslExpression>({
+		name: GQL_UNIQ_TYPE.INPUT_QUERY_DSL_EXPRESSION_IN,
+		fields: {
+			field: { type: nonNull(GraphQLString) },
+			values: {
+				// The type of TermDslExpression['value'] is unknown[],
+				// but supports string[], dateTime[] and time[], but those are also string[] :)
+				type: list(GraphQLString)
+			},
+			type: { type: glue.getEnumType(GQL_UNIQ_TYPE.ENUM_DSL_QUERY_TYPE) },
+			boost: { type: GraphQLFloat },
+		}
+	});
+
+	const likeInputType = glue.addInputType<LikeDslExpression>({
+		name: GQL_UNIQ_TYPE.INPUT_QUERY_DSL_EXPRESSION_LIKE,
+		fields: {
+			field: { type: nonNull(GraphQLString) },
+			value: { type: nonNull(GraphQLString) },
+			type: { type: glue.getEnumType(GQL_UNIQ_TYPE.ENUM_DSL_QUERY_TYPE) },
+			boost: { type: GraphQLFloat },
+		}
+	});
+
+	const ngramInputType = glue.addInputType<NgramDslExpression>({
 		name: GQL_UNIQ_TYPE.INPUT_QUERY_DSL_EXPRESSION_NGRAM,
 		fields: {
 			//field: { type: nonNull(GraphQLString) },
@@ -253,10 +296,32 @@ export function addQueryDocuments({
 		}
 	});
 
-	const stemmedInputType = glue.addInputType({
+	const pathMatchInputType = glue.addInputType<PathMatchDslExpression>({
+		name: GQL_UNIQ_TYPE.INPUT_QUERY_DSL_EXPRESSION_PATHMATCH,
+		fields: {
+			field: { type: nonNull(GraphQLString) },
+			path: { type: nonNull(GraphQLString) },
+			minimumMatch: { type: GraphQLInt },
+			boost: { type: GraphQLFloat },
+		}
+	});
+
+	const rangeInputType = glue.addInputType<RangeDslExpression>({
+		name: GQL_UNIQ_TYPE.INPUT_QUERY_DSL_EXPRESSION_RANGE,
+		fields: {
+			boost: { type: GraphQLFloat },
+			field: { type: nonNull(GraphQLString) },
+			gt: { type: GraphQLString },
+			gte: { type: GraphQLString },
+			lt: { type: GraphQLString },
+			lte: { type: GraphQLString },
+			type: { type: glue.getEnumType(GQL_UNIQ_TYPE.ENUM_DSL_QUERY_TYPE) },
+		}
+	});
+
+	const stemmedInputType = glue.addInputType<StemmedDslExpression>({
 		name: GQL_UNIQ_TYPE.INPUT_QUERY_DSL_EXPRESSION_STEMMED,
 		fields: {
-			//field: { type: nonNull(GraphQLString) },
 			fields: { type: nonNull(list(GraphQLString)) },
 			query: { type: nonNull(GraphQLString) },
 			language: { type: nonNull(GraphQLString) },
@@ -266,39 +331,49 @@ export function addQueryDocuments({
 		}
 	});
 
-	const termInputType = glue.addInputType({
+	const termInputType = glue.addInputType<TermDslExpression>({
 		name: GQL_UNIQ_TYPE.INPUT_QUERY_DSL_TERM_EXPRESSION,
 		fields: {
-			boost: {
-				type: GraphQLInt
-			},
-			field: {
-				type: nonNull(GraphQLString)
-			},
+			boost: { type: GraphQLFloat },
+			field: { type: nonNull(GraphQLString) },
+			type: { type: glue.getEnumType(GQL_UNIQ_TYPE.ENUM_DSL_QUERY_TYPE) },
 			value: {
-				type: GraphQLString // TODO
+				// The type of TermDslExpression['value'] is unknown,
+				// but supports string, dateTime and time, but those are also strings :)
+				type: GraphQLString
 			}
 		} // fields
 	});
 
-	const queryDslBooleanClauseInput = glue.addInputType({
+	const queryDslBooleanClauseInput = glue.addInputType<QueryDsl>({
 		name: GQL_INPUT_TYPE_QUERY_DSL_BOOLEAN_CLAUSE,
 		fields: {
+			// TODO: Chicken and egg problem :) Use reference?
+			// boolean: { type: glue.getInputType(GQL_UNIQ_TYPE.INPUT_QUERY_DSL_BOOLEAN) },
+			exists: { type: existsInputType },
 			fulltext: { type: fulltextInputType },
-			matchAll: { type: addMatchAll({glue}) },
+			in: { type: inInputType },
+			like: { type: likeInputType },
+			matchAll: { type: addMatchAll({ glue }) },
 			ngram: { type: ngramInputType },
+			pathMatch: { type: pathMatchInputType },
+			range: { type: rangeInputType },
 			stemmed: { type: stemmedInputType },
-			term: { type: termInputType }
+			term: { type: termInputType },
 		} // fields
 	});
 
-	const queryInput = glue.addInputType({
+	const queryInput = glue.addInputType<QueryDsl>({
 		name: GQL_UNIQ_TYPE.INPUT_QUERY_DSL,
 		fields: {
 			boolean: {
-				type: glue.addInputType({
+				type: glue.addInputType<BooleanDslExpression>({
 					name: GQL_UNIQ_TYPE.INPUT_QUERY_DSL_BOOLEAN,
 					fields: {
+						boost: { type: GraphQLFloat },
+						filter: {
+							type: list(queryDslBooleanClauseInput)
+						},
 						must: {
 							type: list(queryDslBooleanClauseInput)
 						},

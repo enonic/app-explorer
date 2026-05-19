@@ -258,8 +258,8 @@ export class Glue<Context extends object = EmptyObject> {
 		fields,
 		name
 	}: {
-		fields: Fields<T>
-		name: string
+		fields: Fields<T>;
+		name: string;
 	}) {
 		//log.debug(`addInputType({name:${name},fields:${toStr(fields)}})`);
 		//log.debug(`addInputType({name:${name}})`);

@@ -25,6 +25,15 @@ import {
 export function addEnumTypes({
 	glue
 }) {
+
+	glue.addEnumType({
+		name: GQL_UNIQ_TYPE.ENUM_DSL_QUERY_TYPE,
+		values: [
+			'dateTime',
+			'time',
+		]
+	});
+
 	glue.addEnumType({
 		name: GQL_UNIQ_TYPE.ENUM_PROJECT_BRANCH,
 		values: [
