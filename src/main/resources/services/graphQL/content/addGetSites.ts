@@ -176,6 +176,8 @@ export function addGetSites({
 							_project,
 						}
 					} = env;
+					env.args.branch = _branch; // Passed on to children (like getContentTypes).
+
 					if (TRACE) log.info('_path:%s', toStr(_path));
 					const context = getContext();
 					if (TRACE) log.info('context:%s', toStr(context));
@@ -187,7 +189,7 @@ export function addGetSites({
 							type: {
 								terms: {
 									field: 'type',
-									minDocCount: 1,
+									minDocCount: 0,
 									// order: '_count desc', // Sort added elsewhere
 									size: 1000,
 								}
@@ -214,10 +216,15 @@ export function addGetSites({
 							}
 						}
 					} = contentQueryRes;
+
+					if (!buckets.length) return []; // Shortcircuit.
+
 					const keyToDocCount: Record<string, number> = {};
-					env.args.branch = _branch;
-					env.args.names = [];
+					env.args.names = []; // Passed on to children (like getContentTypes).
 					for(const { docCount, key } of buckets) {
+						// getTypes() returns more types than aggregation on the type field.
+						// Known issue: Search index fields are lower-cased.
+						// https://github.com/enonic/xp/issues/9466
 						env.args.names.push(key);
 						keyToDocCount[key] = docCount;
 					}
@@ -226,14 +233,14 @@ export function addGetSites({
 					const contentObjectTypes = getContentTypesResolver(env);
 					if (TRACE) log.info('contentObjectTypes:%s', toStr(contentObjectTypes));
 					let contentObjectTypesWithDocCount = contentObjectTypes.map(cOT => {
-						cOT._docCount = keyToDocCount[cOT.name];
+						cOT._docCount = keyToDocCount[cOT.name] || 0; // When type missing in aggregation.
 						return cOT;
 					});
 					if (TRACE) log.info('contentObjectTypesWithDocCount:%s', toStr(contentObjectTypesWithDocCount));
 					if (sortField === 'docCount') {
 						contentObjectTypesWithDocCount = sortByProperty(contentObjectTypesWithDocCount, '_docCount');
 						if (sortDirection === 'DESC') {
-							contentObjectTypesWithDocCount = contentObjectTypesWithDocCount.reverse();
+							return contentObjectTypesWithDocCount.reverse();
 						}
 					}
 					return contentObjectTypesWithDocCount;
