@@ -1,5 +1,5 @@
 [versions]
-lib-cache = "2.2.1"
+lib-cache = "3.0.0"
 lib-graphql = "3.0.0"
 lib-guillotine = "6.2.1"
 lib-http-client = "3.2.2"
