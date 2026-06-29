@@ -4,7 +4,7 @@ lib-graphql = "3.0.0"
 lib-guillotine = "6.2.1"
 lib-http-client = "3.2.2"
 lib-license = "3.1.0"
-lib-router = "3.2.0"
+lib-router = "4.0.0"
 lib-static = "2.1.1"
 lib-explorer = "5.0.0-SNAPSHOT"
 
