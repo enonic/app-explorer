@@ -4,7 +4,7 @@ import type {
 	Cheerio,
 	SelectorType
 } from 'cheerio';
-import type { Response } from '@enonic-types/lib-explorer';
+import type { HttpClient } from '@enonic-types/lib-explorer';
 import type {
 	WebCrawlConfig,
 	WebCrawlDocument,
@@ -60,8 +60,10 @@ import throwIfNotAllowed from './robots/throwIfNotAllowed';
 import throwIfNotIndexable from './robots/throwIfNotIndexable';
 import {throwIfExcluded} from './robots/throwIfExcluded';
 
+import {getHeaderValue} from './getHeaderValue';
 import {matchesExcludeRegexp} from './uri/matchesExcludeRegexp';
 import {normalizeUriObj} from './uri/normalizeUriObj';
+import {resolveRedirectTarget} from './uri/resolveRedirectTarget';
 import {normalizeWithoutEndingSlash} from './uri/normalizeWithoutEndingSlash';
 import {pathFromResolvedUri} from './uri/pathFromResolvedUri';
 import {serializeNormalizedUriObjWithQuery} from './uri/serializeNormalizedUriObjWithQuery';
@@ -359,17 +361,37 @@ export function run({
 					method: 'POST',
 					url: browserlessUrl
 				} : {
-					followRedirects: true, // https://www.enonic.com uses 302
+					// Redirects are handled below instead of by lib-http-client, so
+					// that a redirect leading to another domain aborts instead of
+					// indexing the redirect target's content under the original url.
+					followRedirects: false,
 					headers,
 					url
 				};
 				log.debug('requestParams:%s', toStr(requestParams));
 
-				const res: Response = httpClientRequest(requestParams);
+				const res: HttpClient.Response = httpClientRequest(requestParams);
 				TRACE && log.debug('res:%s', toStr(res));
 
 				if (res.status === 404) {
 					throw new NotFoundException(url);
+				}
+
+				if (res.status >= 300 && res.status < 400) {
+					const location = getHeaderValue(res.headers, 'location');
+					if (!location) {
+						log.warning(`${url}: Ignoring ${res.status} redirect without a Location header`);
+					} else {
+						const {host, normalizedUrl, resolvedUrl, sameDomain} = resolveRedirectTarget(url, location, domain);
+						if (sameDomain) {
+							log.debug('%s: Following same-domain %s redirect to:%s', url, res.status, normalizedUrl);
+							handleNormalizedUri(normalizedUrl);
+						} else {
+							log.info(`${url}: Skipping ${res.status} redirect to other domain:${host} (${resolvedUrl})`);
+						}
+					}
+					collector.addSuccess({message: url});
+					continue whileQueueLoop;
 				}
 
 				if (res.status != 200) {
@@ -384,14 +406,16 @@ export function run({
 				// log.debug(toStr({headers: res.headers}));
 				let boolFollow = true;
 				let boolIndex = true;
-				if (res.headers['X-Robots-Tag']) {
-					const xRobotsTag = res.headers['X-Robots-Tag'].toUpperCase();
+				const xRobotsTagRaw = res.headers?.['X-Robots-Tag'];
+				const xRobotsTagHeader = Array.isArray(xRobotsTagRaw) ? xRobotsTagRaw[0] : xRobotsTagRaw;
+				if (xRobotsTagHeader) {
+					const xRobotsTag = xRobotsTagHeader.toUpperCase();
 					if (xRobotsTag.includes('NOFOLLOW')) {
 						boolFollow = false;
 					}
 					if (xRobotsTag.includes('NOINDEX')) {
 						if(!boolFollow) {
-							throw new RobotsException(url, `HTTP header X-Robots-Tag:${res.headers['X-Robots-Tag']} includes both NOFOLLOW and NOINDEX`);
+							throw new RobotsException(url, `HTTP header X-Robots-Tag:${xRobotsTagHeader} includes both NOFOLLOW and NOINDEX`);
 						}
 						boolIndex = false;
 					}
