@@ -10,11 +10,8 @@ import {connect} from '/lib/explorer/repo/connect';
 import {getDocumentCount} from '/lib/explorer/collection/getDocumentCount';
 import {query as qC} from '/lib/explorer/collection/query';
 import {usedInInterfaces} from '/lib/explorer/collection/usedInInterfaces';
-import {
-	createAggregation,
-	createFilters,
-	// @ts-expect-error No types yet
-} from '/lib/guillotine/util/factory';
+import {createAggregation} from '/lib/explorer/interface/graphql/aggregations/guillotine/createAggregation';
+import {createFilters} from '/lib/explorer/interface/graphql/filters/guillotine/createFilters';
 import {getManagedDocumentTypes} from '../collector/addGetManagedDocumentTypes';
 
 

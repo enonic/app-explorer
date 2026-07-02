@@ -48,7 +48,6 @@ dependencies {
 
 	include libs.lib.cache
 	include libs.lib.graphql
-	include libs.lib.guillotine
 	include libs.lib.http.client
 	include libs.lib.license
 	include libs.lib.router

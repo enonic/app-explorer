@@ -161,9 +161,6 @@ jest.mock('/lib/graphql', () => ({
 jest.mock('/lib/graphql-connection', () => ({
 }), { virtual: true });
 
-jest.mock('/lib/guillotine/util/factory', () => ({
-}), { virtual: true });
-
 jest.mock('/lib/xp/context', () => ({
 	get: jest.fn<typeof get>().mockReturnValue({
 		attributes: {},
@@ -179,8 +176,7 @@ jest.mock('/lib/xp/context', () => ({
 				disabled: false,
 				email: 'john.doe@example.com',
 				login: 'john.doe',
-				idProvider: 'system',
-				hasPassword: false
+				idProvider: 'system'
 			}
 		}
 	}),

@@ -60,11 +60,7 @@ import {
 	nonNull,
 	// @ts-expect-error No types yet
 } from '/lib/graphql';
-import {
-	// createAggregation,
-	createFilters
-	// @ts-expect-error No types yet
-} from '/lib/guillotine/util/factory';
+import {createFilters} from '/lib/explorer/interface/graphql/filters/guillotine/createFilters';
 import {
 	FIELD_SHORTCUT_COLLECTION,
 	FIELD_SHORTCUT_DOCUMENT_TYPE,
