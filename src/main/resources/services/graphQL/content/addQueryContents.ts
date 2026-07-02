@@ -28,11 +28,7 @@ import {
 	nonNull
 	// @ts-ignore
 } from '/lib/graphql';
-import {
-	// createAggregation,
-	createFilters
-	// @ts-expect-error No types yet
-} from '/lib/guillotine/util/factory';
+import { createFilters } from '/lib/explorer/interface/graphql/filters/guillotine/createFilters';
 import {
 	type QueryContentParams,
 	query as queryContent,
