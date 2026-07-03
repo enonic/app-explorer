@@ -5,8 +5,10 @@ import {
 	Repo
 } from '@enonic/explorer-utils';
 // import {toStr} from '@enonic/js-utils';
-import {getToolUrl} from '/lib/xp/admin';
-import {getLauncherPath} from '/lib/xp/admin';
+import {
+	extensionUrl,
+	getToolUrl,
+} from '/lib/xp/admin';
 import {serviceUrl} from '/lib/xp/portal';
 import {runAsSu} from '/lib/explorer/runAsSu';
 import {get as getRepo} from '/lib/xp/repo';
@@ -146,6 +148,14 @@ export function htmlResponse({
 
 	const REACT_MODE_POSTFIX = 'development.js'; // 'production.min.js';
 
+	const menuLoaderUrl = extensionUrl({
+		application: 'com.enonic.xp.app.main',
+		extension: 'menu-loader',
+		params: {
+			theme: 'dark',
+		},
+	});
+
 	return {
 		body: `<html>
 	<head>
@@ -196,7 +206,7 @@ export function htmlResponse({
 			//<script type="text/javascript" src="${getImmuteableUrl({manifestPath: FILEPATH_MANIFEST, path: 'Explorer.mjs'})}"></script>
 			''
 		}
-		<script type="text/javascript" src="${getLauncherPath()}" data-config-theme="dark" async></script>
+		<script type="module" src="${menuLoaderUrl}"></script>
 		<script type='module' defer>
 			import {App} from '${getImmuteableUrl({manifestPath: FILEPATH_MANIFEST, path: 'Explorer.mjs'})}';
 			const root = ReactDOM.createRoot(document.getElementById('${ID_REACT_EXPLORER_CONTAINER}'));

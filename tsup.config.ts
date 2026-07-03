@@ -119,7 +119,6 @@ export default defineConfig((options: MyOptions) => {
 				'/lib/galimatias',
 				'/lib/graphql',
 				'/lib/graphql-connection',
-				/^\/lib\/guillotine/,
 				'/lib/http-client',
 				'/lib/license',
 				'/lib/router',

@@ -85,7 +85,7 @@ export default defineConfig(() => {
 		],
 		format: 'cjs',
 		minify: false, // Minifying server files makes debugging harder
-		publicDir: resolve(__dirname, 'publicDir'), // Copies xml file :)
+		publicDir: resolve(__dirname, 'publicDir'), // Copies the task descriptor :)
 		noExternal: [
 			/^@enonic\/js-utils/,
 			'cheerio',

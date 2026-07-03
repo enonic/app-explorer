@@ -6,3 +6,5 @@ description:
 allow:
   - "role:com.enonic.app.explorer.admin"
   - "role:system.admin"
+apis:
+  - "admin:extension"
