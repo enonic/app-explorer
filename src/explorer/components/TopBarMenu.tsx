@@ -1,4 +1,3 @@
-import type {User} from '/lib/xp/auth';
 import type {
 	SemanticICONS,
 	StrictDropdownItemProps,
@@ -6,8 +5,13 @@ import type {
 
 
 import {
+	useEffect,
+	useRef,
+} from 'react';
+import {
 	Link,
 	useLocation,
+	useNavigate,
 } from 'react-router-dom';
 import {
 	Dropdown,
@@ -27,7 +31,6 @@ export default function TopBarMenu({
 	setLicensedTo,
 	setLicenseValid,
 	sideBarVisible, setSideBarVisible,
-	userState,
 }: {
 	interfaceNameState: string
 	interfaceOptions?: StrictDropdownItemProps[]
@@ -40,9 +43,64 @@ export default function TopBarMenu({
 	setLicenseValid: React.Dispatch<React.SetStateAction<boolean>>
 	setSideBarVisible: React.Dispatch<React.SetStateAction<boolean>>
 	sideBarVisible: boolean
-	userState: User
 }) {
 	const location = useLocation();
+	const navigate = useNavigate();
+
+	const xpMenuContainerRef = useRef<HTMLDivElement>(null);
+	useEffect(() => {
+		const container = xpMenuContainerRef.current;
+		if (!container) { return; }
+
+		let shadowObserver: MutationObserver;
+
+		const linkUpUsername = (xpMenu: Element) => {
+			const shadowRoot = xpMenu.shadowRoot;
+			if (!shadowRoot) { return; }
+			const addLink = () => {
+				const usernameEl = shadowRoot.querySelector<HTMLElement>('.avatar-dropdown-username');
+				if (!usernameEl) { return false; }
+				if (!usernameEl.dataset.explorerUserLink) {
+					usernameEl.dataset.explorerUserLink = 'true';
+					usernameEl.style.cursor = 'pointer';
+					usernameEl.addEventListener('click', () => navigate('/user'));
+				}
+				return true;
+			};
+			if (addLink()) { return; }
+			shadowObserver = new MutationObserver(() => {
+				if (addLink()) {
+					shadowObserver.disconnect();
+				}
+			});
+			shadowObserver.observe(shadowRoot, { childList: true, subtree: true });
+		};
+
+		const moveXpMenu = () => {
+			const xpMenu = document.querySelector('xp-menu');
+			if (!xpMenu) { return false; }
+			if (xpMenu.parentElement !== container) {
+				container.appendChild(xpMenu);
+			}
+			linkUpUsername(xpMenu);
+			return true;
+		};
+
+		let bodyObserver: MutationObserver;
+		if (!moveXpMenu()) {
+			bodyObserver = new MutationObserver(() => {
+				if (moveXpMenu()) {
+					bodyObserver.disconnect();
+				}
+			});
+			bodyObserver.observe(document.body, { childList: true });
+		}
+		return () => {
+			bodyObserver?.disconnect();
+			shadowObserver?.disconnect();
+		};
+	}, [navigate]);
+
 	return <Menu
 		className="admin-ui-gray"
 		inverted
@@ -65,16 +123,15 @@ export default function TopBarMenu({
 			setLicenseValid={setLicenseValid}
 		/>
 		<Menu.Menu position='right' style={{
-			marginRight: 44
+			marginRight: 100
 		}}>
-			<Menu.Item
-				active={location.pathname === '/user'}
-				as={Link}
-				to='/user'
-			>
-				<Icon name='user'/>
-				{userState?.displayName}
-			</Menu.Item>
+			<div
+				ref={xpMenuContainerRef}
+				style={{
+					alignItems: 'center',
+					display: 'flex',
+				}}
+			/>
 		</Menu.Menu>
 		{location.pathname === '/api' && interfaceOptions.length
 			? <Dropdown

@@ -80,7 +80,6 @@ function Explorer({
 			menuIconName={menuIconName}
 			servicesBaseUrl={servicesBaseUrl}
 			sideBarVisible={sideBarVisible} setSideBarVisible={setSideBarVisible}
-			userState={userState}
 		/>
 		<Sidebar.Pushable
 			id='explorerPushable'>
