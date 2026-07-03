@@ -241,12 +241,15 @@ export function addGetSites({
 				type: list(glue.getObjectType(GQL_UNIQ_TYPE.OBJECT_CONTENT_TYPE)),
 			},
 			[GQL_UNIQ_TYPE.QUERY_CONTENT_QUERY]: {
-				args: {
-					...getQueryContentsArgs({ glue }),
-					branch: undefined, // available in source
-					projectId: undefined, // available in source
-					sitePath: undefined, // available in source
-				},
+				// NOTE: keys with an undefined value would make GraphQlBean throw
+				// "type can't be null", so the unwanted args must be deleted instead.
+				args: (() => {
+					const args = getQueryContentsArgs({ glue });
+					delete args.branch; // available in source
+					delete args.projectId; // available in source
+					delete args.sitePath; // available in source
+					return args;
+				})(),
 				type: glue.getObjectType<QueryContentsObjectType>(GQL_UNIQ_TYPE.OBJECT_CONTENT_QUERY_RESULT),
 				// @ts-ignore
 				resolve: (env: Env<QueryContentsArgs, ContextWithProjectId, SiteObjectType>) => {

@@ -1212,13 +1212,13 @@ export default function Action({
 		</div>
 		<h4>cURL</h4>
 		<pre>
-			curl -X{method} "{document.location.href}{pattern}{
+			curl -X{method} &quot;{document.location.href}{pattern}{
 			Object.keys(parameterState).length
 				? '?' + Object.entries(parameterState).map(([name, value]) => Array.isArray(value)
 					? value.map(value => `${name}=${value}`).join('&')
 					: `${name}=${value}`).join('&')
 				: ''
-		}" {curl}{
+		}&quot; {curl}{
 			dataJsonString.length
 				? ` -d '${restringifiedData}'`
 				: ''
