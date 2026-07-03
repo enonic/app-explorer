@@ -86,7 +86,7 @@
     "concurrently": "^8.2.0",
     "del-cli": "^7.0.0",
     "dynamic-importmap": "^0.1.0",
-    "esbuild": "^0.27",
+    "esbuild": "^0.28",
     "esbuild-loader": "^4.4",
     "esbuild-plugin-globals": "^0.2.0",
     "esbuild-plugin-manifest": "^1.0.5",
