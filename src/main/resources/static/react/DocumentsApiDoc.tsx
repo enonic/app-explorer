@@ -327,7 +327,7 @@ export default function DocumentsApiDoc() {
 						<li>documentType url query.</li>
 						<li>documentTypeId property stored on the collection node.</li>
 					</ol>
-					If it's not provided by any of these ways, the document will NOT be created or modifed.
+					If it&apos;s not provided by any of these ways, the document will NOT be created or modifed.
 					</>,
 					list: false,
 					required: false,
@@ -674,7 +674,7 @@ export default function DocumentsApiDoc() {
 						<li>documentType url query.</li>
 						<li>documentTypeId property stored on the collection node.</li>
 					</ol>
-					If it's not provided by any of these ways, the document will NOT be created.
+					If it&apos;s not provided by any of these ways, the document will NOT be created.
 					</>,
 					list: false,
 					required: false,
@@ -809,7 +809,7 @@ export default function DocumentsApiDoc() {
 						<li>documentType url query.</li>
 						<li>documentTypeId property stored on the collection node.</li>
 					</ol>
-					If it's not provided by any of these ways, the document will NOT be created or modified.
+					If it&apos;s not provided by any of these ways, the document will NOT be created or modified.
 					</>,
 					list: false,
 					required: false,

@@ -18,6 +18,7 @@ export default function runWithExplorerWrite<T extends () => unknown>(fn: T): Re
 		// CreateNode tries to set owner, and fails when no user
 		user = {
 			displayName: EXPLORER_APP_USER.displayName,
+			hasPassword: false,
 			disabled: false,
 			idProvider: EXPLORER_APP_USER.idProvider, // 'system',
 			key: `user:${EXPLORER_APP_USER.idProvider}:${EXPLORER_APP_USER.name}`, // `user:system:${USER_EXPLORER_APP_NAME}`,

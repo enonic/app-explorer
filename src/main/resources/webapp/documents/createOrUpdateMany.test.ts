@@ -256,7 +256,9 @@ describe('webapp', () => {
 
 					const modifiedDocumentTypeNode = explorerNodeConnection.get(createdDocumentTypeNode._id);
 					// log.debug('modifiedDocumentTypeNode', modifiedDocumentTypeNode);
-					expect(modifiedDocumentTypeNode['properties']).toStrictEqual([{
+					// NOTE: Like the real XP node layer, mock-xp >= 2 returns a
+					// single-element array as just the element:
+					expect(modifiedDocumentTypeNode['properties']).toStrictEqual({
 						active: true,
 						enabled: true,
 						fulltext: false,
@@ -268,7 +270,7 @@ describe('webapp', () => {
 						path: false,
 						stemmed: false,
 						valueType: 'string'
-					}]);
+					});
 				});
 			}); // it
 

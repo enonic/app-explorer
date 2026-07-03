@@ -176,7 +176,8 @@ jest.mock('/lib/xp/context', () => ({
 				disabled: false,
 				email: 'john.doe@example.com',
 				login: 'john.doe',
-				idProvider: 'system'
+				idProvider: 'system',
+				hasPassword: false
 			}
 		}
 	}),
