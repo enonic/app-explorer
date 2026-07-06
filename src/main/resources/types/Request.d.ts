@@ -1,4 +1,4 @@
-import type {AnyObject} from './Utility.d';
+import type {AnyObject} from '@enonic/js-utils/types';
 
 
 export type Request<

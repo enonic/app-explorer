@@ -6,18 +6,30 @@ updates:
       interval: "daily"
     open-pull-requests-limit: 10
     assignees:
-      - "ComLock"
+      - "alansemenov"
     reviewers:
-      - "ComLock"
+      - "alansemenov"
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 0
     assignees:
-      - "ComLock"
+      - "alansemenov"
     reviewers:
-      - "ComLock"
+      - "alansemenov"
+    ignore:
+      # Vite 8 bundles with Rolldown, which leaves bare require('react') calls
+      # from CJS deps in the WebCrawler.umd.js lib build — the form crashes in
+      # the browser and the Collections buttons stay disabled (#1053).
+      # Keep vite on 6.x (and its plugins on matching majors) until the
+      # webcrawler form build is reworked for Rolldown.
+      - dependency-name: "vite"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@vitejs/plugin-react"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "vite-plugin-static-copy"
+        update-types: ["version-update:semver-major"]
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:

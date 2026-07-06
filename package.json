@@ -64,7 +64,7 @@
     "@enonic-types/lib-value": "^8",
     "@enonic-types/lib-vhost": "^8",
     "@enonic/esbuild-plugin-copy-with-hash": "^0.2.0",
-    "@enonic/explorer-utils": "^0.3.0",
+    "@enonic/explorer-utils": "^1.0.0",
     "@enonic/mock-xp": "^2.0.0",
     "@enonic/tsup-plugin-manifest": "^0.0.1",
     "@graphiql/plugin-explorer": "^0.1.12",
@@ -81,7 +81,7 @@
     "@types/react": "^18",
     "@types/react-html-parser": "^2",
     "@types/traverse": "^0",
-    "@vitejs/plugin-react": "^6.0.3",
+    "@vitejs/plugin-react": "^4.4.1",
     "buffer": "^6",
     "concurrently": "^8.2.0",
     "del-cli": "^7.0.0",
@@ -113,8 +113,8 @@
     "tsup": "^8.5.1",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.62.1",
-    "vite": "^8.1.3",
-    "vite-plugin-static-copy": "^4.1.1"
+    "vite": "^6.4.2",
+    "vite-plugin-static-copy": "^2.3.2"
   },
   "license": "Apache-2.0",
   "optionalDependencies": {
