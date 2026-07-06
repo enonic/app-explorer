@@ -185,7 +185,7 @@ describe('webapp', () => {
 					pathParams: {
 						collectionName: COLLECTION_NAME
 					}
-				} as PostRequest);
+				} as unknown as PostRequest);
 				// const queryRes = collectionConnection.query({
 				// 	query: {
 				// 		boolean: {
@@ -229,7 +229,7 @@ describe('webapp', () => {
 							collectionName: COLLECTION_NAME,
 							documentId: '71cffa3d-2c3f-464a-a2b0-19bd447b4b95'
 						}
-					} as DeleteOneRequest)).toStrictEqual({
+					} as unknown as DeleteOneRequest)).toStrictEqual({
 						body: {
 							id: '71cffa3d-2c3f-464a-a2b0-19bd447b4b95',
 							error: 'Document with id "71cffa3d-2c3f-464a-a2b0-19bd447b4b95" does not exist in collection "my_collection"!'
@@ -263,7 +263,7 @@ describe('webapp', () => {
 							collectionName: COLLECTION_NAME,
 							documentId: queryRes.hits[0].id
 						}
-					} as DeleteOneRequest);
+					} as unknown as DeleteOneRequest);
 
 					expect(deleteResponse).toStrictEqual({
 						body: {

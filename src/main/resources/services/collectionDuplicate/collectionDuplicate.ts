@@ -1,4 +1,4 @@
-import type {Request} from '../../types/Request';
+import type {Request} from '@enonic-types/core';
 
 
 import { Principal } from '@enonic/explorer-utils';
@@ -22,7 +22,7 @@ export function post({
 	params: {
 		name
 	}
-}: Request<{name: string}>) {
+}: Request<{params: {name: string}}>) {
 	const writeConnection = connect({principals: [Principal.EXPLORER_WRITE]});
 	const node = get({
 		connection: writeConnection,

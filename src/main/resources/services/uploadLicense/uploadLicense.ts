@@ -1,7 +1,7 @@
 import type {
-	EnonicXpRequest,
+	Request,
 	Response
-} from '@enonic-types/lib-explorer';
+} from '@enonic-types/core';
 
 
 //import {toStr} from '@enonic/js-utils';
@@ -13,9 +13,11 @@ import type {
 import {installLicense, getIssuedTo} from '/lib/licensing';
 
 
-export function post(req :EnonicXpRequest) :Response<{
-	licenseValid :boolean
-	licenseText :string
+export function post(req :Request) :Response<{
+	body: {
+		licenseValid :boolean
+		licenseText :string
+	}
 }> {
 	//log.info('req:%s', toStr(req));
 

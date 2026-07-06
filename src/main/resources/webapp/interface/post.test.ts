@@ -1,5 +1,6 @@
 import { get } from '@enonic-types/lib-context';
 import type { listener } from '@enonic-types/lib-event';
+import type { InterfaceRequest } from './post';
 import type {
 	connect,
 	RepoConnection,
@@ -261,7 +262,7 @@ describe('webapp', () => {
 						headers: {
 							"explorer-interface-name": INTERFACE_NAME
 						},
-					})).toStrictEqual({
+					} as unknown as InterfaceRequest)).toStrictEqual({
 						status: 401
 					});
 				});
@@ -274,7 +275,7 @@ describe('webapp', () => {
 							'authorization': 'nope',
 							'explorer-interface-name': INTERFACE_NAME
 						},
-					})).toStrictEqual({
+					} as unknown as InterfaceRequest)).toStrictEqual({
 						status: 400
 					});
 				});
@@ -287,7 +288,7 @@ describe('webapp', () => {
 							'authorization': 'Explorer-Api-Key ',
 							'explorer-interface-name': INTERFACE_NAME
 						},
-					})).toStrictEqual({
+					} as unknown as InterfaceRequest)).toStrictEqual({
 						status: 400
 					});
 				});
@@ -300,7 +301,7 @@ describe('webapp', () => {
 							'authorization': `Explorer-Api-Key ${API_KEY}`,
 							'explorer-interface-name': INTERFACE_NAME
 						},
-					}).status).toBe(403);
+					} as unknown as InterfaceRequest).status).toBe(403);
 				});
 			});
 
@@ -324,7 +325,7 @@ describe('webapp', () => {
 							'authorization': `Explorer-Api-Key ${API_KEY}`,
 							'explorer-interface-name': INTERFACE_NAME
 						},
-					});
+					} as unknown as InterfaceRequest);
 					// log.debug('response:%s', response);
 					expect(response.status).toBe(200);
 				});
@@ -347,7 +348,7 @@ describe('webapp', () => {
 							'authorization': `Explorer-Api-Key ${API_KEY}`,
 							'explorer-interface-name': 'non-existant' // Note: Seems like this is not Enonified :(
 						},
-					});
+					} as unknown as InterfaceRequest);
 					// log.debug('response:%s', response);
 					expect(response.status).toBe(200);
 				});
@@ -372,7 +373,7 @@ describe('webapp', () => {
 							'authorization': `Explorer-Api-Key ${API_KEY}`,
 							'explorer-interface-name': INTERFACE_NAME
 						},
-					});
+					} as unknown as InterfaceRequest);
 					// log.debug('response:%s', response);
 					expect(response.status).toBe(200);
 				});
@@ -387,7 +388,7 @@ describe('webapp', () => {
 						headers: {
 							'authorization': `Explorer-Api-Key ${API_KEY}`,
 						},
-					}).status).toBe(200);
+					} as unknown as InterfaceRequest).status).toBe(200);
 				});
 			});
 

@@ -180,7 +180,7 @@ describe('webapp', () => {
 					pathParams: {
 						collectionName: COLLECTION_NAME
 					}
-				} as PostRequest);
+				} as unknown as PostRequest);
 			});
 
 			it('returns 200 Ok when there are no documents with documentId', () => {
@@ -209,7 +209,7 @@ describe('webapp', () => {
 						pathParams: {
 							collectionName: COLLECTION_NAME,
 						}
-					} as RemoveRequest)).toStrictEqual({
+					} as unknown as RemoveRequest)).toStrictEqual({
 						body: [{
 							action: 'delete',
 							error: 'Unable to find document with id = 71cffa3d-2c3f-464a-a2b0-19bd447b4b95!',
@@ -230,7 +230,7 @@ describe('webapp', () => {
 						pathParams: {
 							collectionName: COLLECTION_NAME,
 						}
-					} as RemoveRequest)).toStrictEqual({
+					} as unknown as RemoveRequest)).toStrictEqual({
 						body: [{
 							action: 'delete',
 							error: 'Unable to find document with id = 71cffa3d-2c3f-464a-a2b0-19bd447b4b95!',
@@ -274,7 +274,7 @@ describe('webapp', () => {
 						pathParams: {
 							collectionName: COLLECTION_NAME,
 						}
-					} as RemoveRequest);
+					} as unknown as RemoveRequest);
 
 					expect(deleteResponse).toStrictEqual({
 						body: [{

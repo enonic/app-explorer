@@ -199,7 +199,7 @@ describe('webapp', () => {
 						pathParams: {
 							collectionName: COLLECTION_NAME
 						}
-					} as PostRequest);
+					} as unknown as PostRequest);
 					const collectionConnection = server.connect({
 						branchId: 'master',
 						repoId: COLLECTION_REPO_ID
@@ -236,7 +236,7 @@ describe('webapp', () => {
 							pathParams: {
 								collectionName: COLLECTION_NAME
 							}
-						} as QueryRequest);
+						} as unknown as QueryRequest);
 						// log.error('queryResponse', queryResponse);
 
 						import('./stripDocumentNode').then((stripDocumentNodeModule) => {

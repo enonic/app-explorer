@@ -204,7 +204,7 @@ describe('webapp', () => {
 						pathParams: {
 							collectionName: COLLECTION_NAME
 						}
-					} as PostRequest);
+					} as unknown as PostRequest);
 					// log.error('createOrUpdateManyResponse', createOrUpdateManyResponse);
 
 					const queryRes = collectionConnection.query({
@@ -300,7 +300,7 @@ describe('webapp', () => {
 						pathParams: {
 							collectionName: COLLECTION_NAME
 						}
-					} as PostRequest);
+					} as unknown as PostRequest);
 					// log.error('createOrUpdateManyResponse', createOrUpdateManyResponse);
 
 					const queryRes = collectionConnection.query({
@@ -375,7 +375,7 @@ describe('webapp', () => {
 						pathParams: {
 							collectionName: COLLECTION_NAME
 						}
-					} as PostRequest);
+					} as unknown as PostRequest);
 					// log.error('createOrUpdateManyResponse', createOrUpdateManyResponse);
 
 					const queryRes = collectionConnection.query({
@@ -448,7 +448,7 @@ describe('webapp', () => {
 						pathParams: {
 							collectionName: COLLECTION_NAME
 						}
-					} as PostRequest);
+					} as unknown as PostRequest);
 					// log.error('createOrUpdateManyResponse', createOrUpdateManyResponse);
 
 					const queryRes = collectionConnection.query({
@@ -493,7 +493,7 @@ describe('webapp', () => {
 						pathParams: {
 							collectionName: COLLECTION_NAME2
 						}
-					} as PostRequest);
+					} as unknown as PostRequest);
 					// log.error('createOrUpdateManyResponse', createOrUpdateManyResponse);
 
 					const queryRes = collection2Connection.query({

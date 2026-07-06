@@ -1,6 +1,6 @@
 //import type {RepoConnection} from '@enonic-types/lib-explorer';
 import type { DocumentNode } from '@enonic-types/lib-explorer/Document';
-import type { Request } from '../../types/Request';
+import type { Request } from '@enonic-types/core';
 import type {
 	RequestItem,
 	ResponseItem
@@ -42,13 +42,16 @@ import createOne from './createOne';
 
 
 export type PostRequest = Request<{
-	documentType?: string
-	documentTypeId?: string
-	partial?: 'true' | 'false'
-	requireValid?: 'true' | 'false'
-	returnDocument?: 'true' | 'false'
-}, {
-	collectionName?: string
+	params: {
+		documentType?: string
+		documentTypeId?: string
+		partial?: 'true' | 'false'
+		requireValid?: 'true' | 'false'
+		returnDocument?: 'true' | 'false'
+	}
+	pathParams: {
+		collectionName?: string
+	}
 }>
 
 

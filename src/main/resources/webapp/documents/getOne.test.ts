@@ -183,7 +183,7 @@ describe('webapp', () => {
 					pathParams: {
 						collectionName: COLLECTION_NAME
 					}
-				} as PostRequest);
+				} as unknown as PostRequest);
 			});
 
 			it('returns 404 Not found when there are no documents with documentId', () => {
@@ -206,7 +206,7 @@ describe('webapp', () => {
 							collectionName: COLLECTION_NAME,
 							documentId: '123'
 						}
-					} as GetOneRequest)).toStrictEqual({
+					} as unknown as GetOneRequest)).toStrictEqual({
 						status: HTTP_RESPONSE_STATUS_CODES.NOT_FOUND
 					});
 				});
@@ -236,7 +236,7 @@ describe('webapp', () => {
 							collectionName: COLLECTION_NAME,
 							documentId: queryRes.hits[0].id
 						}
-					} as GetOneRequest)).toStrictEqual({
+					} as unknown as GetOneRequest)).toStrictEqual({
 						body: {
 							collection: documentNode['document_metadata']['collection'],
 							collector: documentNode['document_metadata']['collector'],

@@ -1,4 +1,4 @@
-import type { Request } from '../../types/Request';
+import type { Request } from '@enonic-types/core';
 import type { DocumentNode } from '@enonic-types/lib-explorer/Document';
 
 
@@ -16,11 +16,14 @@ import runWithExplorerWrite from './runWithExplorerWrite';
 
 
 export type DeleteOneRequest = Request<{
-	collection?: string
-	id?: string
-},{
-	collectionName?: string
-	documentId?: string
+	params: {
+		collection?: string
+		id?: string
+	}
+	pathParams: {
+		collectionName?: string
+		documentId?: string
+	}
 }>;
 
 export default function deleteOne(request: DeleteOneRequest) {

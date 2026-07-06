@@ -1,4 +1,4 @@
-import type { Request } from '../../types/Request';
+import type { Request } from '@enonic-types/core';
 
 
 import { Role } from '@enonic/explorer-utils';
@@ -20,12 +20,16 @@ import authorize from './authorize';
 const ID_REACT_CONTAINER = 'react-container';
 
 
-export default function documentation(request: Request<{
-	count: string
-	query: string
-	sort: string
-	start: string
-}>): {
+export type DocumentationRequest = Request<{
+	params: {
+		count: string
+		query: string
+		sort: string
+		start: string
+	}
+}>
+
+export default function documentation(request: DocumentationRequest): {
 		body?: string | {
 			error: string
 		}

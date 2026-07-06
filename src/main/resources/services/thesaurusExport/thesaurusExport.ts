@@ -1,4 +1,4 @@
-import type {Request} from '../../types/Request';
+import type {Request} from '@enonic-types/core';
 
 
 import { Principal } from '@enonic/explorer-utils';
@@ -72,9 +72,11 @@ export function get({
 		toLanguage
 	}
 } :Request<{
-	fromLanguage :string
-	name :string
-	toLanguage :string
+	params: {
+		fromLanguage :string
+		name :string
+		toLanguage :string
+	}
 }>) {
 	const thesaurus = getThesaurus({
 		fromLanguage,

@@ -1,5 +1,5 @@
 import type { Headers } from '@enonic-types/lib-explorer/Request.d';
-import type { Request } from '../../types/Request';
+import type { Request } from '@enonic-types/core';
 
 
 import {
