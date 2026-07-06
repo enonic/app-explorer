@@ -1,10 +1,10 @@
 import type {
 	Headers
 } from '@enonic-types/lib-explorer/Request.d';
+import type {EmptyObject} from '@enonic/js-utils/types/Utility.d';
 import {GraphQLContext} from '/lib/explorer/interface/graphql/output/index.d';
 import type {
 	ApiKeyNode,
-	EmptyObject,
 	Request
 } from '../../types';
 

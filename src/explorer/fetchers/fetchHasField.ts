@@ -1,4 +1,4 @@
-import type {AnyObject} from '../../../types/index.d';
+import type {AnyObject} from '@enonic/js-utils/types';
 
 
 import {GQL_QUERY_HAS_FIELD} from '../queries/hasField';

@@ -1,4 +1,4 @@
-import type {AnyObject} from '../../types/index.d';
+import type {AnyObject} from '@enonic/js-utils/types';
 
 import {
 	VALUE_TYPE_BOOLEAN,
