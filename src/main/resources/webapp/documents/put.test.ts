@@ -185,7 +185,7 @@ describe('webapp', () => {
 					pathParams: {
 						collectionName: COLLECTION_NAME
 					}
-				} as PostRequest);
+				} as unknown as PostRequest);
 			});
 
 			it('returns 404 Not found when there are no documents with documentId', () => {
@@ -218,7 +218,7 @@ describe('webapp', () => {
 							collectionName: COLLECTION_NAME,
 							documentId: '71cffa3d-2c3f-464a-a2b0-19bd447b4b95'
 						}
-					} as PutRequest)).toStrictEqual({
+					} as unknown as PutRequest)).toStrictEqual({
 						body: {
 							id: '71cffa3d-2c3f-464a-a2b0-19bd447b4b95',
 							error: 'Document with id "71cffa3d-2c3f-464a-a2b0-19bd447b4b95" does not exist in collection "my_collection"!'
@@ -277,7 +277,7 @@ describe('webapp', () => {
 							collectionName: COLLECTION_NAME,
 							documentId: queryRes.hits[0].id
 						}
-					} as PutRequest);
+					} as unknown as PutRequest);
 					// log.error('putResponse: %s', putResponse);
 
 					expect(putResponse).toStrictEqual({

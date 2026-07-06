@@ -5,8 +5,15 @@ mapping.api.target = /webapp/com.enonic.app.explorer/api
 mapping.api.idProvider.system = default
 */
 
-import type { EnonicXpRequest } from '@enonic-types/lib-explorer';
-import type { Request } from '../types/index.d';
+import type { Request } from '@enonic-types/core';
+import type { PostRequest } from './documents/createOrGetOrModifyOrDeleteMany';
+import type { RemoveRequest } from './documents/deleteMany';
+import type { DeleteOneRequest } from './documents/deleteOne';
+import type { DocumentationRequest } from './documents/documentation';
+import type { GetManyRequest } from './documents/getMany';
+import type { GetOneRequest } from './documents/getOne';
+import type { PatchRequest } from './documents/patch';
+import type { QueryRequest } from './documents/query';
 import type { InterfaceRequest } from './interface/post';
 
 
@@ -52,35 +59,35 @@ router.post('/api/graphql/?', (r: InterfaceRequest) => interfacePost(r));
 // Batch/Bulk/Many
 //──────────────────────────────────────────────────────────────────────────────
 
-router.delete(`${DOCUMENT_REST_API_PATH}/{collectionName}/?`, (r: EnonicXpRequest) => deleteMany(r));
+router.delete(`${DOCUMENT_REST_API_PATH}/{collectionName}/?`, (r: RemoveRequest) => deleteMany(r));
 
-router.get(`${DOCUMENT_REST_API_PATH}/{collectionName}/?`, (r: EnonicXpRequest) => getMany(r));
+router.get(`${DOCUMENT_REST_API_PATH}/{collectionName}/?`, (r: GetManyRequest) => getMany(r));
 
-router.post(`${DOCUMENT_REST_API_PATH}/{collectionName}/?`, (r: EnonicXpRequest) => createOrUpdateMany(r));
+router.post(`${DOCUMENT_REST_API_PATH}/{collectionName}/?`, (r: PostRequest) => createOrUpdateMany(r));
 
-router.post(`${DOCUMENT_REST_API_PATH}/{collectionName}/query/?`, (r: EnonicXpRequest) => query(r));
+router.post(`${DOCUMENT_REST_API_PATH}/{collectionName}/query/?`, (r: QueryRequest) => query(r));
 
 //──────────────────────────────────────────────────────────────────────────────
 // One/Single
 //──────────────────────────────────────────────────────────────────────────────
-router.delete(`${DOCUMENT_REST_API_PATH}/{collectionName}/{documentId}/?`, (r: EnonicXpRequest) => deleteOne(r));
+router.delete(`${DOCUMENT_REST_API_PATH}/{collectionName}/{documentId}/?`, (r: DeleteOneRequest) => deleteOne(r));
 
-router.get(`${DOCUMENT_REST_API_PATH}/{collectionName}/{documentId}/?`, (r: EnonicXpRequest) => getOne(r));
+router.get(`${DOCUMENT_REST_API_PATH}/{collectionName}/{documentId}/?`, (r: GetOneRequest) => getOne(r));
 
-// router.put(`${DOCUMENT_REST_API_PATH}/{collectionName}/{documentId}/?`, (r: EnonicXpRequest) => put(r));
+// router.put(`${DOCUMENT_REST_API_PATH}/{collectionName}/{documentId}/?`, (r: PutRequest) => put(r));
 
 // Method PATCH isn't part of the HTTP/1.1 standard.
 // It is supported by some frameworks, but currently NOT Enonic XP, NOR lib-router:
 // https://github.com/enonic/xp/issues/9131
 // https://github.com/enonic/lib-router/issues/108
-router.post(`${DOCUMENT_REST_API_PATH}/{collectionName}/{documentId}/?`, (r: EnonicXpRequest) => patch(r));
+router.post(`${DOCUMENT_REST_API_PATH}/{collectionName}/{documentId}/?`, (r: PatchRequest) => patch(r));
 
 //──────────────────────────────────────────────────────────────────────────────
 // Documentation
 //──────────────────────────────────────────────────────────────────────────────
-router.get(`${DOCUMENT_REST_API_PATH}/?`, (r: EnonicXpRequest) => documentation(r));
+router.get(`${DOCUMENT_REST_API_PATH}/?`, (r: DocumentationRequest) => documentation(r));
 
-function respondToRootRequest(/*request: EnonicXpRequest*/) {
+function respondToRootRequest(/*request: Request*/) {
 	if (!(
 		hasRole(Role.SYSTEM_ADMIN)
 		|| hasRole(Role.EXPLORER_ADMIN)
@@ -161,4 +168,4 @@ router.all(`${DOCUMENT_REST_API_PATH}/${GETTER_ROOT}/{path:.+}`, (r: Request) =>
 	}
 });
 
-export const all = (r: EnonicXpRequest) => router.dispatch(r);
+export const all = (r: Request) => router.dispatch(r);

@@ -184,7 +184,7 @@ describe('webapp', () => {
 					pathParams: {
 						collectionName: COLLECTION_NAME
 					}
-				} as PostRequest);
+				} as unknown as PostRequest);
 				// const queryRes = collectionConnection.query({
 				// 	query: {
 				// 		boolean: {
@@ -231,7 +231,7 @@ describe('webapp', () => {
 							collectionName: COLLECTION_NAME,
 							documentId: '71cffa3d-2c3f-464a-a2b0-19bd447b4b95'
 						}
-					} as PatchRequest);
+					} as unknown as PatchRequest);
 					// log.error('patchRes: %s', patchRes);
 					expect(patchRes).toStrictEqual({
 						body: {
@@ -286,7 +286,7 @@ describe('webapp', () => {
 							collectionName: COLLECTION_NAME,
 							documentId: queryRes.hits[0].id
 						}
-					} as PatchRequest);
+					} as unknown as PatchRequest);
 					// log.error('patchResponse: %s', patchResponse);
 
 					expect(patchResponse).toStrictEqual({

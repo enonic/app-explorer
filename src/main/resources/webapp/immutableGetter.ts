@@ -1,5 +1,5 @@
-import type { Request } from '../types/index.d';
-import type { Response } from '@enonic-types/lib-explorer';
+import type { Request, Response } from '@enonic-types/core';
+
 
 import {
 	mappedRelativePath,
@@ -8,7 +8,7 @@ import {
 import {DOCUMENT_REST_API_PATH} from './constants';
 
 
-const immutableGetter = (request) => requestHandler(
+const immutableGetter = (request: Request): Response => requestHandler(
 	request,
 	{
 		contentType: ({
@@ -33,7 +33,7 @@ const immutableGetter = (request) => requestHandler(
 		},
 		index: false,
 		relativePath: mappedRelativePath(`${DOCUMENT_REST_API_PATH}/static`),
-	}) as ((_request: Request) => Response);
+	});
 
 
 export default immutableGetter;

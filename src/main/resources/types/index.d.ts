@@ -4,4 +4,3 @@ export {
 	ApiKeyNodeCreateParams,
 	ApiKeyNodeUpdated
 } from './ApiKey.d';
-export {Request} from './Request.d';

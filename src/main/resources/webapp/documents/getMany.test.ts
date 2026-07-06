@@ -185,7 +185,7 @@ describe('webapp', () => {
 					pathParams: {
 						collectionName: COLLECTION_NAME
 					}
-				} as PostRequest);
+				} as unknown as PostRequest);
 				// const queryRes = collectionConnection.query({
 				// 	query: {
 				// 		boolean: {
@@ -214,7 +214,7 @@ describe('webapp', () => {
 						pathParams: {
 							collectionName: COLLECTION_NAME,
 						}
-					} as GetManyRequest)).toStrictEqual({
+					} as unknown as GetManyRequest)).toStrictEqual({
 						body: [{
 							id: 'nonexistent_document_id',
 							status: HTTP_RESPONSE_STATUS_CODES.NOT_FOUND,
@@ -232,7 +232,7 @@ describe('webapp', () => {
 						pathParams: {
 							collectionName: COLLECTION_NAME,
 						}
-					} as GetManyRequest)).toStrictEqual({
+					} as unknown as GetManyRequest)).toStrictEqual({
 						body: [{
 							id: 'nonexistent_document_id1',
 							status: HTTP_RESPONSE_STATUS_CODES.NOT_FOUND,
@@ -272,7 +272,7 @@ describe('webapp', () => {
 						pathParams: {
 							collectionName: COLLECTION_NAME,
 						}
-					} as GetManyRequest);
+					} as unknown as GetManyRequest);
 					expect(getManyRes).toStrictEqual({
 						body: queryRes.hits.map(({id}) => {
 							const documentNode = collectionConnection.get(id) as unknown as DocumentNode;

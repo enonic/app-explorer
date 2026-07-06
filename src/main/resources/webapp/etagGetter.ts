@@ -1,5 +1,5 @@
-import type { Request } from '../types/index.d';
-import type { Response } from '@enonic-types/lib-explorer';
+import type { Request, Response } from '@enonic-types/core';
+
 
 import {
 	RESPONSE_CACHE_CONTROL,
@@ -9,7 +9,7 @@ import {
 import {DOCUMENT_REST_API_PATH} from './constants';
 
 
-const etagGetter = (request) => requestHandler(
+const etagGetter = (request: Request): Response => requestHandler(
 	request,
 	{
 		cacheControl: () => RESPONSE_CACHE_CONTROL.SAFE,
@@ -35,7 +35,7 @@ const etagGetter = (request) => requestHandler(
 		},
 		index: false,
 		relativePath: mappedRelativePath(`${DOCUMENT_REST_API_PATH}/static`),
-	}) as ((_request: Request) => Response);
+	});
 
 
 export default etagGetter;

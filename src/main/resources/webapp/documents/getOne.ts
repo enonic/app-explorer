@@ -1,6 +1,6 @@
 // import type { EnonicXpRequest } from '@enonic-types/lib-explorer';
 import type { DocumentNode } from '@enonic-types/lib-explorer/Document';
-import type { Request } from '../../types/Request';
+import type { Request } from '@enonic-types/core';
 
 
 import {
@@ -18,11 +18,14 @@ import documentNodeToBodyItem from './documentNodeToBodyItem';
 
 
 export type GetOneRequest = Request<{
-	collection?: string
-	id?: string
-},{
-	collectionName?: string
-	documentId?: string
+	params: {
+		collection?: string
+		id?: string
+	}
+	pathParams: {
+		collectionName?: string
+		documentId?: string
+	}
 }>
 
 export default function getOne(request: GetOneRequest) {

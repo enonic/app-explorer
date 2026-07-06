@@ -1,12 +1,9 @@
+import type { Request } from '@enonic-types/core';
 import type {
 	Headers
 } from '@enonic-types/lib-explorer/Request.d';
-import type {EmptyObject} from '@enonic/js-utils/types/Utility.d';
 import {GraphQLContext} from '/lib/explorer/interface/graphql/output/index.d';
-import type {
-	ApiKeyNode,
-	Request
-} from '../../types';
+import type { ApiKeyNode } from '../../types';
 
 // These imports works when treeshake: false, but gives error when treeshake: true
 // ReferenceError: "Reflect" is not defined
@@ -43,7 +40,7 @@ export type Response = {
 	status: number
 }
 
-export type InterfaceRequest = Request<EmptyObject>
+export type InterfaceRequest = Request
 
 
 // const LOG_LEVEL = 'info';
