@@ -1,7 +1,7 @@
 {
   "author": "Christian Andreas Westgaard <cwe@enonic.com>",
   "dependencies": {
-    "@enonic/js-utils": "^1.9.0",
+    "@enonic/js-utils": "^1.11.0",
     "@enonic/semantic-ui-react-form": "^2",
     "@monaco-editor/react": "^4.7.0",
     "@seamusleahy/init-hooks": "^1",
@@ -64,7 +64,7 @@
     "@enonic-types/lib-value": "^7",
     "@enonic-types/lib-vhost": "^7",
     "@enonic/esbuild-plugin-copy-with-hash": "^0.2.0",
-    "@enonic/explorer-utils": "^0.3.0",
+    "@enonic/explorer-utils": "^1.0.1",
     "@enonic/mock-xp": "^1.1.1",
     "@enonic/tsup-plugin-manifest": "^0.0.1",
     "@graphiql/plugin-explorer": "^0.1.12",

@@ -61,22 +61,15 @@ dependencies {
 	// Other enonic libs (com.enonic.lib)
 	//──────────────────────────────────────────────────────────────────────────
 
-	//include 'com.enonic.lib:lib-admin-ui:3.0.0' // Not needed for the XP Menu
-
 	include 'com.enonic.lib:lib-cache:2.2.1'
 	include 'com.enonic.lib:lib-graphql:2.1.0'
-	//include 'com.enonic.lib:lib-graphql-playground:0.0.1'
 	include 'com.enonic.lib:lib-guillotine:6.2.1'
 	include 'com.enonic.lib:lib-http-client:3.2.2'
 	include 'com.enonic.lib:lib-license:3.1.0'
 	include 'com.enonic.lib:lib-router:3.2.0'
-	// include 'com.enonic.lib:lib-asset:1.0.0'
 	include 'com.enonic.lib:lib-static:2.1.1'
-	include 'com.enonic.lib:lib-explorer:4.5.1-SNAPSHOT'
+	include 'com.enonic.lib:lib-explorer:4.6.0'
 	include 'com.enonic.lib:lib-util:3.1.1' //lib/util/content/getSites
-	// include 'com.enonic.lib:lib-text-encoding:2.0.0'
-
-	// WARNING: Do NOT use include files, jar file will be missing dependencies!
 }
 
 
