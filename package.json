@@ -77,7 +77,7 @@
     "@types/jquery": "^3",
     "@types/jsuri": "^1",
     "@types/lodash": "^4",
-    "@types/node": "^22",
+    "@types/node": "^26",
     "@types/object.getownpropertydescriptors": "^2.1.4",
     "@types/react": "^18",
     "@types/react-html-parser": "^2",
