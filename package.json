@@ -69,7 +69,7 @@
     "@enonic/mock-xp": "^2.0.0",
     "@enonic/tsup-plugin-manifest": "^0.0.1",
     "@graphiql/plugin-explorer": "^0.1.12",
-    "@jest/globals": "^29",
+    "@jest/globals": "^30",
     "@seamusleahy/values-changes-hooks": "^1.0.0-alpha",
     "@swc/cli": "^0.8",
     "@swc/core": "^1.15",
