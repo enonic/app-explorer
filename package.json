@@ -35,7 +35,7 @@
     "robots-txt-guard": "^1",
     "semantic-ui-css": "^2",
     "semantic-ui-react": "^2",
-    "tiny-jsonc": "^1.0.1",
+    "tiny-jsonc": "^1.0.2",
     "traverse": "^0",
     "uri-js": "^4",
     "use-debounce": "^9"
