@@ -9,7 +9,7 @@
     "cheerio": "1.0.0-rc.12",
     "classnames": "^2",
     "core-js": "^3.49",
-    "cron-parser": "^4",
+    "cron-parser": "^5",
     "deep-object-diff": "1",
     "fast-deep-equal": "^3",
     "gql-query-builder-ts": "^3.9.0",
