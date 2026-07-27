@@ -65,7 +65,7 @@
     "@enonic-types/lib-value": "^8",
     "@enonic-types/lib-vhost": "^8",
     "@enonic/esbuild-plugin-copy-with-hash": "^0.2.0",
-    "@enonic/explorer-utils": "^1.0.0",
+    "@enonic/explorer-utils": "^1.0.1",
     "@enonic/mock-xp": "^2.0.0",
     "@enonic/tsup-plugin-manifest": "^0.0.1",
     "@graphiql/plugin-explorer": "^0.1.12",
