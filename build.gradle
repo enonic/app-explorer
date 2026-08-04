@@ -55,6 +55,14 @@ dependencies {
 	include libs.lib.explorer
 
 	// WARNING: Do NOT use include files, jar file will be missing dependencies!
+
+	//──────────────────────────────────────────────────────────────────────────
+	// Test (runs the JS on the real script engine, once per engine)
+	//──────────────────────────────────────────────────────────────────────────
+
+	testImplementation "com.enonic.xp:testing:${xpVersion}"
+	testImplementation 'org.junit.jupiter:junit-jupiter:6.1.1'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 
@@ -158,3 +166,18 @@ tasks.register('compressAssets', NpmTask) {
 }
 // TODO: Use if switch to lib-asset
 // jar.dependsOn compressAssets
+
+// The JS tests run the compiled bundle on the real engine, so it must exist on
+// build/resources/main before the test sources are compiled and executed.
+tasks.named('compileTestJava') {
+	dependsOn npmBuild
+}
+
+test {
+	dependsOn npmBuild
+	useJUnitPlatform()
+}
+
+xp {
+	scriptEngines = ['Nashorn', 'GraalJS']
+}
