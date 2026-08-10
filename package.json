@@ -13,7 +13,7 @@
     "deep-object-diff": "1",
     "fast-deep-equal": "^3",
     "gql-query-builder-ts": "^3.9.0",
-    "graphql-hooks": "^6.1.0",
+    "graphql-hooks": "^8.2.0",
     "human-object-diff": "^3",
     "jsuri": "^1",
     "lodash": "^4.18.1",
