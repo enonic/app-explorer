@@ -15,6 +15,7 @@ import {fetchInterfaceCreate} from '../fetchers/fetchInterfaceCreate';
 import {fetchInterfaceUpdate} from '../fetchers/fetchInterfaceUpdate';
 import {BoostBuilder} from './boost/BoostBuilder';
 import {useNewOrEditInterfaceState} from './useNewOrEditInterfaceState';
+import Expressions from './Expressions';
 
 
 export function NewOrEditInterface({
@@ -39,6 +40,7 @@ export function NewOrEditInterface({
 		isDefaultInterface,
 		isLoading,
 		isStateChanged,
+		expressions,
 		fieldButtonVisible, setFieldButtonVisible,
 		fieldOptions,
 		fields, setFields,
@@ -48,6 +50,7 @@ export function NewOrEditInterface({
 		nameError,
 		nonExistantCollectionIds,
 		resetState,
+		setExpressions,
 		setName,
 		setNameVisited,
 		setStopWords,
@@ -111,6 +114,11 @@ export function NewOrEditInterface({
 						/>
 						: null
 				}
+				<Expressions
+					disabled={isLoading || isDefaultInterface}
+					expressions={expressions}
+					setExpressions={setExpressions}
+				/>
 				<BoostBuilder
 					collectionIdsFromStorage={collectionIdsFromStorage}
 					fieldNameToValueTypesState={fieldNameToValueTypesState}
@@ -193,9 +201,10 @@ export function NewOrEditInterface({
 						},
 						url,
 						variables: {
-							_id,
+							_id: _id as string,
 							_name: name,
 							collectionIds: collectionIdsFromStorage.filter(id => !nonExistantCollectionIds.includes(id)),
+							expressions,
 							fields,
 							stopWords,
 							synonymIds,

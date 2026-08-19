@@ -2,6 +2,7 @@ import type { DocumentTypesJson } from '@enonic-types/lib-explorer';
 
 
 import {fold} from '@enonic/js-utils';
+import { toStr } from '@enonic/js-utils/value/toStr';
 import {createDocumentType} from '/lib/explorer/documentType/createDocumentType';
 import {exists as documentTypeExists} from '/lib/explorer/documentType/exists';
 import { maybeUpdateManagedDocumentType } from '/lib/explorer/documentType/maybeUpdateManagedDocumentType';
@@ -12,24 +13,32 @@ declare const Java: {
 	type: <T>(s: string) => T
 };
 
+const DEBUG = false;
+const TRACE = false;
 
 const RESOURCE_KEY = Java.type<{ from: (resourcePath: string) => unknown}>('com.enonic.xp.resource.ResourceKey');
 
 
 export function createFromDocumentTypesJson({
+	_debug = DEBUG,
+	_trace = TRACE,
 	applicationKey
 }: {
-	applicationKey: string
+	_debug?: boolean;
+	_trace?: boolean;
+	applicationKey: string;
 }) {
 	const filePath = 'documentTypes.json';
 	const resourcePath = `${applicationKey}:${filePath}`;
+
 	const resource = getResource(RESOURCE_KEY.from(resourcePath));
 	if (!resource.exists()) {
 		return;
 	}
+	if (_debug) log.debug('createFromDocumentTypesJson resourcePath:%s', toStr(resourcePath));
 
 	const resourceJson: string = readText(resource.getStream());
-	//log.debug(`resourcePath:${resourcePath} resourceJson:${resourceJson}`);
+	if (_trace) log.debug('createFromDocumentTypesJson resourcePath:%s resourceJson:%s', toStr(resourcePath), toStr(resourceJson));
 
 	let resourceData: DocumentTypesJson;
 	try {
@@ -37,7 +46,7 @@ export function createFromDocumentTypesJson({
 	} catch (e) {
 		log.error(`Something went wrong while parsing resource path:${resourcePath} json:${resourceJson}!`, e);
 	}
-	//log.debug(`resourcePath:${resourcePath} resourceData:${toStr(resourceData)}`);
+	if (_trace) log.debug('createFromDocumentTypesJson resourcePath:%s resourceData:%s', toStr(resourcePath), toStr(resourceData));
 
 	resourceData.forEach(({
 		_name,
@@ -46,7 +55,9 @@ export function createFromDocumentTypesJson({
 		properties = [] // NOTE: Only overrides undefined, not null.
 	}) => {
 		const foldedLowerCaseName = fold(_name.toLowerCase());
+		if (_debug) log.debug('createFromDocumentTypesJson foldedLowerCaseName:%s', toStr(foldedLowerCaseName));
 		if (!documentTypeExists({_name: foldedLowerCaseName})) {
+			if (_trace) log.debug('createFromDocumentTypesJson new/create foldedLowerCaseName:%s ', toStr(foldedLowerCaseName));
 			createDocumentType({
 				_name: foldedLowerCaseName,
 				addFields,
@@ -55,6 +66,7 @@ export function createFromDocumentTypesJson({
 				properties
 			});
 		} else {
+			if (_debug) log.debug('createFromDocumentTypesJson old/update foldedLowerCaseName:%s ', toStr(foldedLowerCaseName));
 			maybeUpdateManagedDocumentType({
 				_name: foldedLowerCaseName,
 				addFields,

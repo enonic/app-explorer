@@ -138,7 +138,7 @@ export function Term({
 				<Table.Body>
 					{
 						termQueries.map(({
-							boost = 1,
+							boost = 0,
 							field,
 							type,
 							booleanValue,
@@ -175,7 +175,7 @@ export function Term({
 														: stringValue
 										});
 										deref[index] = {
-											boost, // : isSet(boost) ? boost : 1,
+											boost, // : isSet(boost) ? boost : 0,
 											field: newField,
 											type: newType,
 											booleanValue: isSet(booleanValue)
@@ -233,7 +233,7 @@ export function Term({
 																: stringValue
 												})
 												deref[index] = {
-													boost, // : isSet(boost) ? boost : 1,
+													boost, // : isSet(boost) ? boost : 0,
 													field,
 													type: newType,
 													booleanValue: isSet(booleanValue)
@@ -317,7 +317,7 @@ export function Term({
 														//console.debug('newValue', newValue);
 														const deref = JSON.parse(JSON.stringify(termQueries)) as typeof termQueries;
 														deref[index] = {
-															boost, // : isSet(boost) ? boost : 1,
+															boost, // : isSet(boost) ? boost : 0,
 															field,
 															type,
 															booleanValue,
@@ -446,7 +446,7 @@ export function Term({
 															: parseInt(newStringValue, 10)
 														// console.debug('newNumberValue', newNumberValue);
 														deref[index] = {
-															boost: isSet(boost) ? boost : 1,
+															boost: isSet(boost) ? boost : 0,
 															field,
 															type,
 															booleanValue,
@@ -476,6 +476,7 @@ export function Term({
 								<Input
 									disabled={disabled}
 									fluid
+									min={0}
 									onChange={(_e,{value: newStringBoost}: {value: string}) => {
 										// console.debug('newStringBoost', newStringBoost);
 										const newNumberBoost = parseFloat(newStringBoost);
@@ -492,7 +493,7 @@ export function Term({
 										}
 										setTermQueries(deref);
 									}}
-									step={0.1}
+									step={0.01}
 									type='number'
 									value={boost}
 								/>
@@ -506,7 +507,7 @@ export function Term({
 										setArrayFunction={setTermQueries}
 										valueToInsert={{
 											// field: '',
-											// boost: 1,
+											// boost: 0,
 											// type: VALUE_TYPE_STRING,
 											// value: ''
 										}}
