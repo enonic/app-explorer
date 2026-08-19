@@ -1,19 +1,28 @@
-import type {InterfaceField} from '@enonic-types/lib-explorer';
-import type {TermQuery} from '@enonic-types/lib-explorer/Interface.d';
+import {
+	type FetchInterfaceVariables,
+	FETCH_INTERFACE_FIELDS,
+	FETCH_JSON_HEADERS,
+	getFetchInterfaceVariableOptions,
+} from './fetchInterfaceCreate';
 
 
 import * as gql from 'gql-query-builder-ts';
-import {
-	GQL_INPUT_TYPE_INTERFACE_FIELD_NAME,
-	GQL_INPUT_TYPE_INTERFACE_TERM_QUERY_NAME
-} from '../../main/resources/services/graphQL/constants';
 
 
 type JSONResponse = {
-	data?: unknown
-	errors?: {message: string}[]
+	data?: unknown;
+	errors?: {message: string}[];
 }
 
+
+interface FetchInterfaceUpdateParams {
+	url: string;
+	variables: FetchInterfaceVariables & {
+		_id: string;
+	}
+	handleData?: (data: unknown) => void
+	handleResponse?: (response: Response) => void
+}
 
 export function fetchInterfaceUpdate({
 	url,
@@ -22,6 +31,7 @@ export function fetchInterfaceUpdate({
 		_id,
 		_name,
 		collectionIds = [],
+		expressions,
 		fields = [],
 		//stopWordIds = [],
 		stopWords = [],
@@ -39,26 +49,11 @@ export function fetchInterfaceUpdate({
 		//console.debug('fetchInterfaceUpdate({url:', url, ', variables:', variables, '}) --> response:', response);
 		handleData((response.json()as JSONResponse).data);
 	}
-}: {
-	url: string
-	variables: {
-		_id: string
-		_name?: string
-		collectionIds?: string[]
-		fields?: InterfaceField[]
-		stopWords?: string[]
-		synonymIds?: string[]
-		termQueries?: TermQuery[]
-	}
-	handleData?: (data: unknown) => void
-	handleResponse?: (response: Response) => void
-}) {
+}: FetchInterfaceUpdateParams) {
 	//console.debug('fetchInterfaceUpdate({url:', url, ', variables:', variables, '})');
 	fetch(url, {
 		method: 'POST',
-		headers: { // HTTP/2 uses lowercase header keys
-			'content-type':	'application/json'
-		},
+		headers: FETCH_JSON_HEADERS,
 		body: JSON.stringify(gql.mutation({
 			operation: 'updateInterface',
 			variables: {
@@ -68,72 +63,17 @@ export function fetchInterfaceUpdate({
 					type: 'ID',
 					value: _id
 				},
-				_name: {
-					list: false,
-					required: true,
-					type: 'String',
-					value: _name
-				},
-				collectionIds: {
-					list: true,
-					required: false,
-					type: 'ID',
-					value: collectionIds
-				},
-				fields: {
-					list: true,
-					required: false,
-					type: GQL_INPUT_TYPE_INTERFACE_FIELD_NAME,
-					value: fields
-				},
-				//stopWordIds,
-				stopWords: {
-					list: true,
-					required: false,
-					type: 'String',
-					value: stopWords
-				},
-				synonymIds: {
-					list: true,
-					required: false,
-					type: 'ID',
-					value: synonymIds
-				},
-				termQueries: {
-					list: true,
-					required: false,
-					type: GQL_INPUT_TYPE_INTERFACE_TERM_QUERY_NAME,
-					value: termQueries
-				}
+				...getFetchInterfaceVariableOptions({
+					_name,
+					collectionIds,
+					expressions,
+					fields,
+					stopWords,
+					synonymIds,
+					termQueries,
+				})
 			}, // variables
-			fields: [
-				'_id',
-				'_name',
-				'_nodeType',
-				'_path',
-				'_versionKey',
-				'collectionIds',
-				{
-					fields: [
-						'boost',
-						'name',
-					]
-				},
-				// 'stopWordIds',
-				'stopWords',
-				'synonymIds',
-				{
-					termQueries: [
-						'boost',
-						'field',
-						'type',
-						'booleanValue',
-						'doubleValue',
-						'longValue',
-						'stringValue',
-					]
-				}
-			]
+			fields: FETCH_INTERFACE_FIELDS
 		}))
 	})
 		.then(response => handleResponse(response));

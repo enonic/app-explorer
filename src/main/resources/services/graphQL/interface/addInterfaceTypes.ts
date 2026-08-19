@@ -22,9 +22,13 @@ import {
 } from '/lib/graphql';
 
 import {
+	GQL_INPUT_TYPE_INTERFACE_EXPRESSION_NAME,
+	GQL_INPUT_TYPE_INTERFACE_EXPRESSIONS_NAME,
 	GQL_INPUT_TYPE_INTERFACE_FIELD_NAME,
 	GQL_INPUT_TYPE_INTERFACE_TERM_QUERY_NAME,
 	GQL_INTERFACE_NODE_NAME,
+	GQL_TYPE_INTERFACE_EXPRESSION_NAME,
+	GQL_TYPE_INTERFACE_EXPRESSIONS_NAME,
 	GQL_TYPE_INTERFACE_FIELD_NAME,
 	GQL_TYPE_INTERFACE_NAME,
 	GQL_TYPE_INTERFACE_TERM_QUERY_NAME,
@@ -32,6 +36,23 @@ import {
 
 
 export function addInterfaceTypes({glue}) {
+	const inputInterfaceExpression = glue.addInputType({
+		name: GQL_INPUT_TYPE_INTERFACE_EXPRESSION_NAME,
+		fields: {
+			boost: { type: GraphQLFloat },
+			disabled: { type: GraphQLBoolean },
+		}
+	});
+
+	glue.addInputType({
+		name: GQL_INPUT_TYPE_INTERFACE_EXPRESSIONS_NAME,
+		fields: {
+			fulltext: { type: inputInterfaceExpression },
+			stemmed: { type: inputInterfaceExpression },
+			nGram: { type: inputInterfaceExpression },
+		}
+	});
+
 	glue.addInputType({
 		name: GQL_INPUT_TYPE_INTERFACE_FIELD_NAME,
 		fields: {
@@ -79,6 +100,14 @@ export function addInterfaceTypes({glue}) {
 		type: interfaceNodeType
 	} = glue.getInterfaceTypeObj(GQL_INTERFACE_NODE_NAME);
 
+	const expressionsObjectType = glue.addObjectType({
+		name: GQL_TYPE_INTERFACE_EXPRESSION_NAME,
+		fields: {
+			boost: { type: GraphQLFloat },
+			disabled: { type: GraphQLBoolean },
+		},
+	});
+
 	glue.addObjectType({
 		name: GQL_TYPE_INTERFACE_NAME,
 		fields: {
@@ -87,6 +116,16 @@ export function addInterfaceTypes({glue}) {
 				resolve: (env) => coerseInterfaceTypeCollectionIds(env.source.collectionIds),
 				type: list(GraphQLID)
 			}, // null allowed
+			expressions: {
+				type: glue.addObjectType({
+					name: GQL_TYPE_INTERFACE_EXPRESSIONS_NAME,
+					fields: {
+						fulltext: { type: expressionsObjectType },
+						stemmed: { type: expressionsObjectType },
+						nGram: { type: expressionsObjectType },
+					},
+				}),
+			},
 			fields: {
 				resolve: (env) => coerseInterfaceTypeFields(env.source.fields),
 				type: list(glue.getObjectType(GQL_TYPE_INTERFACE_FIELD_NAME))

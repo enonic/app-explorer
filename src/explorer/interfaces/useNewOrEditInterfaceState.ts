@@ -1,4 +1,5 @@
 import type {
+	Expressions,
 	Interface,
 	InterfaceField,
 	TermQuery
@@ -74,6 +75,26 @@ function buildGetInterfaceQueryObject({
 			//'_versionKey',
 			'collectionIds',
 			{
+				expressions: [
+					{
+						'fulltext': [
+							'boost',
+							'disabled',
+						]
+					}, {
+						'stemmed': [
+							'boost',
+							'disabled',
+						]
+					}, {
+						'nGram': [
+							'boost',
+							'disabled',
+						]
+					}
+				]
+			},
+			{
 				fields: [
 					'boost',
 					'name'
@@ -106,8 +127,8 @@ function buildGetInterfaceQueryObject({
 
 function buildQueryDocumentsObject({
 	collectionIds = []
-} :{
-	collectionIds ?:string[]
+}: {
+	collectionIds?: string[];
 }) {
 	return {
 		operation: 'queryDocuments',
@@ -188,6 +209,21 @@ export function useNewOrEditInterfaceState({
 	const [collectionIdsFromStorage, setCollectionIdsFromStorage] = React.useState<string[]>([]);
 	const [nonExistantCollectionIds, setNonExistantCollectionIds] = React.useState<string[]>([]);
 
+	const [expressions, setExpressions] = React.useState<Expressions>({
+		fulltext: {
+			boost: 1,
+			disabled: false
+		},
+		stemmed: {
+			boost: 0.9,
+			disabled: false
+		},
+		nGram: {
+			boost: 0.8,
+			disabled: false
+		}
+	});
+
 	const [fieldButtonVisible, setFieldButtonVisible] = React.useState(_id ? false : true); // This is used to make nice transition when adding first/remoing last
 	const [fieldOptions, setFieldOptions] = React.useState<DropdownItemProps[]>([]);
 	const [fields, setFields] = React.useState<InterfaceField[]>([]);
@@ -203,19 +239,34 @@ export function useNewOrEditInterfaceState({
 	const [synonymIds, setSynonymIds] = React.useState<string[]>([]);
 	const [termButtonVisible, setTermButtonVisible] = React.useState(_id ? false : true); // This is used to make nice transition when adding first/remoing last
 	const [initialState, setInitialState] = React.useState<{
-		name: string
-		collectionIds: string[]
-		fields: InterfaceField[]
-		stopWords: string[]
-		synonymIds: string[]
-		termQueries: TermQuery[]
+		name: string;
+		collectionIds: string[];
+		expressions: Expressions;
+		fields: InterfaceField[];
+		stopWords: string[];
+		synonymIds: string[];
+		termQueries: TermQuery[];
 	}>({
 		name: '',
 		collectionIds: [],
+		expressions: {
+			fulltext: {
+				boost: 1,
+				disabled: false,
+			},
+			stemmed: {
+				boost: 0.9,
+				disabled: false,
+			},
+			nGram: {
+				boost: 0.8,
+				disabled: false,
+			},
+		},
 		fields: [], // DEFAULT_INTERFACE_FIELDS,
 		stopWords: [],
 		synonymIds: [],
-		termQueries: []
+		termQueries: [],
 	});
 	const [isStateChanged, setIsStateChanged] = React.useState(false);
 	const [anyError, setAnyError] = React.useState(false);
@@ -400,7 +451,7 @@ export function useNewOrEditInterfaceState({
 			.then(response => response.json())
 			.then(json => {
 				const data = json.data as {
-					getInterface :Interface/*,
+					getInterface: Interface/*,
 					queryDocuments :{
 						aggregations :Array<{
 							name :'collections'//string
@@ -420,6 +471,7 @@ export function useNewOrEditInterfaceState({
 					const {
 						_name: initialName,
 						collectionIds: initialCollectionIds,
+						expressions: initialExpressions,
 						fields: initialFields,
 						stopWords: initialStopWords,
 						synonymIds: initialSynonymIds,
@@ -428,6 +480,7 @@ export function useNewOrEditInterfaceState({
 					} = data.getInterface;
 					setName(initialName);
 					setCollectionIdsFromStorage(initialCollectionIds);
+					setExpressions(initialExpressions);
 					setTermQueries(initialTermQueries);
 					if (!initialTermQueries.length) {
 						setTermButtonVisible(true);
@@ -479,11 +532,12 @@ export function useNewOrEditInterfaceState({
 					setInitialState({
 						name: initialName,
 						collectionIds: initialCollectionIds, // This is not filtered for non-existant ids, but we don't care, they are removed on submit
+						expressions: initialExpressions,
 						fields: initialFields,
 						stopWords: initialStopWords,
 						synonymIds: initialSynonymIds,
 						termQueries: initialTermQueries,
-					})
+					});
 				}
 				/*const newFieldOptions :DropdownItemProps[] = [];
 				if (data.queryDocuments.fieldValueCounts && data.queryDocuments.fieldValueCounts.length) {
@@ -514,6 +568,7 @@ export function useNewOrEditInterfaceState({
 		const newIsStateChanged = !fastDeepEqual({
 			name,
 			collectionIds: collectionIdsFromStorage,
+			expressions,
 			fields,
 			stopWords,
 			synonymIds
@@ -524,6 +579,7 @@ export function useNewOrEditInterfaceState({
 	},[
 		name,
 		collectionIdsFromStorage,
+		expressions,
 		fields,
 		initialState,
 		isStateChanged,
@@ -613,6 +669,7 @@ export function useNewOrEditInterfaceState({
 		const {
 			name: initialName,
 			collectionIds: initialCollectionIds,
+			expressions: initialExpressions,
 			fields: initialFields,
 			stopWords: initialStopWords,
 			synonymIds: initialSynonymIds,
@@ -620,6 +677,7 @@ export function useNewOrEditInterfaceState({
 		} = initialState;
 		setName(initialName);
 		setCollectionIdsFromStorage(initialCollectionIds);
+		setExpressions(initialExpressions);
 		setTermQueries(initialTermQueries);
 		if (!initialTermQueries.length) {
 			setTermButtonVisible(true);
@@ -640,6 +698,7 @@ export function useNewOrEditInterfaceState({
 			stopWords,
 			synonymIds
 		},
+		expressions,
 		fieldButtonVisible, setFieldButtonVisible,
 		fields, setFields,
 		fieldOptions,
@@ -656,6 +715,7 @@ export function useNewOrEditInterfaceState({
 		nameError,
 		nonExistantCollectionIds,
 		resetState,
+		setExpressions,
 		setName,
 		setNameVisited,
 		setStopWords,
