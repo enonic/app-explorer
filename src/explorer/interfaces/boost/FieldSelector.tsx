@@ -67,7 +67,7 @@ export function FieldSelector(props :{
 			<Table.Body>
 				{
 					fieldsArray.map(({
-						boost = 1,
+						boost = 0,
 						name = ''
 					}, index) => {
 						//console.debug('index', index, 'name', name, 'boost', boost);
@@ -100,6 +100,7 @@ export function FieldSelector(props :{
 									? <Input
 										disabled={disabled}
 										fluid
+										min={0.001}
 										onChange={(_e,{value:newBoost}) => {
 											// console.debug('newBoost', newBoost);
 											const deref = JSON.parse(JSON.stringify(fieldsArray));
@@ -109,7 +110,7 @@ export function FieldSelector(props :{
 											}
 											setFields(deref);
 										}}
-										step={0.1}
+										step={0.01}
 										type='number'
 										value={boost}
 									/>
@@ -123,7 +124,10 @@ export function FieldSelector(props :{
 										insertAtIndex={index + 1}
 										disabled={disabled}
 										setArrayFunction={setFields}
-										valueToInsert={{name: '', boost: 1}}
+										valueToInsert={{
+											boost: 0,
+											name: '',
+										}}
 									/>
 									<MoveDownButton
 										array={fieldsArray}

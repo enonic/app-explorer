@@ -1,4 +1,4 @@
-import type {TermQuery} from '@enonic-types/lib-explorer/Interface.d';
+import type { Expressions, TermQuery } from '@enonic-types/lib-explorer/Interface.d';
 
 
 //import {toStr} from '@enonic/js-utils';
@@ -13,6 +13,7 @@ import {
 	//@ts-ignore
 } from '/lib/graphql';
 import {
+	GQL_INPUT_TYPE_INTERFACE_EXPRESSIONS_NAME,
 	GQL_INPUT_TYPE_INTERFACE_FIELD_NAME,
 	GQL_INPUT_TYPE_INTERFACE_TERM_QUERY_NAME,
 	GQL_MUTATION_INTERFACE_CREATE_NAME,
@@ -26,6 +27,7 @@ export function addMutationInterfaceCreate({glue}) {
 		args: {
 			_name: glue.getScalarType('_name'),
 			collectionIds: list(GraphQLID), // null allowed
+			expressions: glue.getInputType(GQL_INPUT_TYPE_INTERFACE_EXPRESSIONS_NAME),
 			fields: list(glue.getInputType(GQL_INPUT_TYPE_INTERFACE_FIELD_NAME)), // null allowed
 			//stopWordIds: list(GraphQLID), // null allowed
 			stopWords: list(GraphQLString), // null allowed
@@ -34,15 +36,16 @@ export function addMutationInterfaceCreate({glue}) {
 		},
 		resolve(env: {
 			args: {
-				_name: string
-				collectionIds: string[]
+				_name: string;
+				collectionIds: string[];
+				expressions?: Expressions;
 				fields: {
-					boost?: number
-					name: string
-				}[]
-				stopWords: string[]
-				synonymIds: string[]
-				termQueries: TermQuery[]
+					boost?: number;
+					name: string;
+				}[];
+				stopWords: string[];
+				synonymIds: string[];
+				termQueries: TermQuery[];
 			}
 		}) {
 			//log.debug(`env:${toStr(env)}`);
@@ -50,6 +53,7 @@ export function addMutationInterfaceCreate({glue}) {
 				args: {
 					_name,
 					collectionIds = [],
+					expressions,
 					fields = [],
 					//stopWordIds = [],
 					stopWords = [],
@@ -60,6 +64,7 @@ export function addMutationInterfaceCreate({glue}) {
 			const createdNode = create({ // Model applies forceArray and reference
 				_name,
 				collectionIds, // empty array allowed
+				expressions,
 				fields,
 				//stopWordIds: stopWordIds.map((stopWordId) => reference(stopWordId)), // empty array allowed
 				stopWords,

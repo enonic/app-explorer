@@ -33,7 +33,7 @@ import {hash} from '/lib/explorer/string/hash';
 import {connect} from '/lib/explorer/repo/connect';
 
 //import {generateSchemaForInterface} from './schemaWithLimitedDocumentTypes/generateSchemaForInterface';
-import {getCachedSchema} from '/lib/explorer/interface/graphql/getCachedSchema';
+import { getCachedSchema } from '/lib/explorer/interface/graphql/getCachedSchema';
 import { HTTP_RESPONSE_STATUS_CODES } from '../constants';
 
 

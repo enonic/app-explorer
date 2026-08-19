@@ -76,6 +76,8 @@ export const GQL_INPUT_TYPE_DOCUMENT_TYPE_PROPERTIES_NAME = 'DocumentTypePropert
 export const GQL_INPUT_TYPE_FILTERS_NAME = 'Filters';
 export const GQL_INPUT_TYPE_FILTERS_BOOLEAN_NAME = 'FiltersBoolean';
 
+export const GQL_INPUT_TYPE_INTERFACE_EXPRESSION_NAME = 'InterfaceExpressionInput';
+export const GQL_INPUT_TYPE_INTERFACE_EXPRESSIONS_NAME = 'InterfaceExpressionsInput';
 export const GQL_INPUT_TYPE_INTERFACE_FIELD_NAME = 'InterfaceFieldInput';
 export const GQL_INPUT_TYPE_INTERFACE_TERM_QUERY_NAME = 'InterfaceTermQueryInput';
 
@@ -122,6 +124,8 @@ export const GQL_TYPE_GROUP_NAME = 'Group';
 export const GQL_TYPE_HAS_FIELD_QUERY_RESULT_NAME = 'HasFieldQueryResult';
 
 export const GQL_TYPE_INTERFACE_NAME = 'Interface';
+export const GQL_TYPE_INTERFACE_EXPRESSIONS_NAME = 'InterfaceExpressions';
+export const GQL_TYPE_INTERFACE_EXPRESSION_NAME = 'InterfaceExpression';
 export const GQL_TYPE_INTERFACE_FIELD_NAME = 'InterfaceField';
 export const GQL_TYPE_INTERFACE_TERM_QUERY_NAME = 'InterfaceTermQuery';
 

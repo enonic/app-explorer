@@ -100,7 +100,7 @@ export function BoostBuilder({
 						setFieldButtonVisible(false);
 						setTimeout(() => {
 							setFields([{
-								boost: 1,
+								boost: 0,
 								name: ''
 							}]);
 						}, DURATION_BUTTON_HIDE);
@@ -125,7 +125,7 @@ export function BoostBuilder({
 						setTermButtonVisible(false);
 						setTermQueries(prev => {
 							prev.push({
-								// boost: 1,
+								// boost: 0,
 								// field: '',
 								// type: VALUE_TYPE_STRING,
 								// value: ''

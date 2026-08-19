@@ -210,7 +210,7 @@ export function Interfaces({
 									boost,
 									//fieldId,
 									name
-								}, i) => <li key={i} style={{marginBottom: 3}}>{`${name}${(boost && boost > 1) ? `^${boost}` : ''}`}</li>)}</ul></Table.Cell> : null}
+								}, i) => <li key={i} style={{marginBottom: 3}}>{`${name}${boost ? `^${boost}` : ''}`}</li>)}</ul></Table.Cell> : null}
 							{showSynonyms ? <Table.Cell collapsing disabled={isLoading}><ul style={{
 								listStyleType: 'none',
 								margin: 0,

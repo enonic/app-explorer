@@ -1,4 +1,4 @@
-import type {TermQuery} from '@enonic-types/lib-explorer/Interface.d';
+import type { Expressions, TermQuery } from '@enonic-types/lib-explorer/Interface.d';
 
 
 import {coerseInterfaceType} from '/lib/explorer/interface/coerseInterfaceType';
@@ -13,6 +13,7 @@ import {
 } from '/lib/graphql';
 
 import {
+	GQL_INPUT_TYPE_INTERFACE_EXPRESSIONS_NAME,
 	GQL_INPUT_TYPE_INTERFACE_FIELD_NAME,
 	GQL_INPUT_TYPE_INTERFACE_TERM_QUERY_NAME,
 	GQL_MUTATION_INTERFACE_UPDATE_NAME,
@@ -27,24 +28,26 @@ export function addMutationInterfaceUpdate({glue}) {
 			_id: glue.getScalarType('_id'),
 			_name: glue.getScalarType('_name'),
 			collectionIds: list(GraphQLID), // null allowed
+			expressions: glue.getInputType(GQL_INPUT_TYPE_INTERFACE_EXPRESSIONS_NAME),
 			fields: list(glue.getInputType(GQL_INPUT_TYPE_INTERFACE_FIELD_NAME)), // null allowed
 			//stopWordIds: list(GraphQLID), // null allowed
 			stopWords: list(GraphQLString), // null allowed
 			synonymIds: list(GraphQLID), // null allowed
 			termQueries: list(glue.getInputType(GQL_INPUT_TYPE_INTERFACE_TERM_QUERY_NAME)),
 		},
-		resolve(env :{
-			args :{
-				_id :string
-				_name :string
-				collectionIds ?:Array<string>
-				fields ?:Array<{
+		resolve(env: {
+			args: {
+				_id: string;
+				_name: string;
+				collectionIds?: string[];
+				expressions?: Expressions;
+				fields?: {
 					boost ?:number
 					name :string
-				}>
-				stopWords ?:Array<string>
-				synonymIds ?:Array<string>
-				termQueries: TermQuery[]
+				}[];
+				stopWords?: string[]
+				synonymIds?: string[];
+				termQueries: TermQuery[];
 			}
 		}) {
 			//log.debug(`env:${toStr(env)}`);
@@ -53,6 +56,7 @@ export function addMutationInterfaceUpdate({glue}) {
 					_id,
 					_name,
 					collectionIds = [],
+					expressions,
 					fields = [],
 					//stopWordIds = [],
 					stopWords = [],
@@ -81,6 +85,7 @@ export function addMutationInterfaceUpdate({glue}) {
 			const modifiedNode = update({ // Model applies forceArray and reference
 				_id,
 				collectionIds,
+				expressions,
 				fields,
 				//stopWordIds, // empty array allowed
 				stopWords,

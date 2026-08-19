@@ -234,7 +234,7 @@ const JSON_SCHEMA_QUERY_DOCUMENTS = {
 						"properties": {
 							"boost": {
 								"type": "number",
-								"default": "1.0"
+								"default": "0"
 							}
 						},
 						"default": {}
@@ -284,7 +284,7 @@ const JSON_SCHEMA_QUERY_DOCUMENTS = {
 							},
 							"boost": {
 								"type": "number",
-								"default": "1.0"
+								"default": "0"
 							}
 						},
 						"default": {
@@ -318,7 +318,7 @@ const JSON_SCHEMA_QUERY_DOCUMENTS = {
 							},
 							"boost": {
 								"type": "number",
-								"default": "1.0"
+								"default": "0"
 							}
 						},
 						"default": {
@@ -355,7 +355,7 @@ const JSON_SCHEMA_QUERY_DOCUMENTS = {
 							},
 							"boost": {
 								"type": "number",
-								"default": "1.0"
+								"default": "0"
 							}
 						},
 						"default": {
@@ -374,7 +374,7 @@ const JSON_SCHEMA_QUERY_DOCUMENTS = {
 						"properties": {
 							"boost": {
 								"type": "number",
-								"default": "1.0"
+								"default": "0"
 							},
 							"field": {
 								"type": "string"
@@ -412,7 +412,7 @@ const JSON_SCHEMA_QUERY_DOCUMENTS = {
 						"properties": {
 							"boost": {
 								"type": "number",
-								"default": "1.0"
+								"default": "0"
 							},
 							"field": {
 								"type": "string"
@@ -447,7 +447,7 @@ const JSON_SCHEMA_QUERY_DOCUMENTS = {
 						"properties": {
 							"boost": {
 								"type": "number",
-								"default": "1.0"
+								"default": "0"
 							},
 							"field": {
 								"type": "string"
@@ -503,7 +503,7 @@ const JSON_SCHEMA_QUERY_DOCUMENTS = {
 						"properties": {
 							"boost": {
 								"type": "number",
-								"default": "1.0"
+								"default": "0"
 							},
 							"field": {
 								"type": "string"
@@ -531,7 +531,7 @@ const JSON_SCHEMA_QUERY_DOCUMENTS = {
 						"properties": {
 							"boost": {
 								"type": "number",
-								"default": "1.0"
+								"default": "0"
 							},
 							"field": {
 								"type": "string"
@@ -610,7 +610,7 @@ const JSON_SCHEMA_QUERY_DOCUMENTS = {
 						"properties": {
 							"boost": {
 								"type": "number",
-								"default": "1.0"
+								"default": "0"
 							},
 							"filter": {"$ref": "#/$defs/oneOrMoreQueries"},
 							"must": {"$ref": "#/$defs/oneOrMoreQueries"},
