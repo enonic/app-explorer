@@ -59,7 +59,7 @@ export default function Expressions({
 					<TableCell>
 						<Input
 							fluid
-							min={0.001}
+							min={0}
 							onChange={(_e,{value:newBoost}) => setExpressions((prev) => {
 								const newExpressions = JSON.parse(JSON.stringify(prev||{}));
 								if (!newExpressions.fulltext) newExpressions.fulltext = {};
@@ -88,7 +88,7 @@ export default function Expressions({
 					<TableCell>
 						<Input
 							fluid
-							min={0.01}
+							min={0}
 							onChange={(_e,{value:newBoost}) => setExpressions((prev) => {
 								const newExpressions = JSON.parse(JSON.stringify(prev||{}));
 								if (!newExpressions.stemmed) newExpressions.stemmed = {};
@@ -117,7 +117,7 @@ export default function Expressions({
 					<TableCell>
 						<Input
 							fluid
-							min={0.01}
+							min={0}
 							onChange={(_e,{value:newBoost}) => setExpressions((prev) => {
 								const newExpressions = JSON.parse(JSON.stringify(prev||{}));
 								if (!newExpressions.nGram) newExpressions.nGram = {};

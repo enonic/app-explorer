@@ -100,7 +100,7 @@ export function FieldSelector(props :{
 									? <Input
 										disabled={disabled}
 										fluid
-										min={0.001}
+										min={0}
 										onChange={(_e,{value:newBoost}) => {
 											// console.debug('newBoost', newBoost);
 											const deref = JSON.parse(JSON.stringify(fieldsArray));
