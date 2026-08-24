@@ -38,7 +38,7 @@
     "tiny-jsonc": "^1.0.2",
     "traverse": "^0",
     "uri-js": "^4",
-    "use-debounce": "^9"
+    "use-debounce": "^10"
   },
   "devDependencies": {
     "@enonic-types/core": "^8.0.3",
