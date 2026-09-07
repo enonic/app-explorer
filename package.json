@@ -84,7 +84,7 @@
     "@types/traverse": "^0",
     "@vitejs/plugin-react": "^4.4.1",
     "buffer": "^6",
-    "concurrently": "^8.2.0",
+    "concurrently": "^10.0.5",
     "del-cli": "^7.0.0",
     "dynamic-importmap": "^0.1.0",
     "esbuild": "^0.28",
