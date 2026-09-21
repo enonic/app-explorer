@@ -41,7 +41,7 @@
     "use-debounce": "^10"
   },
   "devDependencies": {
-    "@enonic-types/core": "^8.0.3",
+    "@enonic-types/core": "^8.0.4",
     "@enonic-types/global": "^8",
     "@enonic-types/lib-admin": "^8",
     "@enonic-types/lib-app": "^8",
