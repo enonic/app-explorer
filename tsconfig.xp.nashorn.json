@@ -160,9 +160,9 @@
     "strictNullChecks": false,
 
     // There are actually two "targets"
-    // 1. The environment tsup runs in (set in this file)
-    // 2. The environment tsup transpiles to (set in tsconfig.tsup.json via tsup.config.ts)
-    "target": "ES2020", // What bundle-require inside tsup uses to load tsup.config.ts
+    // 1. The environment tsdown runs in (set in this file)
+    // 2. The environment tsdown transpiles to (set in tsdown.config.mts)
+    "target": "ES2020", // What Node uses to load tsdown.config.mts
 
     // NOTE: Setting target to something other than ES3 or ES5 brings in the type for the console object :(
     // "target": "ES5",

@@ -1,4 +1,4 @@
-{ // This file is used by tsup transpiling source code
+{ // This file is used by tsdown transpiling source code
 	"compilerOptions": {
     "composite": false,
 		"paths": {
@@ -7,6 +7,5 @@
 			"@enonic/nashorn-polyfills": ["./src/main/resources/lib/nashorn/index.ts"],
 			"/lib/licensing": ["./src/main/resources/lib/licensing.ts"],
 		},
-		"target": "ES5"
 	}
 }

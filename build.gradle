@@ -141,7 +141,7 @@ processResources {
 	exclude 'tsconfig.json'
 	exclude 'assets/tsconfig.json'
 
-	// Let tsup/vite handle these (rather than gradle)
+	// Let tsdown/vite handle these (rather than gradle)
 	exclude '**/*.css'
 	exclude '**/*.es'
 	exclude '**/*.js'

@@ -44,8 +44,6 @@ export default {
 		'/lib/explorer/(.*)': '<rootDir>/symlinks/lib-explorer/src/main/resources/lib/explorer/$1',
 	},
 
-	preset: 'ts-jest',
-
 	// A list of paths to modules that run some code to configure or set up the
 	// testing environment. Each setupFile will be run once per test file. Since
 	// every test runs in its own environment, these scripts will be executed in
@@ -65,11 +63,18 @@ export default {
 
 	transform: {
 		'^.+\\.(js|jsx|ts|tsx)$': [
-			'ts-jest',
+			'@swc/jest',
 			{
-				tsconfig: 'test/tsconfig.json'
-			}
-		]
+				jsc: {
+					parser: {
+						syntax: 'typescript',
+						tsx: true,
+					},
+					target: 'es2022',
+				},
+				sourceMaps: 'inline',
+			},
+		],
 	},
 
 	transformIgnorePatterns: [

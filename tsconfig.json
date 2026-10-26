@@ -5,7 +5,7 @@
       "path": "tsconfig.xp.nashorn.json"
     },
     // {
-    //   "path": "tsconfig.tsup.json"
+    //   "path": "tsconfig.tsdown.json"
     // },
     {
       "path": "tsconfig.assets.json"
