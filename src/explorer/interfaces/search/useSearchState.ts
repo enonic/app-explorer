@@ -7,7 +7,6 @@ import type {InterfaceField} from '@enonic-types/lib-explorer/Interface.d';
 
 
 import {HTTP_HEADERS} from '@enonic/explorer-utils';
-import {useWhenInitAsync} from '@seamusleahy/init-hooks';
 import * as gql from 'gql-query-builder-ts';
 import * as React from 'react';
 import useJsonModalState from '../../components/modals/useJsonModalState';
@@ -224,7 +223,7 @@ export function useSearchState({
 	//──────────────────────────────────────────────────────────────────────────
 	// Init only
 	//──────────────────────────────────────────────────────────────────────────
-	useWhenInitAsync(() => {
+	React.useEffect(() => {
 		Promise.all([
 			getInterfaceCollectionCount(),
 			getInterfaceDocumentCount(),
@@ -235,7 +234,7 @@ export function useSearchState({
 		]).then(() => {
 			setInitializing(false);
 		})
-	});
+	}, []);
 
 	//──────────────────────────────────────────────────────────────────────────
 	// Update only (not init)

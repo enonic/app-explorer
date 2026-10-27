@@ -1,6 +1,5 @@
 import type { IQueryBuilderOptions } from 'gql-query-builder-ts';
 
-import { useWhenInitAsync } from '@seamusleahy/init-hooks';
 import { mutation, query } from 'gql-query-builder-ts';
 import { useManualQuery } from 'graphql-hooks';
 import * as React from 'react';
@@ -175,7 +174,7 @@ export default function useDeleteCollectionState({
 	//──────────────────────────────────────────────────────────────────────────
 	// Init
 	//──────────────────────────────────────────────────────────────────────────
-	useWhenInitAsync(() => {
+	React.useEffect(() => {
 		fetchInterfacesWithCollection();
 		fetchRepoList().then(({
 			data: {
@@ -183,7 +182,7 @@ export default function useDeleteCollectionState({
 			}}) => {
 			setHasRepo(listRepos.length > 0);
 		});
-	});
+	}, []);
 
 	//──────────────────────────────────────────────────────────────────────────
 	// Updates (not init)

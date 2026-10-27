@@ -1,6 +1,5 @@
 import type { UserConfig } from 'vite'
 import externalGlobals from 'rollup-plugin-external-globals';
-import { visualizer } from 'rollup-plugin-visualizer';
 
 export default {
 	build: {
@@ -22,9 +21,6 @@ export default {
 		externalGlobals({
 			react: 'React',
 			'react-dom': 'ReactDOM'
-		}),
-		visualizer({
-			filename: 'build/vite-stats-webcrawler-form.html',
-		}) // should be the last one
+		})
 	],
 } satisfies UserConfig

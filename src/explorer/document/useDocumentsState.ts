@@ -11,7 +11,6 @@ import {
 	// storage
 } from '@enonic/js-utils';
 import {FieldPath} from '@enonic/explorer-utils';
-import {useWhenInitAsync} from '@seamusleahy/init-hooks';
 import {useDebounce} from 'use-debounce';
 import * as gql from 'gql-query-builder-ts';
 import {difference} from 'lodash';
@@ -611,10 +610,10 @@ export function useDocumentsState({
 	//──────────────────────────────────────────────────────────────────────────
 	// Init
 	//──────────────────────────────────────────────────────────────────────────
-	useWhenInitAsync(() => {
+	React.useEffect(() => {
 		DEBUG_DEPENDENCIES && console.debug('init');
 		getDocumentTypes()
-	});
+	}, []);
 
 	//──────────────────────────────────────────────────────────────────────────
 	// Effects (init and changes)

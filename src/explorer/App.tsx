@@ -1,5 +1,4 @@
-import {useWhenInit} from '@seamusleahy/init-hooks';
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {
 	BrowserRouter as Router,
 } from 'react-router-dom';
@@ -10,7 +9,7 @@ export function App() {
 	const [toolUrl, setToolUrl] = useState<string | null>(null);
 	const [servicesBaseUrl, setServicesBaseUrl] = useState<string | null>(null);
 
-	useWhenInit(() => {
+	useEffect(() => {
 		// This has to happen before GraphiQL is loaded
 		if (!localStorage.getItem('graphiql:theme')) {
 			localStorage.setItem('graphiql:theme', 'light');
@@ -24,7 +23,7 @@ export function App() {
 			setToolUrl(tUrl);
 			setServicesBaseUrl(`${tUrl}/_/service/com.enonic.app.explorer`)
 		});
-	});
+	}, []);
 
 	if (!toolUrl || !servicesBaseUrl) {
 		return null;

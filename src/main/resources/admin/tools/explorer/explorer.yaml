@@ -8,3 +8,4 @@ allow:
   - "role:system.admin"
 apis:
   - "admin:extension"
+  - "admin:events"

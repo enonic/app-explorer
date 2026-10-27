@@ -6,7 +6,6 @@ import type {
 import type {QueriedSynonym} from '@enonic-types/lib-explorer/index.d';
 
 //import {isSet} from '@enonic/js-utils';
-import {useWhenInitAsync} from '@seamusleahy/init-hooks';
 import * as React from 'react';
 import {fetchSynonymsQuery} from '../../fetchers/fetchSynonymsQuery';
 import {useUpdateEffect} from '../../utils/useUpdateEffect';
@@ -140,7 +139,7 @@ export function useEditSynonymsState({
 	//──────────────────────────────────────────────────────────────────────────
 	// Init
 	//──────────────────────────────────────────────────────────────────────────
-	useWhenInitAsync(() => {
+	React.useEffect(() => {
 		DEBUG_DEPENDENCIES && console.debug('init');
 		memoizedQuerySynonyms({
 			from: fromState,
@@ -150,7 +149,7 @@ export function useEditSynonymsState({
 			sort: sortState,
 			to: toState,
 		});
-	});
+	}, []);
 
 	//──────────────────────────────────────────────────────────────────────────
 	// Effects

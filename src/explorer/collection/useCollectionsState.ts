@@ -2,7 +2,6 @@ import type {
 	TaskInfo,
 	TaskStateType
 } from '@enonic-types/lib-task';
-import {useWhenInitAsync} from '@seamusleahy/init-hooks';
 import type {
 	Collector,
 	ContentTypeOptions,
@@ -725,7 +724,9 @@ export function useCollectionsState() {
 		}
 	}, 1000);
 
-	useWhenInitAsync(() => fetchOnMount());
+	React.useEffect(() => {
+		fetchOnMount();
+	}, []);
 
 	const shemaIdToName = {};
 	documentTypes.forEach(({_id, _name}) => {

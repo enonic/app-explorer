@@ -38,7 +38,6 @@ const BUNDLED_PACKAGES = [
 	'gql-query-builder', //
 	'core-js', //
 	'fast-deep-equal', //
-	'human-object-diff', //
 	// 'is-generator-function', // my_node_modules/util
 	'object.getownpropertydescriptors', // tasks/webcrawl/webcrawl
 	'robots-txt-guard', //

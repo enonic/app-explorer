@@ -19,8 +19,6 @@ import {
 	VALUE_TYPE_STRING,
 	isSet
 } from '@enonic/js-utils';
-import {useWhenInitAsync} from '@seamusleahy/init-hooks';
-import {useWhenValuesChange} from '@seamusleahy/values-changes-hooks';
 import fastDeepEqual from 'fast-deep-equal/react';
 import * as gql from 'gql-query-builder-ts';
 import {useManualQuery} from 'graphql-hooks';
@@ -31,7 +29,7 @@ import {mustStartWithALowercaseLetter} from '../utils/mustStartWithALowercaseLet
 import {notDoubleUnderscore} from '../utils/notDoubleUnderscore';
 import {onlyLowercaseAsciiLettersDigitsAndUnderscores} from '../utils/onlyLowercaseAsciiLettersDigitsAndUnderscores';
 import {required} from '../utils/required';
-// import {useUpdateEffect} from '../utils/useUpdateEffect';
+import {useUpdateEffect} from '../utils/useUpdateEffect';
 
 
 export interface QueryCollectionsResponseData {
@@ -334,9 +332,9 @@ export function useNewOrEditInterfaceState({
 	//──────────────────────────────────────────────────────────────────────────
 	// Init (not updates)
 	//──────────────────────────────────────────────────────────────────────────
-	useWhenInitAsync(() => {
+	React.useEffect(() => {
 		fetchCollections();
-	});
+	}, []);
 
 	//──────────────────────────────────────────────────────────────────────────
 	// Effects (init and updates)
@@ -589,7 +587,7 @@ export function useNewOrEditInterfaceState({
 	//──────────────────────────────────────────────────────────────────────────
 	// Updates (not init)
 	//──────────────────────────────────────────────────────────────────────────
-	useWhenValuesChange(() => {
+	useUpdateEffect(() => {
 		if (fetchCollectionsData) {
 			const existingCollectionIds = fetchCollectionsData.queryCollections.hits.map(({_id}) => _id);
 			setNonExistantCollectionIds(collectionIdsFromStorage.filter(collectionId => !existingCollectionIds.includes(collectionId)));
@@ -606,7 +604,7 @@ export function useNewOrEditInterfaceState({
 	}, [
 		collectionIdsFromStorage,
 		fetchCollectionsData,
-	], false);
+	]);
 
 	//──────────────────────────────────────────────────────────────────────────
 	function resetState() {

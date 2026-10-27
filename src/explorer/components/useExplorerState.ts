@@ -5,7 +5,6 @@ import type {User} from '/lib/xp/auth';
 import type {License} from '../index.d';
 
 
-import {useWhenInitAsync} from '@seamusleahy/init-hooks';
 import * as gql from 'gql-query-builder-ts';
 import { useManualQuery } from 'graphql-hooks';
 import * as React from 'react';
@@ -143,7 +142,7 @@ function useExplorerState({
 	//──────────────────────────────────────────────────────────────────────────
 	// Init
 	//──────────────────────────────────────────────────────────────────────────
-	useWhenInitAsync(() => {
+	React.useEffect(() => {
 		fetchLicense();
 		fetchInterfaces();
 		setLoadingModalState(prev => {
@@ -157,7 +156,7 @@ function useExplorerState({
 			setUserState(object.data.getUser);
 		})
 		memoizedQueryInterfacesDefault();
-	});
+	}, []);
 
 	//console.debug('defaultInterfaceFields', defaultInterfaceFields);
 

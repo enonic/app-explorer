@@ -2,7 +2,6 @@ import type {Profile} from '../../..';
 
 
 import * as React from 'react';
-import {useWhenInitAsync} from '@seamusleahy/init-hooks';
 import fetchProfile from '../fetchers/fetchProfile';
 
 
@@ -23,13 +22,13 @@ function useUserState({
 	//──────────────────────────────────────────────────────────────────────────
 	// Init
 	//──────────────────────────────────────────────────────────────────────────
-	useWhenInitAsync(() => {
+	React.useEffect(() => {
 		fetchProfile({
 			url: `${servicesBaseUrl}/graphQL`
 		}).then(profile => {
 			setProfileState(profile);
 		})
-	});
+	}, []);
 
 	//──────────────────────────────────────────────────────────────────────────
 	// Return

@@ -86,7 +86,6 @@
       "@enonic/nashorn-polyfills": ["./src/main/resources/lib/nashorn/index.ts"],
       "/lib/licensing": ["./src/main/resources/lib/licensing.ts"],
       // "/constants": ["./src/main/resources/constants"], // Doesn't work
-      "/lib/enonic/asset": ["./node_modules/@enonic-types/lib-asset"],
       "/lib/enonic/static": ["./node_modules/@enonic-types/lib-static"],
       "/lib/xp/*": ["./node_modules/@enonic-types/lib-*"],
 

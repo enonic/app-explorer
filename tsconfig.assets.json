@@ -77,7 +77,6 @@
 		// "strict": true, // TODO: enable and fix 55 errors
 		// "strictNullChecks": true, // TODO: enable and fix 400 errors
 		"types": [
-			"jquery",
 			"jsuri",
 			"react",
 			"react-html-parser",
