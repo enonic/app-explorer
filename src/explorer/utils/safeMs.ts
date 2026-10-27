@@ -7,7 +7,6 @@ export default function safeMs(strOrNum: string | number) {
 		result = ms(strOrNum) as string | number;
 	} catch (e) {
 		result = 'N/A';
-	} finally {
-		return result;
 	}
+	return result;
 }

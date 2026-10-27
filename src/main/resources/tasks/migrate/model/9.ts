@@ -10,7 +10,7 @@ import type {
 	InterfaceNodeWithQuery,
 	InterfaceNodeWithResultMappings,
 	InterfaceNodeWithThesauri
-} from '../types.d';
+} from '../../init/types.d';
 
 
 import {
@@ -41,7 +41,7 @@ import {
 	DEFAULT_INTERFACE,
 	DEFAULT_INTERFACE_NAME
 } from '../interfaceDefault';
-import {Progress} from '../Progress';
+import {Progress} from '../../init/Progress';
 
 
 export function model9({
@@ -369,7 +369,7 @@ export function model9({
 		writeConnection.modify<SynonymNode>({
 			key: _id,
 			editor: (node) => {
-				node.thesaurusReference = reference(thesaurusId);
+				node.thesaurusReference = reference(thesaurusId) as unknown as string;
 				return node;
 			}
 		});

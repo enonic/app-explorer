@@ -273,9 +273,9 @@ export function MigrationSegment({
 		}
 		<Button
 			content={`Migrate ${needsMigrationCount} synonyms`}
-			disabled={!!migrateTaskId || !fromLanguage || !toLanguage ||  loading}
+			disabled={!!migrateTaskId || !fromLanguage || !toLanguage ||  loading}
 			icon={{name: 'tasks'}}
-			loading={migrating || loading}
+			loading={migrating || loading}
 			onClick={() => {
 				setLoading(true);
 				fetch(`${servicesBaseUrl}/graphQL`, {

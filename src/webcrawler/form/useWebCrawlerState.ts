@@ -128,7 +128,7 @@ export function useWebCrawlerState({
 		//console.debug('baseUriOnBlur');
 		setBaseUriVisited(true);
 		validateBaseUri(collectorConfig
-			? (collectorConfig.baseUri || '')
+			? (collectorConfig.baseUri || '')
 			: '');
 	}, [
 		collectorConfig,

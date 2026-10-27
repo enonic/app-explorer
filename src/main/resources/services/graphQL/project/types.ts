@@ -1,7 +1,9 @@
 import type { Project } from '/lib/xp/project';
 
-import type { GetSitesObjectType } from '../content/addGetSites';
-import type { QueryContentsObjectType } from '../content/addQueryContents';
+import type {
+	GetSitesObjectType,
+	QueryContentsObjectType,
+} from '../content/types';
 import type { ObjectType } from '../Glue';
 import { GQL_UNIQ_TYPE } from '../constants';
 

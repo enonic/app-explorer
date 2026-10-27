@@ -64,7 +64,7 @@ export function SynonymLanguages({
 							}
 							<Segment
 								basic
-								disabled={!state.enabled || !state.languages[i].enabled}
+								disabled={!state.enabled || !state.languages[i].enabled}
 								vertical
 							>
 								<SynonymLanguageSynonyms

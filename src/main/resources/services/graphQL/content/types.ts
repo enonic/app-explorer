@@ -16,7 +16,7 @@ import type {
 	// BooleanFilter,
 	Guillotine
 } from '@enonic/js-utils/types/node/query/Filters.d';
-import type { Highlight } from '@enonic-types/lib-explorer/GraphQL.d';
+import type { GQL_InputType_Highlight as Highlight } from '@enonic-types/lib-explorer/GraphQL.d';
 
 import type { AggregationArg } from '../types';
 import type { ObjectType } from '../Glue';
@@ -33,6 +33,7 @@ export type IconWithUrl = Omit<Icon, 'data'> & {
 
 export type ContentTypeObjectType = Omit<ContentType, 'form'|'icon'> & {
 	_docCount?: number;
+	displayName?: string;
 	formJson: string; // TODO Remove this in next major release?
 	formAsJson: Record<string, unknown>;
 	icon?: IconWithUrl;

@@ -1,4 +1,5 @@
 import type {
+	CollectionNode,
 	RepoConnection,
 	ScheduledJob
 } from '@enonic-types/lib-explorer';
@@ -22,7 +23,7 @@ import {
 	list as listJobs
 	//@ts-ignore
 } from '/lib/xp/scheduler';
-import {Progress} from '../Progress';
+import {Progress} from '../../init/Progress';
 
 
 
@@ -72,7 +73,7 @@ export function model10({
 				});
 				if (collectionNode) {
 					//log.debug(`collectionNode:${toStr(collectionNode)}`);
-					const {_id: collectionId} = collectionNode;
+					const {_id: collectionId} = collectionNode as CollectionNode;
 					//log.debug(`collectionId:${toStr(collectionId)}`);
 					job.config.collectionId = collectionId; // Not using reference since this is in another repo.
 					job.name = uniqueId({
@@ -82,7 +83,7 @@ export function model10({
 					});
 					//log.debug(`job.name:${toStr(job.name)}`);
 					log.debug(`job:${toStr(job)}`);
-					const createdJob = createJob(job);
+					const createdJob = createJob(job as unknown as Parameters<typeof createJob>[0]);
 					log.debug(`createdJob:${toStr(createdJob)}`);
 					if (createdJob) {
 						const deleteRes = deleteJob({name});

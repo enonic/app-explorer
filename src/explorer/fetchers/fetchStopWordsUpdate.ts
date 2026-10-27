@@ -1,5 +1,5 @@
 import type {JSONResponse}  from './index.d';
-import type {Stopword} from '@enonic-types/lib-explorer/Stopword.d';
+import type {Stopword} from '@enonic-types/lib-explorer/StopWord.d';
 
 
 import {GQL_MUTATION_STOP_WORDS_UPDATE} from '../mutations/stopWordsUpdateMutation';

@@ -21,8 +21,8 @@ export function RemoveFieldFromDocumentTypeModal({
 	servicesBaseUrl,
 	updateOrDeleteProperties,
 	modalState: {
-		state: state,
-		open: open
+		state,
+		open
 	},
 	// Optional
 	collectionNames = [], // optional

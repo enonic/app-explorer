@@ -19,25 +19,28 @@ import {
 } from '/lib/graphql';
 
 
+export type GraphQLField = {
+	args?: Record<string, unknown>
+	resolve?: ({
+		args,
+		context,
+		source
+	}: {
+		args?: any
+		context?: any
+		source?: any
+	}) => unknown
+	type: unknown
+}
+
 export type GraphQLFields<T> = {
-	[P in keyof T]: {
-		resolve?: ({
-			args,
-			context,
-			source
-		}: {
-			args?: object
-			context?: object
-			source?: object
-		}) => T
-		type: T[P]
-	}
+	[P in keyof T]?: GraphQLField
+} & {
+	[name: string]: GraphQLField
 }
 
 export type GraphQLArgs<T> = {
-	[P in keyof T] :{
-		type: T[P]
-	}
+	[P in keyof T] :unknown
 }
 
 // type List<T extends object> = T & {
@@ -81,7 +84,7 @@ export type Reference<
 	'__objectOrInterfaceType__': OI['__type__']
 }; // Bascially rebrand, but keep around original brand
 
-interface EnvObject {
+export interface EnvObject {
 	args?: object
 	context?: object
 	source?: object
@@ -115,7 +118,7 @@ export type QueriesItem<
 		args?: Args
 		context?: Context
 		source?: Source
-	}, OneOrMore<T>>
+	}>
 	type: OneOrMore<ObjectType<T>|UnionType<T>>
 }
 
@@ -136,7 +139,7 @@ export class Glue<Context extends object = EmptyObject> {
 	}> = {};
 	_mutations: Record<string,{
 		args: AnyObject
-		resolve: FieldResolver
+		resolve: FieldResolver<EnvObject>
 		type: unknown
 	}> = {};
 	_objectTypes: Record<string, ObjectType> = {};
@@ -159,7 +162,7 @@ export class Glue<Context extends object = EmptyObject> {
 		createInterfaceType: (params: {
 			fields: unknown
 			name: string
-			typeResolver: TypeResolver
+			typeResolver: TypeResolver<object>
 		}) => InterfaceType
 		createObjectType: <T extends object = EmptyObject>(params: {
 			fields: Fields<T>
@@ -176,7 +179,7 @@ export class Glue<Context extends object = EmptyObject> {
 		>(params: {
 			name: string
 			typeResolver: TypeResolver<T>
-			types: Reference<OI>
+			types: (OI|Reference<OI>)[]
 		}) => UnionType<T>
 	};
 
@@ -300,7 +303,7 @@ export class Glue<Context extends object = EmptyObject> {
 		}
 		this._uniqueNames[name] = 'interfaceType';
 		this._interfaceTypes[name] = {
-			fields,
+			fields: fields as Fields,
 			type: this.schemaGenerator.createInterfaceType({
 				fields,
 				name,
@@ -384,7 +387,7 @@ export class Glue<Context extends object = EmptyObject> {
 			args: Args,
 			context: Context,
 			source: Source
-		}, OneOrMore<T>>
+		}>
 		type: OneOrMore<ObjectType<T>|UnionType<T>>
 	}) {
 		//log.debug(`addQuery({name:${name}})`);
@@ -452,7 +455,7 @@ export class Glue<Context extends object = EmptyObject> {
 			type,
 			typeResolver,
 			types
-		};
+		} as unknown as UnionTypesItem;
 		return type;
 	}
 

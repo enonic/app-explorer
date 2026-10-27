@@ -1,4 +1,5 @@
 import type {AggregationsResponseEntry} from '@enonic/js-utils/types/node/query/Aggregation.d';
+import type {StemmingLanguageCode} from '@enonic/js-utils/types/Stemming.d';
 import type {
 	QueryFilters,
 	QueriedSynonym
@@ -75,7 +76,7 @@ export function addQuerySynonymsField({
 		},
 		resolve: ({
 			args: {
-				filters = {},
+				filters = {} as QueryFilters,
 				from,
 				//highlight, // TODO?
 				languages = [],
@@ -91,7 +92,7 @@ export function addQuerySynonymsField({
 		}) => {
 			//log.debug('thesaurusNames:%s', toStr(thesaurusNames));
 			const highlightLocales = [];
-			const localeToStemmingLanguage: Record<string,string> = {};
+			const localeToStemmingLanguage: Record<string,StemmingLanguageCode> = {};
 			const explorerRepoReadConnection = connect({
 				principals: [Principal.EXPLORER_READ]
 			});
@@ -101,7 +102,7 @@ export function addQuerySynonymsField({
 						clause: 'should',
 						filters,
 						filter: hasValue('_parentPath', `/thesauri/${thesaurusName}`)
-					});
+					}) as QueryFilters;
 					const { // TODO Refactor
 						//_id,
 						allowedLanguages
@@ -115,7 +116,7 @@ export function addQuerySynonymsField({
 							highlightLocales.push(locale);
 						}
 						if (locale !== 'zxx' && !localeToStemmingLanguage[locale]) {
-							localeToStemmingLanguage[locale] = javaLocaleToSupportedLanguage(locale); // Doesn't support zxx
+							localeToStemmingLanguage[locale] = javaLocaleToSupportedLanguage(locale) as StemmingLanguageCode; // Doesn't support zxx
 						}
 					}
 				});
@@ -135,7 +136,7 @@ export function addQuerySynonymsField({
 							highlightLocales.push(locale);
 						}
 						if (locale !== 'zxx' && !localeToStemmingLanguage[locale]) {
-							localeToStemmingLanguage[locale] = javaLocaleToSupportedLanguage(locale); // Doesn't support zxx
+							localeToStemmingLanguage[locale] = javaLocaleToSupportedLanguage(locale) as StemmingLanguageCode; // Doesn't support zxx
 						}
 					}
 				}
@@ -154,7 +155,7 @@ export function addQuerySynonymsField({
 								field: `languages.${locale}`
 							}
 						}
-					});
+					}) as QueryFilters;
 				} // for languages
 			}
 			//log.debug('filters:%s', toStr(filters));

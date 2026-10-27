@@ -371,7 +371,7 @@ export function useCollectionsState() {
 	const [copyModalCollectionId, setCopyModalCollectionId] = React.useState<string>();
 
 	const fieldsObj = {};
-	queryFieldsGraph.hits ? queryFieldsGraph.hits.forEach(({
+	if (queryFieldsGraph.hits) queryFieldsGraph.hits.forEach(({
 		//displayName: fieldLabel,
 		key
 	}) => {
@@ -382,7 +382,7 @@ export function useCollectionsState() {
 			key,
 			label: displayName
 		};*/
-	}): [];
+	});
 
 	const [collectorComponents, setCollectorComponents] = React.useState<CollectorComponents>({});
 	const collectorsObj: {[collectorName: string]: boolean} = {};

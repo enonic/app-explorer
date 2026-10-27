@@ -25,6 +25,8 @@
 			// "@enonic/semantic-ui-react-form": ["./../semantic-ui-react-form/src"],
 			// Production (should be commented in when commiting)
 			"@enonic/semantic-ui-react-form": ["./node_modules/@enonic/semantic-ui-react-form/src"],
+			"@enonic/js-utils/types": ["./node_modules/@enonic/js-utils/types"],
+			"@enonic/js-utils/types/*": ["./node_modules/@enonic/js-utils/types/*"],
 			// There is no @enonic-types/lib-explorer yet, so these are workarounds
 			"@enonic-types/lib-explorer": ["./../lib-explorer/src/main/resources/lib/explorer/types/index.d"],
 			"@enonic-types/lib-explorer/*": ["./../lib-explorer/src/main/resources/lib/explorer/types/*"],
@@ -74,7 +76,7 @@
 			"./src/main/resources/assets",
 		],
 		"skipLibCheck": true,
-		// "strict": true, // TODO: enable and fix 55 errors
+		"strict": false,
 		// "strictNullChecks": true, // TODO: enable and fix 400 errors
 		"types": [
 			"jsuri",

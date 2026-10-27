@@ -69,7 +69,7 @@ export function SynonymLanguageSynonymsTable({
 				</Table.Cell>
 				<Table.Cell>
 					<Form.Input
-						disabled={!state.enabled || !state.languages[languageIndex].enabled || !state.languages[languageIndex].synonyms[j].enabled}
+						disabled={!state.enabled || !state.languages[languageIndex].enabled || !state.languages[languageIndex].synonyms[j].enabled}
 						fluid
 						onChange={(_e, {value}) => setState(prev => {
 							const deref = JSON.parse(JSON.stringify(prev));
@@ -81,7 +81,7 @@ export function SynonymLanguageSynonymsTable({
 				</Table.Cell>
 				<Table.Cell>
 					<Form.Dropdown
-						disabled={!state.enabled || !state.languages[languageIndex].enabled || !state.languages[languageIndex].synonyms[j].enabled}
+						disabled={!state.enabled || !state.languages[languageIndex].enabled || !state.languages[languageIndex].synonyms[j].enabled}
 						fluid
 						onChange={(_e,{value}) => setState(prev => {
 							const deref :SynonymGUI = JSON.parse(JSON.stringify(prev));
@@ -108,7 +108,7 @@ export function SynonymLanguageSynonymsTable({
 				</Table.Cell>
 				<Table.Cell>
 					<Form.Input
-						disabled={!state.enabled || !state.languages[languageIndex].enabled || !state.languages[languageIndex].synonyms[j].enabled}
+						disabled={!state.enabled || !state.languages[languageIndex].enabled || !state.languages[languageIndex].synonyms[j].enabled}
 						fluid
 						onChange={(_e, {value}) => setState(prev => {
 							const deref = JSON.parse(JSON.stringify(prev));
@@ -121,7 +121,7 @@ export function SynonymLanguageSynonymsTable({
 				<Table.Cell>
 					<Form.Dropdown
 						clearable
-						disabled={!state.enabled || !state.languages[languageIndex].enabled || !state.languages[languageIndex].synonyms[j].enabled}
+						disabled={!state.enabled || !state.languages[languageIndex].enabled || !state.languages[languageIndex].synonyms[j].enabled}
 						fluid
 						multiple
 						onChange={(_e,{value}) => setState(prev => {
@@ -192,7 +192,7 @@ export function SynonymLanguageSynonymsTable({
 						*/}
 					<DeleteItemButton
 						array={state.languages[languageIndex].synonyms}
-						disabled={!state.enabled || !state.languages[languageIndex].enabled || !state.languages[languageIndex].synonyms[j].enabled/* || j < 2*/}
+						disabled={!state.enabled || !state.languages[languageIndex].enabled || !state.languages[languageIndex].synonyms[j].enabled/* || j < 2*/}
 						setArrayFunction={(changedArray :Array<SynonymGUI_LanguagesSynonymObject>) => setState(prev => {
 							const deref :SynonymGUI = JSON.parse(JSON.stringify(prev));
 							deref.languages[languageIndex].synonyms = changedArray;

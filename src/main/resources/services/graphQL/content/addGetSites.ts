@@ -93,21 +93,21 @@ export function getSitesResolver<
 		if (TRACE) log.info('query:%s', toStr(query));
 
 		const sitesInProject = gS({
-			context,
+			context: context as unknown as Record<string, unknown>,
 			query
 		});
 		if (TRACE) log.info('sitesInProject:%s', toStr(sitesInProject));
 
 		sitesQueryRes.count += sitesInProject.count;
 		sitesQueryRes.total += sitesInProject.total;
-		for (const hit of sitesInProject.hits) {
+		for (const hit of sitesInProject.hits as unknown as SiteObjectType[]) {
 			hit._branch = branch;
 			hit._project = projectId;
 			const newAttachments: AttachmentObjectType[] = [];
-			const attachmentObject = (hit as SiteObjectType).attachments;
+			const attachmentObject = hit.attachments as unknown as Record<string, AttachmentObjectType>;
 			for (const attachmentName in attachmentObject) {
 				const attachment = attachmentObject[attachmentName];
-				(attachment as AttachmentObjectType).url = runInContext(context, () => serviceUrl({
+				attachment.url = runInContext(context, () => serviceUrl({
 					service: 'attachment',
 					params: {
 						contentId: hit._id,
@@ -156,7 +156,6 @@ export function addGetSites({
 				args: {
 					sort: glue.getInputType(GQL_UNIQ_TYPE.INPUT_CONTENT_TYPES_SORT),
 				},
-				// @ts-expect-error
 				resolve: (env: {
 					args: GetContentTypesArgs;
 					source: SiteObjectType;

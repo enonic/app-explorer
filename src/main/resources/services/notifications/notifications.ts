@@ -30,7 +30,7 @@ export function get() {
 	}) || {} as NotificationsNode;
 	//log.info(toStr({node}));
 
-	const {emails = []} = node;
+	const {emails = []} = node as NotificationsNode;
 	//log.info(toStr({emails}));
 
 	return {

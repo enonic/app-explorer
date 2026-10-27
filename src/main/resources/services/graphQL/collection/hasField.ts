@@ -64,7 +64,7 @@ export function hasField({
 					field
 				}
 			},
-			filters
+			filters: filters as unknown as Parameters<typeof addQueryFilter>[0]['filters']
 		}),
 		query: ''
 	};

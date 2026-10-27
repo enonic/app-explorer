@@ -80,11 +80,7 @@ const server = new Server({
 });
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
-declare module globalThis {
-	let log: Log
-}
-
-globalThis.log = server.log;
+(globalThis as unknown as {log: Log}).log = server.log;
 
 const explorerNodeConnection = server.connect({
 	branchId: 'master',

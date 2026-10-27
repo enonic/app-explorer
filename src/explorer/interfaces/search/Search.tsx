@@ -58,12 +58,6 @@ export function Search(props: SearchProps) {
 	// console.debug({initializing, interfaceCollectionCount, interfaceDocumentCount});
 	// console.debug('interfaceCollectionCount', interfaceCollectionCount);
 	// console.debug('interfaceDocumentCount', interfaceDocumentCount);
-	const {
-		// documentTypesAndFields = [],
-		// collectionOptions = [],
-		// firstColumnWidth = 2,
-		// thesaurusOptions = []
-	} = props;
 	//console.debug('documentTypesAndFields', documentTypesAndFields);
 	//const [synonyms, setSynonyms] = React.useState([]);
 

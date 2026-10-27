@@ -1,7 +1,7 @@
 import type {ScheduledJob} from './index.d';
 
 
-import {parseExpression as parseCronExpression} from 'cron-parser';
+import {CronExpressionParser} from 'cron-parser';
 import hash from 'object-hash';
 import * as React from 'react';
 
@@ -76,20 +76,17 @@ export function useScheduleState({
 						const tasks = [];
 						let taskCount = 1;
 						try {
-							const interval = parseCronExpression(cronExpression, {
+							const interval = CronExpressionParser.parse(cronExpression, {
 								currentDate: start, // Start date of the iteration
 								endDate: end, // End date of the iteration
-								iterator: true//, // Return ES6 compatible iterator object
 								//tz: 'Europe/Oslo' // Timezone string. It won't be used in case utc is enabled
 								//tz: timeZone // Timezone string. It won't be used in case utc is enabled
 								//utc: true // Enable UTC
 							});
 							while (true) { //eslint-disable-line no-constant-condition
 								try {
-									const obj = interval.next();
-									//console.log('value:', obj.value.toString(), 'done:', obj.done);
 									const taskId = `${projectId}.${taskCount}`;
-									const taskStart = new Date(obj.value as unknown as Date); // CronDate
+									const taskStart = interval.next().toDate();
 									const taskEnd = new Date(taskStart.getTime());
 									taskEnd.setHours( taskEnd.getHours() + 1 );
 									tasks.push({

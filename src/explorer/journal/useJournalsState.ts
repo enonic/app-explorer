@@ -2,7 +2,7 @@ import type {
 	PaginationProps,
 	StrictTableHeaderCellProps
 } from 'semantic-ui-react';
-import type {QueryJournalsRes} from '../../../services/journals/journals';
+import type {QueryJournalsRes} from '../../main/resources/services/journals/types';
 
 
 import Uri from 'jsuri';

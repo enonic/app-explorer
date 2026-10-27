@@ -16,7 +16,7 @@ import {setModel} from '/lib/explorer/model/setModel';
 import {hasValue} from '/lib/explorer/query/hasValue';
 //@ts-ignore
 import {reference} from '/lib/xp/value';
-import {Progress} from '../Progress';
+import {Progress} from '../../init/Progress';
 
 
 type InterfaceNodeWithCollections = /*InterfaceNode &*/ {
@@ -38,7 +38,7 @@ export function model11({
 		count: -1,
 		filters: addQueryFilter({
 			filter: hasValue('_nodeType', [NT_COLLECTION]),
-			filters: {}
+			filters: {} as Parameters<typeof addQueryFilter>[0]['filters']
 		}),
 		query: ''
 	};
@@ -103,7 +103,7 @@ export function model11({
 					}
 				}); // forEach collectionName
 				//log.debug(`(after) interfaceNode.collectionIds:${toStr(interfaceNode.collectionIds)}`); // Should be strings
-				interfaceNode.collectionIds = interfaceNode.collectionIds.map((collectionId) => reference(collectionId));
+				interfaceNode.collectionIds = interfaceNode.collectionIds.map((collectionId) => reference(collectionId)) as unknown as string[];
 				//log.debug(`(out) collectionIdReferences:${toStr(interfaceNode.collectionIds)}`); // This should report nulls again
 				delete interfaceNode.collections;
 				return interfaceNode;

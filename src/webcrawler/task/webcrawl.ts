@@ -4,7 +4,7 @@ import type {
 	Cheerio,
 	SelectorType
 } from 'cheerio';
-import type { Response } from '@enonic-types/lib-explorer';
+import type { HttpClient } from '@enonic-types/lib-explorer';
 import type {
 	WebCrawlConfig,
 	WebCrawlDocument,
@@ -365,7 +365,7 @@ export function run({
 				};
 				log.debug('requestParams:%s', toStr(requestParams));
 
-				const res: Response = httpClientRequest(requestParams);
+				const res: HttpClient.Response = httpClientRequest(requestParams);
 				TRACE && log.debug('res:%s', toStr(res));
 
 				if (res.status === 404) {
@@ -385,7 +385,7 @@ export function run({
 				let boolFollow = true;
 				let boolIndex = true;
 				if (res.headers['X-Robots-Tag']) {
-					const xRobotsTag = res.headers['X-Robots-Tag'].toUpperCase();
+					const xRobotsTag = String(res.headers['X-Robots-Tag']).toUpperCase();
 					if (xRobotsTag.includes('NOFOLLOW')) {
 						boolFollow = false;
 					}

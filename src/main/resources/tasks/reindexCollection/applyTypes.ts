@@ -227,7 +227,7 @@ export function applyTypes({
 						// TODO Handle arrays of geopoint array
 						try {
 							const typedValue = Array.isArray(value)
-								? geoPoint(...value) // Doesn't take array, must spread
+								? geoPoint(...(value as [number, number])) // Doesn't take array, must spread
 								: geoPointString(value);
 							setIn(dereffedDocumentNode, propertyPath, typedValue);
 						} catch (e) {

@@ -1,5 +1,5 @@
 import type {JSONResponse}  from './index.d';
-import type {QueriedStopword} from '@enonic-types/lib-explorer/Stopword.d';
+import type {QueriedStopword} from '@enonic-types/lib-explorer/StopWord.d';
 
 
 import {GQL_QUERY_STOP_WORDS} from '../queries/queryStopWords';

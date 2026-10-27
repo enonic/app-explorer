@@ -16,7 +16,7 @@ import { GQL_UNIQ_TYPE } from '../constants';
 
 const TRACE = false;
 
-type SchemaType = 'CONTENT_TYPE' | 'MIXIN' | 'XDATA';
+type SchemaType = Parameters<typeof listSchemas>[0]['type'];
 
 export interface ListSchemasArgs {
 	application: string;

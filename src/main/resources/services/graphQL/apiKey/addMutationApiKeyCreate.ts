@@ -85,7 +85,7 @@ export function addMutationApiKeyCreate({glue}) {
 				principals: [Principal.EXPLORER_WRITE]
 			});
 
-			const createdApiKeyNode :ApiKeyNode = writeConnection.create(apiKeyNodeToCreate);
+			const createdApiKeyNode = writeConnection.create(apiKeyNodeToCreate) as unknown as ApiKeyNode;
 			//log.debug('createdApiKeyNode:%s', toStr(createdApiKeyNode));
 
 			if (createdApiKeyNode) {

@@ -343,7 +343,7 @@ export function ImportThesaurusModal({
 					</Grid.Column>
 					<Grid.Column textAlign='right'>
 						<Button
-							disabled={!fromLanguage || !toLanguage || loading}
+							disabled={!fromLanguage || !toLanguage || loading}
 							content='Import'
 							icon={{
 								color: 'green',

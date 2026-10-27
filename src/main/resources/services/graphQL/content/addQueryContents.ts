@@ -109,7 +109,7 @@ export function queryContentsResolver<
 	let filtersArray: Filter[];
 	if (filtersArg) {
 		// This works magically because fieldType is an Enum?
-		filtersArray = createFilters(filtersArg);
+		filtersArray = createFilters(filtersArg as unknown as Parameters<typeof createFilters>[0]);
 		//log.debug('filtersArray:%s', toStr(filtersArray));
 	}
 
@@ -143,7 +143,7 @@ export function queryContentsResolver<
 	});
 
 	return {
-		aggregations: list,
+		aggregations: list as unknown as QueryContentsObjectType['aggregations'],
 		count: contentQueryResult.count,
 		hits: contentQueryResult.hits.map(({
 			_id,
@@ -165,7 +165,7 @@ export function queryContentsResolver<
 			workflowAsJson: workflow,
 			xAsJson: x,
 			...rest
-		})),
+		})) as unknown as QueryContentsObjectType['hits'],
 		total: contentQueryResult.total
 	};
 }
@@ -176,13 +176,13 @@ export function getQueryContentsArgs({
 	glue: Glue
 }): GraphQLArgs<QueryContentsArgs> {
 	return {
-		aggregations: list(addAggregationInput({ glue })),
+		aggregations: list(addAggregationInput({ glue: glue as any })),
 		// @ts-ignore TODO
 		branch: glue.getEnumType(GQL_UNIQ_TYPE.ENUM_PROJECT_BRANCH),
 		contentTypes: list(GraphQLString),
 		count: GraphQLInt,
-		filters: list(addFilterInput({ glue })),
-		highlight: addInputTypeHighlight({ glue }),
+		filters: list(addFilterInput({ glue: glue as any })),
+		highlight: addInputTypeHighlight({ glue: glue as any }),
 		projectId: nonNull(GraphQLString),
 		sitePath: GraphQLString,
 		// @ts-ignore

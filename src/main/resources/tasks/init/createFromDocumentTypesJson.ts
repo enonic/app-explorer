@@ -1,3 +1,4 @@
+import type {ResourceKey} from '@enonic-types/core';
 import type { DocumentTypesJson } from '@enonic-types/lib-explorer';
 
 
@@ -13,7 +14,7 @@ declare const Java: {
 };
 
 
-const RESOURCE_KEY = Java.type<{ from: (resourcePath: string) => unknown}>('com.enonic.xp.resource.ResourceKey');
+const RESOURCE_KEY = Java.type<{ from: (resourcePath: string) => ResourceKey}>('com.enonic.xp.resource.ResourceKey');
 
 
 export function createFromDocumentTypesJson({

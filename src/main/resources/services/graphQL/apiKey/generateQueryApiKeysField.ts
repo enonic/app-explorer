@@ -58,7 +58,7 @@ export function generateQueryApiKeysField({
 				filters: addQueryFilter({
 					clause: 'must',
 					filter: hasValue('_nodeType', [NodeType.API_KEY]),
-					filters: {}
+					filters: {} as Parameters<typeof addQueryFilter>[0]['filters']
 				}),
 				query: '',
 				sort,

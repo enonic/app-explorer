@@ -1,3 +1,4 @@
+import type {CollectionNode} from '@enonic-types/lib-explorer';
 import { Principal } from '@enonic/explorer-utils';
 import {
 	RESPONSE_TYPE_JSON,
@@ -56,7 +57,7 @@ export function post({
 	const collectionNode = getCollection({
 		connection: readConnection,
 		name: collectionName
-	});
+	}) as CollectionNode;
 	DEBUG && log.debug(`collectionNode:${toStr(collectionNode)}`);
 
 	const {

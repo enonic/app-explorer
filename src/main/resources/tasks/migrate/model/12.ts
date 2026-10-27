@@ -16,7 +16,7 @@ import {setModel} from '/lib/explorer/model/setModel';
 import {hasValue} from '/lib/explorer/query/hasValue';
 //@ts-ignore
 import {reference} from '/lib/xp/value';
-import {Progress} from '../Progress';
+import {Progress} from '../../init/Progress';
 
 
 type InterfaceNodeWithSynonyms = /*InterfaceNode &*/ {
@@ -39,7 +39,7 @@ export function model12({
 		count: -1,
 		filters: addQueryFilter({
 			filter: hasValue('_nodeType', [NT_THESAURUS]),
-			filters: {}
+			filters: {} as Parameters<typeof addQueryFilter>[0]['filters']
 		}),
 		query: ''
 	}).hits
@@ -98,7 +98,7 @@ export function model12({
 					}
 				}); // forEach synonymName
 				//log.debug(`(after) interfaceNode.synonymIds:${toStr(interfaceNode.synonymIds)}`); // Should be strings
-				interfaceNode.synonymIds = interfaceNode.synonymIds.map((synonymId) => reference(synonymId));
+				interfaceNode.synonymIds = interfaceNode.synonymIds.map((synonymId) => reference(synonymId)) as unknown as string[];
 				//log.debug(`(out) synonymIdReferences:${toStr(interfaceNode.synonymIds)}`); // This should report nulls again
 				delete interfaceNode.synonyms;
 				return interfaceNode;

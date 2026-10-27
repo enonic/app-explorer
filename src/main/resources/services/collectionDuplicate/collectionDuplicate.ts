@@ -1,4 +1,5 @@
 import type {Request} from '@enonic-types/core';
+import type {CollectionNode} from '@enonic-types/lib-explorer';
 
 
 import { Principal } from '@enonic/explorer-utils';
@@ -27,7 +28,7 @@ export function post({
 	const node = get({
 		connection: writeConnection,
 		name
-	});
+	}) as CollectionNode;
 	if (!node) {
 		return {
 			body: {

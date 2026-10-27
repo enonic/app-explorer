@@ -34,7 +34,7 @@ src/test/                    JUnit + JS test of the deleteCollection mutation on
 test/                        jest setup, XP library mocks (test/mocks/libXp*.ts, libHttpClient, libGalimatias), HTML fixtures
 symlinks/lib-explorer -> ../../lib-explorer   gives tsc and jest access to lib-explorer sources and types
 tsdown.config.mts, tsdown/*.mts, src/explorer/tsdown.config.mts, src/webcrawler/task/tsdown.config.mts, src/webcrawler/form/vite.config.ts
-jest.config.mjs, eslint.config.mjs, tsconfig*.json, build.gradle
+jest.config.mjs, .oxlintrc.json, tsconfig*.json, build.gradle
 ```
 
 ## Build
@@ -73,7 +73,7 @@ The webcrawler form stays on vite 6 deliberately: `.github/dependabot.yml` block
 |---|---|
 | `npm run verify:types` | `tsc --noEmit` for the client (`tsconfig.assets.json`) and server (`tsconfig.xp.nashorn.json`). Clean since October 2026; keep it clean. Not wired into Gradle because the release CI does not check lib-explorer out into `symlinks/`, which the server config needs. |
 | `npm test` | jest with `@swc/jest` (TypeScript 7 has no JS API, so ts-jest is out). 12 suites / 44 tests. |
-| `npm run eslint` | not part of CI or Gradle |
+| `npm run lint` | oxlint (`.oxlintrc.json`: the `correctness` category plus `react-hooks`, `no-unused-vars` as warnings, `ban-ts-comment` allowing `@ts-ignore`/`@ts-expect-error`); clean of errors, warnings remain. Not part of CI or Gradle. ESLint was dropped because typescript-eslint cannot run on TypeScript 7. |
 | `./gradlew clean build` | the bundles, the jar, the Java script-engine test |
 | manual | deploy, open the admin tool, run the web crawler on a collection, open `/api` (GraphiQL) and the documents API docs page |
 
@@ -141,7 +141,7 @@ Client only: `react`, `react-dom` (as page globals), `semantic-ui-react`, `seman
 
 Types: `@enonic-types/core`, `@enonic-types/global`, `@enonic-types/lib-{auth,common,content,context,event,io,mail,node,repo,scheduler,task,value}` (source or `test/mocks`), `@types/{fnv-plus,jsuri,lodash,node,object.getownpropertydescriptors,react,react-html-parser,traverse}` (picked up implicitly or via tsconfig `types`). `@enonic-types/lib-{admin,app,portal,project,schema,static,vhost}` have no direct references; `/lib/xp/*` and `/lib/enonic/static` imports resolve through the `paths` entries of `tsconfig.xp.nashorn.json`, so a missing one only shows up in `verify:types`.
 
-Build and test tooling referenced: `tsdown`, `@swc/core`, `glob`, `sass`, `@jspm/core`, `concurrently`, `del-cli`, `precompress`, `vite`, `rollup-plugin-external-globals`, `jest`, `@swc/jest`, `@jest/globals`, `@enonic/mock-xp`, `fnv-plus` (tests), `typescript`, `eslint`, `typescript-eslint`, `eslint-plugin-react-hooks`, `globals`.
+Build and test tooling referenced: `tsdown`, `@swc/core`, `glob`, `sass`, `@jspm/core`, `concurrently`, `del-cli`, `precompress`, `vite`, `rollup-plugin-external-globals`, `jest`, `@swc/jest`, `@jest/globals`, `@enonic/mock-xp`, `fnv-plus` (tests), `typescript`, `oxlint`.
 
 Every declared package is now referenced. The October 2026 clean-up removed `@swc/cli`, `buffer`, `esbuild`, `esbuild-loader`, `sass-loader`, `graphql-ws`, `q-i`, `vite-plugin-static-copy`, `is-generator-function`, `rollup-plugin-visualizer`, `@vitejs/plugin-react`, `@enonic-types/lib-asset`, `@types/jquery`, `deep-object-diff`, `human-object-diff`, `regenerator-runtime`, `@seamusleahy/values-changes-hooks` (replaced by the local `utils/useUpdateEffect.ts`) and `@seamusleahy/init-hooks` (its `useWhenInit`/`useWhenInitAsync` calls became `useEffect(..., [])`), together with the dead `src/explorer/index.tsx` and `assets/js/tablesort.ts`. `tsconfig.esbuild.json` and `.sass-lint.yml` are still orphaned files.
 

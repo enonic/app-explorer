@@ -94,7 +94,7 @@ export function NewOrEditInterface({
 					multiple={true}
 					options={collectionOptions}
 					onChange={(_e,{value} :{value: Array<string>}) => setCollectionIdsFromStorage(value)}
-					placeholder={isLoading || isLoading ? 'Fetching selected collections...' : 'Please select one or more collections'}
+					placeholder={isLoading ? 'Fetching selected collections...' : 'Please select one or more collections'}
 					search
 					selection
 					value={collectionIdsFromStorage}
@@ -175,7 +175,7 @@ export function NewOrEditInterface({
 		<Modal.Actions>
 			<Button onClick={doClose}>Cancel</Button>
 			<ResetButton
-				disabled={isLoading || isDefaultInterface}
+				disabled={isLoading || isDefaultInterface}
 				isStateChanged={isStateChanged}
 				onClick={() => resetState()}
 				secondary
@@ -187,7 +187,7 @@ export function NewOrEditInterface({
 				negative={anyError}
 				onClick={()=>{
 					const url = `${servicesBaseUrl}/graphQL`;
-					(_id ? fetchInterfaceUpdate : fetchInterfaceCreate)({
+					((_id ? fetchInterfaceUpdate : fetchInterfaceCreate) as typeof fetchInterfaceUpdate)({
 						handleResponse(response) {
 							if (response.status === 200) { doClose(); }
 						},

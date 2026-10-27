@@ -15,6 +15,7 @@
     "./node_modules/@types/node/globals.d.ts",
     "./node_modules/@types/node/**/*.d.ts",
     "./src/main/resources/**/*.test.ts",
+    "./src/webcrawler/task/**/*.test.ts",
     "./src/main/resources/assets/**/*",
     "./src/main/resources/static/**/*",
     // "./**/*.d.ts",
@@ -28,18 +29,17 @@
     "declaration": true,
 
     "declarationMap": false,
-    "downlevelIteration": true,
     "esModuleInterop": true,
     "experimentalDecorators": true,
     "importHelpers": true,
-    "importsNotUsedAsValues": "remove",
 
     // "incremental": false, // Avoid *.tsbuildinfo files // Composite projects may not disable incremental compilation
 
     "inlineSourceMap": false,
     "inlineSources": false,
     "lib": [
-      "ES5"
+      "ES5",
+      "ES2022.Error"
     	//"es6", // alias for es2015
     	//"es7", // alias for es2016
     	//"es2015",
@@ -58,15 +58,15 @@
     "listEmittedFiles": false,
     "listFiles": false,
     "module": "commonjs",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "noEmitOnError": true, // Do not emit compiler output files like JavaScript source code, source-maps or declarations if any errors were reported.
     "noErrorTruncation": true,
     "noImplicitAny": false,
     // "noLib": true, // This causes type errors when decontructing arrays :(
-    "noPropertyAccessFromIndexSignature": true,
+    "noPropertyAccessFromIndexSignature": false,
     "noUncheckedIndexedAccess": true,
     "noUnusedLocals": false,
-    "noUnusedParameters": true,
+    "noUnusedParameters": false,
     "outDir": "build/tsc",
     "paths": {
       // Development (should be commented out when commiting)
@@ -81,8 +81,13 @@
       // Production (should be commented in when commiting)
       // "@enonic/app-explorer/*": ["./src/main/resources/*"],
       "@enonic/app-explorer/*": ["./*"],
+      "@enonic/explorer-utils": ["./node_modules/@enonic/explorer-utils"],
       "@enonic/js-utils": ["./node_modules/@enonic/js-utils"],
+      "@enonic/js-utils/types": ["./node_modules/@enonic/js-utils/types"],
+      "@enonic/js-utils/types/*": ["./node_modules/@enonic/js-utils/types/*"],
       "@enonic/js-utils/*": ["./node_modules/@enonic/js-utils/*"],
+      "@enonic-types/core": ["./node_modules/@enonic-types/core"],
+      "@enonic-types/lib-*": ["./node_modules/@enonic-types/lib-*"],
       "@enonic/nashorn-polyfills": ["./src/main/resources/lib/nashorn/index.ts"],
       "/lib/licensing": ["./src/main/resources/lib/licensing.ts"],
       // "/constants": ["./src/main/resources/constants"], // Doesn't work

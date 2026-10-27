@@ -1,4 +1,4 @@
-import type {Profile} from '../../..';
+import type {Profile} from '..';
 
 
 import * as React from 'react';

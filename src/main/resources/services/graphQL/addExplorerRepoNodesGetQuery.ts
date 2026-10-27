@@ -1,4 +1,4 @@
-import type {BooleanFilter} from '@enonic/js-utils/src/types/index.d';
+import type {BooleanFilter} from '@enonic/js-utils/types';
 
 
 import {
@@ -78,7 +78,7 @@ export const addExplorerRepoNodesGetQuery = ({glue}) => {
 			if (nodeTypes) {
 				queryParams.filters = addQueryFilter({
 					filter: hasValue('_nodeType', nodeTypes)
-				});
+				}) as BooleanFilter;
 			}
 			//log.debug(`queryParams:${toStr(queryParams)}`);
 

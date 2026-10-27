@@ -29,7 +29,7 @@ export function SynonymLanguageOptions({
 		/>
 		<Form.Dropdown
 			clearable
-			disabled={!state.enabled || !state.languages[languageIndex].enabled}
+			disabled={!state.enabled || !state.languages[languageIndex].enabled}
 			fluid
 			label='Disabled in interfaces'
 			multiple
@@ -44,7 +44,7 @@ export function SynonymLanguageOptions({
 			value={state.languages[languageIndex].disabledInInterfaces}
 		/>
 		<Form.Input
-			disabled={!state.enabled || !state.languages[languageIndex].enabled}
+			disabled={!state.enabled || !state.languages[languageIndex].enabled}
 			fluid
 			label='Comment'
 			onChange={(_e, {value}) => setState(prev => {

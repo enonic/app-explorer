@@ -57,7 +57,7 @@ function DocumentsTable({
 	documentsRes,
 	dragAndDropColumnsProp = false,
 	fragmentSize = FRAGMENT_SIZE_DEFAULT,
-	handleDroppedColumn = ({}) => undefined,
+	handleDroppedColumn = () => undefined,
 	handlePaginationChange,
 	jsonModalState,
 	loading,

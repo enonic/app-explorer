@@ -1,8 +1,11 @@
 import type {
 	QueryDSL,
 	SortDSLExpression
-} from '@enonic/js-utils/src/types';
-import type {AggregationsResponseEntry} from '@enonic/js-utils/src/types/node/query/Aggregation.d';
+} from '@enonic/js-utils/types';
+import type {
+	AggregationsResponseBucket,
+	AggregationsResponseEntry
+} from '@enonic/js-utils/types/node/query/Aggregation.d';
 import type {
 	Highlight,
 	QueryFilters,
@@ -18,7 +21,7 @@ import {query as qS} from '/lib/explorer/synonym/query';
 
 export function querySynonyms({
 	count, // NOTE: lib-explorer/synonym/query defaults to -1
-	filters = {},
+	filters = {} as QueryFilters,
 	highlight = {},
 	query = '',
 	sort = '_name ASC',
@@ -69,7 +72,7 @@ export function querySynonyms({
 			}
 		},
 		count: 0,
-		filters: {},
+		filters: {} as QueryFilters,
 		query
 	};
 	//log.debug('aggQueryParams:%s', toStr(aggQueryParams));
@@ -82,12 +85,10 @@ export function querySynonyms({
 			buckets: []
 		}
 	};
-	if (
-		thesauriAggRes.aggregations // {} is Truthy
-		&& thesauriAggRes.aggregations.thesaurus // {} is Truthy
-		&& thesauriAggRes.aggregations.thesaurus.buckets // [] is Truthy
-	) {
-		synonymsRes.aggregations.thesaurus.buckets = thesauriAggRes.aggregations.thesaurus.buckets;
+	const thesaurusAggRes = thesauriAggRes.aggregations // {} is Truthy
+		&& thesauriAggRes.aggregations.thesaurus as unknown as {buckets?: AggregationsResponseBucket[]}; // {} is Truthy
+	if (thesaurusAggRes && thesaurusAggRes.buckets) { // [] is Truthy
+		(synonymsRes.aggregations.thesaurus as unknown as {buckets: AggregationsResponseBucket[]}).buckets = thesaurusAggRes.buckets;
 	}
 
 	//log.debug('synonymsRes3:%s', toStr(synonymsRes));

@@ -45,7 +45,7 @@ export default function authorize(request: Request, collectionName: string): {
 	}
 
 	const { // HTTP/2 uses lowercase header keys
-		'authorization': authorization // 'Explorer-Api-Key XXXX'
+		authorization // 'Explorer-Api-Key XXXX'
 	} = lcKeys(request.headers || {}) as Headers;
 
 

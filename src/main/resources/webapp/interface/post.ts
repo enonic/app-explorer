@@ -55,7 +55,7 @@ function authorize({
 	// log[LOG_LEVEL]('isUnauthorized request:%s', toStr(request));
 	const {
 		 // HTTP/2 uses lowercase header keys
-		'authorization': authorization//, // 'Explorer-Api-Key XXXX
+		authorization//, // 'Explorer-Api-Key XXXX
 	} = lcKeys(request.headers) as Headers;
 	// log[LOG_LEVEL](`authorization:${toStr(authorization)}`);
 	if(!authorization) {

@@ -340,6 +340,7 @@ function addGetMemberships<Context extends object = EmptyObject>({
 	});
 	return query as QueriesItem<{
 			principalKey?: GroupKey|UserKey
+			transitive?: boolean
 	}, Context, undefined, ExtendedPrincipal>;
 }
 

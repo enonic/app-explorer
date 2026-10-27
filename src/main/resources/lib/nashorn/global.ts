@@ -2,6 +2,7 @@
 //type AnyObject = Record<PropertyKey,unknown>
 type MyGlobal = {
 	frames: typeof globalThis
+	global: typeof globalThis
 	globalThis: typeof globalThis
 	self: typeof globalThis
 	window: typeof globalThis
@@ -16,7 +17,7 @@ type GlobalThis = typeof globalThis & Window & {
 //@ts-ignore TS2451: Cannot redeclare block-scoped variable 'global'.
 const global :typeof globalThis = (1, eval)('this'); // eslint-disable-line no-eval
 
-global.global = global;
+(global as unknown as MyGlobal).global = global;
 (global as unknown as MyGlobal).globalThis = global;
 (global as unknown as MyGlobal).frames = global;
 (global as unknown as MyGlobal).self = global;

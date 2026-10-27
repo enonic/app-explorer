@@ -8,13 +8,18 @@ import {
 	nonNull
 	//@ts-ignore
 } from '/lib/graphql';
+import type {ResourceKey} from '@enonic-types/core';
 import {getResource, readText} from '/lib/xp/io';
 import {
 	GQL_QUERY_COLLECTOR_GET_MANAGED_DOCUMENT_TYPES
 } from '../constants';
 
 
-const RESOURCE_KEY = Java.type<{ from :(resourcePath :string) => unknown}>('com.enonic.xp.resource.ResourceKey');
+declare const Java: {
+	type: <T>(s: string) => T
+};
+
+const RESOURCE_KEY = Java.type<{ from :(resourcePath :string) => ResourceKey}>('com.enonic.xp.resource.ResourceKey');
 const FILE_PATH = 'documentTypes.json';
 
 

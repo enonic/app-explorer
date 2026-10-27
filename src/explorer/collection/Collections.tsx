@@ -13,7 +13,7 @@ import {
 	lpad,
 	rpad
 } from '@enonic/js-utils';
-import {parseExpression as parseCronExpression} from 'cron-parser';
+import {CronExpressionParser} from 'cron-parser';
 import {Link} from 'react-router-dom';
 import {
 	Dropdown,
@@ -480,8 +480,8 @@ export function Collections(props: {
 															if (jobsObj[collectionId].length === 1 && !enabled) {
 																return 'Inactive';
 															}
-															const interval = parseCronExpression(value);
-															const fields = JSON.parse(JSON.stringify(interval.fields)); // Fields is immutable
+															const {dayOfMonth, dayOfWeek, hour, minute, month} = CronExpressionParser.parse(value).fields;
+															const fields = {dayOfMonth: dayOfMonth.values, dayOfWeek: dayOfWeek.values, hour: hour.values, minute: minute.values, month: month.values};
 															return <pre key={`${collectionName}.cron.${i}`} style={{color:enabled ? 'auto' : 'gray'}}>
 																{`${Cron.hourToHuman(fields.hour)}:${
 																	Cron.minuteToHuman(fields.minute)} ${

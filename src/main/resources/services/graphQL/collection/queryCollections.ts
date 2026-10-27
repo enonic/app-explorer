@@ -52,7 +52,7 @@ export function queryCollections({
 	let filtersArray: Filter[] = [];
 	if (filtersArg) {
 		// log.info('filtersArg:%s', toStr(filtersArg));
-		filtersArray = createFilters(filtersArg);
+		filtersArray = createFilters(filtersArg as unknown as Parameters<typeof createFilters>[0]);
 		// log.info('filtersArray:%s', toStr(filtersArray));
 	}
 

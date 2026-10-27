@@ -31,7 +31,7 @@ export function addQueryFieldGet({glue}) {
 				connection: connect({principals: [PRINCIPAL_EXPLORER_READ]}),
 				key: _id
 			});
-			const rv = coerceFieldType(fieldNode);
+			const rv = coerceFieldType(fieldNode as Parameters<typeof coerceFieldType>[0]);
 			//log.debug(`rv:${toStr(rv)}`);
 			return rv;
 		},

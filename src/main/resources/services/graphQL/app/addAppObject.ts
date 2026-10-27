@@ -45,7 +45,6 @@ export function addAppObject({
 				args: {
 					type: nonNull(glue.getEnumType(GQL_UNIQ_TYPE.ENUM_SCHEMA_TYPE)),
 				},
-				// @ts-expect-error
 				resolve: (env: {
 					args: ListSchemasArgs;
 					source: Application;

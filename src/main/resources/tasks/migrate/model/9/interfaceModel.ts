@@ -118,5 +118,5 @@ export function interfaceModel({
 		//stopWordIds: forceArray(stopWordIds).map((stopWordId) => reference(stopWordId)), // empty array allowed,
 		stopWords: isNotSet(stopWords) ? [] : forceArray(stopWords),
 		synonymIds: isNotSet(synonymIds) ? [] : forceArray(synonymIds).map((synonymId) => reference(synonymId)) // empty array allowed,
-	});
+	}) as unknown as InterfaceModel;
 } // interfaceModel

@@ -69,14 +69,14 @@ export function Emails({
 						/>
 						<MoveDownButton
 							array={emails}
-							disabled={isLoading || index + 1 >= emails.length}
+							disabled={isLoading || index + 1 >= emails.length}
 							index={index}
 							loading={isLoading}
 							setArrayFunction={setEmails}
 						/>
 						<MoveUpButton
 							array={emails}
-							disabled={isLoading || index === 0}
+							disabled={isLoading || index === 0}
 							index={index}
 							loading={isLoading}
 							setArrayFunction={setEmails}

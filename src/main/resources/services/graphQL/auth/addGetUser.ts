@@ -71,6 +71,9 @@ function addGetUser({
 							key
 						}
 					}: {
+						args: {
+							transitive?: boolean
+						}
 						source: {
 							key: UserKey
 						}

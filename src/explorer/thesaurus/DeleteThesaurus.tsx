@@ -56,7 +56,7 @@ export function DeleteThesaurus({
 		trigger={
 			<Popup
 				content={`Delete thesaurus ${name}`}
-				disabled={loading || disabled}
+				disabled={loading || disabled}
 				loading={loading}
 				inverted
 				trigger={

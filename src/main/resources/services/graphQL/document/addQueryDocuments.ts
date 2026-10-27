@@ -32,7 +32,7 @@ import type {
 	AnyObject
 } from '@enonic-types/lib-explorer';
 import type {
-	Highlight
+	GQL_InputType_Highlight as Highlight
 } from '@enonic-types/lib-explorer/GraphQL.d';
 import type { AggregationArg } from '../types';
 import type { Glue } from '../Glue';
@@ -235,7 +235,7 @@ export function addQueryDocuments({
 }: {
 	glue: Glue;
 }) {
-	const filterInput = addFilterInput({ glue });
+	const filterInput = addFilterInput({ glue: glue as any });
 
 	const existsInputType = glue.addInputType<ExistsDslExpression>({
 		name: GQL_UNIQ_TYPE.INPUT_QUERY_DSL_EXPRESSION_EXISTS,
@@ -391,7 +391,7 @@ export function addQueryDocuments({
 	glue.addQuery({
 		name: GQL_QUERY_DOCUMENTS,
 		args: {
-			aggregations: list(addAggregationInput({glue})),
+			aggregations: list(addAggregationInput({glue: glue as any})),
 			// aggregations: list(glue.addInputType({
 			// 	name: GQL_INPUT_TYPE_AGGREGATION,
 			// 	fields: {
@@ -431,7 +431,7 @@ export function addQueryDocuments({
 			count: GraphQLInt,
 			countFieldValues: GraphQLBoolean,
 			filters: list(filterInput),
-			highlight: addInputTypeHighlight({glue}),
+			highlight: addInputTypeHighlight({glue: glue as any}),
 			query: queryInput,
 			start: GraphQLInt
 		},
@@ -621,7 +621,7 @@ export function addQueryDocuments({
 				let filtersArray: Filter[];
 				if (filtersArg) {
 					// This works magically because fieldType is an Enum?
-					filtersArray = createFilters(filtersArg);
+					filtersArray = createFilters(filtersArg as unknown as Parameters<typeof createFilters>[0]);
 					//log.debug('filtersArray:%s', toStr(filtersArray));
 					filtersArray.push(staticFilters as unknown as Filter);
 					//log.debug('filtersArray:%s', toStr(filtersArray));
@@ -639,7 +639,7 @@ export function addQueryDocuments({
 				};
 				// log.debug('multiRepoQueryParams:%s', toStr(multiRepoQueryParams));
 
-				queryResult = multiRepoReadConnection.query(multiRepoQueryParams);
+				queryResult = multiRepoReadConnection.query(multiRepoQueryParams) as unknown as typeof queryResult;
 				// log.debug('addQueryDocuments queryResult:%s', toStr(queryResult));
 				// log.debug('queryResult.aggregations:%s', toStr(queryResult.aggregations));
 			} catch (e) {

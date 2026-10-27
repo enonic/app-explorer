@@ -72,7 +72,7 @@ export function generateQueryJournalsField({
 			//log.info(`journalsRes:${toStr(qr)}`);
 			const graph = {
 				count: qr.count,
-				hits: qr.hits.map((hit) => coerceJournalType(hit)),
+				hits: qr.hits.map((hit) => coerceJournalType(hit as Parameters<typeof coerceJournalType>[0])),
 				total: qr.total
 			};
 			//log.debug(`journalsRes:${toStr(graph)}`);

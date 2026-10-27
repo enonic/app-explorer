@@ -125,7 +125,7 @@ export function useCollectionState({
 				? `The name "${collectionName}" is already in use, please input another name."`
 				: repoIdValidator(collectionName);
 		setNameError(newNameError);
-		return !(!!newNameError); // negate boolean casted string
+		return !newNameError; // negate boolean casted string
 	}, [
 		collections,
 		initialValues._name
@@ -213,7 +213,7 @@ export function useCollectionState({
 		return name !== initialValues._name
 			|| language !== initialValues.language
 			|| collectorName !== (initialValues.collector ? initialValues.collector.name : undefined)
-			|| documentTypeId !== initialValues.documentTypeId
+			|| documentTypeId !== initialValues.documentTypeId
 			|| !fastDeepEqual(collectorConfig, (initialValues.collector ? initialValues.collector.config : undefined))
 			|| doCollect !== initialValues.doCollect
 			|| !fastDeepEqual(cronArray,initialValues.cron);

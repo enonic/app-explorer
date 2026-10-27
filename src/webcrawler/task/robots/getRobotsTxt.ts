@@ -1,6 +1,7 @@
+import type {ByteSource} from '@enonic-types/core';
 import type {
-	HttpClientRequest,
-	Response
+	HttpClient,
+	HttpClientRequest
 } from '@enonic-types/lib-explorer';
 import type { RobotsTxt } from './RobotsTxt';
 
@@ -37,10 +38,10 @@ export default function getRobotsTxt(
 	};
 	// log.debug('robotsReq:%s', toStr(robotsReq));
 
-	const robotsRes = httpClientRequest(robotsReq) as Response;
+	const robotsRes = httpClientRequest(robotsReq) as HttpClient.Response;
 	// log.debug('robotsRes:%s', toStr(robotsRes));
 
-	const body = robotsRes.body || readText(robotsRes.bodyStream);
+	const body = robotsRes.body || readText(robotsRes.bodyStream as ByteSource);
 	// log.debug('robotsRes.bodyStream:%s', body);
 
 	let robots: RobotsTxt;

@@ -142,7 +142,7 @@ export class Cron {
 	}
 
 	static dayOfWeekToHuman(
-		dayOfWeek :DayOfWeek,
+		dayOfWeek :DayOfWeek|DayOfWeek[],
 		w = WIDEST_DAY_OF_WEEK
 	) {
 		//console.debug('w', w, 'dayOfWeek', dayOfWeek);

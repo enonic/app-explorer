@@ -79,7 +79,7 @@ export function ExportThesaurusModal({
 			<Button onClick={reset} secondary type="reset">Reset</Button>
 			<Button
 				as='a'
-				disabled={!fromLanguage || !toLanguage}
+				disabled={!fromLanguage || !toLanguage}
 				icon
 				href={`${servicesBaseUrl}/thesaurusExport?fromLanguage=${fromLanguage}&name=${thesaurusName}&toLanguage=${toLanguage}`}
 				primary

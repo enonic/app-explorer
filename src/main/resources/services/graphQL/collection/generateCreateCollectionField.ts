@@ -129,8 +129,8 @@ export function generateCreateCollectionField({
 				//log.debug(`createdDocumentTypeNode:${toStr(createdDocumentTypeNode)}`);
 				documentTypeId = createdDocumentTypeNode._id;
 			}
-			if (documentTypeId && !documentTypeId.startsWith('_')) {
-				nodeToBeCreated.documentTypeId = referenceValue(documentTypeId);
+			if (documentTypeId && !(documentTypeId as string).startsWith('_')) {
+				nodeToBeCreated.documentTypeId = referenceValue(documentTypeId as string);
 			}
 			//log.debug(`nodeToBeCreated:${toStr(nodeToBeCreated)}`);
 

@@ -1,0 +1,63 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": [
+    "typescript",
+    "oxc",
+    "react"
+  ],
+  "categories": {
+    "correctness": "error"
+  },
+  "ignorePatterns": [
+    "**/build/**",
+    "**/node_modules/**",
+    "**/symlinks/**"
+  ],
+  "globals": {
+    "__": "readonly",
+    "Java": "readonly",
+    "app": "readonly",
+    "log": "readonly",
+    "resolve": "readonly",
+    "React": "readonly"
+  },
+  "rules": {
+    "no-unused-vars": [
+      "warn",
+      {
+        "argsIgnorePattern": "^_"
+      }
+    ],
+    "typescript/ban-ts-comment": [
+      "error",
+      {
+        "ts-expect-error": false,
+        "ts-ignore": false,
+        "ts-nocheck": true,
+        "ts-check": true
+      }
+    ],
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn",
+    "no-unused-expressions": [
+      "error",
+      {
+        "allowShortCircuit": true,
+        "allowTernary": true
+      }
+    ],
+    "no-irregular-whitespace": [
+      "error",
+      {
+        "skipStrings": true,
+        "skipComments": true,
+        "skipRegExps": true,
+        "skipTemplates": true,
+        "skipJSXText": true
+      }
+    ],
+    "react/set-state-in-effect": "off",
+    "react/purity": "off",
+    "react/immutability": "off"
+  }
+}

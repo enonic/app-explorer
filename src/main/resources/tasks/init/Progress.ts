@@ -41,7 +41,7 @@ export class Progress<Info extends string|AnyObject = string> {
 	}*/
 
 	getInfoString() {
-		return isObject(this.info) ? JSON.stringify(this.info) : this.info;
+		return isObject(this.info) ? JSON.stringify(this.info) : this.info as string;
 	}
 
 	debug() {
@@ -66,7 +66,7 @@ export class Progress<Info extends string|AnyObject = string> {
 	report() {
 		reportProgress({
 			current: this.current,
-			info: this.info,
+			info: this.getInfoString(),
 			total: this.total
 		});
 		return this; // chainable
