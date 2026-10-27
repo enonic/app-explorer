@@ -21,20 +21,20 @@ import fnv = require('fnv-plus');
 import {
 	APP_NAME,
 	EXPLORER_VERSION
-} from '../../../../../jest.config';
-import mockLibGalimatias from '../../../../../test/mocks/libGalimatias';
-import mockLibHttpClient from '../../../../../test/mocks/libHttpClient';
-import mockLibXpAuth from '../../../../../test/mocks/libXpAuth';
-import mockLibXpContext from '../../../../../test/mocks/libXpContext';
-import mockLibXpCommon from '../../../../../test/mocks/libXpCommon';
-import mockLibXpMail from '../../../../../test/mocks/libXpMail';
-import mockLibXpEvent from '../../../../../test/mocks/libXpEvent';
-import mockLibXpIo from '../../../../../test/mocks/libXpIo';
-import mockLibXpNode from '../../../../../test/mocks/libXpNode';
-import mockLibXpRepo from '../../../../../test/mocks/libXpRepo';
-import mockLibXpScheduler from '../../../../../test/mocks/libXpScheduler';
-import mockLibXpTask from '../../../../../test/mocks/libXpTask';
-import mockLibXpValue from '../../../../../test/mocks/libXpValue';
+} from '../../../jest.config.mjs';
+import mockLibGalimatias from '../../../test/mocks/libGalimatias';
+import mockLibHttpClient from '../../../test/mocks/libHttpClient';
+import mockLibXpAuth from '../../../test/mocks/libXpAuth';
+import mockLibXpContext from '../../../test/mocks/libXpContext';
+import mockLibXpCommon from '../../../test/mocks/libXpCommon';
+import mockLibXpMail from '../../../test/mocks/libXpMail';
+import mockLibXpEvent from '../../../test/mocks/libXpEvent';
+import mockLibXpIo from '../../../test/mocks/libXpIo';
+import mockLibXpNode from '../../../test/mocks/libXpNode';
+import mockLibXpRepo from '../../../test/mocks/libXpRepo';
+import mockLibXpScheduler from '../../../test/mocks/libXpScheduler';
+import mockLibXpTask from '../../../test/mocks/libXpTask';
+import mockLibXpValue from '../../../test/mocks/libXpValue';
 
 //──────────────────────────────────────────────────────────────────────────────
 // Constants

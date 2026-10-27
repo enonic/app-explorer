@@ -1,15 +1,16 @@
 import type { Node } from '/lib/xp/node';
+import type { AnyNode } from 'domhandler';
 import type {
-	AnyNode,
 	Cheerio,
 	SelectorType
-} from 'cheerio';
+} from 'cheerio/slim';
 import type { HttpClient } from '@enonic-types/lib-explorer';
 import type {
 	WebCrawlConfig,
 	WebCrawlDocument,
 } from '../types';
 
+import 'core-js/stable/atob';
 import 'core-js/stable/array/from';
 import 'core-js/stable/object/assign';
 import 'core-js/stable/string/includes';
@@ -30,7 +31,7 @@ import {toStr} from '@enonic/js-utils/value/toStr';
 // Cheerio import causes:
 // TypeError: Cannot read property "TYPED_ARRAY_SUPPORT" from undefined
 // And requires global to be provided.
-import cheerio from 'cheerio'; // uses Array.from
+import { load } from 'cheerio/slim'; // uses Array.from
 // cheerio: str.trimEnd is not a function
 // import cheerio from '/lib/cheerio';
 import { ElementType } from "domelementtype";
@@ -69,19 +70,20 @@ import {canonizeNormalizedUriObj} from './uri/canonizeNormalizedUriObj';
 
 
 const TRACE = false;
+const $ = load('');
 
 
 const querySelector = (
 	node: Cheerio<AnyNode>,
 	selector: SelectorType
-) => cheerio(node.find(selector)[0]);
+) => $(node.find(selector)[0]);
 
 
 const querySelectorAll = (
 	node: Cheerio<AnyNode>,
 	selector: SelectorType
 ) => node.find(selector).toArray()
-	.map((element) => cheerio(element));
+	.map((element) => $(element));
 
 
 const getAttributeValue = (
@@ -399,10 +401,9 @@ export function run({
 				// log.debug(toStr({boolFollow, boolIndex}));
 
 				// const dom = parseDOM(res.body, options);
-				const rootNode = cheerio.load(res.body, {
+				const rootNode = load(res.body, {
 					// decodeEntities: true, // If set to true, entities within the document will be decoded. Defaults to true.
 					// lowerCaseAttributeNames: false,// If set to true, all attribute names will be lowercased. This has noticeable impact on speed, so it defaults to false.
-					lowerCaseTags: true, // If set to true, all tags will be lowercased. If xmlMode is disabled, this defaults to true.
 					// normalizeWhitespace: true, // Removes NEWLINES, but there are still multiple spaces
 					// scriptingEnabled: false, // Disable scripting in parse5, so noscript tags would be parsed.
 					xmlMode: false // Tags are lowercased // When xmlMode is false noscript tags are in the dom, but it's content doesn't show up in querySelector!

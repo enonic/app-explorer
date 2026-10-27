@@ -58,11 +58,12 @@ export default {
 
 	testMatch: [
 		`<rootDir>/${DIR_SRC}/${AND_BELOW}/${TEST_FILES}`,
+		`<rootDir>/src/webcrawler/${AND_BELOW}/${TEST_FILES}`,
 		`<rootDir>/test/${AND_BELOW}/${TEST_FILES}`
 	],
 
 	transform: {
-		'^.+\\.(js|jsx|ts|tsx)$': [
+		'^.+\\.(js|jsx|mjs|ts|tsx)$': [
 			'@swc/jest',
 			{
 				jsc: {

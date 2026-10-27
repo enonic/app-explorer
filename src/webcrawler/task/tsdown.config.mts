@@ -6,6 +6,7 @@ const outDir = resolve(import.meta.dirname,'../../../build/resources/main/tasks/
 
 export default defineConfig({
 	alias: {
+		'cheerio/slim': resolve(import.meta.dirname, '../../../node_modules/cheerio/dist/browser/slim.js'),
 		util: resolve(import.meta.dirname, '../../../node_modules/@jspm/core/nodelibs/browser/util.js'),
 	},
 	entry: {
@@ -24,6 +25,8 @@ export default defineConfig({
 			'@enonic/js-utils',
 			'cheerio',
 			'core-js',
+			'domelementtype',
+			'domhandler',
 			'object.getownpropertydescriptors',
 			'robots-txt-guard',
 			'uri-js',

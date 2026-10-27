@@ -39,6 +39,9 @@
     "inlineSources": false,
     "lib": [
       "ES5",
+      "ES2015.Core",
+      "ES2016.Array.Include",
+      "ES2019.Array",
       "ES2022.Error"
     	//"es6", // alias for es2015
     	//"es7", // alias for es2016

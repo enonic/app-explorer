@@ -21,7 +21,7 @@ import {setModel} from '/lib/explorer/model/setModel';
 import {connect} from '/lib/explorer/repo/connect';
 import {multiConnect} from '/lib/explorer/repo/multiConnect';
 import {list} from '/lib/xp/repo';
-import { Node } from 'cheerio';
+import type { AnyNode as Node } from 'domhandler';
 
 
 export function model17({
