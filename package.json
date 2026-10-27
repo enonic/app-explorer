@@ -85,7 +85,7 @@
     "@vitejs/plugin-react": "^4.4.1",
     "buffer": "^6",
     "concurrently": "^10.0.6",
-    "del-cli": "^7.0.0",
+    "del-cli": "^8.0.1",
     "dynamic-importmap": "^0.1.0",
     "esbuild": "^0.28",
     "esbuild-loader": "^4.5",
