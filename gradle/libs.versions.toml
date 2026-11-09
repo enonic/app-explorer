@@ -1,5 +1,5 @@
 [versions]
-lib-cache = "3.0.0"
+lib-cache = "3.0.1"
 lib-graphql = "3.0.0"
 lib-http-client = "4.0.1"
 lib-license = "4.0.0"
