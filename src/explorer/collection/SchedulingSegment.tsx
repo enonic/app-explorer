@@ -1,4 +1,4 @@
-import type {Cron} from './index.d';
+import type {Cron} from '@enonic-types/lib-explorer/Collection.d';
 
 
 import {

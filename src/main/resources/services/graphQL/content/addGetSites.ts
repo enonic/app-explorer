@@ -17,7 +17,6 @@ import {
 } from '/lib/xp/context';
 import { serviceUrl } from '/lib/xp/portal';
 import { list as listProjects } from '/lib/xp/project';
-// @ts-ignore
 import { getSites as gS } from '/lib/explorer/content/getSites';
 
 import type {

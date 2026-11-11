@@ -4,14 +4,6 @@ import type {
 } from 'semantic-ui-react';
 
 
-export type Cron = {
-	minute :string
-	hour :string
-	dayOfMonth :string
-	month :string
-	dayOfWeek :string
-}
-
 export type DropdownItemPropsWithKey<Value extends boolean | number | string> = Omit<StrictDropdownItemProps,'text'|'value'> & {
 	key: Value
 	text: SemanticShorthandContent
