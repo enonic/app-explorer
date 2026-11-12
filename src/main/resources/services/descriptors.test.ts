@@ -10,8 +10,7 @@ import { join } from 'path';
 const SERVICES_DIR = __dirname;
 
 const ADMIN_PRINCIPALS = [
-	'role:com.enonic.app.explorer.admin',
-	'role:system.admin'
+	'role:com.enonic.app.explorer.admin'
 ];
 
 const serviceNames = readdirSync(SERVICES_DIR, { withFileTypes: true })

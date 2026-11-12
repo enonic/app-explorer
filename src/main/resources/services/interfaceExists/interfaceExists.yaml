@@ -2,4 +2,3 @@ kind: "Service"
 title: "interfaceExists"
 allow:
   - "role:com.enonic.app.explorer.admin"
-  - "role:system.admin"
