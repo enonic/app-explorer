@@ -1,5 +1,5 @@
 import type {InterfaceField} from '@enonic-types/lib-explorer';
-import type {TermQuery} from '@enonic-types/lib-explorer/Interface.d';
+import type {TermQuery} from '@enonic-types/lib-explorer';
 
 
 import * as gql from 'gql-query-builder-ts';

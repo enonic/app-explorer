@@ -1,5 +1,5 @@
 // import type { EnonicXpRequest } from '@enonic-types/lib-explorer';
-import type { DocumentNode } from '@enonic-types/lib-explorer/Document';
+import type { DocumentNode } from '@enonic-types/lib-explorer';
 import type { Request } from '@enonic-types/core';
 
 

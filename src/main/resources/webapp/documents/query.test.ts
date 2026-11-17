@@ -19,7 +19,7 @@ import type {
 	Repository,
 	get as getRepo
 } from '@enonic-types/lib-repo';
-import type { DocumentNode } from '@enonic-types/lib-explorer/Document';
+import type { DocumentNode } from '@enonic-types/lib-explorer';
 import type { PostRequest } from './createOrGetOrModifyOrDeleteMany';
 import type { QueryRequest } from './query';
 

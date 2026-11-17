@@ -37,10 +37,6 @@ export default {
 		// '@enonic/mock-xp/(.*)': '<rootDir>/symlinks/enonic-mock-xp/$1',
 		'@enonic/js-utils/(.*)': '<rootDir>/node_modules/@enonic/js-utils/dist/cjs/$1.cjs',
 
-		// There is no @enonic-types/lib-explorer yet, so these are workarounds
-		'@enonic-types/lib-explorer': '<rootDir>/symlinks/lib-explorer/src/main/resources/lib/explorer/types/index.d',
-		'@enonic-types/lib-explorer/(.*)': '<rootDir>/symlinks/lib-explorer/src/main/resources/lib/explorer/types/$1',
-
 		'/lib/explorer/(.*)': '<rootDir>/symlinks/lib-explorer/src/main/resources/lib/explorer/$1',
 	},
 

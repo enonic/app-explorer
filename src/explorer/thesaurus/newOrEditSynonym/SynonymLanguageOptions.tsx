@@ -1,4 +1,4 @@
-import type {SynonymGUI} from '@enonic-types/lib-explorer/Synonym.d';
+import type {SynonymGUI} from '@enonic-types/lib-explorer';
 
 
 import {Form} from 'semantic-ui-react';

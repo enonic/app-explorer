@@ -1,4 +1,4 @@
-import type {Task} from '@enonic-types/lib-explorer/'
+import type {Task} from '@enonic-types/lib-explorer'
 import type {Glue} from '../Glue';
 
 //@ts-ignore

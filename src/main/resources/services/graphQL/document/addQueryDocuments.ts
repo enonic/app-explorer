@@ -33,7 +33,7 @@ import type {
 } from '@enonic-types/lib-explorer';
 import type {
 	GQL_InputType_Highlight as Highlight
-} from '@enonic-types/lib-explorer/GraphQL.d';
+} from '@enonic-types/lib-explorer';
 import type { AggregationArg } from '../types';
 import type { Glue } from '../Glue';
 

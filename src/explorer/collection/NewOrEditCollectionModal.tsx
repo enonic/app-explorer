@@ -1,9 +1,9 @@
-import type {CollectionFormValues} from '@enonic-types/lib-explorer/index.d';
+import type {CollectionFormValues} from '@enonic-types/lib-explorer';
 import type {
 	ContentTypeOptions,
 	Fields,
 	SiteOptions
-} from '@enonic-types/lib-explorer/Collector.d';
+} from '@enonic-types/lib-explorer/types/Collector';
 import type {
 	CollectorComponents,
 	Locales,

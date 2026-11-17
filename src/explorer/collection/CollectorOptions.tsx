@@ -3,7 +3,7 @@ import type {
 	ContentTypeOptions,
 	Fields,
 	SiteOptions
-} from '@enonic-types/lib-explorer/Collector.d';
+} from '@enonic-types/lib-explorer/types/Collector';
 import type {CollectorComponents} from '../index.d';
 
 

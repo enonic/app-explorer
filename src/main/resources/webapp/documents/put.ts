@@ -1,5 +1,5 @@
 import type { Node } from '@enonic-types/lib-node';
-import type { DocumentNode } from '@enonic-types/lib-explorer/Document';
+import type { DocumentNode } from '@enonic-types/lib-explorer';
 import type { Request } from '@enonic-types/core';
 import type { RequestItem } from './documentNodeToBodyItem';
 

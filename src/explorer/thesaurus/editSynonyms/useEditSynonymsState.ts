@@ -3,7 +3,7 @@ import type {
 	// PaginationProps,
 	StrictTableHeaderCellProps
 } from 'semantic-ui-react';
-import type {QueriedSynonym} from '@enonic-types/lib-explorer/index.d';
+import type {QueriedSynonym} from '@enonic-types/lib-explorer';
 
 //import {isSet} from '@enonic/js-utils';
 import * as React from 'react';

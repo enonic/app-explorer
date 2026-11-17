@@ -1,4 +1,4 @@
-import type {DocumentTypeFields} from '@enonic-types/lib-explorer/index.d';
+import type {DocumentTypeFields} from '@enonic-types/lib-explorer';
 import type {
 	AddOrEditLocalFieldModalState,
 	UpdateOrDeletePropertiesFunction

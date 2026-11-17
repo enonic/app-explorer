@@ -1,4 +1,4 @@
-import type {QueriedStopword} from '@enonic-types/lib-explorer/StopWord.d';
+import type {QueriedStopword} from '@enonic-types/lib-explorer';
 
 
 import * as React from 'react';

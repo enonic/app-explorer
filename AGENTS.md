@@ -32,7 +32,7 @@ src/webcrawler/form/         the crawler's collector form (React, built as UMD b
 src/task-test-admin-graphql/ an XP 7 style task that exercises the admin GraphQL schema; not built or run by anything
 src/test/                    JUnit + JS test of the deleteCollection mutation on Nashorn and GraalJS
 test/                        jest setup, XP library mocks (test/mocks/libXp*.ts, libHttpClient, libGalimatias), HTML fixtures
-symlinks/lib-explorer -> ../../lib-explorer   gives tsc and jest access to lib-explorer sources and types
+symlinks/lib-explorer -> ../../lib-explorer   gives jest access to lib-explorer sources (types come from the `@enonic-types/lib-explorer` npm package)
 tsdown.config.mts, tsdown/*.mts, src/explorer/tsdown.config.mts, src/webcrawler/task/tsdown.config.mts, src/webcrawler/form/vite.config.ts
 jest.config.mjs, .oxlintrc.json, tsconfig*.json, build.gradle
 ```
@@ -71,13 +71,13 @@ The webcrawler form stays on vite 6 deliberately: `.github/dependabot.yml` block
 
 | Command | What it proves |
 |---|---|
-| `npm run verify:types` | `tsc --noEmit` for the client (`tsconfig.assets.json`) and server (`tsconfig.xp.nashorn.json`). Clean since October 2026; keep it clean. Not wired into Gradle because the release CI does not check lib-explorer out into `symlinks/`, which the server config needs. |
+| `npm run verify:types` | `tsc --noEmit` for the client (`tsconfig.assets.json`) and server (`tsconfig.xp.nashorn.json`). Clean since October 2026; keep it clean. lib-explorer types resolve from the `@enonic-types/lib-explorer` npm package (`/lib/explorer/*` is a `paths` entry into it), so no lib-explorer checkout is needed. |
 | `npm test` | jest with `@swc/jest` (TypeScript 7 has no JS API, so ts-jest is out). 12 suites / 44 tests. |
 | `npm run lint` | oxlint (`.oxlintrc.json`: the `correctness` category plus `react-hooks`, `no-unused-vars` as warnings, `ban-ts-comment` allowing `@ts-ignore`/`@ts-expect-error`); clean of errors, warnings remain. Not part of CI or Gradle. ESLint was dropped because typescript-eslint cannot run on TypeScript 7. |
 | `./gradlew clean build` | the bundles, the jar, the Java script-engine test |
 | manual | deploy, open the admin tool, run the web crawler on a collection, open `/api` (GraphiQL) and the documents API docs page |
 
-The jest `testMatch` covers `src/main/resources/**`, `src/webcrawler/**` and `test/**`; `src/explorer/document/getHighlightedHtml.test.ts` is still not matched. `jest.config.mjs` maps `/lib/explorer/(.*)` and the `@enonic-types/lib-explorer` alias to `symlinks/lib-explorer`, and `@enonic/js-utils/(.*)` to that package's `dist/cjs` build. `test/setupFile.ts` mocks `Java.type` for `java.util.Locale` and `java.lang.System`. CI (`.github/workflows/coverage.yml`) checks lib-explorer out into `symlinks/lib-explorer` and runs `npm run cov` with `continue-on-error`, so a red test suite does not fail CI. `enonic-gradle.yml` builds and releases via `enonic/release-tools` on pushes to `master` and `4.x`.
+The jest `testMatch` covers `src/main/resources/**`, `src/webcrawler/**` and `test/**`; `src/explorer/document/getHighlightedHtml.test.ts` is still not matched. `jest.config.mjs` maps `/lib/explorer/(.*)` to the lib-explorer sources in `symlinks/lib-explorer` (runtime code, not types), and `@enonic/js-utils/(.*)` to that package's `dist/cjs` build. `test/setupFile.ts` mocks `Java.type` for `java.util.Locale` and `java.lang.System`. CI (`.github/workflows/coverage.yml`) checks lib-explorer out into `symlinks/lib-explorer` and runs `npm run cov` with `continue-on-error`, so a red test suite does not fail CI. `enonic-gradle.yml` builds and releases via `enonic/release-tools` on pushes to `master` and `4.x`.
 
 `src/test/java/.../AddMutationCollectionDeleteTest.java` runs `src/test/resources/graphql/addMutationCollectionDelete.test.js` against the built `services/graphQL` bundle on both engines, with JS mocks under `src/test/resources/lib`. This is the only automated check that exercises the bundled output on Nashorn, so keep it green.
 

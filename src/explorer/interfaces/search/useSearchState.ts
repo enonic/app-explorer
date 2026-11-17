@@ -2,7 +2,7 @@ import type {
 	StrictDropdownItemProps,
 	PaginationProps,
 } from 'semantic-ui-react';
-import type {InterfaceField} from '@enonic-types/lib-explorer/Interface.d';
+import type {InterfaceField} from '@enonic-types/lib-explorer';
 
 
 

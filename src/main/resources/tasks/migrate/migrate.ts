@@ -7,7 +7,7 @@ const startTimeLoadMs = currentTimeMillis();
 
 
 import type {IndexConfigObject} from '@enonic-types/lib-explorer';
-import type {CollectionWithCron} from '@enonic-types/lib-explorer/Collection.d';
+import type {CollectionWithCron} from '@enonic-types/lib-explorer';
 //import type {InterfaceNode} from '/lib/explorer/interface/types.d';
 import type { RepoConnection } from '/lib/xp/node';
 import type {

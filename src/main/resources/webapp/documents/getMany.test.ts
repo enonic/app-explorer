@@ -11,7 +11,7 @@ import type {
 	listener,
 	send
 } from '@enonic-types/lib-event';
-import type { DocumentNode } from '@enonic-types/lib-explorer/Document.d';
+import type { DocumentNode } from '@enonic-types/lib-explorer';
 import type { PostRequest } from './createOrGetOrModifyOrDeleteMany';
 import type { GetManyRequest } from './getMany';
 

@@ -1,5 +1,5 @@
-//import type {Fields} from '@enonic-types/lib-explorer/Field.d';
-import type {InterfaceField} from '@enonic-types/lib-explorer/Interface.d';
+//import type {Fields} from '@enonic-types/lib-explorer';
+import type {InterfaceField} from '@enonic-types/lib-explorer';
 
 
 import * as React from 'react';

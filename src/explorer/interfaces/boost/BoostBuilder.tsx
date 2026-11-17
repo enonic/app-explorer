@@ -5,7 +5,7 @@ import type {
 import type {
 	InterfaceField,
 	TermQuery,
-} from '@enonic-types/lib-explorer/Interface.d';
+} from '@enonic-types/lib-explorer';
 import type {
 	GetFieldValuesParams,
 	FieldNameToValueTypes,

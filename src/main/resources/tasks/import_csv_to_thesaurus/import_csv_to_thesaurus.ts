@@ -1,4 +1,4 @@
-import type {InputTypeSynonymLanguage} from '@enonic-types/lib-explorer/Synonym.d';
+import type {InputTypeSynonymLanguage} from '@enonic-types/lib-explorer/types/Synonym';
 
 
 import {

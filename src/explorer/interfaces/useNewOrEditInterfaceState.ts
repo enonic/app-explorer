@@ -2,7 +2,7 @@ import type {
 	Interface,
 	InterfaceField,
 	TermQuery
-} from '@enonic-types/lib-explorer/Interface.d';
+} from '@enonic-types/lib-explorer';
 import type IQueryBuilderOptions from 'gql-query-builder-ts/build/IQueryBuilderOptions.d';
 import type {DropdownItemProps} from 'semantic-ui-react/index.d';
 import type {

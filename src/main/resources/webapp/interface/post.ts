@@ -1,7 +1,7 @@
 import type { Request } from '@enonic-types/core';
 import type {
 	Headers
-} from '@enonic-types/lib-explorer/Request.d';
+} from '@enonic-types/lib-explorer/types/Request';
 import {GraphQLContext} from '/lib/explorer/interface/graphql/output/index.d';
 import type { ApiKeyNode } from '../../types';
 

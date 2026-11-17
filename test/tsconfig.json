@@ -16,12 +16,8 @@
 		"noUnusedLocals": false, // Annoying while writing tests
 		"noUnusedParameters": false,
 		"paths": {
-			// There is no @enonic-types/lib-explorer yet, so these are workarounds
-			"@enonic-types/lib-explorer": ["../symlinks/lib-explorer/src/main/resources/lib/explorer/types/index.d"],
-			"@enonic-types/lib-explorer/*": ["../symlinks/lib-explorer/src/main/resources/lib/explorer/types/*"],
-
-			// lib-explorer is an external, but we still want the code editor to resolve types
-			"/lib/explorer/*": ["../symlinks/lib-explorer/src/main/resources/lib/explorer/*"],
+			"/lib/explorer": ["../node_modules/@enonic-types/lib-explorer"],
+			"/lib/explorer/*": ["../node_modules/@enonic-types/lib-explorer/*"],
 
 			"/lib/xp/*": ["../node_modules/@enonic-types/lib-*"],
 		},

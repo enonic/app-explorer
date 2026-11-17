@@ -2,7 +2,7 @@ import type {
 	SynonymGUI,
 	SynonymGUI_LanguagesSynonymObject,
 	SynonymUse
-} from '@enonic-types/lib-explorer/Synonym.d';
+} from '@enonic-types/lib-explorer';
 import type {Locales} from '../../index.d';
 
 

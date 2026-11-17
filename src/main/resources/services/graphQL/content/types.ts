@@ -16,7 +16,7 @@ import type {
 	// BooleanFilter,
 	Guillotine
 } from '@enonic/js-utils/types/node/query/Filters.d';
-import type { GQL_InputType_Highlight as Highlight } from '@enonic-types/lib-explorer/GraphQL.d';
+import type { GQL_InputType_Highlight as Highlight } from '@enonic-types/lib-explorer';
 
 import type { AggregationArg } from '../types';
 import type { ObjectType } from '../Glue';

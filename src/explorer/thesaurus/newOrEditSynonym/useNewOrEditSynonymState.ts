@@ -2,14 +2,14 @@ import type IQueryBuilderOptions from 'gql-query-builder-ts/build/IQueryBuilderO
 import type {
 	//Synonym,
 	Thesaurus
-} from '@enonic-types/lib-explorer/index.d';
+} from '@enonic-types/lib-explorer';
 import type {
 	Synonym_Common,
 	Synonym_Language,
 	SynonymGUI,
 	SynonymGUI_Language,
 	SynonymGUI_LanguagesSynonymObject
-} from '@enonic-types/lib-explorer/Synonym.d';
+} from '@enonic-types/lib-explorer';
 import type {JSONResponse}  from '../../fetchers/index.d';
 
 

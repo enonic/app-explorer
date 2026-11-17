@@ -1,4 +1,4 @@
-// import type { Headers } from '@enonic-types/lib-explorer/Request.d';
+// import type { Headers } from '@enonic-types/lib-explorer';
 
 /*
 mapping.api.host = localhost

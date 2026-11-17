@@ -1,5 +1,5 @@
 import type {HighlightResult} from '@enonic/js-utils/types/node/query/Highlight';
-import type {Synonym_Language} from '@enonic-types/lib-explorer/Synonym';
+import type {Synonym_Language} from '@enonic-types/lib-explorer';
 
 
 export function processLanguages({

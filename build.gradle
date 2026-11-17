@@ -106,7 +106,6 @@ tasks.register('npmTest', NpmTask) {
 	outputs.dir 'coverage'
 }
 // The lib-explorer files are not available on github, so tests can't run there yet.
-// Also @enonic-types/lib-explorer is not available on npm yet, which also prevents tests from running on github.
 // test.dependsOn npmTest
 
 tasks.register('cleanCoverage', Delete) {

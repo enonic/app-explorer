@@ -1,4 +1,4 @@
-import type {DocumentType} from '@enonic-types/lib-explorer/index.d';
+import type {DocumentType} from '@enonic-types/lib-explorer';
 import type {JSONResponse} from '../fetchers/index.d';
 import type {FetchDocumentTypeCreateData} from '../fetchers/fetchDocumentTypeCreate';
 import type {FetchDocumentTypeUpdateData} from '../fetchers/fetchDocumentTypeUpdate';

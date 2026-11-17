@@ -1,7 +1,7 @@
 import type {
 	DocumentNode,
 	MetaData
-} from '@enonic-types/lib-explorer/Document.d';
+} from '@enonic-types/lib-explorer/types/Document';
 
 
 import {

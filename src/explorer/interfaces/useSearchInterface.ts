@@ -1,4 +1,4 @@
-import type {InterfaceField} from '@enonic-types/lib-explorer/Interface.d';
+import type {InterfaceField} from '@enonic-types/lib-explorer';
 // import type {Hit} from './search/Hits';
 import type {QueryDocumentsHit} from '../document'
 import type {

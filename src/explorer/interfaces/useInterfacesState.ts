@@ -1,4 +1,4 @@
-import type {InterfaceField} from '@enonic-types/lib-explorer/Interface';
+import type {InterfaceField} from '@enonic-types/lib-explorer';
 import type {FetchData} from 'graphql-hooks';
 import type {DropdownItemProps} from 'semantic-ui-react/index.d';
 import type {QueryInterfacesResponseData} from '../components/useExplorerState';
