@@ -98,6 +98,11 @@
   "optionalDependencies": {
     "@rollup/rollup-linux-x64-gnu": "*"
   },
+  "overrides": {
+    "glob": "$glob",
+    "markdown-it": "^14.3.3",
+    "minimatch": "^11.0.9"
+  },
   "private": true,
   "repository": {
     "type": "git",
