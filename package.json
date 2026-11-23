@@ -86,7 +86,7 @@
     "graphiql": "^2",
     "graphql": "^17.0",
     "jest": "^30.5.2",
-    "oxlint": "^1.90.0",
+    "oxlint": "^1.94.0",
     "precompress": "^13.1.1",
     "rollup-plugin-external-globals": "^0.13.0",
     "sass": "^1",
