@@ -5,7 +5,7 @@ lib-http-client = "4.0.1"
 lib-license = "4.0.1"
 lib-router = "4.0.1"
 lib-static = "3.0.0"
-lib-explorer = "5.0.0-B2"
+lib-explorer = "5.0.0"
 
 [libraries]
 lib-cache = { module = "com.enonic.lib:lib-cache", version.ref = "lib-cache" }
