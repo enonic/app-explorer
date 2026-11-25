@@ -28,6 +28,7 @@ updates:
         update-types: ["version-update:semver-major"]
       - dependency-name: "vite-plugin-static-copy"
         update-types: ["version-update:semver-major"]
+      - dependency-name: "@jspm/core"
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
