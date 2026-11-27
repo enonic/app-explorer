@@ -2,7 +2,7 @@
 
 Enonic Explorer, the admin application: an XP admin tool with a React UI, an admin GraphQL service, the public search (GraphQL) and ingest (REST) APIs, the built-in web crawler collector, and the data migrations. All domain logic lives in the sibling library `../lib-explorer` (read its `AGENTS.md` first); this repo imports it at runtime as `/lib/explorer/*` from the jar that Gradle `include`s.
 
-`gradle.properties`: `appName=com.enonic.app.explorer`, `version=5.0.0-SNAPSHOT`, `xpVersion=8.1.1`, `nodeVersion=24.18.0`. `gradle/libs.versions.toml` pins `lib-explorer = "5.0.0-SNAPSHOT"` (resolved from `mavenLocal()` during development; publish lib-explorer with `./gradlew clean build pTML` there first) plus lib-cache 3.0.0, lib-graphql 3.0.0, lib-http-client 4.0.1, lib-license 4.0.0, lib-router 4.0.0, lib-static 3.0.0. The 5.x line targets XP 8; `4.x` is the XP 7 release branch.
+`gradle.properties`: `appName=com.enonic.app.explorer`, `version=5.0.1-SNAPSHOT`, `xpVersion=8.1.1`, `nodeVersion=24.18.0`. `gradle/libs.versions.toml` pins `lib-explorer = "5.0.0"` (to develop against local library changes, pin its snapshot version instead; it resolves from `mavenLocal()` after `./gradlew clean build pTML` in lib-explorer) plus lib-cache 3.0.0, lib-graphql 3.0.0, lib-http-client 4.0.1, lib-license 4.0.0, lib-router 4.0.0, lib-static 3.0.0. The 5.x line targets XP 8; `4.x` is the XP 7 release branch.
 
 User documentation is `../doc-explorer/docs` (AsciiDoc, published by `enonic/release-tools/generate-docs`): admin UI, collections, collectors, document types, documents, interfaces, API keys, GraphQL API, Ingest API, Collector API, upgrading.
 
